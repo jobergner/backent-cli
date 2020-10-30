@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type stateMachine ast.File
+
 // "ab c  de\nf" => "ab c de f"
 func normalizeWhitespace(str string) string {
 	var b strings.Builder
@@ -43,7 +45,7 @@ func normalizeWhitespace(str string) string {
 	return b.String()
 }
 
-func unsafePrintFile(file *ast.File) string {
+func unsafePrintFile(file *stateMachine) string {
 	var buf bytes.Buffer
 	err := printer.Fprint(&buf, token.NewFileSet(), file)
 	if err != nil {
@@ -52,143 +54,159 @@ func unsafePrintFile(file *ast.File) string {
 	return buf.String()
 }
 
-func compareFile(file *ast.File) string {
-	return normalizeWhitespace(unsafePrintFile(file))
+func stringifyFile(sm *stateMachine) string {
+	return normalizeWhitespace(unsafePrintFile(sm))
 }
 
-func unsafeParseDecls(decls string) *ast.File {
+func unsafeParseDecls(decls string) *stateMachine {
 	file, err := parser.ParseFile(token.NewFileSet(), "", "package foo\n"+decls, 0)
 	if err != nil {
 		panic(err)
 	}
-	return file
+	x := stateMachine(*file)
+	return &x
 }
 
 func TestFlattenStructTree(t *testing.T) {
 	t.Run("should replace object references with ids", func(t *testing.T) {
 		input := unsafeParseDecls(`
 type person struct {
-	name residency
+	name name
 }
-type residency struct {
-	location location
-}
-type location struct {
-	x float
-	y float
+type name struct {
+	first string
+	last string
 }`)
 
-		actual := flattenStructTree(input)
+		inputStateMachine := stateMachine(*input)
+		actual := inputStateMachine.flattenStructTree()
 		expected := unsafeParseDecls(`
 type person struct {
-	residency residencyID
+	name nameID
 }
-type residency struct {
-	location locationID
-}
-type location struct {
-	x float
-	y float
-}`)
+type name struct {
+	first string
+	last string
+} `)
 
-		assert.Equal(t, compareFile(expected), compareFile(actual))
+		assert.Equal(t, stringifyFile(expected), stringifyFile(actual))
 	})
 }
 
-func flattenStructTree(file *ast.File) *ast.File {
-	return file
+func (sm *stateMachine) flattenStructTree() *stateMachine {
+	return sm
+}
+
+func TestAddIDTypes(t *testing.T) {
+	t.Run("should replace object references with ids", func(t *testing.T) {
+		input := unsafeParseDecls(`
+type person struct {
+	name name
+}
+type name struct {
+	first string
+	last string
+}`)
+
+		inputStateMachine := stateMachine(*input)
+		actual := inputStateMachine.addIdTypes()
+		expected := unsafeParseDecls(`
+type personID string
+type nameID string
+type person struct {
+	name nameID
+}
+type name struct {
+	first string
+	last string
+} `)
+
+		assert.Equal(t, stringifyFile(expected), stringifyFile(actual))
+	})
+}
+
+func (sm *stateMachine) addIdTypes() *stateMachine {
+	return sm
 }
 
 func TestExtractDeclaredStructNames(t *testing.T) {
 	t.Run("should find all struct names in file", func(t *testing.T) {
 		input := unsafeParseDecls(`
 type person struct {
-	name residency
+	name name
 }
-type residency struct {
-	location location
-}
-type location struct {
-	x float
-	y float
+type name struct {
+	first string
+	last string
 }`)
 
-		actual := extractDeclaredStructNames(input)
-		expected := []string{"person", "residency", "location"}
+		actual := input.extractDeclaredStructNames()
+		expected := []string{"person", "name"}
 
 		assert.Equal(t, expected, actual)
 	})
 }
 
-func extractDeclaredStructNames(file *ast.File) []string {
-	return []string{}
+func (sm *stateMachine) extractDeclaredStructNames() *stateMachine {
+	return sm
+}
+
+type metaField struct {
+	name        string
+	typeLiteral string
 }
 
 func TestEmbedStructMetaFields(t *testing.T) {
 	t.Run("should embed meta fields in all structs", func(t *testing.T) {
 		input := unsafeParseDecls(`
 type person struct {
-	residency residencyID
+	name name
 }
-type residency struct {
-	location locationID
-}
-type location struct {
-	x float
-	y float
+type name struct {
+	first string
+	last string
 }`)
 
-		actual := embedStructMetaFields(input)
+		actual := input.embedStructMetaFields([]metaField{{"lastModified", "int"}})
 		expected := unsafeParseDecls(`
 type person struct {
-	residency residencyID
-	lastUpdated int
+	name name
+	lastModified int
 }
-type residency struct {
-	location locationID
-	lastUpdated int
-}
-type location struct {
-	x float
-	y float
-	lastUpdated int
+type name struct {
+	first string
+	last string
+	lastModified int
 }`)
 
-		assert.Equal(t, compareFile(expected), compareFile(actual))
+		assert.Equal(t, stringifyFile(expected), stringifyFile(actual))
 	})
 }
 
-func embedStructMetaFields(file *ast.File) *ast.File {
-	return file
+func (sm *stateMachine) embedStructMetaFields(metaFields []metaField) *stateMachine {
+	return sm
 }
 
 func TestEmbedParentageDeclaration(t *testing.T) {
 	t.Run("should add parentage declaration", func(t *testing.T) {
 		input := unsafeParseDecls(`
 type person struct {
-	residency residencyID
+	name name
 }
-type residency struct {
-	location locationID
-}
-type location struct {
-	x float
-	y float
+type name struct {
+	first string
+	last string
 }`)
 
-		actual := embedParentageDeclaration(input)
+		actual := input.embedParentageDeclaration()
 		expected := unsafeParseDecls(`
 type person struct {
-	residency residencyID
+	name name
 	parentage Parentage
 }
-type residency struct {
-	location locationID
-	parentage Parentage
-}
-type location struct {
-	x float
-	y float
+type name struct {
+	first string
+	last string
 	parentage Parentage
 }
 type parentage []parentInfo
@@ -197,50 +215,37 @@ type parentInfo struct {
 	id string
 }`)
 
-		assert.Equal(t, compareFile(expected), compareFile(actual))
+		assert.Equal(t, stringifyFile(expected), stringifyFile(actual))
 	})
 }
 
-func embedParentageDeclaration(file *ast.File) *ast.File {
-	return file
+func (sm *stateMachine) embedParentageDeclaration() *stateMachine {
+	return sm
 }
 
 func TestAddStateMachine(t *testing.T) {
 	t.Run("should add state machine declaration", func(t *testing.T) {
 		input := unsafeParseDecls(`
 type person struct {
-	residency residencyID
-	lastUpdated int
+	name name
 }
-type residency struct {
-	location locationID
-	lastUpdated int
-}
-type location struct {
-	x float
-	y float
-	lastUpdated int
+type name struct {
+	first string
+	last string
 }`)
 
-		actual := addStateMachineDeclaration(input)
+		actual := input.addStateMachineDeclaration()
 		expected := unsafeParseDecls(`
 type person struct {
-	residency residencyID
-	lastUpdated int
+	name name
 }
-type residency struct {
-	location locationID
-	lastUpdated int
-}
-type location struct {
-	x float
-	y float
-	lastUpdated int
+type name struct {
+	first string
+	last string
 }
 type state struct {
-	residency map[residencyID]residency
-	location map[locationID]location
 	person map[personID]person
+	name map[nameID]name
 }
 type stateMachine struct {
 	state state
@@ -249,10 +254,83 @@ type stateMachine struct {
 }
 `)
 
-		assert.Equal(t, compareFile(expected), compareFile(actual))
+		assert.Equal(t, stringifyFile(expected), stringifyFile(actual))
 	})
 }
 
-func addStateMachineDeclaration(file *ast.File) *ast.File {
-	return file
+func (sm *stateMachine) addStateMachineDeclaration() *stateMachine {
+	return sm
+}
+
+func TestAddGetters(t *testing.T) {
+	t.Run("adds getters", func(t *testing.T) {
+		input := unsafeParseDecls(`
+type person struct {
+	name nameID
+	age int
+}
+type name struct {
+	first string
+	last string
+}`)
+
+		actual := input.addGetters([]metaField{{"lastModified", "int"}})
+		expected := unsafeParseDecls(`
+type person struct {
+	name nameID
+	age int
+	lastModified int
+}
+type name struct {
+	first string
+	last string
+	lastModified int
+}
+func (sm *stateMachine) GetPerson(personID personID) person {
+	person, ok := sm.patch.person[personID]
+	if ok {
+		return person
+	}
+	currentPerson := sm.state.person[personID]
+	personCopy := person{}
+	copier.Copy(&personCopy, &currentPerson)
+	return personCopy
+}
+func (sm *stateMachine) GetName(nameID nameID) name {
+	name, ok := sm.patch.name[nameID]
+	if ok {
+		return name
+	}
+	currentName := sm.state.name[nameID]
+	nameCopy := name{}
+	copier.Copy(&nameCopy, &currentName)
+	return nameCopy
+}
+func (p person) GetName(sm *stateMachine) name {
+	name, ok := sm.patch.name[p.name]
+	if ok {
+		return name
+	}
+	currentName := sm.state.name[p.name]
+	nameCopy := name{}
+	copier.Copy(&nameCopy, &currentName)
+	return nameCopy
+}
+func (p person) GetAge() int {
+	return p.age
+}
+func (n name) GetFirst() string {
+	return n.first
+}
+func (n name) GetLast() string {
+	return n.last
+}
+`)
+
+		assert.Equal(t, stringifyFile(expected), stringifyFile(actual))
+	})
+}
+
+func (sm *stateMachine) addGetters(metaFields []metaField) *stateMachine {
+	return sm
 }
