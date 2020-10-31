@@ -15,6 +15,20 @@ import (
 
 type stateMachine ast.File
 
+const (
+	_personDeclaration string = `
+type person struct {
+	name name
+}
+	`
+	_nameDeclaration = `
+type name struct {
+	first string
+	last string
+}
+	`
+)
+
 // "ab c  de\nf" => "ab c de f"
 func normalizeWhitespace(_str string) string {
 	str := strings.TrimSpace(_str)
@@ -200,14 +214,9 @@ func unsafeParseDecls(decls []string) *stateMachine {
 
 func TestFlattenStructTree(t *testing.T) {
 	t.Run("should replace object references with ids", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+		input := unsafeParseDecls([]string{
+			_personDeclaration,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.flattenStructTree())
@@ -234,28 +243,17 @@ func (sm *stateMachine) flattenStructTree() *stateMachine {
 
 func TestAddIDTypes(t *testing.T) {
 	t.Run("should replace object references with ids", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+		input := unsafeParseDecls([]string{
+			_personDeclaration,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.addIdTypes())
 		expected := []string{
 			`type personID string`,
 			`type nameID string`,
-			`
-type person struct{
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+			_personDeclaration,
+			_nameDeclaration,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
@@ -271,14 +269,9 @@ func (sm *stateMachine) addIdTypes() *stateMachine {
 
 func TestExtractDeclaredStructNames(t *testing.T) {
 	t.Run("should find all struct names in file", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+		input := unsafeParseDecls([]string{
+			_personDeclaration,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.extractDeclaredStructNames())
@@ -300,14 +293,9 @@ type metaField struct {
 
 func TestEmbedStructMetaFields(t *testing.T) {
 	t.Run("should embed meta fields in all structs", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+		input := unsafeParseDecls([]string{
+			_personDeclaration,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.embedStructMetaFields([]metaField{{"lastModified", "int"}}))
@@ -336,14 +324,9 @@ func (sm *stateMachine) embedStructMetaFields(metaFields []metaField) *stateMach
 
 func TestEmbedParentageDeclaration(t *testing.T) {
 	t.Run("should add parentage declaration", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+		input := unsafeParseDecls([]string{
+			_personDeclaration,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.embedParentageDeclaration())
@@ -377,25 +360,15 @@ func (sm *stateMachine) embedParentageDeclaration() *stateMachine {
 
 func TestAddStateMachine(t *testing.T) {
 	t.Run("should add state machine declaration", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`,
+		input := unsafeParseDecls([]string{
+			_personDeclaration,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.addStateMachineDeclaration())
-		expected := []string{`
-type person struct {
-	name name
-}`, `
-type name struct {
-	first string
-	last string
-}`, `
+		expected := []string{
+			_personDeclaration,
+			_nameDeclaration, `
 type state struct {
 	person map[personID]person
 	name map[nameID]name
@@ -424,11 +397,8 @@ func TestAddGetters(t *testing.T) {
 type person struct {
 	name nameID
 	age int
-}`, `
-type name struct {
-	first string
-	last string
 }`,
+			_nameDeclaration,
 		})
 
 		actual := splitPrintedDeclarations(input.addGetters([]metaField{{"lastModified", "int"}}))
