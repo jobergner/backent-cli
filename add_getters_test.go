@@ -13,59 +13,68 @@ type person struct {
 	id string
 	name nameID
 	age int
-	lastModified int
+	lastModified int64
 }`, `
 type name struct {
 	id string
 	first string
 	last string
-	lastModified int
+	lastModified int64
 }`,
 		})
 
-		metaFields := []metaField{{"lastModified", "int"}, {"id", "string"}}
+		metaFields := []metaField{{"lastModified", "int64"}, {"id", "string"}}
 		actual := splitPrintedDeclarations(input.addGetters(metaFields))
 		expected := []string{`
 type person struct {
 	id string
 	name nameID
 	age int
-	lastModified int
+	lastModified int64
 }`, `
 type name struct {
 	id string
 	first string
 	last string
-	lastModified int
+	lastModified int64
 }`, `
 func (sm *stateMachine) GetPerson(personID personID) person {
 	person, ok := sm.patch.person[personID]
 	if ok {
 		return person
 	}
-	return sm.state.person[personID]
+	currentPerson := sm.state.person[personID]
+	personCopy := person{}
+	copier.Copy(&personCopy, &currentPerson)
+	return personCopy
 }`, `
 func (sm *stateMachine) GetName(nameID nameID) name {
 	name, ok := sm.patch.name[nameID]
 	if ok {
 		return name
 	}
-	return sm.state.name[nameID]
+	currentName := sm.state.name[nameID]
+	nameCopy := name{}
+	copier.Copy(&nameCopy, &currentName)
+	return nameCopy
 }`, `
-func (p *person) GetName(sm *stateMachine) name {
+func (p person) GetName(sm *stateMachine) name {
 	name, ok := sm.patch.name[p.name]
 	if ok {
 		return name
 	}
-	return sm.state.name[p.name]
+	currentName := sm.state.name[p.name]
+	nameCopy := name{}
+	copier.Copy(&nameCopy, &currentName)
+	return nameCopy
 }`, `
-func (p *person) GetAge() int {
+func (p person) GetAge() int {
 	return p.age
 }`, `
-func (n *name) GetFirst() string {
+func (n name) GetFirst() string {
 	return n.first
 }`, `
-func (n *name) GetLast() string {
+func (n name) GetLast() string {
 	return n.last
 }`,
 		}

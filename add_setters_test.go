@@ -32,36 +32,35 @@ type person struct {
 	name nameID
 	age int
 	lastModified int64
+	operationKind operationKind
 }`, `
 type name struct {
 	id string
 	first string
 	last string
 	lastModified int64
+	operationKind operationKind
 }`, `
 func (p person) SetAge(val int, sm *stateMachine) person {
-	patchingPerson := sm.patch.person[p.id]
-	patchingPerson.age = val
-	patchingPerson.lastModified = time.Now().UnixNano()
-	patchingPerson.operationKind = operationKindUpdate
-	sm.patch.person[p.id] = patchingPerson
-	return patchingPerson
+	p.age = val
+	p.lastModified = time.Now().UnixNano()
+	p.operationKind = operationKindUpdate
+	sm.patch.person[p.id] = p
+	return p
 }`, `
 func (n name) SetFirst(val string, sm *stateMachine) name {
-	patchingName := sm.patch.name[p.id]
-	patchingName.first = val
-	patchingName.lastModified = time.Now().UnixNano()
-	patchingName.operationKind = operationKindUpdate
-	sm.patch.name[p.id] = patchingName
-	return patchingName
+	n.first = val
+	n.lastModified = time.Now().UnixNano()
+	n.operationKind = operationKindUpdate
+	sm.patch.name[p.id] = n
+	return n
 }`, `
 func (n name) SetLast(val string, sm *stateMachine) name {
-	patchingName := sm.patch.name[p.id]
-	patchingName.last = val
-	patchingName.lastModified = time.Now().UnixNano()
-	patchingName.operationKind = operationKindUpdate
-	sm.patch.name[p.id] = patchingName
-	return patchingName
+	n.last = val
+	n.lastModified = time.Now().UnixNano()
+	n.operationKind = operationKindUpdate
+	sm.patch.name[p.id] = n
+	return n
 }`,
 		}
 
