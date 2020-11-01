@@ -25,7 +25,7 @@ type name struct {
 	`
 )
 
-// "ab c  de\nf" => "ab c de f"
+// " ab c  de\nf" => "ab c de f"
 func normalizeWhitespace(_str string) string {
 	str := strings.TrimSpace(_str)
 	var b strings.Builder
