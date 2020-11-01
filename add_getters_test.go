@@ -10,25 +10,30 @@ func TestAddGetters(t *testing.T) {
 	t.Run("adds getters", func(t *testing.T) {
 		input := unsafeParseDecls([]string{`
 type person struct {
+	id string
 	name nameID
 	age int
 	lastModified int
 }`, `
-type name string {
+type name struct {
+	id string
 	first string
 	last string
 	lastModified int
 }`,
 		})
 
-		actual := splitPrintedDeclarations(input.addGetters([]metaField{{"lastModified", "int"}}))
+		metaFields := []metaField{{"lastModified", "int"}, {"id", "string"}}
+		actual := splitPrintedDeclarations(input.addGetters(metaFields))
 		expected := []string{`
 type person struct {
+	id string
 	name nameID
 	age int
 	lastModified int
 }`, `
 type name struct {
+	id string
 	first string
 	last string
 	lastModified int
@@ -53,7 +58,7 @@ func (sm *stateMachine) GetName(nameID nameID) name {
 	copier.Copy(&nameCopy, &currentName)
 	return nameCopy
 }`, `
-func (p person) GetName(sm *stateMachine) name {
+func (p *person) GetName(sm *stateMachine) name {
 	name, ok := sm.patch.name[p.name]
 	if ok {
 		return name
@@ -63,13 +68,13 @@ func (p person) GetName(sm *stateMachine) name {
 	copier.Copy(&nameCopy, &currentName)
 	return nameCopy
 }`, `
-func (p person) GetAge() int {
+func (p *person) GetAge() int {
 	return p.age
 }`, `
-func (n name) GetFirst() string {
+func (n *name) GetFirst() string {
 	return n.first
 }`, `
-func (n name) GetLast() string {
+func (n *name) GetLast() string {
 	return n.last
 }`,
 		}
