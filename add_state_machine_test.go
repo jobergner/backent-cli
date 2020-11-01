@@ -17,6 +17,12 @@ func TestAddStateMachine(t *testing.T) {
 		expected := []string{
 			_personDeclaration,
 			_nameDeclaration, `
+type operationKind string
+const (
+	operationKindCreate operationKind = "CREATE"
+	operationKindDelete = "DELETE"
+	operationKindUpdate = "UPDATE"
+)
 type state struct {
 	person map[personID]person
 	name map[nameID]name
