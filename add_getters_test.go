@@ -43,30 +43,21 @@ func (sm *stateMachine) GetPerson(personID personID) person {
 	if ok {
 		return person
 	}
-	currentPerson := sm.state.person[personID]
-	personCopy := person{}
-	copier.Copy(&personCopy, &currentPerson)
-	return personCopy
+	return sm.state.person[personID]
 }`, `
 func (sm *stateMachine) GetName(nameID nameID) name {
 	name, ok := sm.patch.name[nameID]
 	if ok {
 		return name
 	}
-	currentName := sm.state.name[nameID]
-	nameCopy := name{}
-	copier.Copy(&nameCopy, &currentName)
-	return nameCopy
+	return sm.state.name[nameID]
 }`, `
 func (p *person) GetName(sm *stateMachine) name {
 	name, ok := sm.patch.name[p.name]
 	if ok {
 		return name
 	}
-	currentName := sm.state.name[p.name]
-	nameCopy := name{}
-	copier.Copy(&nameCopy, &currentName)
-	return nameCopy
+	return sm.state.name[p.name]
 }`, `
 func (p *person) GetAge() int {
 	return p.age
