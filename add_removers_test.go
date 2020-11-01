@@ -1,0 +1,88 @@
+package statefactory
+
+// TODO WIP
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestAddRemovers(t *testing.T) {
+	t.Run("adds removers", func(t *testing.T) {
+		input := unsafeParseDecls([]string{`
+type person struct {
+	id string
+	children []childID
+	lastModified int64
+	operationKind operationKind
+}`, `
+type child struct {
+	id string
+	name string
+	lastModified int64
+	operationKind operationKind
+}`,
+		})
+
+		metaFields := []metaField{{"lastModified", "int64"}, {"id", "string"}, {"operationKind", "operationKind"}}
+		actual := splitPrintedDeclarations(input.addRemovers(metaFields))
+		expected := []string{`
+type person struct {
+	id string
+	children []childID
+	lastModified int64
+	operationKind operationKind
+}`, `
+type child struct {
+	id string
+	name string
+	lastModified int64
+	operationKind operationKind
+}`, `
+func (sm *stateMachine) RemovePerson(personID personID) {
+	person := sm.GetPerson(personID)
+	person.lastModified = time.Now().UnixNano()
+	person.operationKind = operationKindDelete
+	sm.patch.person[p.id] = person
+}`, `
+func (sm *stateMachine) RemoveName(nameID nameID) {
+	name := sm.GetName(nameID)
+	name.lastModified = time.Now().UnixNano()
+	name.operationKind = operationKindDelete
+	sm.patch.name[p.id] = name
+}`, `
+func (p person) RemoveChild(childID childID, sm *stateMachine) name {
+	var indexToRemove int
+	for i, _childID := p.children {
+		if _childID == childID {
+			indexToRemove = i	
+			break
+		}
+	}
+	p.children = append(p.children[:indexToRemove], p.children[indexToRemove+1:]...)
+	p.lastModified = time.Now().UnixNano()
+	p.operationKind = operationKindUpdate
+	sm.patch.person[p.id] = p
+}`, `
+func (p *person) RemoveAge() int {
+	return p.age
+}`, `
+func (n *name) RemoveFirst() string {
+	return n.first
+}`, `
+func (n *name) RemoveLast() string {
+	return n.last
+}`,
+		}
+
+		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
+
+		assert.Equal(t, []string{}, missingDeclarations)
+		assert.Equal(t, []string{}, redundantDeclarations)
+	})
+}
+
+func (sm *stateMachine) addRemovers(metaFields []metaField) *stateMachine {
+	return sm
+}
