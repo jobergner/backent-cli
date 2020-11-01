@@ -44,8 +44,8 @@ func (p *person) prepareModification(sm *stateMachine) *person {
 		return p
 	}
 	sm.patch.person[p.id] = *p
-	patchingPerson := sm.patch.person[p.id] 
-	return &patchingPerson
+	patchingPerson := &sm.patch.person[p.id] 
+	return patchingPerson
 }`, `
 func (n *name) prepareModification(sm *stateMachine) *name {
 	_, ok := sm.patch.name[n.id]
@@ -53,22 +53,25 @@ func (n *name) prepareModification(sm *stateMachine) *name {
 		return n
 	}
 	sm.patch.name[n.id] = *n
-	patchingName := sm.patch.name[n.id] 
-	return &patchingName
-}`, `
-func (p *person) SetAge(val int, sm *stateMachine) *person {
-	patchingPerson := p.prepareModification(sm)
-	patchingPerson.age = val
-	return patchingPerson
-}`, `
-func (n *name) SetFirst(val string, sm *stateMachine) *name {
-	patchingName := n.prepareModification(sm)
-	patchingName.first = val
+	patchingName := &sm.patch.name[n.id] 
 	return patchingName
 }`, `
-func (n *name) SetLast(val string, sm *stateMachine) *name {
-	patchingName := n.prepareModification(sm)
+func (p person) SetAge(val int, sm *stateMachine) person {
+	patchingPerson := sm.patch.person[p.id]
+	patchingPerson.age = val
+	sm.patch.person[p.id] = patchingPerson
+	return patchingPerson
+}`, `
+func (n name) SetFirst(val string, sm *stateMachine) name {
+	patchingName := sm.patch.name[p.id]
+	patchingName.first = val
+	sm.patch.name[p.id] = patchingName
+	return patchingName
+}`, `
+func (n name) SetLast(val string, sm *stateMachine) name {
+	patchingName := sm.patch.name[p.id]
 	patchingName.last = val
+	sm.patch.name[p.id] = patchingName
 	return patchingName
 }`,
 		}
@@ -78,6 +81,15 @@ func (n *name) SetLast(val string, sm *stateMachine) *name {
 		assert.Equal(t, []string{}, missingDeclarations)
 		assert.Equal(t, []string{}, redundantDeclarations)
 	})
+}
+
+type x int
+
+func (x *x) set() *x {
+	return x
+}
+func (x x) get() x {
+	return x
 }
 
 func (sm *stateMachine) addSetters(metaFields []metaField) *stateMachine {
