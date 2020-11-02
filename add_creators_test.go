@@ -25,8 +25,7 @@ type name struct {
 }`,
 		})
 
-		metaFields := []metaField{{"lastModified", "int64"}, {"id", "int"}, {"operationKind", "operationKind"}}
-		actual := splitPrintedDeclarations(input.addCreaters(metaFields))
+		actual := splitPrintedDeclarations(input.addCreaters())
 		expected := []string{`
 type person struct {
 	id personID
@@ -67,6 +66,6 @@ func (sm *stateMachine) CreateName(nameID nameID) name {
 	})
 }
 
-func (sm *stateMachine) addCreaters(metaFields []metaField) *stateMachine {
+func (sm *stateMachine) addCreaters() *stateMachine {
 	return sm
 }

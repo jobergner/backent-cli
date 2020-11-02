@@ -25,8 +25,7 @@ type name struct {
 }`,
 		})
 
-		metaFields := []metaField{{"lastModified", "int64"}, {"id", "int"}, {"operationKind", "operationKind"}}
-		actual := splitPrintedDeclarations(input.addSetters(metaFields))
+		actual := splitPrintedDeclarations(input.addSetters())
 		expected := []string{`
 type person struct {
 	id personID
@@ -72,6 +71,6 @@ func (n name) SetLast(val string, sm *stateMachine) name {
 	})
 }
 
-func (sm *stateMachine) addSetters(metaFields []metaField) *stateMachine {
+func (sm *stateMachine) addSetters() *stateMachine {
 	return sm
 }
