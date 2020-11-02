@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddSetters(t *testing.T) {
-	t.Run("adds setters", func(t *testing.T) {
+func TestAddCreaters(t *testing.T) {
+	t.Run("adds creators", func(t *testing.T) {
 		input := unsafeParseDecls([]string{`
 type person struct {
 	id personID
@@ -26,7 +26,7 @@ type name struct {
 		})
 
 		metaFields := []metaField{{"lastModified", "int64"}, {"id", "int"}, {"operationKind", "operationKind"}}
-		actual := splitPrintedDeclarations(input.addSetters(metaFields))
+		actual := splitPrintedDeclarations(input.addCreaters(metaFields))
 		expected := []string{`
 type person struct {
 	id personID
@@ -42,26 +42,21 @@ type name struct {
 	lastModified int64
 	operationKind operationKind
 }`, `
-func (p person) SetAge(val int, sm *stateMachine) person {
-	p.age = val
-	p.lastModified = time.Now().UnixNano()
-	p.operationKind = operationKindUpdate
-	sm.patch.person[p.id] = p
-	return p
+func (sm *stateMachine) CreatePerson(personID personID) person {
+	var person person
+	person.id = personID(sm.generateID())
+	person.lastModified = time.Now().UnixNano()
+	person.operationKind = operationKindCreate
+	sm.patch.person[person.id] = person
+	return person
 }`, `
-func (n name) SetFirst(val string, sm *stateMachine) name {
-	n.first = val
-	n.lastModified = time.Now().UnixNano()
-	n.operationKind = operationKindUpdate
-	sm.patch.name[n.id] = n
-	return n
-}`, `
-func (n name) SetLast(val string, sm *stateMachine) name {
-	n.last = val
-	n.lastModified = time.Now().UnixNano()
-	n.operationKind = operationKindUpdate
-	sm.patch.name[n.id] = n
-	return n
+func (sm *stateMachine) CreateName(nameID nameID) name {
+	var name name
+	name.id = nameID(sm.generateID())
+	name.lastModified = time.Now().UnixNano()
+	name.operationKind = operationKindCreate
+	sm.patch.name[name.id] = name
+	return name
 }`,
 		}
 
@@ -72,6 +67,6 @@ func (n name) SetLast(val string, sm *stateMachine) name {
 	})
 }
 
-func (sm *stateMachine) addSetters(metaFields []metaField) *stateMachine {
+func (sm *stateMachine) addCreaters(metaFields []metaField) *stateMachine {
 	return sm
 }

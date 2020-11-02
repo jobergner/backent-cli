@@ -10,30 +10,30 @@ func TestAddGetters(t *testing.T) {
 	t.Run("adds getters", func(t *testing.T) {
 		input := unsafeParseDecls([]string{`
 type person struct {
-	id string
+	id personID
 	name nameID
 	age int
 	lastModified int64
 }`, `
 type name struct {
-	id string
+	id nameID
 	first string
 	last string
 	lastModified int64
 }`,
 		})
 
-		metaFields := []metaField{{"lastModified", "int64"}, {"id", "string"}}
+		metaFields := []metaField{{"lastModified", "int64"}, {"id", "int"}}
 		actual := splitPrintedDeclarations(input.addGetters(metaFields))
 		expected := []string{`
 type person struct {
-	id string
+	id personID
 	name nameID
 	age int
 	lastModified int64
 }`, `
 type name struct {
-	id string
+	id nameID
 	first string
 	last string
 	lastModified int64

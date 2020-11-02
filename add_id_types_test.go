@@ -15,8 +15,8 @@ func TestAddIDTypes(t *testing.T) {
 
 		actual := splitPrintedDeclarations(input.addIdTypes())
 		expected := []string{
-			`type personID string`,
-			`type nameID string`,
+			`type personID int`,
+			`type nameID int`,
 			_personDeclaration,
 			_nameDeclaration,
 		}
