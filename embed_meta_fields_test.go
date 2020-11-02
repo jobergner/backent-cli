@@ -6,11 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type metaField struct {
-	name        string
-	typeLiteral string
-}
-
 func TestEmbedMetaFields(t *testing.T) {
 	t.Run("should embed meta fields in all structs", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
@@ -18,16 +13,20 @@ func TestEmbedMetaFields(t *testing.T) {
 			_nameDeclaration,
 		})
 
-		actual := splitPrintedDeclarations(input.embedMetaFields([]metaField{{"lastModified", "int64"}}))
+		actual := splitPrintedDeclarations(input.embedMetaFields())
 		expected := []string{`
 type person struct {
+	person personID
 	name name
 	lastModified int64
+	operationKind operationKind
 }`, `
 type name struct {
+	person nameID
 	first string
 	last string
 	lastModified int64
+	operationKind operationKind
 }`,
 		}
 
@@ -38,6 +37,6 @@ type name struct {
 	})
 }
 
-func (sm *stateMachine) embedMetaFields(metaFields []metaField) *stateMachine {
+func (sm *stateMachine) embedMetaFields() *stateMachine {
 	return sm
 }

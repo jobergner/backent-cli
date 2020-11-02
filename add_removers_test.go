@@ -23,8 +23,7 @@ type child struct {
 }`,
 		})
 
-		metaFields := []metaField{{"lastModified", "int64"}, {"id", "int"}, {"operationKind", "operationKind"}}
-		actual := splitPrintedDeclarations(input.addRemovers(metaFields))
+		actual := splitPrintedDeclarations(input.addRemovers())
 		expected := []string{`
 type person struct {
 	id personID
@@ -72,6 +71,6 @@ func (p person) RemoveChild(childID childID, sm *stateMachine) {
 	})
 }
 
-func (sm *stateMachine) addRemovers(metaFields []metaField) *stateMachine {
+func (sm *stateMachine) addRemovers() *stateMachine {
 	return sm
 }
