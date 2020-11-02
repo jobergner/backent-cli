@@ -1,7 +1,5 @@
 package statefactory
 
-// TODO WIP
-
 import (
 	"testing"
 
@@ -12,30 +10,30 @@ func TestAddRemovers(t *testing.T) {
 	t.Run("adds removers", func(t *testing.T) {
 		input := unsafeParseDecls([]string{`
 type person struct {
-	id string
+	id personID
 	children []childID
 	lastModified int64
 	operationKind operationKind
 }`, `
 type child struct {
-	id string
+	id childID
 	name string
 	lastModified int64
 	operationKind operationKind
 }`,
 		})
 
-		metaFields := []metaField{{"lastModified", "int64"}, {"id", "string"}, {"operationKind", "operationKind"}}
+		metaFields := []metaField{{"lastModified", "int64"}, {"id", "int"}, {"operationKind", "operationKind"}}
 		actual := splitPrintedDeclarations(input.addRemovers(metaFields))
 		expected := []string{`
 type person struct {
-	id string
+	id personID
 	children []childID
 	lastModified int64
 	operationKind operationKind
 }`, `
 type child struct {
-	id string
+	id childID
 	name string
 	lastModified int64
 	operationKind operationKind
@@ -44,15 +42,15 @@ func (sm *stateMachine) RemovePerson(personID personID) {
 	person := sm.GetPerson(personID)
 	person.lastModified = time.Now().UnixNano()
 	person.operationKind = operationKindDelete
-	sm.patch.person[p.id] = person
+	sm.patch.person[person.id] = person
 }`, `
 func (sm *stateMachine) RemoveName(nameID nameID) {
 	name := sm.GetName(nameID)
 	name.lastModified = time.Now().UnixNano()
 	name.operationKind = operationKindDelete
-	sm.patch.name[p.id] = name
+	sm.patch.name[name.id] = name
 }`, `
-func (p person) RemoveChild(childID childID, sm *stateMachine) name {
+func (p person) RemoveChild(childID childID, sm *stateMachine) {
 	var indexToRemove int
 	for i, _childID := p.children {
 		if _childID == childID {
@@ -64,15 +62,6 @@ func (p person) RemoveChild(childID childID, sm *stateMachine) name {
 	p.lastModified = time.Now().UnixNano()
 	p.operationKind = operationKindUpdate
 	sm.patch.person[p.id] = p
-}`, `
-func (p *person) RemoveAge() int {
-	return p.age
-}`, `
-func (n *name) RemoveFirst() string {
-	return n.first
-}`, `
-func (n *name) RemoveLast() string {
-	return n.last
 }`,
 		}
 

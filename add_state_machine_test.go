@@ -31,7 +31,14 @@ type stateMachine struct {
 	state state
 	patch state
 	patchReceiver chan state
-}`,
+	idgen int
+}`, `
+func (*sm) generateID() int {
+	newID := sm.idgen
+	sm.idgen = sm.idgen + 1
+	return newID
+}
+`,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)

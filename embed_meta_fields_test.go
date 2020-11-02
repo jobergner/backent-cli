@@ -18,16 +18,16 @@ func TestEmbedMetaFields(t *testing.T) {
 			_nameDeclaration,
 		})
 
-		actual := splitPrintedDeclarations(input.embedMetaFields([]metaField{{"lastModified", "int"}}))
+		actual := splitPrintedDeclarations(input.embedMetaFields([]metaField{{"lastModified", "int64"}}))
 		expected := []string{`
 type person struct {
 	name name
-	lastModified int
+	lastModified int64
 }`, `
 type name struct {
 	first string
 	last string
-	lastModified int
+	lastModified int64
 }`,
 		}
 

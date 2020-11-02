@@ -27,7 +27,7 @@ type name struct {
 			`type parentage []parentInfo`, `
 type parentInfo struct {
 	kind entityKind
-	id string
+	id int
 }`,
 		}
 
