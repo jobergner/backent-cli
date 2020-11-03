@@ -30,7 +30,6 @@ type state struct {
 type stateMachine struct {
 	state state
 	patch state
-	patchReceiver chan state
 	idgen int
 }`, `
 func (*sm) generateID() int {
@@ -38,7 +37,26 @@ func (*sm) generateID() int {
 	sm.idgen = sm.idgen + 1
 	return newID
 }
+`, `
+func (*sm) updateState() {
+	for _, person := range sm.patch.person {
+		if person.operationKind == operationKindDelete {
+			delete(sm.state.person, person.id)
+		} else {
+			sm.state.person[person.id] = person
+		}
+	}
+	for _, name := range sm.patch.name {
+		if name.operationKind == operationKindDelete {
+			delete(sm.state.name, name.id)
+		} else {
+			sm.state.name[name.id] = name
+		}
+	}
+	sm.patch = newState()
+}
 `,
+			// TODO newState()
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
