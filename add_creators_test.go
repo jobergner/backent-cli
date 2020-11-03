@@ -41,15 +41,16 @@ type name struct {
 	lastModified int64
 	operationKind operationKind
 }`, `
-func (sm *stateMachine) CreatePerson(personID personID) person {
+func (sm *stateMachine) CreatePerson() person {
 	var person person
+	person.name = sm.CreateName()
 	person.id = personID(sm.generateID())
 	person.lastModified = time.Now().UnixNano()
 	person.operationKind = operationKindCreate
 	sm.patch.person[person.id] = person
 	return person
 }`, `
-func (sm *stateMachine) CreateName(nameID nameID) name {
+func (sm *stateMachine) CreateName() name {
 	var name name
 	name.id = nameID(sm.generateID())
 	name.lastModified = time.Now().UnixNano()
