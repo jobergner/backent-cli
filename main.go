@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -52,10 +51,10 @@ func evalDeclName(decl ast.Decl, containingFile file) string {
 		return rejoined + "_import"
 	}
 	if isFuncDecl(decl) {
-		return getFuncName(decl.(*ast.FuncDecl))
+		return getFuncName(decl.(*ast.FuncDecl)) + "_func"
 	}
 	if isGenDecl(decl) {
-		return getGenDeclName(decl.(*ast.GenDecl))
+		return getGenDeclName(decl.(*ast.GenDecl)) + "_type"
 	}
 	panic("unknown decl kind")
 }
@@ -91,7 +90,7 @@ type outputDeclaration struct {
 	value string
 }
 
-func writeToOutputFile(outputDecls []outputDeclaration) {
+func writeToOutputFile(outputDecls []outputDeclaration, outputFileName string) {
 	var buf bytes.Buffer
 
 	buf.WriteString("package main\n\n")
@@ -100,11 +99,14 @@ func writeToOutputFile(outputDecls []outputDeclaration) {
 		buf.WriteString("\n\nconst " + outputDecl.name + " string = `" + escapedValue + "`")
 	}
 
-	fmt.Println(formatFileContent(buf.String()))
+	formattedContent := formatFileContent(buf.String())
+	err := ioutil.WriteFile(outputFileName, []byte(formattedContent), 0644)
+	check(err)
 }
 
 func main() {
 	inputDirectoryFlag := flag.String("i", "./", "input directory")
+	outputFileName := flag.String("o", "stringified_decls.go", "output file")
 	flag.Parse()
 	files := scanFiles(*inputDirectoryFlag)
 
@@ -119,7 +121,7 @@ func main() {
 		})
 	}
 
-	writeToOutputFile(outputDecls)
+	writeToOutputFile(outputDecls, *outputFileName)
 }
 
 func isImportDecl(decl ast.Decl) bool {
