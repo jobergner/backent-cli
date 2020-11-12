@@ -61,7 +61,7 @@ func evalDeclName(decl ast.Decl, containingFile file) string {
 
 func printDecl(decl ast.Decl) string {
 	var buf bytes.Buffer
-	// ast.Print(token.NewFileSet(), decl)
+
 	printer.Fprint(&buf, token.NewFileSet(), decl)
 	return buf.String()
 }
@@ -152,5 +152,9 @@ func getFuncName(decl *ast.FuncDecl) string {
 }
 
 func getGenDeclName(decl *ast.GenDecl) string {
-	return decl.Specs[0].(*ast.TypeSpec).Name.Name
+	// fmt.Println(ast.Print(token.NewFileSet(), decl))
+	if typeSpec, ok := decl.Specs[0].(*ast.TypeSpec); ok {
+		return typeSpec.Name.Name
+	}
+	return decl.Specs[0].(*ast.ValueSpec).Names[0].Name
 }
