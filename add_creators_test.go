@@ -8,56 +8,19 @@ import (
 
 func TestAddCreaters(t *testing.T) {
 	t.Run("adds creators", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	id personID
-	name nameID
-	age int
-	lastModified int64
-	operationKind operationKind
-}`, `
-type name struct {
-	id nameID
-	first string
-	last string
-	lastModified int64
-	operationKind operationKind
-}`,
+		input := unsafeParseDecls([]string{
+			output_person_type,
+			output_name_type,
+			output_child_type,
 		})
 
 		actual := splitPrintedDeclarations(input.addCreaters())
-		expected := []string{`
-type person struct {
-	id personID
-	name nameID
-	age int
-	lastModified int64
-	operationKind operationKind
-}`, `
-type name struct {
-	id nameID
-	first string
-	last string
-	lastModified int64
-	operationKind operationKind
-}`, `
-func (sm *stateMachine) CreatePerson() person {
-	var person person
-	person.name = sm.CreateName()
-	person.id = personID(sm.generateID())
-	person.lastModified = time.Now().UnixNano()
-	person.operationKind = operationKindCreate
-	sm.patch.person[person.id] = person
-	return person
-}`, `
-func (sm *stateMachine) CreateName() name {
-	var name name
-	name.id = nameID(sm.generateID())
-	name.lastModified = time.Now().UnixNano()
-	name.operationKind = operationKindCreate
-	sm.patch.name[name.id] = name
-	return name
-}`,
+		expected := []string{
+			output_person_type,
+			output_name_type,
+			output_CreatePerson_stateMachine_func,
+			output_CreateName_stateMachine_func,
+			output_CreateChild_stateMachine_func,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)

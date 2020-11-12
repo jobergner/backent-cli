@@ -9,12 +9,13 @@ import (
 func TestExtractStructNames(t *testing.T) {
 	t.Run("should find all struct names in file", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			_personDeclaration,
-			_nameDeclaration,
+			input_person_type,
+			input_child_type,
+			input_name_type,
 		})
 
 		actual := splitPrintedDeclarations(extractStructNames(input))
-		expected := []string{"person", "name"}
+		expected := []string{"person", "name", "child"}
 
 		assert.Equal(t, expected, actual)
 	})

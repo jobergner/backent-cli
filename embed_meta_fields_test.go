@@ -9,22 +9,28 @@ import (
 func TestEmbedMetaFields(t *testing.T) {
 	t.Run("should embed meta fields in all structs", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			_personDeclaration,
-			_nameDeclaration,
+			input_person_type,
+			input_child_type,
+			input_name_type,
 		})
 
 		actual := splitPrintedDeclarations(input.embedMetaFields())
-		expected := []string{`
-type person struct {
-	person personID
-	name name
+		expected := []string{
+			`type person struct {
+	name		name
+	children	[]child
+	age		int
 	lastModified int64
 	operationKind operationKind
 }`, `
 type name struct {
-	person nameID
 	first string
 	last string
+	lastModified int64
+	operationKind operationKind
+}`, `
+type child struct {
+	name name
 	lastModified int64
 	operationKind operationKind
 }`,

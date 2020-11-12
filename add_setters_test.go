@@ -8,60 +8,20 @@ import (
 
 func TestAddSetters(t *testing.T) {
 	t.Run("adds setters", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	id personID
-	name nameID
-	age int
-	lastModified int64
-	operationKind operationKind
-}`, `
-type name struct {
-	id nameID
-	first string
-	last string
-	lastModified int64
-	operationKind operationKind
-}`,
+		input := unsafeParseDecls([]string{
+			output_person_type,
+			output_name_type,
+			output_child_type,
 		})
 
 		actual := splitPrintedDeclarations(input.addSetters())
-		expected := []string{`
-type person struct {
-	id personID
-	name nameID
-	age int
-	lastModified int64
-	operationKind operationKind
-}`, `
-type name struct {
-	id nameID
-	first string
-	last string
-	lastModified int64
-	operationKind operationKind
-}`, `
-func (p person) SetAge(val int, sm *stateMachine) person {
-	p.age = val
-	p.lastModified = time.Now().UnixNano()
-	p.operationKind = operationKindUpdate
-	sm.patch.person[p.id] = p
-	return p
-}`, `
-func (n name) SetFirst(val string, sm *stateMachine) name {
-	n.first = val
-	n.lastModified = time.Now().UnixNano()
-	n.operationKind = operationKindUpdate
-	sm.patch.name[n.id] = n
-	return n
-}`, `
-func (n name) SetLast(val string, sm *stateMachine) name {
-	n.last = val
-	n.lastModified = time.Now().UnixNano()
-	n.operationKind = operationKindUpdate
-	sm.patch.name[n.id] = n
-	return n
-}`,
+		expected := []string{
+			output_person_type,
+			output_name_type,
+			output_child_type,
+			output_SetAge_person_func,
+			output_SetFirst_name_func,
+			output_SetLast_name_func,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
