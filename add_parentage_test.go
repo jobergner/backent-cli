@@ -9,26 +9,30 @@ import (
 func TestEmbedParentage(t *testing.T) {
 	t.Run("should add parentage declaration", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			_personDeclaration,
-			_nameDeclaration,
+			input_person_type,
+			input_child_type,
+			input_name_type,
 		})
 
 		actual := splitPrintedDeclarations(input.embedParentage())
-		expected := []string{`
-type person struct {
-	name name
+		expected := []string{
+			`type person struct {
+	name		name
+	children	[]child
+	age		int
 	parentage Parentage
 }`, `
 type name struct {
 	first string
 	last string
 	parentage Parentage
+}`, `
+type child struct {
+	name name
+	parentage Parentage
 }`,
-			`type parentage []parentInfo`, `
-type parentInfo struct {
-	kind entityKind
-	id int
-}`,
+			output_parentInfo_type,
+			output_parentage_type,
 			// TODO; entityKind for each entity
 		}
 

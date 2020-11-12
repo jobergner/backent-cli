@@ -8,74 +8,26 @@ import (
 
 func TestAddGetters(t *testing.T) {
 	t.Run("adds getters", func(t *testing.T) {
-		input := unsafeParseDecls([]string{`
-type person struct {
-	id personID
-	name nameID
-	age int
-	lastModified int64
-}`, `
-type name struct {
-	id nameID
-	first string
-	last string
-	lastModified int64
-}`,
+		input := unsafeParseDecls([]string{
+			output_person_type,
+			output_name_type,
+			output_child_type,
 		})
 
 		actual := splitPrintedDeclarations(input.addGetters())
-		expected := []string{`
-type person struct {
-	id personID
-	name nameID
-	age int
-	lastModified int64
-}`, `
-type name struct {
-	id nameID
-	first string
-	last string
-	lastModified int64
-}`, `
-func (sm *stateMachine) GetPerson(personID personID) person {
-	person, ok := sm.patch.person[personID]
-	if ok {
-		return person
-	}
-	currentPerson := sm.state.person[personID]
-	personCopy := person{}
-	copier.Copy(&personCopy, &currentPerson)
-	return personCopy
-}`, `
-func (sm *stateMachine) GetName(nameID nameID) name {
-	name, ok := sm.patch.name[nameID]
-	if ok {
-		return name
-	}
-	currentName := sm.state.name[nameID]
-	nameCopy := name{}
-	copier.Copy(&nameCopy, &currentName)
-	return nameCopy
-}`, `
-func (p person) GetName(sm *stateMachine) name {
-	name, ok := sm.patch.name[p.name]
-	if ok {
-		return name
-	}
-	currentName := sm.state.name[p.name]
-	nameCopy := name{}
-	copier.Copy(&nameCopy, &currentName)
-	return nameCopy
-}`, `
-func (p person) GetAge() int {
-	return p.age
-}`, `
-func (n name) GetFirst() string {
-	return n.first
-}`, `
-func (n name) GetLast() string {
-	return n.last
-}`,
+		expected := []string{
+			output_person_type,
+			output_name_type,
+			output_child_type,
+			output_GetPerson_stateMachine_func,
+			output_GetChild_stateMachine_func,
+			output_GetName_stateMachine_func,
+			output_GetName_person_func,
+			output_GetChildren_person_func,
+			output_GetName_child_func,
+			output_GetAge_person_func,
+			output_GetFirst_name_func,
+			output_GetLast_name_func,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)

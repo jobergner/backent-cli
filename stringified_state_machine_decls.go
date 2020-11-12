@@ -53,6 +53,24 @@ const output_generateID_stateMachine_func string = `func (sm *stateMachine) gene
 	return newID
 }`
 
+const output_updateState_stateMachine_func string = `func (sm *stateMachine) updateState() {
+	for _, person := range sm.patch.person {
+		if person.operationKind == operationKindDelete {
+			delete(sm.state.person, person.id)
+		} else {
+			sm.state.person[person.id] = person
+		}
+	}
+	for _, name := range sm.patch.name {
+		if name.operationKind == operationKindDelete {
+			delete(sm.state.name, name.id)
+		} else {
+			sm.state.name[name.id] = name
+		}
+	}
+	sm.patch = newState()
+}`
+
 const output_person_type string = `type person struct {
 	id		personID
 	name		nameID
@@ -60,6 +78,7 @@ const output_person_type string = `type person struct {
 	age		int
 	lastModified	int64
 	operationKind	operationKind
+	parentage	parentage
 }`
 
 const output_name_type string = `type name struct {
@@ -68,6 +87,7 @@ const output_name_type string = `type name struct {
 	last		string
 	lastModified	int64
 	operationKind	operationKind
+	parentage	parentage
 }`
 
 const output_child_type string = `type child struct {
@@ -75,6 +95,7 @@ const output_child_type string = `type child struct {
 	name		nameID
 	lastModified	int64
 	operationKind	operationKind
+	parentage	parentage
 }`
 
 const output_CreatePerson_stateMachine_func string = `func (sm *stateMachine) CreatePerson() person {
@@ -188,6 +209,13 @@ const output_RemovePerson_stateMachine_func string = `func (sm *stateMachine) Re
 	person.lastModified = time.Now().UnixNano()
 	person.operationKind = operationKindDelete
 	sm.patch.person[person.id] = person
+}`
+
+const output_RemoveChild_stateMachine_func string = `func (sm *stateMachine) RemoveChild(childID childID) {
+	child := sm.GetChild(childID)
+	child.lastModified = time.Now().UnixNano()
+	child.operationKind = operationKindDelete
+	sm.patch.child[child.id] = child
 }`
 
 const output_RemoveName_stateMachine_func string = `func (sm *stateMachine) RemoveName(nameID nameID) {

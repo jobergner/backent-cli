@@ -15,16 +15,6 @@ import (
 
 type stateMachine ast.File
 
-const (
-	_personDeclaration string = "type person struct{ name name }"
-	_nameDeclaration          = `
-type name struct {
-	first string
-	last string
-}
-	`
-)
-
 // " ab c  de\nf" => "ab c de f"
 func normalizeWhitespace(_str string) string {
 	str := strings.TrimSpace(_str)
