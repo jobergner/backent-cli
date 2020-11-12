@@ -29,6 +29,7 @@ type parentInfo struct {
 	kind entityKind
 	id int
 }`,
+			// TODO; entityKind for each entity
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
