@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"flag"
+	// "fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -151,11 +152,25 @@ func isGenDecl(decl ast.Decl) bool {
 }
 
 func getFuncName(decl *ast.FuncDecl) string {
-	return decl.Name.Name
+	if decl.Recv == nil {
+		return decl.Name.Name
+	}
+	// fmt.Println(ast.Print(token.NewFileSet(), decl))
+	receiverName := findMethodReceiverIdent(decl.Recv.List[0].Type)
+	return decl.Name.Name + "_" + receiverName.Name
+}
+
+func findMethodReceiverIdent(expr ast.Expr) *ast.Ident {
+	if identType, ok := expr.(*ast.Ident); ok {
+		return identType
+	}
+	if arrayType, ok := expr.(*ast.ArrayType); ok {
+		return findMethodReceiverIdent(arrayType.Elt)
+	}
+	return findMethodReceiverIdent(expr.(*ast.StarExpr).X)
 }
 
 func getGenDeclName(decl *ast.GenDecl) string {
-	// fmt.Println(ast.Print(token.NewFileSet(), decl))
 	if typeSpec, ok := decl.Specs[0].(*ast.TypeSpec); ok {
 		return typeSpec.Name.Name
 	}
