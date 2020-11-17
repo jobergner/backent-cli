@@ -14,7 +14,9 @@ func TestAddSetters(t *testing.T) {
 			output_child_type,
 		})
 
-		actual := splitPrintedDeclarations(input.addSetters())
+		smb := newStateMachineBuilder(input)
+		smb.addSetters()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			output_person_type,
 			output_name_type,
@@ -31,6 +33,6 @@ func TestAddSetters(t *testing.T) {
 	})
 }
 
-func (sm *stateMachine) addSetters() *stateMachine {
+func (sm *stateMachineBuilder) addSetters() *stateMachineBuilder {
 	return sm
 }

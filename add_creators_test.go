@@ -14,7 +14,9 @@ func TestAddCreaters(t *testing.T) {
 			output_child_type,
 		})
 
-		actual := splitPrintedDeclarations(input.addCreaters())
+		smb := newStateMachineBuilder(input)
+		smb.addCreators()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			output_person_type,
 			output_name_type,
@@ -30,6 +32,6 @@ func TestAddCreaters(t *testing.T) {
 	})
 }
 
-func (sm *stateMachine) addCreaters() *stateMachine {
+func (sm *stateMachineBuilder) addCreators() *stateMachineBuilder {
 	return sm
 }

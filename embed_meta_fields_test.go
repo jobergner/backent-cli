@@ -14,7 +14,9 @@ func TestEmbedMetaFields(t *testing.T) {
 			input_name_type,
 		})
 
-		actual := splitPrintedDeclarations(input.embedMetaFields())
+		smb := newStateMachineBuilder(input)
+		smb.embedMetaFields()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			`type person struct {
 	name		name
@@ -43,6 +45,6 @@ type child struct {
 	})
 }
 
-func (sm *stateMachine) embedMetaFields() *stateMachine {
+func (sm *stateMachineBuilder) embedMetaFields() *stateMachineBuilder {
 	return sm
 }

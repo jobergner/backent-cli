@@ -14,7 +14,9 @@ func TestAddRemovers(t *testing.T) {
 			output_child_type,
 		})
 
-		actual := splitPrintedDeclarations(input.addRemovers())
+		smb := newStateMachineBuilder(input)
+		smb.addRemovers()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			output_person_type,
 			output_name_type,
@@ -32,6 +34,6 @@ func TestAddRemovers(t *testing.T) {
 	})
 }
 
-func (sm *stateMachine) addRemovers() *stateMachine {
+func (sm *stateMachineBuilder) addRemovers() *stateMachineBuilder {
 	return sm
 }

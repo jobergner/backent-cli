@@ -16,6 +16,7 @@ type entityKind string
 const (
 	entityKindPerson entityKind = "person"
 	entityKindName              = "name"
+	entityKindChild             = "child"
 )
 
 const (
@@ -31,9 +32,17 @@ type state struct {
 }
 
 type stateMachine struct {
-	state state
-	patch state
+	state *state
+	patch *state
 	idgen int
+}
+
+func newState() *state {
+	return &state{
+		person: make(map[personID]person),
+		child:  make(map[childID]child),
+		name:   make(map[nameID]name),
+	}
 }
 
 type parentage []parentInfo
