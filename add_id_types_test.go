@@ -14,7 +14,9 @@ func TestAddIDTypes(t *testing.T) {
 			input_name_type,
 		})
 
-		actual := splitPrintedDeclarations(input.addIdTypes())
+		smb := newStateMachineBuilder(input)
+		smb.addIdTypes()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			input_person_type,
 			input_child_type,
@@ -31,6 +33,6 @@ func TestAddIDTypes(t *testing.T) {
 	})
 }
 
-func (sm *stateMachine) addIdTypes() *stateMachine {
+func (sm *stateMachineBuilder) addIdTypes() *stateMachineBuilder {
 	return sm
 }

@@ -14,7 +14,9 @@ func TestAddStateMachine(t *testing.T) {
 			input_name_type,
 		})
 
-		actual := splitPrintedDeclarations(input.addStateMachineDeclaration())
+		smb := newStateMachineBuilder(input)
+		smb.addStateMachineDeclaration()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			input_person_type,
 			input_child_type,
@@ -25,7 +27,7 @@ func TestAddStateMachine(t *testing.T) {
 			output_stateMachine_type,
 			output_generateID_stateMachine_func,
 			output_updateState_stateMachine_func,
-			// TODO newState()
+			output_newState_func,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
@@ -35,6 +37,6 @@ func TestAddStateMachine(t *testing.T) {
 	})
 }
 
-func (sm *stateMachine) addStateMachineDeclaration() *stateMachine {
+func (sm *stateMachineBuilder) addStateMachineDeclaration() *stateMachineBuilder {
 	return sm
 }

@@ -14,7 +14,9 @@ func TestEvenOutStructTree(t *testing.T) {
 			input_name_type,
 		})
 
-		actual := splitPrintedDeclarations(input.evenOutStructTree())
+		smb := newStateMachineBuilder(input)
+		smb.evenOutStructTree()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{`
 type person struct {
 	name nameID
@@ -36,6 +38,6 @@ type child struct {
 	})
 }
 
-func (sm *stateMachine) evenOutStructTree() *stateMachine {
+func (sm *stateMachineBuilder) evenOutStructTree() *stateMachineBuilder {
 	return sm
 }

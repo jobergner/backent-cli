@@ -14,7 +14,9 @@ func TestAddGetters(t *testing.T) {
 			output_child_type,
 		})
 
-		actual := splitPrintedDeclarations(input.addGetters())
+		smb := newStateMachineBuilder(input)
+		smb.addGetters()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			output_person_type,
 			output_name_type,
@@ -37,6 +39,6 @@ func TestAddGetters(t *testing.T) {
 	})
 }
 
-func (sm *stateMachine) addGetters() *stateMachine {
+func (sm *stateMachineBuilder) addGetters() *stateMachineBuilder {
 	return sm
 }

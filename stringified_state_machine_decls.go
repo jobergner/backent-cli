@@ -20,6 +20,7 @@ const output_entityKind_type string = `type entityKind string`
 const output_entityKindPerson_type string = `const (
 	entityKindPerson	entityKind	= "person"
 	entityKindName				= "name"
+	entityKindChild				= "child"
 )`
 
 const output_operationKindCreate_type string = `const (
@@ -35,9 +36,13 @@ const output_state_type string = `type state struct {
 }`
 
 const output_stateMachine_type string = `type stateMachine struct {
-	state	state
-	patch	state
+	state	*state
+	patch	*state
 	idgen	int
+}`
+
+const output_newState_func string = `func newState() *state {
+	return &state{person: make(map[personID]person), child: make(map[childID]child), name: make(map[nameID]name)}
 }`
 
 const output_parentage_type string = `type parentage []parentInfo`

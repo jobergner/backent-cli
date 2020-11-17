@@ -1,6 +1,7 @@
 package statefactory
 
 import (
+	"go/ast"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,13 +15,14 @@ func TestExtractStructNames(t *testing.T) {
 			input_name_type,
 		})
 
-		actual := splitPrintedDeclarations(extractStructNames(input))
+		smb := newStateMachineBuilder(input)
+		actual := extractStructNames(smb.input)
 		expected := []string{"person", "name", "child"}
 
 		assert.Equal(t, expected, actual)
 	})
 }
 
-func extractStructNames(sm *stateMachine) *stateMachine {
-	return sm
+func extractStructNames(sm *ast.File) []string {
+	return []string{}
 }

@@ -172,9 +172,9 @@ func TestMatchDeclarations(t *testing.T) {
 	})
 }
 
-func splitPrintedDeclarations(sm *stateMachine) []string {
+func splitPrintedDeclarations(f *ast.File) []string {
 	printedDeclarations := make([]string, 0)
-	for _, decl := range sm.Decls {
+	for _, decl := range f.Decls {
 		printedDeclarations = append(printedDeclarations, unsafePrintDeclaration(decl))
 	}
 	return printedDeclarations
@@ -189,11 +189,10 @@ func unsafePrintDeclaration(decl ast.Decl) string {
 	return buf.String()
 }
 
-func unsafeParseDecls(decls []string) *stateMachine {
+func unsafeParseDecls(decls []string) *ast.File {
 	file, err := parser.ParseFile(token.NewFileSet(), "", "package foo\n"+strings.Join(decls, "\n"), 0)
 	if err != nil {
 		panic(err)
 	}
-	x := stateMachine(*file)
-	return &x
+	return file
 }

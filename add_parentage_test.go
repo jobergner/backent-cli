@@ -14,7 +14,9 @@ func TestEmbedParentage(t *testing.T) {
 			input_name_type,
 		})
 
-		actual := splitPrintedDeclarations(input.embedParentage())
+		smb := newStateMachineBuilder(input)
+		smb.embedParentage()
+		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
 			`type person struct {
 	name		name
@@ -33,7 +35,8 @@ type child struct {
 }`,
 			output_parentInfo_type,
 			output_parentage_type,
-			// TODO; entityKind for each entity
+			output_entityKind_type,
+			output_entityKindPerson_type,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
@@ -43,6 +46,6 @@ type child struct {
 	})
 }
 
-func (sm *stateMachine) embedParentage() *stateMachine {
+func (sm *stateMachineBuilder) embedParentage() *stateMachineBuilder {
 	return sm
 }
