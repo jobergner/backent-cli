@@ -18,9 +18,9 @@ func TestGenerate(t *testing.T) {
 
 	err = exec.Command(
 		"go", "run", ".",
-		"-i", "testdata/input/",
-		"-o", outputFilePath,
-		"-p", "package_name",
+		"-input", "testdata/input/",
+		"-output", outputFilePath,
+		"-package", "package_name",
 		"-prefix", "golden",
 	).Run()
 
