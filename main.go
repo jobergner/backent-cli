@@ -35,9 +35,9 @@ func scanFiles(directoryPath string) []inputFile {
 }
 
 func main() {
-	inputDirectoryFlag := flag.String("i", "./", "input directory")
-	outputFileName := flag.String("o", "stringified_decls.go", "output file")
-	packageName := flag.String("p", "main", "package name")
+	inputDirectoryFlag := flag.String("input", "./", "input directory")
+	outputFileName := flag.String("output", "stringified_decls.go", "output file")
+	packageName := flag.String("package", "main", "package name")
 	outputDeclsPrefix := flag.String("prefix", "", "prefix of output declaraton names")
 	flag.Parse()
 
