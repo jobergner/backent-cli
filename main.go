@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 )
 
 func check(err error) {
@@ -12,8 +13,9 @@ func check(err error) {
 	}
 }
 
-func scanFiles(directoryPath string) []inputFile {
+func scanFiles(directoryPath, excludedIdentifier string) []inputFile {
 	var files []inputFile
+	excludeExp := regexp.MustCompile(excludedIdentifier)
 
 	fileInfos, err := ioutil.ReadDir(directoryPath)
 	check(err)
@@ -21,14 +23,18 @@ func scanFiles(directoryPath string) []inputFile {
 		if fileInfo.IsDir() {
 			continue
 		}
-		if filepath.Ext(fileInfo.Name()) != ".go" {
+		fileName := fileInfo.Name()
+		if filepath.Ext(fileName) != ".go" {
+			continue
+		}
+		if excludeExp.MatchString(fileName) {
 			continue
 		}
 
-		filePath := filepath.Join(directoryPath, fileInfo.Name())
+		filePath := filepath.Join(directoryPath, fileName)
 		content, err := ioutil.ReadFile(filePath)
 		check(err)
-		files = append(files, newInputFile(fileInfo.Name(), filePath, content))
+		files = append(files, newInputFile(fileName, filePath, content))
 	}
 
 	return files
@@ -39,9 +45,10 @@ func main() {
 	outputFileName := flag.String("output", "stringified_decls.go", "output file")
 	packageName := flag.String("package", "main", "package name")
 	outputDeclsPrefix := flag.String("prefix", "", "prefix of output declaraton names")
+	excludedIdentifier := flag.String("exclude", "$^", "files to exclude")
 	flag.Parse()
 
-	inputFiles := scanFiles(*inputDirectoryFlag)
+	inputFiles := scanFiles(*inputDirectoryFlag, *excludedIdentifier)
 	outputFile := newOutputFile(*outputFileName, *outputDeclsPrefix, *packageName)
 	for _, inputFile := range inputFiles {
 		for _, decl := range inputFile.decls {

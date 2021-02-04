@@ -22,6 +22,7 @@ func TestGenerate(t *testing.T) {
 		"-output", outputFilePath,
 		"-package", "package_name",
 		"-prefix", "golden",
+		"-exclude", "fax",
 	).Run()
 
 	if err != nil {
