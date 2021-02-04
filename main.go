@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -16,21 +15,21 @@ func check(err error) {
 func scanFiles(directoryPath string) []inputFile {
 	var files []inputFile
 
-	err := filepath.Walk(directoryPath, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		if filepath.Ext(path) != ".go" {
-			return nil
-		}
-
-		content, err := ioutil.ReadFile(path)
-		check(err)
-		files = append(files, newInputFile(info.Name(), path, content))
-		return nil
-	})
-
+	fileInfos, err := ioutil.ReadDir(directoryPath)
 	check(err)
+	for _, fileInfo := range fileInfos {
+		if fileInfo.IsDir() {
+			continue
+		}
+		if filepath.Ext(fileInfo.Name()) != ".go" {
+			continue
+		}
+
+		filePath := filepath.Join(directoryPath, fileInfo.Name())
+		content, err := ioutil.ReadFile(filePath)
+		check(err)
+		files = append(files, newInputFile(fileInfo.Name(), filePath, content))
+	}
 
 	return files
 }
