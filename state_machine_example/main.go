@@ -208,21 +208,21 @@ func (n name) GetLast() string {
 	return n.last
 }
 
-func (sm *stateMachine) RemovePerson(personID personID) {
+func (sm *stateMachine) DeletePerson(personID personID) {
 	person := sm.GetPerson(personID)
 	person.lastModified = time.Now().UnixNano()
 	person.operationKind = operationKindDelete
 	sm.patch.person[person.id] = person
 }
 
-func (sm *stateMachine) RemoveChild(childID childID) {
+func (sm *stateMachine) DeleteChild(childID childID) {
 	child := sm.GetChild(childID)
 	child.lastModified = time.Now().UnixNano()
 	child.operationKind = operationKindDelete
 	sm.patch.child[child.id] = child
 }
 
-func (sm *stateMachine) RemoveName(nameID nameID) {
+func (sm *stateMachine) DeleteName(nameID nameID) {
 	name := sm.GetName(nameID)
 	name.lastModified = time.Now().UnixNano()
 	name.operationKind = operationKindDelete
