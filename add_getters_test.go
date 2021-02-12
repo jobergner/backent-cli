@@ -9,18 +9,18 @@ import (
 func TestAddGetters(t *testing.T) {
 	t.Run("adds getters", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			output_person_type,
-			output_name_type,
-			output_child_type,
+			input_person_type,
+			input_child_type,
+			input_name_type,
 		})
 
 		smb := newStateMachineBuilder(input)
 		smb.addGetters()
 		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
-			output_person_type,
-			output_name_type,
-			output_child_type,
+			input_person_type,
+			input_child_type,
+			input_name_type,
 			output_GetPerson_stateMachine_func,
 			output_GetChild_stateMachine_func,
 			output_GetName_stateMachine_func,

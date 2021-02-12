@@ -9,9 +9,9 @@ import (
 func TestAddSetters(t *testing.T) {
 	t.Run("adds setters", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			output_person_type,
-			output_name_type,
-			output_child_type,
+			input_person_type,
+			input_child_type,
+			input_name_type,
 		})
 
 		smb := newStateMachineBuilder(input)
