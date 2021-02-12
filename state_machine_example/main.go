@@ -107,8 +107,8 @@ func (sm *stateMachine) CreatePerson() person {
 	personName := sm.CreateName()
 	person.name = personName.id
 	person.id = personID(sm.generateID())
-	person.lastModified = time.Now().UnixNano()
 	person.operationKind = operationKindCreate
+	person.lastModified = time.Now().UnixNano()
 	sm.patch.person[person.id] = person
 	return person
 }
@@ -116,8 +116,8 @@ func (sm *stateMachine) CreatePerson() person {
 func (sm *stateMachine) CreateName() name {
 	var name name
 	name.id = nameID(sm.generateID())
-	name.lastModified = time.Now().UnixNano()
 	name.operationKind = operationKindCreate
+	name.lastModified = time.Now().UnixNano()
 	sm.patch.name[name.id] = name
 	return name
 }
@@ -127,8 +127,8 @@ func (sm *stateMachine) CreateChild() child {
 	childName := sm.CreateName()
 	child.name = childName.id
 	child.id = childID(sm.generateID())
-	child.lastModified = time.Now().UnixNano()
 	child.operationKind = operationKindCreate
+	child.lastModified = time.Now().UnixNano()
 	sm.patch.child[child.id] = child
 	return child
 }
@@ -210,22 +210,22 @@ func (n name) GetLast() string {
 
 func (sm *stateMachine) DeletePerson(personID personID) {
 	person := sm.GetPerson(personID)
-	person.lastModified = time.Now().UnixNano()
 	person.operationKind = operationKindDelete
+	person.lastModified = time.Now().UnixNano()
 	sm.patch.person[person.id] = person
 }
 
 func (sm *stateMachine) DeleteChild(childID childID) {
 	child := sm.GetChild(childID)
-	child.lastModified = time.Now().UnixNano()
 	child.operationKind = operationKindDelete
+	child.lastModified = time.Now().UnixNano()
 	sm.patch.child[child.id] = child
 }
 
 func (sm *stateMachine) DeleteName(nameID nameID) {
 	name := sm.GetName(nameID)
-	name.lastModified = time.Now().UnixNano()
 	name.operationKind = operationKindDelete
+	name.lastModified = time.Now().UnixNano()
 	sm.patch.name[name.id] = name
 }
 
@@ -238,31 +238,39 @@ func (p person) RemoveChild(childID childID, sm *stateMachine) {
 		}
 	}
 	p.children = append(p.children[:indexToRemove], p.children[indexToRemove+1:]...)
-	p.lastModified = time.Now().UnixNano()
 	p.operationKind = operationKindUpdate
+	p.lastModified = time.Now().UnixNano()
 	sm.patch.person[p.id] = p
+}
+
+func (p person) AddChild(childID childID, sm *stateMachine) person {
+	p.children = append(p.children, childID)
+	p.operationKind = operationKindUpdate
+	p.lastModified = time.Now().UnixNano()
+	sm.patch.person[p.id] = p
+	return p
 }
 
 func (p person) SetAge(val int, sm *stateMachine) person {
 	p.age = val
-	p.lastModified = time.Now().UnixNano()
 	p.operationKind = operationKindUpdate
+	p.lastModified = time.Now().UnixNano()
 	sm.patch.person[p.id] = p
 	return p
 }
 
 func (n name) SetFirst(val string, sm *stateMachine) name {
 	n.first = val
-	n.lastModified = time.Now().UnixNano()
 	n.operationKind = operationKindUpdate
+	n.lastModified = time.Now().UnixNano()
 	sm.patch.name[n.id] = n
 	return n
 }
 
 func (n name) SetLast(val string, sm *stateMachine) name {
 	n.last = val
-	n.lastModified = time.Now().UnixNano()
 	n.operationKind = operationKindUpdate
+	n.lastModified = time.Now().UnixNano()
 	sm.patch.name[n.id] = n
 	return n
 }

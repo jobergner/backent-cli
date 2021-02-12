@@ -29,3 +29,29 @@ func (sm *StateMachine) {
    sm.finish()
 }
 ```
+
+
+
+## data consistency:
+### invalidation:
+certain changes within an action must be denieable due to being invalid. 
+
+Eg. ValueX is manipulated by User2 to be "2". However User1 has already manipulated ValueX to be "1" at an earlier point in time, but has a slower connection than User2.
+If the connection of User1 is slow enough, the value would turn out to be "1", since User1's change would be applied later despite having happened earlier than the changes of User2.
+
+However, this invalidaiton of changes must not be applied to all pieces of data which are affected by the change. Imagine a cenario where manipulating ValueY sets a negative (-) User positive (+).
+Let's say, again, User1(-) manipulates ValueY to be "1", but has a slow connection, while User2(-) manipuates ValueY to be "2". If we have an action wide invalidation of all changes to any data,
+ValueY would be 2, as User1's changes would be invalidated. However User1 would still be negative (1) as the changes to his own state would also be denied.
+
+As result invalidation must happen action specific, or there has to be a type system in place where certain actions have certain overwriting rules. 
+
+### thread safety:
+Only one action can be processed at a given time to ensure every piece of data is at the most recent state before manipulation or reading occurs.
+This might not be the fastest way to process actions, but only this way conflicts can be ruled out.
+
+### concurrent action processing:
+dumb idea. peaces of data within one action may depend on each other.
+
+## patch batching:
+
+
