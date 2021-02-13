@@ -50,8 +50,29 @@ Only one action can be processed at a given time to ensure every piece of data i
 This might not be the fastest way to process actions, but only this way conflicts can be ruled out.
 
 ### concurrent action processing:
-dumb idea. peaces of data within one action may depend on each other.
+dumb idea. pieces of data within one action may depend on each other.
 
 ## patch batching:
+is not required in POC
 
+## generated orchestrator:
+- a small script that reads files 
+- with a functions named after the action with parameters
+- maintains an "action receiver" file where the new action gets registered in a switch
+- a server with socket endpoint
+- sm.finish() emits patch to all connected sockets
+- create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config' 
 
+## testing
+- with decltostring
+- some files will just be copy/pasted as they will always be the same
+
+## TODO
+- finish state machine
+- finish state factory tests
+- write state factory
+- sketch orcestrator
+- write orchestrator
+- write action receiver generator
+- create cli for 'generate from config' and 'register actions'
+- write server
