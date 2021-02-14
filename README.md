@@ -52,22 +52,31 @@ This might not be the fastest way to process actions, but only this way conflict
 ### concurrent action processing:
 dumb idea. pieces of data within one action may depend on each other.
 
-## patch batching:
-is not required in POC
+### patch batching:
+is only optimization
 
-## generated orchestrator:
-- a small script that reads files 
+### generated orchestrator:
+- a small script that regisers all _action files
 - with a functions named after the action with parameters
 - maintains an "action receiver" file where the new action gets registered in a switch
 - a server with socket endpoint
 - sm.finish() emits patch to all connected sockets
 - create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config' 
 
-## testing
+### testing
 - with decltostring
 - some files will just be copy/pasted as they will always be the same
 
-## TODO
+### state conveyor:
+- go WASM clinet
+- caches the previous revision of each element
+- assembles the state in it's original tree-like structure
+- 'sends' state to browser
+- removes meta fields
+- adds 'hasUpdated' field
+- updates of elements with multiple children will only include children that actually updated
+
+### TODO
 - finish state machine
 - finish state factory tests
 - write state factory
@@ -76,3 +85,4 @@ is not required in POC
 - write action receiver generator
 - create cli for 'generate from config' and 'register actions'
 - write server
+- write state conveyor
