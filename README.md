@@ -31,9 +31,7 @@ func (sm *StateMachine) {
 ```
 
 
-
-## data consistency:
-### invalidation:
+### data consistency:
 certain changes within an action must be denieable due to being invalid. 
 
 Eg. ValueX is manipulated by User2 to be "2". However User1 has already manipulated ValueX to be "1" at an earlier point in time, but has a slower connection than User2.
@@ -52,8 +50,17 @@ This might not be the fastest way to process actions, but only this way conflict
 ### concurrent action processing:
 dumb idea. pieces of data within one action may depend on each other.
 
-### patch batching:
-is only optimization
+### frames & patch batching:
+some processing may be required to be done without an action triggering it. Such as physics when eg. an objetc is thrown.
+therefore the server state should be able to be broadcasted with every x frames.
+
+### data races:
+processing running concurently will lead to data races. Thus, the action listener will feed actions into a queue, 
+and with each frame tick, all actions within the queue will be processed then the frame will be processed. 
+
+### (environment actor):
+with each frame tick actions can be performed and a new patch for these actions can be created.
+with patch batching this should be possible. 
 
 ### generated orchestrator:
 - a small script that regisers all _action files
@@ -61,7 +68,7 @@ is only optimization
 - maintains an "action receiver" file where the new action gets registered in a switch
 - a server with socket endpoint
 - sm.finish() emits patch to all connected sockets
-- create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config' 
+- create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config'
 
 ### testing
 - with decltostring
@@ -75,6 +82,18 @@ is only optimization
 - removes meta fields
 - adds 'hasUpdated' field
 - updates of elements with multiple children will only include children that actually updated
+
+### local-only-state and remote-state mapping:
+some actions should/must not rely on the server accepting, processing, and broadcasting it.
+(apart from UI) like a character walking, rotating, aiming. In this case the action should
+be processed lokally, changes be applied to a local state, which only handles local data.
+However a second action should still be send to the server, as the movement of a character 
+needs to be broadcasted to everyone.
+The position of the the character should therefore be read from the local state.
+What if the actions of another player manipulate the position of the character?
+In this case the remote position state of the character would be changed. 
+it's up to the dev to decide which state is used, local or remote. maybe the dev should implement a flag
+on the server side state to signal the frontend to use the remote state instead.
 
 ### TODO
 - finish state machine
