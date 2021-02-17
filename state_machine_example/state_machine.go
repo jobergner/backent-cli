@@ -22,25 +22,46 @@ func (sm *stateMachine) generateID() int {
 }
 
 func (sm *stateMachine) updateState() {
-	for _, child := range sm.patch.child {
-		if child.operationKind == operationKindDelete {
-			delete(sm.state.child, child.id)
+	for _, player := range sm.patch.player {
+		if player.operationKind == operationKindDelete {
+			delete(sm.state.player, player.id)
 		} else {
-			sm.state.child[child.id] = child
+			sm.state.player[player.id] = player
 		}
 	}
-	for _, name := range sm.patch.name {
-		if name.operationKind == operationKindDelete {
-			delete(sm.state.name, name.id)
+	for _, zone := range sm.patch.zone {
+		if zone.operationKind == operationKindDelete {
+			delete(sm.state.zone, zone.id)
 		} else {
-			sm.state.name[name.id] = name
+			sm.state.zone[zone.id] = zone
 		}
 	}
-	for _, person := range sm.patch.person {
-		if person.operationKind == operationKindDelete {
-			delete(sm.state.person, person.id)
+	for _, zoneItem := range sm.patch.zoneItem {
+		if zoneItem.operationKind == operationKindDelete {
+			delete(sm.state.zoneItem, zoneItem.id)
 		} else {
-			sm.state.person[person.id] = person
+			sm.state.zoneItem[zoneItem.id] = zoneItem
+		}
+	}
+	for _, position := range sm.patch.position {
+		if position.operationKind == operationKindDelete {
+			delete(sm.state.position, position.id)
+		} else {
+			sm.state.position[position.id] = position
+		}
+	}
+	for _, item := range sm.patch.item {
+		if item.operationKind == operationKindDelete {
+			delete(sm.state.item, item.id)
+		} else {
+			sm.state.item[item.id] = item
+		}
+	}
+	for _, gearScore := range sm.patch.gearScore {
+		if gearScore.operationKind == operationKindDelete {
+			delete(sm.state.gearScore, gearScore.id)
+		} else {
+			sm.state.gearScore[gearScore.id] = gearScore
 		}
 	}
 	sm.patch = newState()
