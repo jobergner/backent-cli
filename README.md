@@ -64,7 +64,6 @@ it would only make things complicated.
 processing running concurently will lead to data races. Thus, the action listener will feed actions into a queue, 
 and with each frame tick, all actions within the queue will be processed then the frame will be processed.
 
-
 ### (environment actor):
 with each frame tick actions can be performed and a new patch for these actions can be created.
 with patch batching this should be possible. 

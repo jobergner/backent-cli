@@ -1,9 +1,10 @@
 package statemachine
 
-func (sm *stateMachine) DeletePerson(personID personID) {
-	person := sm.GetPerson(personID)
-	person.operationKind = operationKindDelete
-	sm.patch.person[person.id] = person
+// deep deleting
+func (sm *stateMachine) DeletePlayer(playerID playerID) {
+	element := sm.GetPlayer(playerID)
+	element.operationKind = operationKindDelete
+	sm.patch.player[element.id] = element
 }
 
 func (sm *stateMachine) DeleteChild(childID childID) {
