@@ -51,12 +51,19 @@ This might not be the fastest way to process actions, but only this way conflict
 dumb idea. pieces of data within one action may depend on each other.
 
 ### frames & patch batching:
-some processing may be required to be done without an action triggering it. Such as physics when eg. an objetc is thrown.
+some processing may be required to be done without an action triggering it. Such as physics when eg. an objetc is thrown/falling/colliding.
 therefore the server state should be able to be broadcasted with every x frames.
+A patch is complete when all actions in the queue and the frame itself is processed. then the patch will be applied to the state
+and broadcasted.
 
-### data races:
+### eventkinds:
+a create event kind is not necessary as it is handled just like an update anyway.
+it would only make things complicated.
+
+### data races and frames:
 processing running concurently will lead to data races. Thus, the action listener will feed actions into a queue, 
-and with each frame tick, all actions within the queue will be processed then the frame will be processed. 
+and with each frame tick, all actions within the queue will be processed then the frame will be processed.
+
 
 ### (environment actor):
 with each frame tick actions can be performed and a new patch for these actions can be created.
@@ -67,7 +74,7 @@ with patch batching this should be possible.
 - with a functions named after the action with parameters
 - maintains an "action receiver" file where the new action gets registered in a switch
 - a server with socket endpoint
-- sm.finish() emits patch to all connected sockets
+- (sm.finish() dont know if really needed)
 - create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config'
 
 ### testing
