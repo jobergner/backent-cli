@@ -15,9 +15,8 @@ const (
 )
 
 const (
-	operationKindCreate operationKind = "CREATE"
-	operationKindDelete               = "DELETE"
-	operationKindUpdate               = "UPDATE"
+	operationKindDelete = "DELETE"
+	operationKindUpdate = "UPDATE"
 )
 
 type stateMachine struct {
