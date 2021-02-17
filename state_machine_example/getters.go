@@ -1,66 +1,140 @@
 package statemachine
 
-func (sm *stateMachine) GetPerson(personID personID) person {
-	patchingPerson, ok := sm.patch.person[personID]
+func (sm *stateMachine) GetPlayer(playerID playerID) player {
+	patchingElement, ok := sm.patch.player[playerID]
 	if ok {
-		return patchingPerson
+		return patchingElement
 	}
-	currentPerson := sm.state.person[personID]
-	return currentPerson
+	currentElement := sm.state.player[playerID]
+	return currentElement
 }
 
-func (sm *stateMachine) GetChild(childID childID) child {
-	patchingChild, ok := sm.patch.child[childID]
+func (e player) GetItems(sm *stateMachine) []item {
+	var items []item
+	for _, itemID := range e.items {
+		items = append(items, sm.GetItem(itemID))
+	}
+	return items
+}
+
+func (e player) GetGearScore(sm *stateMachine) gearScore {
+	patchingElement, ok := sm.patch.gearScore[e.gearScore]
 	if ok {
-		return patchingChild
+		return patchingElement
 	}
-	currentChild := sm.state.child[childID]
-	return currentChild
+	currentElement := sm.state.gearScore[e.gearScore]
+	return currentElement
 }
 
-func (sm *stateMachine) GetName(nameID nameID) name {
-	patchingName, ok := sm.patch.name[nameID]
+func (e player) GetPosition(sm *stateMachine) position {
+	patchingElement, ok := sm.patch.position[e.position]
 	if ok {
-		return patchingName
+		return patchingElement
 	}
-	currentName := sm.state.name[nameID]
-	return currentName
+	currentElement := sm.state.position[e.position]
+	return currentElement
 }
 
-func (p person) GetName(sm *stateMachine) name {
-	patchingName, ok := sm.patch.name[p.name]
+func (sm *stateMachine) GetGearScore(gearScoreID gearScoreID) gearScore {
+	patchingElement, ok := sm.patch.gearScore[gearScoreID]
 	if ok {
-		return patchingName
+		return patchingElement
 	}
-	currentName := sm.state.name[p.name]
-	return currentName
+	currentElement := sm.state.gearScore[gearScoreID]
+	return currentElement
 }
 
-func (p person) GetChildren(sm *stateMachine) []child {
-	var children []child
-	for _, childID := range p.children {
-		children = append(children, sm.GetChild(childID))
-	}
-	return children
+func (e gearScore) GetLevel() int {
+	return e.level
 }
 
-func (c child) GetName(sm *stateMachine) name {
-	patchingName, ok := sm.patch.name[c.name]
+func (e gearScore) GetScore() int {
+	return e.score
+}
+
+func (sm *stateMachine) GetItem(itemID itemID) item {
+	patchingElement, ok := sm.patch.item[itemID]
 	if ok {
-		return patchingName
+		return patchingElement
 	}
-	currentName := sm.state.name[c.name]
-	return currentName
+	currentElement := sm.state.item[itemID]
+	return currentElement
 }
 
-func (p person) GetAge() int {
-	return p.age
+func (e item) GetGearScore(sm *stateMachine) gearScore {
+	patchingElement, ok := sm.patch.gearScore[e.gearScore]
+	if ok {
+		return patchingElement
+	}
+	currentElement := sm.state.gearScore[e.gearScore]
+	return currentElement
 }
 
-func (n name) GetFirst() string {
-	return n.first
+func (sm *stateMachine) GetPosition(positionID positionID) position {
+	patchingElement, ok := sm.patch.position[positionID]
+	if ok {
+		return patchingElement
+	}
+	currentElement := sm.state.position[positionID]
+	return currentElement
 }
 
-func (n name) GetLast() string {
-	return n.last
+func (e position) GetX() float64 {
+	return e.x
+}
+
+func (e position) GetY() float64 {
+	return e.y
+}
+
+func (sm *stateMachine) GetZoneItem(zoneItemID zoneItemID) zoneItem {
+	patchingElement, ok := sm.patch.zoneItem[zoneItemID]
+	if ok {
+		return patchingElement
+	}
+	currentElement := sm.state.zoneItem[zoneItemID]
+	return currentElement
+}
+
+func (e zoneItem) GetPosition(sm *stateMachine) position {
+	patchingElement, ok := sm.patch.position[e.position]
+	if ok {
+		return patchingElement
+	}
+	currentElement := sm.state.position[e.position]
+	return currentElement
+}
+
+func (e zoneItem) GetItem(sm *stateMachine) item {
+	patchingElement, ok := sm.patch.item[e.item]
+	if ok {
+		return patchingElement
+	}
+	currentElement := sm.state.item[e.item]
+	return currentElement
+}
+
+func (sm *stateMachine) GetZone(zoneID zoneID) zone {
+	patchingElement, ok := sm.patch.zone[zoneID]
+	if ok {
+		return patchingElement
+	}
+	currentElement := sm.state.zone[zoneID]
+	return currentElement
+}
+
+func (e zone) GetPlayers(sm *stateMachine) []player {
+	var elements []player
+	for _, elementID := range e.players {
+		elements = append(elements, sm.GetPlayer(elementID))
+	}
+	return elements
+}
+
+func (e zone) GetZoneItems(sm *stateMachine) []zoneItem {
+	var elements []zoneItem
+	for _, elementID := range e.items {
+		elements = append(elements, sm.GetZoneItem(elementID))
+	}
+	return elements
 }

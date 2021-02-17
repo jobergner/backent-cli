@@ -2,17 +2,7 @@ package statemachine
 
 type operationKind string
 
-type personID int
-type nameID int
-type childID int
-
 type entityKind string
-
-const (
-	entityKindPerson entityKind = "person"
-	entityKindName              = "name"
-	entityKindChild             = "child"
-)
 
 const (
 	operationKindDelete = "DELETE"
