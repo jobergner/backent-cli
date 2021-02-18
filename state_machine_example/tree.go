@@ -25,6 +25,12 @@ func (t *tree) reassembleZoneItem(zoneItemID zoneItemID, s state) {
 	// create operationKindZero with value 0
 	// this way it'll be clear to the frontend that this element
 	// does not require re-rendering/processing
+
+// scrap that. All children referenced by id are pointers. 
+// Get reassembling item out of tree, if non existent, create new one
+// then check next element in Parentage, only create field that is mentioned
+// if slice, just append
+
 	t.zoneItem[zoneItemID] = _zoneItem{
 		position: _position{}, // reassemblePosition()
 	}
