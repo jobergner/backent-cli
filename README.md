@@ -101,7 +101,7 @@ In this case the remote position state of the character would be changed.
 it's up to the dev to decide which state is used, local or remote. maybe the dev should implement a flag
 on the server side state to signal the frontend to use the remote state instead.
 
-
+## TODO
 ### deletion -> update in queue
 what if a queued action including a delete is followed by a queue action with an update on the same element??
 

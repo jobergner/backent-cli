@@ -1,12 +1,12 @@
 package statemachine
 
 func (sm *stateMachine) GetPlayer(playerID playerID) player {
-	patchingElement, ok := sm.patch.player[playerID]
+	patchingPlayer, ok := sm.patch.player[playerID]
 	if ok {
-		return patchingElement
+		return patchingPlayer
 	}
-	currentElement := sm.state.player[playerID]
-	return currentElement
+	currentPlayer := sm.state.player[playerID]
+	return currentPlayer
 }
 
 func (e player) GetItems(sm *stateMachine) []item {
@@ -18,30 +18,30 @@ func (e player) GetItems(sm *stateMachine) []item {
 }
 
 func (e player) GetGearScore(sm *stateMachine) gearScore {
-	patchingElement, ok := sm.patch.gearScore[e.gearScore]
+	patchingGearScore, ok := sm.patch.gearScore[e.gearScore]
 	if ok {
-		return patchingElement
+		return patchingGearScore
 	}
-	currentElement := sm.state.gearScore[e.gearScore]
-	return currentElement
+	currentGearScore := sm.state.gearScore[e.gearScore]
+	return currentGearScore
 }
 
 func (e player) GetPosition(sm *stateMachine) position {
-	patchingElement, ok := sm.patch.position[e.position]
+	patchingPosition, ok := sm.patch.position[e.position]
 	if ok {
-		return patchingElement
+		return patchingPosition
 	}
-	currentElement := sm.state.position[e.position]
-	return currentElement
+	currentPosition := sm.state.position[e.position]
+	return currentPosition
 }
 
 func (sm *stateMachine) GetGearScore(gearScoreID gearScoreID) gearScore {
-	patchingElement, ok := sm.patch.gearScore[gearScoreID]
+	patchingGearScore, ok := sm.patch.gearScore[gearScoreID]
 	if ok {
-		return patchingElement
+		return patchingGearScore
 	}
-	currentElement := sm.state.gearScore[gearScoreID]
-	return currentElement
+	currentGearScore := sm.state.gearScore[gearScoreID]
+	return currentGearScore
 }
 
 func (e gearScore) GetLevel() int {
@@ -53,30 +53,30 @@ func (e gearScore) GetScore() int {
 }
 
 func (sm *stateMachine) GetItem(itemID itemID) item {
-	patchingElement, ok := sm.patch.item[itemID]
+	patchingItem, ok := sm.patch.item[itemID]
 	if ok {
-		return patchingElement
+		return patchingItem
 	}
-	currentElement := sm.state.item[itemID]
-	return currentElement
+	currentItem := sm.state.item[itemID]
+	return currentItem
 }
 
 func (e item) GetGearScore(sm *stateMachine) gearScore {
-	patchingElement, ok := sm.patch.gearScore[e.gearScore]
+	patchingGearScore, ok := sm.patch.gearScore[e.gearScore]
 	if ok {
-		return patchingElement
+		return patchingGearScore
 	}
-	currentElement := sm.state.gearScore[e.gearScore]
-	return currentElement
+	currentGearScore := sm.state.gearScore[e.gearScore]
+	return currentGearScore
 }
 
 func (sm *stateMachine) GetPosition(positionID positionID) position {
-	patchingElement, ok := sm.patch.position[positionID]
+	patchingPosition, ok := sm.patch.position[positionID]
 	if ok {
-		return patchingElement
+		return patchingPosition
 	}
-	currentElement := sm.state.position[positionID]
-	return currentElement
+	currentPosition := sm.state.position[positionID]
+	return currentPosition
 }
 
 func (e position) GetX() float64 {
@@ -88,53 +88,53 @@ func (e position) GetY() float64 {
 }
 
 func (sm *stateMachine) GetZoneItem(zoneItemID zoneItemID) zoneItem {
-	patchingElement, ok := sm.patch.zoneItem[zoneItemID]
+	patchingZoneItem, ok := sm.patch.zoneItem[zoneItemID]
 	if ok {
-		return patchingElement
+		return patchingZoneItem
 	}
-	currentElement := sm.state.zoneItem[zoneItemID]
-	return currentElement
+	currentZoneItem := sm.state.zoneItem[zoneItemID]
+	return currentZoneItem
 }
 
 func (e zoneItem) GetPosition(sm *stateMachine) position {
-	patchingElement, ok := sm.patch.position[e.position]
+	patchingPosition, ok := sm.patch.position[e.position]
 	if ok {
-		return patchingElement
+		return patchingPosition
 	}
-	currentElement := sm.state.position[e.position]
-	return currentElement
+	currentPosition := sm.state.position[e.position]
+	return currentPosition
 }
 
 func (e zoneItem) GetItem(sm *stateMachine) item {
-	patchingElement, ok := sm.patch.item[e.item]
+	patchingItem, ok := sm.patch.item[e.item]
 	if ok {
-		return patchingElement
+		return patchingItem
 	}
-	currentElement := sm.state.item[e.item]
-	return currentElement
+	currentItem := sm.state.item[e.item]
+	return currentItem
 }
 
 func (sm *stateMachine) GetZone(zoneID zoneID) zone {
-	patchingElement, ok := sm.patch.zone[zoneID]
+	patchingZone, ok := sm.patch.zone[zoneID]
 	if ok {
-		return patchingElement
+		return patchingZone
 	}
-	currentElement := sm.state.zone[zoneID]
-	return currentElement
+	currentZone := sm.state.zone[zoneID]
+	return currentZone
 }
 
 func (e zone) GetPlayers(sm *stateMachine) []player {
-	var elements []player
-	for _, elementID := range e.players {
-		elements = append(elements, sm.GetPlayer(elementID))
+	var players []player
+	for _, playerID := range e.players {
+		players = append(players, sm.GetPlayer(playerID))
 	}
-	return elements
+	return players
 }
 
 func (e zone) GetZoneItems(sm *stateMachine) []zoneItem {
-	var elements []zoneItem
-	for _, elementID := range e.items {
-		elements = append(elements, sm.GetZoneItem(elementID))
+	var items []zoneItem
+	for _, zoneItemID := range e.items {
+		items = append(items, sm.GetZoneItem(zoneItemID))
 	}
-	return elements
+	return items
 }
