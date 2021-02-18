@@ -1,64 +1,64 @@
 package statemachine
 
 func (sm *stateMachine) CreateGearScore(parentage ...parentInfo) gearScore {
-	var element gearScore
-	element.id = gearScoreID(sm.generateID())
-	element.parentage = append(element.parentage, parentage...)
-	element.operationKind = operationKindUpdate
-	sm.patch.gearScore[element.id] = element
-	return element
+	var gearScore gearScore
+	gearScore.id = gearScoreID(sm.generateID())
+	gearScore.parentage = append(gearScore.parentage, parentage...)
+	gearScore.operationKind = operationKindUpdate
+	sm.patch.gearScore[gearScore.id] = gearScore
+	return gearScore
 }
 
 func (sm *stateMachine) CreatePosition(parentage ...parentInfo) position {
-	var element position
-	element.id = positionID(sm.generateID())
-	element.parentage = append(element.parentage, parentage...)
-	element.operationKind = operationKindUpdate
-	sm.patch.position[element.id] = element
-	return element
+	var position position
+	position.id = positionID(sm.generateID())
+	position.parentage = append(position.parentage, parentage...)
+	position.operationKind = operationKindUpdate
+	sm.patch.position[position.id] = position
+	return position
 }
 
 func (sm *stateMachine) CreateItem(parentage ...parentInfo) item {
-	var element item
-	element.id = itemID(sm.generateID())
-	element.parentage = append(element.parentage, parentage...)
-	elementGearScore := sm.CreateGearScore(append(element.parentage, parentInfo{entityKindItem, int(element.id)})...)
-	element.gearScore = elementGearScore.id
-	element.operationKind = operationKindUpdate
-	sm.patch.item[element.id] = element
-	return element
+	var item item
+	item.id = itemID(sm.generateID())
+	item.parentage = append(item.parentage, parentage...)
+	elementGearScore := sm.CreateGearScore(append(item.parentage, parentInfo{entityKindItem, int(item.id)})...)
+	item.gearScore = elementGearScore.id
+	item.operationKind = operationKindUpdate
+	sm.patch.item[item.id] = item
+	return item
 }
 
 func (sm *stateMachine) CreateZoneItem(parentage ...parentInfo) zoneItem {
-	var element zoneItem
-	element.id = zoneItemID(sm.generateID())
-	element.parentage = append(element.parentage, parentage...)
-	elementItem := sm.CreateItem(append(element.parentage, parentInfo{entityKindZoneItem, int(element.id)})...)
-	element.item = elementItem.id
-	elementPosition := sm.CreatePosition(append(element.parentage, parentInfo{entityKindZoneItem, int(element.id)})...)
-	element.position = elementPosition.id
-	element.operationKind = operationKindUpdate
-	sm.patch.zoneItem[element.id] = element
-	return element
+	var zoneItem zoneItem
+	zoneItem.id = zoneItemID(sm.generateID())
+	zoneItem.parentage = append(zoneItem.parentage, parentage...)
+	elementItem := sm.CreateItem(append(zoneItem.parentage, parentInfo{entityKindZoneItem, int(zoneItem.id)})...)
+	zoneItem.item = elementItem.id
+	elementPosition := sm.CreatePosition(append(zoneItem.parentage, parentInfo{entityKindZoneItem, int(zoneItem.id)})...)
+	zoneItem.position = elementPosition.id
+	zoneItem.operationKind = operationKindUpdate
+	sm.patch.zoneItem[zoneItem.id] = zoneItem
+	return zoneItem
 }
 
 func (sm *stateMachine) CreatePlayer(parentage ...parentInfo) player {
-	var element player
-	element.id = playerID(sm.generateID())
-	element.parentage = append(element.parentage, parentage...)
-	elementGearScore := sm.CreateGearScore(append(element.parentage, parentInfo{entityKindPlayer, int(element.id)})...)
-	element.gearScore = elementGearScore.id
-	elementPosition := sm.CreatePosition(append(element.parentage, parentInfo{entityKindPlayer, int(element.id)})...)
-	element.position = elementPosition.id
-	element.operationKind = operationKindUpdate
-	sm.patch.player[element.id] = element
-	return element
+	var player player
+	player.id = playerID(sm.generateID())
+	player.parentage = append(player.parentage, parentage...)
+	elementGearScore := sm.CreateGearScore(append(player.parentage, parentInfo{entityKindPlayer, int(player.id)})...)
+	player.gearScore = elementGearScore.id
+	elementPosition := sm.CreatePosition(append(player.parentage, parentInfo{entityKindPlayer, int(player.id)})...)
+	player.position = elementPosition.id
+	player.operationKind = operationKindUpdate
+	sm.patch.player[player.id] = player
+	return player
 }
 
 func (sm *stateMachine) CreateZone() zone {
-	var element zone
-	element.id = zoneID(sm.generateID())
-	element.operationKind = operationKindUpdate
-	sm.patch.zone[element.id] = element
-	return element
+	var zone zone
+	zone.id = zoneID(sm.generateID())
+	zone.operationKind = operationKindUpdate
+	sm.patch.zone[zone.id] = zone
+	return zone
 }
