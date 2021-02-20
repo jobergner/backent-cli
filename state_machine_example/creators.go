@@ -1,64 +1,64 @@
 package statemachine
 
-func (sm *stateMachine) CreateGearScore(parentage ...parentInfo) gearScore {
-	var gearScore gearScore
-	gearScore.id = gearScoreID(sm.generateID())
-	gearScore.parentage = append(gearScore.parentage, parentage...)
-	gearScore.operationKind = operationKindUpdate
-	sm.patch.gearScore[gearScore.id] = gearScore
+func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
+	var gearScore GearScore
+	gearScore.ID = GearScoreID(sm.GenerateID())
+	gearScore.Parentage = append(gearScore.Parentage, parentage...)
+	gearScore.OperationKind = OperationKindUpdate
+	sm.Patch.GearScore[gearScore.ID] = gearScore
 	return gearScore
 }
 
-func (sm *stateMachine) CreatePosition(parentage ...parentInfo) position {
-	var position position
-	position.id = positionID(sm.generateID())
-	position.parentage = append(position.parentage, parentage...)
-	position.operationKind = operationKindUpdate
-	sm.patch.position[position.id] = position
+func (sm *StateMachine) CreatePosition(parentage ...ParentInfo) Position {
+	var position Position
+	position.ID = PositionID(sm.GenerateID())
+	position.Parentage = append(position.Parentage, parentage...)
+	position.OperationKind = OperationKindUpdate
+	sm.Patch.Position[position.ID] = position
 	return position
 }
 
-func (sm *stateMachine) CreateItem(parentage ...parentInfo) item {
-	var item item
-	item.id = itemID(sm.generateID())
-	item.parentage = append(item.parentage, parentage...)
-	elementGearScore := sm.CreateGearScore(append(item.parentage, parentInfo{entityKindItem, int(item.id)})...)
-	item.gearScore = elementGearScore.id
-	item.operationKind = operationKindUpdate
-	sm.patch.item[item.id] = item
+func (sm *StateMachine) CreateItem(parentage ...ParentInfo) Item {
+	var item Item
+	item.ID = ItemID(sm.GenerateID())
+	item.Parentage = append(item.Parentage, parentage...)
+	elementGearScore := sm.CreateGearScore(append(item.Parentage, ParentInfo{EntityKindItem, int(item.ID)})...)
+	item.GearScore = elementGearScore.ID
+	item.OperationKind = OperationKindUpdate
+	sm.Patch.Item[item.ID] = item
 	return item
 }
 
-func (sm *stateMachine) CreateZoneItem(parentage ...parentInfo) zoneItem {
-	var zoneItem zoneItem
-	zoneItem.id = zoneItemID(sm.generateID())
-	zoneItem.parentage = append(zoneItem.parentage, parentage...)
-	elementItem := sm.CreateItem(append(zoneItem.parentage, parentInfo{entityKindZoneItem, int(zoneItem.id)})...)
-	zoneItem.item = elementItem.id
-	elementPosition := sm.CreatePosition(append(zoneItem.parentage, parentInfo{entityKindZoneItem, int(zoneItem.id)})...)
-	zoneItem.position = elementPosition.id
-	zoneItem.operationKind = operationKindUpdate
-	sm.patch.zoneItem[zoneItem.id] = zoneItem
+func (sm *StateMachine) CreateZoneItem(parentage ...ParentInfo) ZoneItem {
+	var zoneItem ZoneItem
+	zoneItem.ID = ZoneItemID(sm.GenerateID())
+	zoneItem.Parentage = append(zoneItem.Parentage, parentage...)
+	elementItem := sm.CreateItem(append(zoneItem.Parentage, ParentInfo{EntityKindZoneItem, int(zoneItem.ID)})...)
+	zoneItem.Item = elementItem.ID
+	elementPosition := sm.CreatePosition(append(zoneItem.Parentage, ParentInfo{EntityKindZoneItem, int(zoneItem.ID)})...)
+	zoneItem.Position = elementPosition.ID
+	zoneItem.OperationKind = OperationKindUpdate
+	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
 	return zoneItem
 }
 
-func (sm *stateMachine) CreatePlayer(parentage ...parentInfo) player {
-	var player player
-	player.id = playerID(sm.generateID())
-	player.parentage = append(player.parentage, parentage...)
-	elementGearScore := sm.CreateGearScore(append(player.parentage, parentInfo{entityKindPlayer, int(player.id)})...)
-	player.gearScore = elementGearScore.id
-	elementPosition := sm.CreatePosition(append(player.parentage, parentInfo{entityKindPlayer, int(player.id)})...)
-	player.position = elementPosition.id
-	player.operationKind = operationKindUpdate
-	sm.patch.player[player.id] = player
+func (sm *StateMachine) CreatePlayer(parentage ...ParentInfo) Player {
+	var player Player
+	player.ID = PlayerID(sm.GenerateID())
+	player.Parentage = append(player.Parentage, parentage...)
+	elementGearScore := sm.CreateGearScore(append(player.Parentage, ParentInfo{EntityKindPlayer, int(player.ID)})...)
+	player.GearScore = elementGearScore.ID
+	elementPosition := sm.CreatePosition(append(player.Parentage, ParentInfo{EntityKindPlayer, int(player.ID)})...)
+	player.Position = elementPosition.ID
+	player.OperationKind = OperationKindUpdate
+	sm.Patch.Player[player.ID] = player
 	return player
 }
 
-func (sm *stateMachine) CreateZone() zone {
-	var zone zone
-	zone.id = zoneID(sm.generateID())
-	zone.operationKind = operationKindUpdate
-	sm.patch.zone[zone.id] = zone
+func (sm *StateMachine) CreateZone() Zone {
+	var zone Zone
+	zone.ID = ZoneID(sm.GenerateID())
+	zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[zone.ID] = zone
 	return zone
 }

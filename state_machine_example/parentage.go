@@ -1,7 +1,7 @@
 package statemachine
 
-type parentage []parentInfo
-type parentInfo struct {
-	kind entityKind
-	id   int
+type Parentage []ParentInfo
+type ParentInfo struct {
+	Kind EntityKind
+	ID   int
 }

@@ -1,68 +1,68 @@
 package statemachine
 
-type operationKind string
+type OperationKind string
 
-type entityKind string
+type EntityKind string
 
 const (
-	operationKindDelete = "DELETE"
-	operationKindUpdate = "UPDATE"
+	OperationKindDelete = "DELETE"
+	OperationKindUpdate = "UPDATE"
 )
 
-type stateMachine struct {
-	state state
-	patch state
-	idgen int
+type StateMachine struct {
+	State State
+	Patch State
+	IDgen int
 }
 
-func (sm *stateMachine) generateID() int {
-	newID := sm.idgen
-	sm.idgen = sm.idgen + 1
+func (sm *StateMachine) GenerateID() int {
+	newID := sm.IDgen
+	sm.IDgen = sm.IDgen + 1
 	return newID
 }
 
-func (sm *stateMachine) updateState() {
-	for _, player := range sm.patch.player {
-		if player.operationKind == operationKindDelete {
-			delete(sm.state.player, player.id)
+func (sm *StateMachine) UpdateState() {
+	for _, player := range sm.Patch.Player {
+		if player.OperationKind == OperationKindDelete {
+			delete(sm.State.Player, player.ID)
 		} else {
-			sm.state.player[player.id] = player
+			sm.State.Player[player.ID] = player
 		}
 	}
-	for _, zone := range sm.patch.zone {
-		if zone.operationKind == operationKindDelete {
-			delete(sm.state.zone, zone.id)
+	for _, zone := range sm.Patch.Zone {
+		if zone.OperationKind == OperationKindDelete {
+			delete(sm.State.Zone, zone.ID)
 		} else {
-			sm.state.zone[zone.id] = zone
+			sm.State.Zone[zone.ID] = zone
 		}
 	}
-	for _, zoneItem := range sm.patch.zoneItem {
-		if zoneItem.operationKind == operationKindDelete {
-			delete(sm.state.zoneItem, zoneItem.id)
+	for _, zoneItem := range sm.Patch.ZoneItem {
+		if zoneItem.OperationKind == OperationKindDelete {
+			delete(sm.State.ZoneItem, zoneItem.ID)
 		} else {
-			sm.state.zoneItem[zoneItem.id] = zoneItem
+			sm.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
-	for _, position := range sm.patch.position {
-		if position.operationKind == operationKindDelete {
-			delete(sm.state.position, position.id)
+	for _, position := range sm.Patch.Position {
+		if position.OperationKind == OperationKindDelete {
+			delete(sm.State.Position, position.ID)
 		} else {
-			sm.state.position[position.id] = position
+			sm.State.Position[position.ID] = position
 		}
 	}
-	for _, item := range sm.patch.item {
-		if item.operationKind == operationKindDelete {
-			delete(sm.state.item, item.id)
+	for _, item := range sm.Patch.Item {
+		if item.OperationKind == OperationKindDelete {
+			delete(sm.State.Item, item.ID)
 		} else {
-			sm.state.item[item.id] = item
+			sm.State.Item[item.ID] = item
 		}
 	}
-	for _, gearScore := range sm.patch.gearScore {
-		if gearScore.operationKind == operationKindDelete {
-			delete(sm.state.gearScore, gearScore.id)
+	for _, gearScore := range sm.Patch.GearScore {
+		if gearScore.OperationKind == OperationKindDelete {
+			delete(sm.State.GearScore, gearScore.ID)
 		} else {
-			sm.state.gearScore[gearScore.id] = gearScore
+			sm.State.GearScore[gearScore.ID] = gearScore
 		}
 	}
-	sm.patch = newState()
+	sm.Patch = newState()
 }

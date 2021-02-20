@@ -1,46 +1,46 @@
 package statemachine
 
-func (z zone) RemovePlayer(playerID playerID, sm *stateMachine) zone {
+func (z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
 	var indexToRemove int
-	for i, _playerID := range z.players {
+	for i, _playerID := range z.Players {
 		if _playerID == playerID {
 			indexToRemove = i
 			break
 		}
 	}
-	z.players = append(z.players[:indexToRemove], z.players[indexToRemove+1:]...)
-	z.operationKind = operationKindUpdate
-	sm.patch.zone[z.id] = z
+	z.Players = append(z.Players[:indexToRemove], z.Players[indexToRemove+1:]...)
+	z.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[z.ID] = z
 	sm.DeletePlayer(playerID)
 	return z
 }
 
-func (z zone) RemoveZoneItem(zoneItemID zoneItemID, sm *stateMachine) zone {
+func (z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
 	var indexToRemove int
-	for i, _zoneItemID := range z.items {
+	for i, _zoneItemID := range z.Items {
 		if _zoneItemID == zoneItemID {
 			indexToRemove = i
 			break
 		}
 	}
-	z.items = append(z.items[:indexToRemove], z.items[indexToRemove+1:]...)
-	z.operationKind = operationKindUpdate
-	sm.patch.zone[z.id] = z
+	z.Items = append(z.Items[:indexToRemove], z.Items[indexToRemove+1:]...)
+	z.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[z.ID] = z
 	sm.DeleteZoneItem(zoneItemID)
 	return z
 }
 
-func (p player) RemoveItem(itemID itemID, sm *stateMachine) player {
+func (p Player) RemoveItem(itemID ItemID, sm *StateMachine) Player {
 	var indexToRemove int
-	for i, _itemID := range p.items {
+	for i, _itemID := range p.Items {
 		if _itemID == itemID {
 			indexToRemove = i
 			break
 		}
 	}
-	p.items = append(p.items[:indexToRemove], p.items[indexToRemove+1:]...)
-	p.operationKind = operationKindUpdate
-	sm.patch.player[p.id] = p
+	p.Items = append(p.Items[:indexToRemove], p.Items[indexToRemove+1:]...)
+	p.OperationKind = OperationKindUpdate
+	sm.Patch.Player[p.ID] = p
 	sm.DeleteItem(itemID)
 	return p
 }

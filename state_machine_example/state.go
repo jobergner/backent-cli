@@ -1,84 +1,84 @@
 package statemachine
 
 const (
-	entityKindPlayer    entityKind = "player"
-	entityKindZone                 = "zone"
-	entityKindZoneItem             = "zoneItem"
-	entityKindPosition             = "position"
-	entityKindItem                 = "item"
-	entityKindGearScore            = "gearScore"
+	EntityKindPlayer    EntityKind = "player"
+	EntityKindZone                 = "zone"
+	EntityKindZoneItem             = "zoneItem"
+	EntityKindPosition             = "position"
+	EntityKindItem                 = "item"
+	EntityKindGearScore            = "gearScore"
 )
 
-type zoneID int
-type zoneItemID int
-type positionID int
-type playerID int
-type itemID int
-type gearScoreID int
+type ZoneID int
+type ZoneItemID int
+type PositionID int
+type PlayerID int
+type ItemID int
+type GearScoreID int
 
-type state struct {
-	player    map[playerID]player
-	zone      map[zoneID]zone
-	zoneItem  map[zoneItemID]zoneItem
-	position  map[positionID]position
-	item      map[itemID]item
-	gearScore map[gearScoreID]gearScore
+type State struct {
+	Player    map[PlayerID]Player
+	Zone      map[ZoneID]Zone
+	ZoneItem  map[ZoneItemID]ZoneItem
+	Position  map[PositionID]Position
+	Item      map[ItemID]Item
+	GearScore map[GearScoreID]GearScore
 }
 
-func newState() state {
-	return state{
-		player:    make(map[playerID]player),
-		zone:      make(map[zoneID]zone),
-		zoneItem:  make(map[zoneItemID]zoneItem),
-		position:  make(map[positionID]position),
-		item:      make(map[itemID]item),
-		gearScore: make(map[gearScoreID]gearScore),
+func newState() State {
+	return State{
+		Player:    make(map[PlayerID]Player),
+		Zone:      make(map[ZoneID]Zone),
+		ZoneItem:  make(map[ZoneItemID]ZoneItem),
+		Position:  make(map[PositionID]Position),
+		Item:      make(map[ItemID]Item),
+		GearScore: make(map[GearScoreID]GearScore),
 	}
 }
 
-type zone struct {
-	id            zoneID
-	players       []playerID
-	items         []zoneItemID
-	operationKind operationKind
+type Zone struct {
+	ID            ZoneID
+	Players       []PlayerID
+	Items         []ZoneItemID
+	OperationKind OperationKind
 }
 
-type zoneItem struct {
-	id            zoneItemID
-	position      positionID
-	item          itemID
-	operationKind operationKind
-	parentage     parentage
+type ZoneItem struct {
+	ID            ZoneItemID
+	Position      PositionID
+	Item          ItemID
+	OperationKind OperationKind
+	Parentage     Parentage
 }
 
-type item struct {
-	id            itemID
-	gearScore     gearScoreID
-	operationKind operationKind
-	parentage     parentage
+type Item struct {
+	ID            ItemID
+	GearScore     GearScoreID
+	OperationKind OperationKind
+	Parentage     Parentage
 }
 
-type player struct {
-	id            playerID
-	items         []itemID
-	gearScore     gearScoreID
-	position      positionID
-	operationKind operationKind
-	parentage     parentage
+type Player struct {
+	ID            PlayerID
+	Items         []ItemID
+	GearScore     GearScoreID
+	Position      PositionID
+	OperationKind OperationKind
+	Parentage     Parentage
 }
 
-type gearScore struct {
-	id            gearScoreID
-	level         int
-	score         int
-	operationKind operationKind
-	parentage     parentage
+type GearScore struct {
+	ID            GearScoreID
+	Level         int
+	Score         int
+	OperationKind OperationKind
+	Parentage     Parentage
 }
 
-type position struct {
-	id            positionID
-	x             float64
-	y             float64
-	operationKind operationKind
-	parentage     parentage
+type Position struct {
+	ID            PositionID
+	X             float64
+	Y             float64
+	OperationKind OperationKind
+	Parentage     Parentage
 }
