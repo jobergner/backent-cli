@@ -27,7 +27,7 @@ func (t *Tree) reassembleByEnityKind(parentage Parentage, s State) {
 	}
 }
 
-func (t Tree) reassembleZone(parentage Parentage, zoneID ZoneID, s State) _Zone {
+func (t Tree) reassembleZone(parentage Parentage, zoneID ZoneID, s State) _zone {
 	_zone := t.Zone[zoneID]
 	zone := s.Zone[zoneID]
 	_zone.ID = zone.ID
@@ -45,7 +45,7 @@ func (t Tree) reassembleZone(parentage Parentage, zoneID ZoneID, s State) _Zone 
 	return _zone
 }
 
-func (t Tree) reassemblePlayer(parentage Parentage, playerID PlayerID, s State) _Player {
+func (t Tree) reassemblePlayer(parentage Parentage, playerID PlayerID, s State) _player {
 	_player := t.Player[playerID]
 	player := s.Player[playerID]
 	_player.ID = player.ID
@@ -66,7 +66,7 @@ func (t Tree) reassemblePlayer(parentage Parentage, playerID PlayerID, s State) 
 	return _player
 }
 
-func (t Tree) reassembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _ZoneItem {
+func (t Tree) reassembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
 	_zoneItem := t.ZoneItem[zoneItemID]
 	zoneItem := s.ZoneItem[zoneItemID]
 	_zoneItem.ID = zoneItem.ID
@@ -84,7 +84,7 @@ func (t Tree) reassembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s S
 	return _zoneItem
 }
 
-func (t Tree) reassemblePosition(positionID PositionID, s State) _Position {
+func (t Tree) reassemblePosition(positionID PositionID, s State) _position {
 	_position := t.Position[positionID]
 	position := s.Position[positionID]
 	_position.ID = position.ID
@@ -95,7 +95,7 @@ func (t Tree) reassemblePosition(positionID PositionID, s State) _Position {
 	return _position
 }
 
-func (t Tree) reassembleItem(parentage Parentage, itemID ItemID, s State) _Item {
+func (t Tree) reassembleItem(parentage Parentage, itemID ItemID, s State) _item {
 	_item := t.Item[itemID]
 	item := s.Item[itemID]
 	_item.ID = item.ID
@@ -110,7 +110,7 @@ func (t Tree) reassembleItem(parentage Parentage, itemID ItemID, s State) _Item 
 	return _item
 }
 
-func (t Tree) reassembleGearScore(gearScoreID GearScoreID, s State) _GearScore {
+func (t Tree) reassembleGearScore(gearScoreID GearScoreID, s State) _gearScore {
 	_gearScore := t.GearScore[gearScoreID]
 	gearScore := s.GearScore[gearScoreID]
 	_gearScore.ID = gearScore.ID
