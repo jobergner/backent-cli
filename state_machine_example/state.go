@@ -17,35 +17,35 @@ type ItemID int
 type GearScoreID int
 
 type State struct {
-	Player    map[PlayerID]PlayerCore
-	Zone      map[ZoneID]ZoneCore
-	ZoneItem  map[ZoneItemID]ZoneItemCore
-	Position  map[PositionID]PositionCore
-	Item      map[ItemID]ItemCore
-	GearScore map[GearScoreID]GearScoreCore
+	Player    map[PlayerID]playerCore
+	Zone      map[ZoneID]zoneCore
+	ZoneItem  map[ZoneItemID]zoneItemCore
+	Position  map[PositionID]positionCore
+	Item      map[ItemID]itemCore
+	GearScore map[GearScoreID]gearScoreCore
 }
 
 func newState() State {
 	return State{
-		Player:    make(map[PlayerID]PlayerCore),
-		Zone:      make(map[ZoneID]ZoneCore),
-		ZoneItem:  make(map[ZoneItemID]ZoneItemCore),
-		Position:  make(map[PositionID]PositionCore),
-		Item:      make(map[ItemID]ItemCore),
-		GearScore: make(map[GearScoreID]GearScoreCore),
+		Player:    make(map[PlayerID]playerCore),
+		Zone:      make(map[ZoneID]zoneCore),
+		ZoneItem:  make(map[ZoneItemID]zoneItemCore),
+		Position:  make(map[PositionID]positionCore),
+		Item:      make(map[ItemID]itemCore),
+		GearScore: make(map[GearScoreID]gearScoreCore),
 	}
 }
 
-type ZoneCore struct {
+type zoneCore struct {
 	ID            ZoneID
 	Players       []PlayerID
 	Items         []ZoneItemID
 	OperationKind OperationKind
 }
 
-type Zone struct{ zone ZoneCore }
+type Zone struct{ zone zoneCore }
 
-type ZoneItemCore struct {
+type zoneItemCore struct {
 	ID            ZoneItemID
 	Position      PositionID
 	Item          ItemID
@@ -53,18 +53,18 @@ type ZoneItemCore struct {
 	Parentage     Parentage
 }
 
-type ZoneItem struct{ zoneItem ZoneItemCore }
+type ZoneItem struct{ zoneItem zoneItemCore }
 
-type ItemCore struct {
+type itemCore struct {
 	ID            ItemID
 	GearScore     GearScoreID
 	OperationKind OperationKind
 	Parentage     Parentage
 }
 
-type Item struct{ item ItemCore }
+type Item struct{ item itemCore }
 
-type PlayerCore struct {
+type playerCore struct {
 	ID            PlayerID
 	Items         []ItemID
 	GearScore     GearScoreID
@@ -73,9 +73,9 @@ type PlayerCore struct {
 	Parentage     Parentage
 }
 
-type Player struct{ player PlayerCore }
+type Player struct{ player playerCore }
 
-type GearScoreCore struct {
+type gearScoreCore struct {
 	ID            GearScoreID
 	Level         int
 	Score         int
@@ -83,9 +83,9 @@ type GearScoreCore struct {
 	Parentage     Parentage
 }
 
-type GearScore struct{ gearScore GearScoreCore }
+type GearScore struct{ gearScore gearScoreCore }
 
-type PositionCore struct {
+type positionCore struct {
 	ID            PositionID
 	X             float64
 	Y             float64
@@ -93,4 +93,4 @@ type PositionCore struct {
 	Parentage     Parentage
 }
 
-type Position struct{ position PositionCore }
+type Position struct{ position positionCore }

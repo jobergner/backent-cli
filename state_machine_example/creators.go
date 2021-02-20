@@ -1,7 +1,7 @@
 package statemachine
 
 func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
-	var gearScore GearScoreCore
+	var gearScore gearScoreCore
 	gearScore.ID = GearScoreID(sm.GenerateID())
 	gearScore.Parentage = append(gearScore.Parentage, parentage...)
 	gearScore.OperationKind = OperationKindUpdate
@@ -10,7 +10,7 @@ func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
 }
 
 func (sm *StateMachine) CreatePosition(parentage ...ParentInfo) Position {
-	var position PositionCore
+	var position positionCore
 	position.ID = PositionID(sm.GenerateID())
 	position.Parentage = append(position.Parentage, parentage...)
 	position.OperationKind = OperationKindUpdate
@@ -19,7 +19,7 @@ func (sm *StateMachine) CreatePosition(parentage ...ParentInfo) Position {
 }
 
 func (sm *StateMachine) CreateItem(parentage ...ParentInfo) Item {
-	var item ItemCore
+	var item itemCore
 	item.ID = ItemID(sm.GenerateID())
 	item.Parentage = append(item.Parentage, parentage...)
 	elementGearScore := sm.CreateGearScore(append(item.Parentage, ParentInfo{EntityKindItem, int(item.ID)})...)
@@ -30,7 +30,7 @@ func (sm *StateMachine) CreateItem(parentage ...ParentInfo) Item {
 }
 
 func (sm *StateMachine) CreateZoneItem(parentage ...ParentInfo) ZoneItem {
-	var zoneItem ZoneItemCore
+	var zoneItem zoneItemCore
 	zoneItem.ID = ZoneItemID(sm.GenerateID())
 	zoneItem.Parentage = append(zoneItem.Parentage, parentage...)
 	elementItem := sm.CreateItem(append(zoneItem.Parentage, ParentInfo{EntityKindZoneItem, int(zoneItem.ID)})...)
@@ -43,7 +43,7 @@ func (sm *StateMachine) CreateZoneItem(parentage ...ParentInfo) ZoneItem {
 }
 
 func (sm *StateMachine) CreatePlayer(parentage ...ParentInfo) Player {
-	var player PlayerCore
+	var player playerCore
 	player.ID = PlayerID(sm.GenerateID())
 	player.Parentage = append(player.Parentage, parentage...)
 	elementGearScore := sm.CreateGearScore(append(player.Parentage, ParentInfo{EntityKindPlayer, int(player.ID)})...)
@@ -56,7 +56,7 @@ func (sm *StateMachine) CreatePlayer(parentage ...ParentInfo) Player {
 }
 
 func (sm *StateMachine) CreateZone() Zone {
-	var zone ZoneCore
+	var zone zoneCore
 	zone.ID = ZoneID(sm.GenerateID())
 	zone.OperationKind = OperationKindUpdate
 	sm.Patch.Zone[zone.ID] = zone

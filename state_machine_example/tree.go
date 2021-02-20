@@ -1,52 +1,52 @@
 package statemachine
 
 type Tree struct {
-	Player    map[PlayerID]_Player
-	Zone      map[ZoneID]_Zone
-	ZoneItem  map[ZoneItemID]_ZoneItem
-	Item      map[ItemID]_Item
-	Position  map[PositionID]_Position
-	GearScore map[GearScoreID]_GearScore
+	Player    map[PlayerID]_player
+	Zone      map[ZoneID]_zone
+	ZoneItem  map[ZoneItemID]_zoneItem
+	Item      map[ItemID]_item
+	Position  map[PositionID]_position
+	GearScore map[GearScoreID]_gearScore
 }
 
-type _ZoneItem struct {
+type _zoneItem struct {
 	ID            ZoneItemID
-	Position      *_Position
-	Item          *_Item
+	Position      *_position
+	Item          *_item
 	OperationKind OperationKind
 }
 
-type _Item struct {
+type _item struct {
 	ID            ItemID
-	GearScore     *_GearScore
+	GearScore     *_gearScore
 	OperationKind OperationKind
 }
 
-type _Position struct {
+type _position struct {
 	ID            PositionID
 	X             float64
 	Y             float64
 	OperationKind OperationKind
 }
 
-type _GearScore struct {
+type _gearScore struct {
 	ID            GearScoreID
 	Level         int
 	Score         int
 	OperationKind OperationKind
 }
 
-type _Player struct {
+type _player struct {
 	ID            PlayerID
-	Items         []_Item
-	GearScore     *_GearScore
-	Position      *_Position
+	Items         []_item
+	GearScore     *_gearScore
+	Position      *_position
 	OperationKind OperationKind
 }
 
-type _Zone struct {
+type _zone struct {
 	ID            ZoneID
-	Players       []_Player
-	Items         []_ZoneItem
+	Players       []_player
+	Items         []_zoneItem
 	OperationKind OperationKind
 }
