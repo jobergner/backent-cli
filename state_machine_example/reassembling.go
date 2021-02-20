@@ -1,122 +1,122 @@
 package statemachine
 
-func (t *tree) reassembleFrom(s state) {
-	for _, player := range s.player {
-		t.reassembleByEnityKind(player.parentage, s)
+func (t *Tree) reassembleFrom(s State) {
+	for _, player := range s.Player {
+		t.reassembleByEnityKind(player.Parentage, s)
 	}
-	for _, zoneItem := range s.zoneItem {
-		t.reassembleByEnityKind(zoneItem.parentage, s)
+	for _, zoneItem := range s.ZoneItem {
+		t.reassembleByEnityKind(zoneItem.Parentage, s)
 	}
-	for _, position := range s.position {
-		t.reassembleByEnityKind(position.parentage, s)
+	for _, position := range s.Position {
+		t.reassembleByEnityKind(position.Parentage, s)
 	}
-	for _, item := range s.item {
-		t.reassembleByEnityKind(item.parentage, s)
+	for _, item := range s.Item {
+		t.reassembleByEnityKind(item.Parentage, s)
 	}
-	for _, gearScore := range s.gearScore {
-		t.reassembleByEnityKind(gearScore.parentage, s)
+	for _, gearScore := range s.GearScore {
+		t.reassembleByEnityKind(gearScore.Parentage, s)
 	}
 }
 
-func (t *tree) reassembleByEnityKind(parentage parentage, s state) {
+func (t *Tree) reassembleByEnityKind(parentage Parentage, s State) {
 	greatestAncestor := parentage[0]
-	switch greatestAncestor.kind {
-	case entityKindZoneItem:
-		_zoneItem := t.reassembleZoneItem(parentage[1:], zoneItemID(greatestAncestor.id), s)
-		t.zoneItem[zoneItemID(greatestAncestor.id)] = _zoneItem
+	switch greatestAncestor.Kind {
+	case EntityKindZoneItem:
+		_zoneItem := t.reassembleZoneItem(parentage[1:], ZoneItemID(greatestAncestor.ID), s)
+		t.ZoneItem[ZoneItemID(greatestAncestor.ID)] = _zoneItem
 	}
 }
 
-func (t tree) reassembleZone(parentage parentage, zoneID zoneID, s state) _zone {
-	_zone := t.zone[zoneID]
-	zone := s.zone[zoneID]
-	_zone.id = zone.id
-	_zone.operationKind = zone.operationKind
+func (t Tree) reassembleZone(parentage Parentage, zoneID ZoneID, s State) _Zone {
+	_zone := t.Zone[zoneID]
+	zone := s.Zone[zoneID]
+	_zone.ID = zone.ID
+	_zone.OperationKind = zone.OperationKind
 
 	nextDescendant := parentage[0]
-	switch nextDescendant.kind {
-	case entityKindPlayer:
-		_player := t.reassemblePlayer(parentage[1:], playerID(nextDescendant.id), s)
-		_zone.players = append(_zone.players, _player)
-	case entityKindZoneItem:
-		_zoneItem := t.reassembleZoneItem(parentage[1:], zoneItemID(nextDescendant.id), s)
-		_zone.items = append(_zone.items, _zoneItem)
+	switch nextDescendant.Kind {
+	case EntityKindPlayer:
+		_player := t.reassemblePlayer(parentage[1:], PlayerID(nextDescendant.ID), s)
+		_zone.Players = append(_zone.Players, _player)
+	case EntityKindZoneItem:
+		_zoneItem := t.reassembleZoneItem(parentage[1:], ZoneItemID(nextDescendant.ID), s)
+		_zone.Items = append(_zone.Items, _zoneItem)
 	}
 	return _zone
 }
 
-func (t tree) reassemblePlayer(parentage parentage, playerID playerID, s state) _player {
-	_player := t.player[playerID]
-	player := s.player[playerID]
-	_player.id = player.id
-	_player.operationKind = player.operationKind
+func (t Tree) reassemblePlayer(parentage Parentage, playerID PlayerID, s State) _Player {
+	_player := t.Player[playerID]
+	player := s.Player[playerID]
+	_player.ID = player.ID
+	_player.OperationKind = player.OperationKind
 
 	nextDescendant := parentage[0]
-	switch nextDescendant.kind {
-	case entityKindPosition:
-		_position := t.reassemblePosition(positionID(nextDescendant.id), s)
-		_player.position = &_position
-	case entityKindGearScore:
-		_gearScore := t.reassembleGearScore(gearScoreID(nextDescendant.id), s)
-		_player.gearScore = &_gearScore
-	case entityKindItem:
-		_item := t.reassembleItem(parentage[1:], itemID(nextDescendant.id), s)
-		_player.items = append(_player.items, _item)
+	switch nextDescendant.Kind {
+	case EntityKindPosition:
+		_position := t.reassemblePosition(PositionID(nextDescendant.ID), s)
+		_player.Position = &_position
+	case EntityKindGearScore:
+		_gearScore := t.reassembleGearScore(GearScoreID(nextDescendant.ID), s)
+		_player.GearScore = &_gearScore
+	case EntityKindItem:
+		_item := t.reassembleItem(parentage[1:], ItemID(nextDescendant.ID), s)
+		_player.Items = append(_player.Items, _item)
 	}
 	return _player
 }
 
-func (t tree) reassembleZoneItem(parentage parentage, zoneItemID zoneItemID, s state) _zoneItem {
-	_zoneItem := t.zoneItem[zoneItemID]
-	zoneItem := s.zoneItem[zoneItemID]
-	_zoneItem.id = zoneItem.id
-	_zoneItem.operationKind = zoneItem.operationKind
+func (t Tree) reassembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _ZoneItem {
+	_zoneItem := t.ZoneItem[zoneItemID]
+	zoneItem := s.ZoneItem[zoneItemID]
+	_zoneItem.ID = zoneItem.ID
+	_zoneItem.OperationKind = zoneItem.OperationKind
 
 	nextDescendant := parentage[0]
-	switch nextDescendant.kind {
-	case entityKindPosition:
-		_position := t.reassemblePosition(positionID(nextDescendant.id), s)
-		_zoneItem.position = &_position
-	case entityKindItem:
-		_item := t.reassembleItem(parentage[1:], itemID(nextDescendant.id), s)
-		_zoneItem.item = &_item
+	switch nextDescendant.Kind {
+	case EntityKindPosition:
+		_position := t.reassemblePosition(PositionID(nextDescendant.ID), s)
+		_zoneItem.Position = &_position
+	case EntityKindItem:
+		_item := t.reassembleItem(parentage[1:], ItemID(nextDescendant.ID), s)
+		_zoneItem.Item = &_item
 	}
 	return _zoneItem
 }
 
-func (t tree) reassemblePosition(positionID positionID, s state) _position {
-	_position := t.position[positionID]
-	position := s.position[positionID]
-	_position.id = position.id
-	_position.operationKind = position.operationKind
+func (t Tree) reassemblePosition(positionID PositionID, s State) _Position {
+	_position := t.Position[positionID]
+	position := s.Position[positionID]
+	_position.ID = position.ID
+	_position.OperationKind = position.OperationKind
 
-	_position.x = position.x
-	_position.y = position.y
+	_position.X = position.X
+	_position.Y = position.Y
 	return _position
 }
 
-func (t tree) reassembleItem(parentage parentage, itemID itemID, s state) _item {
-	_item := t.item[itemID]
-	item := s.item[itemID]
-	_item.id = item.id
-	_item.operationKind = item.operationKind
+func (t Tree) reassembleItem(parentage Parentage, itemID ItemID, s State) _Item {
+	_item := t.Item[itemID]
+	item := s.Item[itemID]
+	_item.ID = item.ID
+	_item.OperationKind = item.OperationKind
 
 	nextDescendant := parentage[0]
-	switch nextDescendant.kind {
-	case entityKindGearScore:
-		_gearScore := t.reassembleGearScore(gearScoreID(nextDescendant.id), s)
-		_item.gearScore = &_gearScore
+	switch nextDescendant.Kind {
+	case EntityKindGearScore:
+		_gearScore := t.reassembleGearScore(GearScoreID(nextDescendant.ID), s)
+		_item.GearScore = &_gearScore
 	}
 	return _item
 }
 
-func (t tree) reassembleGearScore(gearScoreID gearScoreID, s state) _gearScore {
-	_gearScore := t.gearScore[gearScoreID]
-	gearScore := s.gearScore[gearScoreID]
-	_gearScore.id = gearScore.id
-	_gearScore.operationKind = gearScore.operationKind
+func (t Tree) reassembleGearScore(gearScoreID GearScoreID, s State) _GearScore {
+	_gearScore := t.GearScore[gearScoreID]
+	gearScore := s.GearScore[gearScoreID]
+	_gearScore.ID = gearScore.ID
+	_gearScore.OperationKind = gearScore.OperationKind
 
-	_gearScore.level = gearScore.level
-	_gearScore.score = gearScore.score
+	_gearScore.Level = gearScore.Level
+	_gearScore.Score = gearScore.Score
 	return _gearScore
 }

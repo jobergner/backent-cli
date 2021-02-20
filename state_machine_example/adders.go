@@ -1,25 +1,25 @@
 package statemachine
 
-func (e zone) AddPlayer(sm *stateMachine) player {
-	player := sm.CreatePlayer(parentInfo{entityKindZone, int(e.id)})
-	e.players = append(e.players, player.id)
-	e.operationKind = operationKindUpdate
-	sm.patch.zone[e.id] = e
+func (e Zone) AddPlayer(sm *StateMachine) Player {
+	player := sm.CreatePlayer(ParentInfo{EntityKindZone, int(e.ID)})
+	e.Players = append(e.Players, player.ID)
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.ID] = e
 	return player
 }
 
-func (e zone) AddZoneItem(sm *stateMachine) zoneItem {
-	zoneItem := sm.CreateZoneItem(parentInfo{entityKindZone, int(e.id)})
-	e.items = append(e.items, zoneItem.id)
-	e.operationKind = operationKindUpdate
-	sm.patch.zone[e.id] = e
+func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+	zoneItem := sm.CreateZoneItem(ParentInfo{EntityKindZone, int(e.ID)})
+	e.Items = append(e.Items, zoneItem.ID)
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.ID] = e
 	return zoneItem
 }
 
-func (e player) AddItem(sm *stateMachine) item {
-	item := sm.CreateItem(append(e.parentage, parentInfo{entityKindPlayer, int(e.id)})...)
-	e.items = append(e.items, item.id)
-	e.operationKind = operationKindUpdate
-	sm.patch.player[e.id] = e
+func (e Player) AddItem(sm *StateMachine) Item {
+	item := sm.CreateItem(append(e.Parentage, ParentInfo{EntityKindPlayer, int(e.ID)})...)
+	e.Items = append(e.Items, item.ID)
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Player[e.ID] = e
 	return item
 }

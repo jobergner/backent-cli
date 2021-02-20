@@ -1,139 +1,139 @@
 package statemachine
 
-func (sm *stateMachine) GetPlayer(playerID playerID) player {
-	patchingPlayer, ok := sm.patch.player[playerID]
+func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
+	patchingPlayer, ok := sm.Patch.Player[playerID]
 	if ok {
 		return patchingPlayer
 	}
-	currentPlayer := sm.state.player[playerID]
+	currentPlayer := sm.State.Player[playerID]
 	return currentPlayer
 }
 
-func (e player) GetItems(sm *stateMachine) []item {
-	var items []item
-	for _, itemID := range e.items {
+func (e Player) GetItems(sm *StateMachine) []Item {
+	var items []Item
+	for _, itemID := range e.Items {
 		items = append(items, sm.GetItem(itemID))
 	}
 	return items
 }
 
-func (e player) GetGearScore(sm *stateMachine) gearScore {
-	patchingGearScore, ok := sm.patch.gearScore[e.gearScore]
+func (e Player) GetGearScore(sm *StateMachine) GearScore {
+	patchingGearScore, ok := sm.Patch.GearScore[e.GearScore]
 	if ok {
 		return patchingGearScore
 	}
-	currentGearScore := sm.state.gearScore[e.gearScore]
+	currentGearScore := sm.State.GearScore[e.GearScore]
 	return currentGearScore
 }
 
-func (e player) GetPosition(sm *stateMachine) position {
-	patchingPosition, ok := sm.patch.position[e.position]
+func (e Player) GetPosition(sm *StateMachine) Position {
+	patchingPosition, ok := sm.Patch.Position[e.Position]
 	if ok {
 		return patchingPosition
 	}
-	currentPosition := sm.state.position[e.position]
+	currentPosition := sm.State.Position[e.Position]
 	return currentPosition
 }
 
-func (sm *stateMachine) GetGearScore(gearScoreID gearScoreID) gearScore {
-	patchingGearScore, ok := sm.patch.gearScore[gearScoreID]
+func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
+	patchingGearScore, ok := sm.Patch.GearScore[gearScoreID]
 	if ok {
 		return patchingGearScore
 	}
-	currentGearScore := sm.state.gearScore[gearScoreID]
+	currentGearScore := sm.State.GearScore[gearScoreID]
 	return currentGearScore
 }
 
-func (e gearScore) GetLevel() int {
-	return e.level
+func (e GearScore) GetLevel() int {
+	return e.Level
 }
 
-func (e gearScore) GetScore() int {
-	return e.score
+func (e GearScore) GetScore() int {
+	return e.Score
 }
 
-func (sm *stateMachine) GetItem(itemID itemID) item {
-	patchingItem, ok := sm.patch.item[itemID]
+func (sm *StateMachine) GetItem(itemID ItemID) Item {
+	patchingItem, ok := sm.Patch.Item[itemID]
 	if ok {
 		return patchingItem
 	}
-	currentItem := sm.state.item[itemID]
+	currentItem := sm.State.Item[itemID]
 	return currentItem
 }
 
-func (e item) GetGearScore(sm *stateMachine) gearScore {
-	patchingGearScore, ok := sm.patch.gearScore[e.gearScore]
+func (e Item) GetGearScore(sm *StateMachine) GearScore {
+	patchingGearScore, ok := sm.Patch.GearScore[e.GearScore]
 	if ok {
 		return patchingGearScore
 	}
-	currentGearScore := sm.state.gearScore[e.gearScore]
+	currentGearScore := sm.State.GearScore[e.GearScore]
 	return currentGearScore
 }
 
-func (sm *stateMachine) GetPosition(positionID positionID) position {
-	patchingPosition, ok := sm.patch.position[positionID]
+func (sm *StateMachine) GetPosition(positionID PositionID) Position {
+	patchingPosition, ok := sm.Patch.Position[positionID]
 	if ok {
 		return patchingPosition
 	}
-	currentPosition := sm.state.position[positionID]
+	currentPosition := sm.State.Position[positionID]
 	return currentPosition
 }
 
-func (e position) GetX() float64 {
-	return e.x
+func (e Position) GetX() float64 {
+	return e.X
 }
 
-func (e position) GetY() float64 {
-	return e.y
+func (e Position) GetY() float64 {
+	return e.Y
 }
 
-func (sm *stateMachine) GetZoneItem(zoneItemID zoneItemID) zoneItem {
-	patchingZoneItem, ok := sm.patch.zoneItem[zoneItemID]
+func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
+	patchingZoneItem, ok := sm.Patch.ZoneItem[zoneItemID]
 	if ok {
 		return patchingZoneItem
 	}
-	currentZoneItem := sm.state.zoneItem[zoneItemID]
+	currentZoneItem := sm.State.ZoneItem[zoneItemID]
 	return currentZoneItem
 }
 
-func (e zoneItem) GetPosition(sm *stateMachine) position {
-	patchingPosition, ok := sm.patch.position[e.position]
+func (e ZoneItem) GetPosition(sm *StateMachine) Position {
+	patchingPosition, ok := sm.Patch.Position[e.Position]
 	if ok {
 		return patchingPosition
 	}
-	currentPosition := sm.state.position[e.position]
+	currentPosition := sm.State.Position[e.Position]
 	return currentPosition
 }
 
-func (e zoneItem) GetItem(sm *stateMachine) item {
-	patchingItem, ok := sm.patch.item[e.item]
+func (e ZoneItem) GetItem(sm *StateMachine) Item {
+	patchingItem, ok := sm.Patch.Item[e.Item]
 	if ok {
 		return patchingItem
 	}
-	currentItem := sm.state.item[e.item]
+	currentItem := sm.State.Item[e.Item]
 	return currentItem
 }
 
-func (sm *stateMachine) GetZone(zoneID zoneID) zone {
-	patchingZone, ok := sm.patch.zone[zoneID]
+func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
+	patchingZone, ok := sm.Patch.Zone[zoneID]
 	if ok {
 		return patchingZone
 	}
-	currentZone := sm.state.zone[zoneID]
+	currentZone := sm.State.Zone[zoneID]
 	return currentZone
 }
 
-func (e zone) GetPlayers(sm *stateMachine) []player {
-	var players []player
-	for _, playerID := range e.players {
+func (e Zone) GetPlayers(sm *StateMachine) []Player {
+	var players []Player
+	for _, playerID := range e.Players {
 		players = append(players, sm.GetPlayer(playerID))
 	}
 	return players
 }
 
-func (e zone) GetZoneItems(sm *stateMachine) []zoneItem {
-	var items []zoneItem
-	for _, zoneItemID := range e.items {
+func (e Zone) GetZoneItems(sm *StateMachine) []ZoneItem {
+	var items []ZoneItem
+	for _, zoneItemID := range e.Items {
 		items = append(items, sm.GetZoneItem(zoneItemID))
 	}
 	return items
