@@ -88,6 +88,13 @@ with patch batching this should be possible.
 - removes meta fields
 - adds 'hasUpdated' field
 - updates of elements with multiple children will only include children that actually updated
+- upon generation a dist folder is created which includes wasm_exec.js, client.wasm, index.html and an your_code.js file
+
+### local state
+should be optional
+Is just empty if not defined
+only affected by 'local actions'
+actions may be local and remote at the same time
 
 ### local-only-state and remote-state mapping:
 some actions should/must not rely on the server accepting, processing, and broadcasting it.
@@ -101,9 +108,20 @@ In this case the remote position state of the character would be changed.
 it's up to the dev to decide which state is used, local or remote. maybe the dev should implement a flag
 on the server side state to signal the frontend to use the remote state instead.
 
+## TODO
 ### deletion -> update in queue
 what if a queued action including a delete is followed by a queue action with an update on the same element??
-Setters, removers and adders will return receiver when operation kind is delete 
+Setters, removers and adders will return receiver when operation kind is delete.
+
+### Marshaling:
+Fields of elements should not be accessible directly, only through the API.
+A Wrapper for each element is needed which only exposes the API but not the fields themselves.
+
+### Later Usage:
+the package gets generated
+is being updated with every 'register action'
+User can decide initially whether he wants to use 'go install' to make it global.
+use https://github.com/mailru/easyjson to generate json marshal func.
 
 ### TODO
 - finish state machine
