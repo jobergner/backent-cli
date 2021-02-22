@@ -17,12 +17,12 @@ type ItemID int
 type GearScoreID int
 
 type State struct {
-	Player    map[PlayerID]playerCore
-	Zone      map[ZoneID]zoneCore
-	ZoneItem  map[ZoneItemID]zoneItemCore
-	Position  map[PositionID]positionCore
-	Item      map[ItemID]itemCore
-	GearScore map[GearScoreID]gearScoreCore
+	Player    map[PlayerID]playerCore       `json:"player"`
+	Zone      map[ZoneID]zoneCore           `json:"zone"`
+	ZoneItem  map[ZoneItemID]zoneItemCore   `json:"zoneItem"`
+	Position  map[PositionID]positionCore   `json:"position"`
+	Item      map[ItemID]itemCore           `json:"item"`
+	GearScore map[GearScoreID]gearScoreCore `json:"gearScore"`
 }
 
 func newState() State {
@@ -37,60 +37,60 @@ func newState() State {
 }
 
 type zoneCore struct {
-	ID            ZoneID
-	Players       []PlayerID
-	Items         []ZoneItemID
-	OperationKind OperationKind
+	ID            ZoneID        `json:"id"`
+	Players       []PlayerID    `json:"players"`
+	Items         []ZoneItemID  `json:"items"`
+	OperationKind OperationKind `json:"operationKind"`
 }
 
 type Zone struct{ zone zoneCore }
 
 type zoneItemCore struct {
-	ID            ZoneItemID
-	Position      PositionID
-	Item          ItemID
-	OperationKind OperationKind
-	Parentage     Parentage
+	ID            ZoneItemID    `json:"id"`
+	Position      PositionID    `json:"position"`
+	Item          ItemID        `json:"item"`
+	OperationKind OperationKind `json:"operationKind"`
+	Parentage     Parentage     `json:"parentage"`
 }
 
 type ZoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
-	ID            ItemID
-	GearScore     GearScoreID
-	OperationKind OperationKind
-	Parentage     Parentage
+	ID            ItemID        `json:"id"`
+	GearScore     GearScoreID   `json:"gearScore"`
+	OperationKind OperationKind `json:"operationKind"`
+	Parentage     Parentage     `json:"parentage"`
 }
 
 type Item struct{ item itemCore }
 
 type playerCore struct {
-	ID            PlayerID
-	Items         []ItemID
-	GearScore     GearScoreID
-	Position      PositionID
-	OperationKind OperationKind
-	Parentage     Parentage
+	ID            PlayerID      `json:"id"`
+	Items         []ItemID      `json:"items"`
+	GearScore     GearScoreID   `json:"gearScore"`
+	Position      PositionID    `json:"position"`
+	OperationKind OperationKind `json:"operationKind"`
+	Parentage     Parentage     `json:"parentage"`
 }
 
 type Player struct{ player playerCore }
 
 type gearScoreCore struct {
-	ID            GearScoreID
-	Level         int
-	Score         int
-	OperationKind OperationKind
-	Parentage     Parentage
+	ID            GearScoreID   `json:"id"`
+	Level         int           `json:"level"`
+	Score         int           `json:"score"`
+	OperationKind OperationKind `json:"operationKind"`
+	Parentage     Parentage     `json:"parentage"`
 }
 
 type GearScore struct{ gearScore gearScoreCore }
 
 type positionCore struct {
-	ID            PositionID
-	X             float64
-	Y             float64
-	OperationKind OperationKind
-	Parentage     Parentage
+	ID            PositionID    `json:"id"`
+	X             float64       `json:"x"`
+	Y             float64       `json:"y"`
+	OperationKind OperationKind `json:"operationKind"`
+	Parentage     Parentage     `json:"parentage"`
 }
 
 type Position struct{ position positionCore }
