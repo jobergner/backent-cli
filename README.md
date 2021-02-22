@@ -76,6 +76,18 @@ with patch batching this should be possible.
 - (sm.finish() dont know if really needed)
 - create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config'
 
+### validating input:
+the original idea was to let the user configure the state inside a go file. However there are a few problems:
+- the user would have to keep a file with type declarations somewhere outside or clutter their code base with types
+- using go would allow/suggest too much freedom
+- gives wrong idea about how the data works
+better alternative would be to let the user define their state inside a yaml file with strict rules and validation.
+make use of https://github.com/Java-Jonas/yamltostruct, maybe fork or copy/paste usable code.
+additional restirctions:
+- no named types
+- only basic/self defined types and slices of them 
+
+
 ### testing
 - with decltostring
 - some files will just be copy/pasted as they will always be the same
@@ -108,7 +120,6 @@ In this case the remote position state of the character would be changed.
 it's up to the dev to decide which state is used, local or remote. maybe the dev should implement a flag
 on the server side state to signal the frontend to use the remote state instead.
 
-## TODO
 ### deletion -> update in queue
 what if a queued action including a delete is followed by a queue action with an update on the same element??
 Setters, removers and adders will return receiver when operation kind is delete.
@@ -123,6 +134,10 @@ is being updated with every 'register action'
 User can decide initially whether he wants to use 'go install' to make it global.
 use https://github.com/mailru/easyjson to generate json marshal func.
 
+### Declared types as receiver:
+Having your basic type declarations in a package takes away the ability to to write methods for them.
+The user would have to reassign and cast the type into a self defined type
+
 ### TODO
 - finish state machine
 - finish state factory tests
@@ -133,3 +148,4 @@ use https://github.com/mailru/easyjson to generate json marshal func.
 - create cli for 'generate from config' and 'register actions'
 - write server
 - write state conveyor
+
