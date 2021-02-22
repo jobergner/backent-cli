@@ -1,16 +1,31 @@
 package inputexample
 
-type person struct {
-	name     name
-	children []child
-	age      int
+type position struct {
+	X float64
+	Y float64
 }
 
-type name struct {
-	first string
-	last  string
+type gearScore struct {
+	level int
+	score int
 }
 
-type child struct {
-	name name
+type item struct {
+	gearScore gearScore
+}
+
+type player struct {
+	items     []item
+	gearScore gearScore
+	position  position
+}
+
+type zoneItem struct {
+	position position
+	item     item
+}
+
+type zone struct {
+	players []player
+	items   []zoneItem
 }

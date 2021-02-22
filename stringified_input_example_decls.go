@@ -2,15 +2,30 @@
 
 package statefactory
 
-const input_person_type string = `type person struct {
-	name		name
-	children	[]child
-	age		int
+const input_position_type string = `type position struct {
+	X	float64
+	Y	float64
 }`
 
-const input_name_type string = `type name struct {
-	first	string
-	last	string
+const input_gearScore_type string = `type gearScore struct {
+	level	int
+	score	int
 }`
 
-const input_child_type string = `type child struct{ name name }`
+const input_item_type string = `type item struct{ gearScore gearScore }`
+
+const input_player_type string = `type player struct {
+	items		[]item
+	gearScore	gearScore
+	position	position
+}`
+
+const input_zoneItem_type string = `type zoneItem struct {
+	position	position
+	item		item
+}`
+
+const input_zone_type string = `type zone struct {
+	players	[]player
+	items	[]zoneItem
+}`
