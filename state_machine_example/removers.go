@@ -1,12 +1,20 @@
 package statemachine
 
 func (z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
+	if z.zone.OperationKind == OperationKindDelete {
+		return z
+	}
+	var elementFound bool
 	var indexToRemove int
 	for i, _playerID := range z.zone.Players {
 		if _playerID == playerID {
 			indexToRemove = i
+			elementFound = true
 			break
 		}
+	}
+	if !elementFound {
+		return z
 	}
 	z.zone.Players = append(z.zone.Players[:indexToRemove], z.zone.Players[indexToRemove+1:]...)
 	z.zone.OperationKind = OperationKindUpdate
@@ -16,12 +24,20 @@ func (z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
 }
 
 func (z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
+	if z.zone.OperationKind == OperationKindDelete {
+		return z
+	}
+	var elementFound bool
 	var indexToRemove int
 	for i, _zoneItemID := range z.zone.Items {
 		if _zoneItemID == zoneItemID {
 			indexToRemove = i
+			elementFound = true
 			break
 		}
+	}
+	if !elementFound {
+		return z
 	}
 	z.zone.Items = append(z.zone.Items[:indexToRemove], z.zone.Items[indexToRemove+1:]...)
 	z.zone.OperationKind = OperationKindUpdate
@@ -31,12 +47,20 @@ func (z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
 }
 
 func (p Player) RemoveItem(itemID ItemID, sm *StateMachine) Player {
+	if p.player.OperationKind == OperationKindDelete {
+		return p
+	}
+	var elementFound bool
 	var indexToRemove int
 	for i, _itemID := range p.player.Items {
 		if _itemID == itemID {
 			indexToRemove = i
+			elementFound = true
 			break
 		}
+	}
+	if !elementFound {
+		return p
 	}
 	p.player.Items = append(p.player.Items[:indexToRemove], p.player.Items[indexToRemove+1:]...)
 	p.player.OperationKind = OperationKindUpdate
