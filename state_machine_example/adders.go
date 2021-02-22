@@ -1,6 +1,9 @@
 package statemachine
 
 func (e Zone) AddPlayer(sm *StateMachine) Player {
+	if e.zone.OperationKind == OperationKindDelete {
+		return Player{}
+	}
 	player := sm.CreatePlayer(ParentInfo{EntityKindZone, int(e.zone.ID)})
 	e.zone.Players = append(e.zone.Players, player.player.ID)
 	e.zone.OperationKind = OperationKindUpdate
@@ -9,6 +12,9 @@ func (e Zone) AddPlayer(sm *StateMachine) Player {
 }
 
 func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+	if e.zone.OperationKind == OperationKindDelete {
+		return ZoneItem{}
+	}
 	zoneItem := sm.CreateZoneItem(ParentInfo{EntityKindZone, int(e.zone.ID)})
 	e.zone.Items = append(e.zone.Items, zoneItem.zoneItem.ID)
 	e.zone.OperationKind = OperationKindUpdate
@@ -17,6 +23,9 @@ func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
 }
 
 func (e Player) AddItem(sm *StateMachine) Item {
+	if e.player.OperationKind == OperationKindDelete {
+		return Item{}
+	}
 	item := sm.CreateItem(append(e.player.Parentage, ParentInfo{EntityKindPlayer, int(e.player.ID)})...)
 	e.player.Items = append(e.player.Items, item.item.ID)
 	e.player.OperationKind = OperationKindUpdate
