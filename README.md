@@ -81,12 +81,14 @@ the original idea was to let the user configure the state inside a go file. Howe
 - the user would have to keep a file with type declarations somewhere outside or clutter their code base with types
 - using go would allow/suggest too much freedom
 - gives wrong idea about how the data works
+
 better alternative would be to let the user define their state inside a yaml file with strict rules and validation.
 make use of https://github.com/Java-Jonas/yamltostruct, maybe fork or copy/paste usable code.
 additional restirctions:
 - no named types
 - only basic/self defined types and slices of them 
 
+should return simple-ast of the input.
 
 ### testing
 - with decltostring
