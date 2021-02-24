@@ -15,8 +15,8 @@ func TestFieldLevels(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "", data, fieldLevelZero)
@@ -37,8 +37,8 @@ func TestClosureKind(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "foo", data["foo"], firstFieldLevel)
@@ -52,8 +52,8 @@ func TestClosureKind(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "foo", data["foo"], firstFieldLevel)
@@ -67,8 +67,8 @@ func TestClosureKind(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "foo", data["foo"], firstFieldLevel)
@@ -82,8 +82,8 @@ func TestClosureKind(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "foo", data["foo"], firstFieldLevel)
@@ -97,8 +97,8 @@ func TestClosureKind(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "foo", data["foo"], firstFieldLevel)
@@ -115,8 +115,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "ban", data["ban"], firstFieldLevel)
@@ -132,8 +132,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "foo", data["foo"], firstFieldLevel)
@@ -148,8 +148,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "bar", data["bar"], firstFieldLevel)
@@ -167,8 +167,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "baz", data["baz"], firstFieldLevel)
@@ -187,8 +187,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "baz", data["baz"], firstFieldLevel)
@@ -214,8 +214,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "baz", data["baz"], firstFieldLevel)
@@ -236,8 +236,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "baz", data["baz"], firstFieldLevel)
@@ -258,8 +258,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "bar", data["bar"], firstFieldLevel)
@@ -285,8 +285,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "baz", data["baz"], firstFieldLevel)
@@ -307,7 +307,7 @@ func TestPathBuilder(t *testing.T) {
 		assert.Contains(t, joinedNamess, []string{"baz", "bar.fof", "bas.bunt", "bant", "int"})
 	})
 
-	t.Run("should build paths from yamlData root", func(t *testing.T) {
+	t.Run("should build paths from data root", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"bar": map[interface{}]interface{}{
 				"foo": "baz",
@@ -317,8 +317,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "", data, fieldLevelZero)
@@ -343,8 +343,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "", data, fieldLevelZero)
@@ -368,8 +368,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "", data, fieldLevelZero)
@@ -396,8 +396,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "ban", data["ban"], firstFieldLevel)
@@ -424,8 +424,8 @@ func TestPathBuilder(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "baz", data["baz"], firstFieldLevel)
@@ -452,8 +452,8 @@ func TestDeclarationPath(t *testing.T) {
 		}
 
 		pb := pathBuilder{
-			paths:    []declarationPath{},
-			yamlData: data,
+			paths: []declarationPath{},
+			data:  data,
 		}
 
 		pb.build(declarationPath{}, "", data, fieldLevelZero)

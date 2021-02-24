@@ -1,9 +1,9 @@
 package validator
 
-func validateRecursiveTypeUsage(yamlData map[interface{}]interface{}) (errs []error) {
-	pathBuilder := newPathBuilder(yamlData)
+func validateRecursiveTypeUsage(data map[interface{}]interface{}) (errs []error) {
+	pathBuilder := newPathBuilder(data)
 
-	pathBuilder.build(declarationPath{}, "", yamlData, fieldLevelZero)
+	pathBuilder.build(declarationPath{}, "", data, fieldLevelZero)
 
 	for _, path := range pathBuilder.paths {
 		if path.closureKind == pathClosureKindRecursiveness {

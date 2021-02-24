@@ -45,70 +45,79 @@ func isEmptyString(unknown interface{}) bool {
 	return valueString == ""
 }
 
-func structuralValidation(yamlData map[interface{}]interface{}) (errs []error) {
+func structuralValidation(data map[interface{}]interface{}) (errs []error) {
 
-	valueErrors := validateIllegalValue(yamlData)
+	valueErrors := validateIllegalValue(data)
 	errs = append(errs, valueErrors...)
 
 	return
 }
 
-func syntacticalValidation(yamlData map[interface{}]interface{}) (errs []error) {
+func syntacticalValidation(data map[interface{}]interface{}) (errs []error) {
 
-	illegalTypeNameErrs := validateIllegalTypeName(yamlData)
+	illegalTypeNameErrs := validateIllegalTypeName(data)
 	errs = append(errs, illegalTypeNameErrs...)
 
-	invalidValueStringErrs := validateInvalidValueString(yamlData)
+	invalidValueStringErrs := validateInvalidValueString(data)
 	errs = append(errs, invalidValueStringErrs...)
 
 	return
 }
 
-func logicalValidation(yamlData map[interface{}]interface{}) (errs []error) {
+func logicalValidation(data map[interface{}]interface{}) (errs []error) {
 
-	missingTypeDeclarationErrs := validateTypeNotFound(yamlData)
+	missingTypeDeclarationErrs := validateTypeNotFound(data)
 	errs = append(errs, missingTypeDeclarationErrs...)
 
-	recursiveTypeUsageErrs := validateRecursiveTypeUsage(yamlData)
+	recursiveTypeUsageErrs := validateRecursiveTypeUsage(data)
 	errs = append(errs, recursiveTypeUsageErrs...)
 
-	invalidMapKeyErrs := validateIllegalMapKeys(yamlData)
+	invalidMapKeyErrs := validateIllegalMapKeys(data)
 	errs = append(errs, invalidMapKeyErrs...)
 
-	unknownMethodErrs := validateUnknownMethod(yamlData)
+	unknownMethodErrs := validateUnknownMethod(data)
 	errs = append(errs, unknownMethodErrs...)
 
 	return
 }
 
-func thematicalValidation(yamlData map[interface{}]interface{}) (errs []error) {
+func thematicalValidation(data map[interface{}]interface{}) (errs []error) {
 
-	nonObjectTypeErrs := validateNonObjectType(yamlData)
+	nonObjectTypeErrs := validateNonObjectType(data)
 	errs = append(errs, nonObjectTypeErrs...)
 
-	if len(errs) != 0 {
-		return
-	}
+	incompatibleValueErrs := validateIncompatibleValue(data)
+	errs = append(errs, incompatibleValueErrs...)
 
-	return validateIncompatibleValue(yamlData)
+	return
 }
 
-func validateYamlData(yamlData map[interface{}]interface{}) (errs []error) {
+func generalValidation(data map[interface{}]interface{}) (errs []error) {
 
-	structuralErrs := structuralValidation(yamlData)
+	structuralErrs := structuralValidation(data)
 	errs = append(errs, structuralErrs...)
 	if len(errs) != 0 {
 		return
 	}
 
-	syntacticalErrs := syntacticalValidation(yamlData)
+	syntacticalErrs := syntacticalValidation(data)
 	errs = append(errs, syntacticalErrs...)
 	if len(errs) != 0 {
 		return
 	}
 
-	logicalErrs := logicalValidation(yamlData)
+	logicalErrs := logicalValidation(data)
 	errs = append(errs, logicalErrs...)
+
+	return
+}
+
+func Validate(data map[interface{}]interface{}) (errs []error) {
+	generalErrs := generalValidation(data)
+	errs = append(errs, generalErrs...)
+
+	thematicalErrs := thematicalValidation(data)
+	errs = append(errs, thematicalErrs...)
 
 	return
 }

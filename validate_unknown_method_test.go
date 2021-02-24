@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlDataUnknwonMethod(t *testing.T) {
+func TestValidateDataUnknwonMethod(t *testing.T) {
 	t.Run("should generally fail when values are literals sequenced with dots", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int.bar",

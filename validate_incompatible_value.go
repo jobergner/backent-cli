@@ -5,9 +5,9 @@ import (
 	"regexp"
 )
 
-func validateIncompatibleValue(yamlData map[interface{}]interface{}) (errs []error) {
+func validateIncompatibleValue(data map[interface{}]interface{}) (errs []error) {
 
-	for key, value := range yamlData {
+	for key, value := range data {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isMap(value) {
@@ -43,7 +43,11 @@ func validateIncompatibleValueObject(
 
 func isSliceOfType(valueString string) bool {
 	re := regexp.MustCompile(`\[\][A-Za-z]+[0-9]*`)
-	return re.MatchString(valueString)
+	includesSliceOfType := re.MatchString(valueString)
+	if includesSliceOfType && len(re.FindString(valueString)) == len(valueString) {
+		return true
+	}
+	return false
 }
 
 func isCompatibleValue(valueString string) bool {

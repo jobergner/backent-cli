@@ -6,9 +6,9 @@ import (
 
 // returns errors if invalid values are used in the YAML file
 // the declarations may not contain: Objects in Objects, Lists, "" and nil
-func validateIllegalValue(yamlData map[interface{}]interface{}) (errs []error) {
+func validateIllegalValue(data map[interface{}]interface{}) (errs []error) {
 
-	for key, value := range yamlData {
+	for key, value := range data {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isString(value) {

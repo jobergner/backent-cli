@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlDataIllegalTypeName(t *testing.T) {
+func TestValidateDataIllegalTypeName(t *testing.T) {
 	t.Run("should not fail on valid key inputs", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int",

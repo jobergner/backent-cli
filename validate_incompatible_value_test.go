@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlDataIncompatibleMethod(t *testing.T) {
+func TestValidateDataIncompatibleMethod(t *testing.T) {
 	t.Run("should generally fail when values are not compatible", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"bar": map[interface{}]interface{}{},
@@ -16,6 +16,7 @@ func TestValidateYamlDataIncompatibleMethod(t *testing.T) {
 				"buf": "*int",
 				"fan": "[]float64",
 				"lan": "bar",
+				"boe": "**[]int",
 			},
 		}
 
@@ -24,6 +25,7 @@ func TestValidateYamlDataIncompatibleMethod(t *testing.T) {
 			newValidationErrorIncompatibleValue("map[int]string", "ban", "foo"),
 			newValidationErrorIncompatibleValue("[2]int", "bal", "foo"),
 			newValidationErrorIncompatibleValue("*int", "buf", "foo"),
+			newValidationErrorIncompatibleValue("**[]int", "boe", "foo"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
