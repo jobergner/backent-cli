@@ -5,10 +5,6 @@ Used to validate a user's state configuration.
 ## Validation Error Messages
 <br/> 
 
-### TODO:
-- ErrIncompatibleValue
-- ErrNonObjectType
-
 ### structural:
 | Error | Text | Meaning |
 |---|---------|----------|
