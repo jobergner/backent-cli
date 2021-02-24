@@ -75,6 +75,9 @@ func logicalValidation(yamlData map[interface{}]interface{}) (errs []error) {
 	invalidMapKeyErrs := validateIllegalMapKeys(yamlData)
 	errs = append(errs, invalidMapKeyErrs...)
 
+	unknownMethodErrs := validateUnknownMethod(yamlData)
+	errs = append(errs, unknownMethodErrs...)
+
 	return
 }
 

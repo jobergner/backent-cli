@@ -6,7 +6,7 @@ Used to validate a user's state configuration.
 <br/> 
 
 ### TODO:
-- ErrTypeHasNoMethod
+- ErrUnknownMethod
 - ErrIncompatibleValue
 - ErrNonObjectType
 
@@ -29,7 +29,7 @@ Used to validate a user's state configuration.
 | ErrTypeNotFound | type with name "{TypeName}" in "{ParentObject}" was not found | A type was referenced as value but not defined anywhere in the YAML document. |
 | ErrRecursiveTypeUsage | illegal recursive type detected for "{RecurringKeyNames}" | A recursive type was defined. |
 | ErrInvalidMapKey | "{MapKey}" in "{ValueString}" is not a valid map key | An uncomparable type was chosen as map key. |
-| ErrTypeHasNoMethod | type "{TypeName}" has no method "{Literal}". | An unknown method was attempted to be assigned as value. |
+| ErrUnknownMethod | type "{TypeName}" has no method "{Literal}". | An unknown method was attempted to be referenced. |
 <br/> 
 
 ### thematical:
