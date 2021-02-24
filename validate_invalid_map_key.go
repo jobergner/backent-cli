@@ -61,7 +61,7 @@ func extractMapKeys(valueString string) []string {
 	return extractMapKeyRecursive([]string{}, mapType, mockSrc)
 }
 
-func findIllegalMapKeys(valueString string, yamlData map[interface{}]interface{}) []string {
+func findIllegalMapKeys(valueString string, data map[interface{}]interface{}) []string {
 	mapKeys := extractMapKeys(valueString)
 	if len(mapKeys) == 0 {
 		return nil
@@ -74,7 +74,7 @@ func findIllegalMapKeys(valueString string, yamlData map[interface{}]interface{}
 		if isReferenceType(mapKey) {
 			isInvalid = true
 		}
-		if containsUncomparableValue(mapKey, yamlData) {
+		if containsUncomparableValue(mapKey, data) {
 			isInvalid = true
 		}
 		if isInvalid {
@@ -85,12 +85,12 @@ func findIllegalMapKeys(valueString string, yamlData map[interface{}]interface{}
 	return invalidMapKeys
 }
 
-func validateIllegalMapKeys(yamlData map[interface{}]interface{}) (errs []error) {
-	for _, value := range yamlData {
+func validateIllegalMapKeys(data map[interface{}]interface{}) (errs []error) {
+	for _, value := range data {
 
 		if isString(value) {
 			valueString := fmt.Sprintf("%v", value)
-			illegalMapKeys := findIllegalMapKeys(valueString, yamlData)
+			illegalMapKeys := findIllegalMapKeys(valueString, data)
 			for _, illegalMapKey := range illegalMapKeys {
 				errs = append(errs, newValidationErrorInvalidMapKey(illegalMapKey, valueString))
 			}
@@ -99,7 +99,7 @@ func validateIllegalMapKeys(yamlData map[interface{}]interface{}) (errs []error)
 
 		if isMap(value) {
 			mapValue := value.(map[interface{}]interface{})
-			objectValidationErrs := validateIllegalMapKeysObject(mapValue, yamlData)
+			objectValidationErrs := validateIllegalMapKeysObject(mapValue, data)
 			errs = append(errs, objectValidationErrs...)
 		}
 	}
@@ -107,10 +107,10 @@ func validateIllegalMapKeys(yamlData map[interface{}]interface{}) (errs []error)
 	return
 }
 
-func validateIllegalMapKeysObject(yamlObjectData, yamlData map[interface{}]interface{}) (errs []error) {
+func validateIllegalMapKeysObject(yamlObjectData, data map[interface{}]interface{}) (errs []error) {
 	for _, value := range yamlObjectData {
 		valueString := fmt.Sprintf("%v", value)
-		illegalMapKeys := findIllegalMapKeys(valueString, yamlData)
+		illegalMapKeys := findIllegalMapKeys(valueString, data)
 		for _, illegalMapKey := range illegalMapKeys {
 			errs = append(errs, newValidationErrorInvalidMapKey(illegalMapKey, valueString))
 		}

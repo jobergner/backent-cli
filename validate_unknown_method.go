@@ -5,9 +5,9 @@ import (
 	"regexp"
 )
 
-func validateUnknownMethod(yamlData map[interface{}]interface{}) (errs []error) {
+func validateUnknownMethod(data map[interface{}]interface{}) (errs []error) {
 
-	for key, value := range yamlData {
+	for key, value := range data {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isString(value) {
@@ -15,7 +15,7 @@ func validateUnknownMethod(yamlData map[interface{}]interface{}) (errs []error) 
 			if hasDotAccessedMethod(valueString) {
 				errs = append(
 					errs,
-					newValidationErrorUnknownMethod(ExtractFirstLiteralBeforeDot(valueString), ExtractFirstLiteralAfterDot(valueString)),
+					newValidationErrorUnknownMethod(extractFirstLiteralBeforeDot(valueString), extractFirstLiteralAfterDot(valueString)),
 				)
 			}
 		}
@@ -41,7 +41,7 @@ func validateUnknownMethodObject(
 			if hasDotAccessedMethod(valueString) {
 				errs = append(
 					errs,
-					newValidationErrorUnknownMethod(ExtractFirstLiteralBeforeDot(valueString), ExtractFirstLiteralAfterDot(valueString)),
+					newValidationErrorUnknownMethod(extractFirstLiteralBeforeDot(valueString), extractFirstLiteralAfterDot(valueString)),
 				)
 			}
 		}
@@ -55,12 +55,12 @@ func hasDotAccessedMethod(valueString string) bool {
 	return re.MatchString(valueString)
 }
 
-func ExtractFirstLiteralAfterDot(valueString string) string {
+func extractFirstLiteralAfterDot(valueString string) string {
 	re := regexp.MustCompile(`\.[A-Za-z]+[0-9]*`)
 	return re.FindAllString(valueString, 1)[0][1:]
 }
 
-func ExtractFirstLiteralBeforeDot(valueString string) string {
+func extractFirstLiteralBeforeDot(valueString string) string {
 	re := regexp.MustCompile(`[A-Za-z]+[0-9]*\.`)
 	match := re.FindAllString(valueString, 1)[0]
 	return match[:len(match)-1]

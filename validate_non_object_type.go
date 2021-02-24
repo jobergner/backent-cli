@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-func validateNonObjectType(yamlData map[interface{}]interface{}) (errs []error) {
+func validateNonObjectType(data map[interface{}]interface{}) (errs []error) {
 
-	for key, value := range yamlData {
+	for key, value := range data {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isString(value) {

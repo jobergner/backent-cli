@@ -87,7 +87,7 @@ func TestMatchErrors(t *testing.T) {
 	})
 }
 
-func TestValidateYamlData(t *testing.T) {
+func TestGeneralValidation(t *testing.T) {
 	t.Run("should procude no errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int",
@@ -107,7 +107,7 @@ func TestValidateYamlData(t *testing.T) {
 			},
 		}
 
-		errs := validateYamlData(data)
+		errs := generalValidation(data)
 
 		assert.Empty(t, errs)
 	})
@@ -127,7 +127,7 @@ func TestValidateYamlData(t *testing.T) {
 			},
 		}
 
-		actualErrors := validateYamlData(data)
+		actualErrors := generalValidation(data)
 		expectedErrors := []error{
 			newValidationErrorIllegalValue("bar", "root"),
 			newValidationErrorIllegalValue("baf", "root"),
@@ -164,7 +164,7 @@ func TestValidateYamlData(t *testing.T) {
 			},
 		}
 
-		actualErrors := validateYamlData(data)
+		actualErrors := generalValidation(data)
 		expectedErrors := []error{
 			newValidationErrorInvalidValueString("map[int]string]", "b", "root"),
 			newValidationErrorInvalidValueString("int[]", "fo o", "root"),
@@ -206,7 +206,7 @@ func TestValidateYamlData(t *testing.T) {
 			},
 		}
 
-		actualErrors := validateYamlData(data)
+		actualErrors := generalValidation(data)
 		expectedErrors := []error{
 			newValidationErrorRecursiveTypeUsage([]string{"bam.baf", "baz.ban", "bar.foo", "bam"}),
 			newValidationErrorRecursiveTypeUsage([]string{"baz.ban", "bar.foo", "bam.baf", "baz"}),
@@ -214,6 +214,56 @@ func TestValidateYamlData(t *testing.T) {
 			newValidationErrorInvalidMapKey("[]foo", "map[[]foo]int"),
 			newValidationErrorInvalidMapKey("bunt", "map[bunt]int"),
 			newValidationErrorTypeNotFound("kan", "baz"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+}
+
+func TestValidation(t *testing.T) {
+	t.Run("should procude no errors", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"bar": map[interface{}]interface{}{},
+			"baz": map[interface{}]interface{}{
+				"ban":  "int32",
+				"bam":  "bar",
+				"bunt": "[]int",
+			},
+		}
+
+		errs := Validate(data)
+
+		assert.Empty(t, errs)
+	})
+
+	t.Run("should procude expected errors", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": "int",
+			"bar": "float64",
+			"baz": map[interface{}]interface{}{
+				"ban":  "int32",
+				"bam":  "bar",
+				"bunt": "[]foo",
+				"bap":  "map[bar]foo",
+				"bal":  "***bar",
+				"slap": "**[]**bar",
+				"arg":  "*foo",
+				"barg": "[3]foo",
+			},
+		}
+
+		actualErrors := Validate(data)
+		expectedErrors := []error{
+			newValidationErrorNonObjectType("foo"),
+			newValidationErrorNonObjectType("bar"),
+			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
+			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
+			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
+			newValidationErrorIncompatibleValue("*foo", "arg", "baz"),
+			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

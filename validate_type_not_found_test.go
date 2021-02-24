@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlDataTypeNotFound(t *testing.T) {
+func TestValidateDataTypeNotFound(t *testing.T) {
 	t.Run("should not fail on usage of standard types", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int",

@@ -7,16 +7,16 @@ import (
 
 // returns errors if types are used which are not declared in the YAML file
 // order of declaration is irrelevant
-func validateTypeNotFound(yamlData map[interface{}]interface{}) (errs []error) {
+func validateTypeNotFound(data map[interface{}]interface{}) (errs []error) {
 
 	var definedTypes []string
 
-	for key := range yamlData {
+	for key := range data {
 		keyName := fmt.Sprintf("%v", key)
 		definedTypes = append(definedTypes, keyName)
 	}
 
-	for key, value := range yamlData {
+	for key, value := range data {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isString(value) {

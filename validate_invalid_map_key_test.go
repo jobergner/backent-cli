@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlDataInvalidMapKey(t *testing.T) {
+func TestValidateDataInvalidMapKey(t *testing.T) {
 	t.Run("should not fail on usage of valid map keys", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "string",

@@ -7,8 +7,8 @@ import (
 )
 
 // returns errors if type names contain illegal characters that do not adhere to golangs syntax restrictions
-func validateIllegalTypeName(yamlData map[interface{}]interface{}) (errs []error) {
-	for key, value := range yamlData {
+func validateIllegalTypeName(data map[interface{}]interface{}) (errs []error) {
+	for key, value := range data {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isIllegalTypeName(keyName) {

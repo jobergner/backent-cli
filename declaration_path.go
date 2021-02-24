@@ -119,19 +119,19 @@ func (path declarationPath) copySelf() declarationPath {
 }
 
 type pathBuilder struct {
-	yamlData map[interface{}]interface{}
-	paths    []declarationPath
+	data  map[interface{}]interface{}
+	paths []declarationPath
 }
 
-func newPathBuilder(yamlData map[interface{}]interface{}) *pathBuilder {
-	return &pathBuilder{yamlData: yamlData}
+func newPathBuilder(data map[interface{}]interface{}) *pathBuilder {
+	return &pathBuilder{data: data}
 }
 
 func (pb *pathBuilder) addPath(path declarationPath) {
 	pb.paths = append(pb.paths, path)
 }
 
-// a recursive function to travel through the yamlData
+// a recursive function to travel through the data
 func (pb *pathBuilder) build(path declarationPath, keyName string, value interface{}, fieldLevel fieldLevelKind) {
 
 	if isString(value) {
@@ -166,7 +166,7 @@ func (pb *pathBuilder) build(path declarationPath, keyName string, value interfa
 		// this only ever has an effect on arrays because all other types would be either reference types
 		// (e.g. "[]foo" or "map[foo]bar") and returned above, or named types like "foo"
 		nextTypeLiteral := extractTypes(valueLiteral)[0]
-		nextValue := pb.yamlData[nextTypeLiteral]
+		nextValue := pb.data[nextTypeLiteral]
 		pb.build(path, nextTypeLiteral, nextValue, firstFieldLevel)
 	}
 
@@ -215,10 +215,10 @@ func isReferenceType(declarationTypeString string) bool {
 	return re.MatchString(declarationTypeString)
 }
 
-func containsUncomparableValue(typeName string, yamlData map[interface{}]interface{}) bool {
-	pathBuilder := newPathBuilder(yamlData)
+func containsUncomparableValue(typeName string, data map[interface{}]interface{}) bool {
+	pathBuilder := newPathBuilder(data)
 
-	pathBuilder.build(declarationPath{}, typeName, yamlData[typeName], firstFieldLevel)
+	pathBuilder.build(declarationPath{}, typeName, data[typeName], firstFieldLevel)
 
 	var isUncomparable bool
 	for _, path := range pathBuilder.paths {
