@@ -64,9 +64,27 @@ func newValidationErrorInvalidMapKey(mapKey, valueString string) error {
 func newValidationErrorUnknownMethod(typeName, unknownMethod string) error {
 	return errors.New(
 		fmt.Sprintf(
-			"ErrIllegalValue: type \"%s\" has no method \"%s\".",
+			"ErrIllegalValue: type \"%s\" has no method \"%s\"",
 			typeName,
 			unknownMethod,
+		),
+	)
+}
+func newValidationErrorNonObjectType(keyName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrNonObjectType: type \"%s\" is not an object type",
+			keyName,
+		),
+	)
+}
+func newValidationErrorIncompatibleValue(valueString, keyName, parentItemName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrIncompatibleValue: value \"%s\" assigned to \"%s\" in \"%s\" is incompatible",
+			valueString,
+			keyName,
+			parentItemName,
 		),
 	)
 }

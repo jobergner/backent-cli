@@ -81,6 +81,18 @@ func logicalValidation(yamlData map[interface{}]interface{}) (errs []error) {
 	return
 }
 
+func thematicalValidation(yamlData map[interface{}]interface{}) (errs []error) {
+
+	nonObjectTypeErrs := validateNonObjectType(yamlData)
+	errs = append(errs, nonObjectTypeErrs...)
+
+	if len(errs) != 0 {
+		return
+	}
+
+	return validateIncompatibleValue(yamlData)
+}
+
 func validateYamlData(yamlData map[interface{}]interface{}) (errs []error) {
 
 	structuralErrs := structuralValidation(yamlData)

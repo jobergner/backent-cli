@@ -6,7 +6,6 @@ Used to validate a user's state configuration.
 <br/> 
 
 ### TODO:
-- ErrUnknownMethod
 - ErrIncompatibleValue
 - ErrNonObjectType
 
@@ -35,7 +34,7 @@ Used to validate a user's state configuration.
 ### thematical:
 | Error | Text | Meaning |
 |---|---------|----------|
-| ErrIncompatibleValue | value "{TypeName}" assigned to "{KeyName}" in "{ParentObject}" is incompatible. | The assigned value can't be used, as only golang's basic types, self defined types, and slices of them can be used. |
+| ErrIncompatibleValue | value "{ValueString}" assigned to "{KeyName}" in "{ParentObject}" is incompatible. | The assigned value can't be used, as only golang's basic types, self defined types, and slices of them can be used. |
 | ErrNonObjectType | type "{TypeName}" is not an object type. | The defined type can't be converted to a go struct as it's not an object. |
 <br/>
 
