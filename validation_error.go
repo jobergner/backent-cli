@@ -61,3 +61,12 @@ func newValidationErrorInvalidMapKey(mapKey, valueString string) error {
 		),
 	)
 }
+func newValidationErrorUnknownMethod(typeName, unknownMethod string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrIllegalValue: type \"%s\" has no method \"%s\".",
+			typeName,
+			unknownMethod,
+		),
+	)
+}
