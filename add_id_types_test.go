@@ -9,21 +9,21 @@ import (
 func TestAddIDTypes(t *testing.T) {
 	t.Run("should replace object references with ids", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			input_person_type,
-			input_child_type,
-			input_name_type,
+			// input_person_type,
+			// input_child_type,
+			// input_name_type,
 		})
 
 		smb := newStateMachineBuilder(input)
 		smb.addIdTypes()
 		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
-			input_person_type,
-			input_child_type,
-			input_name_type,
-			output_childID_type,
-			output_personID_type,
-			output_nameID_type,
+			// input_person_type,
+			// input_child_type,
+			// input_name_type,
+			// output_childID_type,
+			// output_personID_type,
+			// output_nameID_type,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)

@@ -9,9 +9,9 @@ import (
 func TestEvenOutStructTree(t *testing.T) {
 	t.Run("should replace object references with ids", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			input_person_type,
-			input_child_type,
-			input_name_type,
+			// input_person_type,
+			// input_child_type,
+			// input_name_type,
 		})
 
 		smb := newStateMachineBuilder(input)
