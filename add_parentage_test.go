@@ -9,9 +9,9 @@ import (
 func TestEmbedParentage(t *testing.T) {
 	t.Run("should add parentage declaration", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			input_person_type,
-			input_child_type,
-			input_name_type,
+			// input_person_type,
+			// input_child_type,
+			// input_name_type,
 		})
 
 		smb := newStateMachineBuilder(input)
@@ -33,10 +33,10 @@ type child struct {
 	name name
 	parentage Parentage
 }`,
-			output_parentInfo_type,
-			output_parentage_type,
-			output_entityKind_type,
-			output_entityKindPerson_type,
+			// output_parentInfo_type,
+			// output_parentage_type,
+			// output_entityKind_type,
+			// output_entityKindPerson_type,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)

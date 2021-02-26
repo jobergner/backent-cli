@@ -9,27 +9,27 @@ import (
 func TestAddGetters(t *testing.T) {
 	t.Run("adds getters", func(t *testing.T) {
 		input := unsafeParseDecls([]string{
-			input_person_type,
-			input_child_type,
-			input_name_type,
+			// input_person_type,
+			// input_child_type,
+			// input_name_type,
 		})
 
 		smb := newStateMachineBuilder(input)
 		smb.addGetters()
 		actual := splitPrintedDeclarations(smb.stateMachine)
 		expected := []string{
-			input_person_type,
-			input_child_type,
-			input_name_type,
-			output_GetPerson_stateMachine_func,
-			output_GetChild_stateMachine_func,
-			output_GetName_stateMachine_func,
-			output_GetName_person_func,
-			output_GetChildren_person_func,
-			output_GetName_child_func,
-			output_GetAge_person_func,
-			output_GetFirst_name_func,
-			output_GetLast_name_func,
+			// input_person_type,
+			// input_child_type,
+			// input_name_type,
+			// output_GetPerson_stateMachine_func,
+			// output_GetChild_stateMachine_func,
+			// output_GetName_stateMachine_func,
+			// output_GetName_person_func,
+			// output_GetChildren_person_func,
+			// output_GetName_child_func,
+			// output_GetAge_person_func,
+			// output_GetFirst_name_func,
+			// output_GetLast_name_func,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
