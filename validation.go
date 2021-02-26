@@ -86,6 +86,9 @@ func thematicalValidation(data map[interface{}]interface{}) (errs []error) {
 	nonObjectTypeErrs := validateNonObjectType(data)
 	errs = append(errs, nonObjectTypeErrs...)
 
+	capitalizationErrs := validateIllegalCapitalization(data)
+	errs = append(errs, capitalizationErrs...)
+
 	incompatibleValueErrs := validateIncompatibleValue(data)
 	errs = append(errs, incompatibleValueErrs...)
 

@@ -44,6 +44,7 @@ Despite the fact that each of these errors would find a place in one of the abov
 |---|---------|----------|
 | ErrIncompatibleValue | value "{ValueString}" assigned to "{KeyName}" in "{ParentObject}" is incompatible. | The assigned value can't be used, as only golang's basic types, self defined types, and slices of them can be used. |
 | ErrNonObjectType | type "{TypeName}" is not an object type. | The defined type is not an object. |
+| ErrIllegalCapitalization | {type/field name} "{literal}" starts with a capital letter. | A type or field name starts with a capital letter, which is not allowed |
 <br/>
 
 

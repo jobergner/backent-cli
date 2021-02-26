@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+type literalKind string
+
+const (
+	literalKindType      literalKind = "type"
+	literalKindFieldName             = "field name"
+)
+
 func newValidationErrorTypeNotFound(missingTypeLiteral, parentItemName string) error {
 	return errors.New(
 		fmt.Sprintf(
@@ -85,6 +92,15 @@ func newValidationErrorIncompatibleValue(valueString, keyName, parentItemName st
 			valueString,
 			keyName,
 			parentItemName,
+		),
+	)
+}
+func newValidationErrorIllegalCapitalization(literal string, literalKind literalKind) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrIllegalCapitalization: %s \"%s\" starts with a capital letter",
+			literalKind,
+			literal,
 		),
 	)
 }
