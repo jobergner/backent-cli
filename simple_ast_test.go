@@ -7,7 +7,6 @@ import (
 )
 
 func TestSimpleAST(t *testing.T) {
-	nilSimpleStruct := func() *simpleStructDecl { return nil }
 	t.Run("should build a rudimentary simpleAST from data", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"house": map[interface{}]interface{}{
@@ -29,7 +28,7 @@ func TestSimpleAST(t *testing.T) {
 		actual := buildRudimentarySimpleAST(data)
 
 		expected := simpleAST{
-			decls: map[string]simpleStructDecl{
+			decls: map[string]simpleTypeDecl{
 				"house": {
 					name: "house",
 					fields: map[string]simpleFieldDecl{
@@ -115,29 +114,37 @@ func TestSimpleAST(t *testing.T) {
 
 		livingSpaceField := actual.decls["house"].fields["livingSpace"]
 		assert.Equal(t, livingSpaceField.parent.name, "house")
-		assert.Equal(t, livingSpaceField.valueType, nilSimpleStruct())
+		assert.Equal(t, livingSpaceField.valueType.name, "int")
+		assert.Equal(t, livingSpaceField.valueType.isBasicType, true)
 		residentsField := actual.decls["house"].fields["residents"]
 		assert.Equal(t, residentsField.parent.name, "house")
 		assert.Equal(t, residentsField.valueType.name, "person")
+		assert.Equal(t, residentsField.valueType.isBasicType, false)
 		addressField := actual.decls["house"].fields["address"]
 		assert.Equal(t, addressField.parent.name, "house")
 		assert.Equal(t, addressField.valueType.name, "address")
+		assert.Equal(t, addressField.valueType.isBasicType, false)
 
 		streetField := actual.decls["address"].fields["street"]
 		assert.Equal(t, streetField.parent.name, "address")
-		assert.Equal(t, streetField.valueType, nilSimpleStruct())
+		assert.Equal(t, streetField.valueType.name, "string")
+		assert.Equal(t, streetField.valueType.isBasicType, true)
 		houseNumberField := actual.decls["address"].fields["houseNumber"]
 		assert.Equal(t, houseNumberField.parent.name, "address")
-		assert.Equal(t, houseNumberField.valueType, nilSimpleStruct())
+		assert.Equal(t, houseNumberField.valueType.name, "int")
+		assert.Equal(t, houseNumberField.valueType.isBasicType, true)
 		cityField := actual.decls["address"].fields["city"]
 		assert.Equal(t, cityField.parent.name, "address")
-		assert.Equal(t, cityField.valueType, nilSimpleStruct())
+		assert.Equal(t, cityField.valueType.name, "string")
+		assert.Equal(t, cityField.valueType.isBasicType, true)
 
 		nameField := actual.decls["person"].fields["name"]
 		assert.Equal(t, nameField.parent.name, "person")
-		assert.Equal(t, nameField.valueType, nilSimpleStruct())
+		assert.Equal(t, nameField.valueType.name, "string")
+		assert.Equal(t, nameField.valueType.isBasicType, true)
 		ageField := actual.decls["person"].fields["age"]
 		assert.Equal(t, ageField.parent.name, "person")
-		assert.Equal(t, ageField.valueType, nilSimpleStruct())
+		assert.Equal(t, ageField.valueType.name, "int")
+		assert.Equal(t, ageField.valueType.isBasicType, true)
 	})
 }
