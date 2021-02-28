@@ -27,7 +27,7 @@ func TestAddStateMachine(t *testing.T) {
 			// output_stateMachine_type,
 			// output_generateID_stateMachine_func,
 			// output_updateState_stateMachine_func,
-			output_newState_func,
+			// output_newState_func,
 		}
 
 		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)

@@ -6,34 +6,34 @@ import (
 )
 
 type simpleAST struct {
-	decls map[string]simpleTypeDecl
+	Decls map[string]simpleTypeDecl
 }
 
 func newSimpleAST() simpleAST {
 	return simpleAST{
-		decls: make(map[string]simpleTypeDecl),
+		Decls: make(map[string]simpleTypeDecl),
 	}
 }
 
 type simpleTypeDecl struct {
-	name        string
-	fields      map[string]simpleFieldDecl
-	isBasicType bool
+	Name        string
+	Fields      map[string]simpleFieldDecl
+	IsBasicType bool
 }
 
 func newSimpleType(name string) simpleTypeDecl {
 	return simpleTypeDecl{
-		name:   name,
-		fields: make(map[string]simpleFieldDecl),
+		Name:   name,
+		Fields: make(map[string]simpleFieldDecl),
 	}
 }
 
 type simpleFieldDecl struct {
-	name          string
-	parent        *simpleTypeDecl
-	valueType     *simpleTypeDecl
-	valueString   string
-	hasSliceValue bool
+	Name          string
+	Parent        *simpleTypeDecl
+	ValueType     *simpleTypeDecl
+	ValueString   string
+	HasSliceValue bool
 }
 
 func buildRudimentarySimpleAST(data map[interface{}]interface{}) simpleAST {
@@ -45,7 +45,7 @@ func buildRudimentarySimpleAST(data map[interface{}]interface{}) simpleAST {
 
 		typeDecl := buildRudimentarySimpleTypeDecl(objectValue, typeName)
 
-		ast.decls[typeName] = typeDecl
+		ast.Decls[typeName] = typeDecl
 	}
 
 	return ast
@@ -59,40 +59,44 @@ func buildRudimentarySimpleTypeDecl(objectValue map[interface{}]interface{}, typ
 		valueString := getSring(value)
 
 		fieldDecl := simpleFieldDecl{
-			name:          fieldName,
-			hasSliceValue: isSliceValue(valueString),
-			valueString:   valueString,
+			Name:          fieldName,
+			HasSliceValue: isSliceValue(valueString),
+			ValueString:   valueString,
 		}
 
-		typeDecl.fields[fieldName] = fieldDecl
+		typeDecl.Fields[fieldName] = fieldDecl
 	}
 
 	return typeDecl
 }
 
 func (s *simpleAST) fillInReferences() {
-	for simpleTypeName, simpleType := range s.decls {
+	for simpleTypeName, simpleType := range s.Decls {
 		ss := simpleType
-		for simpleFieldName, simpleField := range ss.fields {
+		for simpleFieldName, simpleField := range ss.Fields {
 			sf := simpleField
-			sf.parent = &ss
-			referencedType, ok := s.decls[extractValueType(sf.valueString)]
+			sf.Parent = &ss
+			referencedType, ok := s.Decls[extractValueType(sf.ValueString)]
 			if ok {
-				sf.valueType = &referencedType
+				sf.ValueType = &referencedType
 			} else {
-				sf.valueType = &simpleTypeDecl{name: extractValueType(sf.valueString), isBasicType: true}
+				sf.ValueType = &simpleTypeDecl{Name: extractValueType(sf.ValueString), IsBasicType: true}
 			}
-			ss.fields[simpleFieldName] = sf
+			ss.Fields[simpleFieldName] = sf
 		}
-		s.decls[simpleTypeName] = ss
+		s.Decls[simpleTypeName] = ss
 	}
 }
 
+// "[]string" -> true
+// "string" -> false
 func isSliceValue(valueString string) bool {
 	re := regexp.MustCompile(`\[\]`)
 	return re.MatchString(valueString)
 }
 
+// "[]float64" -> float64
+// "float64" -> float64
 func extractValueType(valueString string) string {
 	re := regexp.MustCompile(`[A-Za-z]+[0-9]*`)
 	return re.FindString(valueString)

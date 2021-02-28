@@ -2,8 +2,6 @@ package statemachine
 
 type OperationKind string
 
-type EntityKind string
-
 const (
 	OperationKindDelete = "DELETE"
 	OperationKindUpdate = "UPDATE"
