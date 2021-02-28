@@ -2,7 +2,7 @@
 
 package statefactory
 
-const output_AddPlayer_Zone_func string = `func (e Zone) AddPlayer(sm *StateMachine) Player {
+const AddPlayer_Zone_func string = `func (e Zone) AddPlayer(sm *StateMachine) Player {
 	if e.zone.OperationKind == OperationKindDelete {
 		return Player{}
 	}
@@ -13,7 +13,7 @@ const output_AddPlayer_Zone_func string = `func (e Zone) AddPlayer(sm *StateMach
 	return player
 }`
 
-const output_AddZoneItem_Zone_func string = `func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+const AddZoneItem_Zone_func string = `func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{}
 	}
@@ -24,7 +24,7 @@ const output_AddZoneItem_Zone_func string = `func (e Zone) AddZoneItem(sm *State
 	return zoneItem
 }`
 
-const output_AddItem_Player_func string = `func (e Player) AddItem(sm *StateMachine) Item {
+const AddItem_Player_func string = `func (e Player) AddItem(sm *StateMachine) Item {
 	if e.player.OperationKind == OperationKindDelete {
 		return Item{}
 	}
@@ -35,7 +35,7 @@ const output_AddItem_Player_func string = `func (e Player) AddItem(sm *StateMach
 	return item
 }`
 
-const output_assembleFrom_Tree_func string = `func (t *Tree) assembleFrom(s State) {
+const assembleFrom_Tree_func string = `func (t *Tree) assembleFrom(s State) {
 	for _, player := range s.Player {
 		t.assembleByEnityKind(player.Parentage, s)
 	}
@@ -53,7 +53,7 @@ const output_assembleFrom_Tree_func string = `func (t *Tree) assembleFrom(s Stat
 	}
 }`
 
-const output_assembleByEnityKind_Tree_func string = `func (t *Tree) assembleByEnityKind(parentage Parentage, s State) {
+const assembleByEnityKind_Tree_func string = `func (t *Tree) assembleByEnityKind(parentage Parentage, s State) {
 	greatestAncestor := parentage[0]
 	switch greatestAncestor.Kind {
 	case EntityKindZoneItem:
@@ -62,7 +62,7 @@ const output_assembleByEnityKind_Tree_func string = `func (t *Tree) assembleByEn
 	}
 }`
 
-const output_assembleZone_Tree_func string = `func (t Tree) assembleZone(parentage Parentage, zoneID ZoneID, s State) _zone {
+const assembleZone_Tree_func string = `func (t Tree) assembleZone(parentage Parentage, zoneID ZoneID, s State) _zone {
 	_zone := t.Zone[zoneID]
 	zone := s.Zone[zoneID]
 	_zone.ID = zone.ID
@@ -79,7 +79,7 @@ const output_assembleZone_Tree_func string = `func (t Tree) assembleZone(parenta
 	return _zone
 }`
 
-const output_assemblePlayer_Tree_func string = `func (t Tree) assemblePlayer(parentage Parentage, playerID PlayerID, s State) _player {
+const assemblePlayer_Tree_func string = `func (t Tree) assemblePlayer(parentage Parentage, playerID PlayerID, s State) _player {
 	_player := t.Player[playerID]
 	player := s.Player[playerID]
 	_player.ID = player.ID
@@ -99,7 +99,7 @@ const output_assemblePlayer_Tree_func string = `func (t Tree) assemblePlayer(par
 	return _player
 }`
 
-const output_assembleZoneItem_Tree_func string = `func (t Tree) assembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
+const assembleZoneItem_Tree_func string = `func (t Tree) assembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
 	_zoneItem := t.ZoneItem[zoneItemID]
 	zoneItem := s.ZoneItem[zoneItemID]
 	_zoneItem.ID = zoneItem.ID
@@ -116,7 +116,7 @@ const output_assembleZoneItem_Tree_func string = `func (t Tree) assembleZoneItem
 	return _zoneItem
 }`
 
-const output_assemblePosition_Tree_func string = `func (t Tree) assemblePosition(positionID PositionID, s State) _position {
+const assemblePosition_Tree_func string = `func (t Tree) assemblePosition(positionID PositionID, s State) _position {
 	_position := t.Position[positionID]
 	position := s.Position[positionID]
 	_position.ID = position.ID
@@ -126,7 +126,7 @@ const output_assemblePosition_Tree_func string = `func (t Tree) assemblePosition
 	return _position
 }`
 
-const output_assembleItem_Tree_func string = `func (t Tree) assembleItem(parentage Parentage, itemID ItemID, s State) _item {
+const assembleItem_Tree_func string = `func (t Tree) assembleItem(parentage Parentage, itemID ItemID, s State) _item {
 	_item := t.Item[itemID]
 	item := s.Item[itemID]
 	_item.ID = item.ID
@@ -140,7 +140,7 @@ const output_assembleItem_Tree_func string = `func (t Tree) assembleItem(parenta
 	return _item
 }`
 
-const output_assembleGearScore_Tree_func string = `func (t Tree) assembleGearScore(gearScoreID GearScoreID, s State) _gearScore {
+const assembleGearScore_Tree_func string = `func (t Tree) assembleGearScore(gearScoreID GearScoreID, s State) _gearScore {
 	_gearScore := t.GearScore[gearScoreID]
 	gearScore := s.GearScore[gearScoreID]
 	_gearScore.ID = gearScore.ID
@@ -150,7 +150,7 @@ const output_assembleGearScore_Tree_func string = `func (t Tree) assembleGearSco
 	return _gearScore
 }`
 
-const output_CreateGearScore_StateMachine_func string = `func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
+const CreateGearScore_StateMachine_func string = `func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
 	var gearScore gearScoreCore
 	gearScore.ID = GearScoreID(sm.GenerateID())
 	gearScore.Parentage = append(gearScore.Parentage, parentage...)
@@ -159,7 +159,7 @@ const output_CreateGearScore_StateMachine_func string = `func (sm *StateMachine)
 	return GearScore{gearScore: gearScore}
 }`
 
-const output_CreatePosition_StateMachine_func string = `func (sm *StateMachine) CreatePosition(parentage ...ParentInfo) Position {
+const CreatePosition_StateMachine_func string = `func (sm *StateMachine) CreatePosition(parentage ...ParentInfo) Position {
 	var position positionCore
 	position.ID = PositionID(sm.GenerateID())
 	position.Parentage = append(position.Parentage, parentage...)
@@ -168,7 +168,7 @@ const output_CreatePosition_StateMachine_func string = `func (sm *StateMachine) 
 	return Position{position: position}
 }`
 
-const output_CreateItem_StateMachine_func string = `func (sm *StateMachine) CreateItem(parentage ...ParentInfo) Item {
+const CreateItem_StateMachine_func string = `func (sm *StateMachine) CreateItem(parentage ...ParentInfo) Item {
 	var item itemCore
 	item.ID = ItemID(sm.GenerateID())
 	item.Parentage = append(item.Parentage, parentage...)
@@ -179,7 +179,7 @@ const output_CreateItem_StateMachine_func string = `func (sm *StateMachine) Crea
 	return Item{item: item}
 }`
 
-const output_CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) CreateZoneItem(parentage ...ParentInfo) ZoneItem {
+const CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) CreateZoneItem(parentage ...ParentInfo) ZoneItem {
 	var zoneItem zoneItemCore
 	zoneItem.ID = ZoneItemID(sm.GenerateID())
 	zoneItem.Parentage = append(zoneItem.Parentage, parentage...)
@@ -192,7 +192,7 @@ const output_CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) 
 	return ZoneItem{zoneItem: zoneItem}
 }`
 
-const output_CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePlayer(parentage ...ParentInfo) Player {
+const CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePlayer(parentage ...ParentInfo) Player {
 	var player playerCore
 	player.ID = PlayerID(sm.GenerateID())
 	player.Parentage = append(player.Parentage, parentage...)
@@ -205,7 +205,7 @@ const output_CreatePlayer_StateMachine_func string = `func (sm *StateMachine) Cr
 	return Player{player: player}
 }`
 
-const output_CreateZone_StateMachine_func string = `func (sm *StateMachine) CreateZone() Zone {
+const CreateZone_StateMachine_func string = `func (sm *StateMachine) CreateZone() Zone {
 	var zone zoneCore
 	zone.ID = ZoneID(sm.GenerateID())
 	zone.OperationKind = OperationKindUpdate
@@ -213,7 +213,7 @@ const output_CreateZone_StateMachine_func string = `func (sm *StateMachine) Crea
 	return Zone{zone: zone}
 }`
 
-const output_DeletePlayer_StateMachine_func string = `func (sm *StateMachine) DeletePlayer(playerID PlayerID) {
+const DeletePlayer_StateMachine_func string = `func (sm *StateMachine) DeletePlayer(playerID PlayerID) {
 	player := sm.GetPlayer(playerID).player
 	player.OperationKind = OperationKindDelete
 	sm.Patch.Player[player.ID] = player
@@ -224,31 +224,31 @@ const output_DeletePlayer_StateMachine_func string = `func (sm *StateMachine) De
 	sm.DeletePosition(player.Position)
 }`
 
-const output_DeleteGearScore_StateMachine_func string = `func (sm *StateMachine) DeleteGearScore(gearScoreID GearScoreID) {
+const DeleteGearScore_StateMachine_func string = `func (sm *StateMachine) DeleteGearScore(gearScoreID GearScoreID) {
 	gearScore := sm.GetGearScore(gearScoreID).gearScore
 	gearScore.OperationKind = OperationKindDelete
 	sm.Patch.GearScore[gearScore.ID] = gearScore
 }`
 
-const output_DeletePosition_StateMachine_func string = `func (sm *StateMachine) DeletePosition(positionID PositionID) {
+const DeletePosition_StateMachine_func string = `func (sm *StateMachine) DeletePosition(positionID PositionID) {
 	position := sm.GetPosition(positionID).position
 	position.OperationKind = OperationKindDelete
 	sm.Patch.Position[position.ID] = position
 }`
 
-const output_DeleteItem_StateMachine_func string = `func (sm *StateMachine) DeleteItem(itemID ItemID) {
+const DeleteItem_StateMachine_func string = `func (sm *StateMachine) DeleteItem(itemID ItemID) {
 	item := sm.GetItem(itemID).item
 	item.OperationKind = OperationKindDelete
 	sm.Patch.Item[item.ID] = item
 }`
 
-const output_DeleteZoneItem_StateMachine_func string = `func (sm *StateMachine) DeleteZoneItem(zoneItemID ZoneItemID) {
+const DeleteZoneItem_StateMachine_func string = `func (sm *StateMachine) DeleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := sm.GetZoneItem(zoneItemID).zoneItem
 	zoneItem.OperationKind = OperationKindDelete
 	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
 }`
 
-const output_DeleteZone_StateMachine_func string = `func (sm *StateMachine) DeleteZone(zoneID ZoneID) {
+const DeleteZone_StateMachine_func string = `func (sm *StateMachine) DeleteZone(zoneID ZoneID) {
 	zone := sm.GetZone(zoneID).zone
 	zone.OperationKind = OperationKindDelete
 	sm.Patch.Zone[zone.ID] = zone
@@ -260,7 +260,7 @@ const output_DeleteZone_StateMachine_func string = `func (sm *StateMachine) Dele
 	}
 }`
 
-const output_GetPlayer_StateMachine_func string = `func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
+const GetPlayer_StateMachine_func string = `func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
 	patchingPlayer, ok := sm.Patch.Player[playerID]
 	if ok {
 		return Player{patchingPlayer}
@@ -269,7 +269,7 @@ const output_GetPlayer_StateMachine_func string = `func (sm *StateMachine) GetPl
 	return Player{currentPlayer}
 }`
 
-const output_GetItems_Player_func string = `func (e Player) GetItems(sm *StateMachine) []Item {
+const GetItems_Player_func string = `func (e Player) GetItems(sm *StateMachine) []Item {
 	var items []Item
 	for _, itemID := range e.player.Items {
 		items = append(items, sm.GetItem(itemID))
@@ -277,7 +277,7 @@ const output_GetItems_Player_func string = `func (e Player) GetItems(sm *StateMa
 	return items
 }`
 
-const output_GetGearScore_Player_func string = `func (e Player) GetGearScore(sm *StateMachine) GearScore {
+const GetGearScore_Player_func string = `func (e Player) GetGearScore(sm *StateMachine) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[e.player.GearScore]
 	if ok {
 		return GearScore{patchingGearScore}
@@ -286,7 +286,7 @@ const output_GetGearScore_Player_func string = `func (e Player) GetGearScore(sm 
 	return GearScore{currentGearScore}
 }`
 
-const output_GetPosition_Player_func string = `func (e Player) GetPosition(sm *StateMachine) Position {
+const GetPosition_Player_func string = `func (e Player) GetPosition(sm *StateMachine) Position {
 	patchingPosition, ok := sm.Patch.Position[e.player.Position]
 	if ok {
 		return Position{patchingPosition}
@@ -295,7 +295,7 @@ const output_GetPosition_Player_func string = `func (e Player) GetPosition(sm *S
 	return Position{currentPosition}
 }`
 
-const output_GetGearScore_StateMachine_func string = `func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
+const GetGearScore_StateMachine_func string = `func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[gearScoreID]
 	if ok {
 		return GearScore{gearScore: patchingGearScore}
@@ -304,15 +304,15 @@ const output_GetGearScore_StateMachine_func string = `func (sm *StateMachine) Ge
 	return GearScore{gearScore: currentGearScore}
 }`
 
-const output_GetLevel_GearScore_func string = `func (e GearScore) GetLevel() int {
+const GetLevel_GearScore_func string = `func (e GearScore) GetLevel() int {
 	return e.gearScore.Level
 }`
 
-const output_GetScore_GearScore_func string = `func (e GearScore) GetScore() int {
+const GetScore_GearScore_func string = `func (e GearScore) GetScore() int {
 	return e.gearScore.Score
 }`
 
-const output_GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem(itemID ItemID) Item {
+const GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem(itemID ItemID) Item {
 	patchingItem, ok := sm.Patch.Item[itemID]
 	if ok {
 		return Item{patchingItem}
@@ -321,7 +321,7 @@ const output_GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem
 	return Item{currentItem}
 }`
 
-const output_GetGearScore_Item_func string = `func (e Item) GetGearScore(sm *StateMachine) GearScore {
+const GetGearScore_Item_func string = `func (e Item) GetGearScore(sm *StateMachine) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[e.item.GearScore]
 	if ok {
 		return GearScore{gearScore: patchingGearScore}
@@ -330,7 +330,7 @@ const output_GetGearScore_Item_func string = `func (e Item) GetGearScore(sm *Sta
 	return GearScore{gearScore: currentGearScore}
 }`
 
-const output_GetPosition_StateMachine_func string = `func (sm *StateMachine) GetPosition(positionID PositionID) Position {
+const GetPosition_StateMachine_func string = `func (sm *StateMachine) GetPosition(positionID PositionID) Position {
 	patchingPosition, ok := sm.Patch.Position[positionID]
 	if ok {
 		return Position{patchingPosition}
@@ -339,15 +339,15 @@ const output_GetPosition_StateMachine_func string = `func (sm *StateMachine) Get
 	return Position{currentPosition}
 }`
 
-const output_GetX_Position_func string = `func (e Position) GetX() float64 {
+const GetX_Position_func string = `func (e Position) GetX() float64 {
 	return e.position.X
 }`
 
-const output_GetY_Position_func string = `func (e Position) GetY() float64 {
+const GetY_Position_func string = `func (e Position) GetY() float64 {
 	return e.position.Y
 }`
 
-const output_GetZoneItem_StateMachine_func string = `func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
+const GetZoneItem_StateMachine_func string = `func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	patchingZoneItem, ok := sm.Patch.ZoneItem[zoneItemID]
 	if ok {
 		return ZoneItem{patchingZoneItem}
@@ -356,7 +356,7 @@ const output_GetZoneItem_StateMachine_func string = `func (sm *StateMachine) Get
 	return ZoneItem{currentZoneItem}
 }`
 
-const output_GetPosition_ZoneItem_func string = `func (e ZoneItem) GetPosition(sm *StateMachine) Position {
+const GetPosition_ZoneItem_func string = `func (e ZoneItem) GetPosition(sm *StateMachine) Position {
 	patchingPosition, ok := sm.Patch.Position[e.zoneItem.Position]
 	if ok {
 		return Position{patchingPosition}
@@ -365,7 +365,7 @@ const output_GetPosition_ZoneItem_func string = `func (e ZoneItem) GetPosition(s
 	return Position{currentPosition}
 }`
 
-const output_GetItem_ZoneItem_func string = `func (e ZoneItem) GetItem(sm *StateMachine) Item {
+const GetItem_ZoneItem_func string = `func (e ZoneItem) GetItem(sm *StateMachine) Item {
 	patchingItem, ok := sm.Patch.Item[e.zoneItem.Item]
 	if ok {
 		return Item{patchingItem}
@@ -374,7 +374,7 @@ const output_GetItem_ZoneItem_func string = `func (e ZoneItem) GetItem(sm *State
 	return Item{currentItem}
 }`
 
-const output_GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
+const GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
 	patchingZone, ok := sm.Patch.Zone[zoneID]
 	if ok {
 		return Zone{zone: patchingZone}
@@ -383,7 +383,7 @@ const output_GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone
 	return Zone{zone: currentZone}
 }`
 
-const output_GetPlayers_Zone_func string = `func (e Zone) GetPlayers(sm *StateMachine) []Player {
+const GetPlayers_Zone_func string = `func (e Zone) GetPlayers(sm *StateMachine) []Player {
 	var players []Player
 	for _, playerID := range e.zone.Players {
 		players = append(players, sm.GetPlayer(playerID))
@@ -391,7 +391,7 @@ const output_GetPlayers_Zone_func string = `func (e Zone) GetPlayers(sm *StateMa
 	return players
 }`
 
-const output_GetZoneItems_Zone_func string = `func (e Zone) GetZoneItems(sm *StateMachine) []ZoneItem {
+const GetZoneItems_Zone_func string = `func (e Zone) GetZoneItems(sm *StateMachine) []ZoneItem {
 	var items []ZoneItem
 	for _, zoneItemID := range e.zone.Items {
 		items = append(items, sm.GetZoneItem(zoneItemID))
@@ -399,14 +399,14 @@ const output_GetZoneItems_Zone_func string = `func (e Zone) GetZoneItems(sm *Sta
 	return items
 }`
 
-const output_Parentage_type string = `type Parentage []ParentInfo`
+const Parentage_type string = `type Parentage []ParentInfo`
 
-const output_ParentInfo_type string = `type ParentInfo struct {
+const ParentInfo_type string = `type ParentInfo struct {
 	Kind	EntityKind	` + "`" + `json:"kind"` + "`" + `
 	ID	int		` + "`" + `json:"id"` + "`" + `
 }`
 
-const output_RemovePlayer_Zone_func string = `func (z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
+const RemovePlayer_Zone_func string = `func (z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
 	if z.zone.OperationKind == OperationKindDelete {
 		return z
 	}
@@ -429,7 +429,7 @@ const output_RemovePlayer_Zone_func string = `func (z Zone) RemovePlayer(playerI
 	return z
 }`
 
-const output_RemoveZoneItem_Zone_func string = `func (z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
+const RemoveZoneItem_Zone_func string = `func (z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
 	if z.zone.OperationKind == OperationKindDelete {
 		return z
 	}
@@ -452,7 +452,7 @@ const output_RemoveZoneItem_Zone_func string = `func (z Zone) RemoveZoneItem(zon
 	return z
 }`
 
-const output_RemoveItem_Player_func string = `func (p Player) RemoveItem(itemID ItemID, sm *StateMachine) Player {
+const RemoveItem_Player_func string = `func (p Player) RemoveItem(itemID ItemID, sm *StateMachine) Player {
 	if p.player.OperationKind == OperationKindDelete {
 		return p
 	}
@@ -475,7 +475,7 @@ const output_RemoveItem_Player_func string = `func (p Player) RemoveItem(itemID 
 	return p
 }`
 
-const output_SetLevel_GearScore_func string = `func (g GearScore) SetLevel(newLevel int, sm *StateMachine) GearScore {
+const SetLevel_GearScore_func string = `func (g GearScore) SetLevel(newLevel int, sm *StateMachine) GearScore {
 	if g.gearScore.OperationKind == OperationKindDelete {
 		return g
 	}
@@ -485,7 +485,7 @@ const output_SetLevel_GearScore_func string = `func (g GearScore) SetLevel(newLe
 	return g
 }`
 
-const output_SetScore_GearScore_func string = `func (g GearScore) SetScore(newScore int, sm *StateMachine) GearScore {
+const SetScore_GearScore_func string = `func (g GearScore) SetScore(newScore int, sm *StateMachine) GearScore {
 	if g.gearScore.OperationKind == OperationKindDelete {
 		return g
 	}
@@ -495,7 +495,7 @@ const output_SetScore_GearScore_func string = `func (g GearScore) SetScore(newSc
 	return g
 }`
 
-const output_SetX_Position_func string = `func (p Position) SetX(newX float64, sm *StateMachine) Position {
+const SetX_Position_func string = `func (p Position) SetX(newX float64, sm *StateMachine) Position {
 	if p.position.OperationKind == OperationKindDelete {
 		return p
 	}
@@ -505,7 +505,7 @@ const output_SetX_Position_func string = `func (p Position) SetX(newX float64, s
 	return p
 }`
 
-const output_SetY_Position_func string = `func (p Position) SetY(newY float64, sm *StateMachine) Position {
+const SetY_Position_func string = `func (p Position) SetY(newY float64, sm *StateMachine) Position {
 	if p.position.OperationKind == OperationKindDelete {
 		return p
 	}
@@ -515,28 +515,30 @@ const output_SetY_Position_func string = `func (p Position) SetY(newY float64, s
 	return p
 }`
 
-const output_EntityKindPlayer_type string = `const (
+const EntityKind_type string = `type EntityKind string`
+
+const EntityKindGearScore_type string = `const (
+	EntityKindGearScore	EntityKind	= "gearScore"
+	EntityKindItem		EntityKind	= "item"
 	EntityKindPlayer	EntityKind	= "player"
-	EntityKindZone				= "zone"
-	EntityKindZoneItem			= "zoneItem"
-	EntityKindPosition			= "position"
-	EntityKindItem				= "item"
-	EntityKindGearScore			= "gearScore"
+	EntityKindPosition	EntityKind	= "position"
+	EntityKindZone		EntityKind	= "zone"
+	EntityKindZoneItem	EntityKind	= "zoneItem"
 )`
 
-const output_ZoneID_type string = `type ZoneID int`
+const ZoneID_type string = `type ZoneID int`
 
-const output_ZoneItemID_type string = `type ZoneItemID int`
+const ZoneItemID_type string = `type ZoneItemID int`
 
-const output_PositionID_type string = `type PositionID int`
+const PositionID_type string = `type PositionID int`
 
-const output_PlayerID_type string = `type PlayerID int`
+const PlayerID_type string = `type PlayerID int`
 
-const output_ItemID_type string = `type ItemID int`
+const ItemID_type string = `type ItemID int`
 
-const output_GearScoreID_type string = `type GearScoreID int`
+const GearScoreID_type string = `type GearScoreID int`
 
-const output_State_type string = `type State struct {
+const State_type string = `type State struct {
 	Player		map[PlayerID]playerCore		` + "`" + `json:"player"` + "`" + `
 	Zone		map[ZoneID]zoneCore		` + "`" + `json:"zone"` + "`" + `
 	ZoneItem	map[ZoneItemID]zoneItemCore	` + "`" + `json:"zoneItem"` + "`" + `
@@ -545,20 +547,20 @@ const output_State_type string = `type State struct {
 	GearScore	map[GearScoreID]gearScoreCore	` + "`" + `json:"gearScore"` + "`" + `
 }`
 
-const output_newState_func string = `func newState() State {
+const newState_func string = `func newState() State {
 	return State{Player: make(map[PlayerID]playerCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore), Position: make(map[PositionID]positionCore), Item: make(map[ItemID]itemCore), GearScore: make(map[GearScoreID]gearScoreCore)}
 }`
 
-const output_zoneCore_type string = `type zoneCore struct {
+const zoneCore_type string = `type zoneCore struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
 	Players		[]PlayerID	` + "`" + `json:"players"` + "`" + `
 	Items		[]ZoneItemID	` + "`" + `json:"items"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
-const output_Zone_type string = `type Zone struct{ zone zoneCore }`
+const Zone_type string = `type Zone struct{ zone zoneCore }`
 
-const output_zoneItemCore_type string = `type zoneItemCore struct {
+const zoneItemCore_type string = `type zoneItemCore struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
 	Item		ItemID		` + "`" + `json:"item"` + "`" + `
@@ -566,18 +568,18 @@ const output_zoneItemCore_type string = `type zoneItemCore struct {
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
 }`
 
-const output_ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
+const ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
 
-const output_itemCore_type string = `type itemCore struct {
+const itemCore_type string = `type itemCore struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
 	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
 }`
 
-const output_Item_type string = `type Item struct{ item itemCore }`
+const Item_type string = `type Item struct{ item itemCore }`
 
-const output_playerCore_type string = `type playerCore struct {
+const playerCore_type string = `type playerCore struct {
 	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
 	Items		[]ItemID	` + "`" + `json:"items"` + "`" + `
 	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
@@ -586,9 +588,9 @@ const output_playerCore_type string = `type playerCore struct {
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
 }`
 
-const output_Player_type string = `type Player struct{ player playerCore }`
+const Player_type string = `type Player struct{ player playerCore }`
 
-const output_gearScoreCore_type string = `type gearScoreCore struct {
+const gearScoreCore_type string = `type gearScoreCore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
@@ -596,9 +598,9 @@ const output_gearScoreCore_type string = `type gearScoreCore struct {
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
 }`
 
-const output_GearScore_type string = `type GearScore struct{ gearScore gearScoreCore }`
+const GearScore_type string = `type GearScore struct{ gearScore gearScoreCore }`
 
-const output_positionCore_type string = `type positionCore struct {
+const positionCore_type string = `type positionCore struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
@@ -606,30 +608,28 @@ const output_positionCore_type string = `type positionCore struct {
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
 }`
 
-const output_Position_type string = `type Position struct{ position positionCore }`
+const Position_type string = `type Position struct{ position positionCore }`
 
-const output_OperationKind_type string = `type OperationKind string`
+const OperationKind_type string = `type OperationKind string`
 
-const output_EntityKind_type string = `type EntityKind string`
-
-const output_OperationKindDelete_type string = `const (
+const OperationKindDelete_type string = `const (
 	OperationKindDelete	= "DELETE"
 	OperationKindUpdate	= "UPDATE"
 )`
 
-const output_StateMachine_type string = `type StateMachine struct {
+const StateMachine_type string = `type StateMachine struct {
 	State	State
 	Patch	State
 	IDgen	int
 }`
 
-const output_GenerateID_StateMachine_func string = `func (sm *StateMachine) GenerateID() int {
+const GenerateID_StateMachine_func string = `func (sm *StateMachine) GenerateID() int {
 	newID := sm.IDgen
 	sm.IDgen = sm.IDgen + 1
 	return newID
 }`
 
-const output_UpdateState_StateMachine_func string = `func (sm *StateMachine) UpdateState() {
+const UpdateState_StateMachine_func string = `func (sm *StateMachine) UpdateState() {
 	for _, player := range sm.Patch.Player {
 		if player.OperationKind == OperationKindDelete {
 			delete(sm.State.Player, player.ID)
@@ -675,7 +675,7 @@ const output_UpdateState_StateMachine_func string = `func (sm *StateMachine) Upd
 	sm.Patch = newState()
 }`
 
-const output_Tree_type string = `type Tree struct {
+const Tree_type string = `type Tree struct {
 	Player		map[PlayerID]_player		` + "`" + `json:"player"` + "`" + `
 	Zone		map[ZoneID]_zone		` + "`" + `json:"zone"` + "`" + `
 	ZoneItem	map[ZoneItemID]_zoneItem	` + "`" + `json:"zoneItem"` + "`" + `
@@ -684,38 +684,38 @@ const output_Tree_type string = `type Tree struct {
 	GearScore	map[GearScoreID]_gearScore	` + "`" + `json:"gearScore"` + "`" + `
 }`
 
-const output_newTree_func string = `func newTree() Tree {
+const newTree_func string = `func newTree() Tree {
 	return Tree{Player: make(map[PlayerID]_player), Zone: make(map[ZoneID]_zone), ZoneItem: make(map[ZoneItemID]_zoneItem), Position: make(map[PositionID]_position), Item: make(map[ItemID]_item), GearScore: make(map[GearScoreID]_gearScore)}
 }`
 
-const output__zoneItem_type string = `type _zoneItem struct {
+const _zoneItem_type string = `type _zoneItem struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Position	*_position	` + "`" + `json:"position"` + "`" + `
 	Item		*_item		` + "`" + `json:"item"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
-const output__item_type string = `type _item struct {
+const _item_type string = `type _item struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
 	GearScore	*_gearScore	` + "`" + `json:"gearScore"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
-const output__position_type string = `type _position struct {
+const _position_type string = `type _position struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
-const output__gearScore_type string = `type _gearScore struct {
+const _gearScore_type string = `type _gearScore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
-const output__player_type string = `type _player struct {
+const _player_type string = `type _player struct {
 	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
 	Items		[]_item		` + "`" + `json:"items"` + "`" + `
 	GearScore	*_gearScore	` + "`" + `json:"gearScore"` + "`" + `
@@ -723,7 +723,7 @@ const output__player_type string = `type _player struct {
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
-const output__zone_type string = `type _zone struct {
+const _zone_type string = `type _zone struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
 	Players		[]_player	` + "`" + `json:"players"` + "`" + `
 	Items		[]_zoneItem	` + "`" + `json:"items"` + "`" + `

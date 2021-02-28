@@ -1,12 +1,14 @@
 package statemachine
 
+type EntityKind string
+
 const (
+	EntityKindGearScore EntityKind = "gearScore"
+	EntityKindItem      EntityKind = "item"
 	EntityKindPlayer    EntityKind = "player"
-	EntityKindZone                 = "zone"
-	EntityKindZoneItem             = "zoneItem"
-	EntityKindPosition             = "position"
-	EntityKindItem                 = "item"
-	EntityKindGearScore            = "gearScore"
+	EntityKindPosition  EntityKind = "position"
+	EntityKindZone      EntityKind = "zone"
+	EntityKindZoneItem  EntityKind = "zoneItem"
 )
 
 type ZoneID int
