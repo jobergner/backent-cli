@@ -94,7 +94,7 @@ func TestSimpleAST(t *testing.T) {
 	t.Run("should fill in references of rudimentary simpleAST", func(t *testing.T) {
 
 		actual := buildRudimentarySimpleAST(data)
-		actual.fillInReferences()
+		actual.fillInReferences().fillInParentalInfo()
 
 		livingSpaceField := actual.Decls["house"].Fields["livingSpace"]
 		assert.Equal(t, livingSpaceField.Parent.Name, "house")
@@ -130,5 +130,15 @@ func TestSimpleAST(t *testing.T) {
 		assert.Equal(t, ageField.Parent.Name, "person")
 		assert.Equal(t, ageField.ValueType.Name, "int")
 		assert.Equal(t, ageField.ValueType.IsBasicType, true)
+	})
+
+	t.Run("should fill in parentalInfo", func(t *testing.T) {
+
+		actual := buildRudimentarySimpleAST(data)
+		actual.fillInReferences().fillInParentalInfo()
+
+		assert.True(t, actual.Decls["house"].IsRootType)
+		assert.False(t, actual.Decls["person"].IsRootType)
+		assert.False(t, actual.Decls["address"].IsRootType)
 	})
 }
