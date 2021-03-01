@@ -46,7 +46,8 @@ func (s *stateFactory) writeState() *stateFactory {
 	return s
 }
 
-const elementTemplateString string = `<( range .Decls )>
+const elementTemplateString string = `
+<( range .Decls )>
 type <( .Name )>Core struct {
 	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
 <( range .Fields )> <( toTitleCase .Name )> <( toFieldValue . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
