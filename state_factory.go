@@ -2,7 +2,7 @@ package statefactory
 
 import (
 	"bytes"
-	"fmt"
+	"strings"
 	"text/template"
 )
 
@@ -18,20 +18,12 @@ func newStateFactory(ast simpleAST) stateFactory {
 	}
 }
 
-const entityKindsTemplateString string = `
-type EntityKind string
-
-const ({{range $index, $element := .Decls}}
-	EntityKind{{ .Name }} EntityKind = "{{.Name}}"{{end}}
-)
-`
-
-var entityKindsTemplate *template.Template = template.Must(
-	template.New("entityKindsTemplate").Parse(entityKindsTemplateString),
-)
-
-func (s *stateFactory) writeEntityKinds() *stateFactory {
-	entityKindsTemplate.Execute(&s.buf, s.ast)
-	fmt.Println(s.buf.String())
-	return s
+func newTemplateFrom(name, templateString string) *template.Template {
+	return template.Must(
+		template.New(name).
+			Funcs(template.FuncMap{
+				"toTitleCase": strings.Title,
+			}).
+			Parse(templateString),
+	)
 }

@@ -15,31 +15,33 @@ import (
 
 type stateMachine ast.File
 
-// " ab c  de\nf" => "ab c de f"
+func simplifyIfWhitespace(ch rune) rune {
+	if ch == '\n' {
+		return ch
+	}
+	if unicode.IsSpace(ch) {
+		return ' '
+	}
+	return ch
+}
+
 func normalizeWhitespace(_str string) string {
 	str := strings.TrimSpace(_str)
 	var b strings.Builder
 	b.Grow(len(str))
 
-	var wroteSpace bool = true
+	var lastWrittenRune rune = '1'
 
-	for _, ch := range str {
-		var isSpace bool = unicode.IsSpace(ch)
-
-		if isSpace && wroteSpace {
-			continue
-		}
-
-		if isSpace {
-			b.WriteRune(' ')
-		} else {
+	for _, _ch := range str {
+		ch := simplifyIfWhitespace(_ch)
+		if !unicode.IsSpace(ch) {
 			b.WriteRune(ch)
-		}
-
-		if isSpace {
-			wroteSpace = true
+			lastWrittenRune = ch
 		} else {
-			wroteSpace = false
+			if lastWrittenRune != ch {
+				b.WriteRune(ch)
+				lastWrittenRune = ch
+			}
 		}
 	}
 

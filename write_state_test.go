@@ -1,9 +1,10 @@
 package statefactory
 
 import (
+	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 func TestWriteState(t *testing.T) {
@@ -11,15 +12,19 @@ func TestWriteState(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeEntityKinds()
 
-		actual := splitDecls(sf.buf.String())
-		expected := []string{
+		actual := normalizeWhitespace(sf.buf.String())
+		expected := normalizeWhitespace(strings.Join([]string{
 			EntityKind_type,
 			EntityKindGearScore_type,
+		}, "\n"))
+
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(actual, expected, true)
+
+		dmp.DiffPrettyText(diffs)
+
+		if expected != actual {
+			t.Errorf(dmp.DiffPrettyText(diffs))
 		}
-
-		missingDeclarations, redundantDeclarations := matchDeclarations(actual, expected)
-
-		assert.Equal(t, []string{}, missingDeclarations)
-		assert.Equal(t, []string{}, redundantDeclarations)
 	})
 }
