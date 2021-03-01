@@ -52,6 +52,7 @@ type <( .Name )>Core struct {
 <( range .Fields )> <( toTitleCase .Name )> <( toFieldValue . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
 <( end )>
 	OperationKind OperationKind ` + "`" + `json:"operationKind"` + "`" + `
+<( if not .IsRootType )> Parentage Parentage ` + "`" + `json:"parentage"` + "`" + `<( end )>
 }
 type <( toTitleCase .Name )> struct{ <( .Name )> <( .Name )>Core }
 <( end )>
