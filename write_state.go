@@ -4,16 +4,44 @@ import (
 	"text/template"
 )
 
-const entityKindsTemplateString string = `
+const entityKindTemplateString string = `
 type EntityKind string
 
-const ({{range .Decls}}
-	EntityKind{{ toTitleCase .Name }} EntityKind = "{{.Name}}"{{end}}
+const (<( range .Decls )>
+	EntityKind<( toTitleCase .Name )> <( writeOnIndex $.Decls . 0 "EntityKind" )> = "<( .Name )>"<(end)>
 )`
 
-var entityKindsTemplate *template.Template = newTemplateFrom("entityKindsTemplate", entityKindsTemplateString)
+var entityKindTemplate *template.Template = newTemplateFrom("entityKindTemplate", entityKindTemplateString)
 
 func (s *stateFactory) writeEntityKinds() *stateFactory {
-	entityKindsTemplate.Execute(&s.buf, s.ast)
+	entityKindTemplate.Execute(&s.buf, s.ast)
+	return s
+}
+
+const idTemplateString string = `<( range .Decls )>
+type <( toTitleCase .Name )>ID int<( end )>
+`
+
+var idTemplate *template.Template = newTemplateFrom("idTemplate", idTemplateString)
+
+func (s *stateFactory) writeIDs() *stateFactory {
+	idTemplate.Execute(&s.buf, s.ast)
+	return s
+}
+
+const stateTemplateString string = `
+type State struct {<( range .Decls )>
+	<( toTitleCase .Name )> map[<( toTitleCase .Name )>ID]<( .Name )>Core ` + "`" + `json:"<( .Name )>"` + "`" + `
+<( end )>}
+
+func newState() State {
+	return State{<( range .Decls )><( toTitleCase .Name )>: make(map[<( toTitleCase .Name )>ID]<( .Name )>Core)<( doNotWriteOnIndex $.Decls . -1 ", ")><( end )>}
+}
+`
+
+var stateTemplate *template.Template = newTemplateFrom("stateTemplate", stateTemplateString)
+
+func (s *stateFactory) writeState() *stateFactory {
+	stateTemplate.Execute(&s.buf, s.ast)
 	return s
 }
