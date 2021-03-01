@@ -553,8 +553,8 @@ const newState_func string = `func newState() State {
 
 const zoneCore_type string = `type zoneCore struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
-	Players		[]PlayerID	` + "`" + `json:"players"` + "`" + `
 	Items		[]ZoneItemID	` + "`" + `json:"items"` + "`" + `
+	Players		[]PlayerID	` + "`" + `json:"players"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
@@ -562,8 +562,8 @@ const Zone_type string = `type Zone struct{ zone zoneCore }`
 
 const zoneItemCore_type string = `type zoneItemCore struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
-	Position	PositionID	` + "`" + `json:"position"` + "`" + `
 	Item		ItemID		` + "`" + `json:"item"` + "`" + `
+	Position	PositionID	` + "`" + `json:"position"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
 }`
@@ -581,8 +581,8 @@ const Item_type string = `type Item struct{ item itemCore }`
 
 const playerCore_type string = `type playerCore struct {
 	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
-	Items		[]ItemID	` + "`" + `json:"items"` + "`" + `
 	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
+	Items		[]ItemID	` + "`" + `json:"items"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `

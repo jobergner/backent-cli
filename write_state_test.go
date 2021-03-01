@@ -69,4 +69,33 @@ func TestWriteState(t *testing.T) {
 			t.Errorf(dmp.DiffPrettyText(diffs))
 		}
 	})
+	t.Run("writes elements", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeElements()
+
+		actual := normalizeWhitespace(sf.buf.String())
+		expected := normalizeWhitespace(strings.Join([]string{
+			gearScoreCore_type,
+			GearScore_type,
+			itemCore_type,
+			Item_type,
+			playerCore_type,
+			Player_type,
+			positionCore_type,
+			Position_type,
+			zoneCore_type,
+			Zone_type,
+			zoneItemCore_type,
+			ZoneItem_type,
+		}, "\n"))
+
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(actual, expected, true)
+
+		dmp.DiffPrettyText(diffs)
+
+		if expected != actual {
+			t.Errorf(dmp.DiffPrettyText(diffs))
+		}
+	})
 }

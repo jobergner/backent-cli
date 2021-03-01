@@ -40,8 +40,8 @@ func newState() State {
 
 type zoneCore struct {
 	ID            ZoneID        `json:"id"`
-	Players       []PlayerID    `json:"players"`
 	Items         []ZoneItemID  `json:"items"`
+	Players       []PlayerID    `json:"players"`
 	OperationKind OperationKind `json:"operationKind"`
 }
 
@@ -49,8 +49,8 @@ type Zone struct{ zone zoneCore }
 
 type zoneItemCore struct {
 	ID            ZoneItemID    `json:"id"`
-	Position      PositionID    `json:"position"`
 	Item          ItemID        `json:"item"`
+	Position      PositionID    `json:"position"`
 	OperationKind OperationKind `json:"operationKind"`
 	Parentage     Parentage     `json:"parentage"`
 }
@@ -68,8 +68,8 @@ type Item struct{ item itemCore }
 
 type playerCore struct {
 	ID            PlayerID      `json:"id"`
-	Items         []ItemID      `json:"items"`
 	GearScore     GearScoreID   `json:"gearScore"`
+	Items         []ItemID      `json:"items"`
 	Position      PositionID    `json:"position"`
 	OperationKind OperationKind `json:"operationKind"`
 	Parentage     Parentage     `json:"parentage"`
