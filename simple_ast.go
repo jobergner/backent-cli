@@ -19,6 +19,7 @@ type simpleTypeDecl struct {
 	Name        string
 	Fields      map[string]simpleFieldDecl
 	IsBasicType bool
+	IsRootType  bool
 }
 
 func newSimpleType(name string) simpleTypeDecl {
@@ -70,7 +71,7 @@ func buildRudimentarySimpleTypeDecl(objectValue map[interface{}]interface{}, typ
 	return typeDecl
 }
 
-func (s *simpleAST) fillInReferences() {
+func (s *simpleAST) fillInReferences() *simpleAST {
 	for simpleTypeName, simpleType := range s.Decls {
 		ss := simpleType
 		for simpleFieldName, simpleField := range ss.Fields {
@@ -85,6 +86,24 @@ func (s *simpleAST) fillInReferences() {
 			ss.Fields[simpleFieldName] = sf
 		}
 		s.Decls[simpleTypeName] = ss
+	}
+	return s
+}
+
+func (s *simpleAST) fillInParentalInfo() {
+	for simpleTypeName, simpleType := range s.Decls {
+		isRootType := true
+		for _, _simpleType := range s.Decls {
+			for _, simpleField := range _simpleType.Fields {
+				if simpleField.ValueType.Name == simpleTypeName {
+					isRootType = false
+				}
+			}
+		}
+		if isRootType {
+			simpleType.IsRootType = true
+			s.Decls[simpleTypeName] = simpleType
+		}
 	}
 }
 
