@@ -237,7 +237,7 @@ func newSimpleASTExample() simpleAST {
 
 	// TODO: make prettier
 	simpleAST := buildRudimentarySimpleAST(data)
-	simpleAST.fillInReferences()
+	simpleAST.fillInReferences().fillInParentalInfo()
 
 	return simpleAST
 }
