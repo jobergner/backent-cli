@@ -10,6 +10,7 @@ import (
 	"testing"
 	"unicode"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,6 +47,29 @@ func normalizeWhitespace(_str string) string {
 	}
 
 	return b.String()
+}
+
+// creates diff and makes whitespace visible
+func diff(actual, expected string) string {
+	dmp := diffmatchpatch.New()
+	diffs := dmp.DiffMain(actual, expected, true)
+
+	for i, diff := range diffs {
+		if diff.Type == diffmatchpatch.DiffDelete || diff.Type == diffmatchpatch.DiffInsert {
+			var buf bytes.Buffer
+			for _, ch := range diff.Text {
+				if unicode.IsSpace(ch) {
+					buf.WriteString("~")
+				} else {
+					buf.WriteRune(ch)
+				}
+			}
+			diff.Text = buf.String()
+			diffs[i] = diff
+		}
+	}
+
+	return dmp.DiffPrettyText(diffs)
 }
 
 func findDeclarationIn(val string, slice []string) (int, bool) {

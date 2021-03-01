@@ -3,8 +3,6 @@ package statefactory
 import (
 	"strings"
 	"testing"
-
-	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 func TestWriteState(t *testing.T) {
@@ -18,13 +16,8 @@ func TestWriteState(t *testing.T) {
 			EntityKindGearScore_type,
 		}, "\n"))
 
-		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(actual, expected, true)
-
-		dmp.DiffPrettyText(diffs)
-
 		if expected != actual {
-			t.Errorf(dmp.DiffPrettyText(diffs))
+			t.Errorf(diff(actual, expected))
 		}
 	})
 	t.Run("writes ids", func(t *testing.T) {
@@ -41,13 +34,8 @@ func TestWriteState(t *testing.T) {
 			ZoneItemID_type,
 		}, "\n"))
 
-		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(actual, expected, true)
-
-		dmp.DiffPrettyText(diffs)
-
 		if expected != actual {
-			t.Errorf(dmp.DiffPrettyText(diffs))
+			t.Errorf(diff(actual, expected))
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
@@ -60,13 +48,8 @@ func TestWriteState(t *testing.T) {
 			newState_func,
 		}, "\n"))
 
-		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(actual, expected, true)
-
-		dmp.DiffPrettyText(diffs)
-
 		if expected != actual {
-			t.Errorf(dmp.DiffPrettyText(diffs))
+			t.Errorf(diff(actual, expected))
 		}
 	})
 	t.Run("writes elements", func(t *testing.T) {
@@ -89,13 +72,8 @@ func TestWriteState(t *testing.T) {
 			ZoneItem_type,
 		}, "\n"))
 
-		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(actual, expected, true)
-
-		dmp.DiffPrettyText(diffs)
-
 		if expected != actual {
-			t.Errorf(dmp.DiffPrettyText(diffs))
+			t.Errorf(diff(actual, expected))
 		}
 	})
 }
