@@ -45,3 +45,21 @@ func (s *stateFactory) writeState() *stateFactory {
 	stateTemplate.Execute(&s.buf, s.ast)
 	return s
 }
+
+const elementTemplateString string = `<( range .Decls )>
+type <( .Name )>Core struct {
+	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
+<( range .Fields )> <( toTitleCase .Name )> <( toFieldValue . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
+<( end )>
+	OperationKind OperationKind ` + "`" + `json:"operationKind"` + "`" + `<()>
+}
+type <( toTitleCase .Name )> struct{ <( .Name )> <( .Name )>Core }
+<( end )>
+`
+
+var elementTemplate *template.Template = newTemplateFrom("elementTemplate", elementTemplateString)
+
+func (s *stateFactory) writeElements() *stateFactory {
+	elementTemplate.Execute(&s.buf, s.ast)
+	return s
+}

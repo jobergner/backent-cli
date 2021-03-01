@@ -34,11 +34,24 @@ func indexOfDecl(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl) in
 	return indexOf
 }
 
+// TODO prettier
 func newTemplateFrom(name, templateString string) *template.Template {
 	return template.Must(
 		template.New(name).
 			Funcs(template.FuncMap{
 				"toTitleCase": strings.Title,
+				"toFieldValue": func(field simpleFieldDecl) string {
+					var valueStringWriter bytes.Buffer
+					if field.HasSliceValue {
+						valueStringWriter.WriteString("[]")
+					}
+					if field.ValueType.IsBasicType {
+						valueStringWriter.WriteString(field.ValueType.Name)
+					} else {
+						valueStringWriter.WriteString(strings.Title(field.ValueType.Name) + "ID")
+					}
+					return valueStringWriter.String()
+				},
 				"doNotWriteOnIndex": func(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl, requiredIndex int, toWrite string) string {
 					currentIndex := indexOfDecl(decls, currentDecl)
 					if requiredIndex < 0 {
