@@ -519,11 +519,11 @@ const EntityKind_type string = `type EntityKind string`
 
 const EntityKindGearScore_type string = `const (
 	EntityKindGearScore	EntityKind	= "gearScore"
-	EntityKindItem		EntityKind	= "item"
-	EntityKindPlayer	EntityKind	= "player"
-	EntityKindPosition	EntityKind	= "position"
-	EntityKindZone		EntityKind	= "zone"
-	EntityKindZoneItem	EntityKind	= "zoneItem"
+	EntityKindItem				= "item"
+	EntityKindPlayer			= "player"
+	EntityKindPosition			= "position"
+	EntityKindZone				= "zone"
+	EntityKindZoneItem			= "zoneItem"
 )`
 
 const ZoneID_type string = `type ZoneID int`
@@ -539,16 +539,16 @@ const ItemID_type string = `type ItemID int`
 const GearScoreID_type string = `type GearScoreID int`
 
 const State_type string = `type State struct {
+	GearScore	map[GearScoreID]gearScoreCore	` + "`" + `json:"gearScore"` + "`" + `
+	Item		map[ItemID]itemCore		` + "`" + `json:"item"` + "`" + `
 	Player		map[PlayerID]playerCore		` + "`" + `json:"player"` + "`" + `
+	Position	map[PositionID]positionCore	` + "`" + `json:"position"` + "`" + `
 	Zone		map[ZoneID]zoneCore		` + "`" + `json:"zone"` + "`" + `
 	ZoneItem	map[ZoneItemID]zoneItemCore	` + "`" + `json:"zoneItem"` + "`" + `
-	Position	map[PositionID]positionCore	` + "`" + `json:"position"` + "`" + `
-	Item		map[ItemID]itemCore		` + "`" + `json:"item"` + "`" + `
-	GearScore	map[GearScoreID]gearScoreCore	` + "`" + `json:"gearScore"` + "`" + `
 }`
 
 const newState_func string = `func newState() State {
-	return State{Player: make(map[PlayerID]playerCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore), Position: make(map[PositionID]positionCore), Item: make(map[ItemID]itemCore), GearScore: make(map[GearScoreID]gearScoreCore)}
+	return State{GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), Player: make(map[PlayerID]playerCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore)}
 }`
 
 const zoneCore_type string = `type zoneCore struct {
