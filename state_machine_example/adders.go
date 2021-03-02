@@ -1,6 +1,7 @@
 package statemachine
 
-func (e Zone) AddPlayer(sm *StateMachine) Player {
+func (_e Zone) AddPlayer(sm *StateMachine) Player {
+	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return Player{}
 	}
@@ -11,7 +12,8 @@ func (e Zone) AddPlayer(sm *StateMachine) Player {
 	return player
 }
 
-func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+func (_e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{}
 	}
@@ -22,7 +24,8 @@ func (e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
 	return zoneItem
 }
 
-func (e Player) AddItem(sm *StateMachine) Item {
+func (_e Player) AddItem(sm *StateMachine) Item {
+	e := sm.GetPlayer(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
 		return Item{}
 	}
