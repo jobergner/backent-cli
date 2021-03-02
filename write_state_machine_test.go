@@ -27,6 +27,19 @@ func TestWriteStateMachine(t *testing.T) {
 		actual := normalizeWhitespace(sf.buf.String())
 		expected := normalizeWhitespace(strings.Join([]string{
 			StateMachine_type,
+			newStateMachine_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(diff(actual, expected))
+		}
+	})
+	t.Run("writes generateID method", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeGenerateID()
+
+		actual := normalizeWhitespace(sf.buf.String())
+		expected := normalizeWhitespace(strings.Join([]string{
 			GenerateID_StateMachine_func,
 		}, "\n"))
 
@@ -34,7 +47,7 @@ func TestWriteStateMachine(t *testing.T) {
 			t.Errorf(diff(actual, expected))
 		}
 	})
-	t.Run("writes stateMachine", func(t *testing.T) {
+	t.Run("writes updateState method", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeUpdateState()
 

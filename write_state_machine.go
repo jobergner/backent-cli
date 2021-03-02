@@ -27,10 +27,8 @@ type StateMachine struct {
 	IDgen int
 }
 
-func (sm *StateMachine) GenerateID() int {
-	newID := sm.IDgen
-	sm.IDgen = sm.IDgen + 1
-	return newID
+func newStateMachine() *StateMachine {
+	return &StateMachine{State: newState(), Patch: newState(), IDgen: 1}
 }
 `
 
@@ -38,6 +36,21 @@ var stateMachineTemplate *template.Template = newTemplateFrom("stateMachineTempl
 
 func (s *stateFactory) writeStateMachine() *stateFactory {
 	stateMachineTemplate.Execute(&s.buf, s.ast)
+	return s
+}
+
+const generateIDTemplateString string = `
+func (sm *StateMachine) GenerateID() int {
+	newID := sm.IDgen
+	sm.IDgen = sm.IDgen + 1
+	return newID
+}
+`
+
+var generateIDTemplate *template.Template = newTemplateFrom("generateIDTemplate", generateIDTemplateString)
+
+func (s *stateFactory) writeGenerateID() *stateFactory {
+	generateIDTemplate.Execute(&s.buf, s.ast)
 	return s
 }
 
