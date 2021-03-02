@@ -13,6 +13,14 @@ type StateMachine struct {
 	IDgen int
 }
 
+func newStateMachine() *StateMachine {
+	return &StateMachine{
+		State: newState(),
+		Patch: newState(),
+		IDgen: 1,
+	}
+}
+
 func (sm *StateMachine) GenerateID() int {
 	newID := sm.IDgen
 	sm.IDgen = sm.IDgen + 1
