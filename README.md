@@ -136,9 +136,33 @@ is being updated with every 'register action'
 User can decide initially whether he wants to use 'go install' to make it global.
 use https://github.com/mailru/easyjson to generate json marshal func.
 
-### Declared types as receiver:
+### Declared elements as receiver:
 Having your basic type declarations in a package takes away the ability to to write methods for them.
-The user would have to reassign and cast the type into a self defined type
+The user would have to reassign and cast the type into a self defined type. but wont fix atm this is a price im willing to pay.
+
+### Unintuitive API:
+```
+following issue:
+...
+player := sm.CreatePlayer(sm) // "attribute" default is 0
+player.SetAttribute(1, sm) // sets "attribute" to 1
+fmt.Println(player.GetAttribute()) // prints 0
+```
+this is very unintuitive as you'd expect the third line to print 1. However, player was returned as value, not a pointer, so it's not.
+to work around this all methods ignore their receivers values, and rather get the element out of the statemachine via it's getter.
+this would result in the following api
+```
+player := sm.CreatePlayer(sm)
+player.SetAttribute(1, sm)
+fmt.Println(player.GetAttribute(sm)) // prints 1, but requires the stateMachine to be passed
+```
+the `GetAttribute` method would look like this
+```
+func (_p Player) GetAttribute(sm *StateMachine) int {
+   p := sm.GetPlayer(_p.player.ID)
+   return p.Attribute
+}
+```
 
 ### TODO
 - finish state machine
