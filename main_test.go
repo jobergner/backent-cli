@@ -2,14 +2,11 @@ package statefactory
 
 import (
 	"bytes"
-	"go/ast"
 	"strings"
 	"unicode"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
-
-type stateMachine ast.File
 
 func simplifyIfWhitespace(ch rune) rune {
 	if ch == '\n' {
@@ -64,7 +61,18 @@ func diff(actual, expected string) string {
 		}
 	}
 
-	return dmp.DiffPrettyText(diffs)
+	return `
+
+DIFF:
+` + dmp.DiffPrettyText(diffs) + `
+
+__________________________________
+
+WANT:
+` + expected + `
+
+GOT:
+` + actual
 }
 
 func newSimpleASTExample() simpleAST {
