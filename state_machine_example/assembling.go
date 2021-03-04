@@ -1,51 +1,52 @@
 package statemachine
 
-func (t *Tree) assembleFrom(s State) {
-	for _, player := range s.Player {
-		t.assembleByEnityKind(player.Parentage, s)
-	}
-	for _, zoneItem := range s.ZoneItem {
-		t.assembleByEnityKind(zoneItem.Parentage, s)
-	}
-	for _, position := range s.Position {
-		t.assembleByEnityKind(position.Parentage, s)
+// this is kind of a mess atm
+// the implementation completely missed the idea
+// this code is supposed to only run in the wasm client
+// its purpose is to assemble the data of the incoming patch in a tree
+// so it would be called on the stateMachine in the client
+// sm.Patch = incomingPatch
+// dataTree := sm.assembleTree()
+// sm.UpdateState()
+// ...
+// the tree is assembled from the patch and fills in the missing parents of elements
+// with the elements it has in it's state.
+// the implementation would look like this
+// func (sm *StateMachine) assemble() Tree {
+// the inteesting thing of the tree is that it really only holds updated data and their parents,
+// and will omit children of elements that haven't updated (with the use of pointers)
+//
+// the implementation should also not be too hard to write.
+// I just need to loop through each elementKind and of State AND Patch
+// and check for len(parentage) == 0
+// from there I build ALL children, BUT have 2 returned values:
+// 1. the element
+// 2. a boolean value whether the actually was an item taken from the Patch, and not only from the State
+// (alternative is the item always gets returned as pointer, and is just nil in case)
+// if the boolean is false, the built element get's dircarded
+
+func (t *Tree) assemble(s State) *Tree {
+	for _, gearScore := range s.GearScore {
+		t.assembleUpstreamFromGearScore(gearScore.ID, s)
 	}
 	for _, item := range s.Item {
-		t.assembleByEnityKind(item.Parentage, s)
+		t.assembleUpstreamFromItem(item.Parentage, item.ID, s)
 	}
-	for _, gearScore := range s.GearScore {
-		t.assembleByEnityKind(gearScore.Parentage, s)
+	for _, player := range s.Player {
+		t.assembleUpstreamFromPlayer(player.Parentage, player.ID, s)
 	}
+	for _, position := range s.Position {
+		t.assembleUpstreamFromPosition(position.ID, s)
+	}
+	for _, zoneItem := range s.ZoneItem {
+		t.assembleUpstreamFromZoneItem(zoneItem.Parentage, zoneItem.ID, s)
+	}
+	// needs zone here too, just add it
+
+	return t
 }
 
-func (t *Tree) assembleByEnityKind(parentage Parentage, s State) {
-	greatestAncestor := parentage[0]
-	switch greatestAncestor.Kind {
-	case EntityKindZoneItem:
-		_zoneItem := t.assembleZoneItem(parentage[1:], ZoneItemID(greatestAncestor.ID), s)
-		t.ZoneItem[ZoneItemID(greatestAncestor.ID)] = _zoneItem
-	}
-}
-
-func (t Tree) assembleZone(parentage Parentage, zoneID ZoneID, s State) _zone {
-	_zone := t.Zone[zoneID]
-	zone := s.Zone[zoneID]
-	_zone.ID = zone.ID
-	_zone.OperationKind = zone.OperationKind
-
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindPlayer:
-		_player := t.assemblePlayer(parentage[1:], PlayerID(nextDescendant.ID), s)
-		_zone.Players = append(_zone.Players, _player)
-	case EntityKindZoneItem:
-		_zoneItem := t.assembleZoneItem(parentage[1:], ZoneItemID(nextDescendant.ID), s)
-		_zone.Items = append(_zone.Items, _zoneItem)
-	}
-	return _zone
-}
-
-func (t Tree) assemblePlayer(parentage Parentage, playerID PlayerID, s State) _player {
+func (t Tree) assembleUpstreamFromPlayer(parentage Parentage, playerID PlayerID, s State) _player {
 	_player := t.Player[playerID]
 	player := s.Player[playerID]
 	_player.ID = player.ID
@@ -54,19 +55,19 @@ func (t Tree) assemblePlayer(parentage Parentage, playerID PlayerID, s State) _p
 	nextDescendant := parentage[0]
 	switch nextDescendant.Kind {
 	case EntityKindPosition:
-		_position := t.assemblePosition(PositionID(nextDescendant.ID), s)
+		_position := t.assembleUpstreamFromPosition(PositionID(nextDescendant.ID), s)
 		_player.Position = &_position
 	case EntityKindGearScore:
-		_gearScore := t.assembleGearScore(GearScoreID(nextDescendant.ID), s)
+		_gearScore := t.assembleUpstreamFromGearScore(GearScoreID(nextDescendant.ID), s)
 		_player.GearScore = &_gearScore
 	case EntityKindItem:
-		_item := t.assembleItem(parentage[1:], ItemID(nextDescendant.ID), s)
+		_item := t.assembleUpstreamFromItem(parentage[1:], ItemID(nextDescendant.ID), s)
 		_player.Items = append(_player.Items, _item)
 	}
 	return _player
 }
 
-func (t Tree) assembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
+func (t Tree) assembleUpstreamFromZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
 	_zoneItem := t.ZoneItem[zoneItemID]
 	zoneItem := s.ZoneItem[zoneItemID]
 	_zoneItem.ID = zoneItem.ID
@@ -75,16 +76,16 @@ func (t Tree) assembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s Sta
 	nextDescendant := parentage[0]
 	switch nextDescendant.Kind {
 	case EntityKindPosition:
-		_position := t.assemblePosition(PositionID(nextDescendant.ID), s)
+		_position := t.assembleUpstreamFromPosition(PositionID(nextDescendant.ID), s)
 		_zoneItem.Position = &_position
 	case EntityKindItem:
-		_item := t.assembleItem(parentage[1:], ItemID(nextDescendant.ID), s)
+		_item := t.assembleUpstreamFromItem(parentage[1:], ItemID(nextDescendant.ID), s)
 		_zoneItem.Item = &_item
 	}
 	return _zoneItem
 }
 
-func (t Tree) assemblePosition(positionID PositionID, s State) _position {
+func (t Tree) assembleUpstreamFromPosition(positionID PositionID, s State) _position {
 	_position := t.Position[positionID]
 	position := s.Position[positionID]
 	_position.ID = position.ID
@@ -95,7 +96,7 @@ func (t Tree) assemblePosition(positionID PositionID, s State) _position {
 	return _position
 }
 
-func (t Tree) assembleItem(parentage Parentage, itemID ItemID, s State) _item {
+func (t Tree) assembleUpstreamFromItem(itemID ItemID, s State) _item {
 	_item := t.Item[itemID]
 	item := s.Item[itemID]
 	_item.ID = item.ID
@@ -104,13 +105,13 @@ func (t Tree) assembleItem(parentage Parentage, itemID ItemID, s State) _item {
 	nextDescendant := parentage[0]
 	switch nextDescendant.Kind {
 	case EntityKindGearScore:
-		_gearScore := t.assembleGearScore(GearScoreID(nextDescendant.ID), s)
+		_gearScore := t.assembleUpstreamFromGearScore(GearScoreID(nextDescendant.ID), s)
 		_item.GearScore = &_gearScore
 	}
 	return _item
 }
 
-func (t Tree) assembleGearScore(gearScoreID GearScoreID, s State) _gearScore {
+func (t Tree) assembleUpstreamFromGearScore(gearScoreID GearScoreID, s State) _gearScore {
 	_gearScore := t.GearScore[gearScoreID]
 	gearScore := s.GearScore[gearScoreID]
 	_gearScore.ID = gearScore.ID
@@ -118,5 +119,17 @@ func (t Tree) assembleGearScore(gearScoreID GearScoreID, s State) _gearScore {
 
 	_gearScore.Level = gearScore.Level
 	_gearScore.Score = gearScore.Score
+
+	if len(gearScore.Parentage) == 0 {
+		return _gearScore
+	}
+
+	nextParent := gearScore.Parentage[len(gearScore.Parentage)-1]
+	switch nextParent.Kind {
+	case EntityKindItem:
+		_gearScore := t.assembleUpstreamFromItem(ItemID(nextParent.ID), s)
+		_item.GearScore = &_gearScore
+	}
+
 	return _gearScore
 }
