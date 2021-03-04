@@ -1,8 +1,10 @@
 package statemachine
 
 import (
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStateMachine(t *testing.T) {
@@ -109,5 +111,54 @@ func TestUpdateState(t *testing.T) {
 		sm.UpdateState()
 		_, ok := sm.State.Item[item.item.ID]
 		assert.False(t, ok)
+	})
+}
+
+func TestTree(t *testing.T) {
+	t.Run("assembles expected tree", func(t *testing.T) {
+		sm := newStateMachine()
+		zone := sm.CreateZone()
+		player1 := zone.AddPlayer(sm)
+		player1_item1 := player1.AddItem(sm)
+		player2 := zone.AddPlayer(sm)
+
+		actual := newTree().assemble(sm.Patch)
+
+		expected := newTree()
+		expected.Zone = map[ZoneID]_zone{
+			zone.zone.ID: {
+				ID: zone.zone.ID,
+				Players: []_player{
+					{
+						ID: player1.player.ID,
+						Items: []_item{{
+							ID:            player1_item1.item.ID,
+							OperationKind: OperationKindUpdate,
+						}},
+						OperationKind: OperationKindUpdate,
+					},
+					{
+						ID:            player2.player.ID,
+						OperationKind: OperationKindUpdate,
+					},
+				},
+				OperationKind: OperationKindUpdate,
+			},
+		}
+
+		assert.Equal(t, expected, actual)
+		fmt.Println("DAW")
+		fmt.Printf("%+v\n", expected)
+	})
+	t.Run("assembles expected tree", func(t *testing.T) {
+		sm := newStateMachine()
+
+		actual := newTree().assemble(sm.Patch)
+
+		expected := newTree()
+
+		assert.Equal(t, expected, actual)
+		fmt.Println("DAW")
+		fmt.Printf("%+v\n", expected)
 	})
 }
