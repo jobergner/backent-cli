@@ -109,7 +109,7 @@ func (sm *StateMachine) assemblePlayer(playerID PlayerID) (_player, bool) {
 		hasUpdated = true
 		treePlayer.GearScore = &treeGearScore
 	}
-	for _, itemID := range player.Items {
+	for _, itemID := range deduplicateItemIDs(sm.State.Player[player.ID].Items, sm.Patch.Player[player.ID].Items) {
 		if treeItem, itemHasUpdated := sm.assembleItem(itemID); itemHasUpdated {
 			hasUpdated = true
 			treePlayer.Items = append(treePlayer.Items, treeItem)
@@ -133,13 +133,13 @@ func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
 
 	var treeZone _zone
 
-	for _, zoneItemID := range zone.Items {
+	for _, zoneItemID := range deduplicateZoneItemIDs(sm.State.Zone[zone.ID].Items, sm.Patch.Zone[zone.ID].Items) {
 		if treeZoneItem, zoneItemHasUpdated := sm.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
 			hasUpdated = true
 			treeZone.Items = append(treeZone.Items, treeZoneItem)
 		}
 	}
-	for _, playerID := range zone.Players {
+	for _, playerID := range deduplicatePlayerIDs(sm.State.Zone[zone.ID].Players, sm.Patch.Zone[zone.ID].Players) {
 		if treePlayer, playerHasUpdated := sm.assemblePlayer(playerID); playerHasUpdated {
 			hasUpdated = true
 			treeZone.Players = append(treeZone.Players, treePlayer)
