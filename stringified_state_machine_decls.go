@@ -630,13 +630,6 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 	return deduped
 }`
 
-const Parentage_type string = `type Parentage []ParentInfo`
-
-const ParentInfo_type string = `type ParentInfo struct {
-	Kind	EntityKind	` + "`" + `json:"kind"` + "`" + `
-	ID	int		` + "`" + `json:"id"` + "`" + `
-}`
-
 const RemovePlayer_Zone_func string = `func (_z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
 	z := sm.GetZone(_z.zone.ID)
 	if z.zone.OperationKind == OperationKindDelete {
