@@ -150,3 +150,12 @@ func (_e Zone) GetZoneItems(sm *StateMachine) []ZoneItem {
 	}
 	return items
 }
+
+func (_e Zone) GetTags(sm *StateMachine) []string {
+	e := sm.GetZone(_e.zone.ID)
+	var tags []string
+	for _, tag := range e.zone.Tags {
+		tags = append(tags, tag)
+	}
+	return tags
+}

@@ -24,6 +24,16 @@ func (_e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
 	return zoneItem
 }
 
+func (_e Zone) AddTags(sm *StateMachine, tags ...string) {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return
+	}
+	e.zone.Tags = append(e.zone.Tags, tags...)
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+}
+
 func (_e Player) AddItem(sm *StateMachine) Item {
 	e := sm.GetPlayer(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {

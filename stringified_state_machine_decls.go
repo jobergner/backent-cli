@@ -702,48 +702,48 @@ const RemoveItem_Player_func string = `func (_p Player) RemoveItem(itemID ItemID
 	return p
 }`
 
-const SetLevel_GearScore_func string = `func (_g GearScore) SetLevel(newLevel int, sm *StateMachine) GearScore {
-	g := sm.GetGearScore(_g.gearScore.ID)
-	if g.gearScore.OperationKind == OperationKindDelete {
-		return g
+const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(newLevel int, sm *StateMachine) GearScore {
+	e := sm.GetGearScore(_e.gearScore.ID)
+	if e.gearScore.OperationKind == OperationKindDelete {
+		return e
 	}
-	g.gearScore.Level = newLevel
-	g.gearScore.OperationKind = OperationKindUpdate
-	sm.Patch.GearScore[g.gearScore.ID] = g.gearScore
-	return g
+	e.gearScore.Level = newLevel
+	e.gearScore.OperationKind = OperationKindUpdate
+	sm.Patch.GearScore[e.gearScore.ID] = e.gearScore
+	return e
 }`
 
-const SetScore_GearScore_func string = `func (_g GearScore) SetScore(newScore int, sm *StateMachine) GearScore {
-	g := sm.GetGearScore(_g.gearScore.ID)
-	if g.gearScore.OperationKind == OperationKindDelete {
-		return g
+const SetScore_GearScore_func string = `func (_e GearScore) SetScore(newScore int, sm *StateMachine) GearScore {
+	e := sm.GetGearScore(_e.gearScore.ID)
+	if e.gearScore.OperationKind == OperationKindDelete {
+		return e
 	}
-	g.gearScore.Score = newScore
-	g.gearScore.OperationKind = OperationKindUpdate
-	sm.Patch.GearScore[g.gearScore.ID] = g.gearScore
-	return g
+	e.gearScore.Score = newScore
+	e.gearScore.OperationKind = OperationKindUpdate
+	sm.Patch.GearScore[e.gearScore.ID] = e.gearScore
+	return e
 }`
 
-const SetX_Position_func string = `func (_p Position) SetX(newX float64, sm *StateMachine) Position {
-	p := sm.GetPosition(_p.position.ID)
-	if p.position.OperationKind == OperationKindDelete {
-		return p
+const SetX_Position_func string = `func (_e Position) SetX(newX float64, sm *StateMachine) Position {
+	e := sm.GetPosition(_e.position.ID)
+	if e.position.OperationKind == OperationKindDelete {
+		return e
 	}
-	p.position.X = newX
-	p.position.OperationKind = OperationKindUpdate
-	sm.Patch.Position[p.position.ID] = p.position
-	return p
+	e.position.X = newX
+	e.position.OperationKind = OperationKindUpdate
+	sm.Patch.Position[e.position.ID] = e.position
+	return e
 }`
 
-const SetY_Position_func string = `func (_p Position) SetY(newY float64, sm *StateMachine) Position {
-	p := sm.GetPosition(_p.position.ID)
-	if p.position.OperationKind == OperationKindDelete {
-		return p
+const SetY_Position_func string = `func (_e Position) SetY(newY float64, sm *StateMachine) Position {
+	e := sm.GetPosition(_e.position.ID)
+	if e.position.OperationKind == OperationKindDelete {
+		return e
 	}
-	p.position.X = newY
-	p.position.OperationKind = OperationKindUpdate
-	sm.Patch.Position[p.position.ID] = p.position
-	return p
+	e.position.X = newY
+	e.position.OperationKind = OperationKindUpdate
+	sm.Patch.Position[e.position.ID] = e.position
+	return e
 }`
 
 const EntityKind_type string = `type EntityKind string`

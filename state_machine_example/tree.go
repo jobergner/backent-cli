@@ -59,5 +59,6 @@ type _zone struct {
 	ID            ZoneID        `json:"id"`
 	Players       []_player     `json:"players"`
 	Items         []_zoneItem   `json:"items"`
+	Tags          []string      `json:"tags"`
 	OperationKind OperationKind `json:"operationKind"`
 }

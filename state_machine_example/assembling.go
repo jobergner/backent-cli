@@ -123,6 +123,7 @@ func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
 
 	treeZone.ID = zone.ID
 	treeZone.OperationKind = zone.OperationKind
+	treeZone.Tags = zone.Tags
 	return treeZone, hasUpdated
 }
 

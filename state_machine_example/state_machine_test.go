@@ -24,7 +24,7 @@ func TestStateMachine(t *testing.T) {
 		gearScore := sm.CreateGearScore()
 		_gearScore := sm.Patch.GearScore[gearScore.gearScore.ID]
 		assert.Zero(t, _gearScore.Level)
-		gearScore.SetLevel(10, sm)
+		gearScore.SetLevel(sm, 10)
 		_gearScore = sm.Patch.GearScore[gearScore.gearScore.ID]
 		assert.NotZero(t, _gearScore.Level)
 	})
@@ -48,7 +48,7 @@ func TestStateMachine(t *testing.T) {
 		sm := newStateMachine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
-		player.RemoveItem(item.item.ID, sm)
+		player.RemoveItems(sm, item.item.ID)
 		_item := sm.Patch.Item[item.item.ID]
 		assert.Equal(t, OperationKind(OperationKindDelete), _item.OperationKind)
 	})
@@ -69,12 +69,12 @@ func TestUpdateState(t *testing.T) {
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
 		assert.Zero(t, gearScore.GetLevel(sm))
-		gearScore.SetLevel(1, sm)
+		gearScore.SetLevel(sm, 1)
 		assert.Equal(t, gearScore.GetLevel(sm), 1)
 	})
 	t.Run("sets elements", func(t *testing.T) {
 		sm := newStateMachine()
-		gearScore := sm.CreateGearScore().SetLevel(1, sm)
+		gearScore := sm.CreateGearScore().SetLevel(sm, 1)
 		sm.UpdateState()
 		_gearScore := sm.State.GearScore[gearScore.gearScore.ID]
 		assert.Equal(t, _gearScore.Level, 1)
@@ -106,7 +106,7 @@ func TestUpdateState(t *testing.T) {
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
-		player.RemoveItem(item.item.ID, sm)
+		player.RemoveItems(sm, item.item.ID)
 		sm.UpdateState()
 		_, ok := sm.State.Item[item.item.ID]
 		assert.False(t, ok)
@@ -167,7 +167,7 @@ func TestTree(t *testing.T) {
 		player1 := zone.AddPlayer(sm)
 		_ = zone.AddPlayer(sm)
 		sm.UpdateState()
-		player1.GetGearScore(sm).SetLevel(1, sm)
+		player1.GetGearScore(sm).SetLevel(sm, 1)
 
 		actual := sm.assembleTree()
 
@@ -244,7 +244,7 @@ func TestTree(t *testing.T) {
 
 		sm.UpdateState()
 
-		player1.RemoveItem(player1item2.item.ID, sm)
+		player1.RemoveItems(sm, player1item2.item.ID)
 		actual := sm.assembleTree()
 
 		expected := newTree()
