@@ -1,7 +1,6 @@
 package statemachine
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -115,10 +114,58 @@ func TestUpdateState(t *testing.T) {
 }
 
 func TestTree(t *testing.T) {
-	t.Run("assembles expected tree", func(t *testing.T) {
+	t.Run("assembles elements in a tree", func(t *testing.T) {
 		sm := newStateMachine()
 		zone := sm.CreateZone()
 		player1 := zone.AddPlayer(sm)
+		player2 := zone.AddPlayer(sm)
+
+		actual := sm.assembleTree()
+
+		expected := newTree()
+		expected.Zone = map[ZoneID]_zone{
+			zone.zone.ID: {
+				ID: zone.zone.ID,
+				Players: []_player{
+					{
+						ID: player1.player.ID,
+						GearScore: &_gearScore{
+							ID:            player1.GetGearScore(sm).gearScore.ID,
+							OperationKind: OperationKindUpdate,
+						},
+						OperationKind: OperationKindUpdate,
+						Position: &_position{
+							ID:            player1.GetPosition(sm).position.ID,
+							OperationKind: OperationKindUpdate,
+						},
+					},
+					{
+						ID: player2.player.ID,
+						GearScore: &_gearScore{
+							ID:            player2.GetGearScore(sm).gearScore.ID,
+							OperationKind: OperationKindUpdate,
+						},
+						OperationKind: OperationKindUpdate,
+						Position: &_position{
+							ID:            player2.GetPosition(sm).position.ID,
+							OperationKind: OperationKindUpdate,
+						},
+					},
+				},
+				OperationKind: OperationKindUpdate,
+			},
+		}
+
+		_actual, _ := actual.MarshalJSON()
+		_expected, _ := expected.MarshalJSON()
+
+		assert.Equal(t, string(_expected), string(_actual))
+	})
+	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
+		sm := newStateMachine()
+		zone := sm.CreateZone()
+		player1 := zone.AddPlayer(sm)
+		_ = zone.AddPlayer(sm)
 		sm.UpdateState()
 		player1.GetGearScore(sm).SetLevel(1, sm)
 
@@ -132,7 +179,9 @@ func TestTree(t *testing.T) {
 					{
 						ID: player1.player.ID,
 						GearScore: &_gearScore{
-							ID: player1.GetGearScore(sm).gearScore.ID,
+							ID:            player1.GetGearScore(sm).gearScore.ID,
+							Level:         1,
+							OperationKind: OperationKindUpdate,
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -141,19 +190,86 @@ func TestTree(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, expected, actual)
-		fmt.Println("DAW")
-		fmt.Printf("%+v\n", expected)
+		_actual, _ := actual.MarshalJSON()
+		_expected, _ := expected.MarshalJSON()
+
+		assert.Equal(t, string(_expected), string(_actual))
 	})
-	// t.Run("assembles expected tree", func(t *testing.T) {
-	// 	sm := newStateMachine()
+	t.Run("assembles tree based on added item", func(t *testing.T) {
+		sm := newStateMachine()
+		zone := sm.CreateZone()
+		player1 := zone.AddPlayer(sm)
+		_ = zone.AddPlayer(sm)
+		sm.UpdateState()
+		player1item1 := player1.AddItem(sm)
 
-	// 	actual := newTree().assemble(sm.Patch)
+		actual := sm.assembleTree()
 
-	// 	expected := newTree()
+		expected := newTree()
+		expected.Zone = map[ZoneID]_zone{
+			zone.zone.ID: {
+				ID: zone.zone.ID,
+				Players: []_player{
+					{
+						ID: player1.player.ID,
+						Items: []_item{
+							{
+								ID:            player1item1.item.ID,
+								OperationKind: OperationKindUpdate,
+								GearScore: &_gearScore{
+									ID:            player1item1.GetGearScore(sm).gearScore.ID,
+									OperationKind: OperationKindUpdate,
+								},
+							},
+						},
+						OperationKind: OperationKindUpdate,
+					},
+				},
+				OperationKind: OperationKindUpdate,
+			},
+		}
 
-	// 	assert.Equal(t, expected, actual)
-	// 	fmt.Println("DAW")
-	// 	fmt.Printf("%+v\n", expected)
-	// })
+		_actual, _ := actual.MarshalJSON()
+		_expected, _ := expected.MarshalJSON()
+
+		assert.Equal(t, string(_expected), string(_actual))
+	})
+	t.Run("assembles tree based on removed item", func(t *testing.T) {
+		sm := newStateMachine()
+		zone := sm.CreateZone()
+		player1 := zone.AddPlayer(sm)
+		_ = zone.AddPlayer(sm)
+		_ = player1.AddItem(sm)
+		player1item2 := player1.AddItem(sm)
+
+		sm.UpdateState()
+
+		player1.RemoveItem(player1item2.item.ID, sm)
+		actual := sm.assembleTree()
+
+		expected := newTree()
+		expected.Zone = map[ZoneID]_zone{
+			zone.zone.ID: {
+				ID: zone.zone.ID,
+				Players: []_player{
+					{
+						ID: player1.player.ID,
+						Items: []_item{
+							{
+								ID:            player1item2.item.ID,
+								OperationKind: OperationKindDelete,
+							},
+						},
+						OperationKind: OperationKindUpdate,
+					},
+				},
+				OperationKind: OperationKindUpdate,
+			},
+		}
+
+		_actual, _ := actual.MarshalJSON()
+		_expected, _ := expected.MarshalJSON()
+
+		assert.Equal(t, string(_expected), string(_actual))
+	})
 }

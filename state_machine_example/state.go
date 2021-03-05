@@ -11,12 +11,12 @@ const (
 	EntityKindZoneItem             = "zoneItem"
 )
 
+type GearScoreID int
+type ItemID int
+type PlayerID int
+type PositionID int
 type ZoneID int
 type ZoneItemID int
-type PositionID int
-type PlayerID int
-type ItemID int
-type GearScoreID int
 
 type State struct {
 	GearScore map[GearScoreID]gearScoreCore `json:"gearScore"`

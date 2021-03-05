@@ -38,119 +38,221 @@ const AddItem_Player_func string = `func (_e Player) AddItem(sm *StateMachine) I
 	return item
 }`
 
-const assembleFrom_Tree_func string = `func (t *Tree) assembleFrom(s State) {
-	for _, player := range s.Player {
-		t.assembleByEnityKind(player.Parentage, s)
+const assembleGearScore_StateMachine_func string = `func (sm *StateMachine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
+	gearScore, hasUpdated := sm.Patch.GearScore[gearScoreID]
+	if !hasUpdated {
+		return _gearScore{}, false
 	}
-	for _, zoneItem := range s.ZoneItem {
-		t.assembleByEnityKind(zoneItem.Parentage, s)
-	}
-	for _, position := range s.Position {
-		t.assembleByEnityKind(position.Parentage, s)
-	}
-	for _, item := range s.Item {
-		t.assembleByEnityKind(item.Parentage, s)
-	}
-	for _, gearScore := range s.GearScore {
-		t.assembleByEnityKind(gearScore.Parentage, s)
-	}
+	var treeGearScore _gearScore
+	treeGearScore.ID = gearScore.ID
+	treeGearScore.OperationKind = gearScore.OperationKind
+	treeGearScore.Level = gearScore.Level
+	treeGearScore.Score = gearScore.Score
+	return treeGearScore, true
 }`
 
-const assembleByEnityKind_Tree_func string = `func (t *Tree) assembleByEnityKind(parentage Parentage, s State) {
-	greatestAncestor := parentage[0]
-	switch greatestAncestor.Kind {
-	case EntityKindZoneItem:
-		_zoneItem := t.assembleZoneItem(parentage[1:], ZoneItemID(greatestAncestor.ID), s)
-		t.ZoneItem[ZoneItemID(greatestAncestor.ID)] = _zoneItem
+const assemblePosition_StateMachine_func string = `func (sm *StateMachine) assemblePosition(positionID PositionID) (_position, bool) {
+	position, hasUpdated := sm.Patch.Position[positionID]
+	if !hasUpdated {
+		return _position{}, false
 	}
+	var treePosition _position
+	treePosition.ID = position.ID
+	treePosition.OperationKind = position.OperationKind
+	treePosition.X = position.X
+	treePosition.Y = position.Y
+	return treePosition, true
 }`
 
-const assembleZone_Tree_func string = `func (t Tree) assembleZone(parentage Parentage, zoneID ZoneID, s State) _zone {
-	_zone := t.Zone[zoneID]
-	zone := s.Zone[zoneID]
-	_zone.ID = zone.ID
-	_zone.OperationKind = zone.OperationKind
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindPlayer:
-		_player := t.assemblePlayer(parentage[1:], PlayerID(nextDescendant.ID), s)
-		_zone.Players = append(_zone.Players, _player)
-	case EntityKindZoneItem:
-		_zoneItem := t.assembleZoneItem(parentage[1:], ZoneItemID(nextDescendant.ID), s)
-		_zone.Items = append(_zone.Items, _zoneItem)
+const assembleItem_StateMachine_func string = `func (sm *StateMachine) assembleItem(itemID ItemID) (_item, bool) {
+	item, hasUpdated := sm.Patch.Item[itemID]
+	if !hasUpdated {
+		item = sm.State.Item[itemID]
 	}
-	return _zone
-}`
-
-const assemblePlayer_Tree_func string = `func (t Tree) assemblePlayer(parentage Parentage, playerID PlayerID, s State) _player {
-	_player := t.Player[playerID]
-	player := s.Player[playerID]
-	_player.ID = player.ID
-	_player.OperationKind = player.OperationKind
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindPosition:
-		_position := t.assemblePosition(PositionID(nextDescendant.ID), s)
-		_player.Position = &_position
-	case EntityKindGearScore:
-		_gearScore := t.assembleGearScore(GearScoreID(nextDescendant.ID), s)
-		_player.GearScore = &_gearScore
-	case EntityKindItem:
-		_item := t.assembleItem(parentage[1:], ItemID(nextDescendant.ID), s)
-		_player.Items = append(_player.Items, _item)
+	var treeItem _item
+	if treeGearScore, gearScoreHasUpdated := sm.assembleGearScore(item.GearScore); gearScoreHasUpdated {
+		hasUpdated = true
+		treeItem.GearScore = &treeGearScore
 	}
-	return _player
+	treeItem.ID = item.ID
+	treeItem.OperationKind = item.OperationKind
+	return treeItem, hasUpdated
 }`
 
-const assembleZoneItem_Tree_func string = `func (t Tree) assembleZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
-	_zoneItem := t.ZoneItem[zoneItemID]
-	zoneItem := s.ZoneItem[zoneItemID]
-	_zoneItem.ID = zoneItem.ID
-	_zoneItem.OperationKind = zoneItem.OperationKind
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindPosition:
-		_position := t.assemblePosition(PositionID(nextDescendant.ID), s)
-		_zoneItem.Position = &_position
-	case EntityKindItem:
-		_item := t.assembleItem(parentage[1:], ItemID(nextDescendant.ID), s)
-		_zoneItem.Item = &_item
+const assembleZoneItem_StateMachine_func string = `func (sm *StateMachine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
+	zoneItem, hasUpdated := sm.Patch.ZoneItem[zoneItemID]
+	if !hasUpdated {
+		zoneItem = sm.State.ZoneItem[zoneItemID]
 	}
-	return _zoneItem
-}`
-
-const assemblePosition_Tree_func string = `func (t Tree) assemblePosition(positionID PositionID, s State) _position {
-	_position := t.Position[positionID]
-	position := s.Position[positionID]
-	_position.ID = position.ID
-	_position.OperationKind = position.OperationKind
-	_position.X = position.X
-	_position.Y = position.Y
-	return _position
-}`
-
-const assembleItem_Tree_func string = `func (t Tree) assembleItem(parentage Parentage, itemID ItemID, s State) _item {
-	_item := t.Item[itemID]
-	item := s.Item[itemID]
-	_item.ID = item.ID
-	_item.OperationKind = item.OperationKind
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindGearScore:
-		_gearScore := t.assembleGearScore(GearScoreID(nextDescendant.ID), s)
-		_item.GearScore = &_gearScore
+	var treeZoneItem _zoneItem
+	if treeItem, itemHasUpdated := sm.assembleItem(zoneItem.Item); itemHasUpdated {
+		hasUpdated = true
+		treeZoneItem.Item = &treeItem
 	}
-	return _item
+	if treePosition, positionHasUpdated := sm.assemblePosition(zoneItem.Position); positionHasUpdated {
+		hasUpdated = true
+		treeZoneItem.Position = &treePosition
+	}
+	treeZoneItem.ID = zoneItem.ID
+	treeZoneItem.OperationKind = zoneItem.OperationKind
+	return treeZoneItem, hasUpdated
 }`
 
-const assembleGearScore_Tree_func string = `func (t Tree) assembleGearScore(gearScoreID GearScoreID, s State) _gearScore {
-	_gearScore := t.GearScore[gearScoreID]
-	gearScore := s.GearScore[gearScoreID]
-	_gearScore.ID = gearScore.ID
-	_gearScore.OperationKind = gearScore.OperationKind
-	_gearScore.Level = gearScore.Level
-	_gearScore.Score = gearScore.Score
-	return _gearScore
+const assemblePlayer_StateMachine_func string = `func (sm *StateMachine) assemblePlayer(playerID PlayerID) (_player, bool) {
+	player, hasUpdated := sm.Patch.Player[playerID]
+	if !hasUpdated {
+		player = sm.State.Player[playerID]
+	}
+	var treePlayer _player
+	if treeGearScore, gearScoreHasUpdated := sm.assembleGearScore(player.GearScore); gearScoreHasUpdated {
+		hasUpdated = true
+		treePlayer.GearScore = &treeGearScore
+	}
+	for _, itemID := range deduplicateItemIDs(sm.State.Player[player.ID].Items, sm.Patch.Player[player.ID].Items) {
+		if treeItem, itemHasUpdated := sm.assembleItem(itemID); itemHasUpdated {
+			hasUpdated = true
+			treePlayer.Items = append(treePlayer.Items, treeItem)
+		}
+	}
+	if treePosition, positionHasUpdated := sm.assemblePosition(player.Position); positionHasUpdated {
+		hasUpdated = true
+		treePlayer.Position = &treePosition
+	}
+	treePlayer.ID = player.ID
+	treePlayer.OperationKind = player.OperationKind
+	return treePlayer, hasUpdated
+}`
+
+const assembleZone_StateMachine_func string = `func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
+	zone, hasUpdated := sm.Patch.Zone[zoneID]
+	if !hasUpdated {
+		zone = sm.State.Zone[zoneID]
+	}
+	var treeZone _zone
+	for _, zoneItemID := range zone.Items {
+		if treeZoneItem, zoneItemHasUpdated := sm.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
+			hasUpdated = true
+			treeZone.Items = append(treeZone.Items, treeZoneItem)
+		}
+	}
+	for _, playerID := range zone.Players {
+		if treePlayer, playerHasUpdated := sm.assemblePlayer(playerID); playerHasUpdated {
+			hasUpdated = true
+			treeZone.Players = append(treeZone.Players, treePlayer)
+		}
+	}
+	treeZone.ID = zone.ID
+	treeZone.OperationKind = zone.OperationKind
+	return treeZone, hasUpdated
+}`
+
+const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleTree() Tree {
+	tree := newTree()
+	for _, gearScore := range sm.Patch.GearScore {
+		if len(gearScore.Parentage) == 0 {
+			treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
+			if hasUpdated {
+				tree.GearScore[gearScore.ID] = treeGearScore
+			}
+		}
+	}
+	for _, item := range sm.Patch.Item {
+		if len(item.Parentage) == 0 {
+			treeItem, hasUpdated := sm.assembleItem(item.ID)
+			if hasUpdated {
+				tree.Item[item.ID] = treeItem
+			}
+		}
+	}
+	for _, player := range sm.Patch.Player {
+		if len(player.Parentage) == 0 {
+			treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
+			if hasUpdated {
+				tree.Player[player.ID] = treePlayer
+			}
+		}
+	}
+	for _, position := range sm.Patch.Position {
+		if len(position.Parentage) == 0 {
+			treePosition, hasUpdated := sm.assemblePosition(position.ID)
+			if hasUpdated {
+				tree.Position[position.ID] = treePosition
+			}
+		}
+	}
+	for _, zone := range sm.Patch.Zone {
+		treeZone, hasUpdated := sm.assembleZone(zone.ID)
+		if hasUpdated {
+			tree.Zone[zone.ID] = treeZone
+		}
+	}
+	for _, zoneItem := range sm.Patch.ZoneItem {
+		if len(zoneItem.Parentage) == 0 {
+			treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
+			if hasUpdated {
+				tree.ZoneItem[zoneItem.ID] = treeZoneItem
+			}
+		}
+	}
+	for _, gearScore := range sm.State.GearScore {
+		if len(gearScore.Parentage) == 0 {
+			if _, ok := tree.GearScore[gearScore.ID]; !ok {
+				treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
+				if hasUpdated {
+					tree.GearScore[gearScore.ID] = treeGearScore
+				}
+			}
+		}
+	}
+	for _, item := range sm.State.Item {
+		if len(item.Parentage) == 0 {
+			if _, ok := tree.Item[item.ID]; !ok {
+				treeItem, hasUpdated := sm.assembleItem(item.ID)
+				if hasUpdated {
+					tree.Item[item.ID] = treeItem
+				}
+			}
+		}
+	}
+	for _, player := range sm.State.Player {
+		if len(player.Parentage) == 0 {
+			if _, ok := tree.Player[player.ID]; !ok {
+				treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
+				if hasUpdated {
+					tree.Player[player.ID] = treePlayer
+				}
+			}
+		}
+	}
+	for _, position := range sm.State.Position {
+		if len(position.Parentage) == 0 {
+			if _, ok := tree.Position[position.ID]; !ok {
+				treePosition, hasUpdated := sm.assemblePosition(position.ID)
+				if hasUpdated {
+					tree.Position[position.ID] = treePosition
+				}
+			}
+		}
+	}
+	for _, zone := range sm.State.Zone {
+		if _, ok := tree.Zone[zone.ID]; !ok {
+			treeZone, hasUpdated := sm.assembleZone(zone.ID)
+			if hasUpdated {
+				tree.Zone[zone.ID] = treeZone
+			}
+		}
+	}
+	for _, zoneItem := range sm.State.ZoneItem {
+		if len(zoneItem.Parentage) == 0 {
+			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
+				treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
+				if hasUpdated {
+					tree.ZoneItem[zoneItem.ID] = treeZoneItem
+				}
+			}
+		}
+	}
+	return tree
 }`
 
 const CreateGearScore_StateMachine_func string = `func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
@@ -414,6 +516,96 @@ const GetZoneItems_Zone_func string = `func (_e Zone) GetZoneItems(sm *StateMach
 	return items
 }`
 
+const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
+	check := make(map[GearScoreID]bool)
+	deduped := make([]GearScoreID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for letter := range check {
+		deduped = append(deduped, letter)
+	}
+	return deduped
+}`
+
+const deduplicateItemIDs_func string = `func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
+	check := make(map[ItemID]bool)
+	deduped := make([]ItemID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for letter := range check {
+		deduped = append(deduped, letter)
+	}
+	return deduped
+}`
+
+const deduplicatePlayerIDs_func string = `func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
+	check := make(map[PlayerID]bool)
+	deduped := make([]PlayerID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for letter := range check {
+		deduped = append(deduped, letter)
+	}
+	return deduped
+}`
+
+const deduplicatePositionIDs_func string = `func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
+	check := make(map[PositionID]bool)
+	deduped := make([]PositionID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for letter := range check {
+		deduped = append(deduped, letter)
+	}
+	return deduped
+}`
+
+const deduplicateZoneIDs_func string = `func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
+	check := make(map[ZoneID]bool)
+	deduped := make([]ZoneID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for letter := range check {
+		deduped = append(deduped, letter)
+	}
+	return deduped
+}`
+
+const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
+	check := make(map[ZoneItemID]bool)
+	deduped := make([]ZoneItemID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for letter := range check {
+		deduped = append(deduped, letter)
+	}
+	return deduped
+}`
+
 const Parentage_type string = `type Parentage []ParentInfo`
 
 const ParentInfo_type string = `type ParentInfo struct {
@@ -548,17 +740,17 @@ const EntityKindGearScore_type string = `const (
 	EntityKindZoneItem			= "zoneItem"
 )`
 
-const ZoneID_type string = `type ZoneID int`
-
-const ZoneItemID_type string = `type ZoneItemID int`
-
-const PositionID_type string = `type PositionID int`
-
-const PlayerID_type string = `type PlayerID int`
+const GearScoreID_type string = `type GearScoreID int`
 
 const ItemID_type string = `type ItemID int`
 
-const GearScoreID_type string = `type GearScoreID int`
+const PlayerID_type string = `type PlayerID int`
+
+const PositionID_type string = `type PositionID int`
+
+const ZoneID_type string = `type ZoneID int`
+
+const ZoneItemID_type string = `type ZoneItemID int`
 
 const State_type string = `type State struct {
 	GearScore	map[GearScoreID]gearScoreCore	` + "`" + `json:"gearScore"` + "`" + `
