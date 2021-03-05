@@ -25,111 +25,239 @@ package statemachine
 // (alternative is the item always gets returned as pointer, and is just nil in case)
 // if the boolean is false, the built element get's dircarded
 
-func (t *Tree) assemble(s State) *Tree {
-	for _, gearScore := range s.GearScore {
-		t.assembleUpstreamFromGearScore(gearScore.ID, s)
+func (sm *StateMachine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
+	gearScore, hasUpdated := sm.Patch.GearScore[gearScoreID]
+	if !hasUpdated {
+		return _gearScore{}, false
 	}
-	for _, item := range s.Item {
-		t.assembleUpstreamFromItem(item.Parentage, item.ID, s)
-	}
-	for _, player := range s.Player {
-		t.assembleUpstreamFromPlayer(player.Parentage, player.ID, s)
-	}
-	for _, position := range s.Position {
-		t.assembleUpstreamFromPosition(position.ID, s)
-	}
-	for _, zoneItem := range s.ZoneItem {
-		t.assembleUpstreamFromZoneItem(zoneItem.Parentage, zoneItem.ID, s)
-	}
-	// needs zone here too, just add it
 
-	return t
+	var treeGearScore _gearScore
+
+	treeGearScore.ID = gearScore.ID
+	treeGearScore.OperationKind = gearScore.OperationKind
+	treeGearScore.Level = gearScore.Level
+	treeGearScore.Score = gearScore.Score
+	return treeGearScore, true
 }
 
-func (t Tree) assembleUpstreamFromPlayer(parentage Parentage, playerID PlayerID, s State) _player {
-	_player := t.Player[playerID]
-	player := s.Player[playerID]
-	_player.ID = player.ID
-	_player.OperationKind = player.OperationKind
-
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindPosition:
-		_position := t.assembleUpstreamFromPosition(PositionID(nextDescendant.ID), s)
-		_player.Position = &_position
-	case EntityKindGearScore:
-		_gearScore := t.assembleUpstreamFromGearScore(GearScoreID(nextDescendant.ID), s)
-		_player.GearScore = &_gearScore
-	case EntityKindItem:
-		_item := t.assembleUpstreamFromItem(parentage[1:], ItemID(nextDescendant.ID), s)
-		_player.Items = append(_player.Items, _item)
+func (sm *StateMachine) assemblePosition(positionID PositionID) (_position, bool) {
+	position, hasUpdated := sm.Patch.Position[positionID]
+	if !hasUpdated {
+		return _position{}, false
 	}
-	return _player
+
+	var treePosition _position
+
+	treePosition.ID = position.ID
+	treePosition.OperationKind = position.OperationKind
+	treePosition.X = position.X
+	treePosition.Y = position.Y
+	return treePosition, true
 }
 
-func (t Tree) assembleUpstreamFromZoneItem(parentage Parentage, zoneItemID ZoneItemID, s State) _zoneItem {
-	_zoneItem := t.ZoneItem[zoneItemID]
-	zoneItem := s.ZoneItem[zoneItemID]
-	_zoneItem.ID = zoneItem.ID
-	_zoneItem.OperationKind = zoneItem.OperationKind
-
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindPosition:
-		_position := t.assembleUpstreamFromPosition(PositionID(nextDescendant.ID), s)
-		_zoneItem.Position = &_position
-	case EntityKindItem:
-		_item := t.assembleUpstreamFromItem(parentage[1:], ItemID(nextDescendant.ID), s)
-		_zoneItem.Item = &_item
+func (sm *StateMachine) assembleItem(itemID ItemID) (_item, bool) {
+	item, hasUpdated := sm.Patch.Item[itemID]
+	if !hasUpdated {
+		item = sm.State.Item[itemID]
 	}
-	return _zoneItem
+
+	var treeItem _item
+
+	if treeGearScore, gearScoreHasUpdated := sm.assembleGearScore(item.GearScore); gearScoreHasUpdated {
+		hasUpdated = true
+		treeItem.GearScore = &treeGearScore
+	}
+
+	treeItem.ID = item.ID
+	treeItem.OperationKind = item.OperationKind
+
+	return treeItem, hasUpdated
 }
 
-func (t Tree) assembleUpstreamFromPosition(positionID PositionID, s State) _position {
-	_position := t.Position[positionID]
-	position := s.Position[positionID]
-	_position.ID = position.ID
-	_position.OperationKind = position.OperationKind
+func (sm *StateMachine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
+	zoneItem, hasUpdated := sm.Patch.ZoneItem[zoneItemID]
+	if !hasUpdated {
+		zoneItem = sm.State.ZoneItem[zoneItemID]
+	}
 
-	_position.X = position.X
-	_position.Y = position.Y
-	return _position
+	var treeZoneItem _zoneItem
+
+	if treeItem, itemHasUpdated := sm.assembleItem(zoneItem.Item); itemHasUpdated {
+		hasUpdated = true
+		treeZoneItem.Item = &treeItem
+	}
+	if treePosition, positionHasUpdated := sm.assemblePosition(zoneItem.Position); positionHasUpdated {
+		hasUpdated = true
+		treeZoneItem.Position = &treePosition
+	}
+
+	treeZoneItem.ID = zoneItem.ID
+	treeZoneItem.OperationKind = zoneItem.OperationKind
+	return treeZoneItem, hasUpdated
+
 }
 
-func (t Tree) assembleUpstreamFromItem(itemID ItemID, s State) _item {
-	_item := t.Item[itemID]
-	item := s.Item[itemID]
-	_item.ID = item.ID
-	_item.OperationKind = item.OperationKind
-
-	nextDescendant := parentage[0]
-	switch nextDescendant.Kind {
-	case EntityKindGearScore:
-		_gearScore := t.assembleUpstreamFromGearScore(GearScoreID(nextDescendant.ID), s)
-		_item.GearScore = &_gearScore
+func (sm *StateMachine) assemblePlayer(playerID PlayerID) (_player, bool) {
+	player, hasUpdated := sm.Patch.Player[playerID]
+	if !hasUpdated {
+		player = sm.State.Player[playerID]
 	}
-	return _item
+
+	var treePlayer _player
+
+	if treeGearScore, gearScoreHasUpdated := sm.assembleGearScore(player.GearScore); gearScoreHasUpdated {
+		hasUpdated = true
+		treePlayer.GearScore = &treeGearScore
+	}
+	for _, itemID := range player.Items {
+		if treeItem, itemHasUpdated := sm.assembleItem(itemID); itemHasUpdated {
+			hasUpdated = true
+			treePlayer.Items = append(treePlayer.Items, treeItem)
+		}
+	}
+	if treePosition, positionHasUpdated := sm.assemblePosition(player.Position); positionHasUpdated {
+		hasUpdated = true
+		treePlayer.Position = &treePosition
+	}
+
+	treePlayer.ID = player.ID
+	treePlayer.OperationKind = player.OperationKind
+	return treePlayer, hasUpdated
 }
 
-func (t Tree) assembleUpstreamFromGearScore(gearScoreID GearScoreID, s State) _gearScore {
-	_gearScore := t.GearScore[gearScoreID]
-	gearScore := s.GearScore[gearScoreID]
-	_gearScore.ID = gearScore.ID
-	_gearScore.OperationKind = gearScore.OperationKind
-
-	_gearScore.Level = gearScore.Level
-	_gearScore.Score = gearScore.Score
-
-	if len(gearScore.Parentage) == 0 {
-		return _gearScore
+func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
+	zone, hasUpdated := sm.Patch.Zone[zoneID]
+	if !hasUpdated {
+		zone = sm.State.Zone[zoneID]
 	}
 
-	nextParent := gearScore.Parentage[len(gearScore.Parentage)-1]
-	switch nextParent.Kind {
-	case EntityKindItem:
-		_gearScore := t.assembleUpstreamFromItem(ItemID(nextParent.ID), s)
-		_item.GearScore = &_gearScore
+	var treeZone _zone
+
+	for _, zoneItemID := range zone.Items {
+		if treeZoneItem, zoneItemHasUpdated := sm.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
+			hasUpdated = true
+			treeZone.Items = append(treeZone.Items, treeZoneItem)
+		}
+	}
+	for _, playerID := range zone.Players {
+		if treePlayer, playerHasUpdated := sm.assemblePlayer(playerID); playerHasUpdated {
+			hasUpdated = true
+			treeZone.Players = append(treeZone.Players, treePlayer)
+		}
 	}
 
-	return _gearScore
+	treeZone.ID = zone.ID
+	treeZone.OperationKind = zone.OperationKind
+	return treeZone, hasUpdated
+}
+
+func (sm *StateMachine) assembleTree() Tree {
+	tree := newTree()
+	for _, gearScore := range sm.Patch.GearScore {
+		if len(gearScore.Parentage) == 0 {
+			treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
+			if hasUpdated {
+				tree.GearScore[gearScore.ID] = treeGearScore
+			}
+		}
+	}
+	for _, item := range sm.Patch.Item {
+		if len(item.Parentage) == 0 {
+			treeItem, hasUpdated := sm.assembleItem(item.ID)
+			if hasUpdated {
+				tree.Item[item.ID] = treeItem
+			}
+		}
+	}
+	for _, player := range sm.Patch.Player {
+		if len(player.Parentage) == 0 {
+			treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
+			if hasUpdated {
+				tree.Player[player.ID] = treePlayer
+			}
+		}
+	}
+	for _, position := range sm.Patch.Position {
+		if len(position.Parentage) == 0 {
+			treePosition, hasUpdated := sm.assemblePosition(position.ID)
+			if hasUpdated {
+				tree.Position[position.ID] = treePosition
+			}
+		}
+	}
+	for _, zone := range sm.Patch.Zone {
+		treeZone, hasUpdated := sm.assembleZone(zone.ID)
+		if hasUpdated {
+			tree.Zone[zone.ID] = treeZone
+		}
+	}
+	for _, zoneItem := range sm.Patch.ZoneItem {
+		if len(zoneItem.Parentage) == 0 {
+			treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
+			if hasUpdated {
+				tree.ZoneItem[zoneItem.ID] = treeZoneItem
+			}
+		}
+	}
+
+	for _, gearScore := range sm.State.GearScore {
+		if len(gearScore.Parentage) == 0 {
+			if _, ok := tree.GearScore[gearScore.ID]; !ok {
+				treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
+				if hasUpdated {
+					tree.GearScore[gearScore.ID] = treeGearScore
+				}
+			}
+		}
+	}
+	for _, item := range sm.State.Item {
+		if len(item.Parentage) == 0 {
+			if _, ok := tree.Item[item.ID]; !ok {
+				treeItem, hasUpdated := sm.assembleItem(item.ID)
+				if hasUpdated {
+					tree.Item[item.ID] = treeItem
+				}
+			}
+		}
+	}
+	for _, player := range sm.State.Player {
+		if len(player.Parentage) == 0 {
+			if _, ok := tree.Player[player.ID]; !ok {
+				treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
+				if hasUpdated {
+					tree.Player[player.ID] = treePlayer
+				}
+			}
+		}
+	}
+	for _, position := range sm.State.Position {
+		if len(position.Parentage) == 0 {
+			if _, ok := tree.Position[position.ID]; !ok {
+				treePosition, hasUpdated := sm.assemblePosition(position.ID)
+				if hasUpdated {
+					tree.Position[position.ID] = treePosition
+				}
+			}
+		}
+	}
+	for _, zone := range sm.State.Zone {
+		if _, ok := tree.Zone[zone.ID]; !ok {
+			treeZone, hasUpdated := sm.assembleZone(zone.ID)
+			if hasUpdated {
+				tree.Zone[zone.ID] = treeZone
+			}
+		}
+	}
+	for _, zoneItem := range sm.State.ZoneItem {
+		if len(zoneItem.Parentage) == 0 {
+			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
+				treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
+				if hasUpdated {
+					tree.ZoneItem[zoneItem.ID] = treeZoneItem
+				}
+			}
+		}
+	}
+
+	return tree
 }
