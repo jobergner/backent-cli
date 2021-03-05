@@ -1,45 +1,45 @@
 package statemachine
 
-func (_g GearScore) SetLevel(newLevel int, sm *StateMachine) GearScore {
-	g := sm.GetGearScore(_g.gearScore.ID)
-	if g.gearScore.OperationKind == OperationKindDelete {
-		return g
+func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
+	e := sm.GetGearScore(_e.gearScore.ID)
+	if e.gearScore.OperationKind == OperationKindDelete {
+		return e
 	}
-	g.gearScore.Level = newLevel
-	g.gearScore.OperationKind = OperationKindUpdate
-	sm.Patch.GearScore[g.gearScore.ID] = g.gearScore
-	return g
+	e.gearScore.Level = newLevel
+	e.gearScore.OperationKind = OperationKindUpdate
+	sm.Patch.GearScore[e.gearScore.ID] = e.gearScore
+	return e
 }
 
-func (_g GearScore) SetScore(newScore int, sm *StateMachine) GearScore {
-	g := sm.GetGearScore(_g.gearScore.ID)
-	if g.gearScore.OperationKind == OperationKindDelete {
-		return g
+func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
+	e := sm.GetGearScore(_e.gearScore.ID)
+	if e.gearScore.OperationKind == OperationKindDelete {
+		return e
 	}
-	g.gearScore.Score = newScore
-	g.gearScore.OperationKind = OperationKindUpdate
-	sm.Patch.GearScore[g.gearScore.ID] = g.gearScore
-	return g
+	e.gearScore.Score = newScore
+	e.gearScore.OperationKind = OperationKindUpdate
+	sm.Patch.GearScore[e.gearScore.ID] = e.gearScore
+	return e
 }
 
-func (_p Position) SetX(newX float64, sm *StateMachine) Position {
-	p := sm.GetPosition(_p.position.ID)
-	if p.position.OperationKind == OperationKindDelete {
-		return p
+func (_e Position) SetX(sm *StateMachine, newX float64) Position {
+	e := sm.GetPosition(_e.position.ID)
+	if e.position.OperationKind == OperationKindDelete {
+		return e
 	}
-	p.position.X = newX
-	p.position.OperationKind = OperationKindUpdate
-	sm.Patch.Position[p.position.ID] = p.position
-	return p
+	e.position.X = newX
+	e.position.OperationKind = OperationKindUpdate
+	sm.Patch.Position[e.position.ID] = e.position
+	return e
 }
 
-func (_p Position) SetY(newY float64, sm *StateMachine) Position {
-	p := sm.GetPosition(_p.position.ID)
-	if p.position.OperationKind == OperationKindDelete {
-		return p
+func (_e Position) SetY(sm *StateMachine, newY float64) Position {
+	e := sm.GetPosition(_e.position.ID)
+	if e.position.OperationKind == OperationKindDelete {
+		return e
 	}
-	p.position.X = newY
-	p.position.OperationKind = OperationKindUpdate
-	sm.Patch.Position[p.position.ID] = p.position
-	return p
+	e.position.X = newY
+	e.position.OperationKind = OperationKindUpdate
+	sm.Patch.Position[e.position.ID] = e.position
+	return e
 }

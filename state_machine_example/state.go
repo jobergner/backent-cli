@@ -42,6 +42,7 @@ type zoneCore struct {
 	ID            ZoneID        `json:"id"`
 	Items         []ZoneItemID  `json:"items"`
 	Players       []PlayerID    `json:"players"`
+	Tags          []string      `json:"tags"`
 	OperationKind OperationKind `json:"operationKind"`
 }
 

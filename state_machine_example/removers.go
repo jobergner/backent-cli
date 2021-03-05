@@ -1,73 +1,116 @@
 package statemachine
 
-func (_z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
-	z := sm.GetZone(_z.zone.ID)
-	if z.zone.OperationKind == OperationKindDelete {
-		return z
+func (_e Zone) RemovePlayer(sm *StateMachine, playersToRemove ...PlayerID) Zone {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return e
 	}
-	var elementFound bool
-	var indexToRemove int
-	for i, _playerID := range z.zone.Players {
-		if _playerID == playerID {
-			indexToRemove = i
-			elementFound = true
-			break
+	var elementsAltered bool
+	var newElements []PlayerID
+	for _, element := range e.zone.Players {
+		var toBeRemoved bool
+		for _, elementToRemove := range playersToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+				sm.DeletePlayer(element)
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
 		}
 	}
-	if !elementFound {
-		return z
+	if !elementsAltered {
+		return e
 	}
-	z.zone.Players = append(z.zone.Players[:indexToRemove], z.zone.Players[indexToRemove+1:]...)
-	z.zone.OperationKind = OperationKindUpdate
-	sm.Patch.Zone[z.zone.ID] = z.zone
-	sm.DeletePlayer(playerID)
-	return z
+	e.zone.Players = newElements
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+	return e
 }
 
-func (_z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
-	z := sm.GetZone(_z.zone.ID)
-	if z.zone.OperationKind == OperationKindDelete {
-		return z
+func (_e Zone) RemoveZoneItem(sm *StateMachine, itemsToRemove ...ZoneItemID) Zone {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return e
 	}
-	var elementFound bool
-	var indexToRemove int
-	for i, _zoneItemID := range z.zone.Items {
-		if _zoneItemID == zoneItemID {
-			indexToRemove = i
-			elementFound = true
-			break
+	var elementsAltered bool
+	var newElements []ZoneItemID
+	for _, element := range e.zone.Items {
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+				sm.DeleteZoneItem(element)
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
 		}
 	}
-	if !elementFound {
-		return z
+	if !elementsAltered {
+		return e
 	}
-	z.zone.Items = append(z.zone.Items[:indexToRemove], z.zone.Items[indexToRemove+1:]...)
-	z.zone.OperationKind = OperationKindUpdate
-	sm.Patch.Zone[z.zone.ID] = z.zone
-	sm.DeleteZoneItem(zoneItemID)
-	return z
+	e.zone.Items = newElements
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+	return e
 }
 
-func (_p Player) RemoveItem(itemID ItemID, sm *StateMachine) Player {
-	p := sm.GetPlayer(_p.player.ID)
-	if p.player.OperationKind == OperationKindDelete {
-		return p
+func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
+	e := sm.GetPlayer(_e.player.ID)
+	if e.player.OperationKind == OperationKindDelete {
+		return e
 	}
-	var elementFound bool
-	var indexToRemove int
-	for i, _itemID := range p.player.Items {
-		if _itemID == itemID {
-			indexToRemove = i
-			elementFound = true
-			break
+	var elementsAltered bool
+	var newElements []ItemID
+	for _, element := range e.player.Items {
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+				sm.DeleteItem(element)
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
 		}
 	}
-	if !elementFound {
-		return p
+	if !elementsAltered {
+		return e
 	}
-	p.player.Items = append(p.player.Items[:indexToRemove], p.player.Items[indexToRemove+1:]...)
-	p.player.OperationKind = OperationKindUpdate
-	sm.Patch.Player[p.player.ID] = p.player
-	sm.DeleteItem(itemID)
-	return p
+	e.player.Items = newElements
+	e.player.OperationKind = OperationKindUpdate
+	sm.Patch.Player[e.player.ID] = e.player
+	return e
+}
+
+func (_e Zone) RemoveTags(sm *StateMachine, tagsToRemove ...string) Zone {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return e
+	}
+	var elementsAltered bool
+	var newElements []string
+	for _, element := range e.zone.Tags {
+		var toBeRemoved bool
+		for _, elementToRemove := range tagsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
+		}
+	}
+	if !elementsAltered {
+		return e
+	}
+	e.zone.Tags = newElements
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+	return e
 }

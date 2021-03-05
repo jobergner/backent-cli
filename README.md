@@ -171,5 +171,10 @@ the interesting thing about the tree is that it really only holds updated data a
 and will omit children of elements that haven't updated (with the use of pointers)
 
 
+### preventing the developer from mistakes
+when returning slices in getter a new slice is created in order to 
+prevent the user from manipulating the slice directly and therefore disturbing
+altering slices within the stateMachine's State or Patch
+
 ### TODO
 - figure out if parentage is necessary
