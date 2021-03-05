@@ -119,10 +119,10 @@ func TestTree(t *testing.T) {
 		sm := newStateMachine()
 		zone := sm.CreateZone()
 		player1 := zone.AddPlayer(sm)
-		player1_item1 := player1.AddItem(sm)
-		player2 := zone.AddPlayer(sm)
+		sm.UpdateState()
+		player1.GetGearScore(sm).SetLevel(1, sm)
 
-		actual := newTree().assemble(sm.Patch)
+		actual := sm.assembleTree()
 
 		expected := newTree()
 		expected.Zone = map[ZoneID]_zone{
@@ -131,14 +131,9 @@ func TestTree(t *testing.T) {
 				Players: []_player{
 					{
 						ID: player1.player.ID,
-						Items: []_item{{
-							ID:            player1_item1.item.ID,
-							OperationKind: OperationKindUpdate,
-						}},
-						OperationKind: OperationKindUpdate,
-					},
-					{
-						ID:            player2.player.ID,
+						GearScore: &_gearScore{
+							ID: player1.GetGearScore(sm).gearScore.ID,
+						},
 						OperationKind: OperationKindUpdate,
 					},
 				},
@@ -150,15 +145,15 @@ func TestTree(t *testing.T) {
 		fmt.Println("DAW")
 		fmt.Printf("%+v\n", expected)
 	})
-	t.Run("assembles expected tree", func(t *testing.T) {
-		sm := newStateMachine()
+	// t.Run("assembles expected tree", func(t *testing.T) {
+	// 	sm := newStateMachine()
 
-		actual := newTree().assemble(sm.Patch)
+	// 	actual := newTree().assemble(sm.Patch)
 
-		expected := newTree()
+	// 	expected := newTree()
 
-		assert.Equal(t, expected, actual)
-		fmt.Println("DAW")
-		fmt.Printf("%+v\n", expected)
-	})
+	// 	assert.Equal(t, expected, actual)
+	// 	fmt.Println("DAW")
+	// 	fmt.Printf("%+v\n", expected)
+	// })
 }

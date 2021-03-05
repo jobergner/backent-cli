@@ -9,8 +9,8 @@ type Tree struct {
 	GearScore map[GearScoreID]_gearScore `json:"gearScore"`
 }
 
-func newTree() *Tree {
-	return &Tree{
+func newTree() Tree {
+	return Tree{
 		Player:    make(map[PlayerID]_player),
 		Zone:      make(map[ZoneID]_zone),
 		ZoneItem:  make(map[ZoneItemID]_zoneItem),
