@@ -138,7 +138,10 @@ func TestSimpleAST(t *testing.T) {
 		actual.fillInReferences().fillInParentalInfo()
 
 		assert.True(t, actual.Decls["house"].IsRootType)
+		assert.False(t, actual.Decls["house"].IsLeafType)
 		assert.False(t, actual.Decls["person"].IsRootType)
+		assert.True(t, actual.Decls["person"].IsLeafType)
 		assert.False(t, actual.Decls["address"].IsRootType)
+		assert.True(t, actual.Decls["address"].IsLeafType)
 	})
 }

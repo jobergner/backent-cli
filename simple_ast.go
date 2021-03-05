@@ -20,6 +20,7 @@ type simpleTypeDecl struct {
 	Fields      map[string]simpleFieldDecl
 	IsBasicType bool
 	IsRootType  bool
+	IsLeafType  bool
 }
 
 func newSimpleType(name string) simpleTypeDecl {
@@ -91,6 +92,26 @@ func (s *simpleAST) fillInReferences() *simpleAST {
 }
 
 func (s *simpleAST) fillInParentalInfo() {
+	s.evalRootTypes()
+	s.evalLeafTypes()
+}
+
+func (s *simpleAST) evalLeafTypes() {
+	for simpleTypeName, simpleType := range s.Decls {
+		isLeafType := true
+		for _, simpleField := range simpleType.Fields {
+			if !simpleField.ValueType.IsBasicType {
+				isLeafType = false
+			}
+		}
+		if isLeafType {
+			simpleType.IsLeafType = true
+			s.Decls[simpleTypeName] = simpleType
+		}
+	}
+}
+
+func (s *simpleAST) evalRootTypes() {
 	for simpleTypeName, simpleType := range s.Decls {
 		isRootType := true
 		for _, _simpleType := range s.Decls {
