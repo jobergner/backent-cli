@@ -5,7 +5,7 @@ func (_e Zone) AddPlayer(sm *StateMachine) Player {
 	if e.zone.OperationKind == OperationKindDelete {
 		return Player{}
 	}
-	player := sm.CreatePlayer(ParentInfo{EntityKindZone, int(e.zone.ID)})
+	player := sm.createPlayer(true)
 	e.zone.Players = append(e.zone.Players, player.player.ID)
 	e.zone.OperationKind = OperationKindUpdate
 	sm.Patch.Zone[e.zone.ID] = e.zone
@@ -17,7 +17,7 @@ func (_e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{}
 	}
-	zoneItem := sm.CreateZoneItem(ParentInfo{EntityKindZone, int(e.zone.ID)})
+	zoneItem := sm.createZoneItem(true)
 	e.zone.Items = append(e.zone.Items, zoneItem.zoneItem.ID)
 	e.zone.OperationKind = OperationKindUpdate
 	sm.Patch.Zone[e.zone.ID] = e.zone
@@ -29,7 +29,7 @@ func (_e Player) AddItem(sm *StateMachine) Item {
 	if e.player.OperationKind == OperationKindDelete {
 		return Item{}
 	}
-	item := sm.CreateItem(append(e.player.Parentage, ParentInfo{EntityKindPlayer, int(e.player.ID)})...)
+	item := sm.createItem(true)
 	e.player.Items = append(e.player.Items, item.item.ID)
 	e.player.OperationKind = OperationKindUpdate
 	sm.Patch.Player[e.player.ID] = e.player

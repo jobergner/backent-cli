@@ -129,7 +129,7 @@ func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
 func (sm *StateMachine) assembleTree() Tree {
 	tree := newTree()
 	for _, gearScore := range sm.Patch.GearScore {
-		if len(gearScore.Parentage) == 0 {
+		if !gearScore.HasParent {
 			treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
 			if hasUpdated {
 				tree.GearScore[gearScore.ID] = treeGearScore
@@ -137,7 +137,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, item := range sm.Patch.Item {
-		if len(item.Parentage) == 0 {
+		if !item.HasParent {
 			treeItem, hasUpdated := sm.assembleItem(item.ID)
 			if hasUpdated {
 				tree.Item[item.ID] = treeItem
@@ -145,7 +145,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, player := range sm.Patch.Player {
-		if len(player.Parentage) == 0 {
+		if !player.HasParent {
 			treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
 			if hasUpdated {
 				tree.Player[player.ID] = treePlayer
@@ -153,7 +153,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, position := range sm.Patch.Position {
-		if len(position.Parentage) == 0 {
+		if !position.HasParent {
 			treePosition, hasUpdated := sm.assemblePosition(position.ID)
 			if hasUpdated {
 				tree.Position[position.ID] = treePosition
@@ -167,7 +167,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItem := range sm.Patch.ZoneItem {
-		if len(zoneItem.Parentage) == 0 {
+		if !zoneItem.HasParent {
 			treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
 			if hasUpdated {
 				tree.ZoneItem[zoneItem.ID] = treeZoneItem
@@ -176,7 +176,7 @@ func (sm *StateMachine) assembleTree() Tree {
 	}
 
 	for _, gearScore := range sm.State.GearScore {
-		if len(gearScore.Parentage) == 0 {
+		if !gearScore.HasParent {
 			if _, ok := tree.GearScore[gearScore.ID]; !ok {
 				treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
 				if hasUpdated {
@@ -186,7 +186,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, item := range sm.State.Item {
-		if len(item.Parentage) == 0 {
+		if !item.HasParent {
 			if _, ok := tree.Item[item.ID]; !ok {
 				treeItem, hasUpdated := sm.assembleItem(item.ID)
 				if hasUpdated {
@@ -196,7 +196,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, player := range sm.State.Player {
-		if len(player.Parentage) == 0 {
+		if !player.HasParent {
 			if _, ok := tree.Player[player.ID]; !ok {
 				treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
 				if hasUpdated {
@@ -206,7 +206,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, position := range sm.State.Position {
-		if len(position.Parentage) == 0 {
+		if !position.HasParent {
 			if _, ok := tree.Position[position.ID]; !ok {
 				treePosition, hasUpdated := sm.assemblePosition(position.ID)
 				if hasUpdated {
@@ -224,7 +224,7 @@ func (sm *StateMachine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItem := range sm.State.ZoneItem {
-		if len(zoneItem.Parentage) == 0 {
+		if !zoneItem.HasParent {
 			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
 				treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
 				if hasUpdated {

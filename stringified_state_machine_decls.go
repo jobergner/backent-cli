@@ -7,7 +7,7 @@ const AddPlayer_Zone_func string = `func (_e Zone) AddPlayer(sm *StateMachine) P
 	if e.zone.OperationKind == OperationKindDelete {
 		return Player{}
 	}
-	player := sm.CreatePlayer(ParentInfo{EntityKindZone, int(e.zone.ID)})
+	player := sm.createPlayer(true)
 	e.zone.Players = append(e.zone.Players, player.player.ID)
 	e.zone.OperationKind = OperationKindUpdate
 	sm.Patch.Zone[e.zone.ID] = e.zone
@@ -19,7 +19,7 @@ const AddZoneItem_Zone_func string = `func (_e Zone) AddZoneItem(sm *StateMachin
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{}
 	}
-	zoneItem := sm.CreateZoneItem(ParentInfo{EntityKindZone, int(e.zone.ID)})
+	zoneItem := sm.createZoneItem(true)
 	e.zone.Items = append(e.zone.Items, zoneItem.zoneItem.ID)
 	e.zone.OperationKind = OperationKindUpdate
 	sm.Patch.Zone[e.zone.ID] = e.zone
@@ -31,7 +31,7 @@ const AddItem_Player_func string = `func (_e Player) AddItem(sm *StateMachine) I
 	if e.player.OperationKind == OperationKindDelete {
 		return Item{}
 	}
-	item := sm.CreateItem(append(e.player.Parentage, ParentInfo{EntityKindPlayer, int(e.player.ID)})...)
+	item := sm.createItem(true)
 	e.player.Items = append(e.player.Items, item.item.ID)
 	e.player.OperationKind = OperationKindUpdate
 	sm.Patch.Player[e.player.ID] = e.player
@@ -129,13 +129,13 @@ const assembleZone_StateMachine_func string = `func (sm *StateMachine) assembleZ
 		zone = sm.State.Zone[zoneID]
 	}
 	var treeZone _zone
-	for _, zoneItemID := range zone.Items {
+	for _, zoneItemID := range deduplicateZoneItemIDs(sm.State.Zone[zone.ID].Items, sm.Patch.Zone[zone.ID].Items) {
 		if treeZoneItem, zoneItemHasUpdated := sm.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
 			hasUpdated = true
 			treeZone.Items = append(treeZone.Items, treeZoneItem)
 		}
 	}
-	for _, playerID := range zone.Players {
+	for _, playerID := range deduplicatePlayerIDs(sm.State.Zone[zone.ID].Players, sm.Patch.Zone[zone.ID].Players) {
 		if treePlayer, playerHasUpdated := sm.assemblePlayer(playerID); playerHasUpdated {
 			hasUpdated = true
 			treeZone.Players = append(treeZone.Players, treePlayer)
@@ -149,7 +149,7 @@ const assembleZone_StateMachine_func string = `func (sm *StateMachine) assembleZ
 const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleTree() Tree {
 	tree := newTree()
 	for _, gearScore := range sm.Patch.GearScore {
-		if len(gearScore.Parentage) == 0 {
+		if !gearScore.HasParent {
 			treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
 			if hasUpdated {
 				tree.GearScore[gearScore.ID] = treeGearScore
@@ -157,7 +157,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, item := range sm.Patch.Item {
-		if len(item.Parentage) == 0 {
+		if !item.HasParent {
 			treeItem, hasUpdated := sm.assembleItem(item.ID)
 			if hasUpdated {
 				tree.Item[item.ID] = treeItem
@@ -165,7 +165,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, player := range sm.Patch.Player {
-		if len(player.Parentage) == 0 {
+		if !player.HasParent {
 			treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
 			if hasUpdated {
 				tree.Player[player.ID] = treePlayer
@@ -173,7 +173,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, position := range sm.Patch.Position {
-		if len(position.Parentage) == 0 {
+		if !position.HasParent {
 			treePosition, hasUpdated := sm.assemblePosition(position.ID)
 			if hasUpdated {
 				tree.Position[position.ID] = treePosition
@@ -187,7 +187,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, zoneItem := range sm.Patch.ZoneItem {
-		if len(zoneItem.Parentage) == 0 {
+		if !zoneItem.HasParent {
 			treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
 			if hasUpdated {
 				tree.ZoneItem[zoneItem.ID] = treeZoneItem
@@ -195,7 +195,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, gearScore := range sm.State.GearScore {
-		if len(gearScore.Parentage) == 0 {
+		if !gearScore.HasParent {
 			if _, ok := tree.GearScore[gearScore.ID]; !ok {
 				treeGearScore, hasUpdated := sm.assembleGearScore(gearScore.ID)
 				if hasUpdated {
@@ -205,7 +205,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, item := range sm.State.Item {
-		if len(item.Parentage) == 0 {
+		if !item.HasParent {
 			if _, ok := tree.Item[item.ID]; !ok {
 				treeItem, hasUpdated := sm.assembleItem(item.ID)
 				if hasUpdated {
@@ -215,7 +215,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, player := range sm.State.Player {
-		if len(player.Parentage) == 0 {
+		if !player.HasParent {
 			if _, ok := tree.Player[player.ID]; !ok {
 				treePlayer, hasUpdated := sm.assemblePlayer(player.ID)
 				if hasUpdated {
@@ -225,7 +225,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, position := range sm.State.Position {
-		if len(position.Parentage) == 0 {
+		if !position.HasParent {
 			if _, ok := tree.Position[position.ID]; !ok {
 				treePosition, hasUpdated := sm.assemblePosition(position.ID)
 				if hasUpdated {
@@ -243,7 +243,7 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 		}
 	}
 	for _, zoneItem := range sm.State.ZoneItem {
-		if len(zoneItem.Parentage) == 0 {
+		if !zoneItem.HasParent {
 			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
 				treeZoneItem, hasUpdated := sm.assembleZoneItem(zoneItem.ID)
 				if hasUpdated {
@@ -255,55 +255,75 @@ const assembleTree_StateMachine_func string = `func (sm *StateMachine) assembleT
 	return tree
 }`
 
-const CreateGearScore_StateMachine_func string = `func (sm *StateMachine) CreateGearScore(parentage ...ParentInfo) GearScore {
+const CreateGearScore_StateMachine_func string = `func (sm *StateMachine) CreateGearScore() GearScore {
+	return sm.createGearScore(false)
+}`
+
+const createGearScore_StateMachine_func string = `func (sm *StateMachine) createGearScore(hasParent bool) GearScore {
 	var gearScore gearScoreCore
 	gearScore.ID = GearScoreID(sm.GenerateID())
-	gearScore.Parentage = append(gearScore.Parentage, parentage...)
+	gearScore.HasParent = hasParent
 	gearScore.OperationKind = OperationKindUpdate
 	sm.Patch.GearScore[gearScore.ID] = gearScore
 	return GearScore{gearScore: gearScore}
 }`
 
-const CreatePosition_StateMachine_func string = `func (sm *StateMachine) CreatePosition(parentage ...ParentInfo) Position {
+const CreatePosition_StateMachine_func string = `func (sm *StateMachine) CreatePosition() Position {
+	return sm.createPosition(false)
+}`
+
+const createPosition_StateMachine_func string = `func (sm *StateMachine) createPosition(hasParent bool) Position {
 	var position positionCore
 	position.ID = PositionID(sm.GenerateID())
-	position.Parentage = append(position.Parentage, parentage...)
+	position.HasParent = hasParent
 	position.OperationKind = OperationKindUpdate
 	sm.Patch.Position[position.ID] = position
 	return Position{position: position}
 }`
 
-const CreateItem_StateMachine_func string = `func (sm *StateMachine) CreateItem(parentage ...ParentInfo) Item {
+const CreateItem_StateMachine_func string = `func (sm *StateMachine) CreateItem() Item {
+	return sm.createItem(false)
+}`
+
+const createItem_StateMachine_func string = `func (sm *StateMachine) createItem(hasParent bool) Item {
 	var item itemCore
 	item.ID = ItemID(sm.GenerateID())
-	item.Parentage = append(item.Parentage, parentage...)
-	elementGearScore := sm.CreateGearScore(append(item.Parentage, ParentInfo{EntityKindItem, int(item.ID)})...)
+	item.HasParent = hasParent
+	elementGearScore := sm.createGearScore(true)
 	item.GearScore = elementGearScore.gearScore.ID
 	item.OperationKind = OperationKindUpdate
 	sm.Patch.Item[item.ID] = item
 	return Item{item: item}
 }`
 
-const CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) CreateZoneItem(parentage ...ParentInfo) ZoneItem {
+const CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) CreateZoneItem() ZoneItem {
+	return sm.createZoneItem(false)
+}`
+
+const createZoneItem_StateMachine_func string = `func (sm *StateMachine) createZoneItem(hasParent bool) ZoneItem {
 	var zoneItem zoneItemCore
 	zoneItem.ID = ZoneItemID(sm.GenerateID())
-	zoneItem.Parentage = append(zoneItem.Parentage, parentage...)
-	elementItem := sm.CreateItem(append(zoneItem.Parentage, ParentInfo{EntityKindZoneItem, int(zoneItem.ID)})...)
+	zoneItem.HasParent = hasParent
+	elementItem := sm.createItem(true)
 	zoneItem.Item = elementItem.item.ID
-	elementPosition := sm.CreatePosition(append(zoneItem.Parentage, ParentInfo{EntityKindZoneItem, int(zoneItem.ID)})...)
+	elementPosition := sm.createPosition(true)
 	zoneItem.Position = elementPosition.position.ID
 	zoneItem.OperationKind = OperationKindUpdate
 	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
 	return ZoneItem{zoneItem: zoneItem}
 }`
 
-const CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePlayer(parentage ...ParentInfo) Player {
+const CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePlayer() Player {
+	return sm.createPlayer(false)
+}`
+
+const createPlayer_StateMachine_func string = `func (sm *StateMachine) createPlayer(hasParent bool) Player {
 	var player playerCore
 	player.ID = PlayerID(sm.GenerateID())
-	player.Parentage = append(player.Parentage, parentage...)
-	elementGearScore := sm.CreateGearScore(append(player.Parentage, ParentInfo{EntityKindPlayer, int(player.ID)})...)
+	player.HasParent = hasParent
+	elementGearScore := sm.createGearScore(true)
 	player.GearScore = elementGearScore.gearScore.ID
-	elementPosition := sm.CreatePosition(append(player.Parentage, ParentInfo{EntityKindPlayer, int(player.ID)})...)
+	elementPosition := sm.createPosition(true)
 	player.Position = elementPosition.position.ID
 	player.OperationKind = OperationKindUpdate
 	sm.Patch.Player[player.ID] = player
@@ -311,6 +331,10 @@ const CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePla
 }`
 
 const CreateZone_StateMachine_func string = `func (sm *StateMachine) CreateZone() Zone {
+	return sm.createZone()
+}`
+
+const createZone_StateMachine_func string = `func (sm *StateMachine) createZone() Zone {
 	var zone zoneCore
 	zone.ID = ZoneID(sm.GenerateID())
 	zone.OperationKind = OperationKindUpdate
@@ -779,7 +803,7 @@ const zoneItemCore_type string = `type zoneItemCore struct {
 	Item		ItemID		` + "`" + `json:"item"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
 }`
 
 const ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
@@ -788,7 +812,7 @@ const itemCore_type string = `type itemCore struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
 	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
 }`
 
 const Item_type string = `type Item struct{ item itemCore }`
@@ -799,7 +823,7 @@ const playerCore_type string = `type playerCore struct {
 	Items		[]ItemID	` + "`" + `json:"items"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
 }`
 
 const Player_type string = `type Player struct{ player playerCore }`
@@ -809,7 +833,7 @@ const gearScoreCore_type string = `type gearScoreCore struct {
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
 }`
 
 const GearScore_type string = `type GearScore struct{ gearScore gearScoreCore }`
@@ -819,7 +843,7 @@ const positionCore_type string = `type positionCore struct {
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	Parentage	Parentage	` + "`" + `json:"parentage"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
 }`
 
 const Position_type string = `type Position struct{ position positionCore }`
