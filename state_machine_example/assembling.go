@@ -1,30 +1,5 @@
 package statemachine
 
-// this is kind of a mess atm
-// the implementation completely missed the idea
-// this code is supposed to only run in the wasm client
-// its purpose is to assemble the data of the incoming patch in a tree
-// so it would be called on the stateMachine in the client
-// sm.Patch = incomingPatch
-// dataTree := sm.assembleTree()
-// sm.UpdateState()
-// ...
-// the tree is assembled from the patch and fills in the missing parents of elements
-// with the elements it has in it's state.
-// the implementation would look like this
-// func (sm *StateMachine) assemble() Tree {
-// the inteesting thing of the tree is that it really only holds updated data and their parents,
-// and will omit children of elements that haven't updated (with the use of pointers)
-//
-// the implementation should also not be too hard to write.
-// I just need to loop through each elementKind and of State AND Patch
-// and check for len(parentage) == 0
-// from there I build ALL children, BUT have 2 returned values:
-// 1. the element
-// 2. a boolean value whether the actually was an item taken from the Patch, and not only from the State
-// (alternative is the item always gets returned as pointer, and is just nil in case)
-// if the boolean is false, the built element get's dircarded
-
 func (sm *StateMachine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
 	gearScore, hasUpdated := sm.Patch.GearScore[gearScoreID]
 	if !hasUpdated {

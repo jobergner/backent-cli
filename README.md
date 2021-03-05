@@ -164,14 +164,12 @@ func (_p Player) GetAttribute(sm *StateMachine) int {
 }
 ```
 
-### TODO
-- finish state machine
-- finish state factory tests
-- write state factory
-- sketch orcestrator
-- write orchestrator
-- write action receiver generator
-- create cli for 'generate from config' and 'register actions'
-- write server
-- write state conveyor
+### Tree
+its purpose is to assemble the data of the incoming patch in a tree.
+the tree is assembled from the patch and fills in the missing parents of elements with the elements in the stateMachine's state.
+the interesting thing about the tree is that it really only holds updated data and their parents,
+and will omit children of elements that haven't updated (with the use of pointers)
 
+
+### TODO
+- figure out if parentage is necessary
