@@ -650,7 +650,7 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 	return deduped
 }`
 
-const RemovePlayer_Zone_func string = `func (_e Zone) RemovePlayer(sm *StateMachine, playersToRemove ...PlayerID) Zone {
+const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
@@ -679,7 +679,7 @@ const RemovePlayer_Zone_func string = `func (_e Zone) RemovePlayer(sm *StateMach
 	return e
 }`
 
-const RemoveZoneItem_Zone_func string = `func (_e Zone) RemoveZoneItem(sm *StateMachine, itemsToRemove ...ZoneItemID) Zone {
+const RemoveZoneItems_Zone_func string = `func (_e Zone) RemoveZoneItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
@@ -688,7 +688,7 @@ const RemoveZoneItem_Zone_func string = `func (_e Zone) RemoveZoneItem(sm *State
 	var newElements []ZoneItemID
 	for _, element := range e.zone.Items {
 		var toBeRemoved bool
-		for _, elementToRemove := range itemsToRemove {
+		for _, elementToRemove := range zoneItemsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
