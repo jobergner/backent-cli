@@ -38,7 +38,7 @@ func (_e Position) SetY(sm *StateMachine, newY float64) Position {
 	if e.position.OperationKind == OperationKindDelete {
 		return e
 	}
-	e.position.X = newY
+	e.position.Y = newY
 	e.position.OperationKind = OperationKindUpdate
 	sm.Patch.Position[e.position.ID] = e.position
 	return e

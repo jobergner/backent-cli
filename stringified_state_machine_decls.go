@@ -26,6 +26,16 @@ const AddZoneItem_Zone_func string = `func (_e Zone) AddZoneItem(sm *StateMachin
 	return zoneItem
 }`
 
+const AddTags_Zone_func string = `func (_e Zone) AddTags(sm *StateMachine, tags ...string) {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return
+	}
+	e.zone.Tags = append(e.zone.Tags, tags...)
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+}`
+
 const AddItem_Player_func string = `func (_e Player) AddItem(sm *StateMachine) Item {
 	e := sm.GetPlayer(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
@@ -143,6 +153,7 @@ const assembleZone_StateMachine_func string = `func (sm *StateMachine) assembleZ
 	}
 	treeZone.ID = zone.ID
 	treeZone.OperationKind = zone.OperationKind
+	treeZone.Tags = zone.Tags
 	return treeZone, hasUpdated
 }`
 
@@ -540,6 +551,15 @@ const GetZoneItems_Zone_func string = `func (_e Zone) GetZoneItems(sm *StateMach
 	return items
 }`
 
+const GetTags_Zone_func string = `func (_e Zone) GetTags(sm *StateMachine) []string {
+	e := sm.GetZone(_e.zone.ID)
+	var tags []string
+	for _, tag := range e.zone.Tags {
+		tags = append(tags, tag)
+	}
+	return tags
+}`
+
 const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
 	check := make(map[GearScoreID]bool)
 	deduped := make([]GearScoreID, 0)
@@ -630,79 +650,122 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 	return deduped
 }`
 
-const RemovePlayer_Zone_func string = `func (_z Zone) RemovePlayer(playerID PlayerID, sm *StateMachine) Zone {
-	z := sm.GetZone(_z.zone.ID)
-	if z.zone.OperationKind == OperationKindDelete {
-		return z
+const RemovePlayer_Zone_func string = `func (_e Zone) RemovePlayer(sm *StateMachine, playersToRemove ...PlayerID) Zone {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return e
 	}
-	var elementFound bool
-	var indexToRemove int
-	for i, _playerID := range z.zone.Players {
-		if _playerID == playerID {
-			indexToRemove = i
-			elementFound = true
-			break
+	var elementsAltered bool
+	var newElements []PlayerID
+	for _, element := range e.zone.Players {
+		var toBeRemoved bool
+		for _, elementToRemove := range playersToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+				sm.DeletePlayer(element)
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
 		}
 	}
-	if !elementFound {
-		return z
+	if !elementsAltered {
+		return e
 	}
-	z.zone.Players = append(z.zone.Players[:indexToRemove], z.zone.Players[indexToRemove+1:]...)
-	z.zone.OperationKind = OperationKindUpdate
-	sm.Patch.Zone[z.zone.ID] = z.zone
-	sm.DeletePlayer(playerID)
-	return z
+	e.zone.Players = newElements
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+	return e
 }`
 
-const RemoveZoneItem_Zone_func string = `func (_z Zone) RemoveZoneItem(zoneItemID ZoneItemID, sm *StateMachine) Zone {
-	z := sm.GetZone(_z.zone.ID)
-	if z.zone.OperationKind == OperationKindDelete {
-		return z
+const RemoveZoneItem_Zone_func string = `func (_e Zone) RemoveZoneItem(sm *StateMachine, itemsToRemove ...ZoneItemID) Zone {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return e
 	}
-	var elementFound bool
-	var indexToRemove int
-	for i, _zoneItemID := range z.zone.Items {
-		if _zoneItemID == zoneItemID {
-			indexToRemove = i
-			elementFound = true
-			break
+	var elementsAltered bool
+	var newElements []ZoneItemID
+	for _, element := range e.zone.Items {
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+				sm.DeleteZoneItem(element)
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
 		}
 	}
-	if !elementFound {
-		return z
+	if !elementsAltered {
+		return e
 	}
-	z.zone.Items = append(z.zone.Items[:indexToRemove], z.zone.Items[indexToRemove+1:]...)
-	z.zone.OperationKind = OperationKindUpdate
-	sm.Patch.Zone[z.zone.ID] = z.zone
-	sm.DeleteZoneItem(zoneItemID)
-	return z
+	e.zone.Items = newElements
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+	return e
 }`
 
-const RemoveItem_Player_func string = `func (_p Player) RemoveItem(itemID ItemID, sm *StateMachine) Player {
-	p := sm.GetPlayer(_p.player.ID)
-	if p.player.OperationKind == OperationKindDelete {
-		return p
+const RemoveItems_Player_func string = `func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
+	e := sm.GetPlayer(_e.player.ID)
+	if e.player.OperationKind == OperationKindDelete {
+		return e
 	}
-	var elementFound bool
-	var indexToRemove int
-	for i, _itemID := range p.player.Items {
-		if _itemID == itemID {
-			indexToRemove = i
-			elementFound = true
-			break
+	var elementsAltered bool
+	var newElements []ItemID
+	for _, element := range e.player.Items {
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+				sm.DeleteItem(element)
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
 		}
 	}
-	if !elementFound {
-		return p
+	if !elementsAltered {
+		return e
 	}
-	p.player.Items = append(p.player.Items[:indexToRemove], p.player.Items[indexToRemove+1:]...)
-	p.player.OperationKind = OperationKindUpdate
-	sm.Patch.Player[p.player.ID] = p.player
-	sm.DeleteItem(itemID)
-	return p
+	e.player.Items = newElements
+	e.player.OperationKind = OperationKindUpdate
+	sm.Patch.Player[e.player.ID] = e.player
+	return e
 }`
 
-const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(newLevel int, sm *StateMachine) GearScore {
+const RemoveTags_Zone_func string = `func (_e Zone) RemoveTags(sm *StateMachine, tagsToRemove ...string) Zone {
+	e := sm.GetZone(_e.zone.ID)
+	if e.zone.OperationKind == OperationKindDelete {
+		return e
+	}
+	var elementsAltered bool
+	var newElements []string
+	for _, element := range e.zone.Tags {
+		var toBeRemoved bool
+		for _, elementToRemove := range tagsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				elementsAltered = true
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
+		}
+	}
+	if !elementsAltered {
+		return e
+	}
+	e.zone.Tags = newElements
+	e.zone.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.zone.ID] = e.zone
+	return e
+}`
+
+const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
 	e := sm.GetGearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
@@ -713,7 +776,7 @@ const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(newLevel in
 	return e
 }`
 
-const SetScore_GearScore_func string = `func (_e GearScore) SetScore(newScore int, sm *StateMachine) GearScore {
+const SetScore_GearScore_func string = `func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
 	e := sm.GetGearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
@@ -724,7 +787,7 @@ const SetScore_GearScore_func string = `func (_e GearScore) SetScore(newScore in
 	return e
 }`
 
-const SetX_Position_func string = `func (_e Position) SetX(newX float64, sm *StateMachine) Position {
+const SetX_Position_func string = `func (_e Position) SetX(sm *StateMachine, newX float64) Position {
 	e := sm.GetPosition(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
@@ -735,12 +798,12 @@ const SetX_Position_func string = `func (_e Position) SetX(newX float64, sm *Sta
 	return e
 }`
 
-const SetY_Position_func string = `func (_e Position) SetY(newY float64, sm *StateMachine) Position {
+const SetY_Position_func string = `func (_e Position) SetY(sm *StateMachine, newY float64) Position {
 	e := sm.GetPosition(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
 	}
-	e.position.X = newY
+	e.position.Y = newY
 	e.position.OperationKind = OperationKindUpdate
 	sm.Patch.Position[e.position.ID] = e.position
 	return e
@@ -786,6 +849,7 @@ const zoneCore_type string = `type zoneCore struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
 	Items		[]ZoneItemID	` + "`" + `json:"items"` + "`" + `
 	Players		[]PlayerID	` + "`" + `json:"players"` + "`" + `
+	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
@@ -962,5 +1026,6 @@ const _zone_type string = `type _zone struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
 	Players		[]_player	` + "`" + `json:"players"` + "`" + `
 	Items		[]_zoneItem	` + "`" + `json:"items"` + "`" + `
+	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`

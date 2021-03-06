@@ -85,6 +85,7 @@ func newSimpleASTExample() simpleAST {
 		"zone": map[interface{}]interface{}{
 			"items":   "[]zoneItem",
 			"players": "[]player",
+			"tags":    "[]string",
 		},
 		"zoneItem": map[interface{}]interface{}{
 			"position": "position",
