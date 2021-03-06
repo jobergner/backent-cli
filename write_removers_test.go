@@ -5,17 +5,17 @@ import (
 	"testing"
 )
 
-func TestWriteAdders(t *testing.T) {
-	t.Run("writes adders", func(t *testing.T) {
+func TestWriteRemovers(t *testing.T) {
+	t.Run("writes removers", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
-		sf.writeAdders()
+		sf.writeRemovers()
 
 		actual := normalizeWhitespace(sf.buf.String())
 		expected := normalizeWhitespace(strings.Join([]string{
-			AddItem_Player_func,
-			AddZoneItem_Zone_func,
-			AddPlayer_Zone_func,
-			AddTags_Zone_func,
+			RemoveItems_Player_func,
+			RemoveZoneItems_Zone_func,
+			RemovePlayers_Zone_func,
+			RemoveTags_Zone_func,
 		}, "\n"))
 
 		if expected != actual {

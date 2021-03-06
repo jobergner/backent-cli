@@ -1,6 +1,6 @@
 package statemachine
 
-func (_e Zone) RemovePlayer(sm *StateMachine, playersToRemove ...PlayerID) Zone {
+func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
@@ -29,7 +29,7 @@ func (_e Zone) RemovePlayer(sm *StateMachine, playersToRemove ...PlayerID) Zone 
 	return e
 }
 
-func (_e Zone) RemoveZoneItem(sm *StateMachine, itemsToRemove ...ZoneItemID) Zone {
+func (_e Zone) RemoveZoneItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
@@ -38,7 +38,7 @@ func (_e Zone) RemoveZoneItem(sm *StateMachine, itemsToRemove ...ZoneItemID) Zon
 	var newElements []ZoneItemID
 	for _, element := range e.zone.Items {
 		var toBeRemoved bool
-		for _, elementToRemove := range itemsToRemove {
+		for _, elementToRemove := range zoneItemsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
