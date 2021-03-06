@@ -5,19 +5,17 @@ import (
 	"testing"
 )
 
-func TestWriteHelpers(t *testing.T) {
-	t.Run("writes deduplicate", func(t *testing.T) {
+func TestWriteSetters(t *testing.T) {
+	t.Run("writes setters", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
-		sf.writeDeduplicate()
+		sf.writeSetters()
 
 		actual := normalizeWhitespace(sf.buf.String())
 		expected := normalizeWhitespace(strings.Join([]string{
-			deduplicateGearScoreIDs_func,
-			deduplicateItemIDs_func,
-			deduplicatePlayerIDs_func,
-			deduplicatePositionIDs_func,
-			deduplicateZoneIDs_func,
-			deduplicateZoneItemIDs_func,
+			SetLevel_GearScore_func,
+			SetScore_GearScore_func,
+			SetX_Position_func,
+			SetY_Position_func,
 		}, "\n"))
 
 		if expected != actual {
