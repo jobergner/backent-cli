@@ -420,31 +420,21 @@ const GetItems_Player_func string = `func (_e Player) GetItems(sm *StateMachine)
 
 const GetGearScore_Player_func string = `func (_e Player) GetGearScore(sm *StateMachine) GearScore {
 	e := sm.GetPlayer(_e.player.ID)
-	patchingGearScore, ok := sm.Patch.GearScore[e.player.GearScore]
-	if ok {
-		return GearScore{patchingGearScore}
-	}
-	currentGearScore := sm.State.GearScore[e.player.GearScore]
-	return GearScore{currentGearScore}
+	return sm.GetGearScore(e.player.GearScore)
 }`
 
 const GetPosition_Player_func string = `func (_e Player) GetPosition(sm *StateMachine) Position {
 	e := sm.GetPlayer(_e.player.ID)
-	patchingPosition, ok := sm.Patch.Position[e.player.Position]
-	if ok {
-		return Position{patchingPosition}
-	}
-	currentPosition := sm.State.Position[e.player.Position]
-	return Position{currentPosition}
+	return sm.GetPosition(e.player.Position)
 }`
 
 const GetGearScore_StateMachine_func string = `func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[gearScoreID]
 	if ok {
-		return GearScore{gearScore: patchingGearScore}
+		return GearScore{patchingGearScore}
 	}
 	currentGearScore := sm.State.GearScore[gearScoreID]
-	return GearScore{gearScore: currentGearScore}
+	return GearScore{currentGearScore}
 }`
 
 const GetLevel_GearScore_func string = `func (_e GearScore) GetLevel(sm *StateMachine) int {
@@ -468,12 +458,7 @@ const GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem(itemID
 
 const GetGearScore_Item_func string = `func (_e Item) GetGearScore(sm *StateMachine) GearScore {
 	e := sm.GetItem(_e.item.ID)
-	patchingGearScore, ok := sm.Patch.GearScore[e.item.GearScore]
-	if ok {
-		return GearScore{gearScore: patchingGearScore}
-	}
-	currentGearScore := sm.State.GearScore[e.item.GearScore]
-	return GearScore{gearScore: currentGearScore}
+	return sm.GetGearScore(e.item.GearScore)
 }`
 
 const GetPosition_StateMachine_func string = `func (sm *StateMachine) GetPosition(positionID PositionID) Position {
@@ -506,31 +491,21 @@ const GetZoneItem_StateMachine_func string = `func (sm *StateMachine) GetZoneIte
 
 const GetPosition_ZoneItem_func string = `func (_e ZoneItem) GetPosition(sm *StateMachine) Position {
 	e := sm.GetZoneItem(_e.zoneItem.ID)
-	patchingPosition, ok := sm.Patch.Position[e.zoneItem.Position]
-	if ok {
-		return Position{patchingPosition}
-	}
-	currentPosition := sm.State.Position[e.zoneItem.Position]
-	return Position{currentPosition}
+	return sm.GetPosition(e.zoneItem.Position)
 }`
 
 const GetItem_ZoneItem_func string = `func (_e ZoneItem) GetItem(sm *StateMachine) Item {
 	e := sm.GetZoneItem(_e.zoneItem.ID)
-	patchingItem, ok := sm.Patch.Item[e.zoneItem.Item]
-	if ok {
-		return Item{patchingItem}
-	}
-	currentItem := sm.State.Item[e.zoneItem.Item]
-	return Item{currentItem}
+	return sm.GetItem(e.zoneItem.Item)
 }`
 
 const GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
 	patchingZone, ok := sm.Patch.Zone[zoneID]
 	if ok {
-		return Zone{zone: patchingZone}
+		return Zone{patchingZone}
 	}
 	currentZone := sm.State.Zone[zoneID]
-	return Zone{zone: currentZone}
+	return Zone{currentZone}
 }`
 
 const GetPlayers_Zone_func string = `func (_e Zone) GetPlayers(sm *StateMachine) []Player {
@@ -554,8 +529,8 @@ const GetItems_Zone_func string = `func (_e Zone) GetItems(sm *StateMachine) []Z
 const GetTags_Zone_func string = `func (_e Zone) GetTags(sm *StateMachine) []string {
 	e := sm.GetZone(_e.zone.ID)
 	var tags []string
-	for _, tag := range e.zone.Tags {
-		tags = append(tags, tag)
+	for _, element := range e.zone.Tags {
+		tags = append(tags, element)
 	}
 	return tags
 }`

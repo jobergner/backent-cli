@@ -5,28 +5,44 @@ import (
 )
 
 const getterTemplateString string = `
+<( define "returnValue" -)>
+	<( if .HasSliceValue -)>
+		[]
+	<(- end -)>
+	<( if .ValueType.IsBasicType -)>
+		<( .ValueType.Name )>
+	<(- else -)>
+		<( toTitleCase .ValueType.Name )>
+	<(- end )>
+<(- end )>
 <( range .Decls )>
 func (sm *StateMachine) Get<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) <( toTitleCase .Name )> {
 	patching<( toTitleCase .Name )>, ok := sm.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
-	if !ok {
-		return <( toTitleCase .Name )>{patching<( toTitleCase .Name )>} 
+	if ok {
+		return <( toTitleCase .Name )>{patching<( toTitleCase .Name )>}
 	}
 	current<( toTitleCase .Name )> := sm.State.<( toTitleCase .Name )>[<( .Name )>ID]
-	return <( toTitleCase .Name )>{current<( toTitleCase .Name )>} 
+	return <( toTitleCase .Name )>{current<( toTitleCase .Name )>}
 }
 <( $Decl := . )><( range .Fields )>
-func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachine) <( if .ValueType.IsBasicType )><( .ValueType.Name )><( else )><( toTitleCase .ValueType.Name )><( end )> {
+func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachine) <( template "returnValue" . )> {
 	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
-	if e.<( $Decl.Name )>.OperationKind == OperationKindDelete {
-		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{}<( end )>
-	}
-	<( if not .ValueType.IsBasicType )><( .ValueType.Name )> := sm.create<( toTitleCase .ValueType.Name )>(true)
-	<( end )>e.<( $Decl.Name )>.<( toTitleCase .Name )> = append(e.<( $Decl.Name )>.<( toTitleCase .Name )>, <(if .ValueType.IsBasicType )><( .Name )>...<( else )><( .ValueType.Name )>.<( .ValueType.Name )>.ID<( end )>)
-	e.<( $Decl.Name )>.OperationKind = OperationKindUpdate
-	sm.Patch.<( toTitleCase $Decl.Name )>[e.<( $Decl.Name )>.ID] = e.<( $Decl.Name )><( if not .ValueType.IsBasicType )>
-	return <( .ValueType.Name )><( end )>
+	<( if .HasSliceValue -)>
+		var <( .Name )> <( template "returnValue" . )>
+		for _, <( if .ValueType.IsBasicType )>element<( else )><( .ValueType.Name )>ID<( end )> := range e.<( $Decl.Name )>.<( toTitleCase .Name )> {
+			<( .Name )> = append(<( .Name )>, <( if .ValueType.IsBasicType )>element<( else )>sm.Get<( toTitleCase .ValueType.Name )>(<( .ValueType.Name )>ID)<( end )>)
+		}
+		return <( .Name )>
+	<(- else -)>
+		<( if .ValueType.IsBasicType -)>
+			return e.<( $Decl.Name )>.<( toTitleCase .Name )>
+		<(- else -)>
+			return sm.Get<( toTitleCase .Name )>(e.<( $Decl.Name )>.<( toTitleCase .Name )>)
+		<(- end -)>
+	<(- end )>
 }
-<( end )><( end )>
+<( end )>
+<( end )>
 `
 
 var getterTemplate *template.Template = newTemplateFrom("getterTemplate", getterTemplateString)

@@ -178,3 +178,4 @@ altering slices within the stateMachine's State or Patch
 
 ### TODO
 - implement way to get singular/plural of field names (so Zone.GetZoneItem can be Zone.GetItem)
+- remove whitespace from templates
