@@ -31,10 +31,10 @@ func (_e Player) GetPosition(sm *StateMachine) Position {
 func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[gearScoreID]
 	if ok {
-		return GearScore{gearScore: patchingGearScore}
+		return GearScore{patchingGearScore}
 	}
 	currentGearScore := sm.State.GearScore[gearScoreID]
-	return GearScore{gearScore: currentGearScore}
+	return GearScore{currentGearScore}
 }
 
 func (_e GearScore) GetLevel(sm *StateMachine) int {
@@ -102,10 +102,10 @@ func (_e ZoneItem) GetItem(sm *StateMachine) Item {
 func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
 	patchingZone, ok := sm.Patch.Zone[zoneID]
 	if ok {
-		return Zone{zone: patchingZone}
+		return Zone{patchingZone}
 	}
 	currentZone := sm.State.Zone[zoneID]
-	return Zone{zone: currentZone}
+	return Zone{currentZone}
 }
 
 func (_e Zone) GetPlayers(sm *StateMachine) []Player {
@@ -129,8 +129,8 @@ func (_e Zone) GetItems(sm *StateMachine) []ZoneItem {
 func (_e Zone) GetTags(sm *StateMachine) []string {
 	e := sm.GetZone(_e.zone.ID)
 	var tags []string
-	for _, tag := range e.zone.Tags {
-		tags = append(tags, tag)
+	for _, element := range e.zone.Tags {
+		tags = append(tags, element)
 	}
 	return tags
 }
