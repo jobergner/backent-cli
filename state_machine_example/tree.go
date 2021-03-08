@@ -1,29 +1,29 @@
 package statemachine
 
 type Tree struct {
+	GearScore map[GearScoreID]_gearScore `json:"gearScore"`
+	Item      map[ItemID]_item           `json:"item"`
 	Player    map[PlayerID]_player       `json:"player"`
+	Position  map[PositionID]_position   `json:"position"`
 	Zone      map[ZoneID]_zone           `json:"zone"`
 	ZoneItem  map[ZoneItemID]_zoneItem   `json:"zoneItem"`
-	Item      map[ItemID]_item           `json:"item"`
-	Position  map[PositionID]_position   `json:"position"`
-	GearScore map[GearScoreID]_gearScore `json:"gearScore"`
 }
 
 func newTree() Tree {
 	return Tree{
+		GearScore: make(map[GearScoreID]_gearScore),
+		Item:      make(map[ItemID]_item),
 		Player:    make(map[PlayerID]_player),
+		Position:  make(map[PositionID]_position),
 		Zone:      make(map[ZoneID]_zone),
 		ZoneItem:  make(map[ZoneItemID]_zoneItem),
-		Position:  make(map[PositionID]_position),
-		Item:      make(map[ItemID]_item),
-		GearScore: make(map[GearScoreID]_gearScore),
 	}
 }
 
 type _zoneItem struct {
 	ID            ZoneItemID    `json:"id"`
-	Position      *_position    `json:"position"`
 	Item          *_item        `json:"item"`
+	Position      *_position    `json:"position"`
 	OperationKind OperationKind `json:"operationKind"`
 }
 
@@ -49,16 +49,16 @@ type _gearScore struct {
 
 type _player struct {
 	ID            PlayerID      `json:"id"`
-	Items         []_item       `json:"items"`
 	GearScore     *_gearScore   `json:"gearScore"`
+	Items         []_item       `json:"items"`
 	Position      *_position    `json:"position"`
 	OperationKind OperationKind `json:"operationKind"`
 }
 
 type _zone struct {
 	ID            ZoneID        `json:"id"`
-	Players       []_player     `json:"players"`
 	Items         []_zoneItem   `json:"items"`
+	Players       []_player     `json:"players"`
 	Tags          []string      `json:"tags"`
 	OperationKind OperationKind `json:"operationKind"`
 }
