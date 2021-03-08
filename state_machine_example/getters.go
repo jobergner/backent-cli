@@ -142,7 +142,7 @@ func (_e Zone) GetPlayers(sm *StateMachine) []Player {
 	return players
 }
 
-func (_e Zone) GetZoneItems(sm *StateMachine) []ZoneItem {
+func (_e Zone) GetItems(sm *StateMachine) []ZoneItem {
 	e := sm.GetZone(_e.zone.ID)
 	var items []ZoneItem
 	for _, zoneItemID := range e.zone.Items {
