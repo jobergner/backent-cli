@@ -20,22 +20,12 @@ func (_e Player) GetItems(sm *StateMachine) []Item {
 
 func (_e Player) GetGearScore(sm *StateMachine) GearScore {
 	e := sm.GetPlayer(_e.player.ID)
-	patchingGearScore, ok := sm.Patch.GearScore[e.player.GearScore]
-	if ok {
-		return GearScore{patchingGearScore}
-	}
-	currentGearScore := sm.State.GearScore[e.player.GearScore]
-	return GearScore{currentGearScore}
+	return sm.GetGearScore(e.player.GearScore)
 }
 
 func (_e Player) GetPosition(sm *StateMachine) Position {
 	e := sm.GetPlayer(_e.player.ID)
-	patchingPosition, ok := sm.Patch.Position[e.player.Position]
-	if ok {
-		return Position{patchingPosition}
-	}
-	currentPosition := sm.State.Position[e.player.Position]
-	return Position{currentPosition}
+	return sm.GetPosition(e.player.Position)
 }
 
 func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
@@ -68,12 +58,7 @@ func (sm *StateMachine) GetItem(itemID ItemID) Item {
 
 func (_e Item) GetGearScore(sm *StateMachine) GearScore {
 	e := sm.GetItem(_e.item.ID)
-	patchingGearScore, ok := sm.Patch.GearScore[e.item.GearScore]
-	if ok {
-		return GearScore{gearScore: patchingGearScore}
-	}
-	currentGearScore := sm.State.GearScore[e.item.GearScore]
-	return GearScore{gearScore: currentGearScore}
+	return sm.GetGearScore(e.item.GearScore)
 }
 
 func (sm *StateMachine) GetPosition(positionID PositionID) Position {
@@ -106,22 +91,12 @@ func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
 
 func (_e ZoneItem) GetPosition(sm *StateMachine) Position {
 	e := sm.GetZoneItem(_e.zoneItem.ID)
-	patchingPosition, ok := sm.Patch.Position[e.zoneItem.Position]
-	if ok {
-		return Position{patchingPosition}
-	}
-	currentPosition := sm.State.Position[e.zoneItem.Position]
-	return Position{currentPosition}
+	return sm.GetPosition(e.zoneItem.Position)
 }
 
 func (_e ZoneItem) GetItem(sm *StateMachine) Item {
 	e := sm.GetZoneItem(_e.zoneItem.ID)
-	patchingItem, ok := sm.Patch.Item[e.zoneItem.Item]
-	if ok {
-		return Item{patchingItem}
-	}
-	currentItem := sm.State.Item[e.zoneItem.Item]
-	return Item{currentItem}
+	return sm.GetItem(e.zoneItem.Item)
 }
 
 func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
