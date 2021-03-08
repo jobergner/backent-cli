@@ -177,4 +177,4 @@ prevent the user from manipulating the slice directly and therefore disturbing
 altering slices within the stateMachine's State or Patch
 
 ### TODO
-- figure out if parentage is necessary
+- implement way to get singular/plural of field names (so Zone.GetZoneItem can be Zone.GetItem)
