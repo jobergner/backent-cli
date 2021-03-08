@@ -6,16 +6,38 @@ import (
 
 const removerTemplateString string = `
 <( range .Decls )><( $Decl := . )><( range .Fields )><( if .HasSliceValue )>
-func (_e <( toTitleCase $Decl.Name )>) Remove<(if .ValueType.IsBasicType )><( toTitleCase .Name )><( else )><( toTitleCase .ValueType.Name )>s<( end )>(sm *StateMachine, <(if .ValueType.IsBasicType )><( .Name )>ToRemove ...<( .ValueType.Name )><( else )> <( .ValueType.Name )>sToRemove ...<( toTitleCase .ValueType.Name )>ID<( end )>) <( toTitleCase $Decl.Name )> {
+func (_e <( toTitleCase $Decl.Name )>) Remove
+<(- if .ValueType.IsBasicType -)>
+	<( toTitleCase .Name )>
+<(- else -)>
+	<( toTitleCase .ValueType.Name )>s
+<(- end -)>
+(sm *StateMachine,<( print " " )>
+<(- if .ValueType.IsBasicType -)>
+	<( .Name )>ToRemove ...<( .ValueType.Name )>
+<(- else -)>
+	<( .ValueType.Name )>sToRemove ...<( toTitleCase .ValueType.Name )>ID
+<(- end -)>
+) <( toTitleCase $Decl.Name )> {
 	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
 	if e.<( $Decl.Name )>.OperationKind == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
-	var newElements []<(if .ValueType.IsBasicType )><( .ValueType.Name )><( else )><( toTitleCase .ValueType.Name )>ID<( end )>
+	var newElements []
+	<(- if .ValueType.IsBasicType -)>
+		<( .ValueType.Name )>
+	<(- else -)>
+		<( toTitleCase .ValueType.Name )>ID
+	<(- end )>
 	for _, element := range e.<( $Decl.Name )>.<( toTitleCase .Name )> {
 		var toBeRemoved bool
-		for _, elementToRemove := range <(if .ValueType.IsBasicType )><( .Name )>ToRemove<( else )> <( .ValueType.Name )>sToRemove<( end )> {
+		for _, elementToRemove := range<(print " ")>
+		<(- if .ValueType.IsBasicType -)>
+			<( .Name )>ToRemove
+		<(- else -)>
+			<( .ValueType.Name )>sToRemove
+		<(- end )> {
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true<(if not .ValueType.IsBasicType )>

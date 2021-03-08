@@ -29,8 +29,20 @@ func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachi
 	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
 	<( if .HasSliceValue -)>
 		var <( .Name )> <( template "returnValue" . )>
-		for _, <( if .ValueType.IsBasicType )>element<( else )><( .ValueType.Name )>ID<( end )> := range e.<( $Decl.Name )>.<( toTitleCase .Name )> {
-			<( .Name )> = append(<( .Name )>, <( if .ValueType.IsBasicType )>element<( else )>sm.Get<( toTitleCase .ValueType.Name )>(<( .ValueType.Name )>ID)<( end )>)
+		for _,<( print " " )>
+		<(- if .ValueType.IsBasicType -)>
+			element
+		<(- else -)>
+			<( .ValueType.Name )>ID
+		<(- end -)>
+		<( print " " )>:= range e.<( $Decl.Name )>.<( toTitleCase .Name )> {
+			<( .Name )> = append(<( .Name )>,<( print " " )>
+			<(- if .ValueType.IsBasicType -)>
+				element
+			<(- else -)>
+				sm.Get<( toTitleCase .ValueType.Name )>(<( .ValueType.Name )>ID)
+			<(- end -)>
+			)
 		}
 		return <( .Name )>
 	<(- else -)>
