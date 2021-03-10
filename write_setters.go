@@ -23,6 +23,6 @@ func (_e <( toTitleCase $Decl.Name )>) Set<( toTitleCase .Name )>(sm *StateMachi
 var setterTemplate *template.Template = newTemplateFrom("setterTemplate", setterTemplateString)
 
 func (s *stateFactory) writeSetters() *stateFactory {
-	setterTemplate.Execute(&s.buf, s.ast)
+	setterTemplate.Execute(s.buf, s.ast)
 	return s
 }

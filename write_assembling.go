@@ -56,7 +56,7 @@ func (sm *StateMachine) assembleTree() Tree {
 var assembleTreeTemplate *template.Template = newTemplateFrom("assembleTreeTemplate", assembleTreeTemplateString)
 
 func (s *stateFactory) writeAssembleTree() *stateFactory {
-	assembleTreeTemplate.Execute(&s.buf, s.ast)
+	assembleTreeTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -103,6 +103,6 @@ func (sm *StateMachine) assemble<( toTitleCase .Name )>(<( .Name )>ID <( toTitle
 var assembleTreeElementTemplate *template.Template = newTemplateFrom("assembleTreeElementTemplate", assembleTreeElementTemplateString)
 
 func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
-	assembleTreeElementTemplate.Execute(&s.buf, s.ast)
+	assembleTreeElementTemplate.Execute(s.buf, s.ast)
 	return s
 }

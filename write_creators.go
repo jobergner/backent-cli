@@ -31,6 +31,6 @@ func (sm *StateMachine) create<( toTitleCase .Name )>(<( if not .IsRootType )>ha
 var creatorTemplate *template.Template = newTemplateFrom("creatorTemplate", creatorTemplateString)
 
 func (s *stateFactory) writeCreators() *stateFactory {
-	creatorTemplate.Execute(&s.buf, s.ast)
+	creatorTemplate.Execute(s.buf, s.ast)
 	return s
 }

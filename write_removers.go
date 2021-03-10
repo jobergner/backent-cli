@@ -57,6 +57,6 @@ func (_e <( toTitleCase $Decl.Name )>) Remove<( toTitleCase .Name )>(sm *StateMa
 var removerTemplate *template.Template = newTemplateFrom("removerTemplate", removerTemplateString)
 
 func (s *stateFactory) writeRemovers() *stateFactory {
-	removerTemplate.Execute(&s.buf, s.ast)
+	removerTemplate.Execute(s.buf, s.ast)
 	return s
 }

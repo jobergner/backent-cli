@@ -38,6 +38,6 @@ func (_e <( toTitleCase $Decl.Name )>) Add
 var adderTemplate *template.Template = newTemplateFrom("adderTemplate", adderTemplateString)
 
 func (s *stateFactory) writeAdders() *stateFactory {
-	adderTemplate.Execute(&s.buf, s.ast)
+	adderTemplate.Execute(s.buf, s.ast)
 	return s
 }

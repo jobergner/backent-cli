@@ -21,7 +21,7 @@ func newTree() Tree {
 var treeTemplate *template.Template = newTemplateFrom("treeTemplate", treeTemplateString)
 
 func (s *stateFactory) writeTree() *stateFactory {
-	treeTemplate.Execute(&s.buf, s.ast)
+	treeTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -52,6 +52,6 @@ type _<( .Name )> struct {
 var treeElementTemplate *template.Template = newTemplateFrom("treeElementTemplate", treeElementTemplateString)
 
 func (s *stateFactory) writeTreeElements() *stateFactory {
-	treeElementTemplate.Execute(&s.buf, s.ast)
+	treeElementTemplate.Execute(s.buf, s.ast)
 	return s
 }

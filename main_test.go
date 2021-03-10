@@ -2,10 +2,12 @@ package statefactory
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"unicode"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
+	"testing"
 )
 
 func simplifyIfWhitespace(ch rune) rune {
@@ -109,4 +111,31 @@ func newSimpleASTExample() simpleAST {
 	simpleAST.fillInReferences().fillInParentalInfo()
 
 	return simpleAST
+}
+
+func TestStateFactory(t *testing.T) {
+	t.Run("", func(t *testing.T) {
+		x := newStateFactory(newSimpleASTExample()).
+			writeAdders().
+			writeAssembleTree().
+			writeAssembleTreeElement().
+			writeTree().
+			writeTreeElements().
+			writeCreators().
+			writeDeleters().
+			writeGetters().
+			writeDeduplicate().
+			writeRemovers().
+			writeSetters().
+			writeEntityKinds().
+			writeIDs().
+			writeState().
+			writeElements().
+			writeOperationKind().
+			writeStateMachine().
+			writeGenerateID().
+			writeUpdateState().
+			prependPackage()
+		fmt.Println(x.buf.String())
+	})
 }

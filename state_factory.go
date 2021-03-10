@@ -12,13 +12,18 @@ var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
 type stateFactory struct {
 	ast simpleAST
-	buf bytes.Buffer
+	buf *bytes.Buffer
 }
 
-func newStateFactory(ast simpleAST) stateFactory {
-	return stateFactory{
+func (s *stateFactory) prependPackage() *stateFactory {
+	s.buf = bytes.NewBufferString("package statemachine\n" + s.buf.String())
+	return s
+}
+
+func newStateFactory(ast simpleAST) *stateFactory {
+	return &stateFactory{
 		ast: ast,
-		buf: bytes.Buffer{},
+		buf: &bytes.Buffer{},
 	}
 }
 
