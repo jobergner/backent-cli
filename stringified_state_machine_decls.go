@@ -358,13 +358,18 @@ const DeletePlayer_StateMachine_func string = `func (sm *StateMachine) DeletePla
 	if player.HasParent {
 		return
 	}
+	sm.deletePlayer(playerID)
+}`
+
+const deletePlayer_StateMachine_func string = `func (sm *StateMachine) deletePlayer(playerID PlayerID) {
+	player := sm.GetPlayer(playerID).player
 	player.OperationKind = OperationKindDelete
 	sm.Patch.Player[player.ID] = player
-	sm.DeleteGearScore(player.GearScore)
+	sm.deleteGearScore(player.GearScore)
 	for _, itemID := range player.Items {
-		sm.DeleteItem(itemID)
+		sm.deleteItem(itemID)
 	}
-	sm.DeletePosition(player.Position)
+	sm.deletePosition(player.Position)
 }`
 
 const DeleteGearScore_StateMachine_func string = `func (sm *StateMachine) DeleteGearScore(gearScoreID GearScoreID) {
@@ -372,6 +377,11 @@ const DeleteGearScore_StateMachine_func string = `func (sm *StateMachine) Delete
 	if gearScore.HasParent {
 		return
 	}
+	sm.deleteGearScore(gearScoreID)
+}`
+
+const deleteGearScore_StateMachine_func string = `func (sm *StateMachine) deleteGearScore(gearScoreID GearScoreID) {
+	gearScore := sm.GetGearScore(gearScoreID).gearScore
 	gearScore.OperationKind = OperationKindDelete
 	sm.Patch.GearScore[gearScore.ID] = gearScore
 }`
@@ -381,6 +391,11 @@ const DeletePosition_StateMachine_func string = `func (sm *StateMachine) DeleteP
 	if position.HasParent {
 		return
 	}
+	sm.deletePosition(positionID)
+}`
+
+const deletePosition_StateMachine_func string = `func (sm *StateMachine) deletePosition(positionID PositionID) {
+	position := sm.GetPosition(positionID).position
 	position.OperationKind = OperationKindDelete
 	sm.Patch.Position[position.ID] = position
 }`
@@ -390,9 +405,14 @@ const DeleteItem_StateMachine_func string = `func (sm *StateMachine) DeleteItem(
 	if item.HasParent {
 		return
 	}
+	sm.deleteItem(itemID)
+}`
+
+const deleteItem_StateMachine_func string = `func (sm *StateMachine) deleteItem(itemID ItemID) {
+	item := sm.GetItem(itemID).item
 	item.OperationKind = OperationKindDelete
 	sm.Patch.Item[item.ID] = item
-	sm.DeleteGearScore(item.GearScore)
+	sm.deleteGearScore(item.GearScore)
 }`
 
 const DeleteZoneItem_StateMachine_func string = `func (sm *StateMachine) DeleteZoneItem(zoneItemID ZoneItemID) {
@@ -400,21 +420,30 @@ const DeleteZoneItem_StateMachine_func string = `func (sm *StateMachine) DeleteZ
 	if zoneItem.HasParent {
 		return
 	}
+	sm.deleteZoneItem(zoneItemID)
+}`
+
+const deleteZoneItem_StateMachine_func string = `func (sm *StateMachine) deleteZoneItem(zoneItemID ZoneItemID) {
+	zoneItem := sm.GetZoneItem(zoneItemID).zoneItem
 	zoneItem.OperationKind = OperationKindDelete
 	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
-	sm.DeleteItem(zoneItem.Item)
-	sm.DeletePosition(zoneItem.Position)
+	sm.deleteItem(zoneItem.Item)
+	sm.deletePosition(zoneItem.Position)
 }`
 
 const DeleteZone_StateMachine_func string = `func (sm *StateMachine) DeleteZone(zoneID ZoneID) {
+	sm.deleteZone(zoneID)
+}`
+
+const deleteZone_StateMachine_func string = `func (sm *StateMachine) deleteZone(zoneID ZoneID) {
 	zone := sm.GetZone(zoneID).zone
 	zone.OperationKind = OperationKindDelete
 	sm.Patch.Zone[zone.ID] = zone
 	for _, zoneItemID := range zone.Items {
-		sm.DeleteZoneItem(zoneItemID)
+		sm.deleteZoneItem(zoneItemID)
 	}
 	for _, playerID := range zone.Players {
-		sm.DeletePlayer(playerID)
+		sm.deletePlayer(playerID)
 	}
 }`
 
@@ -656,7 +685,7 @@ const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(sm *StateMa
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
-				sm.DeletePlayer(element)
+				sm.deletePlayer(element)
 			}
 		}
 		if !toBeRemoved {
@@ -685,7 +714,7 @@ const RemoveItems_Zone_func string = `func (_e Zone) RemoveItems(sm *StateMachin
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
-				sm.DeleteZoneItem(element)
+				sm.deleteZoneItem(element)
 			}
 		}
 		if !toBeRemoved {
@@ -714,7 +743,7 @@ const RemoveItems_Player_func string = `func (_e Player) RemoveItems(sm *StateMa
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
-				sm.DeleteItem(element)
+				sm.deleteItem(element)
 			}
 		}
 		if !toBeRemoved {

@@ -3,6 +3,9 @@ package statefactory
 import (
 	"bytes"
 	"github.com/gertd/go-pluralize"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"sort"
 	"strings"
 	"text/template"
@@ -27,6 +30,17 @@ func newStateFactory(ast simpleAST) *stateFactory {
 	}
 }
 
+func (s *stateFactory) format() error {
+	ast, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
+	if err != nil {
+		return err
+	}
+
+	s.buf.Reset()
+	err = format.Node(s.buf, token.NewFileSet(), ast)
+	return err
+}
+
 func indexOfDecl(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl) int {
 	var keys []string
 	for k := range decls {
@@ -49,18 +63,6 @@ func newTemplateFrom(name, templateString string) *template.Template {
 			Funcs(template.FuncMap{
 				"toTitleCase": strings.Title,
 				"toSingular":  pluralizeClient.Singular,
-				"toFieldValue": func(field simpleFieldDecl) string {
-					var valueStringWriter bytes.Buffer
-					if field.HasSliceValue {
-						valueStringWriter.WriteString("[]")
-					}
-					if field.ValueType.IsBasicType {
-						valueStringWriter.WriteString(field.ValueType.Name)
-					} else {
-						valueStringWriter.WriteString(strings.Title(field.ValueType.Name) + "ID")
-					}
-					return valueStringWriter.String()
-				},
 				"doNotWriteOnIndex": func(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl, requiredIndex int, toWrite string) string {
 					currentIndex := indexOfDecl(decls, currentDecl)
 					if requiredIndex < 0 {

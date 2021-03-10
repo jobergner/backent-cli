@@ -35,7 +35,7 @@ func (_e <( toTitleCase $Decl.Name )>) Remove<( toTitleCase .Name )>(sm *StateMa
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true<(if not .ValueType.IsBasicType )>
-				sm.Delete<( toTitleCase .ValueType.Name )>(element)<( end )>
+				sm.delete<( toTitleCase .ValueType.Name )>(element)<( end )>
 			}
 		}
 		if !toBeRemoved {

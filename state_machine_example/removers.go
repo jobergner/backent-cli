@@ -13,7 +13,7 @@ func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
-				sm.DeletePlayer(element)
+				sm.deletePlayer(element)
 			}
 		}
 		if !toBeRemoved {
@@ -42,7 +42,7 @@ func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zo
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
-				sm.DeleteZoneItem(element)
+				sm.deleteZoneItem(element)
 			}
 		}
 		if !toBeRemoved {
@@ -71,7 +71,7 @@ func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
 			if element == elementToRemove {
 				toBeRemoved = true
 				elementsAltered = true
-				sm.DeleteItem(element)
+				sm.deleteItem(element)
 			}
 		}
 		if !toBeRemoved {

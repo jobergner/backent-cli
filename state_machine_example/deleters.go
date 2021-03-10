@@ -5,13 +5,17 @@ func (sm *StateMachine) DeletePlayer(playerID PlayerID) {
 	if player.HasParent {
 		return
 	}
+	sm.deletePlayer(playerID)
+}
+func (sm *StateMachine) deletePlayer(playerID PlayerID) {
+	player := sm.GetPlayer(playerID).player
 	player.OperationKind = OperationKindDelete
 	sm.Patch.Player[player.ID] = player
-	sm.DeleteGearScore(player.GearScore)
+	sm.deleteGearScore(player.GearScore)
 	for _, itemID := range player.Items {
-		sm.DeleteItem(itemID)
+		sm.deleteItem(itemID)
 	}
-	sm.DeletePosition(player.Position)
+	sm.deletePosition(player.Position)
 }
 
 func (sm *StateMachine) DeleteGearScore(gearScoreID GearScoreID) {
@@ -19,6 +23,10 @@ func (sm *StateMachine) DeleteGearScore(gearScoreID GearScoreID) {
 	if gearScore.HasParent {
 		return
 	}
+	sm.deleteGearScore(gearScoreID)
+}
+func (sm *StateMachine) deleteGearScore(gearScoreID GearScoreID) {
+	gearScore := sm.GetGearScore(gearScoreID).gearScore
 	gearScore.OperationKind = OperationKindDelete
 	sm.Patch.GearScore[gearScore.ID] = gearScore
 }
@@ -28,6 +36,10 @@ func (sm *StateMachine) DeletePosition(positionID PositionID) {
 	if position.HasParent {
 		return
 	}
+	sm.deletePosition(positionID)
+}
+func (sm *StateMachine) deletePosition(positionID PositionID) {
+	position := sm.GetPosition(positionID).position
 	position.OperationKind = OperationKindDelete
 	sm.Patch.Position[position.ID] = position
 }
@@ -37,9 +49,13 @@ func (sm *StateMachine) DeleteItem(itemID ItemID) {
 	if item.HasParent {
 		return
 	}
+	sm.deleteItem(itemID)
+}
+func (sm *StateMachine) deleteItem(itemID ItemID) {
+	item := sm.GetItem(itemID).item
 	item.OperationKind = OperationKindDelete
 	sm.Patch.Item[item.ID] = item
-	sm.DeleteGearScore(item.GearScore)
+	sm.deleteGearScore(item.GearScore)
 }
 
 func (sm *StateMachine) DeleteZoneItem(zoneItemID ZoneItemID) {
@@ -47,20 +63,27 @@ func (sm *StateMachine) DeleteZoneItem(zoneItemID ZoneItemID) {
 	if zoneItem.HasParent {
 		return
 	}
+	sm.deleteZoneItem(zoneItemID)
+}
+func (sm *StateMachine) deleteZoneItem(zoneItemID ZoneItemID) {
+	zoneItem := sm.GetZoneItem(zoneItemID).zoneItem
 	zoneItem.OperationKind = OperationKindDelete
 	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
-	sm.DeleteItem(zoneItem.Item)
-	sm.DeletePosition(zoneItem.Position)
+	sm.deleteItem(zoneItem.Item)
+	sm.deletePosition(zoneItem.Position)
 }
 
 func (sm *StateMachine) DeleteZone(zoneID ZoneID) {
+	sm.deleteZone(zoneID)
+}
+func (sm *StateMachine) deleteZone(zoneID ZoneID) {
 	zone := sm.GetZone(zoneID).zone
 	zone.OperationKind = OperationKindDelete
 	sm.Patch.Zone[zone.ID] = zone
 	for _, zoneItemID := range zone.Items {
-		sm.DeleteZoneItem(zoneItemID)
+		sm.deleteZoneItem(zoneItemID)
 	}
 	for _, playerID := range zone.Players {
-		sm.DeletePlayer(playerID)
+		sm.deletePlayer(playerID)
 	}
 }

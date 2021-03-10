@@ -116,26 +116,27 @@ func newSimpleASTExample() simpleAST {
 func TestStateFactory(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		x := newStateFactory(newSimpleASTExample()).
-			writeAdders().
-			writeAssembleTree().
-			writeAssembleTreeElement().
-			writeTree().
-			writeTreeElements().
-			writeCreators().
-			writeDeleters().
-			writeGetters().
-			writeDeduplicate().
-			writeRemovers().
-			writeSetters().
+			writeOperationKind().
 			writeEntityKinds().
 			writeIDs().
 			writeState().
-			writeElements().
-			writeOperationKind().
 			writeStateMachine().
 			writeGenerateID().
 			writeUpdateState().
+			writeElements().
+			writeAdders().
+			writeCreators().
+			writeDeleters().
+			writeGetters().
+			writeRemovers().
+			writeSetters().
+			writeTree().
+			writeTreeElements().
+			writeAssembleTree().
+			writeAssembleTreeElement().
+			writeDeduplicate().
 			prependPackage()
+		x.format()
 		fmt.Println(x.buf.String())
 	})
 }
