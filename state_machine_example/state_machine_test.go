@@ -31,7 +31,7 @@ func TestStateMachine(t *testing.T) {
 	t.Run("deletes elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
-		sm.DeleteGearScore(gearScore.gearScore.ID)
+		sm.deleteGearScore(gearScore.gearScore.ID)
 		_gearScore := sm.Patch.GearScore[gearScore.gearScore.ID]
 		assert.Equal(t, OperationKind(OperationKindDelete), _gearScore.OperationKind)
 	})
@@ -85,7 +85,7 @@ func TestUpdateState(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
-		sm.DeleteGearScore(gearScore.gearScore.ID)
+		sm.deleteGearScore(gearScore.gearScore.ID)
 		sm.UpdateState()
 		_, ok := sm.State.GearScore[gearScore.gearScore.ID]
 		assert.False(t, ok)
