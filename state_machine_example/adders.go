@@ -12,7 +12,7 @@ func (_e Zone) AddPlayer(sm *StateMachine) Player {
 	return player
 }
 
-func (_e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+func (_e Zone) AddItem(sm *StateMachine) ZoneItem {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{}

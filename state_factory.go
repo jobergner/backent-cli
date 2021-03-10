@@ -2,10 +2,13 @@ package statefactory
 
 import (
 	"bytes"
+	"github.com/gertd/go-pluralize"
 	"sort"
 	"strings"
 	"text/template"
 )
+
+var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
 type stateFactory struct {
 	ast simpleAST
@@ -40,6 +43,7 @@ func newTemplateFrom(name, templateString string) *template.Template {
 		template.New(name).
 			Funcs(template.FuncMap{
 				"toTitleCase": strings.Title,
+				"toSingular":  pluralizeClient.Singular,
 				"toFieldValue": func(field simpleFieldDecl) string {
 					var valueStringWriter bytes.Buffer
 					if field.HasSliceValue {

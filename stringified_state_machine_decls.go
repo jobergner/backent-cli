@@ -14,7 +14,7 @@ const AddPlayer_Zone_func string = `func (_e Zone) AddPlayer(sm *StateMachine) P
 	return player
 }`
 
-const AddZoneItem_Zone_func string = `func (_e Zone) AddZoneItem(sm *StateMachine) ZoneItem {
+const AddItem_Zone_func string = `func (_e Zone) AddItem(sm *StateMachine) ZoneItem {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{}
@@ -672,7 +672,7 @@ const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(sm *StateMa
 	return e
 }`
 
-const RemoveZoneItems_Zone_func string = `func (_e Zone) RemoveZoneItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
+const RemoveItems_Zone_func string = `func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e

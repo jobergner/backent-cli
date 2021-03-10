@@ -6,13 +6,7 @@ import (
 
 const removerTemplateString string = `
 <( range .Decls )><( $Decl := . )><( range .Fields )><( if .HasSliceValue )>
-func (_e <( toTitleCase $Decl.Name )>) Remove
-<(- if .ValueType.IsBasicType -)>
-	<( toTitleCase .Name )>
-<(- else -)>
-	<( toTitleCase .ValueType.Name )>s
-<(- end -)>
-(sm *StateMachine,<( print " " )>
+func (_e <( toTitleCase $Decl.Name )>) Remove<( toTitleCase .Name )>(sm *StateMachine,<( print " " )>
 <(- if .ValueType.IsBasicType -)>
 	<( .Name )>ToRemove ...<( .ValueType.Name )>
 <(- else -)>
