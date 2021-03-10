@@ -177,5 +177,4 @@ prevent the user from manipulating the slice directly and therefore disturbing
 altering slices within the stateMachine's State or Patch
 
 ### TODO
-- implement way to get singular/plural of field names (so Zone.GetZoneItem can be Zone.GetItem)
-- remove whitespace from templates
+- adders need to early return element with operation kind delete
