@@ -28,6 +28,6 @@ func deduplicate<( toTitleCase .Name )>IDs(a []<( toTitleCase .Name )>ID, b []<(
 var deduplicateTemplate *template.Template = newTemplateFrom("deduplicateTemplate", deduplicateTemplateString)
 
 func (s *stateFactory) writeDeduplicate() *stateFactory {
-	deduplicateTemplate.Execute(&s.buf, s.ast)
+	deduplicateTemplate.Execute(s.buf, s.ast)
 	return s
 }

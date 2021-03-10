@@ -16,7 +16,7 @@ const (
 var operationKindTemplate *template.Template = newTemplateFrom("operationKindTemplate", operationKindTemplateString)
 
 func (s *stateFactory) writeOperationKind() *stateFactory {
-	operationKindTemplate.Execute(&s.buf, s.ast)
+	operationKindTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -35,7 +35,7 @@ func newStateMachine() *StateMachine {
 var stateMachineTemplate *template.Template = newTemplateFrom("stateMachineTemplate", stateMachineTemplateString)
 
 func (s *stateFactory) writeStateMachine() *stateFactory {
-	stateMachineTemplate.Execute(&s.buf, s.ast)
+	stateMachineTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -50,7 +50,7 @@ func (sm *StateMachine) GenerateID() int {
 var generateIDTemplate *template.Template = newTemplateFrom("generateIDTemplate", generateIDTemplateString)
 
 func (s *stateFactory) writeGenerateID() *stateFactory {
-	generateIDTemplate.Execute(&s.buf, s.ast)
+	generateIDTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -72,6 +72,6 @@ func (sm *StateMachine) UpdateState() {
 var updateStateTemplate *template.Template = newTemplateFrom("updateStateTemplate", updateStateTemplateString)
 
 func (s *stateFactory) writeUpdateState() *stateFactory {
-	updateStateTemplate.Execute(&s.buf, s.ast)
+	updateStateTemplate.Execute(s.buf, s.ast)
 	return s
 }

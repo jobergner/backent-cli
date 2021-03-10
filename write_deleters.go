@@ -32,6 +32,6 @@ func (sm *StateMachine) Delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCa
 var deleterTemplate *template.Template = newTemplateFrom("deleterTemplate", deleterTemplateString)
 
 func (s *stateFactory) writeDeleters() *stateFactory {
-	deleterTemplate.Execute(&s.buf, s.ast)
+	deleterTemplate.Execute(s.buf, s.ast)
 	return s
 }

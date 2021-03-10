@@ -14,7 +14,7 @@ const (<( range .Decls )>
 var entityKindTemplate *template.Template = newTemplateFrom("entityKindTemplate", entityKindTemplateString)
 
 func (s *stateFactory) writeEntityKinds() *stateFactory {
-	entityKindTemplate.Execute(&s.buf, s.ast)
+	entityKindTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -25,7 +25,7 @@ type <( toTitleCase .Name )>ID int<( end )>
 var idTemplate *template.Template = newTemplateFrom("idTemplate", idTemplateString)
 
 func (s *stateFactory) writeIDs() *stateFactory {
-	idTemplate.Execute(&s.buf, s.ast)
+	idTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -42,7 +42,7 @@ func newState() State {
 var stateTemplate *template.Template = newTemplateFrom("stateTemplate", stateTemplateString)
 
 func (s *stateFactory) writeState() *stateFactory {
-	stateTemplate.Execute(&s.buf, s.ast)
+	stateTemplate.Execute(s.buf, s.ast)
 	return s
 }
 
@@ -72,6 +72,6 @@ type <( toTitleCase .Name )> struct{ <( .Name )> <( .Name )>Core }
 var elementTemplate *template.Template = newTemplateFrom("elementTemplate", elementTemplateString)
 
 func (s *stateFactory) writeElements() *stateFactory {
-	elementTemplate.Execute(&s.buf, s.ast)
+	elementTemplate.Execute(s.buf, s.ast)
 	return s
 }

@@ -60,6 +60,6 @@ func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachi
 var getterTemplate *template.Template = newTemplateFrom("getterTemplate", getterTemplateString)
 
 func (s *stateFactory) writeGetters() *stateFactory {
-	getterTemplate.Execute(&s.buf, s.ast)
+	getterTemplate.Execute(s.buf, s.ast)
 	return s
 }
