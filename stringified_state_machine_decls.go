@@ -271,12 +271,12 @@ const CreateGearScore_StateMachine_func string = `func (sm *StateMachine) Create
 }`
 
 const createGearScore_StateMachine_func string = `func (sm *StateMachine) createGearScore(hasParent bool) GearScore {
-	var gearScore gearScoreCore
-	gearScore.ID = GearScoreID(sm.GenerateID())
-	gearScore.HasParent = hasParent
-	gearScore.OperationKind = OperationKindUpdate
-	sm.Patch.GearScore[gearScore.ID] = gearScore
-	return GearScore{gearScore: gearScore}
+	var e gearScoreCore
+	e.ID = GearScoreID(sm.GenerateID())
+	e.HasParent = hasParent
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.GearScore[e.ID] = e
+	return GearScore{gearScore: e}
 }`
 
 const CreatePosition_StateMachine_func string = `func (sm *StateMachine) CreatePosition() Position {
@@ -284,12 +284,12 @@ const CreatePosition_StateMachine_func string = `func (sm *StateMachine) CreateP
 }`
 
 const createPosition_StateMachine_func string = `func (sm *StateMachine) createPosition(hasParent bool) Position {
-	var position positionCore
-	position.ID = PositionID(sm.GenerateID())
-	position.HasParent = hasParent
-	position.OperationKind = OperationKindUpdate
-	sm.Patch.Position[position.ID] = position
-	return Position{position: position}
+	var e positionCore
+	e.ID = PositionID(sm.GenerateID())
+	e.HasParent = hasParent
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Position[e.ID] = e
+	return Position{position: e}
 }`
 
 const CreateItem_StateMachine_func string = `func (sm *StateMachine) CreateItem() Item {
@@ -297,14 +297,14 @@ const CreateItem_StateMachine_func string = `func (sm *StateMachine) CreateItem(
 }`
 
 const createItem_StateMachine_func string = `func (sm *StateMachine) createItem(hasParent bool) Item {
-	var item itemCore
-	item.ID = ItemID(sm.GenerateID())
-	item.HasParent = hasParent
+	var e itemCore
+	e.ID = ItemID(sm.GenerateID())
+	e.HasParent = hasParent
 	elementGearScore := sm.createGearScore(true)
-	item.GearScore = elementGearScore.gearScore.ID
-	item.OperationKind = OperationKindUpdate
-	sm.Patch.Item[item.ID] = item
-	return Item{item: item}
+	e.GearScore = elementGearScore.gearScore.ID
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Item[e.ID] = e
+	return Item{item: e}
 }`
 
 const CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) CreateZoneItem() ZoneItem {
@@ -312,16 +312,16 @@ const CreateZoneItem_StateMachine_func string = `func (sm *StateMachine) CreateZ
 }`
 
 const createZoneItem_StateMachine_func string = `func (sm *StateMachine) createZoneItem(hasParent bool) ZoneItem {
-	var zoneItem zoneItemCore
-	zoneItem.ID = ZoneItemID(sm.GenerateID())
-	zoneItem.HasParent = hasParent
+	var e zoneItemCore
+	e.ID = ZoneItemID(sm.GenerateID())
+	e.HasParent = hasParent
 	elementItem := sm.createItem(true)
-	zoneItem.Item = elementItem.item.ID
+	e.Item = elementItem.item.ID
 	elementPosition := sm.createPosition(true)
-	zoneItem.Position = elementPosition.position.ID
-	zoneItem.OperationKind = OperationKindUpdate
-	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
-	return ZoneItem{zoneItem: zoneItem}
+	e.Position = elementPosition.position.ID
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.ZoneItem[e.ID] = e
+	return ZoneItem{zoneItem: e}
 }`
 
 const CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePlayer() Player {
@@ -329,16 +329,16 @@ const CreatePlayer_StateMachine_func string = `func (sm *StateMachine) CreatePla
 }`
 
 const createPlayer_StateMachine_func string = `func (sm *StateMachine) createPlayer(hasParent bool) Player {
-	var player playerCore
-	player.ID = PlayerID(sm.GenerateID())
-	player.HasParent = hasParent
+	var e playerCore
+	e.ID = PlayerID(sm.GenerateID())
+	e.HasParent = hasParent
 	elementGearScore := sm.createGearScore(true)
-	player.GearScore = elementGearScore.gearScore.ID
+	e.GearScore = elementGearScore.gearScore.ID
 	elementPosition := sm.createPosition(true)
-	player.Position = elementPosition.position.ID
-	player.OperationKind = OperationKindUpdate
-	sm.Patch.Player[player.ID] = player
-	return Player{player: player}
+	e.Position = elementPosition.position.ID
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Player[e.ID] = e
+	return Player{player: e}
 }`
 
 const CreateZone_StateMachine_func string = `func (sm *StateMachine) CreateZone() Zone {
@@ -346,11 +346,11 @@ const CreateZone_StateMachine_func string = `func (sm *StateMachine) CreateZone(
 }`
 
 const createZone_StateMachine_func string = `func (sm *StateMachine) createZone() Zone {
-	var zone zoneCore
-	zone.ID = ZoneID(sm.GenerateID())
-	zone.OperationKind = OperationKindUpdate
-	sm.Patch.Zone[zone.ID] = zone
-	return Zone{zone: zone}
+	var e zoneCore
+	e.ID = ZoneID(sm.GenerateID())
+	e.OperationKind = OperationKindUpdate
+	sm.Patch.Zone[e.ID] = e
+	return Zone{zone: e}
 }`
 
 const DeletePlayer_StateMachine_func string = `func (sm *StateMachine) DeletePlayer(playerID PlayerID) {
