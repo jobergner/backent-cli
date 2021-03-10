@@ -10,7 +10,7 @@ func (_e <( toTitleCase $Decl.Name )>) Add
 <(- if .ValueType.IsBasicType -)>
 	<( toTitleCase .Name )>
 <(- else -)>
-	<( toTitleCase .ValueType.Name )>
+	<( .Name | toSingular | toTitleCase )>
 <(- end -)>
 (sm *StateMachine<(if .ValueType.IsBasicType )>, <( .Name)> ...<( .ValueType.Name )><( end )>) <( if not .ValueType.IsBasicType )><( toTitleCase .ValueType.Name )><( end )> {
 	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)

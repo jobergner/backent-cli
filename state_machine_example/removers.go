@@ -29,7 +29,7 @@ func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone
 	return e
 }
 
-func (_e Zone) RemoveZoneItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
+func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e

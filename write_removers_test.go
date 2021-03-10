@@ -13,7 +13,7 @@ func TestWriteRemovers(t *testing.T) {
 		actual := normalizeWhitespace(sf.buf.String())
 		expected := normalizeWhitespace(strings.Join([]string{
 			RemoveItems_Player_func,
-			RemoveZoneItems_Zone_func,
+			RemoveItems_Zone_func,
 			RemovePlayers_Zone_func,
 			RemoveTags_Zone_func,
 		}, "\n"))

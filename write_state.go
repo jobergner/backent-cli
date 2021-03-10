@@ -47,10 +47,20 @@ func (s *stateFactory) writeState() *stateFactory {
 }
 
 const elementTemplateString string = `
+<( define "elementFieldValue" )>
+	<(- if .HasSliceValue -)>
+		[]
+	<(- end -)>
+	<(- if .ValueType.IsBasicType -)>
+		<( .ValueType.Name )>
+	<(- else -)>
+		<( toTitleCase .ValueType.Name )>ID	
+	<(- end -)>
+<( end )>
 <( range .Decls )>
 type <( .Name )>Core struct {
 	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
-<( range .Fields )> <( toTitleCase .Name )> <( toFieldValue . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
+<( range .Fields )> <( toTitleCase .Name )> <( template "elementFieldValue" . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
 <( end )>
 	OperationKind OperationKind ` + "`" + `json:"operationKind"` + "`" + `
 <( if not .IsRootType )> HasParent bool ` + "`" + `json:"hasParent"` + "`" + `<( end )>

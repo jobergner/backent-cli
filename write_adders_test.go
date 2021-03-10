@@ -13,7 +13,7 @@ func TestWriteAdders(t *testing.T) {
 		actual := normalizeWhitespace(sf.buf.String())
 		expected := normalizeWhitespace(strings.Join([]string{
 			AddItem_Player_func,
-			AddZoneItem_Zone_func,
+			AddItem_Zone_func,
 			AddPlayer_Zone_func,
 			AddTags_Zone_func,
 		}, "\n"))
