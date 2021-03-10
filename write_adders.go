@@ -17,8 +17,10 @@ func (_e <( toTitleCase $Decl.Name )>) Add
 	if e.<( $Decl.Name )>.OperationKind == OperationKindDelete {
 		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{}<( end )>
 	}
-	<( if not .ValueType.IsBasicType )><( .ValueType.Name )> := sm.create<( toTitleCase .ValueType.Name )>(true)
-	<( end )>e.<( $Decl.Name )>.<( toTitleCase .Name )> = append(e.<( $Decl.Name )>.<( toTitleCase .Name )>,<(print " ")>
+	<(- if not .ValueType.IsBasicType )>
+		<( .ValueType.Name )> := sm.create<( toTitleCase .ValueType.Name )>(true)
+	<(- end )>
+	e.<( $Decl.Name )>.<( toTitleCase .Name )> = append(e.<( $Decl.Name )>.<( toTitleCase .Name )>,<(print " ")>
 	<(- if .ValueType.IsBasicType -)>
 		<( .Name )>...
 	<(- else -)>
