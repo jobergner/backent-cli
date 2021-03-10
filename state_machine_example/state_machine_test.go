@@ -258,6 +258,10 @@ func TestTree(t *testing.T) {
 							{
 								ID:            player1item2.item.ID,
 								OperationKind: OperationKindDelete,
+								GearScore: &_gearScore{
+									ID:            player1item2.item.GearScore,
+									OperationKind: OperationKindDelete,
+								},
 							},
 						},
 						OperationKind: OperationKindUpdate,
