@@ -3,7 +3,7 @@ package statemachine
 func (_e Zone) AddPlayer(sm *StateMachine) Player {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
-		return Player{}
+		return Player{playerCore{OperationKind: OperationKindDelete}}
 	}
 	player := sm.createPlayer(true)
 	e.zone.Players = append(e.zone.Players, player.player.ID)
@@ -15,7 +15,7 @@ func (_e Zone) AddPlayer(sm *StateMachine) Player {
 func (_e Zone) AddItem(sm *StateMachine) ZoneItem {
 	e := sm.GetZone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
-		return ZoneItem{}
+		return ZoneItem{zoneItemCore{OperationKind: OperationKindDelete}}
 	}
 	zoneItem := sm.createZoneItem(true)
 	e.zone.Items = append(e.zone.Items, zoneItem.zoneItem.ID)
@@ -37,7 +37,7 @@ func (_e Zone) AddTags(sm *StateMachine, tags ...string) {
 func (_e Player) AddItem(sm *StateMachine) Item {
 	e := sm.GetPlayer(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
-		return Item{}
+		return Item{itemCore{OperationKind: OperationKindDelete}}
 	}
 	item := sm.createItem(true)
 	e.player.Items = append(e.player.Items, item.item.ID)

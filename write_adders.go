@@ -15,7 +15,7 @@ func (_e <( toTitleCase $Decl.Name )>) Add
 (sm *StateMachine<(if .ValueType.IsBasicType )>, <( .Name)> ...<( .ValueType.Name )><( end )>) <( if not .ValueType.IsBasicType )><( toTitleCase .ValueType.Name )><( end )> {
 	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
 	if e.<( $Decl.Name )>.OperationKind == OperationKindDelete {
-		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{}<( end )>
+		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{<( .ValueType.Name )>Core{OperationKind: OperationKindDelete}}<( end )>
 	}
 	<(- if not .ValueType.IsBasicType )>
 		<( .ValueType.Name )> := sm.create<( toTitleCase .ValueType.Name )>(true)
