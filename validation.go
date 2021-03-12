@@ -92,6 +92,9 @@ func thematicalValidation(data map[interface{}]interface{}) (errs []error) {
 	incompatibleValueErrs := validateIncompatibleValue(data)
 	errs = append(errs, incompatibleValueErrs...)
 
+	conflictingSingularErrs := validateConflictingSingular(data)
+	errs = append(errs, conflictingSingularErrs...)
+
 	return
 }
 

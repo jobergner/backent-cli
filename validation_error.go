@@ -104,3 +104,13 @@ func newValidationErrorIllegalCapitalization(literal string, literalKind literal
 		),
 	)
 }
+func newValidationErrorConflictingSingular(keyName1, keyName2, singularForm string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrConflictingSingular: \"%s\" and \"%s\" share the same singular form \"%s\"",
+			keyName1,
+			keyName2,
+			singularForm,
+		),
+	)
+}
