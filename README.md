@@ -170,11 +170,13 @@ the tree is assembled from the patch and fills in the missing parents of element
 the interesting thing about the tree is that it really only holds updated data and their parents,
 and will omit children of elements that haven't updated (with the use of pointers)
 
-
 ### preventing the developer from mistakes
 when returning slices in getter a new slice is created in order to 
 prevent the user from manipulating the slice directly and therefore disturbing
 altering slices within the stateMachine's State or Patch
 
 ### TODO
-- adders need to early return element with operation kind delete
+- find solution for possible conflict of field names when using singular of them in adders (validator)
+- good tests for state machine
+- benchmarks
+- figure out if sync.Pool is helpful for managing state and tree structs (cause theyre very big)
