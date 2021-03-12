@@ -90,6 +90,9 @@ func TestUpdateState(t *testing.T) {
 		_, ok := sm.State.GearScore[gearScore.gearScore.ID]
 		assert.False(t, ok)
 	})
+	t.Run("does not delete on illegal delete element with parent", func(t *testing.T) {
+		// todo
+	})
 	t.Run("adds elements", func(t *testing.T) {
 		sm := newStateMachine()
 		player := sm.CreatePlayer()
@@ -110,6 +113,43 @@ func TestUpdateState(t *testing.T) {
 		sm.UpdateState()
 		_, ok := sm.State.Item[item.item.ID]
 		assert.False(t, ok)
+	})
+}
+
+func TestActionsOnDeletedItems(t *testing.T) {
+	t.Run("does not set attribute on element which is set to be deleted", func(t *testing.T) {
+		sm := newStateMachine()
+		gearScore := sm.CreateGearScore()
+		assert.Equal(t, 0, gearScore.GetLevel(sm))
+		sm.DeleteGearScore(gearScore.gearScore.ID)
+		gearScore.SetLevel(sm, 1)
+		assert.Equal(t, 0, gearScore.GetLevel(sm))
+	})
+	t.Run("does not add child on element which is set to be deleted", func(t *testing.T) {
+		sm := newStateMachine()
+		player := sm.CreatePlayer()
+		sm.DeletePlayer(player.player.ID)
+		item := player.AddItem(sm)
+		assert.Equal(t, OperationKind(OperationKindDelete), item.item.OperationKind)
+		sm.UpdateState()
+		assert.Equal(t, 0, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
+	})
+	t.Run("does not remove child on element which is set to be deleted", func(t *testing.T) {
+		sm := newStateMachine()
+		player := sm.CreatePlayer()
+		item := player.AddItem(sm)
+		sm.UpdateState()
+		assert.Equal(t, 1, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
+		sm.DeletePlayer(player.player.ID)
+		player.RemoveItems(sm, item.item.ID)
+		assert.Equal(t, 1, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
+	})
+	t.Run("does not delete element which is a child of another element", func(t *testing.T) {
+		sm := newStateMachine()
+		player := sm.CreatePlayer()
+		item := player.AddItem(sm)
+		sm.DeleteItem(item.item.ID)
+		assert.Equal(t, 1, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
 	})
 }
 
