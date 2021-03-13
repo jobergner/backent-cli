@@ -5,6 +5,12 @@ import (
 	"regexp"
 )
 
+/*
+simpleAST is an abstract syntax tree of a state configuration.
+I could have used Go's own AST, since the way state is configured leans very heavily onto
+Go's structs, but that would have made things more complicated than they need to be.
+This way I was also able to add functionality I needed and will be more flexible in the future.
+*/
 type simpleAST struct {
 	Decls map[string]simpleTypeDecl
 }
@@ -18,12 +24,12 @@ func newSimpleAST() simpleAST {
 type simpleTypeDecl struct {
 	Name        string
 	Fields      map[string]simpleFieldDecl
-	IsBasicType bool
-	IsRootType  bool
-	IsLeafType  bool
+	IsBasicType bool // is of one of Go's basic types (string, rune, int etc.)
+	IsRootType  bool // is not implemented into any other types and thus can not have parent
+	IsLeafType  bool // does not implement any other user-defined types in any of its fields
 }
 
-func newSimpleType(name string) simpleTypeDecl {
+func newSimpleTypeDecl(name string) simpleTypeDecl {
 	return simpleTypeDecl{
 		Name:   name,
 		Fields: make(map[string]simpleFieldDecl),
@@ -34,8 +40,8 @@ type simpleFieldDecl struct {
 	Name          string
 	Parent        *simpleTypeDecl
 	ValueType     *simpleTypeDecl
-	ValueString   string
-	HasSliceValue bool
+	ValueString   string // the original value
+	HasSliceValue bool   // if the value is a slice value (eg. []string)
 }
 
 func buildRudimentarySimpleAST(data map[interface{}]interface{}) simpleAST {
@@ -54,7 +60,7 @@ func buildRudimentarySimpleAST(data map[interface{}]interface{}) simpleAST {
 }
 
 func buildRudimentarySimpleTypeDecl(objectValue map[interface{}]interface{}, typeName string) simpleTypeDecl {
-	typeDecl := newSimpleType(typeName)
+	typeDecl := newSimpleTypeDecl(typeName)
 
 	for key, value := range objectValue {
 		fieldName := getSring(key)
