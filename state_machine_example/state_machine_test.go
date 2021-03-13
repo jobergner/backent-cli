@@ -55,6 +55,12 @@ func TestStateMachine(t *testing.T) {
 }
 
 func TestUpdateState(t *testing.T) {
+	t.Run("clears patch", func(t *testing.T) {
+		sm := newStateMachine()
+		sm.CreateGearScore()
+		sm.UpdateState()
+		assert.Equal(t, len(sm.Patch.GearScore), 0)
+	})
 	t.Run("creates elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
