@@ -18,16 +18,16 @@ type stateFactory struct {
 	buf *bytes.Buffer
 }
 
-func (s *stateFactory) prependPackage() *stateFactory {
-	s.buf = bytes.NewBufferString("package statemachine\n" + s.buf.String())
-	return s
-}
-
 func newStateFactory(ast simpleAST) *stateFactory {
 	return &stateFactory{
 		ast: ast,
 		buf: &bytes.Buffer{},
 	}
+}
+
+func (s *stateFactory) prependPackage() *stateFactory {
+	s.buf = bytes.NewBufferString("package statemachine\n" + s.buf.String())
+	return s
 }
 
 func (s *stateFactory) format() error {
@@ -56,7 +56,6 @@ func indexOfDecl(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl) in
 	return indexOf
 }
 
-// TODO prettier
 func newTemplateFrom(name, templateString string) *template.Template {
 	return template.Must(
 		template.New(name).
