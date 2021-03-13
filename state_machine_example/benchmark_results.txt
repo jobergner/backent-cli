@@ -1,0 +1,8 @@
+
+Sa 13. Mär 16:22:16 CET 2021
+goos: linux
+goarch: amd64
+pkg: statefactory/state_machine_example
+BenchmarkStateMachine-12    	   27114	     41982 ns/op	   22364 B/op	      65 allocs/op
+PASS
+ok  	statefactory/state_machine_example	1.590s
