@@ -10,29 +10,29 @@ func TestStateMachine(t *testing.T) {
 	t.Run("creates elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
-		_, ok := sm.Patch.GearScore[gearScore.gearScore.ID]
+		_, ok := sm.Patch.GearScore[gearScore.GetID(sm)]
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
-		_gearScore := sm.GetGearScore(gearScore.gearScore.ID)
-		assert.NotZero(t, _gearScore.gearScore.ID)
+		_gearScore := sm.GetGearScore(gearScore.GetID(sm))
+		assert.NotZero(t, _gearScore.GetID(sm))
 	})
 	t.Run("sets elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
-		_gearScore := sm.Patch.GearScore[gearScore.gearScore.ID]
+		_gearScore := sm.Patch.GearScore[gearScore.GetID(sm)]
 		assert.Zero(t, _gearScore.Level)
 		gearScore.SetLevel(sm, 10)
-		_gearScore = sm.Patch.GearScore[gearScore.gearScore.ID]
+		_gearScore = sm.Patch.GearScore[gearScore.GetID(sm)]
 		assert.NotZero(t, _gearScore.Level)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
-		sm.deleteGearScore(gearScore.gearScore.ID)
-		_gearScore := sm.Patch.GearScore[gearScore.gearScore.ID]
+		sm.deleteGearScore(gearScore.GetID(sm))
+		_gearScore := sm.Patch.GearScore[gearScore.GetID(sm)]
 		assert.Equal(t, OperationKind(OperationKindDelete), _gearScore.OperationKind)
 	})
 	t.Run("adds elements", func(t *testing.T) {
@@ -40,16 +40,16 @@ func TestStateMachine(t *testing.T) {
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		playerItem := player.GetItems(sm)[0]
-		assert.NotZero(t, playerItem.item.ID)
-		_, ok := sm.Patch.Item[item.item.ID]
+		assert.NotZero(t, playerItem.GetID(sm))
+		_, ok := sm.Patch.Item[item.GetID(sm)]
 		assert.True(t, ok)
 	})
 	t.Run("removes elements", func(t *testing.T) {
 		sm := newStateMachine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
-		player.RemoveItems(sm, item.item.ID)
-		_item := sm.Patch.Item[item.item.ID]
+		player.RemoveItems(sm, item.GetID(sm))
+		_item := sm.Patch.Item[item.GetID(sm)]
 		assert.Equal(t, OperationKind(OperationKindDelete), _item.OperationKind)
 	})
 }
@@ -59,9 +59,9 @@ func TestUpdateState(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
-		_, ok := sm.Patch.GearScore[gearScore.gearScore.ID]
+		_, ok := sm.Patch.GearScore[gearScore.GetID(sm)]
 		assert.False(t, ok)
-		_, ok = sm.State.GearScore[gearScore.gearScore.ID]
+		_, ok = sm.State.GearScore[gearScore.GetID(sm)]
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
@@ -76,18 +76,18 @@ func TestUpdateState(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore().SetLevel(sm, 1)
 		sm.UpdateState()
-		_gearScore := sm.State.GearScore[gearScore.gearScore.ID]
+		_gearScore := sm.State.GearScore[gearScore.GetID(sm)]
 		assert.Equal(t, _gearScore.Level, 1)
-		_, ok := sm.Patch.GearScore[gearScore.gearScore.ID]
+		_, ok := sm.Patch.GearScore[gearScore.GetID(sm)]
 		assert.False(t, ok)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
-		sm.deleteGearScore(gearScore.gearScore.ID)
+		sm.deleteGearScore(gearScore.GetID(sm))
 		sm.UpdateState()
-		_, ok := sm.State.GearScore[gearScore.gearScore.ID]
+		_, ok := sm.State.GearScore[gearScore.GetID(sm)]
 		assert.False(t, ok)
 	})
 	t.Run("does not delete on illegal delete element with parent", func(t *testing.T) {
@@ -98,9 +98,9 @@ func TestUpdateState(t *testing.T) {
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
-		_, ok := sm.State.Item[item.item.ID]
+		_, ok := sm.State.Item[item.GetID(sm)]
 		assert.True(t, ok)
-		_player, ok := sm.State.Player[player.player.ID]
+		_player, ok := sm.State.Player[player.GetID(sm)]
 		_itemID := _player.Items[0]
 		assert.NotZero(t, _itemID)
 	})
@@ -109,9 +109,9 @@ func TestUpdateState(t *testing.T) {
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
-		player.RemoveItems(sm, item.item.ID)
+		player.RemoveItems(sm, item.GetID(sm))
 		sm.UpdateState()
-		_, ok := sm.State.Item[item.item.ID]
+		_, ok := sm.State.Item[item.GetID(sm)]
 		assert.False(t, ok)
 	})
 }
@@ -121,35 +121,35 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		sm := newStateMachine()
 		gearScore := sm.CreateGearScore()
 		assert.Equal(t, 0, gearScore.GetLevel(sm))
-		sm.DeleteGearScore(gearScore.gearScore.ID)
+		sm.DeleteGearScore(gearScore.GetID(sm))
 		gearScore.SetLevel(sm, 1)
 		assert.Equal(t, 0, gearScore.GetLevel(sm))
 	})
 	t.Run("does not add child on element which is set to be deleted", func(t *testing.T) {
 		sm := newStateMachine()
 		player := sm.CreatePlayer()
-		sm.DeletePlayer(player.player.ID)
+		sm.DeletePlayer(player.GetID(sm))
 		item := player.AddItem(sm)
 		assert.Equal(t, OperationKind(OperationKindDelete), item.item.OperationKind)
 		sm.UpdateState()
-		assert.Equal(t, 0, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
+		assert.Equal(t, 0, len(sm.GetPlayer(player.GetID(sm)).GetItems(sm)))
 	})
 	t.Run("does not remove child on element which is set to be deleted", func(t *testing.T) {
 		sm := newStateMachine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
-		assert.Equal(t, 1, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
-		sm.DeletePlayer(player.player.ID)
-		player.RemoveItems(sm, item.item.ID)
-		assert.Equal(t, 1, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
+		assert.Equal(t, 1, len(sm.GetPlayer(player.GetID(sm)).GetItems(sm)))
+		sm.DeletePlayer(player.GetID(sm))
+		player.RemoveItems(sm, item.GetID(sm))
+		assert.Equal(t, 1, len(sm.GetPlayer(player.GetID(sm)).GetItems(sm)))
 	})
 	t.Run("does not delete element which is a child of another element", func(t *testing.T) {
 		sm := newStateMachine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
-		sm.DeleteItem(item.item.ID)
-		assert.Equal(t, 1, len(sm.GetPlayer(player.player.ID).GetItems(sm)))
+		sm.DeleteItem(item.GetID(sm))
+		assert.Equal(t, 1, len(sm.GetPlayer(player.GetID(sm)).GetItems(sm)))
 	})
 }
 
@@ -164,30 +164,30 @@ func TestTree(t *testing.T) {
 
 		expected := newTree()
 		expected.Zone = map[ZoneID]_zone{
-			zone.zone.ID: {
-				ID: zone.zone.ID,
+			zone.GetID(sm): {
+				ID: zone.GetID(sm),
 				Players: []_player{
 					{
-						ID: player1.player.ID,
+						ID: player1.GetID(sm),
 						GearScore: &_gearScore{
-							ID:            player1.GetGearScore(sm).gearScore.ID,
+							ID:            player1.GetGearScore(sm).GetID(sm),
 							OperationKind: OperationKindUpdate,
 						},
 						OperationKind: OperationKindUpdate,
 						Position: &_position{
-							ID:            player1.GetPosition(sm).position.ID,
+							ID:            player1.GetPosition(sm).GetID(sm),
 							OperationKind: OperationKindUpdate,
 						},
 					},
 					{
-						ID: player2.player.ID,
+						ID: player2.GetID(sm),
 						GearScore: &_gearScore{
-							ID:            player2.GetGearScore(sm).gearScore.ID,
+							ID:            player2.GetGearScore(sm).GetID(sm),
 							OperationKind: OperationKindUpdate,
 						},
 						OperationKind: OperationKindUpdate,
 						Position: &_position{
-							ID:            player2.GetPosition(sm).position.ID,
+							ID:            player2.GetPosition(sm).GetID(sm),
 							OperationKind: OperationKindUpdate,
 						},
 					},
@@ -213,13 +213,13 @@ func TestTree(t *testing.T) {
 
 		expected := newTree()
 		expected.Zone = map[ZoneID]_zone{
-			zone.zone.ID: {
-				ID: zone.zone.ID,
+			zone.GetID(sm): {
+				ID: zone.GetID(sm),
 				Players: []_player{
 					{
-						ID: player1.player.ID,
+						ID: player1.GetID(sm),
 						GearScore: &_gearScore{
-							ID:            player1.GetGearScore(sm).gearScore.ID,
+							ID:            player1.GetGearScore(sm).GetID(sm),
 							Level:         1,
 							OperationKind: OperationKindUpdate,
 						},
@@ -247,17 +247,17 @@ func TestTree(t *testing.T) {
 
 		expected := newTree()
 		expected.Zone = map[ZoneID]_zone{
-			zone.zone.ID: {
-				ID: zone.zone.ID,
+			zone.GetID(sm): {
+				ID: zone.GetID(sm),
 				Players: []_player{
 					{
-						ID: player1.player.ID,
+						ID: player1.GetID(sm),
 						Items: []_item{
 							{
-								ID:            player1item1.item.ID,
+								ID:            player1item1.GetID(sm),
 								OperationKind: OperationKindUpdate,
 								GearScore: &_gearScore{
-									ID:            player1item1.GetGearScore(sm).gearScore.ID,
+									ID:            player1item1.GetGearScore(sm).GetID(sm),
 									OperationKind: OperationKindUpdate,
 								},
 							},
@@ -284,19 +284,19 @@ func TestTree(t *testing.T) {
 
 		sm.UpdateState()
 
-		player1.RemoveItems(sm, player1item2.item.ID)
+		player1.RemoveItems(sm, player1item2.GetID(sm))
 		actual := sm.assembleTree()
 
 		expected := newTree()
 		expected.Zone = map[ZoneID]_zone{
-			zone.zone.ID: {
-				ID: zone.zone.ID,
+			zone.GetID(sm): {
+				ID: zone.GetID(sm),
 				Players: []_player{
 					{
-						ID: player1.player.ID,
+						ID: player1.GetID(sm),
 						Items: []_item{
 							{
-								ID:            player1item2.item.ID,
+								ID:            player1item2.GetID(sm),
 								OperationKind: OperationKindDelete,
 								GearScore: &_gearScore{
 									ID:            player1item2.item.GearScore,

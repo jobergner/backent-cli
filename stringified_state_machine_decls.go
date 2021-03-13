@@ -456,6 +456,10 @@ const GetPlayer_StateMachine_func string = `func (sm *StateMachine) GetPlayer(pl
 	return Player{currentPlayer}
 }`
 
+const GetID_Player_func string = `func (_e Player) GetID(sm *StateMachine) PlayerID {
+	return _e.player.ID
+}`
+
 const GetItems_Player_func string = `func (_e Player) GetItems(sm *StateMachine) []Item {
 	e := sm.GetPlayer(_e.player.ID)
 	var items []Item
@@ -484,6 +488,10 @@ const GetGearScore_StateMachine_func string = `func (sm *StateMachine) GetGearSc
 	return GearScore{currentGearScore}
 }`
 
+const GetID_GearScore_func string = `func (_e GearScore) GetID(sm *StateMachine) GearScoreID {
+	return _e.gearScore.ID
+}`
+
 const GetLevel_GearScore_func string = `func (_e GearScore) GetLevel(sm *StateMachine) int {
 	e := sm.GetGearScore(_e.gearScore.ID)
 	return e.gearScore.Level
@@ -503,6 +511,10 @@ const GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem(itemID
 	return Item{currentItem}
 }`
 
+const GetID_Item_func string = `func (_e Item) GetID(sm *StateMachine) ItemID {
+	return _e.item.ID
+}`
+
 const GetGearScore_Item_func string = `func (_e Item) GetGearScore(sm *StateMachine) GearScore {
 	e := sm.GetItem(_e.item.ID)
 	return sm.GetGearScore(e.item.GearScore)
@@ -515,6 +527,10 @@ const GetPosition_StateMachine_func string = `func (sm *StateMachine) GetPositio
 	}
 	currentPosition := sm.State.Position[positionID]
 	return Position{currentPosition}
+}`
+
+const GetID_Position_func string = `func (_e Position) GetID(sm *StateMachine) PositionID {
+	return _e.position.ID
 }`
 
 const GetX_Position_func string = `func (_e Position) GetX(sm *StateMachine) float64 {
@@ -536,6 +552,10 @@ const GetZoneItem_StateMachine_func string = `func (sm *StateMachine) GetZoneIte
 	return ZoneItem{currentZoneItem}
 }`
 
+const GetID_ZoneItem_func string = `func (_e ZoneItem) GetID(sm *StateMachine) ZoneItemID {
+	return _e.zoneItem.ID
+}`
+
 const GetPosition_ZoneItem_func string = `func (_e ZoneItem) GetPosition(sm *StateMachine) Position {
 	e := sm.GetZoneItem(_e.zoneItem.ID)
 	return sm.GetPosition(e.zoneItem.Position)
@@ -553,6 +573,10 @@ const GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone(zoneID
 	}
 	currentZone := sm.State.Zone[zoneID]
 	return Zone{currentZone}
+}`
+
+const GetID_Zone_func string = `func (_e Zone) GetID(sm *StateMachine) ZoneID {
+	return _e.zone.ID
 }`
 
 const GetPlayers_Zone_func string = `func (_e Zone) GetPlayers(sm *StateMachine) []Player {

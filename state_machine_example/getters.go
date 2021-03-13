@@ -9,6 +9,10 @@ func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
 	return Player{currentPlayer}
 }
 
+func (_e Player) GetID(sm *StateMachine) PlayerID {
+	return _e.player.ID
+}
+
 func (_e Player) GetItems(sm *StateMachine) []Item {
 	e := sm.GetPlayer(_e.player.ID)
 	var items []Item
@@ -37,6 +41,10 @@ func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
 	return GearScore{currentGearScore}
 }
 
+func (_e GearScore) GetID(sm *StateMachine) GearScoreID {
+	return _e.gearScore.ID
+}
+
 func (_e GearScore) GetLevel(sm *StateMachine) int {
 	e := sm.GetGearScore(_e.gearScore.ID)
 	return e.gearScore.Level
@@ -56,6 +64,10 @@ func (sm *StateMachine) GetItem(itemID ItemID) Item {
 	return Item{currentItem}
 }
 
+func (_e Item) GetID(sm *StateMachine) ItemID {
+	return _e.item.ID
+}
+
 func (_e Item) GetGearScore(sm *StateMachine) GearScore {
 	e := sm.GetItem(_e.item.ID)
 	return sm.GetGearScore(e.item.GearScore)
@@ -68,6 +80,10 @@ func (sm *StateMachine) GetPosition(positionID PositionID) Position {
 	}
 	currentPosition := sm.State.Position[positionID]
 	return Position{currentPosition}
+}
+
+func (_e Position) GetID(sm *StateMachine) PositionID {
+	return _e.position.ID
 }
 
 func (_e Position) GetX(sm *StateMachine) float64 {
@@ -89,6 +105,10 @@ func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	return ZoneItem{currentZoneItem}
 }
 
+func (_e ZoneItem) GetID(sm *StateMachine) ZoneItemID {
+	return _e.zoneItem.ID
+}
+
 func (_e ZoneItem) GetPosition(sm *StateMachine) Position {
 	e := sm.GetZoneItem(_e.zoneItem.ID)
 	return sm.GetPosition(e.zoneItem.Position)
@@ -106,6 +126,10 @@ func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
 	}
 	currentZone := sm.State.Zone[zoneID]
 	return Zone{currentZone}
+}
+
+func (_e Zone) GetID(sm *StateMachine) ZoneID {
+	return _e.zone.ID
 }
 
 func (_e Zone) GetPlayers(sm *StateMachine) []Player {

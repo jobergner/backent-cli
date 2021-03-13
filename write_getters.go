@@ -24,6 +24,9 @@ func (sm *StateMachine) Get<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase 
 	current<( toTitleCase .Name )> := sm.State.<( toTitleCase .Name )>[<( .Name )>ID]
 	return <( toTitleCase .Name )>{current<( toTitleCase .Name )>}
 }
+func (_e <( toTitleCase .Name )>) GetID(sm *StateMachine) <( toTitleCase .Name )>ID {
+	return _e.<( .Name )>.ID
+}
 <( $Decl := . )><( range .Fields )>
 func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachine) <( template "returnValue" . )> {
 	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
