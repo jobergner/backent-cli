@@ -25,13 +25,13 @@ func TestSimpleAST(t *testing.T) {
 	}
 
 	t.Run("should build a rudimentary simpleAST from data", func(t *testing.T) {
-		actual := buildRudimentarySimpleAST(data)
+		actual := buildRudimentaryStateConfigAST(data)
 
-		expected := simpleAST{
-			Decls: map[string]simpleTypeDecl{
+		expected := stateConfigAST{
+			Types: map[string]stateConfigType{
 				"house": {
 					Name: "house",
-					Fields: map[string]simpleFieldDecl{
+					Fields: map[string]stateConfigField{
 						"residents": {
 							Name:          "residents",
 							ValueString:   "[]person",
@@ -51,7 +51,7 @@ func TestSimpleAST(t *testing.T) {
 				},
 				"address": {
 					Name: "address",
-					Fields: map[string]simpleFieldDecl{
+					Fields: map[string]stateConfigField{
 						"street": {
 							Name:          "street",
 							ValueString:   "string",
@@ -71,7 +71,7 @@ func TestSimpleAST(t *testing.T) {
 				},
 				"person": {
 					Name: "person",
-					Fields: map[string]simpleFieldDecl{
+					Fields: map[string]stateConfigField{
 						"Name": {
 							Name:          "Name",
 							ValueString:   "string",
@@ -93,40 +93,40 @@ func TestSimpleAST(t *testing.T) {
 
 	t.Run("should fill in references of rudimentary simpleAST", func(t *testing.T) {
 
-		actual := buildRudimentarySimpleAST(data)
+		actual := buildRudimentaryStateConfigAST(data)
 		actual.fillInReferences().fillInParentalInfo()
 
-		livingSpaceField := actual.Decls["house"].Fields["livingSpace"]
+		livingSpaceField := actual.Types["house"].Fields["livingSpace"]
 		assert.Equal(t, livingSpaceField.Parent.Name, "house")
 		assert.Equal(t, livingSpaceField.ValueType.Name, "int")
 		assert.Equal(t, livingSpaceField.ValueType.IsBasicType, true)
-		residentsField := actual.Decls["house"].Fields["residents"]
+		residentsField := actual.Types["house"].Fields["residents"]
 		assert.Equal(t, residentsField.Parent.Name, "house")
 		assert.Equal(t, residentsField.ValueType.Name, "person")
 		assert.Equal(t, residentsField.ValueType.IsBasicType, false)
-		addressField := actual.Decls["house"].Fields["address"]
+		addressField := actual.Types["house"].Fields["address"]
 		assert.Equal(t, addressField.Parent.Name, "house")
 		assert.Equal(t, addressField.ValueType.Name, "address")
 		assert.Equal(t, addressField.ValueType.IsBasicType, false)
 
-		streetField := actual.Decls["address"].Fields["street"]
+		streetField := actual.Types["address"].Fields["street"]
 		assert.Equal(t, streetField.Parent.Name, "address")
 		assert.Equal(t, streetField.ValueType.Name, "string")
 		assert.Equal(t, streetField.ValueType.IsBasicType, true)
-		houseNumberField := actual.Decls["address"].Fields["houseNumber"]
+		houseNumberField := actual.Types["address"].Fields["houseNumber"]
 		assert.Equal(t, houseNumberField.Parent.Name, "address")
 		assert.Equal(t, houseNumberField.ValueType.Name, "int")
 		assert.Equal(t, houseNumberField.ValueType.IsBasicType, true)
-		cityField := actual.Decls["address"].Fields["city"]
+		cityField := actual.Types["address"].Fields["city"]
 		assert.Equal(t, cityField.Parent.Name, "address")
 		assert.Equal(t, cityField.ValueType.Name, "string")
 		assert.Equal(t, cityField.ValueType.IsBasicType, true)
 
-		NameField := actual.Decls["person"].Fields["Name"]
+		NameField := actual.Types["person"].Fields["Name"]
 		assert.Equal(t, NameField.Parent.Name, "person")
 		assert.Equal(t, NameField.ValueType.Name, "string")
 		assert.Equal(t, NameField.ValueType.IsBasicType, true)
-		ageField := actual.Decls["person"].Fields["age"]
+		ageField := actual.Types["person"].Fields["age"]
 		assert.Equal(t, ageField.Parent.Name, "person")
 		assert.Equal(t, ageField.ValueType.Name, "int")
 		assert.Equal(t, ageField.ValueType.IsBasicType, true)
@@ -134,14 +134,14 @@ func TestSimpleAST(t *testing.T) {
 
 	t.Run("should fill in parentalInfo", func(t *testing.T) {
 
-		actual := buildRudimentarySimpleAST(data)
+		actual := buildRudimentaryStateConfigAST(data)
 		actual.fillInReferences().fillInParentalInfo()
 
-		assert.True(t, actual.Decls["house"].IsRootType)
-		assert.False(t, actual.Decls["house"].IsLeafType)
-		assert.False(t, actual.Decls["person"].IsRootType)
-		assert.True(t, actual.Decls["person"].IsLeafType)
-		assert.False(t, actual.Decls["address"].IsRootType)
-		assert.True(t, actual.Decls["address"].IsLeafType)
+		assert.True(t, actual.Types["house"].IsRootType)
+		assert.False(t, actual.Types["house"].IsLeafType)
+		assert.False(t, actual.Types["person"].IsRootType)
+		assert.True(t, actual.Types["person"].IsLeafType)
+		assert.False(t, actual.Types["address"].IsRootType)
+		assert.True(t, actual.Types["address"].IsLeafType)
 	})
 }

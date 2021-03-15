@@ -6,8 +6,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"testing"
+
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 func simplifyIfWhitespace(ch rune) rune {
@@ -77,7 +78,7 @@ GOT:
 ` + actual
 }
 
-func newSimpleASTExample() simpleAST {
+func newSimpleASTExample() stateConfigAST {
 	data := map[interface{}]interface{}{
 		"player": map[interface{}]interface{}{
 			"items":     "[]item",
@@ -107,7 +108,7 @@ func newSimpleASTExample() simpleAST {
 	}
 
 	// TODO: make prettier
-	simpleAST := buildRudimentarySimpleAST(data)
+	simpleAST := buildRudimentaryStateConfigAST(data)
 	simpleAST.fillInReferences().fillInParentalInfo()
 
 	return simpleAST

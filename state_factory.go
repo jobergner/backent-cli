@@ -2,23 +2,24 @@ package statefactory
 
 import (
 	"bytes"
-	"github.com/gertd/go-pluralize"
 	"go/format"
 	"go/parser"
 	"go/token"
 	"sort"
 	"strings"
 	"text/template"
+
+	"github.com/gertd/go-pluralize"
 )
 
 var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
 type stateFactory struct {
-	ast simpleAST
+	ast stateConfigAST
 	buf *bytes.Buffer
 }
 
-func newStateFactory(ast simpleAST) *stateFactory {
+func newStateFactory(ast stateConfigAST) *stateFactory {
 	return &stateFactory{
 		ast: ast,
 		buf: &bytes.Buffer{},
@@ -41,15 +42,15 @@ func (s *stateFactory) format() error {
 	return err
 }
 
-func indexOfDecl(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl) int {
+func indexOfType(configTypes map[string]stateConfigType, currentConfigType stateConfigType) int {
 	var keys []string
-	for k := range decls {
+	for k := range configTypes {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	var indexOf int
 	for i, key := range keys {
-		if key == currentDecl.Name {
+		if key == currentConfigType.Name {
 			indexOf = i
 		}
 	}
@@ -62,10 +63,10 @@ func newTemplateFrom(name, templateString string) *template.Template {
 			Funcs(template.FuncMap{
 				"toTitleCase": strings.Title,
 				"toSingular":  pluralizeClient.Singular,
-				"doNotWriteOnIndex": func(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl, requiredIndex int, toWrite string) string {
-					currentIndex := indexOfDecl(decls, currentDecl)
+				"doNotWriteOnIndex": func(configTypes map[string]stateConfigType, currentConfigType stateConfigType, requiredIndex int, toWrite string) string {
+					currentIndex := indexOfType(configTypes, currentConfigType)
 					if requiredIndex < 0 {
-						if currentIndex == len(decls)+requiredIndex {
+						if currentIndex == len(configTypes)+requiredIndex {
 							return ""
 						}
 					} else {
@@ -76,10 +77,10 @@ func newTemplateFrom(name, templateString string) *template.Template {
 					}
 					return toWrite
 				},
-				"writeOnIndex": func(decls map[string]simpleTypeDecl, currentDecl simpleTypeDecl, requiredIndex int, toWrite string) string {
-					currentIndex := indexOfDecl(decls, currentDecl)
+				"writeOnIndex": func(configTypes map[string]stateConfigType, currentConfigType stateConfigType, requiredIndex int, toWrite string) string {
+					currentIndex := indexOfType(configTypes, currentConfigType)
 					if requiredIndex < 0 {
-						if currentIndex == len(decls)+requiredIndex {
+						if currentIndex == len(configTypes)+requiredIndex {
 							return toWrite
 						}
 					} else {
