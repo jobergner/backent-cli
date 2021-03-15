@@ -175,8 +175,14 @@ when returning slices in getter a new slice is created in order to
 prevent the user from manipulating the slice directly and therefore disturbing
 altering slices within the stateMachine's State or Patch
 
+### making the server aware of user defined actions
+- each "register actions" call re-generates the entire thing
+- all files with _action suffix are read and parsed
+- all functions within this file ending with "Action" will be processed
+- a new server.Start() method will be generated which expects the user defined actions as parameters
+- the "register actions" script will recognize the statemachine parameter by it's types name (not safe but no better alternative)
+- in case of doubt the script will ask the user if the stateMachine parameter is actually correct.
+
 ### TODO
-- find solution for possible conflict of field names when using singular of them in adders (validator)
-- good tests for state machine
-- benchmarks
-- figure out if sync.Pool is helpful for managing state and tree structs (cause theyre very big)
+- rename project
+- figure out if sync.Pool is helpful for managing tree structs (cause theyre very big)
