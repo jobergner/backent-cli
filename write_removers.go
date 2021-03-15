@@ -5,16 +5,16 @@ import (
 )
 
 const removerTemplateString string = `
-<( range .Decls )><( $Decl := . )><( range .Fields )><( if .HasSliceValue )>
-func (_e <( toTitleCase $Decl.Name )>) Remove<( toTitleCase .Name )>(sm *StateMachine,<( print " " )>
+<( range .Types )><( $Type := . )><( range .Fields )><( if .HasSliceValue )>
+func (_e <( toTitleCase $Type.Name )>) Remove<( toTitleCase .Name )>(sm *StateMachine,<( print " " )>
 <(- if .ValueType.IsBasicType -)>
 	<( .Name )>ToRemove ...<( .ValueType.Name )>
 <(- else -)>
 	<( .ValueType.Name )>sToRemove ...<( toTitleCase .ValueType.Name )>ID
 <(- end -)>
-) <( toTitleCase $Decl.Name )> {
-	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
-	if e.<( $Decl.Name )>.OperationKind == OperationKindDelete {
+) <( toTitleCase $Type.Name )> {
+	e := sm.Get<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
+	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -24,7 +24,7 @@ func (_e <( toTitleCase $Decl.Name )>) Remove<( toTitleCase .Name )>(sm *StateMa
 	<(- else -)>
 		<( toTitleCase .ValueType.Name )>ID
 	<(- end )>
-	for _, element := range e.<( $Decl.Name )>.<( toTitleCase .Name )> {
+	for _, element := range e.<( $Type.Name )>.<( toTitleCase .Name )> {
 		var toBeRemoved bool
 		for _, elementToRemove := range<(print " ")>
 		<(- if .ValueType.IsBasicType -)>
@@ -45,9 +45,9 @@ func (_e <( toTitleCase $Decl.Name )>) Remove<( toTitleCase .Name )>(sm *StateMa
 	if !elementsAltered {
 		return e
 	}
-	e.<( $Decl.Name )>.<( toTitleCase .Name )> = newElements
-	e.<( $Decl.Name )>.OperationKind = OperationKindUpdate
-	sm.Patch.<( toTitleCase $Decl.Name )>[e.<( $Decl.Name )>.ID] = e.<( $Decl.Name )>
+	e.<( $Type.Name )>.<( toTitleCase .Name )> = newElements
+	e.<( $Type.Name )>.OperationKind = OperationKindUpdate
+	sm.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )>
 	return e
 }
 <( end )>

@@ -5,15 +5,15 @@ import (
 )
 
 const setterTemplateString string = `
-<( range .Decls )><( $Decl := . )><( range .Fields )><( if not .HasSliceValue )><( if .ValueType.IsBasicType)>
-func (_e <( toTitleCase $Decl.Name )>) Set<( toTitleCase .Name )>(sm *StateMachine, new<( toTitleCase .Name )> <( .ValueType.Name )>) <( toTitleCase $Decl.Name )> {
-	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
-	if e.<( $Decl.Name )>.OperationKind == OperationKindDelete {
+<( range .Types )><( $Type := . )><( range .Fields )><( if not .HasSliceValue )><( if .ValueType.IsBasicType)>
+func (_e <( toTitleCase $Type.Name )>) Set<( toTitleCase .Name )>(sm *StateMachine, new<( toTitleCase .Name )> <( .ValueType.Name )>) <( toTitleCase $Type.Name )> {
+	e := sm.Get<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
+	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
 		return e
 	}
-	e.<( $Decl.Name )>.<( toTitleCase .Name )> = new<( toTitleCase .Name )>
-	e.<( $Decl.Name )>.OperationKind = OperationKindUpdate
-	sm.Patch.<( toTitleCase $Decl.Name )>[e.<( $Decl.Name )>.ID] = e.<( $Decl.Name )>
+	e.<( $Type.Name )>.<( toTitleCase .Name )> = new<( toTitleCase .Name )>
+	e.<( $Type.Name )>.OperationKind = OperationKindUpdate
+	sm.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )>
 	return e
 }
 <( end )><( end )>
