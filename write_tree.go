@@ -5,14 +5,14 @@ import (
 )
 
 const treeTemplateString string = `
-type Tree struct {<( range .Decls )>
+type Tree struct {<( range .Types )>
 	<( toTitleCase .Name )> map[<( toTitleCase .Name )>ID]_<( .Name )> ` + "`" + `json:"<( .Name )>"` + "`" + `
 <( end )>}
 
 func newTree() Tree {
 	return Tree{
-	<(- range .Decls -)>
-	<( toTitleCase .Name )>: make(map[<( toTitleCase .Name )>ID]_<( .Name )>)<( doNotWriteOnIndex $.Decls . -1 ", ")>
+	<(- range .Types -)>
+	<( toTitleCase .Name )>: make(map[<( toTitleCase .Name )>ID]_<( .Name )>)<( doNotWriteOnIndex $.Types . -1 ", ")>
 	<(- end -)>
 	}
 }
@@ -26,7 +26,7 @@ func (s *stateFactory) writeTree() *stateFactory {
 }
 
 const treeElementTemplateString string = `
-<( range .Decls )>
+<( range .Types )>
 type _<( .Name )> struct {
 	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
 	<(- range .Fields )>

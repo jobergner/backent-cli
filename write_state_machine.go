@@ -56,7 +56,7 @@ func (s *stateFactory) writeGenerateID() *stateFactory {
 
 const updateStateTemplateString string = `
 func (sm *StateMachine) UpdateState() {
-<( range .Decls )>
+<( range .Types )>
 	for _, <( .Name )> := range sm.Patch.<( toTitleCase .Name )> {
 		if <( .Name )>.OperationKind == OperationKindDelete {
 			delete(sm.State.<( toTitleCase .Name )>, <( .Name )>.ID)
@@ -65,7 +65,11 @@ func (sm *StateMachine) UpdateState() {
 		}
 	}
 <( end )>
-	sm.Patch = newState()
+<( range .Types )>
+	for key := range sm.Patch.<( toTitleCase .Name )> {
+		delete(sm.Patch.<( toTitleCase .Name )>, key)
+	}
+<(- end )>
 }
 `
 

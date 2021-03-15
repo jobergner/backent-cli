@@ -5,7 +5,7 @@ import (
 )
 
 const deduplicateTemplateString string = `
-<( range .Decls )>
+<( range .Types )>
 func deduplicate<( toTitleCase .Name )>IDs(a []<( toTitleCase .Name )>ID, b []<( toTitleCase .Name )>ID) []<( toTitleCase .Name )>ID {
 
 	check := make(map[<( toTitleCase .Name )>ID]bool)

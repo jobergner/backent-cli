@@ -15,7 +15,7 @@ const getterTemplateString string = `
 		<( toTitleCase .ValueType.Name )>
 	<(- end )>
 <(- end )>
-<( range .Decls )>
+<( range .Types )>
 func (sm *StateMachine) Get<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) <( toTitleCase .Name )> {
 	patching<( toTitleCase .Name )>, ok := sm.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
 	if ok {
@@ -27,9 +27,9 @@ func (sm *StateMachine) Get<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase 
 func (_e <( toTitleCase .Name )>) GetID(sm *StateMachine) <( toTitleCase .Name )>ID {
 	return _e.<( .Name )>.ID
 }
-<( $Decl := . )><( range .Fields )>
-func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachine) <( template "returnValue" . )> {
-	e := sm.Get<( toTitleCase $Decl.Name )>(_e.<( $Decl.Name )>.ID)
+<( $Type := . )><( range .Fields )>
+func (_e <( toTitleCase $Type.Name )>) Get<( toTitleCase .Name )>(sm *StateMachine) <( template "returnValue" . )> {
+	e := sm.Get<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
 	<( if .HasSliceValue -)>
 		var <( .Name )> <( template "returnValue" . )>
 		for _,<( print " " )>
@@ -38,7 +38,7 @@ func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachi
 		<(- else -)>
 			<( .ValueType.Name )>ID
 		<(- end -)>
-		<( print " " )>:= range e.<( $Decl.Name )>.<( toTitleCase .Name )> {
+		<( print " " )>:= range e.<( $Type.Name )>.<( toTitleCase .Name )> {
 			<( .Name )> = append(<( .Name )>,<( print " " )>
 			<(- if .ValueType.IsBasicType -)>
 				element
@@ -50,9 +50,9 @@ func (_e <( toTitleCase $Decl.Name )>) Get<( toTitleCase .Name )>(sm *StateMachi
 		return <( .Name )>
 	<(- else -)>
 		<( if .ValueType.IsBasicType -)>
-			return e.<( $Decl.Name )>.<( toTitleCase .Name )>
+			return e.<( $Type.Name )>.<( toTitleCase .Name )>
 		<(- else -)>
-			return sm.Get<( toTitleCase .Name )>(e.<( $Decl.Name )>.<( toTitleCase .Name )>)
+			return sm.Get<( toTitleCase .Name )>(e.<( $Type.Name )>.<( toTitleCase .Name )>)
 		<(- end -)>
 	<(- end )>
 }

@@ -5,7 +5,7 @@ import (
 )
 
 const creatorTemplateString string = `
-<(- range .Decls )>
+<(- range .Types )>
 func (sm *StateMachine) Create<( toTitleCase .Name )>() <( toTitleCase .Name )> {
 	return sm.create<( toTitleCase .Name )>(<( if not .IsRootType )>false<( end )>)
 }
