@@ -5,131 +5,135 @@ import (
 	"regexp"
 )
 
-/*
-simpleAST is an abstract syntax tree of a state configuration.
-I could have used Go's own AST, since the way state is configured leans very heavily onto
-Go's structs, but that would have made things more complicated than they need to be.
-This way I was also able to add functionality I needed and will be more flexible in the future.
-*/
-type simpleAST struct {
-	Decls map[string]simpleTypeDecl
+// stateConfigAST is an abstract syntax tree of a state configuration.
+// I could have used Go's own AST, since the way state is configured leans very heavily onto
+// Go's structs, but that would have made things more complicated than they needed to be.
+// This way I was also able to add functionality I needed and will be more flexible in the future.
+type stateConfigAST struct {
+	Types map[string]stateConfigType
 }
 
-func newSimpleAST() simpleAST {
-	return simpleAST{
-		Decls: make(map[string]simpleTypeDecl),
+func newStateConfigAST() stateConfigAST {
+	return stateConfigAST{
+		Types: make(map[string]stateConfigType),
 	}
 }
 
-type simpleTypeDecl struct {
+type stateConfigType struct {
 	Name        string
-	Fields      map[string]simpleFieldDecl
+	Fields      map[string]stateConfigField
 	IsBasicType bool // is of one of Go's basic types (string, rune, int etc.)
-	IsRootType  bool // is not implemented into any other types and thus can not have parent
+	IsRootType  bool // is not implemented into any other types and thus can not have a parent
 	IsLeafType  bool // does not implement any other user-defined types in any of its fields
 }
 
-func newSimpleTypeDecl(name string) simpleTypeDecl {
-	return simpleTypeDecl{
+func newConfigType(name string) stateConfigType {
+	return stateConfigType{
 		Name:   name,
-		Fields: make(map[string]simpleFieldDecl),
+		Fields: make(map[string]stateConfigField),
 	}
 }
 
-type simpleFieldDecl struct {
+type stateConfigField struct {
 	Name          string
-	Parent        *simpleTypeDecl
-	ValueType     *simpleTypeDecl
-	ValueString   string // the original value
-	HasSliceValue bool   // if the value is a slice value (eg. []string)
+	Parent        *stateConfigType // references the field's Parent's Type
+	ValueType     *stateConfigType // references the field's value's Type
+	ValueString   string           // the original value represented as string (eg. "[]Person")
+	HasSliceValue bool             // if the value is a slice value (eg. []string)
 }
 
-func buildRudimentarySimpleAST(data map[interface{}]interface{}) simpleAST {
-	ast := newSimpleAST()
+// buildRudimentaryStateConfigAST builds the ast structure including all types and fields
+// this needs to happen first so the types in "Parent" and "ValueType" can be referenced
+// in fillInReferences
+func buildRudimentaryStateConfigAST(data map[interface{}]interface{}) stateConfigAST {
+	ast := newStateConfigAST()
 
 	for key, value := range data {
 		objectValue := value.(map[interface{}]interface{})
 		typeName := getSring(key)
 
-		typeDecl := buildRudimentarySimpleTypeDecl(objectValue, typeName)
+		configType := buildRudimentaryStateConfigType(objectValue, typeName)
 
-		ast.Decls[typeName] = typeDecl
+		ast.Types[typeName] = configType
 	}
 
 	return ast
 }
 
-func buildRudimentarySimpleTypeDecl(objectValue map[interface{}]interface{}, typeName string) simpleTypeDecl {
-	typeDecl := newSimpleTypeDecl(typeName)
+func buildRudimentaryStateConfigType(configTypeData map[interface{}]interface{}, typeName string) stateConfigType {
+	configType := newConfigType(typeName)
 
-	for key, value := range objectValue {
+	for key, value := range configTypeData {
 		fieldName := getSring(key)
 		valueString := getSring(value)
 
-		fieldDecl := simpleFieldDecl{
+		configField := stateConfigField{
 			Name:          fieldName,
 			HasSliceValue: isSliceValue(valueString),
 			ValueString:   valueString,
 		}
 
-		typeDecl.Fields[fieldName] = fieldDecl
+		configType.Fields[fieldName] = configField
 	}
 
-	return typeDecl
+	return configType
 }
 
-func (s *simpleAST) fillInReferences() *simpleAST {
-	for simpleTypeName, simpleType := range s.Decls {
-		ss := simpleType
-		for simpleFieldName, simpleField := range ss.Fields {
-			sf := simpleField
+// fillInReferences fills in the references of "Parent" and "ValueType"
+// in each stateConfigType
+func (s *stateConfigAST) fillInReferences() *stateConfigAST {
+	for configTypeName, configType := range s.Types {
+		ss := configType
+		for stateConfigFieldName, stateConfigField := range ss.Fields {
+			sf := stateConfigField
 			sf.Parent = &ss
-			referencedType, ok := s.Decls[extractValueType(sf.ValueString)]
+			referencedType, ok := s.Types[extractValueType(sf.ValueString)]
 			if ok {
 				sf.ValueType = &referencedType
 			} else {
-				sf.ValueType = &simpleTypeDecl{Name: extractValueType(sf.ValueString), IsBasicType: true}
+				sf.ValueType = &stateConfigType{Name: extractValueType(sf.ValueString), IsBasicType: true}
 			}
-			ss.Fields[simpleFieldName] = sf
+			ss.Fields[stateConfigFieldName] = sf
 		}
-		s.Decls[simpleTypeName] = ss
+		s.Types[configTypeName] = ss
 	}
 	return s
 }
 
-func (s *simpleAST) fillInParentalInfo() {
+// fills in "IsLeafType" and "isRootType" in each stateConfigField
+func (s *stateConfigAST) fillInParentalInfo() {
 	s.evalRootTypes()
 	s.evalLeafTypes()
 }
 
-func (s *simpleAST) evalLeafTypes() {
-	for simpleTypeName, simpleType := range s.Decls {
+func (s *stateConfigAST) evalLeafTypes() {
+	for stateConfigTypeName, stateConfigType := range s.Types {
 		isLeafType := true
-		for _, simpleField := range simpleType.Fields {
-			if !simpleField.ValueType.IsBasicType {
+		for _, stateConfigField := range stateConfigType.Fields {
+			if !stateConfigField.ValueType.IsBasicType {
 				isLeafType = false
 			}
 		}
 		if isLeafType {
-			simpleType.IsLeafType = true
-			s.Decls[simpleTypeName] = simpleType
+			stateConfigType.IsLeafType = true
+			s.Types[stateConfigTypeName] = stateConfigType
 		}
 	}
 }
 
-func (s *simpleAST) evalRootTypes() {
-	for simpleTypeName, simpleType := range s.Decls {
+func (s *stateConfigAST) evalRootTypes() {
+	for stateConfigTypeName, stateConfigType := range s.Types {
 		isRootType := true
-		for _, _simpleType := range s.Decls {
-			for _, simpleField := range _simpleType.Fields {
-				if simpleField.ValueType.Name == simpleTypeName {
+		for _, _stateConfigType := range s.Types {
+			for _, stateConfigField := range _stateConfigType.Fields {
+				if stateConfigField.ValueType.Name == stateConfigTypeName {
 					isRootType = false
 				}
 			}
 		}
 		if isRootType {
-			simpleType.IsRootType = true
-			s.Decls[simpleTypeName] = simpleType
+			stateConfigType.IsRootType = true
+			s.Types[stateConfigTypeName] = stateConfigType
 		}
 	}
 }
