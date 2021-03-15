@@ -1017,7 +1017,24 @@ const UpdateState_StateMachine_func string = `func (sm *StateMachine) UpdateStat
 			sm.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
-	sm.Patch = newState()
+	for key := range sm.Patch.GearScore {
+		delete(sm.Patch.GearScore, key)
+	}
+	for key := range sm.Patch.Item {
+		delete(sm.Patch.Item, key)
+	}
+	for key := range sm.Patch.Player {
+		delete(sm.Patch.Player, key)
+	}
+	for key := range sm.Patch.Position {
+		delete(sm.Patch.Position, key)
+	}
+	for key := range sm.Patch.Zone {
+		delete(sm.Patch.Zone, key)
+	}
+	for key := range sm.Patch.ZoneItem {
+		delete(sm.Patch.ZoneItem, key)
+	}
 }`
 
 const Tree_type string = `type Tree struct {

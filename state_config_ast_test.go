@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSimpleAST(t *testing.T) {
+func TestStateConfigAST(t *testing.T) {
 	data := map[interface{}]interface{}{
 		"house": map[interface{}]interface{}{
 			"residents":   "[]person",
@@ -24,7 +24,7 @@ func TestSimpleAST(t *testing.T) {
 		},
 	}
 
-	t.Run("should build a rudimentary simpleAST from data", func(t *testing.T) {
+	t.Run("should build a rudimentary stateConfigAST from data", func(t *testing.T) {
 		actual := buildRudimentaryStateConfigAST(data)
 
 		expected := stateConfigAST{
@@ -91,7 +91,7 @@ func TestSimpleAST(t *testing.T) {
 
 	})
 
-	t.Run("should fill in references of rudimentary simpleAST", func(t *testing.T) {
+	t.Run("should fill in references of rudimentary stateConfigAST", func(t *testing.T) {
 
 		actual := buildRudimentaryStateConfigAST(data)
 		actual.fillInReferences().fillInParentalInfo()
