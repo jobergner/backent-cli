@@ -177,8 +177,9 @@ altering slices within the stateMachine's State or Patch
 
 ### making the server aware of user defined actions
 - each "register actions" call re-generates the entire thing
-- all files with _action suffix are read and parsed
-- all functions within this file ending with "Action" will be processed
+- reads a actions config, which will be validated by validator
+- creates action files based on defined actions (if file already exist log a warning)
+---- scrap that
 - a new server.Start() method will be generated which expects the user defined actions as parameters
 - the "register actions" script will recognize the statemachine parameter by it's types name (not safe but no better alternative)
 - in case of doubt the script will ask the user if the stateMachine parameter is actually correct.
