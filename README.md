@@ -49,9 +49,4 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrConflictingSingular | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}". | Due to the way state will be used two field names cannot have the same singular form. |
 <br/>
 
-TODO:
-- ErrIncompatibleValue should include arrays "[2]int"
-- ValidateActionsConfig
-- find way to not consider action name a type in validate_type_not_found
-
 

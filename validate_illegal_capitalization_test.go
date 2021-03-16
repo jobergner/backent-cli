@@ -19,7 +19,7 @@ func TestValidateDataIllegalCapitalization(t *testing.T) {
 			},
 		}
 
-		actualErrors := thematicalValidation(data)
+		actualErrors := thematicalValidation(data, false, true)
 		expectedErrors := []error{
 			newValidationErrorIllegalCapitalization("Bar", literalKindFieldName),
 			newValidationErrorIllegalCapitalization("Baz", literalKindType),

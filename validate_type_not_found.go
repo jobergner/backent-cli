@@ -7,12 +7,16 @@ import (
 
 // returns errors if types are used which are not declared in the YAML file
 // order of declaration is irrelevant
-func validateTypeNotFound(data map[interface{}]interface{}) (errs []error) {
+// rejectedTypeNames is a list og typeNames that should cause an error when used
+func validateTypeNotFound(data map[interface{}]interface{}, rejectedTypeNames ...string) (errs []error) {
 
 	var definedTypes []string
 
 	for key := range data {
 		keyName := fmt.Sprintf("%v", key)
+		if contains(rejectedTypeNames, keyName) {
+			continue
+		}
 		definedTypes = append(definedTypes, keyName)
 	}
 
@@ -88,4 +92,13 @@ func findUndefinedTypesIn(usedTypes, definedTypes []string) (undefinedTypes []st
 		}
 	}
 	return
+}
+
+func contains(typeNames []string, typeName string) bool {
+	for _, _typeName := range typeNames {
+		if typeName == _typeName {
+			return true
+		}
+	}
+	return false
 }

@@ -185,6 +185,27 @@ func TestValidateDataTypeNotFound(t *testing.T) {
 		assert.Empty(t, redundantErrors)
 	})
 
+	t.Run("should fail when rejected type is used", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"fof": "int",
+			"foo": "string",
+			"baz": map[interface{}]interface{}{
+				"ban": "abcde",
+				"bam": "foo",
+			},
+		}
+
+		// note the direct usage of validateTypeNotFound!!
+		actualErrors := validateTypeNotFound(data, "abcde")
+		expectedErrors := []error{
+			newValidationErrorTypeNotFound("abcde", "baz"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
 }
 
 func TestExtractTypes(t *testing.T) {

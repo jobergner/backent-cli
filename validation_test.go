@@ -223,7 +223,7 @@ func TestGeneralValidation(t *testing.T) {
 	})
 }
 
-func TestValidation(t *testing.T) {
+func TestValidateStateConfig(t *testing.T) {
 	t.Run("should procude no errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"bar": map[interface{}]interface{}{},
@@ -234,7 +234,7 @@ func TestValidation(t *testing.T) {
 			},
 		}
 
-		errs := Validate(data)
+		errs := ValidateStateConfig(data)
 
 		assert.Empty(t, errs)
 	})
@@ -255,7 +255,7 @@ func TestValidation(t *testing.T) {
 			},
 		}
 
-		actualErrors := Validate(data)
+		actualErrors := ValidateStateConfig(data)
 		expectedErrors := []error{
 			newValidationErrorNonObjectType("foo"),
 			newValidationErrorNonObjectType("bar"),
@@ -264,6 +264,53 @@ func TestValidation(t *testing.T) {
 			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
 			newValidationErrorIncompatibleValue("*foo", "arg", "baz"),
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+}
+
+func TestValidateActionsConfig(t *testing.T) {
+	t.Run("should procude expected errors", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": "int",
+			"bar": "float64",
+			"baz": map[interface{}]interface{}{
+				"ban":  "int32",
+				"bam":  "bar",
+				"bunt": "[]foo",
+				"bap":  "map[bar]foo",
+				"bal":  "***bar",
+				"slap": "**[]**bar",
+				"arg":  "*foo",
+				"barg": "[3]foo",
+			},
+		}
+		actionsConfigData := map[interface{}]interface{}{
+			"FooAction": map[interface{}]interface{}{
+				"foo": "int32",
+			},
+			"barAction": map[interface{}]interface{}{
+				"bug":  "FooAction",
+				"bam":  "baz",
+				"foot": "string",
+				"feet": "string",
+			},
+		}
+
+		actualErrors := ValidateActionsConfig(data, actionsConfigData)
+		expectedErrors := []error{
+			newValidationErrorNonObjectType("foo"),
+			newValidationErrorNonObjectType("bar"),
+			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
+			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
+			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
+			newValidationErrorIncompatibleValue("*foo", "arg", "baz"),
+			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
+			newValidationErrorTypeNotFound("FooAction", "barAction"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

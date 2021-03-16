@@ -20,7 +20,7 @@ func TestValidateDataIncompatibleMethod(t *testing.T) {
 			},
 		}
 
-		actualErrors := thematicalValidation(data)
+		actualErrors := thematicalValidation(data, false, true)
 		expectedErrors := []error{
 			newValidationErrorIncompatibleValue("map[int]string", "ban", "foo"),
 			newValidationErrorIncompatibleValue("[2]int", "bal", "foo"),
