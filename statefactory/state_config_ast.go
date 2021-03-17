@@ -13,10 +13,16 @@ type stateConfigAST struct {
 	Types map[string]stateConfigType
 }
 
-func newStateConfigAST() stateConfigAST {
-	return stateConfigAST{
+func newStateConfigAST() *stateConfigAST {
+	return &stateConfigAST{
 		Types: make(map[string]stateConfigType),
 	}
+}
+
+func buildStateConfigASTFrom(stateConfigData map[interface{}]interface{}) *stateConfigAST {
+	return buildRudimentaryStateConfigAST(stateConfigData).
+		fillInReferences().
+		fillInParentalInfo()
 }
 
 type stateConfigType struct {
@@ -45,10 +51,9 @@ type stateConfigField struct {
 // buildRudimentaryStateConfigAST builds the ast structure including all types and fields
 // this needs to happen first so the types in "Parent" and "ValueType" can be referenced
 // in fillInReferences
-func buildRudimentaryStateConfigAST(data map[interface{}]interface{}) stateConfigAST {
+func buildRudimentaryStateConfigAST(stateConfigData map[interface{}]interface{}) *stateConfigAST {
 	ast := newStateConfigAST()
-
-	for key, value := range data {
+	for key, value := range stateConfigData {
 		objectValue := value.(map[interface{}]interface{})
 		typeName := getSring(key)
 
@@ -101,9 +106,10 @@ func (s *stateConfigAST) fillInReferences() *stateConfigAST {
 }
 
 // fills in "IsLeafType" and "isRootType" in each stateConfigField
-func (s *stateConfigAST) fillInParentalInfo() {
+func (s *stateConfigAST) fillInParentalInfo() *stateConfigAST {
 	s.evalRootTypes()
 	s.evalLeafTypes()
+	return s
 }
 
 func (s *stateConfigAST) evalLeafTypes() {

@@ -12,18 +12,57 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
+// pluralizeClient is used to find the singular of field names
+// this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
+// with getting the singular form of a plural, this field:
+// { pieces []piece }
+// can have the coherent adder method of "AddPiece"
 var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
 type stateFactory struct {
-	ast stateConfigAST
+	ast *stateConfigAST
 	buf *bytes.Buffer
 }
 
-func newStateFactory(ast stateConfigAST) *stateFactory {
+// WriteStateMachineFrom writes source code for a given StateConfig
+func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) ([]byte, error) {
+	stateConfigAST := buildStateConfigASTFrom(stateConfigData)
+	s := newStateFactory(stateConfigAST).
+		writeOperationKind().
+		writeEntityKinds().
+		writeIDs().
+		writeState().
+		writeStateMachine().
+		writeGenerateID().
+		writeUpdateState().
+		writeElements().
+		writeAdders().
+		writeCreators().
+		writeDeleters().
+		writeGetters().
+		writeRemovers().
+		writeSetters().
+		writeTree().
+		writeTreeElements().
+		writeAssembleTree().
+		writeAssembleTreeElement().
+		writeDeduplicate().
+		prependPackage()
+
+	err := s.format()
+
+	return s.writtenSourceCode(), err
+}
+
+func newStateFactory(ast *stateConfigAST) *stateFactory {
 	return &stateFactory{
 		ast: ast,
 		buf: &bytes.Buffer{},
 	}
+}
+
+func (s *stateFactory) writtenSourceCode() []byte {
+	return s.buf.Bytes()
 }
 
 func (s *stateFactory) prependPackage() *stateFactory {
@@ -42,6 +81,9 @@ func (s *stateFactory) format() error {
 	return err
 }
 
+// indexOfType is a helper function for finding the index of a given type
+// within the stateConfig. Since golang's templates loop through maps (stateConfigAST is a map)
+// in alphabetical order, this will give a deterministic output within the templating frame
 func indexOfType(configTypes map[string]stateConfigType, currentConfigType stateConfigType) int {
 	var keys []string
 	for k := range configTypes {
@@ -63,6 +105,7 @@ func newTemplateFrom(name, templateString string) *template.Template {
 			Funcs(template.FuncMap{
 				"toTitleCase": strings.Title,
 				"toSingular":  pluralizeClient.Singular,
+				// does not write given string at certain index of configType (determined by alphabetical order of stateConfigAST)
 				"doNotWriteOnIndex": func(configTypes map[string]stateConfigType, currentConfigType stateConfigType, requiredIndex int, toWrite string) string {
 					currentIndex := indexOfType(configTypes, currentConfigType)
 					if requiredIndex < 0 {
@@ -77,6 +120,7 @@ func newTemplateFrom(name, templateString string) *template.Template {
 					}
 					return toWrite
 				},
+				// does only write given string at certain index of configType (determined by alphabetical order of stateConfigAST)
 				"writeOnIndex": func(configTypes map[string]stateConfigType, currentConfigType stateConfigType, requiredIndex int, toWrite string) string {
 					currentIndex := indexOfType(configTypes, currentConfigType)
 					if requiredIndex < 0 {
