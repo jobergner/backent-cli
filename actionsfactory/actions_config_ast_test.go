@@ -1,8 +1,9 @@
 package actionsfactory
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBuildActionsConfigAST(t *testing.T) {
@@ -24,10 +25,10 @@ func TestBuildActionsConfigAST(t *testing.T) {
 
 		actual := buildActionsConfigAST(data)
 		expected := &actionsConfigAST{
-			Actions: map[string]Action{
+			Actions: map[string]action{
 				"makeFoo": {
 					Name: "makeFoo",
-					Params: map[string]ActionParameter{
+					Params: map[string]actionParameter{
 						"entities": {
 							Name:         "entities",
 							TypeLiteral:  "entity",
@@ -50,7 +51,7 @@ func TestBuildActionsConfigAST(t *testing.T) {
 				},
 				"walkBar": {
 					Name: "walkBar",
-					Params: map[string]ActionParameter{
+					Params: map[string]actionParameter{
 						"distance": {
 							Name:         "distance",
 							TypeLiteral:  "float64",
@@ -67,7 +68,7 @@ func TestBuildActionsConfigAST(t *testing.T) {
 				},
 				"interactBaz": {
 					Name: "interactBaz",
-					Params: map[string]ActionParameter{
+					Params: map[string]actionParameter{
 						"target": {
 							Name:         "target",
 							TypeLiteral:  "bool",
