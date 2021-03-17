@@ -2,11 +2,8 @@ package statefactory
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"unicode"
-
-	"testing"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
@@ -21,6 +18,11 @@ func simplifyIfWhitespace(ch rune) rune {
 	return ch
 }
 
+// writing templates can be irritating if you have to be
+// precise with whitespace. this normalization function
+// takes away some of that irritation by removing all consecutive
+// whitespace of a certain kind (newline or everything else) except
+// for one
 func normalizeWhitespace(_str string) string {
 	str := strings.TrimSpace(_str)
 	var b strings.Builder
@@ -78,7 +80,7 @@ GOT:
 ` + actual
 }
 
-func newSimpleASTExample() stateConfigAST {
+func newSimpleASTExample() *stateConfigAST {
 	data := map[interface{}]interface{}{
 		"player": map[interface{}]interface{}{
 			"items":     "[]item",
@@ -112,32 +114,4 @@ func newSimpleASTExample() stateConfigAST {
 	simpleAST.fillInReferences().fillInParentalInfo()
 
 	return simpleAST
-}
-
-func TestStateFactory(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		x := newStateFactory(newSimpleASTExample()).
-			writeOperationKind().
-			writeEntityKinds().
-			writeIDs().
-			writeState().
-			writeStateMachine().
-			writeGenerateID().
-			writeUpdateState().
-			writeElements().
-			writeAdders().
-			writeCreators().
-			writeDeleters().
-			writeGetters().
-			writeRemovers().
-			writeSetters().
-			writeTree().
-			writeTreeElements().
-			writeAssembleTree().
-			writeAssembleTreeElement().
-			writeDeduplicate().
-			prependPackage()
-		x.format()
-		fmt.Println(x.buf.String())
-	})
 }

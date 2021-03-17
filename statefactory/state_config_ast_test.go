@@ -27,7 +27,7 @@ func TestStateConfigAST(t *testing.T) {
 	t.Run("should build a rudimentary stateConfigAST from data", func(t *testing.T) {
 		actual := buildRudimentaryStateConfigAST(data)
 
-		expected := stateConfigAST{
+		expected := &stateConfigAST{
 			Types: map[string]stateConfigType{
 				"house": {
 					Name: "house",
