@@ -19,7 +19,7 @@ func TestStateConfigAST(t *testing.T) {
 			"city":        "string",
 		},
 		"person": map[interface{}]interface{}{
-			"Name": "string",
+			"name": "string",
 			"age":  "int",
 		},
 	}
@@ -72,8 +72,8 @@ func TestStateConfigAST(t *testing.T) {
 				"person": {
 					Name: "person",
 					Fields: map[string]stateConfigField{
-						"Name": {
-							Name:          "Name",
+						"name": {
+							Name:          "name",
 							ValueString:   "string",
 							HasSliceValue: false,
 						},
@@ -122,7 +122,7 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, cityField.ValueType.Name, "string")
 		assert.Equal(t, cityField.ValueType.IsBasicType, true)
 
-		NameField := actual.Types["person"].Fields["Name"]
+		NameField := actual.Types["person"].Fields["name"]
 		assert.Equal(t, NameField.Parent.Name, "person")
 		assert.Equal(t, NameField.ValueType.Name, "string")
 		assert.Equal(t, NameField.ValueType.IsBasicType, true)
