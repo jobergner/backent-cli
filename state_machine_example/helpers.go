@@ -11,8 +11,8 @@ func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped
@@ -29,8 +29,8 @@ func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped
@@ -47,8 +47,8 @@ func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped
@@ -65,8 +65,8 @@ func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped
@@ -83,8 +83,8 @@ func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped
@@ -101,8 +101,8 @@ func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped

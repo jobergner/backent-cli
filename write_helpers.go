@@ -17,8 +17,8 @@ func deduplicate<( toTitleCase .Name )>IDs(a []<( toTitleCase .Name )>ID, b []<(
 		check[val] = true
 	}
 
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 
 	return deduped
