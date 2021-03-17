@@ -1,6 +1,7 @@
 package statefactory
 
 import (
+	"bar-cli/utils"
 	"strings"
 	"testing"
 )
@@ -10,8 +11,8 @@ func TestWriteGetters(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeGetters()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			GetGearScore_StateMachine_func,
 			GetID_GearScore_func,
 			GetLevel_GearScore_func,
@@ -40,7 +41,7 @@ func TestWriteGetters(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

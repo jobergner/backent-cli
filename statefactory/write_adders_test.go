@@ -3,6 +3,7 @@ package statefactory
 import (
 	"strings"
 	"testing"
+	"bar-cli/utils"
 )
 
 func TestWriteAdders(t *testing.T) {
@@ -10,8 +11,8 @@ func TestWriteAdders(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAdders()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			AddItem_Player_func,
 			AddItem_Zone_func,
 			AddPlayer_Zone_func,
@@ -19,7 +20,7 @@ func TestWriteAdders(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

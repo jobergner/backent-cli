@@ -1,6 +1,7 @@
 package statefactory
 
 import (
+	"bar-cli/utils"
 	"strings"
 	"testing"
 )
@@ -10,8 +11,8 @@ func TestWriteCreators(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeCreators()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			CreateGearScore_StateMachine_func,
 			createGearScore_StateMachine_func,
 			CreateItem_StateMachine_func,
@@ -27,7 +28,7 @@ func TestWriteCreators(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

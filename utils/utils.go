@@ -1,6 +1,4 @@
-package actionsfactory
-
-// TODO duplicate!!
+package utils
 
 import (
 	"bytes"
@@ -25,7 +23,7 @@ func simplifyIfWhitespace(ch rune) rune {
 // takes away some of that irritation by removing all consecutive
 // whitespace of a certain kind (newline or everything else) except
 // for one
-func normalizeWhitespace(_str string) string {
+func NormalizeWhitespace(_str string) string {
 	str := strings.TrimSpace(_str)
 	var b strings.Builder
 	b.Grow(len(str))
@@ -49,7 +47,7 @@ func normalizeWhitespace(_str string) string {
 }
 
 // creates diff and makes whitespace visible
-func diff(actual, expected string) string {
+func Diff(actual, expected string) string {
 	dmp := diffmatchpatch.New()
 	diffs := dmp.DiffMain(actual, expected, true)
 
