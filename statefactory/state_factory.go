@@ -46,8 +46,7 @@ func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) ([]byte,
 		writeTreeElements().
 		writeAssembleTree().
 		writeAssembleTreeElement().
-		writeDeduplicate().
-		prependPackage()
+		writeDeduplicate()
 
 	err := s.format()
 
@@ -63,11 +62,6 @@ func newStateFactory(ast *stateConfigAST) *stateFactory {
 
 func (s *stateFactory) writtenSourceCode() []byte {
 	return s.buf.Bytes()
-}
-
-func (s *stateFactory) prependPackage() *stateFactory {
-	s.buf = bytes.NewBufferString("package statemachine\n" + s.buf.String())
-	return s
 }
 
 func (s *stateFactory) format() error {
