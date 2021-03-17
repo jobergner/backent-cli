@@ -25,7 +25,7 @@ type stateFactory struct {
 }
 
 // WriteStateMachineFrom writes source code for a given StateConfig
-func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) ([]byte, error) {
+func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	stateConfigAST := buildStateConfigASTFrom(stateConfigData)
 	s := newStateFactory(stateConfigAST).
 		writeOperationKind().
@@ -49,8 +49,12 @@ func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) ([]byte,
 		writeDeduplicate()
 
 	err := s.format()
+	if err != nil {
+		// unexpected error
+		panic(err)
+	}
 
-	return s.writtenSourceCode(), err
+	return s.writtenSourceCode()
 }
 
 func newStateFactory(ast *stateConfigAST) *stateFactory {

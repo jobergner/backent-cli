@@ -23,6 +23,25 @@ func (s *actionsFactory) writtenSourceCode() []byte {
 	return s.buf.Bytes()
 }
 
+func (s *actionsFactory) writeImport(moduleName string) *actionsFactory {
+	importDecl := ` import (
+	` + moduleName + `/statemachine
+)
+
+`
+	s.buf.WriteString(importDecl)
+	return s
+}
+
+func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName string) []byte {
+	actionsConfigAST := buildActionsConfigAST(actionsConfigData)
+	a := newActionsFactory(actionsConfigAST).
+		writeImport(moduleName).
+		writeActions()
+
+	return a.writtenSourceCode()
+}
+
 // indexOfAction is a helper function for finding the index of a given action
 // within the actionsConfig. Since golang's templates loop through maps (actionsConfigAST is a map)
 // in alphabetical order, this will give a deterministic output within the templating frame
