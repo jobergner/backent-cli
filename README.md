@@ -179,10 +179,8 @@ altering slices within the stateMachine's State or Patch
 - each "register actions" call re-generates the entire thing
 - reads a actions config, which will be validated by validator
 - creates action files based on defined actions (if file already exist log a warning)
----- scrap that
+- assumes statefunction import by reading go.mod file `"module <name>"` and appends it to parameters of action
 - a new server.Start() method will be generated which expects the user defined actions as parameters
-- the "register actions" script will recognize the statemachine parameter by it's types name (not safe but no better alternative)
-- in case of doubt the script will ask the user if the stateMachine parameter is actually correct.
 
 ### TODO
 - rename project

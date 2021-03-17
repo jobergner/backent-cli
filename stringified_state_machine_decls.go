@@ -615,8 +615,8 @@ const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []Ge
 	for _, val := range b {
 		check[val] = true
 	}
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 	return deduped
 }`
@@ -630,8 +630,8 @@ const deduplicateItemIDs_func string = `func deduplicateItemIDs(a []ItemID, b []
 	for _, val := range b {
 		check[val] = true
 	}
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 	return deduped
 }`
@@ -645,8 +645,8 @@ const deduplicatePlayerIDs_func string = `func deduplicatePlayerIDs(a []PlayerID
 	for _, val := range b {
 		check[val] = true
 	}
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 	return deduped
 }`
@@ -660,8 +660,8 @@ const deduplicatePositionIDs_func string = `func deduplicatePositionIDs(a []Posi
 	for _, val := range b {
 		check[val] = true
 	}
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 	return deduped
 }`
@@ -675,8 +675,8 @@ const deduplicateZoneIDs_func string = `func deduplicateZoneIDs(a []ZoneID, b []
 	for _, val := range b {
 		check[val] = true
 	}
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 	return deduped
 }`
@@ -690,8 +690,8 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 	for _, val := range b {
 		check[val] = true
 	}
-	for letter := range check {
-		deduped = append(deduped, letter)
+	for val := range check {
+		deduped = append(deduped, val)
 	}
 	return deduped
 }`
