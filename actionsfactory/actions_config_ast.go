@@ -8,27 +8,27 @@ import (
 var golangBasicTypes = []string{"string", "bool", "int8", "uint8", "byte", "int16", "uint16", "int32", "rune", "uint32", "int64", "uint64", "int", "uint", "uintptr", "float32", "float64", "complex64", "complex128"}
 
 type actionsConfigAST struct {
-	Actions map[string]Action
+	Actions map[string]action
 }
 
 func newActionsConfigAST() *actionsConfigAST {
 	return &actionsConfigAST{
-		Actions: make(map[string]Action),
+		Actions: make(map[string]action),
 	}
 }
 
-type Action struct {
+type action struct {
 	Name   string
-	Params map[string]ActionParameter
+	Params map[string]actionParameter
 }
 
-func newAction() Action {
-	return Action{
-		Params: make(map[string]ActionParameter),
+func newAction() action {
+	return action{
+		Params: make(map[string]actionParameter),
 	}
 }
 
-type ActionParameter struct {
+type actionParameter struct {
 	Name         string
 	TypeLiteral  string
 	IsSliceValue bool
@@ -49,7 +49,7 @@ func buildActionsConfigAST(actionsConfigData map[interface{}]interface{}) *actio
 	return ast
 }
 
-func buildAction(configActionData map[interface{}]interface{}, actionName string) Action {
+func buildAction(configActionData map[interface{}]interface{}, actionName string) action {
 	action := newAction()
 	action.Name = actionName
 
@@ -58,7 +58,7 @@ func buildAction(configActionData map[interface{}]interface{}, actionName string
 		valueString := getSring(value)
 
 		valueType := extractValueType(valueString)
-		actionParam := ActionParameter{
+		actionParam := actionParameter{
 			Name:         paramName,
 			TypeLiteral:  valueType,
 			IsSliceValue: isSliceValue(valueString),
