@@ -2,6 +2,7 @@ package statefactory
 
 import (
 	"strings"
+	"bar-cli/utils"
 	"testing"
 )
 
@@ -10,21 +11,21 @@ func TestWriteAssembling(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTree()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			assembleTree_StateMachine_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes assemble tree element", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTreeElement()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			assembleGearScore_StateMachine_func,
 			assembleItem_StateMachine_func,
 			assemblePlayer_StateMachine_func,
@@ -34,7 +35,7 @@ func TestWriteAssembling(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

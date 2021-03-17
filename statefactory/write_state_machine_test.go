@@ -1,6 +1,7 @@
 package statefactory
 
 import (
+	"bar-cli/utils"
 	"strings"
 	"testing"
 )
@@ -10,54 +11,54 @@ func TestWriteStateMachine(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeOperationKind()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			OperationKind_type,
 			OperationKindDelete_type,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes stateMachine", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeStateMachine()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			StateMachine_type,
 			newStateMachine_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes generateID method", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeGenerateID()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			GenerateID_StateMachine_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes updateState method", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeUpdateState()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			UpdateState_StateMachine_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

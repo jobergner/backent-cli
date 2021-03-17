@@ -1,6 +1,7 @@
 package statefactory
 
 import (
+	"bar-cli/utils"
 	"strings"
 	"testing"
 )
@@ -10,8 +11,8 @@ func TestWriteDeleters(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeDeleters()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			DeleteGearScore_StateMachine_func,
 			deleteGearScore_StateMachine_func,
 			DeleteItem_StateMachine_func,
@@ -27,7 +28,7 @@ func TestWriteDeleters(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

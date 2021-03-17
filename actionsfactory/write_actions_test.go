@@ -1,6 +1,7 @@
 package actionsfactory
 
 import (
+	"bar-cli/utils"
 	"strings"
 	"testing"
 )
@@ -25,15 +26,15 @@ func TestWriteActions(t *testing.T) {
 		ast := buildActionsConfigAST(data)
 		af := newActionsFactory(ast)
 
-		actual := normalizeWhitespace(string(af.writeActions().writtenSourceCode()))
-		expected := normalizeWhitespace(strings.TrimSpace(`
+		actual := utils.NormalizeWhitespace(string(af.writeActions().writtenSourceCode()))
+		expected := utils.NormalizeWhitespace(strings.TrimSpace(`
 func interactBaz(target bool) {}
 func makeFoo(count int, entities []statemachine.Entity, origins []string) {}
 func walkBar(altitude statemachine.Altitude, distance float64) {}
 		`))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }

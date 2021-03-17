@@ -1,6 +1,7 @@
 package statefactory
 
 import (
+	"bar-cli/utils"
 	"strings"
 	"testing"
 )
@@ -10,22 +11,22 @@ func TestWriteState(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeEntityKinds()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			EntityKind_type,
 			EntityKindGearScore_type,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes ids", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeIDs()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			GearScoreID_type,
 			ItemID_type,
 			PlayerID_type,
@@ -35,29 +36,29 @@ func TestWriteState(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeState()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			State_type,
 			newState_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes elements", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeElements()
 
-		actual := normalizeWhitespace(sf.buf.String())
-		expected := normalizeWhitespace(strings.Join([]string{
+		actual := utils.NormalizeWhitespace(sf.buf.String())
+		expected := utils.NormalizeWhitespace(strings.Join([]string{
 			gearScoreCore_type,
 			GearScore_type,
 			itemCore_type,
@@ -73,7 +74,7 @@ func TestWriteState(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(diff(actual, expected))
+			t.Errorf(utils.Diff(actual, expected))
 		}
 	})
 }
