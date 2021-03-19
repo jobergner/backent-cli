@@ -161,6 +161,7 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 	thematicalErrs := thematicalValidation(jointConfigData, true, false)
 	errs = append(errs, thematicalErrs...)
 
+	// deduplicate errors as stateConfigData is being validated twice (ValidateStateConfig, generalValidation)
 	return deduplicateErrs(errs)
 }
 
