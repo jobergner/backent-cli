@@ -7,7 +7,7 @@ import (
 const setterTemplateString string = `
 <( range .Types )><( $Type := . )><( range .Fields )><( if not .HasSliceValue )><( if .ValueType.IsBasicType)>
 func (_e <( toTitleCase $Type.Name )>) Set<( toTitleCase .Name )>(sm *StateMachine, new<( toTitleCase .Name )> <( .ValueType.Name )>) <( toTitleCase $Type.Name )> {
-	e := sm.Get<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
+	e := sm.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
 	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
 		return e
 	}

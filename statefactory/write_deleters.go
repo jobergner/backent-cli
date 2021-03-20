@@ -8,7 +8,7 @@ const deleterTemplateString string = `
 <( range .Types )>
 func (sm *StateMachine) Delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) {
 	<( if not .IsRootType -)>
-		<( .Name )> := sm.Get<( toTitleCase .Name )>(<( .Name )>ID).<( .Name )>
+		<( .Name )> := sm.<( toTitleCase .Name )>(<( .Name )>ID).<( .Name )>
 		if <( .Name )>.HasParent {
 			return
 		}
@@ -16,7 +16,7 @@ func (sm *StateMachine) Delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCa
 	sm.delete<( toTitleCase .Name )>(<( .Name )>ID)
 }
 func (sm *StateMachine) delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) {
-	<( .Name )> := sm.Get<( toTitleCase .Name )>(<( .Name )>ID).<( .Name )>
+	<( .Name )> := sm.<( toTitleCase .Name )>(<( .Name )>ID).<( .Name )>
 	<( .Name )>.OperationKind = OperationKindDelete
 	sm.Patch.<( toTitleCase .Name )>[<( .Name )>.ID] = <( .Name -)>
 	<( $Type := . )>
