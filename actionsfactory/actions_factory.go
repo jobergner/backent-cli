@@ -2,6 +2,9 @@ package actionsfactory
 
 import (
 	"bytes"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"sort"
 	"strings"
 	"text/template"
@@ -40,6 +43,17 @@ func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName 
 		writeActions()
 
 	return a.writtenSourceCode()
+}
+
+func (a *actionsFactory) format() error {
+	ast, err := parser.ParseFile(token.NewFileSet(), "", a.buf.String(), parser.AllErrors)
+	if err != nil {
+		return err
+	}
+
+	a.buf.Reset()
+	err = format.Node(a.buf, token.NewFileSet(), ast)
+	return err
 }
 
 // indexOfAction is a helper function for finding the index of a given action
