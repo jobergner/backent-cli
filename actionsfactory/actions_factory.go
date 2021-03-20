@@ -36,10 +36,12 @@ func (s *actionsFactory) writeImport(moduleName string) *actionsFactory {
 	return s
 }
 
+// WriteActionsFrom writes source code for a given ActionsConfig
 func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName string) []byte {
 	actionsConfigAST := buildActionsConfigAST(actionsConfigData)
 	a := newActionsFactory(actionsConfigAST).
 		writeImport(moduleName).
+		writeStart().
 		writeActions()
 
 	return a.writtenSourceCode()
