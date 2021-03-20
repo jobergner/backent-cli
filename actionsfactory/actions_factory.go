@@ -2,6 +2,7 @@ package actionsfactory
 
 import (
 	"bytes"
+	"fmt"
 	"go/format"
 	"go/parser"
 	"go/token"
@@ -26,25 +27,39 @@ func (s *actionsFactory) writtenSourceCode() []byte {
 	return s.buf.Bytes()
 }
 
-func (s *actionsFactory) writeImport(moduleName string) *actionsFactory {
-	importDecl := ` import (
-	` + moduleName + `/statemachine
-)
+// WriteActionsFrom writes source code for a given ActionsConfig
+// moduleName is the name of the module the statemachine is created for
+// packageName is the name of the package the statemachine is used in
+func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName string, packageName string) []byte {
+	actionsConfigAST := buildActionsConfigAST(actionsConfigData)
+	a := newActionsFactory(actionsConfigAST).
+		writePackageName(packageName).
+		writeImport(moduleName).
+		writeStart().
+		writeActions()
 
+	err := a.format()
+	if err != nil {
+		// unexpected error
+		fmt.Println(string(a.writtenSourceCode()))
+		panic(err)
+	}
+
+	return a.writtenSourceCode()
+}
+
+func (s *actionsFactory) writeImport(moduleName string) *actionsFactory {
+	importDecl := `import (
+	"` + moduleName + `/statemachine"
+)
 `
 	s.buf.WriteString(importDecl)
 	return s
 }
 
-// WriteActionsFrom writes source code for a given ActionsConfig
-func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName string) []byte {
-	actionsConfigAST := buildActionsConfigAST(actionsConfigData)
-	a := newActionsFactory(actionsConfigAST).
-		writeImport(moduleName).
-		writeStart().
-		writeActions()
-
-	return a.writtenSourceCode()
+func (s *actionsFactory) writePackageName(packageName string) *actionsFactory {
+	s.buf.WriteString("package " + packageName + "\n\n")
+	return s
 }
 
 func (a *actionsFactory) format() error {

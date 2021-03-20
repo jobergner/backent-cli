@@ -13,7 +13,7 @@ const actionTemplateString string = `
 	<(- end -)>
 <(- end -)>
 <( range .Actions )><( $Action := . )>
-func <( .Name )>(<( range .Params )><( template "parameter" . )><( doNotWriteOnIndex $Action.Params . -1 ", " )><( end )>) {}
+func <( .Name )>(<( range .Params )><( template "parameter" . )>, <( end )>sm *statemachine.StateMachine) {}
 <(- end -)>
 `
 
