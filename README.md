@@ -50,3 +50,6 @@ Despite the fact that each of these errors would find a place in one of the abov
 <br/>
 
 
+
+TODO:
+- deal with slices of slices (arrays of arrays) (eg. [][]int). they currenlty don't cause an error
