@@ -28,6 +28,7 @@ type stateFactory struct {
 func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	stateConfigAST := buildStateConfigASTFrom(stateConfigData)
 	s := newStateFactory(stateConfigAST).
+		writePackageName().
 		writeOperationKind().
 		writeEntityKinds().
 		writeIDs().
@@ -55,6 +56,11 @@ func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	}
 
 	return s.writtenSourceCode()
+}
+
+func (s *stateFactory) writePackageName() *stateFactory {
+	s.buf.WriteString("package statemachine\n")
+	return s
 }
 
 func newStateFactory(ast *stateConfigAST) *stateFactory {
