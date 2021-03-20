@@ -1,6 +1,6 @@
-package statemachine
+package state
 
-func (sm *StateMachine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
+func (sm *Engine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
 	gearScore, hasUpdated := sm.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
 		return _gearScore{}, false
@@ -15,7 +15,7 @@ func (sm *StateMachine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, 
 	return treeGearScore, true
 }
 
-func (sm *StateMachine) assemblePosition(positionID PositionID) (_position, bool) {
+func (sm *Engine) assemblePosition(positionID PositionID) (_position, bool) {
 	position, hasUpdated := sm.Patch.Position[positionID]
 	if !hasUpdated {
 		return _position{}, false
@@ -30,7 +30,7 @@ func (sm *StateMachine) assemblePosition(positionID PositionID) (_position, bool
 	return treePosition, true
 }
 
-func (sm *StateMachine) assembleItem(itemID ItemID) (_item, bool) {
+func (sm *Engine) assembleItem(itemID ItemID) (_item, bool) {
 	item, hasUpdated := sm.Patch.Item[itemID]
 	if !hasUpdated {
 		item = sm.State.Item[itemID]
@@ -49,7 +49,7 @@ func (sm *StateMachine) assembleItem(itemID ItemID) (_item, bool) {
 	return treeItem, hasUpdated
 }
 
-func (sm *StateMachine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
+func (sm *Engine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
 	zoneItem, hasUpdated := sm.Patch.ZoneItem[zoneItemID]
 	if !hasUpdated {
 		zoneItem = sm.State.ZoneItem[zoneItemID]
@@ -72,7 +72,7 @@ func (sm *StateMachine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool
 
 }
 
-func (sm *StateMachine) assemblePlayer(playerID PlayerID) (_player, bool) {
+func (sm *Engine) assemblePlayer(playerID PlayerID) (_player, bool) {
 	player, hasUpdated := sm.Patch.Player[playerID]
 	if !hasUpdated {
 		player = sm.State.Player[playerID]
@@ -100,7 +100,7 @@ func (sm *StateMachine) assemblePlayer(playerID PlayerID) (_player, bool) {
 	return treePlayer, hasUpdated
 }
 
-func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
+func (sm *Engine) assembleZone(zoneID ZoneID) (_zone, bool) {
 	zone, hasUpdated := sm.Patch.Zone[zoneID]
 	if !hasUpdated {
 		zone = sm.State.Zone[zoneID]
@@ -127,7 +127,7 @@ func (sm *StateMachine) assembleZone(zoneID ZoneID) (_zone, bool) {
 	return treeZone, hasUpdated
 }
 
-func (sm *StateMachine) assembleTree() Tree {
+func (sm *Engine) assembleTree() Tree {
 	tree := newTree()
 	for _, gearScore := range sm.Patch.GearScore {
 		if !gearScore.HasParent {

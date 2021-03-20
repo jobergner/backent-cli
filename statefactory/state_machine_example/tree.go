@@ -1,4 +1,4 @@
-package statemachine
+package state
 
 type Tree struct {
 	GearScore map[GearScoreID]_gearScore `json:"gearScore"`

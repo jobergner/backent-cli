@@ -1,6 +1,6 @@
-package statemachine
+package state
 
-func (_e Zone) AddPlayer(sm *StateMachine) Player {
+func (_e Zone) AddPlayer(sm *Engine) Player {
 	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return Player{playerCore{OperationKind: OperationKindDelete}}
@@ -12,7 +12,7 @@ func (_e Zone) AddPlayer(sm *StateMachine) Player {
 	return player
 }
 
-func (_e Zone) AddItem(sm *StateMachine) ZoneItem {
+func (_e Zone) AddItem(sm *Engine) ZoneItem {
 	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{zoneItemCore{OperationKind: OperationKindDelete}}
@@ -24,7 +24,7 @@ func (_e Zone) AddItem(sm *StateMachine) ZoneItem {
 	return zoneItem
 }
 
-func (_e Zone) AddTags(sm *StateMachine, tags ...string) {
+func (_e Zone) AddTags(sm *Engine, tags ...string) {
 	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return
@@ -34,7 +34,7 @@ func (_e Zone) AddTags(sm *StateMachine, tags ...string) {
 	sm.Patch.Zone[e.zone.ID] = e.zone
 }
 
-func (_e Player) AddItem(sm *StateMachine) Item {
+func (_e Player) AddItem(sm *Engine) Item {
 	e := sm.Player(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
 		return Item{itemCore{OperationKind: OperationKindDelete}}

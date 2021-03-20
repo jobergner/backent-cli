@@ -1,4 +1,4 @@
-package statemachine
+package state
 
 type OperationKind string
 
@@ -7,27 +7,27 @@ const (
 	OperationKindUpdate = "UPDATE"
 )
 
-type StateMachine struct {
+type Engine struct {
 	State State
 	Patch State
 	IDgen int
 }
 
-func newStateMachine() *StateMachine {
-	return &StateMachine{
+func newStateMachine() *Engine {
+	return &Engine{
 		State: newState(),
 		Patch: newState(),
 		IDgen: 1,
 	}
 }
 
-func (sm *StateMachine) GenerateID() int {
+func (sm *Engine) GenerateID() int {
 	newID := sm.IDgen
 	sm.IDgen = sm.IDgen + 1
 	return newID
 }
 
-func (sm *StateMachine) UpdateState() {
+func (sm *Engine) UpdateState() {
 	for _, gearScore := range sm.Patch.GearScore {
 		if gearScore.OperationKind == OperationKindDelete {
 			delete(sm.State.GearScore, gearScore.ID)

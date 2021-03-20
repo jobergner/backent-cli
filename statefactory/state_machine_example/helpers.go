@@ -1,4 +1,4 @@
-package statemachine
+package state
 
 func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
 

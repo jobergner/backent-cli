@@ -1,6 +1,6 @@
-package statemachine
+package state
 
-func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone {
+func (_e Zone) RemovePlayers(sm *Engine, playersToRemove ...PlayerID) Zone {
 	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
@@ -29,7 +29,7 @@ func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone
 	return e
 }
 
-func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
+func (_e Zone) RemoveItems(sm *Engine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
@@ -58,7 +58,7 @@ func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zo
 	return e
 }
 
-func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
+func (_e Player) RemoveItems(sm *Engine, itemsToRemove ...ItemID) Player {
 	e := sm.Player(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
 		return e
@@ -87,7 +87,7 @@ func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
 	return e
 }
 
-func (_e Zone) RemoveTags(sm *StateMachine, tagsToRemove ...string) Zone {
+func (_e Zone) RemoveTags(sm *Engine, tagsToRemove ...string) Zone {
 	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
