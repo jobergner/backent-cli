@@ -183,5 +183,7 @@ altering slices within the stateMachine's State or Patch
 - a new server.Start() method will be generated which expects the user defined actions as parameters
 
 ### TODO
+- the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - rename project
 - figure out if sync.Pool is helpful for managing tree structs (cause theyre very big)
+
