@@ -18,22 +18,22 @@ func BenchmarkStateMachine(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
-		players := zone.GetPlayers(sm)
-		zone.RemovePlayers(sm, players[rand.Intn(len(players))].GetID(sm))
+		players := zone.Players(sm)
+		zone.RemovePlayers(sm, players[rand.Intn(len(players))].ID(sm))
 		for _, player := range players {
-			playerGearScore := player.GetGearScore(sm)
-			playerGearScore.SetLevel(sm, playerGearScore.GetLevel(sm)+1)
-			items := player.GetItems(sm)
-			player.RemoveItems(sm, items[rand.Intn(len(items))].GetID(sm))
+			playerGearScore := player.GearScore(sm)
+			playerGearScore.SetLevel(sm, playerGearScore.Level(sm)+1)
+			items := player.Items(sm)
+			player.RemoveItems(sm, items[rand.Intn(len(items))].ID(sm))
 			player.AddItem(sm)
 		}
 		zone.AddPlayer(sm).AddItem(sm)
-		items := zone.GetItems(sm)
-		zone.RemoveItems(sm, items[rand.Intn(len(items))].GetID(sm))
-		zoneItems := zone.GetItems(sm)
+		items := zone.Items(sm)
+		zone.RemoveItems(sm, items[rand.Intn(len(items))].ID(sm))
+		zoneItems := zone.Items(sm)
 		for _, zoneItem := range zoneItems {
-			zoneItemItemGearScore := zoneItem.GetItem(sm).GetGearScore(sm)
-			zoneItemItemGearScore.SetLevel(sm, zoneItemItemGearScore.GetLevel(sm)+1)
+			zoneItemItemGearScore := zoneItem.Item(sm).GearScore(sm)
+			zoneItemItemGearScore.SetLevel(sm, zoneItemItemGearScore.Level(sm)+1)
 		}
 		zone.AddItem(sm)
 		sm.UpdateState()

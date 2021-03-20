@@ -1,6 +1,6 @@
 package statemachine
 
-func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
+func (sm *StateMachine) Player(playerID PlayerID) Player {
 	patchingPlayer, ok := sm.Patch.Player[playerID]
 	if ok {
 		return Player{patchingPlayer}
@@ -9,30 +9,30 @@ func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
 	return Player{currentPlayer}
 }
 
-func (_e Player) GetID(sm *StateMachine) PlayerID {
+func (_e Player) ID(sm *StateMachine) PlayerID {
 	return _e.player.ID
 }
 
-func (_e Player) GetItems(sm *StateMachine) []Item {
-	e := sm.GetPlayer(_e.player.ID)
+func (_e Player) Items(sm *StateMachine) []Item {
+	e := sm.Player(_e.player.ID)
 	var items []Item
 	for _, itemID := range e.player.Items {
-		items = append(items, sm.GetItem(itemID))
+		items = append(items, sm.Item(itemID))
 	}
 	return items
 }
 
-func (_e Player) GetGearScore(sm *StateMachine) GearScore {
-	e := sm.GetPlayer(_e.player.ID)
-	return sm.GetGearScore(e.player.GearScore)
+func (_e Player) GearScore(sm *StateMachine) GearScore {
+	e := sm.Player(_e.player.ID)
+	return sm.GearScore(e.player.GearScore)
 }
 
-func (_e Player) GetPosition(sm *StateMachine) Position {
-	e := sm.GetPlayer(_e.player.ID)
-	return sm.GetPosition(e.player.Position)
+func (_e Player) Position(sm *StateMachine) Position {
+	e := sm.Player(_e.player.ID)
+	return sm.Position(e.player.Position)
 }
 
-func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
+func (sm *StateMachine) GearScore(gearScoreID GearScoreID) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[gearScoreID]
 	if ok {
 		return GearScore{patchingGearScore}
@@ -41,21 +41,21 @@ func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
 	return GearScore{currentGearScore}
 }
 
-func (_e GearScore) GetID(sm *StateMachine) GearScoreID {
+func (_e GearScore) ID(sm *StateMachine) GearScoreID {
 	return _e.gearScore.ID
 }
 
-func (_e GearScore) GetLevel(sm *StateMachine) int {
-	e := sm.GetGearScore(_e.gearScore.ID)
+func (_e GearScore) Level(sm *StateMachine) int {
+	e := sm.GearScore(_e.gearScore.ID)
 	return e.gearScore.Level
 }
 
-func (_e GearScore) GetScore(sm *StateMachine) int {
-	e := sm.GetGearScore(_e.gearScore.ID)
+func (_e GearScore) Score(sm *StateMachine) int {
+	e := sm.GearScore(_e.gearScore.ID)
 	return e.gearScore.Score
 }
 
-func (sm *StateMachine) GetItem(itemID ItemID) Item {
+func (sm *StateMachine) Item(itemID ItemID) Item {
 	patchingItem, ok := sm.Patch.Item[itemID]
 	if ok {
 		return Item{patchingItem}
@@ -64,16 +64,16 @@ func (sm *StateMachine) GetItem(itemID ItemID) Item {
 	return Item{currentItem}
 }
 
-func (_e Item) GetID(sm *StateMachine) ItemID {
+func (_e Item) ID(sm *StateMachine) ItemID {
 	return _e.item.ID
 }
 
-func (_e Item) GetGearScore(sm *StateMachine) GearScore {
-	e := sm.GetItem(_e.item.ID)
-	return sm.GetGearScore(e.item.GearScore)
+func (_e Item) GearScore(sm *StateMachine) GearScore {
+	e := sm.Item(_e.item.ID)
+	return sm.GearScore(e.item.GearScore)
 }
 
-func (sm *StateMachine) GetPosition(positionID PositionID) Position {
+func (sm *StateMachine) Position(positionID PositionID) Position {
 	patchingPosition, ok := sm.Patch.Position[positionID]
 	if ok {
 		return Position{patchingPosition}
@@ -82,21 +82,21 @@ func (sm *StateMachine) GetPosition(positionID PositionID) Position {
 	return Position{currentPosition}
 }
 
-func (_e Position) GetID(sm *StateMachine) PositionID {
+func (_e Position) ID(sm *StateMachine) PositionID {
 	return _e.position.ID
 }
 
-func (_e Position) GetX(sm *StateMachine) float64 {
-	e := sm.GetPosition(_e.position.ID)
+func (_e Position) X(sm *StateMachine) float64 {
+	e := sm.Position(_e.position.ID)
 	return e.position.X
 }
 
-func (_e Position) GetY(sm *StateMachine) float64 {
-	e := sm.GetPosition(_e.position.ID)
+func (_e Position) Y(sm *StateMachine) float64 {
+	e := sm.Position(_e.position.ID)
 	return e.position.Y
 }
 
-func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
+func (sm *StateMachine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	patchingZoneItem, ok := sm.Patch.ZoneItem[zoneItemID]
 	if ok {
 		return ZoneItem{patchingZoneItem}
@@ -105,21 +105,21 @@ func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	return ZoneItem{currentZoneItem}
 }
 
-func (_e ZoneItem) GetID(sm *StateMachine) ZoneItemID {
+func (_e ZoneItem) ID(sm *StateMachine) ZoneItemID {
 	return _e.zoneItem.ID
 }
 
-func (_e ZoneItem) GetPosition(sm *StateMachine) Position {
-	e := sm.GetZoneItem(_e.zoneItem.ID)
-	return sm.GetPosition(e.zoneItem.Position)
+func (_e ZoneItem) Position(sm *StateMachine) Position {
+	e := sm.ZoneItem(_e.zoneItem.ID)
+	return sm.Position(e.zoneItem.Position)
 }
 
-func (_e ZoneItem) GetItem(sm *StateMachine) Item {
-	e := sm.GetZoneItem(_e.zoneItem.ID)
-	return sm.GetItem(e.zoneItem.Item)
+func (_e ZoneItem) Item(sm *StateMachine) Item {
+	e := sm.ZoneItem(_e.zoneItem.ID)
+	return sm.Item(e.zoneItem.Item)
 }
 
-func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
+func (sm *StateMachine) Zone(zoneID ZoneID) Zone {
 	patchingZone, ok := sm.Patch.Zone[zoneID]
 	if ok {
 		return Zone{patchingZone}
@@ -128,30 +128,30 @@ func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
 	return Zone{currentZone}
 }
 
-func (_e Zone) GetID(sm *StateMachine) ZoneID {
+func (_e Zone) ID(sm *StateMachine) ZoneID {
 	return _e.zone.ID
 }
 
-func (_e Zone) GetPlayers(sm *StateMachine) []Player {
-	e := sm.GetZone(_e.zone.ID)
+func (_e Zone) Players(sm *StateMachine) []Player {
+	e := sm.Zone(_e.zone.ID)
 	var players []Player
 	for _, playerID := range e.zone.Players {
-		players = append(players, sm.GetPlayer(playerID))
+		players = append(players, sm.Player(playerID))
 	}
 	return players
 }
 
-func (_e Zone) GetItems(sm *StateMachine) []ZoneItem {
-	e := sm.GetZone(_e.zone.ID)
+func (_e Zone) Items(sm *StateMachine) []ZoneItem {
+	e := sm.Zone(_e.zone.ID)
 	var items []ZoneItem
 	for _, zoneItemID := range e.zone.Items {
-		items = append(items, sm.GetZoneItem(zoneItemID))
+		items = append(items, sm.ZoneItem(zoneItemID))
 	}
 	return items
 }
 
-func (_e Zone) GetTags(sm *StateMachine) []string {
-	e := sm.GetZone(_e.zone.ID)
+func (_e Zone) Tags(sm *StateMachine) []string {
+	e := sm.Zone(_e.zone.ID)
 	var tags []string
 	for _, element := range e.zone.Tags {
 		tags = append(tags, element)
