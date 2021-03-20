@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func BenchmarkStateMachine(b *testing.B) {
-	sm := newStateMachine()
+func BenchmarkEngine(b *testing.B) {
+	sm := newEngine()
 	zone := sm.CreateZone()
 	for i := 0; i < 10; i++ {
 		player := zone.AddPlayer(sm)

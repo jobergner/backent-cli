@@ -13,7 +13,7 @@ type Engine struct {
 	IDgen int
 }
 
-func newStateMachine() *Engine {
+func newEngine() *Engine {
 	return &Engine{
 		State: newState(),
 		Patch: newState(),
