@@ -1,10 +1,10 @@
-package statemachine
+package state
 
-func (sm *StateMachine) CreateGearScore() GearScore {
+func (sm *Engine) CreateGearScore() GearScore {
 	return sm.createGearScore(false)
 }
 
-func (sm *StateMachine) createGearScore(hasParent bool) GearScore {
+func (sm *Engine) createGearScore(hasParent bool) GearScore {
 	var e gearScoreCore
 	e.ID = GearScoreID(sm.GenerateID())
 	e.HasParent = hasParent
@@ -13,11 +13,11 @@ func (sm *StateMachine) createGearScore(hasParent bool) GearScore {
 	return GearScore{gearScore: e}
 }
 
-func (sm *StateMachine) CreatePosition() Position {
+func (sm *Engine) CreatePosition() Position {
 	return sm.createPosition(false)
 }
 
-func (sm *StateMachine) createPosition(hasParent bool) Position {
+func (sm *Engine) createPosition(hasParent bool) Position {
 	var e positionCore
 	e.ID = PositionID(sm.GenerateID())
 	e.HasParent = hasParent
@@ -26,11 +26,11 @@ func (sm *StateMachine) createPosition(hasParent bool) Position {
 	return Position{position: e}
 }
 
-func (sm *StateMachine) CreateItem() Item {
+func (sm *Engine) CreateItem() Item {
 	return sm.createItem(false)
 }
 
-func (sm *StateMachine) createItem(hasParent bool) Item {
+func (sm *Engine) createItem(hasParent bool) Item {
 	var e itemCore
 	e.ID = ItemID(sm.GenerateID())
 	e.HasParent = hasParent
@@ -41,11 +41,11 @@ func (sm *StateMachine) createItem(hasParent bool) Item {
 	return Item{item: e}
 }
 
-func (sm *StateMachine) CreateZoneItem() ZoneItem {
+func (sm *Engine) CreateZoneItem() ZoneItem {
 	return sm.createZoneItem(false)
 }
 
-func (sm *StateMachine) createZoneItem(hasParent bool) ZoneItem {
+func (sm *Engine) createZoneItem(hasParent bool) ZoneItem {
 	var e zoneItemCore
 	e.ID = ZoneItemID(sm.GenerateID())
 	e.HasParent = hasParent
@@ -58,11 +58,11 @@ func (sm *StateMachine) createZoneItem(hasParent bool) ZoneItem {
 	return ZoneItem{zoneItem: e}
 }
 
-func (sm *StateMachine) CreatePlayer() Player {
+func (sm *Engine) CreatePlayer() Player {
 	return sm.createPlayer(false)
 }
 
-func (sm *StateMachine) createPlayer(hasParent bool) Player {
+func (sm *Engine) createPlayer(hasParent bool) Player {
 	var e playerCore
 	e.ID = PlayerID(sm.GenerateID())
 	e.HasParent = hasParent
@@ -75,11 +75,11 @@ func (sm *StateMachine) createPlayer(hasParent bool) Player {
 	return Player{player: e}
 }
 
-func (sm *StateMachine) CreateZone() Zone {
+func (sm *Engine) CreateZone() Zone {
 	return sm.createZone()
 }
 
-func (sm *StateMachine) createZone() Zone {
+func (sm *Engine) createZone() Zone {
 	var e zoneCore
 	e.ID = ZoneID(sm.GenerateID())
 	e.OperationKind = OperationKindUpdate

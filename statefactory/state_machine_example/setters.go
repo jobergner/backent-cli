@@ -1,6 +1,6 @@
-package statemachine
+package state
 
-func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
+func (_e GearScore) SetLevel(sm *Engine, newLevel int) GearScore {
 	e := sm.GearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
@@ -11,7 +11,7 @@ func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
 	return e
 }
 
-func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
+func (_e GearScore) SetScore(sm *Engine, newScore int) GearScore {
 	e := sm.GearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
@@ -22,7 +22,7 @@ func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
 	return e
 }
 
-func (_e Position) SetX(sm *StateMachine, newX float64) Position {
+func (_e Position) SetX(sm *Engine, newX float64) Position {
 	e := sm.Position(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
@@ -33,7 +33,7 @@ func (_e Position) SetX(sm *StateMachine, newX float64) Position {
 	return e
 }
 
-func (_e Position) SetY(sm *StateMachine, newY float64) Position {
+func (_e Position) SetY(sm *Engine, newY float64) Position {
 	e := sm.Position(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e

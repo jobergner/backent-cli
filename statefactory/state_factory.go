@@ -59,7 +59,7 @@ func WriteStateMachineFrom(stateConfigData map[interface{}]interface{}) []byte {
 }
 
 func (s *stateFactory) writePackageName() *stateFactory {
-	s.buf.WriteString("package statemachine\n")
+	s.buf.WriteString("package state\n")
 	return s
 }
 
