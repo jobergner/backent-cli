@@ -13,7 +13,7 @@ func (_e <( toTitleCase $Type.Name )>) Add
 	<( .Name | toSingular | toTitleCase )>
 <(- end -)>
 (sm *StateMachine<(if .ValueType.IsBasicType )>, <( .Name)> ...<( .ValueType.Name )><( end )>) <( if not .ValueType.IsBasicType )><( toTitleCase .ValueType.Name )><( end )> {
-	e := sm.Get<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
+	e := sm.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
 	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
 		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{<( .ValueType.Name )>Core{OperationKind: OperationKindDelete}}<( end )>
 	}

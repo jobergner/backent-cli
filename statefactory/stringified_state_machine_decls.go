@@ -3,7 +3,7 @@
 package statefactory
 
 const AddPlayer_Zone_func string = `func (_e Zone) AddPlayer(sm *StateMachine) Player {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return Player{playerCore{OperationKind: OperationKindDelete}}
 	}
@@ -15,7 +15,7 @@ const AddPlayer_Zone_func string = `func (_e Zone) AddPlayer(sm *StateMachine) P
 }`
 
 const AddItem_Zone_func string = `func (_e Zone) AddItem(sm *StateMachine) ZoneItem {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{zoneItemCore{OperationKind: OperationKindDelete}}
 	}
@@ -27,7 +27,7 @@ const AddItem_Zone_func string = `func (_e Zone) AddItem(sm *StateMachine) ZoneI
 }`
 
 const AddTags_Zone_func string = `func (_e Zone) AddTags(sm *StateMachine, tags ...string) {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return
 	}
@@ -37,7 +37,7 @@ const AddTags_Zone_func string = `func (_e Zone) AddTags(sm *StateMachine, tags 
 }`
 
 const AddItem_Player_func string = `func (_e Player) AddItem(sm *StateMachine) Item {
-	e := sm.GetPlayer(_e.player.ID)
+	e := sm.Player(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
 		return Item{itemCore{OperationKind: OperationKindDelete}}
 	}
@@ -354,7 +354,7 @@ const createZone_StateMachine_func string = `func (sm *StateMachine) createZone(
 }`
 
 const DeletePlayer_StateMachine_func string = `func (sm *StateMachine) DeletePlayer(playerID PlayerID) {
-	player := sm.GetPlayer(playerID).player
+	player := sm.Player(playerID).player
 	if player.HasParent {
 		return
 	}
@@ -362,7 +362,7 @@ const DeletePlayer_StateMachine_func string = `func (sm *StateMachine) DeletePla
 }`
 
 const deletePlayer_StateMachine_func string = `func (sm *StateMachine) deletePlayer(playerID PlayerID) {
-	player := sm.GetPlayer(playerID).player
+	player := sm.Player(playerID).player
 	player.OperationKind = OperationKindDelete
 	sm.Patch.Player[player.ID] = player
 	sm.deleteGearScore(player.GearScore)
@@ -373,7 +373,7 @@ const deletePlayer_StateMachine_func string = `func (sm *StateMachine) deletePla
 }`
 
 const DeleteGearScore_StateMachine_func string = `func (sm *StateMachine) DeleteGearScore(gearScoreID GearScoreID) {
-	gearScore := sm.GetGearScore(gearScoreID).gearScore
+	gearScore := sm.GearScore(gearScoreID).gearScore
 	if gearScore.HasParent {
 		return
 	}
@@ -381,13 +381,13 @@ const DeleteGearScore_StateMachine_func string = `func (sm *StateMachine) Delete
 }`
 
 const deleteGearScore_StateMachine_func string = `func (sm *StateMachine) deleteGearScore(gearScoreID GearScoreID) {
-	gearScore := sm.GetGearScore(gearScoreID).gearScore
+	gearScore := sm.GearScore(gearScoreID).gearScore
 	gearScore.OperationKind = OperationKindDelete
 	sm.Patch.GearScore[gearScore.ID] = gearScore
 }`
 
 const DeletePosition_StateMachine_func string = `func (sm *StateMachine) DeletePosition(positionID PositionID) {
-	position := sm.GetPosition(positionID).position
+	position := sm.Position(positionID).position
 	if position.HasParent {
 		return
 	}
@@ -395,13 +395,13 @@ const DeletePosition_StateMachine_func string = `func (sm *StateMachine) DeleteP
 }`
 
 const deletePosition_StateMachine_func string = `func (sm *StateMachine) deletePosition(positionID PositionID) {
-	position := sm.GetPosition(positionID).position
+	position := sm.Position(positionID).position
 	position.OperationKind = OperationKindDelete
 	sm.Patch.Position[position.ID] = position
 }`
 
 const DeleteItem_StateMachine_func string = `func (sm *StateMachine) DeleteItem(itemID ItemID) {
-	item := sm.GetItem(itemID).item
+	item := sm.Item(itemID).item
 	if item.HasParent {
 		return
 	}
@@ -409,14 +409,14 @@ const DeleteItem_StateMachine_func string = `func (sm *StateMachine) DeleteItem(
 }`
 
 const deleteItem_StateMachine_func string = `func (sm *StateMachine) deleteItem(itemID ItemID) {
-	item := sm.GetItem(itemID).item
+	item := sm.Item(itemID).item
 	item.OperationKind = OperationKindDelete
 	sm.Patch.Item[item.ID] = item
 	sm.deleteGearScore(item.GearScore)
 }`
 
 const DeleteZoneItem_StateMachine_func string = `func (sm *StateMachine) DeleteZoneItem(zoneItemID ZoneItemID) {
-	zoneItem := sm.GetZoneItem(zoneItemID).zoneItem
+	zoneItem := sm.ZoneItem(zoneItemID).zoneItem
 	if zoneItem.HasParent {
 		return
 	}
@@ -424,7 +424,7 @@ const DeleteZoneItem_StateMachine_func string = `func (sm *StateMachine) DeleteZ
 }`
 
 const deleteZoneItem_StateMachine_func string = `func (sm *StateMachine) deleteZoneItem(zoneItemID ZoneItemID) {
-	zoneItem := sm.GetZoneItem(zoneItemID).zoneItem
+	zoneItem := sm.ZoneItem(zoneItemID).zoneItem
 	zoneItem.OperationKind = OperationKindDelete
 	sm.Patch.ZoneItem[zoneItem.ID] = zoneItem
 	sm.deleteItem(zoneItem.Item)
@@ -436,7 +436,7 @@ const DeleteZone_StateMachine_func string = `func (sm *StateMachine) DeleteZone(
 }`
 
 const deleteZone_StateMachine_func string = `func (sm *StateMachine) deleteZone(zoneID ZoneID) {
-	zone := sm.GetZone(zoneID).zone
+	zone := sm.Zone(zoneID).zone
 	zone.OperationKind = OperationKindDelete
 	sm.Patch.Zone[zone.ID] = zone
 	for _, zoneItemID := range zone.Items {
@@ -447,7 +447,7 @@ const deleteZone_StateMachine_func string = `func (sm *StateMachine) deleteZone(
 	}
 }`
 
-const GetPlayer_StateMachine_func string = `func (sm *StateMachine) GetPlayer(playerID PlayerID) Player {
+const Player_StateMachine_func string = `func (sm *StateMachine) Player(playerID PlayerID) Player {
 	patchingPlayer, ok := sm.Patch.Player[playerID]
 	if ok {
 		return Player{patchingPlayer}
@@ -456,30 +456,30 @@ const GetPlayer_StateMachine_func string = `func (sm *StateMachine) GetPlayer(pl
 	return Player{currentPlayer}
 }`
 
-const GetID_Player_func string = `func (_e Player) GetID(sm *StateMachine) PlayerID {
+const ID_Player_func string = `func (_e Player) ID(sm *StateMachine) PlayerID {
 	return _e.player.ID
 }`
 
-const GetItems_Player_func string = `func (_e Player) GetItems(sm *StateMachine) []Item {
-	e := sm.GetPlayer(_e.player.ID)
+const Items_Player_func string = `func (_e Player) Items(sm *StateMachine) []Item {
+	e := sm.Player(_e.player.ID)
 	var items []Item
 	for _, itemID := range e.player.Items {
-		items = append(items, sm.GetItem(itemID))
+		items = append(items, sm.Item(itemID))
 	}
 	return items
 }`
 
-const GetGearScore_Player_func string = `func (_e Player) GetGearScore(sm *StateMachine) GearScore {
-	e := sm.GetPlayer(_e.player.ID)
-	return sm.GetGearScore(e.player.GearScore)
+const GearScore_Player_func string = `func (_e Player) GearScore(sm *StateMachine) GearScore {
+	e := sm.Player(_e.player.ID)
+	return sm.GearScore(e.player.GearScore)
 }`
 
-const GetPosition_Player_func string = `func (_e Player) GetPosition(sm *StateMachine) Position {
-	e := sm.GetPlayer(_e.player.ID)
-	return sm.GetPosition(e.player.Position)
+const Position_Player_func string = `func (_e Player) Position(sm *StateMachine) Position {
+	e := sm.Player(_e.player.ID)
+	return sm.Position(e.player.Position)
 }`
 
-const GetGearScore_StateMachine_func string = `func (sm *StateMachine) GetGearScore(gearScoreID GearScoreID) GearScore {
+const GearScore_StateMachine_func string = `func (sm *StateMachine) GearScore(gearScoreID GearScoreID) GearScore {
 	patchingGearScore, ok := sm.Patch.GearScore[gearScoreID]
 	if ok {
 		return GearScore{patchingGearScore}
@@ -488,21 +488,21 @@ const GetGearScore_StateMachine_func string = `func (sm *StateMachine) GetGearSc
 	return GearScore{currentGearScore}
 }`
 
-const GetID_GearScore_func string = `func (_e GearScore) GetID(sm *StateMachine) GearScoreID {
+const ID_GearScore_func string = `func (_e GearScore) ID(sm *StateMachine) GearScoreID {
 	return _e.gearScore.ID
 }`
 
-const GetLevel_GearScore_func string = `func (_e GearScore) GetLevel(sm *StateMachine) int {
-	e := sm.GetGearScore(_e.gearScore.ID)
+const Level_GearScore_func string = `func (_e GearScore) Level(sm *StateMachine) int {
+	e := sm.GearScore(_e.gearScore.ID)
 	return e.gearScore.Level
 }`
 
-const GetScore_GearScore_func string = `func (_e GearScore) GetScore(sm *StateMachine) int {
-	e := sm.GetGearScore(_e.gearScore.ID)
+const Score_GearScore_func string = `func (_e GearScore) Score(sm *StateMachine) int {
+	e := sm.GearScore(_e.gearScore.ID)
 	return e.gearScore.Score
 }`
 
-const GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem(itemID ItemID) Item {
+const Item_StateMachine_func string = `func (sm *StateMachine) Item(itemID ItemID) Item {
 	patchingItem, ok := sm.Patch.Item[itemID]
 	if ok {
 		return Item{patchingItem}
@@ -511,16 +511,16 @@ const GetItem_StateMachine_func string = `func (sm *StateMachine) GetItem(itemID
 	return Item{currentItem}
 }`
 
-const GetID_Item_func string = `func (_e Item) GetID(sm *StateMachine) ItemID {
+const ID_Item_func string = `func (_e Item) ID(sm *StateMachine) ItemID {
 	return _e.item.ID
 }`
 
-const GetGearScore_Item_func string = `func (_e Item) GetGearScore(sm *StateMachine) GearScore {
-	e := sm.GetItem(_e.item.ID)
-	return sm.GetGearScore(e.item.GearScore)
+const GearScore_Item_func string = `func (_e Item) GearScore(sm *StateMachine) GearScore {
+	e := sm.Item(_e.item.ID)
+	return sm.GearScore(e.item.GearScore)
 }`
 
-const GetPosition_StateMachine_func string = `func (sm *StateMachine) GetPosition(positionID PositionID) Position {
+const Position_StateMachine_func string = `func (sm *StateMachine) Position(positionID PositionID) Position {
 	patchingPosition, ok := sm.Patch.Position[positionID]
 	if ok {
 		return Position{patchingPosition}
@@ -529,21 +529,21 @@ const GetPosition_StateMachine_func string = `func (sm *StateMachine) GetPositio
 	return Position{currentPosition}
 }`
 
-const GetID_Position_func string = `func (_e Position) GetID(sm *StateMachine) PositionID {
+const ID_Position_func string = `func (_e Position) ID(sm *StateMachine) PositionID {
 	return _e.position.ID
 }`
 
-const GetX_Position_func string = `func (_e Position) GetX(sm *StateMachine) float64 {
-	e := sm.GetPosition(_e.position.ID)
+const X_Position_func string = `func (_e Position) X(sm *StateMachine) float64 {
+	e := sm.Position(_e.position.ID)
 	return e.position.X
 }`
 
-const GetY_Position_func string = `func (_e Position) GetY(sm *StateMachine) float64 {
-	e := sm.GetPosition(_e.position.ID)
+const Y_Position_func string = `func (_e Position) Y(sm *StateMachine) float64 {
+	e := sm.Position(_e.position.ID)
 	return e.position.Y
 }`
 
-const GetZoneItem_StateMachine_func string = `func (sm *StateMachine) GetZoneItem(zoneItemID ZoneItemID) ZoneItem {
+const ZoneItem_StateMachine_func string = `func (sm *StateMachine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	patchingZoneItem, ok := sm.Patch.ZoneItem[zoneItemID]
 	if ok {
 		return ZoneItem{patchingZoneItem}
@@ -552,21 +552,21 @@ const GetZoneItem_StateMachine_func string = `func (sm *StateMachine) GetZoneIte
 	return ZoneItem{currentZoneItem}
 }`
 
-const GetID_ZoneItem_func string = `func (_e ZoneItem) GetID(sm *StateMachine) ZoneItemID {
+const ID_ZoneItem_func string = `func (_e ZoneItem) ID(sm *StateMachine) ZoneItemID {
 	return _e.zoneItem.ID
 }`
 
-const GetPosition_ZoneItem_func string = `func (_e ZoneItem) GetPosition(sm *StateMachine) Position {
-	e := sm.GetZoneItem(_e.zoneItem.ID)
-	return sm.GetPosition(e.zoneItem.Position)
+const Position_ZoneItem_func string = `func (_e ZoneItem) Position(sm *StateMachine) Position {
+	e := sm.ZoneItem(_e.zoneItem.ID)
+	return sm.Position(e.zoneItem.Position)
 }`
 
-const GetItem_ZoneItem_func string = `func (_e ZoneItem) GetItem(sm *StateMachine) Item {
-	e := sm.GetZoneItem(_e.zoneItem.ID)
-	return sm.GetItem(e.zoneItem.Item)
+const Item_ZoneItem_func string = `func (_e ZoneItem) Item(sm *StateMachine) Item {
+	e := sm.ZoneItem(_e.zoneItem.ID)
+	return sm.Item(e.zoneItem.Item)
 }`
 
-const GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone(zoneID ZoneID) Zone {
+const Zone_StateMachine_func string = `func (sm *StateMachine) Zone(zoneID ZoneID) Zone {
 	patchingZone, ok := sm.Patch.Zone[zoneID]
 	if ok {
 		return Zone{patchingZone}
@@ -575,30 +575,30 @@ const GetZone_StateMachine_func string = `func (sm *StateMachine) GetZone(zoneID
 	return Zone{currentZone}
 }`
 
-const GetID_Zone_func string = `func (_e Zone) GetID(sm *StateMachine) ZoneID {
+const ID_Zone_func string = `func (_e Zone) ID(sm *StateMachine) ZoneID {
 	return _e.zone.ID
 }`
 
-const GetPlayers_Zone_func string = `func (_e Zone) GetPlayers(sm *StateMachine) []Player {
-	e := sm.GetZone(_e.zone.ID)
+const Players_Zone_func string = `func (_e Zone) Players(sm *StateMachine) []Player {
+	e := sm.Zone(_e.zone.ID)
 	var players []Player
 	for _, playerID := range e.zone.Players {
-		players = append(players, sm.GetPlayer(playerID))
+		players = append(players, sm.Player(playerID))
 	}
 	return players
 }`
 
-const GetItems_Zone_func string = `func (_e Zone) GetItems(sm *StateMachine) []ZoneItem {
-	e := sm.GetZone(_e.zone.ID)
+const Items_Zone_func string = `func (_e Zone) Items(sm *StateMachine) []ZoneItem {
+	e := sm.Zone(_e.zone.ID)
 	var items []ZoneItem
 	for _, zoneItemID := range e.zone.Items {
-		items = append(items, sm.GetZoneItem(zoneItemID))
+		items = append(items, sm.ZoneItem(zoneItemID))
 	}
 	return items
 }`
 
-const GetTags_Zone_func string = `func (_e Zone) GetTags(sm *StateMachine) []string {
-	e := sm.GetZone(_e.zone.ID)
+const Tags_Zone_func string = `func (_e Zone) Tags(sm *StateMachine) []string {
+	e := sm.Zone(_e.zone.ID)
 	var tags []string
 	for _, element := range e.zone.Tags {
 		tags = append(tags, element)
@@ -697,7 +697,7 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 }`
 
 const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -726,7 +726,7 @@ const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(sm *StateMa
 }`
 
 const RemoveItems_Zone_func string = `func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -755,7 +755,7 @@ const RemoveItems_Zone_func string = `func (_e Zone) RemoveItems(sm *StateMachin
 }`
 
 const RemoveItems_Player_func string = `func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
-	e := sm.GetPlayer(_e.player.ID)
+	e := sm.Player(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -784,7 +784,7 @@ const RemoveItems_Player_func string = `func (_e Player) RemoveItems(sm *StateMa
 }`
 
 const RemoveTags_Zone_func string = `func (_e Zone) RemoveTags(sm *StateMachine, tagsToRemove ...string) Zone {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -812,7 +812,7 @@ const RemoveTags_Zone_func string = `func (_e Zone) RemoveTags(sm *StateMachine,
 }`
 
 const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
-	e := sm.GetGearScore(_e.gearScore.ID)
+	e := sm.GearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -823,7 +823,7 @@ const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(sm *StateMa
 }`
 
 const SetScore_GearScore_func string = `func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
-	e := sm.GetGearScore(_e.gearScore.ID)
+	e := sm.GearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -834,7 +834,7 @@ const SetScore_GearScore_func string = `func (_e GearScore) SetScore(sm *StateMa
 }`
 
 const SetX_Position_func string = `func (_e Position) SetX(sm *StateMachine, newX float64) Position {
-	e := sm.GetPosition(_e.position.ID)
+	e := sm.Position(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -845,7 +845,7 @@ const SetX_Position_func string = `func (_e Position) SetX(sm *StateMachine, new
 }`
 
 const SetY_Position_func string = `func (_e Position) SetY(sm *StateMachine, newY float64) Position {
-	e := sm.GetPosition(_e.position.ID)
+	e := sm.Position(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
 	}

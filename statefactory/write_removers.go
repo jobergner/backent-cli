@@ -13,7 +13,7 @@ func (_e <( toTitleCase $Type.Name )>) Remove<( toTitleCase .Name )>(sm *StateMa
 	<( .ValueType.Name )>sToRemove ...<( toTitleCase .ValueType.Name )>ID
 <(- end -)>
 ) <( toTitleCase $Type.Name )> {
-	e := sm.Get<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
+	e := sm.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
 	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
 		return e
 	}
