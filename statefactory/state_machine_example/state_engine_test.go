@@ -6,21 +6,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStateMachine(t *testing.T) {
+func TestEngine(t *testing.T) {
 	t.Run("creates elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		_, ok := sm.Patch.GearScore[gearScore.ID(sm)]
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		_gearScore := sm.GearScore(gearScore.ID(sm))
 		assert.NotZero(t, _gearScore.ID(sm))
 	})
 	t.Run("sets elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		_gearScore := sm.Patch.GearScore[gearScore.ID(sm)]
 		assert.Zero(t, _gearScore.Level)
@@ -29,14 +29,14 @@ func TestStateMachine(t *testing.T) {
 		assert.NotZero(t, _gearScore.Level)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		sm.deleteGearScore(gearScore.ID(sm))
 		_gearScore := sm.Patch.GearScore[gearScore.ID(sm)]
 		assert.Equal(t, OperationKind(OperationKindDelete), _gearScore.OperationKind)
 	})
 	t.Run("adds elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		playerItem := player.Items(sm)[0]
@@ -45,7 +45,7 @@ func TestStateMachine(t *testing.T) {
 		assert.True(t, ok)
 	})
 	t.Run("removes elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		player.RemoveItems(sm, item.ID(sm))
@@ -56,13 +56,13 @@ func TestStateMachine(t *testing.T) {
 
 func TestUpdateState(t *testing.T) {
 	t.Run("clears patch", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		sm.CreateGearScore()
 		sm.UpdateState()
 		assert.Equal(t, len(sm.Patch.GearScore), 0)
 	})
 	t.Run("creates elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
 		_, ok := sm.Patch.GearScore[gearScore.ID(sm)]
@@ -71,7 +71,7 @@ func TestUpdateState(t *testing.T) {
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
 		assert.Zero(t, gearScore.Level(sm))
@@ -79,7 +79,7 @@ func TestUpdateState(t *testing.T) {
 		assert.Equal(t, gearScore.Level(sm), 1)
 	})
 	t.Run("sets elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore().SetLevel(sm, 1)
 		sm.UpdateState()
 		_gearScore := sm.State.GearScore[gearScore.ID(sm)]
@@ -88,7 +88,7 @@ func TestUpdateState(t *testing.T) {
 		assert.False(t, ok)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		sm.UpdateState()
 		sm.deleteGearScore(gearScore.ID(sm))
@@ -100,7 +100,7 @@ func TestUpdateState(t *testing.T) {
 		// todo
 	})
 	t.Run("adds elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
@@ -111,7 +111,7 @@ func TestUpdateState(t *testing.T) {
 		assert.NotZero(t, _itemID)
 	})
 	t.Run("removes elements", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
@@ -124,7 +124,7 @@ func TestUpdateState(t *testing.T) {
 
 func TestActionsOnDeletedItems(t *testing.T) {
 	t.Run("does not set attribute on element which is set to be deleted", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		gearScore := sm.CreateGearScore()
 		assert.Equal(t, 0, gearScore.Level(sm))
 		sm.DeleteGearScore(gearScore.ID(sm))
@@ -132,7 +132,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, 0, gearScore.Level(sm))
 	})
 	t.Run("does not add child on element which is set to be deleted", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		sm.DeletePlayer(player.ID(sm))
 		item := player.AddItem(sm)
@@ -141,7 +141,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, 0, len(sm.Player(player.ID(sm)).Items(sm)))
 	})
 	t.Run("does not remove child on element which is set to be deleted", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.UpdateState()
@@ -151,7 +151,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, 1, len(sm.Player(player.ID(sm)).Items(sm)))
 	})
 	t.Run("does not delete element which is a child of another element", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		player := sm.CreatePlayer()
 		item := player.AddItem(sm)
 		sm.DeleteItem(item.ID(sm))
@@ -161,7 +161,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 
 func TestTree(t *testing.T) {
 	t.Run("assembles elements in a tree", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		zone := sm.CreateZone()
 		player1 := zone.AddPlayer(sm)
 		player2 := zone.AddPlayer(sm)
@@ -208,7 +208,7 @@ func TestTree(t *testing.T) {
 		assert.Equal(t, string(_expected), string(_actual))
 	})
 	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		zone := sm.CreateZone()
 		player1 := zone.AddPlayer(sm)
 		_ = zone.AddPlayer(sm)
@@ -242,7 +242,7 @@ func TestTree(t *testing.T) {
 		assert.Equal(t, string(_expected), string(_actual))
 	})
 	t.Run("assembles tree based on added item", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		zone := sm.CreateZone()
 		player1 := zone.AddPlayer(sm)
 		_ = zone.AddPlayer(sm)
@@ -281,7 +281,7 @@ func TestTree(t *testing.T) {
 		assert.Equal(t, string(_expected), string(_actual))
 	})
 	t.Run("assembles tree based on removed item", func(t *testing.T) {
-		sm := newStateMachine()
+		sm := newEngine()
 		zone := sm.CreateZone()
 		player1 := zone.AddPlayer(sm)
 		_ = zone.AddPlayer(sm)
