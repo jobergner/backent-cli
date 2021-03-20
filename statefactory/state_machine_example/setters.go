@@ -1,7 +1,7 @@
 package statemachine
 
 func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
-	e := sm.GetGearScore(_e.gearScore.ID)
+	e := sm.GearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -12,7 +12,7 @@ func (_e GearScore) SetLevel(sm *StateMachine, newLevel int) GearScore {
 }
 
 func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
-	e := sm.GetGearScore(_e.gearScore.ID)
+	e := sm.GearScore(_e.gearScore.ID)
 	if e.gearScore.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -23,7 +23,7 @@ func (_e GearScore) SetScore(sm *StateMachine, newScore int) GearScore {
 }
 
 func (_e Position) SetX(sm *StateMachine, newX float64) Position {
-	e := sm.GetPosition(_e.position.ID)
+	e := sm.Position(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -34,7 +34,7 @@ func (_e Position) SetX(sm *StateMachine, newX float64) Position {
 }
 
 func (_e Position) SetY(sm *StateMachine, newY float64) Position {
-	e := sm.GetPosition(_e.position.ID)
+	e := sm.Position(_e.position.ID)
 	if e.position.OperationKind == OperationKindDelete {
 		return e
 	}

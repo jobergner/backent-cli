@@ -1,7 +1,7 @@
 package statemachine
 
 func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -30,7 +30,7 @@ func (_e Zone) RemovePlayers(sm *StateMachine, playersToRemove ...PlayerID) Zone
 }
 
 func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zone {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -59,7 +59,7 @@ func (_e Zone) RemoveItems(sm *StateMachine, zoneItemsToRemove ...ZoneItemID) Zo
 }
 
 func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
-	e := sm.GetPlayer(_e.player.ID)
+	e := sm.Player(_e.player.ID)
 	if e.player.OperationKind == OperationKindDelete {
 		return e
 	}
@@ -88,7 +88,7 @@ func (_e Player) RemoveItems(sm *StateMachine, itemsToRemove ...ItemID) Player {
 }
 
 func (_e Zone) RemoveTags(sm *StateMachine, tagsToRemove ...string) Zone {
-	e := sm.GetZone(_e.zone.ID)
+	e := sm.Zone(_e.zone.ID)
 	if e.zone.OperationKind == OperationKindDelete {
 		return e
 	}
