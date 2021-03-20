@@ -1,0 +1,24 @@
+
+Sa 13. Mär 16:22:16 CET 2021
+goos: linux
+goarch: amd64
+pkg: enginefactory/state_engine_example
+BenchmarkEngine-12    	   27114	     41982 ns/op	   22364 B/op	      65 allocs/op
+PASS
+ok  	enginefactory/state_engine_example	1.590s
+
+Sa 13. Mär 16:33:56 CET 2021
+goos: linux
+goarch: amd64
+pkg: enginefactory/state_engine_example
+BenchmarkEngine-12    	   54373	     21553 ns/op	    6372 B/op	      45 allocs/op
+PASS
+ok  	enginefactory/state_engine_example	1.399s
+
+Sa 20. Mär 18:16:05 CET 2021
+goos: linux
+goarch: amd64
+pkg: bar-cli/enginefactory/state_engine_example
+BenchmarkEngine-12    	   55574	     21647 ns/op	    6371 B/op	      45 allocs/op
+PASS
+ok  	bar-cli/enginefactory/state_engine_example	1.426s
