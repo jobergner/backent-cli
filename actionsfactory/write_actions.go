@@ -9,11 +9,11 @@ const actionTemplateString string = `
 	<(- if .IsBasicType -)>
 		<( .Name )> <( if .IsSliceValue )>[]<( end )><( .TypeLiteral )>
 	<(- else -)>
-		<( .Name )> <( if .IsSliceValue )>[]<( end )>statemachine.<( toTitleCase .TypeLiteral )>
+		<( .Name )> <( if .IsSliceValue )>[]<( end )>state.<( toTitleCase .TypeLiteral )>
 	<(- end -)>
 <(- end -)>
 <( range .Actions )><( $Action := . )>
-func <( .Name )>(<( range .Params )><( template "parameter" . )>, <( end )>sm *statemachine.StateMachine) {}
+func <( .Name )>(<( range .Params )><( template "parameter" . )>, <( end )>sm *state.Engine) {}
 <(- end -)>
 `
 

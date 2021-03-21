@@ -6,7 +6,7 @@ import (
 
 const startTemplateString string = `
 func main() {
-	err := statemachine.Start(<(- range .Actions )>
+	err := state.Start(<(- range .Actions )>
 		<( .Name )>,
 <(- end )>
 	)

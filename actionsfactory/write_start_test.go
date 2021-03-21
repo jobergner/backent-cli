@@ -15,7 +15,7 @@ func TestWriteStart(t *testing.T) {
 		actual := utils.NormalizeWhitespace(string(af.writeStart().writtenSourceCode()))
 		expected := utils.NormalizeWhitespace(strings.TrimSpace(`
 func main() {
-	err := statemachine.Start(
+	err := state.Start(
 		interactBaz,
 		makeFoo,
 		walkBar,
