@@ -182,8 +182,23 @@ altering slices within the stateMachine's State or Patch
 - assumes statefunction import by reading go.mod file `"module <name>"` and appends it to parameters of action
 - a new server.Start() method will be generated which expects the user defined actions as parameters
 
+### conflicting variable names
+when code is generated based on user input there is always a chance that the generated code does not compile, or even worse, silently contains errors. for example
+```
+<userDefinedName> := 3
+foo := "hello"
+```
+If the `<userDefinedName>` happened to be `foo`, the code would not compile (obviously)
+This risk can be reduced (and in some cases eliminated) by encrypting local variables if they are named exactly (!) after a user input
+```
+<userDefinedName>XYZ := 3
+foo := "hello"
+```
+Even if `<userDefinedName>` is `foo`, the generated local variable would be named `fooXYZ` and therefore not cause an error.
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - rename project
 - figure out if sync.Pool is helpful for managing tree structs (cause theyre very big)
+- is entityKind still relevant (used for parentage)
 

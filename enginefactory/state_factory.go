@@ -15,7 +15,7 @@ import (
 )
 
 // TODO wtf
-const isProductionMode = true
+const isProductionMode = false
 
 // pluralizeClient is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
