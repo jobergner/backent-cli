@@ -1,16 +1,5 @@
 package state
 
-type EntityKind string
-
-const (
-	EntityKindGearScore EntityKind = "gearScore"
-	EntityKindItem                 = "item"
-	EntityKindPlayer               = "player"
-	EntityKindPosition             = "position"
-	EntityKindZone                 = "zone"
-	EntityKindZoneItem             = "zoneItem"
-)
-
 type GearScoreID int
 type ItemID int
 type PlayerID int

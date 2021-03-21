@@ -35,7 +35,6 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	s := newStateFactory(stateConfigAST).
 		writePackageName().
 		writeOperationKind().
-		writeEntityKinds().
 		writeIDs().
 		writeState().
 		writeEngine().

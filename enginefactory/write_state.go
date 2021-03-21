@@ -4,20 +4,6 @@ import (
 	"text/template"
 )
 
-const entityKindTemplateString string = `
-type EntityKind string
-
-const (<( range .Types )>
-	EntityKind<( toTitleCase .Name )> <( writeOnIndex $.Types . 0 "EntityKind" )> = "<( .Name )>"<(end)>
-)`
-
-var entityKindTemplate *template.Template = newTemplateFrom("entityKindTemplate", entityKindTemplateString)
-
-func (s *stateFactory) writeEntityKinds() *stateFactory {
-	entityKindTemplate.Execute(s.buf, s.ast)
-	return s
-}
-
 const idTemplateString string = `<( range .Types )>
 type <( toTitleCase .Name )>ID int<( end )>
 `

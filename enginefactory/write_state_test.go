@@ -7,20 +7,6 @@ import (
 )
 
 func TestWriteState(t *testing.T) {
-	t.Run("writes entityKinds", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
-		sf.writeEntityKinds()
-
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
-			EntityKind_type,
-			EntityKindGearScore_type,
-		}, "\n"))
-
-		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
-		}
-	})
 	t.Run("writes ids", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeIDs()
