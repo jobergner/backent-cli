@@ -855,17 +855,6 @@ const SetY_Position_func string = `func (_e Position) SetY(se *Engine, newY floa
 	return e
 }`
 
-const EntityKind_type string = `type EntityKind string`
-
-const EntityKindGearScore_type string = `const (
-	EntityKindGearScore	EntityKind	= "gearScore"
-	EntityKindItem				= "item"
-	EntityKindPlayer			= "player"
-	EntityKindPosition			= "position"
-	EntityKindZone				= "zone"
-	EntityKindZoneItem			= "zoneItem"
-)`
-
 const GearScoreID_type string = `type GearScoreID int`
 
 const ItemID_type string = `type ItemID int`
