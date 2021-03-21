@@ -57,11 +57,11 @@ func (s *stateFactory) writeGenerateID() *stateFactory {
 const updateStateTemplateString string = `
 func (se *Engine) UpdateState() {
 <( range .Types )>
-	for _, <( .Name )> := range se.Patch.<( toTitleCase .Name )> {
-		if <( .Name )>.OperationKind == OperationKindDelete {
-			delete(se.State.<( toTitleCase .Name )>, <( .Name )>.ID)
+	for _, <( encrypt .Name )> := range se.Patch.<( toTitleCase .Name )> {
+		if <( encrypt .Name )>.OperationKind == OperationKindDelete {
+			delete(se.State.<( toTitleCase .Name )>, <( encrypt .Name )>.ID)
 		} else {
-			se.State.<( toTitleCase .Name )>[<( .Name )>.ID] = <( .Name )>
+			se.State.<( toTitleCase .Name )>[<( encrypt .Name )>.ID] = <( encrypt .Name )>
 		}
 	}
 <( end )>

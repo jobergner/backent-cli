@@ -2,6 +2,8 @@ package enginefactory
 
 import (
 	"bytes"
+	"crypto/sha1"
+	"encoding/hex"
 	"go/format"
 	"go/parser"
 	"go/token"
@@ -11,6 +13,9 @@ import (
 
 	"github.com/gertd/go-pluralize"
 )
+
+// TODO wtf
+const isProductionMode = true
 
 // pluralizeClient is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
@@ -109,6 +114,15 @@ func newTemplateFrom(name, templateString string) *template.Template {
 			Funcs(template.FuncMap{
 				"toTitleCase": strings.Title,
 				"toSingular":  pluralizeClient.Singular,
+				"encrypt": func(name string) string {
+					if !isProductionMode {
+						return name
+					}
+					hasher := sha1.New()
+					hasher.Write([]byte(name))
+					sha := hasher.Sum(nil)[:5]
+					return name + "_" + hex.EncodeToString(sha)
+				},
 				// does not write given string at certain index of configType (determined by alphabetical order of stateConfigAST)
 				"doNotWriteOnIndex": func(configTypes map[string]stateConfigType, currentConfigType stateConfigType, requiredIndex int, toWrite string) string {
 					currentIndex := indexOfType(configTypes, currentConfigType)

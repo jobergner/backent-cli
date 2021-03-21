@@ -18,18 +18,18 @@ func (_e <( toTitleCase $Type.Name )>) Add
 		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{<( .ValueType.Name )>Core{OperationKind: OperationKindDelete}}<( end )>
 	}
 	<(- if not .ValueType.IsBasicType )>
-		<( .ValueType.Name )> := se.create<( toTitleCase .ValueType.Name )>(true)
+		<( encrypt .ValueType.Name )> := se.create<( toTitleCase .ValueType.Name )>(true)
 	<(- end )>
 	e.<( $Type.Name )>.<( toTitleCase .Name )> = append(e.<( $Type.Name )>.<( toTitleCase .Name )>,<(print " ")>
 	<(- if .ValueType.IsBasicType -)>
 		<( .Name )>...
 	<(- else -)>
-		<( .ValueType.Name )>.<( .ValueType.Name )>.ID
+		<( encrypt .ValueType.Name )>.<( .ValueType.Name )>.ID
 	<(- end -)>
 	)
 	e.<( $Type.Name )>.OperationKind = OperationKindUpdate
 	se.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )><( if not .ValueType.IsBasicType )>
-	return <( .ValueType.Name )><( end )>
+	return <( encrypt .ValueType.Name )><( end )>
 }
 <( end )>
 <( end )><( end )>
