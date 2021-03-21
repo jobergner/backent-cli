@@ -31,7 +31,7 @@ func (_e <( toTitleCase .Name )>) ID(se *Engine) <( toTitleCase .Name )>ID {
 func (_e <( toTitleCase $Type.Name )>) <( toTitleCase .Name )>(se *Engine) <( template "returnValue" . )> {
 	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
 	<( if .HasSliceValue -)>
-		var <( .Name )> <( template "returnValue" . )>
+		var <( encrypt .Name )> <( template "returnValue" . )>
 		for _,<( print " " )>
 		<(- if .ValueType.IsBasicType -)>
 			element
@@ -39,7 +39,7 @@ func (_e <( toTitleCase $Type.Name )>) <( toTitleCase .Name )>(se *Engine) <( te
 			<( .ValueType.Name )>ID
 		<(- end -)>
 		<( print " " )>:= range e.<( $Type.Name )>.<( toTitleCase .Name )> {
-			<( .Name )> = append(<( .Name )>,<( print " " )>
+			<( encrypt .Name )> = append(<( encrypt .Name )>,<( print " " )>
 			<(- if .ValueType.IsBasicType -)>
 				element
 			<(- else -)>
@@ -47,7 +47,7 @@ func (_e <( toTitleCase $Type.Name )>) <( toTitleCase .Name )>(se *Engine) <( te
 			<(- end -)>
 			)
 		}
-		return <( .Name )>
+		return <( encrypt .Name )>
 	<(- else -)>
 		<( if .ValueType.IsBasicType -)>
 			return e.<( $Type.Name )>.<( toTitleCase .Name )>

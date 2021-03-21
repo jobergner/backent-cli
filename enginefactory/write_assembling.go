@@ -63,36 +63,36 @@ func (s *stateFactory) writeAssembleTree() *stateFactory {
 const assembleTreeElementTemplateString string = `
 <(- range .Types )><( $Type := . )>
 func (se *Engine) assemble<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) (_<( .Name )>, bool) {
-	<( .Name )>, hasUpdated := se.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
+	<( encrypt .Name )>, hasUpdated := se.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
 	if !hasUpdated {
 		<( if .IsLeafType -)>
 			return _<( .Name )>{}, false
 		<(- else -)>
-			<( .Name )> = se.State.<( toTitleCase .Name )>[<( .Name )>ID]
+			<( encrypt .Name )> = se.State.<( toTitleCase .Name )>[<( .Name )>ID]
 		<(- end )>
 	}
 	var tree<( toTitleCase .Name )> _<( .Name )><( range .Fields -)>
 	<( if not .ValueType.IsBasicType -)>
 		<( if .HasSliceValue )>
-			for _, <( .ValueType.Name )>ID := range deduplicate<( toTitleCase .ValueType.Name )>IDs(se.State.<( toTitleCase $Type.Name )>[<( $Type.Name )>.ID].<( toTitleCase .Name )>, se.Patch.<( toTitleCase $Type.Name )>[<( $Type.Name )>.ID].<( toTitleCase .Name )>) {
+			for _, <( .ValueType.Name )>ID := range deduplicate<( toTitleCase .ValueType.Name )>IDs(se.State.<( toTitleCase $Type.Name )>[<( encrypt $Type.Name )>.ID].<( toTitleCase .Name )>, se.Patch.<( toTitleCase $Type.Name )>[<( encrypt $Type.Name )>.ID].<( toTitleCase .Name )>) {
 				if tree<( toTitleCase .ValueType.Name )>, <( .ValueType.Name )>HasUpdated := se.assemble<( toTitleCase .ValueType.Name )>(<( .ValueType.Name )>ID); <( .ValueType.Name )>HasUpdated {
 					hasUpdated = true
 					tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = append(tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )>, tree<( toTitleCase .ValueType.Name )>)
 				}
 			}
 		<(- else )>
-			if tree<( toTitleCase .Name )>, <( .Name )>HasUpdated := se.assemble<( toTitleCase .Name )>(<( $Type.Name )>.<( toTitleCase .Name )>); <( .Name )>HasUpdated {
+			if tree<( toTitleCase .Name )>, <( .Name )>HasUpdated := se.assemble<( toTitleCase .Name )>(<( encrypt $Type.Name )>.<( toTitleCase .Name )>); <( .Name )>HasUpdated {
 				hasUpdated = true
 				tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = &tree<( toTitleCase .ValueType.Name )>
 			}
 		<(- end -)>
 	<(- end )>
 	<(- end )>
-	tree<( toTitleCase .Name )>.ID = <( .Name )>.ID
-	tree<( toTitleCase .Name )>.OperationKind = <( .Name )>.OperationKind
+	tree<( toTitleCase .Name )>.ID = <( encrypt .Name )>.ID
+	tree<( toTitleCase .Name )>.OperationKind = <( encrypt .Name )>.OperationKind
 	<(- range .Fields )>
 	<(- if .ValueType.IsBasicType )>
-		tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = <( $Type.Name )>.<( toTitleCase .Name )>
+		tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = <( encrypt $Type.Name )>.<( toTitleCase .Name )>
 	<(- end -)>
 	<(- end )>
 	return tree<( toTitleCase .Name )>, <( if .IsLeafType )>true<( else )>hasUpdated<( end )>
