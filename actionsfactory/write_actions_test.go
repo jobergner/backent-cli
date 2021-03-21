@@ -29,9 +29,9 @@ func TestWriteActions(t *testing.T) {
 
 		actual := utils.NormalizeWhitespace(string(af.writeActions().writtenSourceCode()))
 		expected := utils.NormalizeWhitespace(strings.TrimSpace(`
-func interactBaz(target bool, sm *statemachine.StateMachine) {}
-func makeFoo(count int, entities []statemachine.Entity, origins []string, sm *statemachine.StateMachine) {}
-func walkBar(altitude statemachine.Altitude, distance float64, sm *statemachine.StateMachine) {}
+func interactBaz(target bool, sm *state.Engine) {}
+func makeFoo(count int, entities []state.Entity, origins []string, sm *state.Engine) {}
+func walkBar(altitude state.Altitude, distance float64, sm *state.Engine) {}
 		`))
 
 		if expected != actual {

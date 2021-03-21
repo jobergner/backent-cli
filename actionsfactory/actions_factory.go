@@ -28,8 +28,8 @@ func (s *actionsFactory) writtenSourceCode() []byte {
 }
 
 // WriteActionsFrom writes source code for a given ActionsConfig
-// moduleName is the name of the module the statemachine is created for
-// packageName is the name of the package the statemachine is used in
+// moduleName is the name of the module the state is created for
+// packageName is the name of the package the state is used in
 func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName string, packageName string) []byte {
 	actionsConfigAST := buildActionsConfigAST(actionsConfigData)
 	a := newActionsFactory(actionsConfigAST).
@@ -50,7 +50,7 @@ func WriteActionsFrom(actionsConfigData map[interface{}]interface{}, moduleName 
 
 func (s *actionsFactory) writeImport(moduleName string) *actionsFactory {
 	importDecl := `import (
-	"` + moduleName + `/statemachine"
+	"` + moduleName + `/state"
 )
 `
 	s.buf.WriteString(importDecl)
