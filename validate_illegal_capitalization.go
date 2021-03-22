@@ -2,7 +2,7 @@ package validator
 
 import (
 	"fmt"
-	"regexp"
+	"strings"
 )
 
 func validateIllegalCapitalization(data map[interface{}]interface{}) (errs []error) {
@@ -38,7 +38,9 @@ func validateIllegalCapitalizationObject(
 	return
 }
 
-func startsWithCapitalLetter(valueString string) bool {
-	re := regexp.MustCompile(`[A-Z][A-Za-z]+[0-9]*`)
-	return re.MatchString(valueString)
+func startsWithCapitalLetter(keyName string) bool {
+	if keyName == strings.Title(keyName) {
+		return true
+	}
+	return false
 }

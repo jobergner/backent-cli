@@ -13,13 +13,14 @@ func TestValidateDataIllegalCapitalization(t *testing.T) {
 				"Bar": "string",
 			},
 			"Baz": map[interface{}]interface{}{
-				"ban": "int",
-				"Bal": "string",
-				"buf": "bool",
+				"ban":    "int",
+				"Bal":    "string",
+				"buf":    "bool",
+				"fooBar": "int",
 			},
 		}
 
-		actualErrors := thematicalValidation(data, false, true)
+		actualErrors := thematicalValidation(data, false, true, true)
 		expectedErrors := []error{
 			newValidationErrorIllegalCapitalization("Bar", literalKindFieldName),
 			newValidationErrorIllegalCapitalization("Baz", literalKindType),

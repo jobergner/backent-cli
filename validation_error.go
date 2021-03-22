@@ -114,3 +114,11 @@ func newValidationErrorConflictingSingular(keyName1, keyName2, singularForm stri
 		),
 	)
 }
+func newValidationErrorUnavailableFieldName(keyName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrUnavailableFieldName: \"%s\" not an available name",
+			keyName,
+		),
+	)
+}

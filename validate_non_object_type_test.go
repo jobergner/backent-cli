@@ -16,7 +16,7 @@ func TestValidateYamlNonObjectType(t *testing.T) {
 			},
 		}
 
-		actualErrors := thematicalValidation(data, false, true)
+		actualErrors := thematicalValidation(data, false, true, true)
 		expectedErrors := []error{
 			newValidationErrorNonObjectType("foo"),
 			newValidationErrorNonObjectType("bar"),
