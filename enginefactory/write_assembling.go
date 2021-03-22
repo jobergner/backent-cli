@@ -17,7 +17,7 @@ func (se *Engine) assembleTree() Tree {
 	}
 	<(- else -)>
 	for _, <( .Name )> := range se.Patch.<( toTitleCase .Name )> {
-		if !<( .Name )>.HasParent {
+		if !<( .Name )>.HasParent_ {
 			tree<( toTitleCase .Name )>, hasUpdated := se.assemble<( toTitleCase .Name )>(<( .Name )>.ID)
 			if hasUpdated {
 				tree.<( toTitleCase .Name )>[<( .Name )>.ID] = tree<( toTitleCase .Name )>
@@ -38,7 +38,7 @@ func (se *Engine) assembleTree() Tree {
 	}
 	<(- else )>
 	for _, <( .Name )> := range se.State.<( toTitleCase .Name )> {
-		if !<( .Name )>.HasParent {
+		if !<( .Name )>.HasParent_ {
 			if _, ok := tree.<( toTitleCase .Name )>[<( .Name )>.ID]; !ok {
 				tree<( toTitleCase .Name )>, hasUpdated := se.assemble<( toTitleCase .Name )>(<( .Name )>.ID)
 				if hasUpdated {
@@ -89,7 +89,7 @@ func (se *Engine) assemble<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .
 	<(- end )>
 	<(- end )>
 	tree<( toTitleCase .Name )>.ID = <( encrypt .Name )>.ID
-	tree<( toTitleCase .Name )>.OperationKind = <( encrypt .Name )>.OperationKind
+	tree<( toTitleCase .Name )>.OperationKind_ = <( encrypt .Name )>.OperationKind_
 	<(- range .Fields )>
 	<(- if .ValueType.IsBasicType )>
 		tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = <( encrypt $Type.Name )>.<( toTitleCase .Name )>

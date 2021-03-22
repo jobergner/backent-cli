@@ -9,7 +9,7 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) 
 	var treeGearScore _gearScore
 
 	treeGearScore.ID = gearScore.ID
-	treeGearScore.OperationKind = gearScore.OperationKind
+	treeGearScore.OperationKind_ = gearScore.OperationKind_
 	treeGearScore.Level = gearScore.Level
 	treeGearScore.Score = gearScore.Score
 	return treeGearScore, true
@@ -24,7 +24,7 @@ func (se *Engine) assemblePosition(positionID PositionID) (_position, bool) {
 	var treePosition _position
 
 	treePosition.ID = position.ID
-	treePosition.OperationKind = position.OperationKind
+	treePosition.OperationKind_ = position.OperationKind_
 	treePosition.X = position.X
 	treePosition.Y = position.Y
 	return treePosition, true
@@ -44,7 +44,7 @@ func (se *Engine) assembleItem(itemID ItemID) (_item, bool) {
 	}
 
 	treeItem.ID = item.ID
-	treeItem.OperationKind = item.OperationKind
+	treeItem.OperationKind_ = item.OperationKind_
 
 	return treeItem, hasUpdated
 }
@@ -67,7 +67,7 @@ func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
 	}
 
 	treeZoneItem.ID = zoneItem.ID
-	treeZoneItem.OperationKind = zoneItem.OperationKind
+	treeZoneItem.OperationKind_ = zoneItem.OperationKind_
 	return treeZoneItem, hasUpdated
 
 }
@@ -96,7 +96,7 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (_player, bool) {
 	}
 
 	treePlayer.ID = player.ID
-	treePlayer.OperationKind = player.OperationKind
+	treePlayer.OperationKind_ = player.OperationKind_
 	return treePlayer, hasUpdated
 }
 
@@ -122,7 +122,7 @@ func (se *Engine) assembleZone(zoneID ZoneID) (_zone, bool) {
 	}
 
 	treeZone.ID = zone.ID
-	treeZone.OperationKind = zone.OperationKind
+	treeZone.OperationKind_ = zone.OperationKind_
 	treeZone.Tags = zone.Tags
 	return treeZone, hasUpdated
 }
@@ -130,7 +130,7 @@ func (se *Engine) assembleZone(zoneID ZoneID) (_zone, bool) {
 func (se *Engine) assembleTree() Tree {
 	tree := newTree()
 	for _, gearScore := range se.Patch.GearScore {
-		if !gearScore.HasParent {
+		if !gearScore.HasParent_ {
 			treeGearScore, hasUpdated := se.assembleGearScore(gearScore.ID)
 			if hasUpdated {
 				tree.GearScore[gearScore.ID] = treeGearScore
@@ -138,7 +138,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, item := range se.Patch.Item {
-		if !item.HasParent {
+		if !item.HasParent_ {
 			treeItem, hasUpdated := se.assembleItem(item.ID)
 			if hasUpdated {
 				tree.Item[item.ID] = treeItem
@@ -146,7 +146,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, player := range se.Patch.Player {
-		if !player.HasParent {
+		if !player.HasParent_ {
 			treePlayer, hasUpdated := se.assemblePlayer(player.ID)
 			if hasUpdated {
 				tree.Player[player.ID] = treePlayer
@@ -154,7 +154,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, position := range se.Patch.Position {
-		if !position.HasParent {
+		if !position.HasParent_ {
 			treePosition, hasUpdated := se.assemblePosition(position.ID)
 			if hasUpdated {
 				tree.Position[position.ID] = treePosition
@@ -168,7 +168,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItem := range se.Patch.ZoneItem {
-		if !zoneItem.HasParent {
+		if !zoneItem.HasParent_ {
 			treeZoneItem, hasUpdated := se.assembleZoneItem(zoneItem.ID)
 			if hasUpdated {
 				tree.ZoneItem[zoneItem.ID] = treeZoneItem
@@ -177,7 +177,7 @@ func (se *Engine) assembleTree() Tree {
 	}
 
 	for _, gearScore := range se.State.GearScore {
-		if !gearScore.HasParent {
+		if !gearScore.HasParent_ {
 			if _, ok := tree.GearScore[gearScore.ID]; !ok {
 				treeGearScore, hasUpdated := se.assembleGearScore(gearScore.ID)
 				if hasUpdated {
@@ -187,7 +187,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, item := range se.State.Item {
-		if !item.HasParent {
+		if !item.HasParent_ {
 			if _, ok := tree.Item[item.ID]; !ok {
 				treeItem, hasUpdated := se.assembleItem(item.ID)
 				if hasUpdated {
@@ -197,7 +197,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, player := range se.State.Player {
-		if !player.HasParent {
+		if !player.HasParent_ {
 			if _, ok := tree.Player[player.ID]; !ok {
 				treePlayer, hasUpdated := se.assemblePlayer(player.ID)
 				if hasUpdated {
@@ -207,7 +207,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, position := range se.State.Position {
-		if !position.HasParent {
+		if !position.HasParent_ {
 			if _, ok := tree.Position[position.ID]; !ok {
 				treePosition, hasUpdated := se.assemblePosition(position.ID)
 				if hasUpdated {
@@ -225,7 +225,7 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItem := range se.State.ZoneItem {
-		if !zoneItem.HasParent {
+		if !zoneItem.HasParent_ {
 			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
 				treeZoneItem, hasUpdated := se.assembleZoneItem(zoneItem.ID)
 				if hasUpdated {

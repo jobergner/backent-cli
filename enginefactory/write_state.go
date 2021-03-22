@@ -48,8 +48,8 @@ type <( .Name )>Core struct {
 	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
 <( range .Fields )> <( toTitleCase .Name )> <( template "elementFieldValue" . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
 <( end )>
-	OperationKind OperationKind ` + "`" + `json:"operationKind"` + "`" + `
-<( if not .IsRootType )> HasParent bool ` + "`" + `json:"hasParent"` + "`" + `<( end )>
+	OperationKind_ OperationKind ` + "`" + `json:"operationKind_"` + "`" + `
+<( if not .IsRootType )> HasParent_ bool ` + "`" + `json:"hasParent_"` + "`" + `<( end )>
 }
 type <( toTitleCase .Name )> struct{ <( .Name )> <( .Name )>Core }
 <( end )>

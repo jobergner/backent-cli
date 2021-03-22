@@ -8,11 +8,11 @@ const setterTemplateString string = `
 <( range .Types )><( $Type := . )><( range .Fields )><( if not .HasSliceValue )><( if .ValueType.IsBasicType)>
 func (_e <( toTitleCase $Type.Name )>) Set<( toTitleCase .Name )>(se *Engine, new<( toTitleCase .Name )> <( .ValueType.Name )>) <( toTitleCase $Type.Name )> {
 	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
-	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
+	if e.<( $Type.Name )>.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	e.<( $Type.Name )>.<( toTitleCase .Name )> = new<( toTitleCase .Name )>
-	e.<( $Type.Name )>.OperationKind = OperationKindUpdate
+	e.<( $Type.Name )>.OperationKind_ = OperationKindUpdate
 	se.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )>
 	return e
 }

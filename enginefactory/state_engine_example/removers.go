@@ -2,7 +2,7 @@ package state
 
 func (_e Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -24,14 +24,14 @@ func (_e Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
 		return e
 	}
 	e.zone.Players = newElements
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return e
 }
 
 func (_e Zone) RemoveItems(se *Engine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -53,14 +53,14 @@ func (_e Zone) RemoveItems(se *Engine, zoneItemsToRemove ...ZoneItemID) Zone {
 		return e
 	}
 	e.zone.Items = newElements
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return e
 }
 
 func (_e Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
 	e := se.Player(_e.player.ID)
-	if e.player.OperationKind == OperationKindDelete {
+	if e.player.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -82,14 +82,14 @@ func (_e Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
 		return e
 	}
 	e.player.Items = newElements
-	e.player.OperationKind = OperationKindUpdate
+	e.player.OperationKind_ = OperationKindUpdate
 	se.Patch.Player[e.player.ID] = e.player
 	return e
 }
 
 func (_e Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -110,7 +110,7 @@ func (_e Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
 		return e
 	}
 	e.zone.Tags = newElements
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return e
 }

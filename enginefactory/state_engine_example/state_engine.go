@@ -29,42 +29,42 @@ func (se *Engine) GenerateID() int {
 
 func (se *Engine) UpdateState() {
 	for _, gearScore := range se.Patch.GearScore {
-		if gearScore.OperationKind == OperationKindDelete {
+		if gearScore.OperationKind_ == OperationKindDelete {
 			delete(se.State.GearScore, gearScore.ID)
 		} else {
 			se.State.GearScore[gearScore.ID] = gearScore
 		}
 	}
 	for _, item := range se.Patch.Item {
-		if item.OperationKind == OperationKindDelete {
+		if item.OperationKind_ == OperationKindDelete {
 			delete(se.State.Item, item.ID)
 		} else {
 			se.State.Item[item.ID] = item
 		}
 	}
 	for _, player := range se.Patch.Player {
-		if player.OperationKind == OperationKindDelete {
+		if player.OperationKind_ == OperationKindDelete {
 			delete(se.State.Player, player.ID)
 		} else {
 			se.State.Player[player.ID] = player
 		}
 	}
 	for _, position := range se.Patch.Position {
-		if position.OperationKind == OperationKindDelete {
+		if position.OperationKind_ == OperationKindDelete {
 			delete(se.State.Position, position.ID)
 		} else {
 			se.State.Position[position.ID] = position
 		}
 	}
 	for _, zone := range se.Patch.Zone {
-		if zone.OperationKind == OperationKindDelete {
+		if zone.OperationKind_ == OperationKindDelete {
 			delete(se.State.Zone, zone.ID)
 		} else {
 			se.State.Zone[zone.ID] = zone
 		}
 	}
 	for _, zoneItem := range se.Patch.ZoneItem {
-		if zoneItem.OperationKind == OperationKindDelete {
+		if zoneItem.OperationKind_ == OperationKindDelete {
 			delete(se.State.ZoneItem, zoneItem.ID)
 		} else {
 			se.State.ZoneItem[zoneItem.ID] = zoneItem

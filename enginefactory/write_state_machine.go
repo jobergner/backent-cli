@@ -58,7 +58,7 @@ const updateStateTemplateString string = `
 func (se *Engine) UpdateState() {
 <( range .Types )>
 	for _, <( encrypt .Name )> := range se.Patch.<( toTitleCase .Name )> {
-		if <( encrypt .Name )>.OperationKind == OperationKindDelete {
+		if <( encrypt .Name )>.OperationKind_ == OperationKindDelete {
 			delete(se.State.<( toTitleCase .Name )>, <( encrypt .Name )>.ID)
 		} else {
 			se.State.<( toTitleCase .Name )>[<( encrypt .Name )>.ID] = <( encrypt .Name )>
