@@ -17,10 +17,10 @@ const (
 	pathClosureKindBasicType
 )
 
-type yamlValueKind int
+type dataValueKind int
 
 const (
-	valueKindString yamlValueKind = iota
+	valueKindString dataValueKind = iota
 	valueKindObject
 )
 
@@ -37,7 +37,7 @@ const (
 // TODO: name it to be more like golang.ast package naming
 type declaration struct {
 	name          string
-	yamlValueKind yamlValueKind
+	dataValueKind dataValueKind
 	fieldLevel    fieldLevelKind
 }
 
@@ -69,11 +69,11 @@ func (path declarationPath) isRecursive() bool {
 
 func (path *declarationPath) addDeclaration(
 	keyName string,
-	yamlValueKind yamlValueKind,
+	dataValueKind dataValueKind,
 	fieldLevel fieldLevelKind,
 	value interface{},
 ) {
-	path.declarations = append(path.declarations, declaration{keyName, yamlValueKind, fieldLevel})
+	path.declarations = append(path.declarations, declaration{keyName, dataValueKind, fieldLevel})
 }
 
 // we list the declarations' typeNames with some additional logic
@@ -86,7 +86,7 @@ func (path declarationPath) joinedNames() []string {
 	var parentStructName string
 
 	for _, declaration := range path.declarations {
-		if declaration.yamlValueKind == valueKindObject {
+		if declaration.dataValueKind == valueKindObject {
 			wasStructDecl = true
 			parentStructName = declaration.name
 			continue

@@ -36,8 +36,8 @@ func validateIllegalValue(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func validateIllegalValueObject(yamlObjectData map[interface{}]interface{}, objectName string) (errs []error) {
-	for key, value := range yamlObjectData {
+func validateIllegalValueObject(objectData map[interface{}]interface{}, objectName string) (errs []error) {
+	for key, value := range objectData {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isString(value) {

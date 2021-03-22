@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlIllegalValue(t *testing.T) {
+func TestValidateDataIllegalValue(t *testing.T) {
 	t.Run("should not fail on usage of allowed values", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int",

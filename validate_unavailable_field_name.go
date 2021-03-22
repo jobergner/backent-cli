@@ -34,8 +34,8 @@ func validateUnavailableFieldName(data map[interface{}]interface{}) (errs []erro
 	return
 }
 
-func validateUnavailableFieldNameObject(yamlObjectData map[interface{}]interface{}, objectName string) (errs []error) {
-	for key := range yamlObjectData {
+func validateUnavailableFieldNameObject(objectData map[interface{}]interface{}, objectName string) (errs []error) {
+	for key := range objectData {
 		keyName := fmt.Sprintf("%v", key)
 		if isUnavailableFiledName(keyName) {
 			errs = append(errs, newValidationErrorUnavailableFieldName(keyName))

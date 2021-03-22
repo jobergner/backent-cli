@@ -107,8 +107,8 @@ func validateIllegalMapKeys(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func validateIllegalMapKeysObject(yamlObjectData, data map[interface{}]interface{}) (errs []error) {
-	for _, value := range yamlObjectData {
+func validateIllegalMapKeysObject(objectData, data map[interface{}]interface{}) (errs []error) {
+	for _, value := range objectData {
 		valueString := fmt.Sprintf("%v", value)
 		illegalMapKeys := findIllegalMapKeys(valueString, data)
 		for _, illegalMapKey := range illegalMapKeys {

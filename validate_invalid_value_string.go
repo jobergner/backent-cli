@@ -36,8 +36,8 @@ func validateInvalidValueString(data map[interface{}]interface{}) (errs []error)
 	return
 }
 
-func validateInvalidValueStringObject(yamlObjectData map[interface{}]interface{}, objectName string) (errs []error) {
-	for key, value := range yamlObjectData {
+func validateInvalidValueStringObject(objectData map[interface{}]interface{}, objectName string) (errs []error) {
+	for key, value := range objectData {
 		keyName := fmt.Sprintf("%v", key)
 		valueString := fmt.Sprintf("%v", value)
 

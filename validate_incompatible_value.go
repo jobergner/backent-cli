@@ -21,11 +21,11 @@ func validateIncompatibleValue(data map[interface{}]interface{}) (errs []error) 
 }
 
 func validateIncompatibleValueObject(
-	yamlObjectData map[interface{}]interface{},
+	objectData map[interface{}]interface{},
 	objectName string,
 ) (errs []error) {
 
-	for key, value := range yamlObjectData {
+	for key, value := range objectData {
 		if isString(value) {
 			keyName := fmt.Sprintf("%v", key)
 			valueString := fmt.Sprintf("%v", value)
