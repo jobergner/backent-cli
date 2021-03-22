@@ -219,7 +219,7 @@ I will have to revisit this issue later.
 
 ### meta fields
 structs will have meta fields like ID, OperationKind and HasParent. This would mean that the user can not define fields with the names "ID", "OperationKind" and "HasParent.
-To give the user a tiny bit more freedom I will suffix these fields with "_" ("OperationKind" -> "OperationKind_"). I can't do this with ID however, because ID is also a getter method
+To give the user a tiny bit more freedom I will suffix these fields with "\_" ("OperationKind" -> "OperationKind\_"). I can't do this with ID however, because ID is also a getter method
 and therefore unique. It will remain "ID".
 
 ### TODO
