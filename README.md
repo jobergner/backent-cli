@@ -195,6 +195,27 @@ This risk can be reduced (and in some cases eliminated) by encrypting local vari
 foo := "hello"
 ```
 Even if `<userDefinedName>` is `foo`, the generated local variable would be named `fooXYZ` and therefore not cause an error.
+It is still possible for errors and conflicts to occur, for example:
+```
+object.<userDefinedName1>UUID = "123" 
+object.<userDefinedName2>ID = "234"
+```
+if <userDefinedName1> is "foo" and <userDefinedName2> is "fooUU" the generated code would look like this
+```
+object.fooUUID = "123" 
+object.fooUUID = "234"
+```
+and `object.fooUUID` would be "234" instead of "123" so there is still a need for caution.
+The reason I only encrypt the occurances of user defined input when it is exactly (e.g. NOT <userDefinedName>ID etc.) a user defined string within the code is because
+i want the exported methods not to be encrypted (obviously), but also not their parameters (e.g. `func DoThis(user_a7h6v8ID UserID)` would be confusing for the user).
+a workaround would be immediately reassign the parameters at the beginning of every exported method: 
+```
+func DoThis(userID UserID) {
+   user_a7h6v8ID := userID
+   ...
+}
+```
+I will have to revisit this issue later.
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
