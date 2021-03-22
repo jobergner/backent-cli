@@ -44,7 +44,7 @@ type _<( .Name )> struct {
 	<(- end )>
 	<(- .ValueType.Name )> ` + "`" + `json:"<( .Name )>"` + "`" + `
 <( end )>
-	OperationKind OperationKind ` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_ OperationKind ` + "`" + `json:"operationKind_"` + "`" + `
 }
 <( end )>
 `

@@ -33,7 +33,7 @@ func TestEngine(t *testing.T) {
 		gearScore := se.CreateGearScore()
 		se.deleteGearScore(gearScore.ID(se))
 		_gearScore := se.Patch.GearScore[gearScore.ID(se)]
-		assert.Equal(t, OperationKind(OperationKindDelete), _gearScore.OperationKind)
+		assert.Equal(t, OperationKind(OperationKindDelete), _gearScore.OperationKind_)
 	})
 	t.Run("adds elements", func(t *testing.T) {
 		se := newEngine()
@@ -50,7 +50,7 @@ func TestEngine(t *testing.T) {
 		item := player.AddItem(se)
 		player.RemoveItems(se, item.ID(se))
 		_item := se.Patch.Item[item.ID(se)]
-		assert.Equal(t, OperationKind(OperationKindDelete), _item.OperationKind)
+		assert.Equal(t, OperationKind(OperationKindDelete), _item.OperationKind_)
 	})
 }
 
@@ -136,7 +136,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		player := se.CreatePlayer()
 		se.DeletePlayer(player.ID(se))
 		item := player.AddItem(se)
-		assert.Equal(t, OperationKind(OperationKindDelete), item.item.OperationKind)
+		assert.Equal(t, OperationKind(OperationKindDelete), item.item.OperationKind_)
 		se.UpdateState()
 		assert.Equal(t, 0, len(se.Player(player.ID(se)).Items(se)))
 	})
@@ -176,29 +176,29 @@ func TestTree(t *testing.T) {
 					{
 						ID: player1.ID(se),
 						GearScore: &_gearScore{
-							ID:            player1.GearScore(se).ID(se),
-							OperationKind: OperationKindUpdate,
+							ID:             player1.GearScore(se).ID(se),
+							OperationKind_: OperationKindUpdate,
 						},
-						OperationKind: OperationKindUpdate,
+						OperationKind_: OperationKindUpdate,
 						Position: &_position{
-							ID:            player1.Position(se).ID(se),
-							OperationKind: OperationKindUpdate,
+							ID:             player1.Position(se).ID(se),
+							OperationKind_: OperationKindUpdate,
 						},
 					},
 					{
 						ID: player2.ID(se),
 						GearScore: &_gearScore{
-							ID:            player2.GearScore(se).ID(se),
-							OperationKind: OperationKindUpdate,
+							ID:             player2.GearScore(se).ID(se),
+							OperationKind_: OperationKindUpdate,
 						},
-						OperationKind: OperationKindUpdate,
+						OperationKind_: OperationKindUpdate,
 						Position: &_position{
-							ID:            player2.Position(se).ID(se),
-							OperationKind: OperationKindUpdate,
+							ID:             player2.Position(se).ID(se),
+							OperationKind_: OperationKindUpdate,
 						},
 					},
 				},
-				OperationKind: OperationKindUpdate,
+				OperationKind_: OperationKindUpdate,
 			},
 		}
 
@@ -225,14 +225,14 @@ func TestTree(t *testing.T) {
 					{
 						ID: player1.ID(se),
 						GearScore: &_gearScore{
-							ID:            player1.GearScore(se).ID(se),
-							Level:         1,
-							OperationKind: OperationKindUpdate,
+							ID:             player1.GearScore(se).ID(se),
+							Level:          1,
+							OperationKind_: OperationKindUpdate,
 						},
-						OperationKind: OperationKindUpdate,
+						OperationKind_: OperationKindUpdate,
 					},
 				},
-				OperationKind: OperationKindUpdate,
+				OperationKind_: OperationKindUpdate,
 			},
 		}
 
@@ -260,18 +260,18 @@ func TestTree(t *testing.T) {
 						ID: player1.ID(se),
 						Items: []_item{
 							{
-								ID:            player1item1.ID(se),
-								OperationKind: OperationKindUpdate,
+								ID:             player1item1.ID(se),
+								OperationKind_: OperationKindUpdate,
 								GearScore: &_gearScore{
-									ID:            player1item1.GearScore(se).ID(se),
-									OperationKind: OperationKindUpdate,
+									ID:             player1item1.GearScore(se).ID(se),
+									OperationKind_: OperationKindUpdate,
 								},
 							},
 						},
-						OperationKind: OperationKindUpdate,
+						OperationKind_: OperationKindUpdate,
 					},
 				},
-				OperationKind: OperationKindUpdate,
+				OperationKind_: OperationKindUpdate,
 			},
 		}
 
@@ -302,18 +302,18 @@ func TestTree(t *testing.T) {
 						ID: player1.ID(se),
 						Items: []_item{
 							{
-								ID:            player1item2.ID(se),
-								OperationKind: OperationKindDelete,
+								ID:             player1item2.ID(se),
+								OperationKind_: OperationKindDelete,
 								GearScore: &_gearScore{
-									ID:            player1item2.item.GearScore,
-									OperationKind: OperationKindDelete,
+									ID:             player1item2.item.GearScore,
+									OperationKind_: OperationKindDelete,
 								},
 							},
 						},
-						OperationKind: OperationKindUpdate,
+						OperationKind_: OperationKindUpdate,
 					},
 				},
-				OperationKind: OperationKindUpdate,
+				OperationKind_: OperationKindUpdate,
 			},
 		}
 

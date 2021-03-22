@@ -14,8 +14,8 @@ func (_e <( toTitleCase $Type.Name )>) Add
 <(- end -)>
 (se *Engine<(if .ValueType.IsBasicType )>, <( .Name)> ...<( .ValueType.Name )><( end )>) <( if not .ValueType.IsBasicType )><( toTitleCase .ValueType.Name )><( end )> {
 	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
-	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
-		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{<( .ValueType.Name )>Core{OperationKind: OperationKindDelete}}<( end )>
+	if e.<( $Type.Name )>.OperationKind_ == OperationKindDelete {
+		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{<( .ValueType.Name )>Core{OperationKind_: OperationKindDelete}}<( end )>
 	}
 	<(- if not .ValueType.IsBasicType )>
 		<( encrypt .ValueType.Name )> := se.create<( toTitleCase .ValueType.Name )>(true)
@@ -27,7 +27,7 @@ func (_e <( toTitleCase $Type.Name )>) Add
 		<( encrypt .ValueType.Name )>.<( .ValueType.Name )>.ID
 	<(- end -)>
 	)
-	e.<( $Type.Name )>.OperationKind = OperationKindUpdate
+	e.<( $Type.Name )>.OperationKind_ = OperationKindUpdate
 	se.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )><( if not .ValueType.IsBasicType )>
 	return <( encrypt .ValueType.Name )><( end )>
 }

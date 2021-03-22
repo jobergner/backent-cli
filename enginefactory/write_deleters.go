@@ -9,7 +9,7 @@ const deleterTemplateString string = `
 func (se *Engine) Delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) {
 	<( if not .IsRootType -)>
 		<( encrypt .Name )> := se.<( toTitleCase .Name )>(<( .Name )>ID).<( .Name )>
-		if <( encrypt .Name )>.HasParent {
+		if <( encrypt .Name )>.HasParent_ {
 			return
 		}
 	<( end -)>
@@ -17,7 +17,7 @@ func (se *Engine) Delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Na
 }
 func (se *Engine) delete<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) {
 	<( encrypt .Name )> := se.<( toTitleCase .Name )>(<( .Name )>ID).<( .Name )>
-	<( encrypt .Name )>.OperationKind = OperationKindDelete
+	<( encrypt .Name )>.OperationKind_ = OperationKindDelete
 	se.Patch.<( toTitleCase .Name )>[<( encrypt .Name )>.ID] = <( encrypt .Name -)>
 	<( $Type := . )>
 	<(- range .Fields )><( if not .ValueType.IsBasicType )>

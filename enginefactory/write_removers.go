@@ -14,7 +14,7 @@ func (_e <( toTitleCase $Type.Name )>) Remove<( toTitleCase .Name )>(se *Engine,
 <(- end -)>
 ) <( toTitleCase $Type.Name )> {
 	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
-	if e.<( $Type.Name )>.OperationKind == OperationKindDelete {
+	if e.<( $Type.Name )>.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -46,7 +46,7 @@ func (_e <( toTitleCase $Type.Name )>) Remove<( toTitleCase .Name )>(se *Engine,
 		return e
 	}
 	e.<( $Type.Name )>.<( toTitleCase .Name )> = newElements
-	e.<( $Type.Name )>.OperationKind = OperationKindUpdate
+	e.<( $Type.Name )>.OperationKind_ = OperationKindUpdate
 	se.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )>
 	return e
 }

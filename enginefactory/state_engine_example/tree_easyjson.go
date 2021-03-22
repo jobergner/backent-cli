@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson19a9978cDecodeStatefactoryEngineExample(in *jlexer.Lexer, out *_zoneItem) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(in *jlexer.Lexer, out *_zoneItem) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -38,16 +38,6 @@ func easyjson19a9978cDecodeStatefactoryEngineExample(in *jlexer.Lexer, out *_zon
 		switch key {
 		case "id":
 			out.ID = ZoneItemID(in.Int())
-		case "position":
-			if in.IsNull() {
-				in.Skip()
-				out.Position = nil
-			} else {
-				if out.Position == nil {
-					out.Position = new(_position)
-				}
-				(*out.Position).UnmarshalEasyJSON(in)
-			}
 		case "item":
 			if in.IsNull() {
 				in.Skip()
@@ -58,8 +48,18 @@ func easyjson19a9978cDecodeStatefactoryEngineExample(in *jlexer.Lexer, out *_zon
 				}
 				(*out.Item).UnmarshalEasyJSON(in)
 			}
-		case "operationKind":
-			out.OperationKind = OperationKind(in.String())
+		case "position":
+			if in.IsNull() {
+				in.Skip()
+				out.Position = nil
+			} else {
+				if out.Position == nil {
+					out.Position = new(_position)
+				}
+				(*out.Position).UnmarshalEasyJSON(in)
+			}
+		case "operationKind_":
+			out.OperationKind_ = OperationKind(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -70,7 +70,7 @@ func easyjson19a9978cDecodeStatefactoryEngineExample(in *jlexer.Lexer, out *_zon
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample(out *jwriter.Writer, in _zoneItem) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(out *jwriter.Writer, in _zoneItem) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -78,15 +78,6 @@ func easyjson19a9978cEncodeStatefactoryEngineExample(out *jwriter.Writer, in _zo
 		const prefix string = ",\"id\":"
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
-	}
-	{
-		const prefix string = ",\"position\":"
-		out.RawString(prefix)
-		if in.Position == nil {
-			out.RawString("null")
-		} else {
-			(*in.Position).MarshalEasyJSON(out)
-		}
 	}
 	{
 		const prefix string = ",\"item\":"
@@ -98,9 +89,18 @@ func easyjson19a9978cEncodeStatefactoryEngineExample(out *jwriter.Writer, in _zo
 		}
 	}
 	{
-		const prefix string = ",\"operationKind\":"
+		const prefix string = ",\"position\":"
 		out.RawString(prefix)
-		out.String(string(in.OperationKind))
+		if in.Position == nil {
+			out.RawString("null")
+		} else {
+			(*in.Position).MarshalEasyJSON(out)
+		}
+	}
+	{
+		const prefix string = ",\"operationKind_\":"
+		out.RawString(prefix)
+		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
 }
@@ -108,27 +108,27 @@ func easyjson19a9978cEncodeStatefactoryEngineExample(out *jwriter.Writer, in _zo
 // MarshalJSON supports json.Marshaler interface
 func (v _zoneItem) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _zoneItem) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_zoneItem) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_zoneItem) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(l, v)
 }
-func easyjson19a9978cDecodeStatefactoryEngineExample1(in *jlexer.Lexer, out *_zone) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(in *jlexer.Lexer, out *_zone) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -149,29 +149,6 @@ func easyjson19a9978cDecodeStatefactoryEngineExample1(in *jlexer.Lexer, out *_zo
 		switch key {
 		case "id":
 			out.ID = ZoneID(in.Int())
-		case "players":
-			if in.IsNull() {
-				in.Skip()
-				out.Players = nil
-			} else {
-				in.Delim('[')
-				if out.Players == nil {
-					if !in.IsDelim(']') {
-						out.Players = make([]_player, 0, 1)
-					} else {
-						out.Players = []_player{}
-					}
-				} else {
-					out.Players = (out.Players)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v1 _player
-					(v1).UnmarshalEasyJSON(in)
-					out.Players = append(out.Players, v1)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
 		case "items":
 			if in.IsNull() {
 				in.Skip()
@@ -188,15 +165,61 @@ func easyjson19a9978cDecodeStatefactoryEngineExample1(in *jlexer.Lexer, out *_zo
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v2 _zoneItem
-					(v2).UnmarshalEasyJSON(in)
-					out.Items = append(out.Items, v2)
+					var v1 _zoneItem
+					(v1).UnmarshalEasyJSON(in)
+					out.Items = append(out.Items, v1)
 					in.WantComma()
 				}
 				in.Delim(']')
 			}
-		case "operationKind":
-			out.OperationKind = OperationKind(in.String())
+		case "players":
+			if in.IsNull() {
+				in.Skip()
+				out.Players = nil
+			} else {
+				in.Delim('[')
+				if out.Players == nil {
+					if !in.IsDelim(']') {
+						out.Players = make([]_player, 0, 1)
+					} else {
+						out.Players = []_player{}
+					}
+				} else {
+					out.Players = (out.Players)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v2 _player
+					(v2).UnmarshalEasyJSON(in)
+					out.Players = append(out.Players, v2)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "tags":
+			if in.IsNull() {
+				in.Skip()
+				out.Tags = nil
+			} else {
+				in.Delim('[')
+				if out.Tags == nil {
+					if !in.IsDelim(']') {
+						out.Tags = make([]string, 0, 4)
+					} else {
+						out.Tags = []string{}
+					}
+				} else {
+					out.Tags = (out.Tags)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v3 string
+					v3 = string(in.String())
+					out.Tags = append(out.Tags, v3)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "operationKind_":
+			out.OperationKind_ = OperationKind(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -207,7 +230,7 @@ func easyjson19a9978cDecodeStatefactoryEngineExample1(in *jlexer.Lexer, out *_zo
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample1(out *jwriter.Writer, in _zone) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(out *jwriter.Writer, in _zone) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -217,41 +240,57 @@ func easyjson19a9978cEncodeStatefactoryEngineExample1(out *jwriter.Writer, in _z
 		out.Int(int(in.ID))
 	}
 	{
-		const prefix string = ",\"players\":"
-		out.RawString(prefix)
-		if in.Players == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v3, v4 := range in.Players {
-				if v3 > 0 {
-					out.RawByte(',')
-				}
-				(v4).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
-	}
-	{
 		const prefix string = ",\"items\":"
 		out.RawString(prefix)
 		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v5, v6 := range in.Items {
-				if v5 > 0 {
+			for v4, v5 := range in.Items {
+				if v4 > 0 {
 					out.RawByte(',')
 				}
-				(v6).MarshalEasyJSON(out)
+				(v5).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
 	}
 	{
-		const prefix string = ",\"operationKind\":"
+		const prefix string = ",\"players\":"
 		out.RawString(prefix)
-		out.String(string(in.OperationKind))
+		if in.Players == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v6, v7 := range in.Players {
+				if v6 > 0 {
+					out.RawByte(',')
+				}
+				(v7).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	{
+		const prefix string = ",\"tags\":"
+		out.RawString(prefix)
+		if in.Tags == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v8, v9 := range in.Tags {
+				if v8 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v9))
+			}
+			out.RawByte(']')
+		}
+	}
+	{
+		const prefix string = ",\"operationKind_\":"
+		out.RawString(prefix)
+		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
 }
@@ -259,27 +298,27 @@ func easyjson19a9978cEncodeStatefactoryEngineExample1(out *jwriter.Writer, in _z
 // MarshalJSON supports json.Marshaler interface
 func (v _zone) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample1(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _zone) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample1(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_zone) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample1(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_zone) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample1(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(l, v)
 }
-func easyjson19a9978cDecodeStatefactoryEngineExample2(in *jlexer.Lexer, out *_position) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(in *jlexer.Lexer, out *_position) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -304,8 +343,8 @@ func easyjson19a9978cDecodeStatefactoryEngineExample2(in *jlexer.Lexer, out *_po
 			out.X = float64(in.Float64())
 		case "y":
 			out.Y = float64(in.Float64())
-		case "operationKind":
-			out.OperationKind = OperationKind(in.String())
+		case "operationKind_":
+			out.OperationKind_ = OperationKind(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -316,7 +355,7 @@ func easyjson19a9978cDecodeStatefactoryEngineExample2(in *jlexer.Lexer, out *_po
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample2(out *jwriter.Writer, in _position) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(out *jwriter.Writer, in _position) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -336,9 +375,9 @@ func easyjson19a9978cEncodeStatefactoryEngineExample2(out *jwriter.Writer, in _p
 		out.Float64(float64(in.Y))
 	}
 	{
-		const prefix string = ",\"operationKind\":"
+		const prefix string = ",\"operationKind_\":"
 		out.RawString(prefix)
-		out.String(string(in.OperationKind))
+		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
 }
@@ -346,27 +385,27 @@ func easyjson19a9978cEncodeStatefactoryEngineExample2(out *jwriter.Writer, in _p
 // MarshalJSON supports json.Marshaler interface
 func (v _position) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample2(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _position) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample2(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_position) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample2(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_position) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample2(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(l, v)
 }
-func easyjson19a9978cDecodeStatefactoryEngineExample3(in *jlexer.Lexer, out *_player) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lexer, out *_player) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -387,6 +426,16 @@ func easyjson19a9978cDecodeStatefactoryEngineExample3(in *jlexer.Lexer, out *_pl
 		switch key {
 		case "id":
 			out.ID = PlayerID(in.Int())
+		case "gearScore":
+			if in.IsNull() {
+				in.Skip()
+				out.GearScore = nil
+			} else {
+				if out.GearScore == nil {
+					out.GearScore = new(_gearScore)
+				}
+				(*out.GearScore).UnmarshalEasyJSON(in)
+			}
 		case "items":
 			if in.IsNull() {
 				in.Skip()
@@ -403,22 +452,12 @@ func easyjson19a9978cDecodeStatefactoryEngineExample3(in *jlexer.Lexer, out *_pl
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v7 _item
-					(v7).UnmarshalEasyJSON(in)
-					out.Items = append(out.Items, v7)
+					var v10 _item
+					(v10).UnmarshalEasyJSON(in)
+					out.Items = append(out.Items, v10)
 					in.WantComma()
 				}
 				in.Delim(']')
-			}
-		case "gearScore":
-			if in.IsNull() {
-				in.Skip()
-				out.GearScore = nil
-			} else {
-				if out.GearScore == nil {
-					out.GearScore = new(_gearScore)
-				}
-				(*out.GearScore).UnmarshalEasyJSON(in)
 			}
 		case "position":
 			if in.IsNull() {
@@ -430,8 +469,8 @@ func easyjson19a9978cDecodeStatefactoryEngineExample3(in *jlexer.Lexer, out *_pl
 				}
 				(*out.Position).UnmarshalEasyJSON(in)
 			}
-		case "operationKind":
-			out.OperationKind = OperationKind(in.String())
+		case "operationKind_":
+			out.OperationKind_ = OperationKind(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -442,7 +481,7 @@ func easyjson19a9978cDecodeStatefactoryEngineExample3(in *jlexer.Lexer, out *_pl
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample3(out *jwriter.Writer, in _player) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(out *jwriter.Writer, in _player) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -452,28 +491,28 @@ func easyjson19a9978cEncodeStatefactoryEngineExample3(out *jwriter.Writer, in _p
 		out.Int(int(in.ID))
 	}
 	{
-		const prefix string = ",\"items\":"
-		out.RawString(prefix)
-		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v8, v9 := range in.Items {
-				if v8 > 0 {
-					out.RawByte(',')
-				}
-				(v9).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
-	}
-	{
 		const prefix string = ",\"gearScore\":"
 		out.RawString(prefix)
 		if in.GearScore == nil {
 			out.RawString("null")
 		} else {
 			(*in.GearScore).MarshalEasyJSON(out)
+		}
+	}
+	{
+		const prefix string = ",\"items\":"
+		out.RawString(prefix)
+		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v11, v12 := range in.Items {
+				if v11 > 0 {
+					out.RawByte(',')
+				}
+				(v12).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
 		}
 	}
 	{
@@ -486,9 +525,9 @@ func easyjson19a9978cEncodeStatefactoryEngineExample3(out *jwriter.Writer, in _p
 		}
 	}
 	{
-		const prefix string = ",\"operationKind\":"
+		const prefix string = ",\"operationKind_\":"
 		out.RawString(prefix)
-		out.String(string(in.OperationKind))
+		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
 }
@@ -496,27 +535,27 @@ func easyjson19a9978cEncodeStatefactoryEngineExample3(out *jwriter.Writer, in _p
 // MarshalJSON supports json.Marshaler interface
 func (v _player) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample3(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _player) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample3(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_player) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample3(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_player) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample3(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(l, v)
 }
-func easyjson19a9978cDecodeStatefactoryEngineExample4(in *jlexer.Lexer, out *_item) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(in *jlexer.Lexer, out *_item) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -547,8 +586,8 @@ func easyjson19a9978cDecodeStatefactoryEngineExample4(in *jlexer.Lexer, out *_it
 				}
 				(*out.GearScore).UnmarshalEasyJSON(in)
 			}
-		case "operationKind":
-			out.OperationKind = OperationKind(in.String())
+		case "operationKind_":
+			out.OperationKind_ = OperationKind(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -559,7 +598,7 @@ func easyjson19a9978cDecodeStatefactoryEngineExample4(in *jlexer.Lexer, out *_it
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample4(out *jwriter.Writer, in _item) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(out *jwriter.Writer, in _item) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -578,9 +617,9 @@ func easyjson19a9978cEncodeStatefactoryEngineExample4(out *jwriter.Writer, in _i
 		}
 	}
 	{
-		const prefix string = ",\"operationKind\":"
+		const prefix string = ",\"operationKind_\":"
 		out.RawString(prefix)
-		out.String(string(in.OperationKind))
+		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
 }
@@ -588,27 +627,27 @@ func easyjson19a9978cEncodeStatefactoryEngineExample4(out *jwriter.Writer, in _i
 // MarshalJSON supports json.Marshaler interface
 func (v _item) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample4(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _item) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample4(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_item) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample4(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_item) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample4(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(l, v)
 }
-func easyjson19a9978cDecodeStatefactoryEngineExample5(in *jlexer.Lexer, out *_gearScore) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(in *jlexer.Lexer, out *_gearScore) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -633,8 +672,8 @@ func easyjson19a9978cDecodeStatefactoryEngineExample5(in *jlexer.Lexer, out *_ge
 			out.Level = int(in.Int())
 		case "score":
 			out.Score = int(in.Int())
-		case "operationKind":
-			out.OperationKind = OperationKind(in.String())
+		case "operationKind_":
+			out.OperationKind_ = OperationKind(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -645,7 +684,7 @@ func easyjson19a9978cDecodeStatefactoryEngineExample5(in *jlexer.Lexer, out *_ge
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample5(out *jwriter.Writer, in _gearScore) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(out *jwriter.Writer, in _gearScore) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -665,9 +704,9 @@ func easyjson19a9978cEncodeStatefactoryEngineExample5(out *jwriter.Writer, in _g
 		out.Int(int(in.Score))
 	}
 	{
-		const prefix string = ",\"operationKind\":"
+		const prefix string = ",\"operationKind_\":"
 		out.RawString(prefix)
-		out.String(string(in.OperationKind))
+		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
 }
@@ -675,27 +714,27 @@ func easyjson19a9978cEncodeStatefactoryEngineExample5(out *jwriter.Writer, in _g
 // MarshalJSON supports json.Marshaler interface
 func (v _gearScore) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample5(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _gearScore) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample5(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_gearScore) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample5(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_gearScore) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample5(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(l, v)
 }
-func easyjson19a9978cDecodeStatefactoryEngineExample6(in *jlexer.Lexer, out *Tree) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lexer, out *Tree) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -714,50 +753,18 @@ func easyjson19a9978cDecodeStatefactoryEngineExample6(in *jlexer.Lexer, out *Tre
 			continue
 		}
 		switch key {
-		case "player":
+		case "gearScore":
 			if in.IsNull() {
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Player = make(map[PlayerID]_player)
+				out.GearScore = make(map[GearScoreID]_gearScore)
 				for !in.IsDelim('}') {
-					key := PlayerID(in.IntStr())
+					key := GearScoreID(in.IntStr())
 					in.WantColon()
-					var v10 _player
-					(v10).UnmarshalEasyJSON(in)
-					(out.Player)[key] = v10
-					in.WantComma()
-				}
-				in.Delim('}')
-			}
-		case "zone":
-			if in.IsNull() {
-				in.Skip()
-			} else {
-				in.Delim('{')
-				out.Zone = make(map[ZoneID]_zone)
-				for !in.IsDelim('}') {
-					key := ZoneID(in.IntStr())
-					in.WantColon()
-					var v11 _zone
-					(v11).UnmarshalEasyJSON(in)
-					(out.Zone)[key] = v11
-					in.WantComma()
-				}
-				in.Delim('}')
-			}
-		case "zoneItem":
-			if in.IsNull() {
-				in.Skip()
-			} else {
-				in.Delim('{')
-				out.ZoneItem = make(map[ZoneItemID]_zoneItem)
-				for !in.IsDelim('}') {
-					key := ZoneItemID(in.IntStr())
-					in.WantColon()
-					var v12 _zoneItem
-					(v12).UnmarshalEasyJSON(in)
-					(out.ZoneItem)[key] = v12
+					var v13 _gearScore
+					(v13).UnmarshalEasyJSON(in)
+					(out.GearScore)[key] = v13
 					in.WantComma()
 				}
 				in.Delim('}')
@@ -771,9 +778,25 @@ func easyjson19a9978cDecodeStatefactoryEngineExample6(in *jlexer.Lexer, out *Tre
 				for !in.IsDelim('}') {
 					key := ItemID(in.IntStr())
 					in.WantColon()
-					var v13 _item
-					(v13).UnmarshalEasyJSON(in)
-					(out.Item)[key] = v13
+					var v14 _item
+					(v14).UnmarshalEasyJSON(in)
+					(out.Item)[key] = v14
+					in.WantComma()
+				}
+				in.Delim('}')
+			}
+		case "player":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('{')
+				out.Player = make(map[PlayerID]_player)
+				for !in.IsDelim('}') {
+					key := PlayerID(in.IntStr())
+					in.WantColon()
+					var v15 _player
+					(v15).UnmarshalEasyJSON(in)
+					(out.Player)[key] = v15
 					in.WantComma()
 				}
 				in.Delim('}')
@@ -787,25 +810,41 @@ func easyjson19a9978cDecodeStatefactoryEngineExample6(in *jlexer.Lexer, out *Tre
 				for !in.IsDelim('}') {
 					key := PositionID(in.IntStr())
 					in.WantColon()
-					var v14 _position
-					(v14).UnmarshalEasyJSON(in)
-					(out.Position)[key] = v14
+					var v16 _position
+					(v16).UnmarshalEasyJSON(in)
+					(out.Position)[key] = v16
 					in.WantComma()
 				}
 				in.Delim('}')
 			}
-		case "gearScore":
+		case "zone":
 			if in.IsNull() {
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.GearScore = make(map[GearScoreID]_gearScore)
+				out.Zone = make(map[ZoneID]_zone)
 				for !in.IsDelim('}') {
-					key := GearScoreID(in.IntStr())
+					key := ZoneID(in.IntStr())
 					in.WantColon()
-					var v15 _gearScore
-					(v15).UnmarshalEasyJSON(in)
-					(out.GearScore)[key] = v15
+					var v17 _zone
+					(v17).UnmarshalEasyJSON(in)
+					(out.Zone)[key] = v17
+					in.WantComma()
+				}
+				in.Delim('}')
+			}
+		case "zoneItem":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('{')
+				out.ZoneItem = make(map[ZoneItemID]_zoneItem)
+				for !in.IsDelim('}') {
+					key := ZoneItemID(in.IntStr())
+					in.WantColon()
+					var v18 _zoneItem
+					(v18).UnmarshalEasyJSON(in)
+					(out.ZoneItem)[key] = v18
 					in.WantComma()
 				}
 				in.Delim('}')
@@ -820,82 +859,19 @@ func easyjson19a9978cDecodeStatefactoryEngineExample6(in *jlexer.Lexer, out *Tre
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeStatefactoryEngineExample6(out *jwriter.Writer, in Tree) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample6(out *jwriter.Writer, in Tree) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"player\":"
+		const prefix string = ",\"gearScore\":"
 		out.RawString(prefix[1:])
-		if in.Player == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
-		} else {
-			out.RawByte('{')
-			v16First := true
-			for v16Name, v16Value := range in.Player {
-				if v16First {
-					v16First = false
-				} else {
-					out.RawByte(',')
-				}
-				out.IntStr(int(v16Name))
-				out.RawByte(':')
-				(v16Value).MarshalEasyJSON(out)
-			}
-			out.RawByte('}')
-		}
-	}
-	{
-		const prefix string = ",\"zone\":"
-		out.RawString(prefix)
-		if in.Zone == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
-		} else {
-			out.RawByte('{')
-			v17First := true
-			for v17Name, v17Value := range in.Zone {
-				if v17First {
-					v17First = false
-				} else {
-					out.RawByte(',')
-				}
-				out.IntStr(int(v17Name))
-				out.RawByte(':')
-				(v17Value).MarshalEasyJSON(out)
-			}
-			out.RawByte('}')
-		}
-	}
-	{
-		const prefix string = ",\"zoneItem\":"
-		out.RawString(prefix)
-		if in.ZoneItem == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
-		} else {
-			out.RawByte('{')
-			v18First := true
-			for v18Name, v18Value := range in.ZoneItem {
-				if v18First {
-					v18First = false
-				} else {
-					out.RawByte(',')
-				}
-				out.IntStr(int(v18Name))
-				out.RawByte(':')
-				(v18Value).MarshalEasyJSON(out)
-			}
-			out.RawByte('}')
-		}
-	}
-	{
-		const prefix string = ",\"item\":"
-		out.RawString(prefix)
-		if in.Item == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
+		if in.GearScore == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
 			out.RawString(`null`)
 		} else {
 			out.RawByte('{')
 			v19First := true
-			for v19Name, v19Value := range in.Item {
+			for v19Name, v19Value := range in.GearScore {
 				if v19First {
 					v19First = false
 				} else {
@@ -909,14 +885,14 @@ func easyjson19a9978cEncodeStatefactoryEngineExample6(out *jwriter.Writer, in Tr
 		}
 	}
 	{
-		const prefix string = ",\"position\":"
+		const prefix string = ",\"item\":"
 		out.RawString(prefix)
-		if in.Position == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
+		if in.Item == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
 			out.RawString(`null`)
 		} else {
 			out.RawByte('{')
 			v20First := true
-			for v20Name, v20Value := range in.Position {
+			for v20Name, v20Value := range in.Item {
 				if v20First {
 					v20First = false
 				} else {
@@ -930,14 +906,14 @@ func easyjson19a9978cEncodeStatefactoryEngineExample6(out *jwriter.Writer, in Tr
 		}
 	}
 	{
-		const prefix string = ",\"gearScore\":"
+		const prefix string = ",\"player\":"
 		out.RawString(prefix)
-		if in.GearScore == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
+		if in.Player == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
 			out.RawString(`null`)
 		} else {
 			out.RawByte('{')
 			v21First := true
-			for v21Name, v21Value := range in.GearScore {
+			for v21Name, v21Value := range in.Player {
 				if v21First {
 					v21First = false
 				} else {
@@ -950,29 +926,92 @@ func easyjson19a9978cEncodeStatefactoryEngineExample6(out *jwriter.Writer, in Tr
 			out.RawByte('}')
 		}
 	}
+	{
+		const prefix string = ",\"position\":"
+		out.RawString(prefix)
+		if in.Position == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
+			out.RawString(`null`)
+		} else {
+			out.RawByte('{')
+			v22First := true
+			for v22Name, v22Value := range in.Position {
+				if v22First {
+					v22First = false
+				} else {
+					out.RawByte(',')
+				}
+				out.IntStr(int(v22Name))
+				out.RawByte(':')
+				(v22Value).MarshalEasyJSON(out)
+			}
+			out.RawByte('}')
+		}
+	}
+	{
+		const prefix string = ",\"zone\":"
+		out.RawString(prefix)
+		if in.Zone == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
+			out.RawString(`null`)
+		} else {
+			out.RawByte('{')
+			v23First := true
+			for v23Name, v23Value := range in.Zone {
+				if v23First {
+					v23First = false
+				} else {
+					out.RawByte(',')
+				}
+				out.IntStr(int(v23Name))
+				out.RawByte(':')
+				(v23Value).MarshalEasyJSON(out)
+			}
+			out.RawByte('}')
+		}
+	}
+	{
+		const prefix string = ",\"zoneItem\":"
+		out.RawString(prefix)
+		if in.ZoneItem == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
+			out.RawString(`null`)
+		} else {
+			out.RawByte('{')
+			v24First := true
+			for v24Name, v24Value := range in.ZoneItem {
+				if v24First {
+					v24First = false
+				} else {
+					out.RawByte(',')
+				}
+				out.IntStr(int(v24Name))
+				out.RawByte(':')
+				(v24Value).MarshalEasyJSON(out)
+			}
+			out.RawByte('}')
+		}
+	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
 func (v Tree) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson19a9978cEncodeStatefactoryEngineExample6(&w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Tree) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson19a9978cEncodeStatefactoryEngineExample6(w, v)
+	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Tree) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson19a9978cDecodeStatefactoryEngineExample6(&r, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Tree) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson19a9978cDecodeStatefactoryEngineExample6(l, v)
+	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(l, v)
 }

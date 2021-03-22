@@ -4,46 +4,46 @@ package enginefactory
 
 const AddPlayer_Zone_func string = `func (_e Zone) AddPlayer(se *Engine) Player {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
-		return Player{playerCore{OperationKind: OperationKindDelete}}
+	if e.zone.OperationKind_ == OperationKindDelete {
+		return Player{playerCore{OperationKind_: OperationKindDelete}}
 	}
 	player := se.createPlayer(true)
 	e.zone.Players = append(e.zone.Players, player.player.ID)
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return player
 }`
 
 const AddItem_Zone_func string = `func (_e Zone) AddItem(se *Engine) ZoneItem {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
-		return ZoneItem{zoneItemCore{OperationKind: OperationKindDelete}}
+	if e.zone.OperationKind_ == OperationKindDelete {
+		return ZoneItem{zoneItemCore{OperationKind_: OperationKindDelete}}
 	}
 	zoneItem := se.createZoneItem(true)
 	e.zone.Items = append(e.zone.Items, zoneItem.zoneItem.ID)
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return zoneItem
 }`
 
 const AddTags_Zone_func string = `func (_e Zone) AddTags(se *Engine, tags ...string) {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return
 	}
 	e.zone.Tags = append(e.zone.Tags, tags...)
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 }`
 
 const AddItem_Player_func string = `func (_e Player) AddItem(se *Engine) Item {
 	e := se.Player(_e.player.ID)
-	if e.player.OperationKind == OperationKindDelete {
-		return Item{itemCore{OperationKind: OperationKindDelete}}
+	if e.player.OperationKind_ == OperationKindDelete {
+		return Item{itemCore{OperationKind_: OperationKindDelete}}
 	}
 	item := se.createItem(true)
 	e.player.Items = append(e.player.Items, item.item.ID)
-	e.player.OperationKind = OperationKindUpdate
+	e.player.OperationKind_ = OperationKindUpdate
 	se.Patch.Player[e.player.ID] = e.player
 	return item
 }`
@@ -55,7 +55,7 @@ const assembleGearScore_Engine_func string = `func (se *Engine) assembleGearScor
 	}
 	var treeGearScore _gearScore
 	treeGearScore.ID = gearScore.ID
-	treeGearScore.OperationKind = gearScore.OperationKind
+	treeGearScore.OperationKind_ = gearScore.OperationKind_
 	treeGearScore.Level = gearScore.Level
 	treeGearScore.Score = gearScore.Score
 	return treeGearScore, true
@@ -68,7 +68,7 @@ const assemblePosition_Engine_func string = `func (se *Engine) assemblePosition(
 	}
 	var treePosition _position
 	treePosition.ID = position.ID
-	treePosition.OperationKind = position.OperationKind
+	treePosition.OperationKind_ = position.OperationKind_
 	treePosition.X = position.X
 	treePosition.Y = position.Y
 	return treePosition, true
@@ -85,7 +85,7 @@ const assembleItem_Engine_func string = `func (se *Engine) assembleItem(itemID I
 		treeItem.GearScore = &treeGearScore
 	}
 	treeItem.ID = item.ID
-	treeItem.OperationKind = item.OperationKind
+	treeItem.OperationKind_ = item.OperationKind_
 	return treeItem, hasUpdated
 }`
 
@@ -104,7 +104,7 @@ const assembleZoneItem_Engine_func string = `func (se *Engine) assembleZoneItem(
 		treeZoneItem.Position = &treePosition
 	}
 	treeZoneItem.ID = zoneItem.ID
-	treeZoneItem.OperationKind = zoneItem.OperationKind
+	treeZoneItem.OperationKind_ = zoneItem.OperationKind_
 	return treeZoneItem, hasUpdated
 }`
 
@@ -129,7 +129,7 @@ const assemblePlayer_Engine_func string = `func (se *Engine) assemblePlayer(play
 		treePlayer.Position = &treePosition
 	}
 	treePlayer.ID = player.ID
-	treePlayer.OperationKind = player.OperationKind
+	treePlayer.OperationKind_ = player.OperationKind_
 	return treePlayer, hasUpdated
 }`
 
@@ -152,7 +152,7 @@ const assembleZone_Engine_func string = `func (se *Engine) assembleZone(zoneID Z
 		}
 	}
 	treeZone.ID = zone.ID
-	treeZone.OperationKind = zone.OperationKind
+	treeZone.OperationKind_ = zone.OperationKind_
 	treeZone.Tags = zone.Tags
 	return treeZone, hasUpdated
 }`
@@ -160,7 +160,7 @@ const assembleZone_Engine_func string = `func (se *Engine) assembleZone(zoneID Z
 const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 	tree := newTree()
 	for _, gearScore := range se.Patch.GearScore {
-		if !gearScore.HasParent {
+		if !gearScore.HasParent_ {
 			treeGearScore, hasUpdated := se.assembleGearScore(gearScore.ID)
 			if hasUpdated {
 				tree.GearScore[gearScore.ID] = treeGearScore
@@ -168,7 +168,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, item := range se.Patch.Item {
-		if !item.HasParent {
+		if !item.HasParent_ {
 			treeItem, hasUpdated := se.assembleItem(item.ID)
 			if hasUpdated {
 				tree.Item[item.ID] = treeItem
@@ -176,7 +176,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, player := range se.Patch.Player {
-		if !player.HasParent {
+		if !player.HasParent_ {
 			treePlayer, hasUpdated := se.assemblePlayer(player.ID)
 			if hasUpdated {
 				tree.Player[player.ID] = treePlayer
@@ -184,7 +184,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, position := range se.Patch.Position {
-		if !position.HasParent {
+		if !position.HasParent_ {
 			treePosition, hasUpdated := se.assemblePosition(position.ID)
 			if hasUpdated {
 				tree.Position[position.ID] = treePosition
@@ -198,7 +198,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItem := range se.Patch.ZoneItem {
-		if !zoneItem.HasParent {
+		if !zoneItem.HasParent_ {
 			treeZoneItem, hasUpdated := se.assembleZoneItem(zoneItem.ID)
 			if hasUpdated {
 				tree.ZoneItem[zoneItem.ID] = treeZoneItem
@@ -206,7 +206,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, gearScore := range se.State.GearScore {
-		if !gearScore.HasParent {
+		if !gearScore.HasParent_ {
 			if _, ok := tree.GearScore[gearScore.ID]; !ok {
 				treeGearScore, hasUpdated := se.assembleGearScore(gearScore.ID)
 				if hasUpdated {
@@ -216,7 +216,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, item := range se.State.Item {
-		if !item.HasParent {
+		if !item.HasParent_ {
 			if _, ok := tree.Item[item.ID]; !ok {
 				treeItem, hasUpdated := se.assembleItem(item.ID)
 				if hasUpdated {
@@ -226,7 +226,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, player := range se.State.Player {
-		if !player.HasParent {
+		if !player.HasParent_ {
 			if _, ok := tree.Player[player.ID]; !ok {
 				treePlayer, hasUpdated := se.assemblePlayer(player.ID)
 				if hasUpdated {
@@ -236,7 +236,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, position := range se.State.Position {
-		if !position.HasParent {
+		if !position.HasParent_ {
 			if _, ok := tree.Position[position.ID]; !ok {
 				treePosition, hasUpdated := se.assemblePosition(position.ID)
 				if hasUpdated {
@@ -254,7 +254,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItem := range se.State.ZoneItem {
-		if !zoneItem.HasParent {
+		if !zoneItem.HasParent_ {
 			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
 				treeZoneItem, hasUpdated := se.assembleZoneItem(zoneItem.ID)
 				if hasUpdated {
@@ -273,8 +273,8 @@ const CreateGearScore_Engine_func string = `func (se *Engine) CreateGearScore() 
 const createGearScore_Engine_func string = `func (se *Engine) createGearScore(hasParent bool) GearScore {
 	var e gearScoreCore
 	e.ID = GearScoreID(se.GenerateID())
-	e.HasParent = hasParent
-	e.OperationKind = OperationKindUpdate
+	e.HasParent_ = hasParent
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.GearScore[e.ID] = e
 	return GearScore{gearScore: e}
 }`
@@ -286,8 +286,8 @@ const CreatePosition_Engine_func string = `func (se *Engine) CreatePosition() Po
 const createPosition_Engine_func string = `func (se *Engine) createPosition(hasParent bool) Position {
 	var e positionCore
 	e.ID = PositionID(se.GenerateID())
-	e.HasParent = hasParent
-	e.OperationKind = OperationKindUpdate
+	e.HasParent_ = hasParent
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.Position[e.ID] = e
 	return Position{position: e}
 }`
@@ -299,10 +299,10 @@ const CreateItem_Engine_func string = `func (se *Engine) CreateItem() Item {
 const createItem_Engine_func string = `func (se *Engine) createItem(hasParent bool) Item {
 	var e itemCore
 	e.ID = ItemID(se.GenerateID())
-	e.HasParent = hasParent
+	e.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
 	e.GearScore = elementGearScore.gearScore.ID
-	e.OperationKind = OperationKindUpdate
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.Item[e.ID] = e
 	return Item{item: e}
 }`
@@ -314,12 +314,12 @@ const CreateZoneItem_Engine_func string = `func (se *Engine) CreateZoneItem() Zo
 const createZoneItem_Engine_func string = `func (se *Engine) createZoneItem(hasParent bool) ZoneItem {
 	var e zoneItemCore
 	e.ID = ZoneItemID(se.GenerateID())
-	e.HasParent = hasParent
+	e.HasParent_ = hasParent
 	elementItem := se.createItem(true)
 	e.Item = elementItem.item.ID
 	elementPosition := se.createPosition(true)
 	e.Position = elementPosition.position.ID
-	e.OperationKind = OperationKindUpdate
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.ZoneItem[e.ID] = e
 	return ZoneItem{zoneItem: e}
 }`
@@ -331,12 +331,12 @@ const CreatePlayer_Engine_func string = `func (se *Engine) CreatePlayer() Player
 const createPlayer_Engine_func string = `func (se *Engine) createPlayer(hasParent bool) Player {
 	var e playerCore
 	e.ID = PlayerID(se.GenerateID())
-	e.HasParent = hasParent
+	e.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
 	e.GearScore = elementGearScore.gearScore.ID
 	elementPosition := se.createPosition(true)
 	e.Position = elementPosition.position.ID
-	e.OperationKind = OperationKindUpdate
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.Player[e.ID] = e
 	return Player{player: e}
 }`
@@ -348,14 +348,14 @@ const CreateZone_Engine_func string = `func (se *Engine) CreateZone() Zone {
 const createZone_Engine_func string = `func (se *Engine) createZone() Zone {
 	var e zoneCore
 	e.ID = ZoneID(se.GenerateID())
-	e.OperationKind = OperationKindUpdate
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.ID] = e
 	return Zone{zone: e}
 }`
 
 const DeletePlayer_Engine_func string = `func (se *Engine) DeletePlayer(playerID PlayerID) {
 	player := se.Player(playerID).player
-	if player.HasParent {
+	if player.HasParent_ {
 		return
 	}
 	se.deletePlayer(playerID)
@@ -363,7 +363,7 @@ const DeletePlayer_Engine_func string = `func (se *Engine) DeletePlayer(playerID
 
 const deletePlayer_Engine_func string = `func (se *Engine) deletePlayer(playerID PlayerID) {
 	player := se.Player(playerID).player
-	player.OperationKind = OperationKindDelete
+	player.OperationKind_ = OperationKindDelete
 	se.Patch.Player[player.ID] = player
 	se.deleteGearScore(player.GearScore)
 	for _, itemID := range player.Items {
@@ -374,7 +374,7 @@ const deletePlayer_Engine_func string = `func (se *Engine) deletePlayer(playerID
 
 const DeleteGearScore_Engine_func string = `func (se *Engine) DeleteGearScore(gearScoreID GearScoreID) {
 	gearScore := se.GearScore(gearScoreID).gearScore
-	if gearScore.HasParent {
+	if gearScore.HasParent_ {
 		return
 	}
 	se.deleteGearScore(gearScoreID)
@@ -382,13 +382,13 @@ const DeleteGearScore_Engine_func string = `func (se *Engine) DeleteGearScore(ge
 
 const deleteGearScore_Engine_func string = `func (se *Engine) deleteGearScore(gearScoreID GearScoreID) {
 	gearScore := se.GearScore(gearScoreID).gearScore
-	gearScore.OperationKind = OperationKindDelete
+	gearScore.OperationKind_ = OperationKindDelete
 	se.Patch.GearScore[gearScore.ID] = gearScore
 }`
 
 const DeletePosition_Engine_func string = `func (se *Engine) DeletePosition(positionID PositionID) {
 	position := se.Position(positionID).position
-	if position.HasParent {
+	if position.HasParent_ {
 		return
 	}
 	se.deletePosition(positionID)
@@ -396,13 +396,13 @@ const DeletePosition_Engine_func string = `func (se *Engine) DeletePosition(posi
 
 const deletePosition_Engine_func string = `func (se *Engine) deletePosition(positionID PositionID) {
 	position := se.Position(positionID).position
-	position.OperationKind = OperationKindDelete
+	position.OperationKind_ = OperationKindDelete
 	se.Patch.Position[position.ID] = position
 }`
 
 const DeleteItem_Engine_func string = `func (se *Engine) DeleteItem(itemID ItemID) {
 	item := se.Item(itemID).item
-	if item.HasParent {
+	if item.HasParent_ {
 		return
 	}
 	se.deleteItem(itemID)
@@ -410,14 +410,14 @@ const DeleteItem_Engine_func string = `func (se *Engine) DeleteItem(itemID ItemI
 
 const deleteItem_Engine_func string = `func (se *Engine) deleteItem(itemID ItemID) {
 	item := se.Item(itemID).item
-	item.OperationKind = OperationKindDelete
+	item.OperationKind_ = OperationKindDelete
 	se.Patch.Item[item.ID] = item
 	se.deleteGearScore(item.GearScore)
 }`
 
 const DeleteZoneItem_Engine_func string = `func (se *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := se.ZoneItem(zoneItemID).zoneItem
-	if zoneItem.HasParent {
+	if zoneItem.HasParent_ {
 		return
 	}
 	se.deleteZoneItem(zoneItemID)
@@ -425,7 +425,7 @@ const DeleteZoneItem_Engine_func string = `func (se *Engine) DeleteZoneItem(zone
 
 const deleteZoneItem_Engine_func string = `func (se *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := se.ZoneItem(zoneItemID).zoneItem
-	zoneItem.OperationKind = OperationKindDelete
+	zoneItem.OperationKind_ = OperationKindDelete
 	se.Patch.ZoneItem[zoneItem.ID] = zoneItem
 	se.deleteItem(zoneItem.Item)
 	se.deletePosition(zoneItem.Position)
@@ -437,7 +437,7 @@ const DeleteZone_Engine_func string = `func (se *Engine) DeleteZone(zoneID ZoneI
 
 const deleteZone_Engine_func string = `func (se *Engine) deleteZone(zoneID ZoneID) {
 	zone := se.Zone(zoneID).zone
-	zone.OperationKind = OperationKindDelete
+	zone.OperationKind_ = OperationKindDelete
 	se.Patch.Zone[zone.ID] = zone
 	for _, zoneItemID := range zone.Items {
 		se.deleteZoneItem(zoneItemID)
@@ -698,7 +698,7 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 
 const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -720,14 +720,14 @@ const RemovePlayers_Zone_func string = `func (_e Zone) RemovePlayers(se *Engine,
 		return e
 	}
 	e.zone.Players = newElements
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return e
 }`
 
 const RemoveItems_Zone_func string = `func (_e Zone) RemoveItems(se *Engine, zoneItemsToRemove ...ZoneItemID) Zone {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -749,14 +749,14 @@ const RemoveItems_Zone_func string = `func (_e Zone) RemoveItems(se *Engine, zon
 		return e
 	}
 	e.zone.Items = newElements
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return e
 }`
 
 const RemoveItems_Player_func string = `func (_e Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
 	e := se.Player(_e.player.ID)
-	if e.player.OperationKind == OperationKindDelete {
+	if e.player.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -778,14 +778,14 @@ const RemoveItems_Player_func string = `func (_e Player) RemoveItems(se *Engine,
 		return e
 	}
 	e.player.Items = newElements
-	e.player.OperationKind = OperationKindUpdate
+	e.player.OperationKind_ = OperationKindUpdate
 	se.Patch.Player[e.player.ID] = e.player
 	return e
 }`
 
 const RemoveTags_Zone_func string = `func (_e Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
 	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind == OperationKindDelete {
+	if e.zone.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	var elementsAltered bool
@@ -806,51 +806,51 @@ const RemoveTags_Zone_func string = `func (_e Zone) RemoveTags(se *Engine, tagsT
 		return e
 	}
 	e.zone.Tags = newElements
-	e.zone.OperationKind = OperationKindUpdate
+	e.zone.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[e.zone.ID] = e.zone
 	return e
 }`
 
 const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(se *Engine, newLevel int) GearScore {
 	e := se.GearScore(_e.gearScore.ID)
-	if e.gearScore.OperationKind == OperationKindDelete {
+	if e.gearScore.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	e.gearScore.Level = newLevel
-	e.gearScore.OperationKind = OperationKindUpdate
+	e.gearScore.OperationKind_ = OperationKindUpdate
 	se.Patch.GearScore[e.gearScore.ID] = e.gearScore
 	return e
 }`
 
 const SetScore_GearScore_func string = `func (_e GearScore) SetScore(se *Engine, newScore int) GearScore {
 	e := se.GearScore(_e.gearScore.ID)
-	if e.gearScore.OperationKind == OperationKindDelete {
+	if e.gearScore.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	e.gearScore.Score = newScore
-	e.gearScore.OperationKind = OperationKindUpdate
+	e.gearScore.OperationKind_ = OperationKindUpdate
 	se.Patch.GearScore[e.gearScore.ID] = e.gearScore
 	return e
 }`
 
 const SetX_Position_func string = `func (_e Position) SetX(se *Engine, newX float64) Position {
 	e := se.Position(_e.position.ID)
-	if e.position.OperationKind == OperationKindDelete {
+	if e.position.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	e.position.X = newX
-	e.position.OperationKind = OperationKindUpdate
+	e.position.OperationKind_ = OperationKindUpdate
 	se.Patch.Position[e.position.ID] = e.position
 	return e
 }`
 
 const SetY_Position_func string = `func (_e Position) SetY(se *Engine, newY float64) Position {
 	e := se.Position(_e.position.ID)
-	if e.position.OperationKind == OperationKindDelete {
+	if e.position.OperationKind_ == OperationKindDelete {
 		return e
 	}
 	e.position.Y = newY
-	e.position.OperationKind = OperationKindUpdate
+	e.position.OperationKind_ = OperationKindUpdate
 	se.Patch.Position[e.position.ID] = e.position
 	return e
 }`
@@ -885,7 +885,7 @@ const zoneCore_type string = `type zoneCore struct {
 	Items		[]ZoneItemID	` + "`" + `json:"items"` + "`" + `
 	Players		[]PlayerID	` + "`" + `json:"players"` + "`" + `
 	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
 const Zone_type string = `type Zone struct{ zone zoneCore }`
@@ -894,8 +894,8 @@ const zoneItemCore_type string = `type zoneItemCore struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Item		ItemID		` + "`" + `json:"item"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
 const ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
@@ -903,8 +903,8 @@ const ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
 const itemCore_type string = `type itemCore struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
 	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
 const Item_type string = `type Item struct{ item itemCore }`
@@ -914,8 +914,8 @@ const playerCore_type string = `type playerCore struct {
 	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
 	Items		[]ItemID	` + "`" + `json:"items"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
 const Player_type string = `type Player struct{ player playerCore }`
@@ -924,8 +924,8 @@ const gearScoreCore_type string = `type gearScoreCore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
 const GearScore_type string = `type GearScore struct{ gearScore gearScoreCore }`
@@ -934,8 +934,8 @@ const positionCore_type string = `type positionCore struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
-	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
 const Position_type string = `type Position struct{ position positionCore }`
@@ -965,42 +965,42 @@ const GenerateID_Engine_func string = `func (se *Engine) GenerateID() int {
 
 const UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
 	for _, gearScore := range se.Patch.GearScore {
-		if gearScore.OperationKind == OperationKindDelete {
+		if gearScore.OperationKind_ == OperationKindDelete {
 			delete(se.State.GearScore, gearScore.ID)
 		} else {
 			se.State.GearScore[gearScore.ID] = gearScore
 		}
 	}
 	for _, item := range se.Patch.Item {
-		if item.OperationKind == OperationKindDelete {
+		if item.OperationKind_ == OperationKindDelete {
 			delete(se.State.Item, item.ID)
 		} else {
 			se.State.Item[item.ID] = item
 		}
 	}
 	for _, player := range se.Patch.Player {
-		if player.OperationKind == OperationKindDelete {
+		if player.OperationKind_ == OperationKindDelete {
 			delete(se.State.Player, player.ID)
 		} else {
 			se.State.Player[player.ID] = player
 		}
 	}
 	for _, position := range se.Patch.Position {
-		if position.OperationKind == OperationKindDelete {
+		if position.OperationKind_ == OperationKindDelete {
 			delete(se.State.Position, position.ID)
 		} else {
 			se.State.Position[position.ID] = position
 		}
 	}
 	for _, zone := range se.Patch.Zone {
-		if zone.OperationKind == OperationKindDelete {
+		if zone.OperationKind_ == OperationKindDelete {
 			delete(se.State.Zone, zone.ID)
 		} else {
 			se.State.Zone[zone.ID] = zone
 		}
 	}
 	for _, zoneItem := range se.Patch.ZoneItem {
-		if zoneItem.OperationKind == OperationKindDelete {
+		if zoneItem.OperationKind_ == OperationKindDelete {
 			delete(se.State.ZoneItem, zoneItem.ID)
 		} else {
 			se.State.ZoneItem[zoneItem.ID] = zoneItem
@@ -1043,27 +1043,27 @@ const _zoneItem_type string = `type _zoneItem struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Item		*_item		` + "`" + `json:"item"` + "`" + `
 	Position	*_position	` + "`" + `json:"position"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
 const _item_type string = `type _item struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
 	GearScore	*_gearScore	` + "`" + `json:"gearScore"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
 const _position_type string = `type _position struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
 const _gearScore_type string = `type _gearScore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
 const _player_type string = `type _player struct {
@@ -1071,7 +1071,7 @@ const _player_type string = `type _player struct {
 	GearScore	*_gearScore	` + "`" + `json:"gearScore"` + "`" + `
 	Items		[]_item		` + "`" + `json:"items"` + "`" + `
 	Position	*_position	` + "`" + `json:"position"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
 const _zone_type string = `type _zone struct {
@@ -1079,5 +1079,5 @@ const _zone_type string = `type _zone struct {
 	Items		[]_zoneItem	` + "`" + `json:"items"` + "`" + `
 	Players		[]_player	` + "`" + `json:"players"` + "`" + `
 	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`

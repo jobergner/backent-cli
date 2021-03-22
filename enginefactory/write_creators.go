@@ -13,7 +13,7 @@ func (se *Engine) create<( toTitleCase .Name )>(<( if not .IsRootType )>hasParen
 	var e <( .Name )>Core
 	e.ID = <( toTitleCase .Name )>ID(se.GenerateID())
 	<(- if not .IsRootType )>
-		e.HasParent = hasParent
+		e.HasParent_ = hasParent
 	<(- end )>
 	<(- range .Fields -)>
 		<(- if not .HasSliceValue )><( if not .ValueType.IsBasicType )>
@@ -21,7 +21,7 @@ func (se *Engine) create<( toTitleCase .Name )>(<( if not .IsRootType )>hasParen
 			e.<( toTitleCase .Name )> = element<( toTitleCase .ValueType.Name )>.<( .ValueType.Name )>.ID
 		<(- end )><( end -)>
 	<( end )>
-	e.OperationKind = OperationKindUpdate
+	e.OperationKind_ = OperationKindUpdate
 	se.Patch.<( toTitleCase .Name )>[e.ID] = e
 	return <( toTitleCase .Name )>{<( .Name )>: e}
 }

@@ -21,44 +21,44 @@ func newTree() Tree {
 }
 
 type _zoneItem struct {
-	ID            ZoneItemID    `json:"id"`
-	Item          *_item        `json:"item"`
-	Position      *_position    `json:"position"`
-	OperationKind OperationKind `json:"operationKind"`
+	ID             ZoneItemID    `json:"id"`
+	Item           *_item        `json:"item"`
+	Position       *_position    `json:"position"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
 type _item struct {
-	ID            ItemID        `json:"id"`
-	GearScore     *_gearScore   `json:"gearScore"`
-	OperationKind OperationKind `json:"operationKind"`
+	ID             ItemID        `json:"id"`
+	GearScore      *_gearScore   `json:"gearScore"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
 type _position struct {
-	ID            PositionID    `json:"id"`
-	X             float64       `json:"x"`
-	Y             float64       `json:"y"`
-	OperationKind OperationKind `json:"operationKind"`
+	ID             PositionID    `json:"id"`
+	X              float64       `json:"x"`
+	Y              float64       `json:"y"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
 type _gearScore struct {
-	ID            GearScoreID   `json:"id"`
-	Level         int           `json:"level"`
-	Score         int           `json:"score"`
-	OperationKind OperationKind `json:"operationKind"`
+	ID             GearScoreID   `json:"id"`
+	Level          int           `json:"level"`
+	Score          int           `json:"score"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
 type _player struct {
-	ID            PlayerID      `json:"id"`
-	GearScore     *_gearScore   `json:"gearScore"`
-	Items         []_item       `json:"items"`
-	Position      *_position    `json:"position"`
-	OperationKind OperationKind `json:"operationKind"`
+	ID             PlayerID      `json:"id"`
+	GearScore      *_gearScore   `json:"gearScore"`
+	Items          []_item       `json:"items"`
+	Position       *_position    `json:"position"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
 type _zone struct {
-	ID            ZoneID        `json:"id"`
-	Items         []_zoneItem   `json:"items"`
-	Players       []_player     `json:"players"`
-	Tags          []string      `json:"tags"`
-	OperationKind OperationKind `json:"operationKind"`
+	ID             ZoneID        `json:"id"`
+	Items          []_zoneItem   `json:"items"`
+	Players        []_player     `json:"players"`
+	Tags           []string      `json:"tags"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
