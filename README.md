@@ -215,6 +215,15 @@ func DoThis(userID UserID) {
    ...
 }
 ```
+Maybe a workaround for this could be wrapper methods that only wrap
+```
+func (i item) WrapDoThing(userID UserID) {
+   i.actuallyDoThing(userID)
+}
+func (i item) actuallyDoThing(user_a8n39vkID UserID) {
+   // code goes here
+}
+```
 I will have to revisit this issue later.
 
 ### meta fields
