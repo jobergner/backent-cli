@@ -2,6 +2,7 @@ package validator
 
 import (
 	"fmt"
+
 	"github.com/gertd/go-pluralize"
 )
 
@@ -21,13 +22,13 @@ func validateConflictingSingular(data map[interface{}]interface{}) (errs []error
 }
 
 func validateConflictingSingularObject(
-	yamlObjectData map[interface{}]interface{},
+	objectData map[interface{}]interface{},
 ) (errs []error) {
 
-	for key := range yamlObjectData {
+	for key := range objectData {
 		keyName := fmt.Sprintf("%v", key)
 		if pluralizeClient.IsPlural(keyName) {
-			for _key := range yamlObjectData {
+			for _key := range objectData {
 				_keyName := fmt.Sprintf("%v", _key)
 				singularForm := pluralizeClient.Singular(keyName)
 				if singularForm == _keyName {

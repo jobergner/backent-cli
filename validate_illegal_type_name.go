@@ -25,8 +25,8 @@ func validateIllegalTypeName(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func validateIllegalTypeNameObject(yamlObjectData map[interface{}]interface{}, objectName string) (errs []error) {
-	for key := range yamlObjectData {
+func validateIllegalTypeNameObject(objectData map[interface{}]interface{}, objectName string) (errs []error) {
+	for key := range objectData {
 		keyName := fmt.Sprintf("%v", key)
 
 		if isIllegalTypeName(keyName) {

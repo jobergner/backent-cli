@@ -43,12 +43,12 @@ func validateTypeNotFound(data map[interface{}]interface{}, rejectedTypeNames ..
 }
 
 func validateTypeNotFoundObject(
-	yamlObjectData map[interface{}]interface{},
+	objectData map[interface{}]interface{},
 	objectName string,
 	definedTypes []string,
 ) (errs []error) {
 
-	for _, value := range yamlObjectData {
+	for _, value := range objectData {
 		if !isString(value) || isEmptyString(value) {
 			continue
 		}

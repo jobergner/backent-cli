@@ -25,10 +25,10 @@ func validateIllegalCapitalization(data map[interface{}]interface{}) (errs []err
 }
 
 func validateIllegalCapitalizationObject(
-	yamlObjectData map[interface{}]interface{},
+	objectData map[interface{}]interface{},
 ) (errs []error) {
 
-	for key := range yamlObjectData {
+	for key := range objectData {
 		keyName := fmt.Sprintf("%v", key)
 		if startsWithCapitalLetter(keyName) {
 			errs = append(errs, newValidationErrorIllegalCapitalization(keyName, literalKindFieldName))

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlRecursiveTypeUsage(t *testing.T) {
+func TestValidateDataRecursiveTypeUsage(t *testing.T) {
 	t.Run("should not fail on usage of non-recursive types", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"bar": map[interface{}]interface{}{

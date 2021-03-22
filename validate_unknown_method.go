@@ -31,11 +31,11 @@ func validateUnknownMethod(data map[interface{}]interface{}) (errs []error) {
 }
 
 func validateUnknownMethodObject(
-	yamlObjectData map[interface{}]interface{},
+	objectData map[interface{}]interface{},
 	objectName string,
 ) (errs []error) {
 
-	for _, value := range yamlObjectData {
+	for _, value := range objectData {
 		if isString(value) {
 			valueString := fmt.Sprintf("%v", value)
 			if hasDotAccessedMethod(valueString) {

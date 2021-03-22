@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlInvalidValueString(t *testing.T) {
+func TestValidateDataInvalidValueString(t *testing.T) {
 	t.Run("should not fail on usage of allowed values strings", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int",

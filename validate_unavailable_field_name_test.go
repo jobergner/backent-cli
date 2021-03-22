@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlUnavailableFieldName(t *testing.T) {
+func TestValidateDataUnavailableFieldName(t *testing.T) {
 	t.Run("should not fail on usage of available field names", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{

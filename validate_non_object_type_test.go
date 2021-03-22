@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateYamlNonObjectType(t *testing.T) {
+func TestValidateDataNonObjectType(t *testing.T) {
 	t.Run("should fail on usage of named type", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": "int",
