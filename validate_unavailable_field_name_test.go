@@ -6,18 +6,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateDataConflictingSingular(t *testing.T) {
-	t.Run("should fail on usage of two field names with same singular", func(t *testing.T) {
+func TestValidateYamlUnavailableFieldName(t *testing.T) {
+	t.Run("should not fail on usage of available field names", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
-				"foot": "string",
-				"feet": "string",
+				"bar":            "[]int32",
+				"ban":            "int",
+				"operationKind_": "string",
 			},
 		}
 
-		actualErrors := thematicalValidation(data, false, true, true)
+		actualErrors := validateUnavailableFieldName(data)
 		expectedErrors := []error{
-			newValidationErrorConflictingSingular("foot", "feet", "foot"),
+			newValidationErrorUnavailableFieldName("operationKind_"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
@@ -25,4 +26,5 @@ func TestValidateDataConflictingSingular(t *testing.T) {
 		assert.Empty(t, missingErrors)
 		assert.Empty(t, redundantErrors)
 	})
+
 }

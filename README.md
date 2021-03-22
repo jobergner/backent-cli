@@ -47,6 +47,7 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrNonObjectType | type "{TypeName}" is not an object type. | The defined type is not an object. |
 | ErrIllegalCapitalization | {type/field name} "{literal}" starts with a capital letter. | A type or field name starts with a capital letter, which is not allowed. |
 | ErrConflictingSingular | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}". | Due to the way state will be used two field names cannot have the same singular form. |
+| ErrUnavailableFieldName | "{KeyName}" not an available name. | Due to internal usage of this FieldName it is unavailable. |
 <br/>
 
 

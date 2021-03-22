@@ -82,7 +82,12 @@ func logicalValidation(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func thematicalValidation(data map[interface{}]interface{}, allowCapitalization bool, enforceUniqueSingular bool) (errs []error) {
+func thematicalValidation(
+	data map[interface{}]interface{},
+	allowCapitalization bool,
+	enforceUniqueSingular bool,
+	allowUnavailableFieldNames bool,
+) (errs []error) {
 
 	nonObjectTypeErrs := validateNonObjectType(data)
 	errs = append(errs, nonObjectTypeErrs...)
@@ -98,6 +103,11 @@ func thematicalValidation(data map[interface{}]interface{}, allowCapitalization 
 	if enforceUniqueSingular {
 		conflictingSingularErrs := validateConflictingSingular(data)
 		errs = append(errs, conflictingSingularErrs...)
+	}
+
+	if !allowUnavailableFieldNames {
+		unavailableFieldNameErrs := validateUnavailableFieldName(data)
+		errs = append(errs, unavailableFieldNameErrs...)
 	}
 
 	return
@@ -127,7 +137,7 @@ func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
 	generalErrs := generalValidation(data)
 	errs = append(errs, generalErrs...)
 
-	thematicalErrs := thematicalValidation(data, false, true)
+	thematicalErrs := thematicalValidation(data, false, true, false)
 	errs = append(errs, thematicalErrs...)
 
 	return
@@ -158,7 +168,7 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 	actionUsedAsTypeErr := validateTypeNotFound(jointConfigData, actionsNames...)
 	errs = append(errs, actionUsedAsTypeErr...)
 
-	thematicalErrs := thematicalValidation(jointConfigData, true, false)
+	thematicalErrs := thematicalValidation(jointConfigData, true, false, true)
 	errs = append(errs, thematicalErrs...)
 
 	// deduplicate errors as stateConfigData is being validated twice (ValidateStateConfig, generalValidation)

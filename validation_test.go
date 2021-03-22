@@ -244,19 +244,23 @@ func TestValidateStateConfig(t *testing.T) {
 			"foo": "int",
 			"bar": "float64",
 			"baz": map[interface{}]interface{}{
-				"ban":  "int32",
-				"bam":  "bar",
-				"bunt": "[]foo",
-				"bap":  "map[bar]foo",
-				"bal":  "***bar",
-				"slap": "**[]**bar",
-				"arg":  "*foo",
-				"barg": "[3]foo",
+				"ban":        "int32",
+				"bam":        "bar",
+				"bunt":       "[]foo",
+				"bap":        "map[bar]foo",
+				"bal":        "***bar",
+				"slap":       "**[]**bar",
+				"arg":        "*foo",
+				"barg":       "[3]foo",
+				"iD":         "string",
+				"hasParent_": "bool",
 			},
 		}
 
 		actualErrors := ValidateStateConfig(data)
 		expectedErrors := []error{
+			newValidationErrorUnavailableFieldName("iD"),
+			newValidationErrorUnavailableFieldName("hasParent_"),
 			newValidationErrorNonObjectType("foo"),
 			newValidationErrorNonObjectType("bar"),
 			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
