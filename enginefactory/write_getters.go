@@ -1,68 +1,206 @@
 package enginefactory
 
 import (
-	"text/template"
+	. "github.com/dave/jennifer/jen"
 )
 
-const getterTemplateString string = `
-<( define "returnValue" -)>
-	<( if .HasSliceValue -)>
-		[]
-	<(- end -)>
-	<( if .ValueType.IsBasicType -)>
-		<( .ValueType.Name )>
-	<(- else -)>
-		<( toTitleCase .ValueType.Name )>
-	<(- end )>
-<(- end )>
-<( range .Types )>
-func (se *Engine) <( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) <( toTitleCase .Name )> {
-	patching<( toTitleCase .Name )>, ok := se.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
-	if ok {
-		return <( toTitleCase .Name )>{patching<( toTitleCase .Name )>}
-	}
-	current<( toTitleCase .Name )> := se.State.<( toTitleCase .Name )>[<( .Name )>ID]
-	return <( toTitleCase .Name )>{current<( toTitleCase .Name )>}
-}
-func (_e <( toTitleCase .Name )>) ID(se *Engine) <( toTitleCase .Name )>ID {
-	return _e.<( .Name )>.ID
-}
-<( $Type := . )><( range .Fields )>
-func (_e <( toTitleCase $Type.Name )>) <( toTitleCase .Name )>(se *Engine) <( template "returnValue" . )> {
-	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
-	<( if .HasSliceValue -)>
-		var <( encrypt .Name )> <( template "returnValue" . )>
-		for _,<( print " " )>
-		<(- if .ValueType.IsBasicType -)>
-			element
-		<(- else -)>
-			<( .ValueType.Name )>ID
-		<(- end -)>
-		<( print " " )>:= range e.<( $Type.Name )>.<( toTitleCase .Name )> {
-			<( encrypt .Name )> = append(<( encrypt .Name )>,<( print " " )>
-			<(- if .ValueType.IsBasicType -)>
-				element
-			<(- else -)>
-				se.<( toTitleCase .ValueType.Name )>(<( .ValueType.Name )>ID)
-			<(- end -)>
-			)
-		}
-		return <( encrypt .Name )>
-	<(- else -)>
-		<( if .ValueType.IsBasicType -)>
-			return e.<( $Type.Name )>.<( toTitleCase .Name )>
-		<(- else -)>
-			return se.<( toTitleCase .Name )>(e.<( $Type.Name )>.<( toTitleCase .Name )>)
-		<(- end -)>
-	<(- end )>
-}
-<( end )>
-<( end )>
-`
-
-var getterTemplate *template.Template = newTemplateFrom("getterTemplate", getterTemplateString)
-
 func (s *stateFactory) writeGetters() *stateFactory {
-	getterTemplate.Execute(s.buf, s.ast)
+	decls := newDeclSet()
+	s.ast.rangeTypes(func(configType stateConfigType) {
+		t := typeGetter{
+			t: configType,
+		}
+
+		decls.file.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
+			t.definePatchingElement(),
+			If(Id("ok")).Block(
+				Return(t.earlyReturn()),
+			),
+			t.defineCurrentElement(),
+			Return(t.finalReturn()),
+		)
+
+		i := idGetter{
+			t: configType,
+		}
+
+		decls.file.Func().Params(i.receiverParams()).Id(i.name()).Params(i.params()).Id(i.returns()).Block(
+			Return(i.returnID()),
+		)
+
+		configType.rangeFields(func(field stateConfigField) {
+			f := fieldGetter{
+				t: configType,
+				f: field,
+			}
+
+			decls.file.Func().Params(f.receiverParams()).Id(f.name()).Params(f.params()).Id(f.returns()).Block(
+				f.reassignElement(),
+				// if slice
+				onlyIf(field.HasSliceValue, f.declareSliceOfElements()),
+				onlyIf(field.HasSliceValue, For(f.loopConditions().Block(
+					f.appendElement(),
+				))),
+				onlyIf(field.HasSliceValue, Return(f.returnSlice())),
+				// if not slice
+				onlyIf(!field.HasSliceValue, Return(f.returnElement())),
+			)
+		})
+
+	})
+
+	decls.render(s.buf)
 	return s
+}
+
+type typeGetter struct {
+	t stateConfigType
+}
+
+func (t typeGetter) receiverParams() *Statement {
+	return Id("se").Id("*Engine")
+}
+
+func (t typeGetter) name() string {
+	return title(t.t.Name)
+}
+
+func (t typeGetter) idParam() string {
+	return t.t.Name + "ID"
+}
+
+func (t typeGetter) params() *Statement {
+	return Id(t.t.Name + "ID").Id(title(t.t.Name) + "ID")
+}
+
+func (t typeGetter) returns() string {
+	return title(t.t.Name)
+}
+
+func (t typeGetter) definePatchingElement() *Statement {
+	return List(Id("patching"+title(t.t.Name)), Id("ok")).Op(":=").Id("se").Dot("Patch").Dot(title(t.t.Name)).Index(Id(t.idParam()))
+}
+
+func (t typeGetter) earlyReturn() *Statement {
+	return Id(title(t.t.Name)).Values(Dict{Id(t.t.Name): Id("patching" + title(t.t.Name))})
+}
+
+func (t typeGetter) defineCurrentElement() *Statement {
+	return Id("current" + title(t.t.Name)).Op(":=").Id("se").Dot("State").Dot(title(t.t.Name)).Index(Id(t.idParam()))
+}
+
+func (t typeGetter) finalReturn() *Statement {
+	return Id(title(t.t.Name)).Values(Dict{Id(t.t.Name): Id("current" + title(t.t.Name))})
+}
+
+type idGetter struct {
+	t stateConfigType
+}
+
+func (i idGetter) receiverName() string {
+	return "_" + i.t.Name
+}
+
+func (i idGetter) receiverParams() *Statement {
+	return Id(i.receiverName()).Id(title(i.t.Name))
+}
+
+func (i idGetter) name() string {
+	return "ID"
+}
+
+func (i idGetter) params() *Statement {
+	return Id("se").Id("*Engine")
+}
+
+func (i idGetter) returns() string {
+	return title(i.t.Name) + "ID"
+}
+
+func (i idGetter) returnID() *Statement {
+	return Id(i.receiverName()).Dot(i.t.Name).Dot("ID")
+}
+
+type fieldGetter struct {
+	t stateConfigType
+	f stateConfigField
+}
+
+func (f fieldGetter) receiverName() string {
+	return "_" + f.t.Name
+}
+
+func (f fieldGetter) receiverParams() *Statement {
+	return Id(f.receiverName()).Id(title(f.t.Name))
+}
+
+func (f fieldGetter) name() string {
+	return title(f.f.Name)
+}
+
+func (f fieldGetter) params() *Statement {
+	return Id("se").Id("*Engine")
+}
+
+func (f fieldGetter) returns() string {
+	var val string
+
+	if f.f.HasSliceValue {
+		val = "[]"
+	}
+
+	if f.f.ValueType.IsBasicType {
+		return val + f.f.ValueType.Name
+	}
+	return val + title(f.f.ValueType.Name)
+}
+
+func (f fieldGetter) reassignElement() *Statement {
+	return Id(f.t.Name).Op(":=").Id("se").Dot(title(f.t.Name)).Params(Id(f.receiverName()).Dot(f.t.Name).Dot("ID"))
+}
+
+func (f fieldGetter) declareSliceOfElements() *Statement {
+	return Var().Id(f.f.Name).Id(f.returns())
+}
+
+func (f fieldGetter) loopedElementIdentifier() string {
+	if f.f.ValueType.IsBasicType {
+		return "element"
+	}
+	return f.f.ValueType.Name + "ID"
+}
+
+func (f fieldGetter) loopConditions() *Statement {
+	identifier := f.loopedElementIdentifier()
+	return List(Id("_"), Id(identifier)).Op(":=").Range().Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name))
+}
+
+func (f fieldGetter) appendedItem() *Statement {
+	if f.f.ValueType.IsBasicType {
+		return Id(f.loopedElementIdentifier())
+	}
+	return Id("se").Dot(title(f.f.ValueType.Name)).Params(Id(f.f.ValueType.Name + "ID"))
+}
+
+func (f fieldGetter) appendElement() *Statement {
+	return Id(f.f.Name).Op("=").Append(Id(f.f.Name), f.appendedItem())
+}
+
+func (f fieldGetter) returnSlice() *Statement {
+	return Id(f.f.Name)
+}
+
+func (f fieldGetter) returnBasicType() *Statement {
+	return Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name))
+}
+
+func (f fieldGetter) returnType() *Statement {
+	return Id("se").Dot(title(f.f.Name)).Params(Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name)))
+}
+
+func (f fieldGetter) returnElement() *Statement {
+	if f.f.ValueType.IsBasicType {
+		return f.returnBasicType()
+	}
+	return f.returnType()
 }

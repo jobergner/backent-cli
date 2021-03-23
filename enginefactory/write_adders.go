@@ -23,11 +23,11 @@ func (s *stateFactory) writeAdders() *stateFactory {
 				If(a.isOperationKindDelete()).Block(
 					Return(a.earlyReturn()),
 				),
-				conditionalStatement(field.ValueType.IsBasicType == false, a.createNewElement()),
+				onlyIf(!field.ValueType.IsBasicType, a.createNewElement()),
 				a.appendElement(),
 				a.setOperationKindUpdate(),
 				a.updateElementInPatch(),
-				conditionalStatement(field.ValueType.IsBasicType == false, Return(Id(field.ValueType.Name))),
+				onlyIf(!field.ValueType.IsBasicType, Return(Id(field.ValueType.Name))),
 			)
 		})
 	})
@@ -98,7 +98,7 @@ func (a adder) appendElement() *Statement {
 		toAppend = Id(a.f.ValueType.Name).Dot(a.f.ValueType.Name).Dot("ID")
 	}
 
-	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)).Op("=").Id("append").Params(
+	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)).Op("=").Append(
 		Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)),
 		toAppend,
 	)
