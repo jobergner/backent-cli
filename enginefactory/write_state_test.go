@@ -11,8 +11,8 @@ func TestWriteState(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeIDs()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			GearScoreID_type,
 			ItemID_type,
 			PlayerID_type,
@@ -29,8 +29,8 @@ func TestWriteState(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeState()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			State_type,
 			newState_func,
 		}, "\n"))
@@ -43,8 +43,8 @@ func TestWriteState(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeElements()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			gearScoreCore_type,
 			GearScore_type,
 			itemCore_type,

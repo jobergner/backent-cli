@@ -11,8 +11,8 @@ func TestWriteAssembling(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTree()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			assembleTree_Engine_func,
 		}, "\n"))
 
@@ -24,8 +24,8 @@ func TestWriteAssembling(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTreeElement()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			assembleGearScore_Engine_func,
 			assembleItem_Engine_func,
 			assemblePlayer_Engine_func,

@@ -11,8 +11,8 @@ func TestWriteRemovers(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeRemovers()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			RemoveItems_Player_func,
 			RemoveItems_Zone_func,
 			RemovePlayers_Zone_func,

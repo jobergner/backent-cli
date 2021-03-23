@@ -11,8 +11,8 @@ func TestWriteAdders(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAdders()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			AddItem_Player_func,
 			AddItem_Zone_func,
 			AddPlayer_Zone_func,

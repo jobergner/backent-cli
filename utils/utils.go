@@ -2,49 +2,14 @@ package utils
 
 import (
 	"bytes"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"strings"
 	"unicode"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
-
-func simplifyIfWhitespace(ch rune) rune {
-	if ch == '\n' {
-		return ch
-	}
-	if unicode.IsSpace(ch) {
-		return ' '
-	}
-	return ch
-}
-
-// writing templates can be irritating if you have to be
-// precise with whitespace. this normalization function
-// takes away some of that irritation by removing all consecutive
-// whitespace of a certain kind (newline or everything else) except
-// for one
-func NormalizeWhitespace(_str string) string {
-	str := strings.TrimSpace(_str)
-	var b strings.Builder
-	b.Grow(len(str))
-
-	var lastWrittenRune rune = '1'
-
-	for _, _ch := range str {
-		ch := simplifyIfWhitespace(_ch)
-		if !unicode.IsSpace(ch) {
-			b.WriteRune(ch)
-			lastWrittenRune = ch
-		} else {
-			if lastWrittenRune != ch {
-				b.WriteRune(ch)
-				lastWrittenRune = ch
-			}
-		}
-	}
-
-	return b.String()
-}
 
 // creates diff and makes whitespace visible
 func Diff(actual, expected string) string {
@@ -78,4 +43,17 @@ WANT:
 
 GOT:
 ` + actual
+}
+
+func FormatCode(code string) string {
+	packageClause := "package main\n"
+
+	ast, err := parser.ParseFile(token.NewFileSet(), "", packageClause+code, parser.AllErrors)
+	if err != nil {
+		panic(err)
+	}
+
+	var buf bytes.Buffer
+	err = format.Node(&buf, token.NewFileSet(), ast)
+	return strings.TrimPrefix(buf.String(), packageClause)
 }

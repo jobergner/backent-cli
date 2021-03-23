@@ -12,8 +12,8 @@ func TestWriteStart(t *testing.T) {
 		ast := buildActionsConfigAST(testActionsConfig)
 		af := newActionsFactory(ast)
 
-		actual := utils.NormalizeWhitespace(string(af.writeStart().writtenSourceCode()))
-		expected := utils.NormalizeWhitespace(strings.TrimSpace(`
+		actual := utils.FormatCode(string(af.writeStart().writtenSourceCode()))
+		expected := utils.FormatCode(strings.TrimSpace(`
 func main() {
 	err := state.Start(
 		interactBaz,

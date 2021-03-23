@@ -11,8 +11,8 @@ func TestWriteDeleters(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeDeleters()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			DeleteGearScore_Engine_func,
 			deleteGearScore_Engine_func,
 			DeleteItem_Engine_func,

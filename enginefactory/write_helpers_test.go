@@ -11,8 +11,8 @@ func TestWriteHelpers(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeDeduplicate()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			deduplicateGearScoreIDs_func,
 			deduplicateItemIDs_func,
 			deduplicatePlayerIDs_func,
