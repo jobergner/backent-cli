@@ -11,11 +11,37 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/dave/jennifer/jen"
 	"github.com/gertd/go-pluralize"
 )
 
 // TODO wtf
 const isProductionMode = false
+
+func title(name string) string {
+	return strings.Title(name)
+}
+
+type declSet struct {
+	file *jen.File
+}
+
+func newDeclSet() declSet {
+	return declSet{
+		file: jen.NewFile("main"),
+	}
+}
+
+func (d declSet) render(buf *bytes.Buffer) {
+	var _buf bytes.Buffer
+	err := d.file.Render(&_buf)
+	if err != nil {
+		panic(err)
+	}
+	code := strings.TrimPrefix(_buf.String(), "package main")
+	code = strings.TrimSpace(code)
+	buf.WriteString("\n" + code + "\n")
+}
 
 // pluralizeClient is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)

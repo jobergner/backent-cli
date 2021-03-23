@@ -3,6 +3,7 @@ package enginefactory
 import (
 	"fmt"
 	"regexp"
+	"sort"
 )
 
 // stateConfigAST is an abstract syntax tree of a state configuration.
@@ -11,6 +12,17 @@ import (
 // This way I was also able to add functionality I needed and will be more flexible in the future.
 type stateConfigAST struct {
 	Types map[string]stateConfigType
+}
+
+func (a *stateConfigAST) orderedRange(fn func(configType stateConfigType)) {
+	var keys []string
+	for key := range a.Types {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fn(a.Types[key])
+	}
 }
 
 func newStateConfigAST() *stateConfigAST {
@@ -31,6 +43,17 @@ type stateConfigType struct {
 	IsBasicType bool // is of one of Go's basic types (string, rune, int etc.)
 	IsRootType  bool // is not implemented into any other types and thus can not have a parent
 	IsLeafType  bool // does not implement any other user-defined types in any of its fields
+}
+
+func (a *stateConfigType) orderedRange(fn func(field stateConfigField)) {
+	var keys []string
+	for key := range a.Fields {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fn(a.Fields[key])
+	}
 }
 
 func newConfigType(name string) stateConfigType {
