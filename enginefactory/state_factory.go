@@ -22,6 +22,13 @@ func title(name string) string {
 	return strings.Title(name)
 }
 
+func conditionalStatement(is bool, statement *jen.Statement) *jen.Statement {
+	if is {
+		return statement
+	}
+	return jen.Empty()
+}
+
 type declSet struct {
 	file *jen.File
 }

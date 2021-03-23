@@ -14,7 +14,7 @@ type stateConfigAST struct {
 	Types map[string]stateConfigType
 }
 
-func (a *stateConfigAST) orderedRange(fn func(configType stateConfigType)) {
+func (a *stateConfigAST) rangeTypes(fn func(configType stateConfigType)) {
 	var keys []string
 	for key := range a.Types {
 		keys = append(keys, key)
@@ -45,7 +45,7 @@ type stateConfigType struct {
 	IsLeafType  bool // does not implement any other user-defined types in any of its fields
 }
 
-func (a *stateConfigType) orderedRange(fn func(field stateConfigField)) {
+func (a *stateConfigType) rangeFields(fn func(field stateConfigField)) {
 	var keys []string
 	for key := range a.Fields {
 		keys = append(keys, key)

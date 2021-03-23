@@ -1,43 +1,123 @@
 package enginefactory
 
 import (
-	"text/template"
+	. "github.com/dave/jennifer/jen"
 )
 
-const adderTemplateString string = `
-<( range .Types )><( $Type := . )><( range .Fields )><( if .HasSliceValue )>
-func (_e <( toTitleCase $Type.Name )>) Add
-<(- if .ValueType.IsBasicType -)>
-	<( toTitleCase .Name )>
-<(- else -)>
-	<( .Name | toSingular | toTitleCase )>
-<(- end -)>
-(se *Engine<(if .ValueType.IsBasicType )>, <( .Name)> ...<( .ValueType.Name )><( end )>) <( if not .ValueType.IsBasicType )><( toTitleCase .ValueType.Name )><( end )> {
-	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
-	if e.<( $Type.Name )>.OperationKind_ == OperationKindDelete {
-		return<( if not .ValueType.IsBasicType )> <( toTitleCase .ValueType.Name )>{<( .ValueType.Name )>Core{OperationKind_: OperationKindDelete}}<( end )>
-	}
-	<(- if not .ValueType.IsBasicType )>
-		<( encrypt .ValueType.Name )> := se.create<( toTitleCase .ValueType.Name )>(true)
-	<(- end )>
-	e.<( $Type.Name )>.<( toTitleCase .Name )> = append(e.<( $Type.Name )>.<( toTitleCase .Name )>,<(print " ")>
-	<(- if .ValueType.IsBasicType -)>
-		<( .Name )>...
-	<(- else -)>
-		<( encrypt .ValueType.Name )>.<( .ValueType.Name )>.ID
-	<(- end -)>
-	)
-	e.<( $Type.Name )>.OperationKind_ = OperationKindUpdate
-	se.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )><( if not .ValueType.IsBasicType )>
-	return <( encrypt .ValueType.Name )><( end )>
-}
-<( end )>
-<( end )><( end )>
-`
-
-var adderTemplate *template.Template = newTemplateFrom("adderTemplate", adderTemplateString)
-
 func (s *stateFactory) writeAdders() *stateFactory {
-	adderTemplate.Execute(s.buf, s.ast)
+	decls := newDeclSet()
+	s.ast.rangeTypes(func(configType stateConfigType) {
+		configType.rangeFields(func(field stateConfigField) {
+
+			if !field.HasSliceValue {
+				return
+			}
+
+			a := adder{
+				t: configType,
+				f: field,
+			}
+
+			decls.file.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Id(a.returns()).Block(
+				a.reassignElement(),
+				If(a.isOperationKindDelete()).Block(
+					Return(a.earlyReturn()),
+				),
+				conditionalStatement(field.ValueType.IsBasicType == false, a.createNewElement()),
+				a.appendElement(),
+				a.setOperationKindUpdate(),
+				a.updateElementInPatch(),
+				conditionalStatement(field.ValueType.IsBasicType == false, Return(Id(field.ValueType.Name))),
+			)
+		})
+	})
+
+	decls.render(s.buf)
 	return s
+}
+
+type adder struct {
+	t stateConfigType
+	f stateConfigField
+}
+
+func (a adder) receiverParams() *Statement {
+	return Id(a.receiverName()).Id(title(a.t.Name))
+}
+
+func (a adder) name() string {
+	if a.f.ValueType.IsBasicType {
+		return "Add" + title(a.f.Name)
+	}
+	return "Add" + title(pluralizeClient.Singular(a.f.Name))
+}
+
+func (a adder) params() *Statement {
+	params := Id("se").Id("*Engine")
+	if a.f.ValueType.IsBasicType {
+		return List(params, Id(a.f.Name).Id("..."+a.f.ValueType.Name))
+	}
+	return params
+}
+
+func (a adder) returns() string {
+	if a.f.ValueType.IsBasicType {
+		return ""
+	}
+	return title(a.f.ValueType.Name)
+}
+
+func (a adder) reassignElement() *Statement {
+	return Id(a.t.Name).Op(":=").Id("se").Dot(title(a.t.Name)).Params(Id(a.receiverName()).Dot(a.t.Name).Dot("ID"))
+}
+
+func (a adder) isOperationKindDelete() *Statement {
+	return Id(a.t.Name).Dot(a.t.Name).Dot("OperationKind_").Op("==").Id("OperationKindDelete")
+}
+
+func (a adder) earlyReturn() *Statement {
+	if a.f.ValueType.IsBasicType {
+		return Empty()
+	}
+	return Id(title(a.f.ValueType.Name)).Values(Dict{
+		Id(a.f.ValueType.Name): Id(a.f.ValueType.Name + "Core").Values(Dict{
+			Id("OperationKind_"): Id("OperationKindDelete"),
+		})})
+}
+
+func (a adder) createNewElement() *Statement {
+	return Id(a.f.ValueType.Name).Op(":=").Id("se").Dot("create" + title(a.f.ValueType.Name)).Params(Id("true"))
+}
+
+func (a adder) appendElement() *Statement {
+
+	var toAppend *Statement
+	if a.f.ValueType.IsBasicType {
+		toAppend = Id(a.f.Name + "...")
+	} else {
+		toAppend = Id(a.f.ValueType.Name).Dot(a.f.ValueType.Name).Dot("ID")
+	}
+
+	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)).Op("=").Id("append").Params(
+		Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)),
+		toAppend,
+	)
+
+	return appendStatement
+}
+
+func (a adder) setOperationKindUpdate() *Statement {
+	return Id(a.t.Name).Dot(a.t.Name).Dot("OperationKind_").Op("=").Id("OperationKindUpdate")
+}
+
+func (a adder) updateElementInPatch() *Statement {
+	return Id("se").Dot("Patch").Dot(title(a.t.Name)).Index(a.elementID()).Op("=").Id(a.t.Name).Dot(a.t.Name)
+}
+
+func (a adder) elementID() *Statement {
+	return Id(a.t.Name).Dot(a.t.Name).Dot("ID")
+}
+
+func (a adder) receiverName() string {
+	return "_" + a.t.Name
 }
