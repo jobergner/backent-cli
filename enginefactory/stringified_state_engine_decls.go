@@ -811,48 +811,48 @@ const RemoveTags_Zone_func string = `func (_e Zone) RemoveTags(se *Engine, tagsT
 	return e
 }`
 
-const SetLevel_GearScore_func string = `func (_e GearScore) SetLevel(se *Engine, newLevel int) GearScore {
-	e := se.GearScore(_e.gearScore.ID)
-	if e.gearScore.OperationKind_ == OperationKindDelete {
-		return e
+const SetLevel_GearScore_func string = `func (_gearScore GearScore) SetLevel(se *Engine, newLevel int) GearScore {
+	gearScore := se.GearScore(_gearScore.gearScore.ID)
+	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
+		return gearScore
 	}
-	e.gearScore.Level = newLevel
-	e.gearScore.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[e.gearScore.ID] = e.gearScore
-	return e
+	gearScore.gearScore.Level = newLevel
+	gearScore.gearScore.OperationKind_ = OperationKindUpdate
+	se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
+	return gearScore
 }`
 
-const SetScore_GearScore_func string = `func (_e GearScore) SetScore(se *Engine, newScore int) GearScore {
-	e := se.GearScore(_e.gearScore.ID)
-	if e.gearScore.OperationKind_ == OperationKindDelete {
-		return e
+const SetScore_GearScore_func string = `func (_gearScore GearScore) SetScore(se *Engine, newScore int) GearScore {
+	gearScore := se.GearScore(_gearScore.gearScore.ID)
+	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
+		return gearScore
 	}
-	e.gearScore.Score = newScore
-	e.gearScore.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[e.gearScore.ID] = e.gearScore
-	return e
+	gearScore.gearScore.Score = newScore
+	gearScore.gearScore.OperationKind_ = OperationKindUpdate
+	se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
+	return gearScore
 }`
 
-const SetX_Position_func string = `func (_e Position) SetX(se *Engine, newX float64) Position {
-	e := se.Position(_e.position.ID)
-	if e.position.OperationKind_ == OperationKindDelete {
-		return e
+const SetX_Position_func string = `func (_position Position) SetX(se *Engine, newX float64) Position {
+	position := se.Position(_position.position.ID)
+	if position.position.OperationKind_ == OperationKindDelete {
+		return position
 	}
-	e.position.X = newX
-	e.position.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[e.position.ID] = e.position
-	return e
+	position.position.X = newX
+	position.position.OperationKind_ = OperationKindUpdate
+	se.Patch.Position[position.position.ID] = position.position
+	return position
 }`
 
-const SetY_Position_func string = `func (_e Position) SetY(se *Engine, newY float64) Position {
-	e := se.Position(_e.position.ID)
-	if e.position.OperationKind_ == OperationKindDelete {
-		return e
+const SetY_Position_func string = `func (_position Position) SetY(se *Engine, newY float64) Position {
+	position := se.Position(_position.position.ID)
+	if position.position.OperationKind_ == OperationKindDelete {
+		return position
 	}
-	e.position.Y = newY
-	e.position.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[e.position.ID] = e.position
-	return e
+	position.position.Y = newY
+	position.position.OperationKind_ = OperationKindUpdate
+	se.Patch.Position[position.position.ID] = position.position
+	return position
 }`
 
 const GearScoreID_type string = `type GearScoreID int`
