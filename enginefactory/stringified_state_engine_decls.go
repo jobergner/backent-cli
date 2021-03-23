@@ -2,49 +2,49 @@
 
 package enginefactory
 
-const AddPlayer_Zone_func string = `func (_e Zone) AddPlayer(se *Engine) Player {
-	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind_ == OperationKindDelete {
-		return Player{playerCore{OperationKind_: OperationKindDelete}}
+const AddPlayer_Zone_func string = `func (_zone Zone) AddPlayer(se *Engine) Player {
+	zone := se.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return Player{player: playerCore{OperationKind_: OperationKindDelete}}
 	}
 	player := se.createPlayer(true)
-	e.zone.Players = append(e.zone.Players, player.player.ID)
-	e.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.zone.ID] = e.zone
+	zone.zone.Players = append(zone.zone.Players, player.player.ID)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return player
 }`
 
-const AddItem_Zone_func string = `func (_e Zone) AddItem(se *Engine) ZoneItem {
-	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind_ == OperationKindDelete {
-		return ZoneItem{zoneItemCore{OperationKind_: OperationKindDelete}}
+const AddItem_Zone_func string = `func (_zone Zone) AddItem(se *Engine) ZoneItem {
+	zone := se.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
 	}
 	zoneItem := se.createZoneItem(true)
-	e.zone.Items = append(e.zone.Items, zoneItem.zoneItem.ID)
-	e.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.zone.ID] = e.zone
+	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return zoneItem
 }`
 
-const AddTags_Zone_func string = `func (_e Zone) AddTags(se *Engine, tags ...string) {
-	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind_ == OperationKindDelete {
+const AddTags_Zone_func string = `func (_zone Zone) AddTags(se *Engine, tags ...string) {
+	zone := se.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
 		return
 	}
-	e.zone.Tags = append(e.zone.Tags, tags...)
-	e.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.zone.ID] = e.zone
+	zone.zone.Tags = append(zone.zone.Tags, tags...)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 }`
 
-const AddItem_Player_func string = `func (_e Player) AddItem(se *Engine) Item {
-	e := se.Player(_e.player.ID)
-	if e.player.OperationKind_ == OperationKindDelete {
-		return Item{itemCore{OperationKind_: OperationKindDelete}}
+const AddItem_Player_func string = `func (_player Player) AddItem(se *Engine) Item {
+	player := se.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return Item{item: itemCore{OperationKind_: OperationKindDelete}}
 	}
 	item := se.createItem(true)
-	e.player.Items = append(e.player.Items, item.item.ID)
-	e.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[e.player.ID] = e.player
+	player.player.Items = append(player.player.Items, item.item.ID)
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
 	return item
 }`
 
