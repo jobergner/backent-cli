@@ -13,29 +13,19 @@ func (s *stateFactory) writeSetters() *stateFactory {
 				return
 			}
 
-			receiverName := "_" + configType.Name
-			receiverParams := Id(receiverName).Id(title(configType.Name))
-			funcName := "Set" + title(field.Name)
-			newValueParam := "new" + title(field.Name)
-			params := List(Id("se").Id("*Engine"), Id(newValueParam).Id(field.ValueType.Name))
-			returns := title(configType.Name)
+			s := setter{
+				t: configType,
+				f: field,
+			}
 
-			isOperationKindDelete := Id(configType.Name).Dot(configType.Name).Dot("OperationKind_").Op("==").Id("OperationKindDelete")
-			elementID := Id(configType.Name).Dot(configType.Name).Dot("ID")
-
-			reassignElement := Id(configType.Name).Op(":=").Id("se").Dot(title(configType.Name)).Params(Id(receiverName).Dot(configType.Name).Dot("ID"))
-			setAttribute := Id(configType.Name).Dot(configType.Name).Dot(title(field.Name)).Op("=").Id(newValueParam)
-			setOpKind := Id(configType.Name).Dot(configType.Name).Dot("OperationKind_").Op("=").Id("OperationKindUpdate")
-			updateElementInPatch := Id("se").Dot("Patch").Dot(title(configType.Name)).Index(elementID).Op("=").Id(configType.Name).Dot(configType.Name)
-
-			decls.file.Func().Params(receiverParams).Id(funcName).Params(params).Id(returns).Block(
-				reassignElement,
-				If(isOperationKindDelete).Block(
+			decls.file.Func().Params(s.receiverParams()).Id(s.name()).Params(s.params()).Id(s.returns()).Block(
+				s.reassignElement(),
+				If(s.isOperationKindDelete()).Block(
 					Return(Id(configType.Name)),
 				),
-				setAttribute,
-				setOpKind,
-				updateElementInPatch,
+				s.setAttribute(),
+				s.setOperationKind(),
+				s.updateElementInPatch(),
 				Return(Id(configType.Name)),
 			)
 		})
@@ -43,4 +33,64 @@ func (s *stateFactory) writeSetters() *stateFactory {
 
 	decls.render(s.buf)
 	return s
+}
+
+type setter struct {
+	t stateConfigType
+	f stateConfigField
+}
+
+func (s setter) receiverParams() *Statement {
+	return Id(s.receiverName()).Id(title(s.t.Name))
+}
+
+func (s setter) name() string {
+	if s.f.ValueType.IsBasicType {
+		return "Set" + title(s.f.Name)
+	}
+	return "Add" + title(pluralizeClient.Singular(s.f.Name))
+}
+
+func (s setter) newValueParam() string {
+	return "new" + title(s.f.Name)
+}
+
+func (s setter) params() *Statement {
+	return List(Id("se").Id("*Engine"), Id(s.newValueParam()).Id(s.f.ValueType.Name))
+}
+
+func (s setter) returns() string {
+	return title(s.t.Name)
+}
+
+func (s setter) reassignElement() *Statement {
+	return Id(s.t.Name).Op(":=").Id("se").Dot(title(s.t.Name)).Params(Id(s.receiverName()).Dot(s.t.Name).Dot("ID"))
+}
+
+func (s setter) isOperationKindDelete() *Statement {
+	return Id(s.t.Name).Dot(s.t.Name).Dot("OperationKind_").Op("==").Id("OperationKindDelete")
+}
+
+func (s setter) setAttribute() *Statement {
+	return Id(s.t.Name).Dot(s.t.Name).Dot(title(s.f.Name)).Op("=").Id(s.newValueParam())
+}
+
+func (s setter) setOperationKind() *Statement {
+	return Id(s.t.Name).Dot(s.t.Name).Dot("OperationKind_").Op("=").Id("OperationKindUpdate")
+}
+
+func (s setter) setOperationKindUpdate() *Statement {
+	return Id(s.t.Name).Dot(s.t.Name).Dot("OperationKind_").Op("=").Id("OperationKindUpdate")
+}
+
+func (s setter) updateElementInPatch() *Statement {
+	return Id("se").Dot("Patch").Dot(title(s.t.Name)).Index(s.elementID()).Op("=").Id(s.t.Name).Dot(s.t.Name)
+}
+
+func (s setter) elementID() *Statement {
+	return Id(s.t.Name).Dot(s.t.Name).Dot("ID")
+}
+
+func (s setter) receiverName() string {
+	return "_" + s.t.Name
 }
