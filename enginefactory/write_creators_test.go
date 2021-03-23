@@ -11,8 +11,8 @@ func TestWriteCreators(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeCreators()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			CreateGearScore_Engine_func,
 			createGearScore_Engine_func,
 			CreateItem_Engine_func,

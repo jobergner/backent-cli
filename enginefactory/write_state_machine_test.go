@@ -11,8 +11,8 @@ func TestWriteEngine(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeOperationKind()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			OperationKind_type,
 			OperationKindDelete_type,
 		}, "\n"))
@@ -25,8 +25,8 @@ func TestWriteEngine(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeEngine()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			Engine_type,
 			newEngine_func,
 		}, "\n"))
@@ -39,8 +39,8 @@ func TestWriteEngine(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeGenerateID()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			GenerateID_Engine_func,
 		}, "\n"))
 
@@ -52,8 +52,8 @@ func TestWriteEngine(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeUpdateState()
 
-		actual := utils.NormalizeWhitespace(sf.buf.String())
-		expected := utils.NormalizeWhitespace(strings.Join([]string{
+		actual := utils.FormatCode(sf.buf.String())
+		expected := utils.FormatCode(strings.Join([]string{
 			UpdateState_Engine_func,
 		}, "\n"))
 

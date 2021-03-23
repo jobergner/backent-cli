@@ -27,8 +27,8 @@ func TestWriteActions(t *testing.T) {
 		ast := buildActionsConfigAST(testActionsConfig)
 		af := newActionsFactory(ast)
 
-		actual := utils.NormalizeWhitespace(string(af.writeActions().writtenSourceCode()))
-		expected := utils.NormalizeWhitespace(strings.TrimSpace(`
+		actual := utils.FormatCode(string(af.writeActions().writtenSourceCode()))
+		expected := utils.FormatCode(strings.TrimSpace(`
 func interactBaz(target bool, sm *state.Engine) {}
 func makeFoo(count int, entities []state.Entity, origins []string, sm *state.Engine) {}
 func walkBar(altitude state.Altitude, distance float64, sm *state.Engine) {}
