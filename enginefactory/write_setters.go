@@ -1,28 +1,46 @@
 package enginefactory
 
 import (
-	"text/template"
+	"bytes"
+	. "github.com/dave/jennifer/jen"
 )
 
-const setterTemplateString string = `
-<( range .Types )><( $Type := . )><( range .Fields )><( if not .HasSliceValue )><( if .ValueType.IsBasicType)>
-func (_e <( toTitleCase $Type.Name )>) Set<( toTitleCase .Name )>(se *Engine, new<( toTitleCase .Name )> <( .ValueType.Name )>) <( toTitleCase $Type.Name )> {
-	e := se.<( toTitleCase $Type.Name )>(_e.<( $Type.Name )>.ID)
-	if e.<( $Type.Name )>.OperationKind_ == OperationKindDelete {
-		return e
-	}
-	e.<( $Type.Name )>.<( toTitleCase .Name )> = new<( toTitleCase .Name )>
-	e.<( $Type.Name )>.OperationKind_ = OperationKindUpdate
-	se.Patch.<( toTitleCase $Type.Name )>[e.<( $Type.Name )>.ID] = e.<( $Type.Name )>
-	return e
-}
-<( end )><( end )>
-<( end )><( end )>
-`
+func abc(ast *stateConfigAST, buf *bytes.Buffer) {
+	decls := newDeclSet()
+	ast.orderedRange(func(configType stateConfigType) {
+		configType.orderedRange(func(field stateConfigField) {
 
-var setterTemplate *template.Template = newTemplateFrom("setterTemplate", setterTemplateString)
+			if field.HasSliceValue || !field.ValueType.IsBasicType {
+				return
+			}
+
+			receiverParams := Id("_e").Id(title(configType.Name))
+			funcName := "Set" + title(field.Name)
+			params := List(
+				Id("se").Id("*Engine"),
+				Id("new"+title(field.Name)).Id(field.ValueType.Name),
+			)
+			returns := title(configType.Name)
+			isOperationKindDelete := Id("e").Dot(configType.Name).Dot("OperationKind_").Op("==").Id("OperationKindDelete")
+			elementID := Id("e").Dot(configType.Name).Dot("ID")
+
+			decls.file.Func().Params(receiverParams).Id(funcName).Params(params).Id(returns).Block(
+				Id("e").Op(":=").Id("se").Dot(title(configType.Name)).Params(Id("_e").Dot(configType.Name).Dot("ID")),
+				If(isOperationKindDelete).Block(
+					Return(Id("e")),
+				),
+				Id("e").Dot(configType.Name).Dot(title(field.Name)).Op("=").Id("new"+title(field.Name)),
+				Id("e").Dot(configType.Name).Dot("OperationKind_").Op("=").Id("OperationKindUpdate"),
+				Id("se").Dot("Patch").Dot(title(configType.Name)).Index(elementID).Op("=").Id("e").Dot(configType.Name),
+				Return(Id("e")),
+			)
+		})
+	})
+
+	decls.render(buf)
+}
 
 func (s *stateFactory) writeSetters() *stateFactory {
-	setterTemplate.Execute(s.buf, s.ast)
+	abc(s.ast, s.buf)
 	return s
 }

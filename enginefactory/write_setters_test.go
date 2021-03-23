@@ -11,7 +11,7 @@ func TestWriteSetters(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeSetters()
 
-		actual := utils.FormatCode(sf.buf.String())
+		actual := sf.buf.String()
 		expected := utils.FormatCode(strings.Join([]string{
 			SetLevel_GearScore_func,
 			SetScore_GearScore_func,

@@ -3,6 +3,7 @@ module bar-cli
 go 1.13
 
 require (
+	github.com/dave/jennifer v1.4.1
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/mailru/easyjson v0.7.7
 	github.com/sergi/go-diff v1.1.0
