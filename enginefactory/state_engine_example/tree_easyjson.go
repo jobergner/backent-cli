@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(in *jlexer.Lexer, out *_zoneItem) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(in *jlexer.Lexer, out *tZoneItem) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -44,7 +44,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(in *jlexer.Lexe
 				out.Item = nil
 			} else {
 				if out.Item == nil {
-					out.Item = new(_item)
+					out.Item = new(tItem)
 				}
 				(*out.Item).UnmarshalEasyJSON(in)
 			}
@@ -54,7 +54,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(in *jlexer.Lexe
 				out.Position = nil
 			} else {
 				if out.Position == nil {
-					out.Position = new(_position)
+					out.Position = new(tPosition)
 				}
 				(*out.Position).UnmarshalEasyJSON(in)
 			}
@@ -70,7 +70,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(in *jlexer.Lexe
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(out *jwriter.Writer, in _zoneItem) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(out *jwriter.Writer, in tZoneItem) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -106,29 +106,29 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(out *jwriter.Wr
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v _zoneItem) MarshalJSON() ([]byte, error) {
+func (v tZoneItem) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v _zoneItem) MarshalEasyJSON(w *jwriter.Writer) {
+func (v tZoneItem) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *_zoneItem) UnmarshalJSON(data []byte) error {
+func (v *tZoneItem) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *_zoneItem) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *tZoneItem) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample(l, v)
 }
-func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(in *jlexer.Lexer, out *_zone) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(in *jlexer.Lexer, out *tZone) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -157,15 +157,15 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(in *jlexer.Lex
 				in.Delim('[')
 				if out.Items == nil {
 					if !in.IsDelim(']') {
-						out.Items = make([]_zoneItem, 0, 1)
+						out.Items = make([]tZoneItem, 0, 1)
 					} else {
-						out.Items = []_zoneItem{}
+						out.Items = []tZoneItem{}
 					}
 				} else {
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v1 _zoneItem
+					var v1 tZoneItem
 					(v1).UnmarshalEasyJSON(in)
 					out.Items = append(out.Items, v1)
 					in.WantComma()
@@ -180,15 +180,15 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(in *jlexer.Lex
 				in.Delim('[')
 				if out.Players == nil {
 					if !in.IsDelim(']') {
-						out.Players = make([]_player, 0, 1)
+						out.Players = make([]tPlayer, 0, 1)
 					} else {
-						out.Players = []_player{}
+						out.Players = []tPlayer{}
 					}
 				} else {
 					out.Players = (out.Players)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v2 _player
+					var v2 tPlayer
 					(v2).UnmarshalEasyJSON(in)
 					out.Players = append(out.Players, v2)
 					in.WantComma()
@@ -230,7 +230,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(out *jwriter.Writer, in _zone) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(out *jwriter.Writer, in tZone) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -296,29 +296,29 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(out *jwriter.W
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v _zone) MarshalJSON() ([]byte, error) {
+func (v tZone) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v _zone) MarshalEasyJSON(w *jwriter.Writer) {
+func (v tZone) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *_zone) UnmarshalJSON(data []byte) error {
+func (v *tZone) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *_zone) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *tZone) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample1(l, v)
 }
-func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(in *jlexer.Lexer, out *_position) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(in *jlexer.Lexer, out *tPosition) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -355,7 +355,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(out *jwriter.Writer, in _position) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(out *jwriter.Writer, in tPosition) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -383,29 +383,29 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(out *jwriter.W
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v _position) MarshalJSON() ([]byte, error) {
+func (v tPosition) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v _position) MarshalEasyJSON(w *jwriter.Writer) {
+func (v tPosition) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *_position) UnmarshalJSON(data []byte) error {
+func (v *tPosition) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *_position) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *tPosition) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample2(l, v)
 }
-func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lexer, out *_player) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lexer, out *tPlayer) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -432,7 +432,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lex
 				out.GearScore = nil
 			} else {
 				if out.GearScore == nil {
-					out.GearScore = new(_gearScore)
+					out.GearScore = new(tGearScore)
 				}
 				(*out.GearScore).UnmarshalEasyJSON(in)
 			}
@@ -444,15 +444,15 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lex
 				in.Delim('[')
 				if out.Items == nil {
 					if !in.IsDelim(']') {
-						out.Items = make([]_item, 0, 2)
+						out.Items = make([]tItem, 0, 2)
 					} else {
-						out.Items = []_item{}
+						out.Items = []tItem{}
 					}
 				} else {
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v10 _item
+					var v10 tItem
 					(v10).UnmarshalEasyJSON(in)
 					out.Items = append(out.Items, v10)
 					in.WantComma()
@@ -465,7 +465,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lex
 				out.Position = nil
 			} else {
 				if out.Position == nil {
-					out.Position = new(_position)
+					out.Position = new(tPosition)
 				}
 				(*out.Position).UnmarshalEasyJSON(in)
 			}
@@ -481,7 +481,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(out *jwriter.Writer, in _player) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(out *jwriter.Writer, in tPlayer) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -533,29 +533,29 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(out *jwriter.W
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v _player) MarshalJSON() ([]byte, error) {
+func (v tPlayer) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v _player) MarshalEasyJSON(w *jwriter.Writer) {
+func (v tPlayer) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *_player) UnmarshalJSON(data []byte) error {
+func (v *tPlayer) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *_player) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *tPlayer) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample3(l, v)
 }
-func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(in *jlexer.Lexer, out *_item) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(in *jlexer.Lexer, out *tItem) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -582,7 +582,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(in *jlexer.Lex
 				out.GearScore = nil
 			} else {
 				if out.GearScore == nil {
-					out.GearScore = new(_gearScore)
+					out.GearScore = new(tGearScore)
 				}
 				(*out.GearScore).UnmarshalEasyJSON(in)
 			}
@@ -598,7 +598,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(out *jwriter.Writer, in _item) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(out *jwriter.Writer, in tItem) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -625,29 +625,29 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(out *jwriter.W
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v _item) MarshalJSON() ([]byte, error) {
+func (v tItem) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v _item) MarshalEasyJSON(w *jwriter.Writer) {
+func (v tItem) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *_item) UnmarshalJSON(data []byte) error {
+func (v *tItem) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *_item) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *tItem) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample4(l, v)
 }
-func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(in *jlexer.Lexer, out *_gearScore) {
+func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(in *jlexer.Lexer, out *tGearScore) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -684,7 +684,7 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(out *jwriter.Writer, in _gearScore) {
+func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(out *jwriter.Writer, in tGearScore) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -712,26 +712,26 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(out *jwriter.W
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v _gearScore) MarshalJSON() ([]byte, error) {
+func (v tGearScore) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v _gearScore) MarshalEasyJSON(w *jwriter.Writer) {
+func (v tGearScore) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *_gearScore) UnmarshalJSON(data []byte) error {
+func (v *tGearScore) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *_gearScore) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *tGearScore) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(l, v)
 }
 func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lexer, out *Tree) {
@@ -758,11 +758,11 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lex
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.GearScore = make(map[GearScoreID]_gearScore)
+				out.GearScore = make(map[GearScoreID]tGearScore)
 				for !in.IsDelim('}') {
 					key := GearScoreID(in.IntStr())
 					in.WantColon()
-					var v13 _gearScore
+					var v13 tGearScore
 					(v13).UnmarshalEasyJSON(in)
 					(out.GearScore)[key] = v13
 					in.WantComma()
@@ -774,11 +774,11 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lex
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Item = make(map[ItemID]_item)
+				out.Item = make(map[ItemID]tItem)
 				for !in.IsDelim('}') {
 					key := ItemID(in.IntStr())
 					in.WantColon()
-					var v14 _item
+					var v14 tItem
 					(v14).UnmarshalEasyJSON(in)
 					(out.Item)[key] = v14
 					in.WantComma()
@@ -790,11 +790,11 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lex
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Player = make(map[PlayerID]_player)
+				out.Player = make(map[PlayerID]tPlayer)
 				for !in.IsDelim('}') {
 					key := PlayerID(in.IntStr())
 					in.WantColon()
-					var v15 _player
+					var v15 tPlayer
 					(v15).UnmarshalEasyJSON(in)
 					(out.Player)[key] = v15
 					in.WantComma()
@@ -806,11 +806,11 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lex
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Position = make(map[PositionID]_position)
+				out.Position = make(map[PositionID]tPosition)
 				for !in.IsDelim('}') {
 					key := PositionID(in.IntStr())
 					in.WantColon()
-					var v16 _position
+					var v16 tPosition
 					(v16).UnmarshalEasyJSON(in)
 					(out.Position)[key] = v16
 					in.WantComma()
@@ -822,11 +822,11 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lex
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Zone = make(map[ZoneID]_zone)
+				out.Zone = make(map[ZoneID]tZone)
 				for !in.IsDelim('}') {
 					key := ZoneID(in.IntStr())
 					in.WantColon()
-					var v17 _zone
+					var v17 tZone
 					(v17).UnmarshalEasyJSON(in)
 					(out.Zone)[key] = v17
 					in.WantComma()
@@ -838,11 +838,11 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample6(in *jlexer.Lex
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.ZoneItem = make(map[ZoneItemID]_zoneItem)
+				out.ZoneItem = make(map[ZoneItemID]tZoneItem)
 				for !in.IsDelim('}') {
 					key := ZoneItemID(in.IntStr())
 					in.WantColon()
-					var v18 _zoneItem
+					var v18 tZoneItem
 					(v18).UnmarshalEasyJSON(in)
 					(out.ZoneItem)[key] = v18
 					in.WantComma()

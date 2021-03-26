@@ -48,12 +48,12 @@ const AddItem_Player_func string = `func (_player Player) AddItem(se *Engine) It
 	return item
 }`
 
-const assembleGearScore_Engine_func string = `func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
+const assembleGearScore_Engine_func string = `func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (tGearScore, bool) {
 	gearScore, hasUpdated := se.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
-		return _gearScore{}, false
+		return tGearScore{}, false
 	}
-	var treeGearScore _gearScore
+	var treeGearScore tGearScore
 	treeGearScore.ID = gearScore.ID
 	treeGearScore.OperationKind_ = gearScore.OperationKind_
 	treeGearScore.Level = gearScore.Level
@@ -61,12 +61,12 @@ const assembleGearScore_Engine_func string = `func (se *Engine) assembleGearScor
 	return treeGearScore, true
 }`
 
-const assemblePosition_Engine_func string = `func (se *Engine) assemblePosition(positionID PositionID) (_position, bool) {
+const assemblePosition_Engine_func string = `func (se *Engine) assemblePosition(positionID PositionID) (tPosition, bool) {
 	position, hasUpdated := se.Patch.Position[positionID]
 	if !hasUpdated {
-		return _position{}, false
+		return tPosition{}, false
 	}
-	var treePosition _position
+	var treePosition tPosition
 	treePosition.ID = position.ID
 	treePosition.OperationKind_ = position.OperationKind_
 	treePosition.X = position.X
@@ -74,12 +74,12 @@ const assemblePosition_Engine_func string = `func (se *Engine) assemblePosition(
 	return treePosition, true
 }`
 
-const assembleItem_Engine_func string = `func (se *Engine) assembleItem(itemID ItemID) (_item, bool) {
+const assembleItem_Engine_func string = `func (se *Engine) assembleItem(itemID ItemID) (tItem, bool) {
 	item, hasUpdated := se.Patch.Item[itemID]
 	if !hasUpdated {
 		item = se.State.Item[itemID]
 	}
-	var treeItem _item
+	var treeItem tItem
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(item.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
 		treeItem.GearScore = &treeGearScore
@@ -89,12 +89,12 @@ const assembleItem_Engine_func string = `func (se *Engine) assembleItem(itemID I
 	return treeItem, hasUpdated
 }`
 
-const assembleZoneItem_Engine_func string = `func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
+const assembleZoneItem_Engine_func string = `func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (tZoneItem, bool) {
 	zoneItem, hasUpdated := se.Patch.ZoneItem[zoneItemID]
 	if !hasUpdated {
 		zoneItem = se.State.ZoneItem[zoneItemID]
 	}
-	var treeZoneItem _zoneItem
+	var treeZoneItem tZoneItem
 	if treeItem, itemHasUpdated := se.assembleItem(zoneItem.Item); itemHasUpdated {
 		hasUpdated = true
 		treeZoneItem.Item = &treeItem
@@ -108,12 +108,12 @@ const assembleZoneItem_Engine_func string = `func (se *Engine) assembleZoneItem(
 	return treeZoneItem, hasUpdated
 }`
 
-const assemblePlayer_Engine_func string = `func (se *Engine) assemblePlayer(playerID PlayerID) (_player, bool) {
+const assemblePlayer_Engine_func string = `func (se *Engine) assemblePlayer(playerID PlayerID) (tPlayer, bool) {
 	player, hasUpdated := se.Patch.Player[playerID]
 	if !hasUpdated {
 		player = se.State.Player[playerID]
 	}
-	var treePlayer _player
+	var treePlayer tPlayer
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(player.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
 		treePlayer.GearScore = &treeGearScore
@@ -133,12 +133,12 @@ const assemblePlayer_Engine_func string = `func (se *Engine) assemblePlayer(play
 	return treePlayer, hasUpdated
 }`
 
-const assembleZone_Engine_func string = `func (se *Engine) assembleZone(zoneID ZoneID) (_zone, bool) {
+const assembleZone_Engine_func string = `func (se *Engine) assembleZone(zoneID ZoneID) (tZone, bool) {
 	zone, hasUpdated := se.Patch.Zone[zoneID]
 	if !hasUpdated {
 		zone = se.State.Zone[zoneID]
 	}
-	var treeZone _zone
+	var treeZone tZone
 	for _, zoneItemID := range deduplicateZoneItemIDs(se.State.Zone[zone.ID].Items, se.Patch.Zone[zone.ID].Items) {
 		if treeZoneItem, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
 			hasUpdated = true
@@ -1031,57 +1031,57 @@ const UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
 }`
 
 const Tree_type string = `type Tree struct {
-	GearScore	map[GearScoreID]_gearScore	` + "`" + `json:"gearScore"` + "`" + `
-	Item		map[ItemID]_item		` + "`" + `json:"item"` + "`" + `
-	Player		map[PlayerID]_player		` + "`" + `json:"player"` + "`" + `
-	Position	map[PositionID]_position	` + "`" + `json:"position"` + "`" + `
-	Zone		map[ZoneID]_zone		` + "`" + `json:"zone"` + "`" + `
-	ZoneItem	map[ZoneItemID]_zoneItem	` + "`" + `json:"zoneItem"` + "`" + `
+	GearScore	map[GearScoreID]tGearScore	` + "`" + `json:"gearScore"` + "`" + `
+	Item		map[ItemID]tItem		` + "`" + `json:"item"` + "`" + `
+	Player		map[PlayerID]tPlayer		` + "`" + `json:"player"` + "`" + `
+	Position	map[PositionID]tPosition	` + "`" + `json:"position"` + "`" + `
+	Zone		map[ZoneID]tZone		` + "`" + `json:"zone"` + "`" + `
+	ZoneItem	map[ZoneItemID]tZoneItem	` + "`" + `json:"zoneItem"` + "`" + `
 }`
 
 const newTree_func string = `func newTree() Tree {
-	return Tree{GearScore: make(map[GearScoreID]_gearScore), Item: make(map[ItemID]_item), Player: make(map[PlayerID]_player), Position: make(map[PositionID]_position), Zone: make(map[ZoneID]_zone), ZoneItem: make(map[ZoneItemID]_zoneItem)}
+	return Tree{GearScore: make(map[GearScoreID]tGearScore), Item: make(map[ItemID]tItem), Player: make(map[PlayerID]tPlayer), Position: make(map[PositionID]tPosition), Zone: make(map[ZoneID]tZone), ZoneItem: make(map[ZoneItemID]tZoneItem)}
 }`
 
-const _zoneItem_type string = `type _zoneItem struct {
+const tZoneItem_type string = `type tZoneItem struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
-	Item		*_item		` + "`" + `json:"item"` + "`" + `
-	Position	*_position	` + "`" + `json:"position"` + "`" + `
+	Item		*tItem		` + "`" + `json:"item"` + "`" + `
+	Position	*tPosition	` + "`" + `json:"position"` + "`" + `
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
-const _item_type string = `type _item struct {
+const tItem_type string = `type tItem struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
-	GearScore	*_gearScore	` + "`" + `json:"gearScore"` + "`" + `
+	GearScore	*tGearScore	` + "`" + `json:"gearScore"` + "`" + `
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
-const _position_type string = `type _position struct {
+const tPosition_type string = `type tPosition struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
-const _gearScore_type string = `type _gearScore struct {
+const tGearScore_type string = `type tGearScore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
-const _player_type string = `type _player struct {
+const tPlayer_type string = `type tPlayer struct {
 	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
-	GearScore	*_gearScore	` + "`" + `json:"gearScore"` + "`" + `
-	Items		[]_item		` + "`" + `json:"items"` + "`" + `
-	Position	*_position	` + "`" + `json:"position"` + "`" + `
+	GearScore	*tGearScore	` + "`" + `json:"gearScore"` + "`" + `
+	Items		[]tItem		` + "`" + `json:"items"` + "`" + `
+	Position	*tPosition	` + "`" + `json:"position"` + "`" + `
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
-const _zone_type string = `type _zone struct {
+const tZone_type string = `type tZone struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
-	Items		[]_zoneItem	` + "`" + `json:"items"` + "`" + `
-	Players		[]_player	` + "`" + `json:"players"` + "`" + `
+	Items		[]tZoneItem	` + "`" + `json:"items"` + "`" + `
+	Players		[]tPlayer	` + "`" + `json:"players"` + "`" + `
 	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
