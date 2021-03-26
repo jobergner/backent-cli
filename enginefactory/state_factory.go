@@ -22,6 +22,15 @@ func title(name string) string {
 	return strings.Title(name)
 }
 
+func forEachFieldInType(configType stateConfigType, fn func(field stateConfigField) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	configType.rangeFields(func(field stateConfigField) {
+		statements = append(statements, fn(field))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 func onlyIf(is bool, statement *jen.Statement) *jen.Statement {
 	if is {
 		return statement
