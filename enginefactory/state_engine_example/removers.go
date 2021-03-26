@@ -1,116 +1,120 @@
 package state
 
-func (_e Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
-	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind_ == OperationKindDelete {
-		return e
+func (_zone Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
+	zone := se.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zone
 	}
-	var elementsAltered bool
+	var wereElementsAltered bool
 	var newElements []PlayerID
-	for _, element := range e.zone.Players {
+	for _, element := range zone.zone.Players {
 		var toBeRemoved bool
 		for _, elementToRemove := range playersToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
-				elementsAltered = true
+				wereElementsAltered = true
 				se.deletePlayer(element)
+				break
 			}
 		}
 		if !toBeRemoved {
 			newElements = append(newElements, element)
 		}
 	}
-	if !elementsAltered {
-		return e
+	if !wereElementsAltered {
+		return zone
 	}
-	e.zone.Players = newElements
-	e.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.zone.ID] = e.zone
-	return e
+	zone.zone.Players = newElements
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
 }
 
-func (_e Zone) RemoveItems(se *Engine, zoneItemsToRemove ...ZoneItemID) Zone {
-	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind_ == OperationKindDelete {
-		return e
+func (_zone Zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) Zone {
+	zone := se.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zone
 	}
-	var elementsAltered bool
+	var wereElementsAltered bool
 	var newElements []ZoneItemID
-	for _, element := range e.zone.Items {
-		var toBeRemoved bool
-		for _, elementToRemove := range zoneItemsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				elementsAltered = true
-				se.deleteZoneItem(element)
-			}
-		}
-		if !toBeRemoved {
-			newElements = append(newElements, element)
-		}
-	}
-	if !elementsAltered {
-		return e
-	}
-	e.zone.Items = newElements
-	e.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.zone.ID] = e.zone
-	return e
-}
-
-func (_e Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
-	e := se.Player(_e.player.ID)
-	if e.player.OperationKind_ == OperationKindDelete {
-		return e
-	}
-	var elementsAltered bool
-	var newElements []ItemID
-	for _, element := range e.player.Items {
+	for _, element := range zone.zone.Items {
 		var toBeRemoved bool
 		for _, elementToRemove := range itemsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
-				elementsAltered = true
-				se.deleteItem(element)
+				wereElementsAltered = true
+				se.deleteZoneItem(element)
+				break
 			}
 		}
 		if !toBeRemoved {
 			newElements = append(newElements, element)
 		}
 	}
-	if !elementsAltered {
-		return e
+	if !wereElementsAltered {
+		return zone
 	}
-	e.player.Items = newElements
-	e.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[e.player.ID] = e.player
-	return e
+	zone.zone.Items = newElements
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
 }
 
-func (_e Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
-	e := se.Zone(_e.zone.ID)
-	if e.zone.OperationKind_ == OperationKindDelete {
-		return e
+func (_player Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
+	player := se.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return player
 	}
-	var elementsAltered bool
+	var wereElementsAltered bool
+	var newElements []ItemID
+	for _, element := range player.player.Items {
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				se.deleteItem(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, element)
+		}
+	}
+	if !wereElementsAltered {
+		return player
+	}
+	player.player.Items = newElements
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
+	return player
+}
+
+func (_zone Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
+	zone := se.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
 	var newElements []string
-	for _, element := range e.zone.Tags {
+	for _, element := range zone.zone.Tags {
 		var toBeRemoved bool
 		for _, elementToRemove := range tagsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
-				elementsAltered = true
+				wereElementsAltered = true
+				break
 			}
 		}
 		if !toBeRemoved {
 			newElements = append(newElements, element)
 		}
 	}
-	if !elementsAltered {
-		return e
+	if !wereElementsAltered {
+		return zone
 	}
-	e.zone.Tags = newElements
-	e.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.zone.ID] = e.zone
-	return e
+	zone.zone.Tags = newElements
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
 }
