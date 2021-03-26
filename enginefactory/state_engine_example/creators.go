@@ -5,12 +5,12 @@ func (se *Engine) CreateGearScore() GearScore {
 }
 
 func (se *Engine) createGearScore(hasParent bool) GearScore {
-	var e gearScoreCore
-	e.ID = GearScoreID(se.GenerateID())
-	e.HasParent_ = hasParent
-	e.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[e.ID] = e
-	return GearScore{gearScore: e}
+	var gearScore gearScoreCore
+	gearScore.ID = GearScoreID(se.GenerateID())
+	gearScore.HasParent_ = hasParent
+	gearScore.OperationKind_ = OperationKindUpdate
+	se.Patch.GearScore[gearScore.ID] = gearScore
+	return GearScore{gearScore: gearScore}
 }
 
 func (se *Engine) CreatePosition() Position {
@@ -18,12 +18,12 @@ func (se *Engine) CreatePosition() Position {
 }
 
 func (se *Engine) createPosition(hasParent bool) Position {
-	var e positionCore
-	e.ID = PositionID(se.GenerateID())
-	e.HasParent_ = hasParent
-	e.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[e.ID] = e
-	return Position{position: e}
+	var position positionCore
+	position.ID = PositionID(se.GenerateID())
+	position.HasParent_ = hasParent
+	position.OperationKind_ = OperationKindUpdate
+	se.Patch.Position[position.ID] = position
+	return Position{position: position}
 }
 
 func (se *Engine) CreateItem() Item {
@@ -31,14 +31,14 @@ func (se *Engine) CreateItem() Item {
 }
 
 func (se *Engine) createItem(hasParent bool) Item {
-	var e itemCore
-	e.ID = ItemID(se.GenerateID())
-	e.HasParent_ = hasParent
+	var item itemCore
+	item.ID = ItemID(se.GenerateID())
+	item.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
-	e.GearScore = elementGearScore.gearScore.ID
-	e.OperationKind_ = OperationKindUpdate
-	se.Patch.Item[e.ID] = e
-	return Item{item: e}
+	item.GearScore = elementGearScore.gearScore.ID
+	item.OperationKind_ = OperationKindUpdate
+	se.Patch.Item[item.ID] = item
+	return Item{item: item}
 }
 
 func (se *Engine) CreateZoneItem() ZoneItem {
@@ -46,16 +46,16 @@ func (se *Engine) CreateZoneItem() ZoneItem {
 }
 
 func (se *Engine) createZoneItem(hasParent bool) ZoneItem {
-	var e zoneItemCore
-	e.ID = ZoneItemID(se.GenerateID())
-	e.HasParent_ = hasParent
+	var zoneItem zoneItemCore
+	zoneItem.ID = ZoneItemID(se.GenerateID())
+	zoneItem.HasParent_ = hasParent
 	elementItem := se.createItem(true)
-	e.Item = elementItem.item.ID
+	zoneItem.Item = elementItem.item.ID
 	elementPosition := se.createPosition(true)
-	e.Position = elementPosition.position.ID
-	e.OperationKind_ = OperationKindUpdate
-	se.Patch.ZoneItem[e.ID] = e
-	return ZoneItem{zoneItem: e}
+	zoneItem.Position = elementPosition.position.ID
+	zoneItem.OperationKind_ = OperationKindUpdate
+	se.Patch.ZoneItem[zoneItem.ID] = zoneItem
+	return ZoneItem{zoneItem: zoneItem}
 }
 
 func (se *Engine) CreatePlayer() Player {
@@ -63,16 +63,16 @@ func (se *Engine) CreatePlayer() Player {
 }
 
 func (se *Engine) createPlayer(hasParent bool) Player {
-	var e playerCore
-	e.ID = PlayerID(se.GenerateID())
-	e.HasParent_ = hasParent
+	var player playerCore
+	player.ID = PlayerID(se.GenerateID())
+	player.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
-	e.GearScore = elementGearScore.gearScore.ID
+	player.GearScore = elementGearScore.gearScore.ID
 	elementPosition := se.createPosition(true)
-	e.Position = elementPosition.position.ID
-	e.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[e.ID] = e
-	return Player{player: e}
+	player.Position = elementPosition.position.ID
+	player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.ID] = player
+	return Player{player: player}
 }
 
 func (se *Engine) CreateZone() Zone {
@@ -80,9 +80,9 @@ func (se *Engine) CreateZone() Zone {
 }
 
 func (se *Engine) createZone() Zone {
-	var e zoneCore
-	e.ID = ZoneID(se.GenerateID())
-	e.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[e.ID] = e
-	return Zone{zone: e}
+	var zone zoneCore
+	zone.ID = ZoneID(se.GenerateID())
+	zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.ID] = zone
+	return Zone{zone: zone}
 }
