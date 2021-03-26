@@ -1,12 +1,12 @@
 package state
 
-func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) {
+func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (tGearScore, bool) {
 	gearScore, hasUpdated := se.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
-		return _gearScore{}, false
+		return tGearScore{}, false
 	}
 
-	var treeGearScore _gearScore
+	var treeGearScore tGearScore
 
 	treeGearScore.ID = gearScore.ID
 	treeGearScore.OperationKind_ = gearScore.OperationKind_
@@ -15,13 +15,13 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (_gearScore, bool) 
 	return treeGearScore, true
 }
 
-func (se *Engine) assemblePosition(positionID PositionID) (_position, bool) {
+func (se *Engine) assemblePosition(positionID PositionID) (tPosition, bool) {
 	position, hasUpdated := se.Patch.Position[positionID]
 	if !hasUpdated {
-		return _position{}, false
+		return tPosition{}, false
 	}
 
-	var treePosition _position
+	var treePosition tPosition
 
 	treePosition.ID = position.ID
 	treePosition.OperationKind_ = position.OperationKind_
@@ -30,13 +30,13 @@ func (se *Engine) assemblePosition(positionID PositionID) (_position, bool) {
 	return treePosition, true
 }
 
-func (se *Engine) assembleItem(itemID ItemID) (_item, bool) {
+func (se *Engine) assembleItem(itemID ItemID) (tItem, bool) {
 	item, hasUpdated := se.Patch.Item[itemID]
 	if !hasUpdated {
 		item = se.State.Item[itemID]
 	}
 
-	var treeItem _item
+	var treeItem tItem
 
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(item.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
@@ -49,13 +49,13 @@ func (se *Engine) assembleItem(itemID ItemID) (_item, bool) {
 	return treeItem, hasUpdated
 }
 
-func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
+func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (tZoneItem, bool) {
 	zoneItem, hasUpdated := se.Patch.ZoneItem[zoneItemID]
 	if !hasUpdated {
 		zoneItem = se.State.ZoneItem[zoneItemID]
 	}
 
-	var treeZoneItem _zoneItem
+	var treeZoneItem tZoneItem
 
 	if treeItem, itemHasUpdated := se.assembleItem(zoneItem.Item); itemHasUpdated {
 		hasUpdated = true
@@ -72,13 +72,13 @@ func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (_zoneItem, bool) {
 
 }
 
-func (se *Engine) assemblePlayer(playerID PlayerID) (_player, bool) {
+func (se *Engine) assemblePlayer(playerID PlayerID) (tPlayer, bool) {
 	player, hasUpdated := se.Patch.Player[playerID]
 	if !hasUpdated {
 		player = se.State.Player[playerID]
 	}
 
-	var treePlayer _player
+	var treePlayer tPlayer
 
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(player.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
@@ -100,13 +100,13 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (_player, bool) {
 	return treePlayer, hasUpdated
 }
 
-func (se *Engine) assembleZone(zoneID ZoneID) (_zone, bool) {
+func (se *Engine) assembleZone(zoneID ZoneID) (tZone, bool) {
 	zone, hasUpdated := se.Patch.Zone[zoneID]
 	if !hasUpdated {
 		zone = se.State.Zone[zoneID]
 	}
 
-	var treeZone _zone
+	var treeZone tZone
 
 	for _, zoneItemID := range deduplicateZoneItemIDs(se.State.Zone[zone.ID].Items, se.Patch.Zone[zone.ID].Items) {
 		if treeZoneItem, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID); zoneItemHasUpdated {

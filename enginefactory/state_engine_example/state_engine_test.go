@@ -169,30 +169,30 @@ func TestTree(t *testing.T) {
 		actual := se.assembleTree()
 
 		expected := newTree()
-		expected.Zone = map[ZoneID]_zone{
+		expected.Zone = map[ZoneID]tZone{
 			zone.ID(se): {
 				ID: zone.ID(se),
-				Players: []_player{
+				Players: []tPlayer{
 					{
 						ID: player1.ID(se),
-						GearScore: &_gearScore{
+						GearScore: &tGearScore{
 							ID:             player1.GearScore(se).ID(se),
 							OperationKind_: OperationKindUpdate,
 						},
 						OperationKind_: OperationKindUpdate,
-						Position: &_position{
+						Position: &tPosition{
 							ID:             player1.Position(se).ID(se),
 							OperationKind_: OperationKindUpdate,
 						},
 					},
 					{
 						ID: player2.ID(se),
-						GearScore: &_gearScore{
+						GearScore: &tGearScore{
 							ID:             player2.GearScore(se).ID(se),
 							OperationKind_: OperationKindUpdate,
 						},
 						OperationKind_: OperationKindUpdate,
-						Position: &_position{
+						Position: &tPosition{
 							ID:             player2.Position(se).ID(se),
 							OperationKind_: OperationKindUpdate,
 						},
@@ -218,13 +218,13 @@ func TestTree(t *testing.T) {
 		actual := se.assembleTree()
 
 		expected := newTree()
-		expected.Zone = map[ZoneID]_zone{
+		expected.Zone = map[ZoneID]tZone{
 			zone.ID(se): {
 				ID: zone.ID(se),
-				Players: []_player{
+				Players: []tPlayer{
 					{
 						ID: player1.ID(se),
-						GearScore: &_gearScore{
+						GearScore: &tGearScore{
 							ID:             player1.GearScore(se).ID(se),
 							Level:          1,
 							OperationKind_: OperationKindUpdate,
@@ -252,17 +252,17 @@ func TestTree(t *testing.T) {
 		actual := se.assembleTree()
 
 		expected := newTree()
-		expected.Zone = map[ZoneID]_zone{
+		expected.Zone = map[ZoneID]tZone{
 			zone.ID(se): {
 				ID: zone.ID(se),
-				Players: []_player{
+				Players: []tPlayer{
 					{
 						ID: player1.ID(se),
-						Items: []_item{
+						Items: []tItem{
 							{
 								ID:             player1item1.ID(se),
 								OperationKind_: OperationKindUpdate,
-								GearScore: &_gearScore{
+								GearScore: &tGearScore{
 									ID:             player1item1.GearScore(se).ID(se),
 									OperationKind_: OperationKindUpdate,
 								},
@@ -294,17 +294,17 @@ func TestTree(t *testing.T) {
 		actual := se.assembleTree()
 
 		expected := newTree()
-		expected.Zone = map[ZoneID]_zone{
+		expected.Zone = map[ZoneID]tZone{
 			zone.ID(se): {
 				ID: zone.ID(se),
-				Players: []_player{
+				Players: []tPlayer{
 					{
 						ID: player1.ID(se),
-						Items: []_item{
+						Items: []tItem{
 							{
 								ID:             player1item2.ID(se),
 								OperationKind_: OperationKindDelete,
-								GearScore: &_gearScore{
+								GearScore: &tGearScore{
 									ID:             player1item2.item.GearScore,
 									OperationKind_: OperationKindDelete,
 								},

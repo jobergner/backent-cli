@@ -1,64 +1,64 @@
 package state
 
 type Tree struct {
-	GearScore map[GearScoreID]_gearScore `json:"gearScore"`
-	Item      map[ItemID]_item           `json:"item"`
-	Player    map[PlayerID]_player       `json:"player"`
-	Position  map[PositionID]_position   `json:"position"`
-	Zone      map[ZoneID]_zone           `json:"zone"`
-	ZoneItem  map[ZoneItemID]_zoneItem   `json:"zoneItem"`
+	GearScore map[GearScoreID]tGearScore `json:"gearScore"`
+	Item      map[ItemID]tItem           `json:"item"`
+	Player    map[PlayerID]tPlayer       `json:"player"`
+	Position  map[PositionID]tPosition   `json:"position"`
+	Zone      map[ZoneID]tZone           `json:"zone"`
+	ZoneItem  map[ZoneItemID]tZoneItem   `json:"zoneItem"`
 }
 
 func newTree() Tree {
 	return Tree{
-		GearScore: make(map[GearScoreID]_gearScore),
-		Item:      make(map[ItemID]_item),
-		Player:    make(map[PlayerID]_player),
-		Position:  make(map[PositionID]_position),
-		Zone:      make(map[ZoneID]_zone),
-		ZoneItem:  make(map[ZoneItemID]_zoneItem),
+		GearScore: make(map[GearScoreID]tGearScore),
+		Item:      make(map[ItemID]tItem),
+		Player:    make(map[PlayerID]tPlayer),
+		Position:  make(map[PositionID]tPosition),
+		Zone:      make(map[ZoneID]tZone),
+		ZoneItem:  make(map[ZoneItemID]tZoneItem),
 	}
 }
 
-type _zoneItem struct {
+type tZoneItem struct {
 	ID             ZoneItemID    `json:"id"`
-	Item           *_item        `json:"item"`
-	Position       *_position    `json:"position"`
+	Item           *tItem        `json:"item"`
+	Position       *tPosition    `json:"position"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
-type _item struct {
+type tItem struct {
 	ID             ItemID        `json:"id"`
-	GearScore      *_gearScore   `json:"gearScore"`
+	GearScore      *tGearScore   `json:"gearScore"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
-type _position struct {
+type tPosition struct {
 	ID             PositionID    `json:"id"`
 	X              float64       `json:"x"`
 	Y              float64       `json:"y"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
-type _gearScore struct {
+type tGearScore struct {
 	ID             GearScoreID   `json:"id"`
 	Level          int           `json:"level"`
 	Score          int           `json:"score"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
-type _player struct {
+type tPlayer struct {
 	ID             PlayerID      `json:"id"`
-	GearScore      *_gearScore   `json:"gearScore"`
-	Items          []_item       `json:"items"`
-	Position       *_position    `json:"position"`
+	GearScore      *tGearScore   `json:"gearScore"`
+	Items          []tItem       `json:"items"`
+	Position       *tPosition    `json:"position"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
-type _zone struct {
+type tZone struct {
 	ID             ZoneID        `json:"id"`
-	Items          []_zoneItem   `json:"items"`
-	Players        []_player     `json:"players"`
+	Items          []tZoneItem   `json:"items"`
+	Players        []tPlayer     `json:"players"`
 	Tags           []string      `json:"tags"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
