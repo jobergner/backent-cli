@@ -31,6 +31,15 @@ func forEachFieldInType(configType stateConfigType, fn func(field stateConfigFie
 	return &statements
 }
 
+func forEachTypeInAST(ast *stateConfigAST, fn func(configType stateConfigType) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	ast.rangeTypes(func(configType stateConfigType) {
+		statements = append(statements, fn(configType))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 func onlyIf(is bool, statement *jen.Statement) *jen.Statement {
 	if is {
 		return statement
