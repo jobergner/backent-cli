@@ -18,13 +18,13 @@ func (s *stateFactory) writeState() *stateFactory {
 	decls := newDeclSet()
 	decls.file.Type().Id("State").Struct(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
 		s := stateWriter{configType}
-		return Id(s.fieldName()).Map(s.mapKey()).Id(s.fieldValue()).Id(s.fieldTag()).Line()
+		return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 	}))
 
 	decls.file.Func().Id("newState").Params().Id("State").Block(
 		Return(Id("State").Values(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
 			s := stateWriter{configType}
-			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.fieldValue())).Id(",")
+			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 		}))),
 	)
 
@@ -44,7 +44,7 @@ func (s stateWriter) mapKey() *Statement {
 	return Id(title(s.t.Name) + "ID")
 }
 
-func (s stateWriter) fieldValue() string {
+func (s stateWriter) mapValue() string {
 	return s.t.Name + "Core"
 }
 
