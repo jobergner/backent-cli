@@ -1,63 +1,120 @@
 package enginefactory
 
 import (
-	"text/template"
+	. "github.com/dave/jennifer/jen"
 )
 
-const idTemplateString string = `<( range .Types )>
-type <( toTitleCase .Name )>ID int<( end )>
-`
-
-var idTemplate *template.Template = newTemplateFrom("idTemplate", idTemplateString)
-
 func (s *stateFactory) writeIDs() *stateFactory {
-	idTemplate.Execute(s.buf, s.ast)
+	decls := newDeclSet()
+	s.ast.rangeTypes(func(configType stateConfigType) {
+		decls.file.Type().Id(title(configType.Name) + "ID").Int()
+	})
+
+	decls.render(s.buf)
 	return s
 }
-
-const stateTemplateString string = `
-type State struct {<( range .Types )>
-	<( toTitleCase .Name )> map[<( toTitleCase .Name )>ID]<( .Name )>Core ` + "`" + `json:"<( .Name )>"` + "`" + `
-<( end )>}
-
-func newState() State {
-	return State{<( range .Types )><( toTitleCase .Name )>: make(map[<( toTitleCase .Name )>ID]<( .Name )>Core)<( doNotWriteOnIndex $.Types . -1 ", ")><( end )>}
-}
-`
-
-var stateTemplate *template.Template = newTemplateFrom("stateTemplate", stateTemplateString)
 
 func (s *stateFactory) writeState() *stateFactory {
-	stateTemplate.Execute(s.buf, s.ast)
+	decls := newDeclSet()
+	decls.file.Type().Id("State").Struct(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		s := stateWriter{configType}
+		return Id(s.fieldName()).Map(s.mapKey()).Id(s.fieldValue()).Id(s.fieldTag()).Line()
+	}))
+
+	decls.file.Func().Id("newState").Params().Id("State").Block(
+		Return(Id("State").Values(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+			s := stateWriter{configType}
+			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.fieldValue())).Id(",")
+		}))),
+	)
+
+	decls.render(s.buf)
 	return s
 }
 
-const elementTemplateString string = `
-<( define "elementFieldValue" )>
-	<(- if .HasSliceValue -)>
-		[]
-	<(- end -)>
-	<(- if .ValueType.IsBasicType -)>
-		<( .ValueType.Name )>
-	<(- else -)>
-		<( toTitleCase .ValueType.Name )>ID	
-	<(- end -)>
-<( end )>
-<( range .Types )>
-type <( .Name )>Core struct {
-	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
-<( range .Fields )> <( toTitleCase .Name )> <( template "elementFieldValue" . )>  ` + "`" + `json:"<( .Name )>"` + "`" + `
-<( end )>
-	OperationKind_ OperationKind ` + "`" + `json:"operationKind_"` + "`" + `
-<( if not .IsRootType )> HasParent_ bool ` + "`" + `json:"hasParent_"` + "`" + `<( end )>
+type stateWriter struct {
+	t stateConfigType
 }
-type <( toTitleCase .Name )> struct{ <( .Name )> <( .Name )>Core }
-<( end )>
-`
 
-var elementTemplate *template.Template = newTemplateFrom("elementTemplate", elementTemplateString)
+func (s stateWriter) fieldName() string {
+	return title(s.t.Name)
+}
+
+func (s stateWriter) mapKey() *Statement {
+	return Id(title(s.t.Name) + "ID")
+}
+
+func (s stateWriter) fieldValue() string {
+	return s.t.Name + "Core"
+}
+
+func (s stateWriter) fieldTag() string {
+	return "`json:\"" + s.t.Name + "\"`"
+}
 
 func (s *stateFactory) writeElements() *stateFactory {
-	elementTemplate.Execute(s.buf, s.ast)
+	decls := newDeclSet()
+
+	s.ast.rangeTypes(func(configType stateConfigType) {
+
+		e := elementWriter{
+			t: configType,
+		}
+
+		decls.file.Type().Id(e.name()).Struct(
+			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
+			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+				e.f = &field
+				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
+			}),
+			Id("OperationKind_").Id("OperationKind").Id(e.metaFieldTag("operationKind_")).Line(),
+			onlyIf(!configType.IsRootType, Id("HasParent_").Bool().Id(e.metaFieldTag("hasParent_")).Line()),
+		)
+
+		decls.file.Type().Id(title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
+	})
+
+	decls.render(s.buf)
 	return s
+}
+
+type elementWriter struct {
+	t stateConfigType
+	f *stateConfigField
+}
+
+func (e elementWriter) fieldValue() string {
+	var value string
+
+	if e.f.HasSliceValue {
+		value = "[]"
+	}
+
+	if e.f.ValueType.IsBasicType {
+		value += e.f.ValueType.Name
+	} else {
+		value += title(e.f.ValueType.Name) + "ID"
+	}
+
+	return value
+}
+
+func (e elementWriter) fieldTag() string {
+	return "`json:\"" + e.f.Name + "\"`"
+}
+
+func (e elementWriter) metaFieldTag(name string) string {
+	return "`json:\"" + name + "\"`"
+}
+
+func (e elementWriter) fieldName() string {
+	return title(e.f.Name)
+}
+
+func (e elementWriter) name() string {
+	return e.t.Name + "Core"
+}
+
+func (e elementWriter) idType() string {
+	return title(e.t.Name) + "ID"
 }

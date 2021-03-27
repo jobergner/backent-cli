@@ -4,9 +4,9 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (r *stateFactory) writeRemovers() *stateFactory {
+func (s *stateFactory) writeRemovers() *stateFactory {
 	decls := newDeclSet()
-	r.ast.rangeTypes(func(configType stateConfigType) {
+	s.ast.rangeTypes(func(configType stateConfigType) {
 		configType.rangeFields(func(field stateConfigField) {
 
 			if !field.HasSliceValue {
@@ -50,8 +50,8 @@ func (r *stateFactory) writeRemovers() *stateFactory {
 		})
 	})
 
-	decls.render(r.buf)
-	return r
+	decls.render(s.buf)
+	return s
 }
 
 type remover struct {
