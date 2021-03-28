@@ -3,8 +3,8 @@ package state
 type OperationKind string
 
 const (
-	OperationKindDelete = "DELETE"
-	OperationKindUpdate = "UPDATE"
+	OperationKindDelete OperationKind = "DELETE"
+	OperationKindUpdate               = "UPDATE"
 )
 
 type Engine struct {
@@ -15,9 +15,9 @@ type Engine struct {
 
 func newEngine() *Engine {
 	return &Engine{
-		State: newState(),
-		Patch: newState(),
 		IDgen: 1,
+		Patch: newState(),
+		State: newState(),
 	}
 }
 
