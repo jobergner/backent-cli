@@ -64,7 +64,7 @@ func (s setter) returns() string {
 }
 
 func (s setter) reassignElement() *Statement {
-	return Id(s.t.Name).Op(":=").Id("se").Dot(title(s.t.Name)).Params(Id(s.receiverName()).Dot(s.t.Name).Dot("ID"))
+	return Id(s.t.Name).Op(":=").Id("se").Dot(title(s.t.Name)).Call(Id(s.receiverName()).Dot(s.t.Name).Dot("ID"))
 }
 
 func (s setter) isOperationKindDelete() *Statement {

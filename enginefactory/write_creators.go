@@ -69,7 +69,7 @@ func (cw creatorWrapper) createElement() *Statement {
 		callParam = Lit(false)
 	}
 
-	return Id("se").Dot("create" + title(cw.t.Name)).Params(callParam)
+	return Id("se").Dot("create" + title(cw.t.Name)).Call(callParam)
 }
 
 type creator struct {
@@ -108,7 +108,7 @@ func (c creator) declareElement() *Statement {
 }
 
 func (c creator) generateID() *Statement {
-	return Id(c.t.Name).Dot("ID").Op("=").Id(title(c.t.Name) + "ID").Params(Id("se").Dot("GenerateID").Call())
+	return Id(c.t.Name).Dot("ID").Op("=").Id(title(c.t.Name) + "ID").Call(Id("se").Dot("GenerateID").Call())
 }
 
 func (c creator) setHasParent() *Statement {

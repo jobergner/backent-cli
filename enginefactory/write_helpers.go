@@ -15,8 +15,12 @@ func (s *stateFactory) writeDeduplicate() *stateFactory {
 		decls.file.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
 			d.defineCheck(),
 			d.defineDeduped(),
-			d.loopIDs("a"),
-			d.loopIDs("b"),
+			For(d.loopConditions("a")).Block(
+				d.checkValue(),
+			),
+			For(d.loopConditions("b")).Block(
+				d.checkValue(),
+			),
 			d.loopCheck(),
 			Return(Id("deduped")),
 		)
@@ -55,11 +59,12 @@ func (d deduplicator) defineDeduped() *Statement {
 
 }
 
-func (d deduplicator) loopIDs(getsLooped string) *Statement {
-	loop := For(List(Id("_"), Id("val")).Op(":=").Range().Id(getsLooped)).Block(
-		Id("check").Index(Id("val")).Op("=").Id("true"),
-	)
-	return loop
+func (d deduplicator) loopConditions(getsLooped string) *Statement {
+	return List(Id("_"), Id("val")).Op(":=").Range().Id(getsLooped)
+}
+
+func (d deduplicator) checkValue() *Statement {
+	return Id("check").Index(Id("val")).Op("=").Id("true")
 }
 
 func (d deduplicator) loopCheck() *Statement {

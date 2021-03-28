@@ -69,7 +69,7 @@ func (tw typeDeleterWrapper) params() *Statement {
 }
 
 func (tw typeDeleterWrapper) getElement() *Statement {
-	return Id(tw.t.Name).Op(":=").Id("se").Dot(title(tw.t.Name)).Params(Id(tw.idParam())).Dot(tw.t.Name)
+	return Id(tw.t.Name).Op(":=").Id("se").Dot(title(tw.t.Name)).Call(Id(tw.idParam())).Dot(tw.t.Name)
 }
 
 func (tw typeDeleterWrapper) hasParent() *Statement {
@@ -77,7 +77,7 @@ func (tw typeDeleterWrapper) hasParent() *Statement {
 }
 
 func (tw typeDeleterWrapper) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(tw.t.Name)).Params(Id(tw.idParam()))
+	return Id("se").Dot("delete" + title(tw.t.Name)).Call(Id(tw.idParam()))
 }
 
 type typeDeleter struct {
@@ -102,7 +102,7 @@ func (t typeDeleter) params() *Statement {
 }
 
 func (t typeDeleter) getElement() *Statement {
-	return Id(t.t.Name).Op(":=").Id("se").Dot(title(t.t.Name)).Params(Id(t.idParam())).Dot(t.t.Name)
+	return Id(t.t.Name).Op(":=").Id("se").Dot(title(t.t.Name)).Call(Id(t.idParam())).Dot(t.t.Name)
 }
 
 func (t typeDeleter) setOperationKind() *Statement {
@@ -118,9 +118,9 @@ func (t typeDeleter) loopConditions() *Statement {
 }
 
 func (t typeDeleter) deleteElementInLoop() *Statement {
-	return Id("se").Dot("delete" + title(t.f.ValueType.Name)).Params(Id(t.f.ValueType.Name + "ID"))
+	return Id("se").Dot("delete" + title(t.f.ValueType.Name)).Call(Id(t.f.ValueType.Name + "ID"))
 }
 
 func (t typeDeleter) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(t.f.ValueType.Name)).Params(Id(t.t.Name).Dot(title(t.f.ValueType.Name)))
+	return Id("se").Dot("delete" + title(t.f.ValueType.Name)).Call(Id(t.t.Name).Dot(title(t.f.ValueType.Name)))
 }
