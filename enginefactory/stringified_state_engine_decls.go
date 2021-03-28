@@ -947,8 +947,8 @@ const Position_type string = `type Position struct{ position positionCore }`
 const OperationKind_type string = `type OperationKind string`
 
 const OperationKindDelete_type string = `const (
-	OperationKindDelete	= "DELETE"
-	OperationKindUpdate	= "UPDATE"
+	OperationKindDelete	OperationKind	= "DELETE"
+	OperationKindUpdate			= "UPDATE"
 )`
 
 const Engine_type string = `type Engine struct {
@@ -958,7 +958,7 @@ const Engine_type string = `type Engine struct {
 }`
 
 const newEngine_func string = `func newEngine() *Engine {
-	return &Engine{State: newState(), Patch: newState(), IDgen: 1}
+	return &Engine{IDgen: 1, Patch: newState(), State: newState()}
 }`
 
 const GenerateID_Engine_func string = `func (se *Engine) GenerateID() int {

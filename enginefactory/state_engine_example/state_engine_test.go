@@ -33,7 +33,7 @@ func TestEngine(t *testing.T) {
 		gearScore := se.CreateGearScore()
 		se.deleteGearScore(gearScore.ID(se))
 		_gearScore := se.Patch.GearScore[gearScore.ID(se)]
-		assert.Equal(t, OperationKind(OperationKindDelete), _gearScore.OperationKind_)
+		assert.Equal(t, OperationKindDelete, _gearScore.OperationKind_)
 	})
 	t.Run("adds elements", func(t *testing.T) {
 		se := newEngine()
@@ -50,7 +50,7 @@ func TestEngine(t *testing.T) {
 		item := player.AddItem(se)
 		player.RemoveItems(se, item.ID(se))
 		_item := se.Patch.Item[item.ID(se)]
-		assert.Equal(t, OperationKind(OperationKindDelete), _item.OperationKind_)
+		assert.Equal(t, OperationKindDelete, _item.OperationKind_)
 	})
 }
 
@@ -136,7 +136,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		player := se.CreatePlayer()
 		se.DeletePlayer(player.ID(se))
 		item := player.AddItem(se)
-		assert.Equal(t, OperationKind(OperationKindDelete), item.item.OperationKind_)
+		assert.Equal(t, OperationKindDelete, item.item.OperationKind_)
 		se.UpdateState()
 		assert.Equal(t, 0, len(se.Player(player.ID(se)).Items(se)))
 	})
