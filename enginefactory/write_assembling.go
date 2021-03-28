@@ -1,108 +1,261 @@
 package enginefactory
 
 import (
-	"text/template"
+	. "github.com/dave/jennifer/jen"
 )
 
-const assembleTreeTemplateString string = `
-func (se *Engine) assembleTree() Tree {
-	tree := newTree()
-	<(- range .Types )>
-	<( if .IsRootType -)>
-	for _, <( .Name )> := range se.Patch.<( toTitleCase .Name )> {
-		tree<( toTitleCase .Name )>, hasUpdated := se.assemble<( toTitleCase .Name )>(<( .Name )>.ID)
-		if hasUpdated {
-			tree.<( toTitleCase .Name )>[<( .Name )>.ID] = tree<( toTitleCase .Name )>
-		}
-	}
-	<(- else -)>
-	for _, <( .Name )> := range se.Patch.<( toTitleCase .Name )> {
-		if !<( .Name )>.HasParent_ {
-			tree<( toTitleCase .Name )>, hasUpdated := se.assemble<( toTitleCase .Name )>(<( .Name )>.ID)
-			if hasUpdated {
-				tree.<( toTitleCase .Name )>[<( .Name )>.ID] = tree<( toTitleCase .Name )>
-			}
-		}
-	}
-	<(- end )>
-	<(- end )>
-	<(- range .Types )>
-	<(- if .IsRootType )>
-	for _, <( .Name )> := range se.State.<( toTitleCase .Name )> {
-		if _, ok := tree.<( toTitleCase .Name )>[<( .Name )>.ID]; !ok {
-			tree<( toTitleCase .Name )>, hasUpdated := se.assemble<( toTitleCase .Name )>(<( .Name )>.ID)
-			if hasUpdated {
-				tree.<( toTitleCase .Name )>[<( .Name )>.ID] = tree<( toTitleCase .Name )>
-			}
-		}
-	}
-	<(- else )>
-	for _, <( .Name )> := range se.State.<( toTitleCase .Name )> {
-		if !<( .Name )>.HasParent_ {
-			if _, ok := tree.<( toTitleCase .Name )>[<( .Name )>.ID]; !ok {
-				tree<( toTitleCase .Name )>, hasUpdated := se.assemble<( toTitleCase .Name )>(<( .Name )>.ID)
-				if hasUpdated {
-					tree.<( toTitleCase .Name )>[<( .Name )>.ID] = tree<( toTitleCase .Name )>
+func (s *stateFactory) writeAssembleTree() *stateFactory {
+	decls := newDeclSet()
+
+	a := assembleTreeWriter{}
+
+	decls.file.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
+		Id("tree").Op(":=").Id("newTree").Call(),
+		forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+			a.t = &configType
+
+			if a.t.IsRootType {
+				return &Statement{
+					For(a.patchLoopConditions()).Block(
+						a.assembleItem(),
+						If(Id("hasUpdated")).Block(
+							a.setElementInTree(),
+						),
+					),
 				}
 			}
-		}
-	}
-	<(- end )>
-	<(- end )>
-	return tree
-}
-`
 
-var assembleTreeTemplate *template.Template = newTemplateFrom("assembleTreeTemplate", assembleTreeTemplateString)
+			return &Statement{
+				For(a.patchLoopConditions()).Block(
+					If(a.elementHasNoParent()).Block(
+						a.assembleItem(),
+						If(Id("hasUpdated")).Block(
+							a.setElementInTree(),
+						),
+					),
+				),
+			}
 
-func (s *stateFactory) writeAssembleTree() *stateFactory {
-	assembleTreeTemplate.Execute(s.buf, s.ast)
+		}),
+		forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+			a.t = &configType
+
+			if a.t.IsRootType {
+				return &Statement{
+					For(a.stateLoopConditions()).Block(
+						If(a.elementNonExistentInTree()).Block(
+							a.assembleItem(),
+							If(Id("hasUpdated")).Block(
+								a.setElementInTree(),
+							),
+						),
+					),
+				}
+			}
+
+			return &Statement{
+				For(a.stateLoopConditions()).Block(
+					If(a.elementHasNoParent()).Block(
+						If(a.elementNonExistentInTree()).Block(
+							a.assembleItem(),
+							If(Id("hasUpdated")).Block(
+								a.setElementInTree(),
+							),
+						),
+					),
+				),
+			}
+
+		}),
+		Return(Id("tree")),
+	)
+
+	decls.render(s.buf)
 	return s
 }
 
-const assembleTreeElementTemplateString string = `
-<(- range .Types )><( $Type := . )>
-func (se *Engine) assemble<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) (t<( toTitleCase .Name )>, bool) {
-	<( encrypt .Name )>, hasUpdated := se.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
-	if !hasUpdated {
-		<( if .IsLeafType -)>
-			return t<( toTitleCase .Name )>{}, false
-		<(- else -)>
-			<( encrypt .Name )> = se.State.<( toTitleCase .Name )>[<( .Name )>ID]
-		<(- end )>
-	}
-	var tree<( toTitleCase .Name )> t<( toTitleCase .Name )><( range .Fields -)>
-	<( if not .ValueType.IsBasicType -)>
-		<( if .HasSliceValue )>
-			for _, <( .ValueType.Name )>ID := range deduplicate<( toTitleCase .ValueType.Name )>IDs(se.State.<( toTitleCase $Type.Name )>[<( encrypt $Type.Name )>.ID].<( toTitleCase .Name )>, se.Patch.<( toTitleCase $Type.Name )>[<( encrypt $Type.Name )>.ID].<( toTitleCase .Name )>) {
-				if tree<( toTitleCase .ValueType.Name )>, <( .ValueType.Name )>HasUpdated := se.assemble<( toTitleCase .ValueType.Name )>(<( .ValueType.Name )>ID); <( .ValueType.Name )>HasUpdated {
-					hasUpdated = true
-					tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = append(tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )>, tree<( toTitleCase .ValueType.Name )>)
-				}
-			}
-		<(- else )>
-			if tree<( toTitleCase .Name )>, <( .Name )>HasUpdated := se.assemble<( toTitleCase .Name )>(<( encrypt $Type.Name )>.<( toTitleCase .Name )>); <( .Name )>HasUpdated {
-				hasUpdated = true
-				tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = &tree<( toTitleCase .ValueType.Name )>
-			}
-		<(- end -)>
-	<(- end )>
-	<(- end )>
-	tree<( toTitleCase .Name )>.ID = <( encrypt .Name )>.ID
-	tree<( toTitleCase .Name )>.OperationKind_ = <( encrypt .Name )>.OperationKind_
-	<(- range .Fields )>
-	<(- if .ValueType.IsBasicType )>
-		tree<( toTitleCase $Type.Name )>.<( toTitleCase .Name )> = <( encrypt $Type.Name )>.<( toTitleCase .Name )>
-	<(- end -)>
-	<(- end )>
-	return tree<( toTitleCase .Name )>, <( if .IsLeafType )>true<( else )>hasUpdated<( end )>
+type assembleTreeWriter struct {
+	t *stateConfigType
 }
-<(- end )>
-`
 
-var assembleTreeElementTemplate *template.Template = newTemplateFrom("assembleTreeElementTemplate", assembleTreeElementTemplateString)
+func (a assembleTreeWriter) receiverParams() *Statement {
+	return Id("se").Id("*Engine")
+}
+
+func (a assembleTreeWriter) patchLoopConditions() *Statement {
+	return List(Id("_"), Id(a.t.Name)).Op(":=").Range().Id("se").Dot("Patch").Dot(title(a.t.Name))
+}
+
+func (a assembleTreeWriter) elementHasNoParent() *Statement {
+	return Id("!" + a.t.Name).Dot("HasParent_")
+}
+
+func (a assembleTreeWriter) elementNonExistentInTree() (*Statement, *Statement) {
+	condition := List(Id("_"), Id("ok")).Op(":=").Id("tree").Dot(title(a.t.Name)).Index(Id(a.t.Name).Dot("ID"))
+	return condition, Id("!ok")
+}
+
+func (a assembleTreeWriter) assembleItem() *Statement {
+	variableNames := List(Id("tree"+title(a.t.Name)), Id("hasUpdated"))
+	return variableNames.Op(":=").Id("se").Dot("assemble" + title(a.t.Name)).Call(Id(a.t.Name).Dot("ID"))
+}
+
+func (a assembleTreeWriter) setElementInTree() *Statement {
+	return Id("tree").Dot(title(a.t.Name)).Index(Id(a.t.Name).Dot("ID")).Op("=").Id("tree" + title(a.t.Name))
+}
+
+func (a assembleTreeWriter) stateLoopConditions() *Statement {
+	return List(Id("_"), Id(a.t.Name)).Op(":=").Range().Id("se").Dot("State").Dot(title(a.t.Name))
+}
 
 func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
-	assembleTreeElementTemplate.Execute(s.buf, s.ast)
+	decls := newDeclSet()
+	s.ast.rangeTypes(func(configType stateConfigType) {
+
+		a := assembleElement{
+			t: configType,
+			f: nil,
+		}
+
+		decls.file.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Params(a.returns()).Block(
+			a.getElementFromPatch(),
+			If(Id("!hasUpdated")).Block(
+				a.earlyReturn(),
+			),
+			a.declareTreeElement(),
+			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+				a.f = &field
+
+				if a.f.ValueType.IsBasicType {
+					return Empty()
+				}
+
+				if field.HasSliceValue {
+					return For(a.sliceFieldLoopConditions()).Block(
+						If(a.elementHasUpdated(Id(field.ValueType.Name+"ID"))).Block(
+							a.setHasUpdatedTrue(),
+							a.appendToElementsInField(),
+						),
+					)
+				}
+				return If(a.elementHasUpdated(Id(configType.Name).Dot(title(field.Name)))).Block(
+					a.setHasUpdatedTrue(),
+					a.setFieldElement(),
+				)
+			}),
+			a.setID(),
+			a.setOperationKind(),
+			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+				a.f = &field
+
+				if !a.f.ValueType.IsBasicType {
+					return Empty()
+				}
+
+				return a.setField()
+			}),
+			Return(a.finalReturn()),
+		)
+	})
+
+	decls.render(s.buf)
 	return s
+
+}
+
+type assembleElement struct {
+	t stateConfigType
+	f *stateConfigField
+}
+
+func (a assembleElement) treeElementName() string {
+	return "tree" + title(a.t.Name)
+}
+
+func (a assembleElement) treeTypeName() string {
+	return "t" + title(a.t.Name)
+}
+
+func (a assembleElement) receiverParams() *Statement {
+	return Id("se").Id("*Engine")
+}
+
+func (a assembleElement) name() string {
+	return "assemble" + title(a.t.Name)
+}
+
+func (a assembleElement) idParam() string {
+	return a.t.Name + "ID"
+}
+
+func (a assembleElement) params() *Statement {
+	return Id(a.idParam()).Id(title(a.t.Name) + "ID")
+}
+
+func (a assembleElement) returns() (*Statement, *Statement) {
+	return Id(a.treeTypeName()), Bool()
+}
+
+func (a assembleElement) getElementFromPatch() *Statement {
+	return List(Id(a.t.Name), Id("hasUpdated")).Op(":=").Id("se").Dot("Patch").Dot(title(a.t.Name)).Index(Id(a.idParam()))
+}
+
+func (a assembleElement) earlyReturn() *Statement {
+	if a.t.IsLeafType {
+		return Return(List(Id(a.treeTypeName()).Values(), Lit(false)))
+	}
+	return Id(a.t.Name).Op("=").Id("se").Dot("State").Dot(title(a.t.Name)).Index(Id(a.idParam()))
+}
+
+func (a assembleElement) declareTreeElement() *Statement {
+	return Var().Id(a.treeElementName()).Id(a.treeTypeName())
+}
+
+func (a assembleElement) typeFieldOn(from string) *Statement {
+	return Id("se").Dot(from).Dot(title(a.t.Name)).Index(Id(a.t.Name).Dot("ID")).Dot(title(a.f.Name))
+}
+
+func (a assembleElement) sliceFieldLoopConditions() *Statement {
+	loopVars := List(Id("_"), Id(a.f.ValueType.Name+"ID"))
+	deduplicateFuncName := "deduplicate" + title(a.f.ValueType.Name) + "IDs"
+	return loopVars.Op(":=").Range().Id(deduplicateFuncName).Call(a.typeFieldOn("State"), a.typeFieldOn("Patch"))
+}
+
+func (a assembleElement) elementHasUpdated(fieldIdentifier *Statement) (*Statement, *Statement) {
+	elementHasUpdatedId := Id(a.f.ValueType.Name + "HasUpdated")
+	conditionVars := List(Id("tree"+title(a.f.ValueType.Name)), elementHasUpdatedId)
+	condition := conditionVars.Op(":=").Id("se").Dot("assemble" + title(a.f.ValueType.Name)).Call(fieldIdentifier)
+	return condition, elementHasUpdatedId
+}
+
+func (a assembleElement) setHasUpdatedTrue() *Statement {
+	return Id("hasUpdated").Op("=").True()
+}
+
+func (a assembleElement) appendToElementsInField() *Statement {
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(a.f.ValueType.Name)))
+}
+
+func (a assembleElement) setFieldElement() *Statement {
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id("&" + "tree" + title(a.f.ValueType.Name))
+}
+
+func (a assembleElement) setField() *Statement {
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(a.t.Name).Dot(title(a.f.Name))
+}
+
+func (a assembleElement) setID() *Statement {
+	return Id(a.treeElementName()).Dot("ID").Op("=").Id(a.t.Name).Dot("ID")
+}
+
+func (a assembleElement) setOperationKind() *Statement {
+	return Id(a.treeElementName()).Dot("OperationKind_").Op("=").Id(a.t.Name).Dot("OperationKind_")
+}
+
+func (a assembleElement) finalReturn() (*Statement, *Statement) {
+	elementName := Id(a.treeElementName())
+	if a.t.IsLeafType {
+		return elementName, True()
+	}
+	return elementName, Id("hasUpdated")
 }
