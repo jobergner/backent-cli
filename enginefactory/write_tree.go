@@ -2,7 +2,6 @@ package enginefactory
 
 import (
 	. "github.com/dave/jennifer/jen"
-	"text/template"
 )
 
 func (s *stateFactory) writeTree() *stateFactory {
@@ -42,32 +41,6 @@ func (s treeWriter) mapValue() string {
 func (s treeWriter) fieldTag() string {
 	return "`json:\"" + s.t.Name + "\"`"
 }
-
-const treeElementTemplateString string = `
-<( range .Types )>
-type _<( .Name )> struct {
-	ID <( toTitleCase .Name )>ID ` + "`" + `json:"id"` + "`" + `
-	<(- range .Fields )>
-	<( toTitleCase .Name )><( print " " )> 
-	<(- if not .ValueType.IsBasicType -)>
-		<( if not .HasSliceValue -)>
-			*
-		<(- end )>
-	<(- end )>
-	<(- if .HasSliceValue -)>
-		[]
-	<(- end -)>
-	<( if not .ValueType.IsBasicType -)>
-		_
-	<(- end )>
-	<(- .ValueType.Name )> ` + "`" + `json:"<( .Name )>"` + "`" + `
-<( end )>
-	OperationKind_ OperationKind ` + "`" + `json:"operationKind_"` + "`" + `
-}
-<( end )>
-`
-
-var treeElementTemplate *template.Template = newTemplateFrom("treeElementTemplate", treeElementTemplateString)
 
 func (s *stateFactory) writeTreeElements() *stateFactory {
 	decls := newDeclSet()

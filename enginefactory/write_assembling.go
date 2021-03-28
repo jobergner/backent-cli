@@ -62,16 +62,16 @@ func (s *stateFactory) writeAssembleTree() *stateFactory {
 
 const assembleTreeElementTemplateString string = `
 <(- range .Types )><( $Type := . )>
-func (se *Engine) assemble<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) (_<( .Name )>, bool) {
+func (se *Engine) assemble<( toTitleCase .Name )>(<( .Name )>ID <( toTitleCase .Name )>ID) (t<( toTitleCase .Name )>, bool) {
 	<( encrypt .Name )>, hasUpdated := se.Patch.<( toTitleCase .Name )>[<( .Name )>ID]
 	if !hasUpdated {
 		<( if .IsLeafType -)>
-			return _<( .Name )>{}, false
+			return t<( toTitleCase .Name )>{}, false
 		<(- else -)>
 			<( encrypt .Name )> = se.State.<( toTitleCase .Name )>[<( .Name )>ID]
 		<(- end )>
 	}
-	var tree<( toTitleCase .Name )> _<( .Name )><( range .Fields -)>
+	var tree<( toTitleCase .Name )> t<( toTitleCase .Name )><( range .Fields -)>
 	<( if not .ValueType.IsBasicType -)>
 		<( if .HasSliceValue )>
 			for _, <( .ValueType.Name )>ID := range deduplicate<( toTitleCase .ValueType.Name )>IDs(se.State.<( toTitleCase $Type.Name )>[<( encrypt $Type.Name )>.ID].<( toTitleCase .Name )>, se.Patch.<( toTitleCase $Type.Name )>[<( encrypt $Type.Name )>.ID].<( toTitleCase .Name )>) {

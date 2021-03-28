@@ -156,7 +156,7 @@ func (f fieldGetter) returns() string {
 }
 
 func (f fieldGetter) reassignElement() *Statement {
-	return Id(f.t.Name).Op(":=").Id("se").Dot(title(f.t.Name)).Params(Id(f.receiverName()).Dot(f.t.Name).Dot("ID"))
+	return Id(f.t.Name).Op(":=").Id("se").Dot(title(f.t.Name)).Call(Id(f.receiverName()).Dot(f.t.Name).Dot("ID"))
 }
 
 func (f fieldGetter) declareSliceOfElements() *Statement {
@@ -179,7 +179,7 @@ func (f fieldGetter) appendedItem() *Statement {
 	if f.f.ValueType.IsBasicType {
 		return Id(f.loopedElementIdentifier())
 	}
-	return Id("se").Dot(title(f.f.ValueType.Name)).Params(Id(f.f.ValueType.Name + "ID"))
+	return Id("se").Dot(title(f.f.ValueType.Name)).Call(Id(f.f.ValueType.Name + "ID"))
 }
 
 func (f fieldGetter) appendElement() *Statement {
@@ -195,7 +195,7 @@ func (f fieldGetter) returnBasicType() *Statement {
 }
 
 func (f fieldGetter) returnType() *Statement {
-	return Id("se").Dot(title(f.f.Name)).Params(Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name)))
+	return Id("se").Dot(title(f.f.Name)).Call(Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name)))
 }
 
 func (f fieldGetter) returnElement() *Statement {

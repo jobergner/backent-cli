@@ -68,7 +68,7 @@ func (a adder) returns() string {
 }
 
 func (a adder) reassignElement() *Statement {
-	return Id(a.t.Name).Op(":=").Id("se").Dot(title(a.t.Name)).Params(Id(a.receiverName()).Dot(a.t.Name).Dot("ID"))
+	return Id(a.t.Name).Op(":=").Id("se").Dot(title(a.t.Name)).Call(Id(a.receiverName()).Dot(a.t.Name).Dot("ID"))
 }
 
 func (a adder) isOperationKindDelete() *Statement {

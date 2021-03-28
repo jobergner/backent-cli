@@ -86,7 +86,7 @@ func (r remover) returns() string {
 }
 
 func (r remover) reassignElement() *Statement {
-	return Id(r.t.Name).Op(":=").Id("se").Dot(title(r.t.Name)).Params(Id(r.receiverName()).Dot(r.t.Name).Dot("ID"))
+	return Id(r.t.Name).Op(":=").Id("se").Dot(title(r.t.Name)).Call(Id(r.receiverName()).Dot(r.t.Name).Dot("ID"))
 }
 
 func (r remover) isOperationKindDelete() *Statement {
@@ -132,7 +132,7 @@ func (r remover) setWereElementAlteredTrue() *Statement {
 }
 
 func (r remover) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(r.f.ValueType.Name)).Params(Id("element"))
+	return Id("se").Dot("delete" + title(r.f.ValueType.Name)).Call(Id("element"))
 }
 
 func (r remover) isElementRemoved() *Statement {
