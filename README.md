@@ -231,6 +231,23 @@ structs will have meta fields like ID, OperationKind and HasParent. This would m
 To give the user a tiny bit more freedom I will suffix these fields with "\_" ("OperationKind" -> "OperationKind\_"). I can't do this with ID however, because ID is also a getter method
 and therefore unique. It will remain "ID".
 
+
+### code generation: templates vs jennifer
+| Templates        | Jennifer   |
+| ------------- |---------------|
+| writing code is easy and quick | writing code is a bit tedious |
+| can generate anything | only able to generate go code |
+| logic statements with own syntax | is go |
+| no formatting, type-/spellchecking  | some helper methods to reduce the risk of misspelling (jen.Range() etc.) |
+| logic makes templates hardly readable  | easily deal with difficult logic statements |
+| thrown errors are not very comprehensible | throws comprehensible errors based on go/format |
+
+I believe templates are a great way of generating code, as long as there is not too much logic envolved.
+As soon as a lot of confitionals and loops are used it feels like you are just writing code in a underdeveloped language.
+When the output is not as expected you might as well guess where the issue is within your template, as there is no way of debugging it.
+Writing code generation with jennifer was tedious but the written code is very maintainable compared to templates.
+
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - rename project
