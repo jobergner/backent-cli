@@ -26,7 +26,7 @@ func evalDeclName(decl ast.Decl, containingFileName string) string {
 
 func ensureLowerCase(s string) string {
 	if string(s[0]) == strings.ToUpper(string(s[0])) {
-		return "_" + strings.ToLower(string(s[0])) + string(s[1:len(s)])
+		return "_" + s
 	}
 	return s
 }
