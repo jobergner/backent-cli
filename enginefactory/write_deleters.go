@@ -1,12 +1,14 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeDeleters() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		tw := typeDeleterWrapper{
 			t: configType,
@@ -29,7 +31,7 @@ func (s *stateFactory) writeDeleters() *stateFactory {
 			t.getElement(),
 			t.setOperationKind(),
 			t.updateElementInPatch(),
-			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+			forEachFieldInType(configType, func(field ast.Field) *Statement {
 				t.f = &field
 				if field.ValueType.IsBasicType {
 					return Empty()
@@ -49,7 +51,7 @@ func (s *stateFactory) writeDeleters() *stateFactory {
 }
 
 type typeDeleterWrapper struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (tw typeDeleterWrapper) receiverParams() *Statement {
@@ -81,8 +83,8 @@ func (tw typeDeleterWrapper) deleteElement() *Statement {
 }
 
 type typeDeleter struct {
-	t stateConfigType
-	f *stateConfigField
+	t ast.ConfigType
+	f *ast.Field
 }
 
 func (t typeDeleter) receiverParams() *Statement {

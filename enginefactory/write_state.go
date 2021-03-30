@@ -1,12 +1,14 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeIDs() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 		decls.file.Type().Id(title(configType.Name) + "ID").Int()
 	})
 
@@ -16,13 +18,13 @@ func (s *stateFactory) writeIDs() *stateFactory {
 
 func (s *stateFactory) writeState() *stateFactory {
 	decls := newDeclSet()
-	decls.file.Type().Id("State").Struct(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+	decls.file.Type().Id("State").Struct(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 		s := stateWriter{configType}
 		return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 	}))
 
 	decls.file.Func().Id("newState").Params().Id("State").Block(
-		Return(Id("State").Values(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		Return(Id("State").Values(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			s := stateWriter{configType}
 			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 		}))),
@@ -33,7 +35,7 @@ func (s *stateFactory) writeState() *stateFactory {
 }
 
 type stateWriter struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (s stateWriter) fieldName() string {
@@ -55,7 +57,7 @@ func (s stateWriter) fieldTag() string {
 func (s *stateFactory) writeElements() *stateFactory {
 	decls := newDeclSet()
 
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		e := elementWriter{
 			t: configType,
@@ -63,7 +65,7 @@ func (s *stateFactory) writeElements() *stateFactory {
 
 		decls.file.Type().Id(e.name()).Struct(
 			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
-			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+			forEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
@@ -79,8 +81,8 @@ func (s *stateFactory) writeElements() *stateFactory {
 }
 
 type elementWriter struct {
-	t stateConfigType
-	f *stateConfigField
+	t ast.ConfigType
+	f *ast.Field
 }
 
 func (e elementWriter) fieldValue() string {

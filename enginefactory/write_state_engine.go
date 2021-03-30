@@ -1,6 +1,8 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
@@ -58,7 +60,7 @@ func (s *stateFactory) writeUpdateState() *stateFactory {
 	u := updateState{}
 
 	decls.file.Func().Params(u.receiverParams()).Id("UpdateState").Params().Block(
-		forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.t = &configType
 			return For(u.loopPatchElementsConditions()).Block(
 				If(u.isOperationKindDelete()).Block(
@@ -68,7 +70,7 @@ func (s *stateFactory) writeUpdateState() *stateFactory {
 				),
 			)
 		}),
-		forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.t = &configType
 			return For(u.loopPatchKeysConditions()).Block(
 				u.clearElementFromPatch(),
@@ -81,7 +83,7 @@ func (s *stateFactory) writeUpdateState() *stateFactory {
 }
 
 type updateState struct {
-	t *stateConfigType
+	t *ast.ConfigType
 }
 
 func (u updateState) receiverParams() *Statement {

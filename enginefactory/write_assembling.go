@@ -2,6 +2,8 @@ package enginefactory
 
 import (
 	. "github.com/dave/jennifer/jen"
+
+	"bar-cli/ast"
 )
 
 func (s *stateFactory) writeAssembleTree() *stateFactory {
@@ -11,7 +13,7 @@ func (s *stateFactory) writeAssembleTree() *stateFactory {
 
 	decls.file.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
 		Id("tree").Op(":=").Id("newTree").Call(),
-		forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
 
 			if a.t.IsRootType {
@@ -37,7 +39,7 @@ func (s *stateFactory) writeAssembleTree() *stateFactory {
 			}
 
 		}),
-		forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
 
 			if a.t.IsRootType {
@@ -75,7 +77,7 @@ func (s *stateFactory) writeAssembleTree() *stateFactory {
 }
 
 type assembleTreeWriter struct {
-	t *stateConfigType
+	t *ast.ConfigType
 }
 
 func (a assembleTreeWriter) receiverParams() *Statement {
@@ -110,7 +112,7 @@ func (a assembleTreeWriter) stateLoopConditions() *Statement {
 
 func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		a := assembleElement{
 			t: configType,
@@ -123,7 +125,7 @@ func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
 				a.earlyReturn(),
 			),
 			a.declareTreeElement(),
-			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+			forEachFieldInType(configType, func(field ast.Field) *Statement {
 				a.f = &field
 
 				if a.f.ValueType.IsBasicType {
@@ -145,7 +147,7 @@ func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
 			}),
 			a.setID(),
 			a.setOperationKind(),
-			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+			forEachFieldInType(configType, func(field ast.Field) *Statement {
 				a.f = &field
 
 				if !a.f.ValueType.IsBasicType {
@@ -164,8 +166,8 @@ func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
 }
 
 type assembleElement struct {
-	t stateConfigType
-	f *stateConfigField
+	t ast.ConfigType
+	f *ast.Field
 }
 
 func (a assembleElement) treeElementName() string {

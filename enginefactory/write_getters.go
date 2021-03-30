@@ -1,12 +1,14 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeGetters() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 		t := typeGetter{
 			t: configType,
 		}
@@ -28,7 +30,7 @@ func (s *stateFactory) writeGetters() *stateFactory {
 			Return(i.returnID()),
 		)
 
-		configType.rangeFields(func(field stateConfigField) {
+		configType.RangeFields(func(field ast.Field) {
 			f := fieldGetter{
 				t: configType,
 				f: field,
@@ -54,7 +56,7 @@ func (s *stateFactory) writeGetters() *stateFactory {
 }
 
 type typeGetter struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (t typeGetter) receiverParams() *Statement {
@@ -94,7 +96,7 @@ func (t typeGetter) finalReturn() *Statement {
 }
 
 type idGetter struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (i idGetter) receiverName() string {
@@ -122,8 +124,8 @@ func (i idGetter) returnID() *Statement {
 }
 
 type fieldGetter struct {
-	t stateConfigType
-	f stateConfigField
+	t ast.ConfigType
+	f ast.Field
 }
 
 func (f fieldGetter) receiverName() string {

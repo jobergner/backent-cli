@@ -1,13 +1,15 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeRemovers() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
-		configType.rangeFields(func(field stateConfigField) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
 
 			if !field.HasSliceValue {
 				return
@@ -55,8 +57,8 @@ func (s *stateFactory) writeRemovers() *stateFactory {
 }
 
 type remover struct {
-	t stateConfigType
-	f stateConfigField
+	t ast.ConfigType
+	f ast.Field
 }
 
 func (r remover) receiverParams() *Statement {

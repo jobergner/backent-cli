@@ -1,12 +1,14 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeDeduplicate() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		d := deduplicator{
 			t: configType,
@@ -31,7 +33,7 @@ func (s *stateFactory) writeDeduplicate() *stateFactory {
 }
 
 type deduplicator struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (d deduplicator) name() string {
