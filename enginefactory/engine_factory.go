@@ -73,7 +73,7 @@ func (d declSet) render(buf *bytes.Buffer) {
 // can have the coherent adder method of "AddPiece"
 var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
-type engineFactory struct {
+type EngineFactory struct {
 	config *ast.AST
 	buf    *bytes.Buffer
 }
@@ -111,23 +111,23 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	return s.writtenSourceCode()
 }
 
-func (s *engineFactory) writePackageName() *engineFactory {
+func (s *EngineFactory) writePackageName() *EngineFactory {
 	s.buf.WriteString("package state\n")
 	return s
 }
 
-func newStateFactory(config *ast.AST) *engineFactory {
-	return &engineFactory{
+func newStateFactory(config *ast.AST) *EngineFactory {
+	return &EngineFactory{
 		config: config,
 		buf:    &bytes.Buffer{},
 	}
 }
 
-func (s *engineFactory) writtenSourceCode() []byte {
+func (s *EngineFactory) writtenSourceCode() []byte {
 	return s.buf.Bytes()
 }
 
-func (s *engineFactory) format() error {
+func (s *EngineFactory) format() error {
 	config, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
 	if err != nil {
 		return err

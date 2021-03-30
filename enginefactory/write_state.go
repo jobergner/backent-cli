@@ -6,7 +6,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *stateFactory) writeIDs() *stateFactory {
+func (s *EngineFactory) writeIDs() *EngineFactory {
 	decls := newDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		decls.file.Type().Id(title(configType.Name) + "ID").Int()
@@ -16,7 +16,7 @@ func (s *stateFactory) writeIDs() *stateFactory {
 	return s
 }
 
-func (s *stateFactory) writeState() *stateFactory {
+func (s *EngineFactory) writeState() *EngineFactory {
 	decls := newDeclSet()
 	decls.file.Type().Id("State").Struct(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 		s := stateWriter{configType}
@@ -54,7 +54,7 @@ func (s stateWriter) fieldTag() string {
 	return "`json:\"" + s.t.Name + "\"`"
 }
 
-func (s *stateFactory) writeElements() *stateFactory {
+func (s *EngineFactory) writeElements() *EngineFactory {
 	decls := newDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {

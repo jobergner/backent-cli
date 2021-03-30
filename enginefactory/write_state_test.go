@@ -13,12 +13,12 @@ func TestWriteState(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			GearScoreID_type,
-			ItemID_type,
-			PlayerID_type,
-			PositionID_type,
-			ZoneID_type,
-			ZoneItemID_type,
+			_GearScoreID_type,
+			_ItemID_type,
+			_PlayerID_type,
+			_PositionID_type,
+			_ZoneID_type,
+			_ZoneItemID_type,
 		}, "\n"))
 
 		if expected != actual {
@@ -31,7 +31,7 @@ func TestWriteState(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			State_type,
+			_State_type,
 			newState_func,
 		}, "\n"))
 
@@ -46,17 +46,17 @@ func TestWriteState(t *testing.T) {
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
 			gearScoreCore_type,
-			GearScore_type,
+			_GearScore_type,
 			itemCore_type,
-			Item_type,
+			_Item_type,
 			playerCore_type,
-			Player_type,
+			_Player_type,
 			positionCore_type,
-			Position_type,
+			_Position_type,
 			zoneCore_type,
-			Zone_type,
+			_Zone_type,
 			zoneItemCore_type,
-			ZoneItem_type,
+			_ZoneItem_type,
 		}, "\n"))
 
 		if expected != actual {

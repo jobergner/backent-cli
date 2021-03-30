@@ -6,7 +6,7 @@ import (
 	"bar-cli/ast"
 )
 
-func (s *stateFactory) writeAssembleTree() *stateFactory {
+func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 	decls := newDeclSet()
 
 	a := assembleTreeWriter{}
@@ -110,7 +110,7 @@ func (a assembleTreeWriter) stateLoopConditions() *Statement {
 	return List(Id("_"), Id(a.t.Name)).Op(":=").Range().Id("se").Dot("State").Dot(title(a.t.Name))
 }
 
-func (s *stateFactory) writeAssembleTreeElement() *stateFactory {
+func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 	decls := newDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 

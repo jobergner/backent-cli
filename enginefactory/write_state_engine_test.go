@@ -13,8 +13,8 @@ func TestWriteEngine(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			OperationKind_type,
-			OperationKindDelete_type,
+			_OperationKind_type,
+			_OperationKindDelete_type,
 		}, "\n"))
 
 		if expected != actual {
@@ -27,7 +27,7 @@ func TestWriteEngine(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			Engine_type,
+			_Engine_type,
 			newEngine_func,
 		}, "\n"))
 
@@ -41,7 +41,7 @@ func TestWriteEngine(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			GenerateID_Engine_func,
+			_GenerateID_Engine_func,
 		}, "\n"))
 
 		if expected != actual {
@@ -54,7 +54,7 @@ func TestWriteEngine(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			UpdateState_Engine_func,
+			_UpdateState_Engine_func,
 		}, "\n"))
 
 		if expected != actual {

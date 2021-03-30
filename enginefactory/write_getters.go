@@ -6,7 +6,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *stateFactory) writeGetters() *stateFactory {
+func (s *EngineFactory) writeGetters() *EngineFactory {
 	decls := newDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		t := typeGetter{

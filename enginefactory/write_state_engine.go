@@ -6,7 +6,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *stateFactory) writeOperationKind() *stateFactory {
+func (s *EngineFactory) writeOperationKind() *EngineFactory {
 	decls := newDeclSet()
 
 	decls.file.Type().Id("OperationKind").String()
@@ -20,7 +20,7 @@ func (s *stateFactory) writeOperationKind() *stateFactory {
 	return s
 }
 
-func (s *stateFactory) writeEngine() *stateFactory {
+func (s *EngineFactory) writeEngine() *EngineFactory {
 	decls := newDeclSet()
 
 	decls.file.Type().Id("Engine").Struct(
@@ -41,7 +41,7 @@ func (s *stateFactory) writeEngine() *stateFactory {
 	return s
 }
 
-func (s *stateFactory) writeGenerateID() *stateFactory {
+func (s *EngineFactory) writeGenerateID() *EngineFactory {
 	decls := newDeclSet()
 
 	decls.file.Func().Params(Id("se").Id("*Engine")).Id("GenerateID").Params().Int().Block(
@@ -54,7 +54,7 @@ func (s *stateFactory) writeGenerateID() *stateFactory {
 	return s
 }
 
-func (s *stateFactory) writeUpdateState() *stateFactory {
+func (s *EngineFactory) writeUpdateState() *EngineFactory {
 	decls := newDeclSet()
 
 	u := updateState{}

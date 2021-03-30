@@ -6,7 +6,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *stateFactory) writeAdders() *stateFactory {
+func (s *EngineFactory) writeAdders() *EngineFactory {
 	decls := newDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
