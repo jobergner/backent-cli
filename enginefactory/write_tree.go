@@ -6,7 +6,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *stateFactory) writeTree() *stateFactory {
+func (s *EngineFactory) writeTree() *EngineFactory {
 	decls := newDeclSet()
 	decls.file.Type().Id("Tree").Struct(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 		s := treeWriter{configType}
@@ -44,7 +44,7 @@ func (s treeWriter) fieldTag() string {
 	return "`json:\"" + s.t.Name + "\"`"
 }
 
-func (s *stateFactory) writeTreeElements() *stateFactory {
+func (s *EngineFactory) writeTreeElements() *EngineFactory {
 	decls := newDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {

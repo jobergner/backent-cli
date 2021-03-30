@@ -13,10 +13,10 @@ func TestWriteAdders(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			AddItem_Player_func,
-			AddItem_Zone_func,
-			AddPlayer_Zone_func,
-			AddTags_Zone_func,
+			_AddItem_Player_func,
+			_AddItem_Zone_func,
+			_AddPlayer_Zone_func,
+			_AddTags_Zone_func,
 		}, "\n"))
 
 		if expected != actual {

@@ -2,7 +2,7 @@
 
 package enginefactory
 
-const AddPlayer_Zone_func string = `func (_zone Zone) AddPlayer(se *Engine) Player {
+const _AddPlayer_Zone_func string = `func (_zone Zone) AddPlayer(se *Engine) Player {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return Player{player: playerCore{OperationKind_: OperationKindDelete}}
@@ -14,7 +14,7 @@ const AddPlayer_Zone_func string = `func (_zone Zone) AddPlayer(se *Engine) Play
 	return player
 }`
 
-const AddItem_Zone_func string = `func (_zone Zone) AddItem(se *Engine) ZoneItem {
+const _AddItem_Zone_func string = `func (_zone Zone) AddItem(se *Engine) ZoneItem {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
@@ -26,7 +26,7 @@ const AddItem_Zone_func string = `func (_zone Zone) AddItem(se *Engine) ZoneItem
 	return zoneItem
 }`
 
-const AddTags_Zone_func string = `func (_zone Zone) AddTags(se *Engine, tags ...string) {
+const _AddTags_Zone_func string = `func (_zone Zone) AddTags(se *Engine, tags ...string) {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return
@@ -36,7 +36,7 @@ const AddTags_Zone_func string = `func (_zone Zone) AddTags(se *Engine, tags ...
 	se.Patch.Zone[zone.zone.ID] = zone.zone
 }`
 
-const AddItem_Player_func string = `func (_player Player) AddItem(se *Engine) Item {
+const _AddItem_Player_func string = `func (_player Player) AddItem(se *Engine) Item {
 	player := se.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return Item{item: itemCore{OperationKind_: OperationKindDelete}}
@@ -266,7 +266,7 @@ const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
 	return tree
 }`
 
-const CreateGearScore_Engine_func string = `func (se *Engine) CreateGearScore() GearScore {
+const _CreateGearScore_Engine_func string = `func (se *Engine) CreateGearScore() GearScore {
 	return se.createGearScore(false)
 }`
 
@@ -279,7 +279,7 @@ const createGearScore_Engine_func string = `func (se *Engine) createGearScore(ha
 	return GearScore{gearScore: gearScore}
 }`
 
-const CreatePosition_Engine_func string = `func (se *Engine) CreatePosition() Position {
+const _CreatePosition_Engine_func string = `func (se *Engine) CreatePosition() Position {
 	return se.createPosition(false)
 }`
 
@@ -292,7 +292,7 @@ const createPosition_Engine_func string = `func (se *Engine) createPosition(hasP
 	return Position{position: position}
 }`
 
-const CreateItem_Engine_func string = `func (se *Engine) CreateItem() Item {
+const _CreateItem_Engine_func string = `func (se *Engine) CreateItem() Item {
 	return se.createItem(false)
 }`
 
@@ -307,7 +307,7 @@ const createItem_Engine_func string = `func (se *Engine) createItem(hasParent bo
 	return Item{item: item}
 }`
 
-const CreateZoneItem_Engine_func string = `func (se *Engine) CreateZoneItem() ZoneItem {
+const _CreateZoneItem_Engine_func string = `func (se *Engine) CreateZoneItem() ZoneItem {
 	return se.createZoneItem(false)
 }`
 
@@ -324,7 +324,7 @@ const createZoneItem_Engine_func string = `func (se *Engine) createZoneItem(hasP
 	return ZoneItem{zoneItem: zoneItem}
 }`
 
-const CreatePlayer_Engine_func string = `func (se *Engine) CreatePlayer() Player {
+const _CreatePlayer_Engine_func string = `func (se *Engine) CreatePlayer() Player {
 	return se.createPlayer(false)
 }`
 
@@ -341,7 +341,7 @@ const createPlayer_Engine_func string = `func (se *Engine) createPlayer(hasParen
 	return Player{player: player}
 }`
 
-const CreateZone_Engine_func string = `func (se *Engine) CreateZone() Zone {
+const _CreateZone_Engine_func string = `func (se *Engine) CreateZone() Zone {
 	return se.createZone()
 }`
 
@@ -353,7 +353,7 @@ const createZone_Engine_func string = `func (se *Engine) createZone() Zone {
 	return Zone{zone: zone}
 }`
 
-const DeletePlayer_Engine_func string = `func (se *Engine) DeletePlayer(playerID PlayerID) {
+const _DeletePlayer_Engine_func string = `func (se *Engine) DeletePlayer(playerID PlayerID) {
 	player := se.Player(playerID).player
 	if player.HasParent_ {
 		return
@@ -372,7 +372,7 @@ const deletePlayer_Engine_func string = `func (se *Engine) deletePlayer(playerID
 	se.deletePosition(player.Position)
 }`
 
-const DeleteGearScore_Engine_func string = `func (se *Engine) DeleteGearScore(gearScoreID GearScoreID) {
+const _DeleteGearScore_Engine_func string = `func (se *Engine) DeleteGearScore(gearScoreID GearScoreID) {
 	gearScore := se.GearScore(gearScoreID).gearScore
 	if gearScore.HasParent_ {
 		return
@@ -386,7 +386,7 @@ const deleteGearScore_Engine_func string = `func (se *Engine) deleteGearScore(ge
 	se.Patch.GearScore[gearScore.ID] = gearScore
 }`
 
-const DeletePosition_Engine_func string = `func (se *Engine) DeletePosition(positionID PositionID) {
+const _DeletePosition_Engine_func string = `func (se *Engine) DeletePosition(positionID PositionID) {
 	position := se.Position(positionID).position
 	if position.HasParent_ {
 		return
@@ -400,7 +400,7 @@ const deletePosition_Engine_func string = `func (se *Engine) deletePosition(posi
 	se.Patch.Position[position.ID] = position
 }`
 
-const DeleteItem_Engine_func string = `func (se *Engine) DeleteItem(itemID ItemID) {
+const _DeleteItem_Engine_func string = `func (se *Engine) DeleteItem(itemID ItemID) {
 	item := se.Item(itemID).item
 	if item.HasParent_ {
 		return
@@ -415,7 +415,7 @@ const deleteItem_Engine_func string = `func (se *Engine) deleteItem(itemID ItemI
 	se.deleteGearScore(item.GearScore)
 }`
 
-const DeleteZoneItem_Engine_func string = `func (se *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
+const _DeleteZoneItem_Engine_func string = `func (se *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := se.ZoneItem(zoneItemID).zoneItem
 	if zoneItem.HasParent_ {
 		return
@@ -431,7 +431,7 @@ const deleteZoneItem_Engine_func string = `func (se *Engine) deleteZoneItem(zone
 	se.deletePosition(zoneItem.Position)
 }`
 
-const DeleteZone_Engine_func string = `func (se *Engine) DeleteZone(zoneID ZoneID) {
+const _DeleteZone_Engine_func string = `func (se *Engine) DeleteZone(zoneID ZoneID) {
 	se.deleteZone(zoneID)
 }`
 
@@ -447,7 +447,7 @@ const deleteZone_Engine_func string = `func (se *Engine) deleteZone(zoneID ZoneI
 	}
 }`
 
-const Player_Engine_func string = `func (se *Engine) Player(playerID PlayerID) Player {
+const _Player_Engine_func string = `func (se *Engine) Player(playerID PlayerID) Player {
 	patchingPlayer, ok := se.Patch.Player[playerID]
 	if ok {
 		return Player{player: patchingPlayer}
@@ -456,11 +456,11 @@ const Player_Engine_func string = `func (se *Engine) Player(playerID PlayerID) P
 	return Player{player: currentPlayer}
 }`
 
-const ID_Player_func string = `func (_player Player) ID(se *Engine) PlayerID {
+const _ID_Player_func string = `func (_player Player) ID(se *Engine) PlayerID {
 	return _player.player.ID
 }`
 
-const Items_Player_func string = `func (_player Player) Items(se *Engine) []Item {
+const _Items_Player_func string = `func (_player Player) Items(se *Engine) []Item {
 	player := se.Player(_player.player.ID)
 	var items []Item
 	for _, itemID := range player.player.Items {
@@ -469,17 +469,17 @@ const Items_Player_func string = `func (_player Player) Items(se *Engine) []Item
 	return items
 }`
 
-const GearScore_Player_func string = `func (_player Player) GearScore(se *Engine) GearScore {
+const _GearScore_Player_func string = `func (_player Player) GearScore(se *Engine) GearScore {
 	player := se.Player(_player.player.ID)
 	return se.GearScore(player.player.GearScore)
 }`
 
-const Position_Player_func string = `func (_player Player) Position(se *Engine) Position {
+const _Position_Player_func string = `func (_player Player) Position(se *Engine) Position {
 	player := se.Player(_player.player.ID)
 	return se.Position(player.player.Position)
 }`
 
-const GearScore_Engine_func string = `func (se *Engine) GearScore(gearScoreID GearScoreID) GearScore {
+const _GearScore_Engine_func string = `func (se *Engine) GearScore(gearScoreID GearScoreID) GearScore {
 	patchingGearScore, ok := se.Patch.GearScore[gearScoreID]
 	if ok {
 		return GearScore{gearScore: patchingGearScore}
@@ -488,21 +488,21 @@ const GearScore_Engine_func string = `func (se *Engine) GearScore(gearScoreID Ge
 	return GearScore{gearScore: currentGearScore}
 }`
 
-const ID_GearScore_func string = `func (_gearScore GearScore) ID(se *Engine) GearScoreID {
+const _ID_GearScore_func string = `func (_gearScore GearScore) ID(se *Engine) GearScoreID {
 	return _gearScore.gearScore.ID
 }`
 
-const Level_GearScore_func string = `func (_gearScore GearScore) Level(se *Engine) int {
+const _Level_GearScore_func string = `func (_gearScore GearScore) Level(se *Engine) int {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Level
 }`
 
-const Score_GearScore_func string = `func (_gearScore GearScore) Score(se *Engine) int {
+const _Score_GearScore_func string = `func (_gearScore GearScore) Score(se *Engine) int {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Score
 }`
 
-const Item_Engine_func string = `func (se *Engine) Item(itemID ItemID) Item {
+const _Item_Engine_func string = `func (se *Engine) Item(itemID ItemID) Item {
 	patchingItem, ok := se.Patch.Item[itemID]
 	if ok {
 		return Item{item: patchingItem}
@@ -511,16 +511,16 @@ const Item_Engine_func string = `func (se *Engine) Item(itemID ItemID) Item {
 	return Item{item: currentItem}
 }`
 
-const ID_Item_func string = `func (_item Item) ID(se *Engine) ItemID {
+const _ID_Item_func string = `func (_item Item) ID(se *Engine) ItemID {
 	return _item.item.ID
 }`
 
-const GearScore_Item_func string = `func (_item Item) GearScore(se *Engine) GearScore {
+const _GearScore_Item_func string = `func (_item Item) GearScore(se *Engine) GearScore {
 	item := se.Item(_item.item.ID)
 	return se.GearScore(item.item.GearScore)
 }`
 
-const Position_Engine_func string = `func (se *Engine) Position(positionID PositionID) Position {
+const _Position_Engine_func string = `func (se *Engine) Position(positionID PositionID) Position {
 	patchingPosition, ok := se.Patch.Position[positionID]
 	if ok {
 		return Position{position: patchingPosition}
@@ -529,21 +529,21 @@ const Position_Engine_func string = `func (se *Engine) Position(positionID Posit
 	return Position{position: currentPosition}
 }`
 
-const ID_Position_func string = `func (_position Position) ID(se *Engine) PositionID {
+const _ID_Position_func string = `func (_position Position) ID(se *Engine) PositionID {
 	return _position.position.ID
 }`
 
-const X_Position_func string = `func (_position Position) X(se *Engine) float64 {
+const _X_Position_func string = `func (_position Position) X(se *Engine) float64 {
 	position := se.Position(_position.position.ID)
 	return position.position.X
 }`
 
-const Y_Position_func string = `func (_position Position) Y(se *Engine) float64 {
+const _Y_Position_func string = `func (_position Position) Y(se *Engine) float64 {
 	position := se.Position(_position.position.ID)
 	return position.position.Y
 }`
 
-const ZoneItem_Engine_func string = `func (se *Engine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
+const _ZoneItem_Engine_func string = `func (se *Engine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	patchingZoneItem, ok := se.Patch.ZoneItem[zoneItemID]
 	if ok {
 		return ZoneItem{zoneItem: patchingZoneItem}
@@ -552,21 +552,21 @@ const ZoneItem_Engine_func string = `func (se *Engine) ZoneItem(zoneItemID ZoneI
 	return ZoneItem{zoneItem: currentZoneItem}
 }`
 
-const ID_ZoneItem_func string = `func (_zoneItem ZoneItem) ID(se *Engine) ZoneItemID {
+const _ID_ZoneItem_func string = `func (_zoneItem ZoneItem) ID(se *Engine) ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }`
 
-const Position_ZoneItem_func string = `func (_zoneItem ZoneItem) Position(se *Engine) Position {
+const _Position_ZoneItem_func string = `func (_zoneItem ZoneItem) Position(se *Engine) Position {
 	zoneItem := se.ZoneItem(_zoneItem.zoneItem.ID)
 	return se.Position(zoneItem.zoneItem.Position)
 }`
 
-const Item_ZoneItem_func string = `func (_zoneItem ZoneItem) Item(se *Engine) Item {
+const _Item_ZoneItem_func string = `func (_zoneItem ZoneItem) Item(se *Engine) Item {
 	zoneItem := se.ZoneItem(_zoneItem.zoneItem.ID)
 	return se.Item(zoneItem.zoneItem.Item)
 }`
 
-const Zone_Engine_func string = `func (se *Engine) Zone(zoneID ZoneID) Zone {
+const _Zone_Engine_func string = `func (se *Engine) Zone(zoneID ZoneID) Zone {
 	patchingZone, ok := se.Patch.Zone[zoneID]
 	if ok {
 		return Zone{zone: patchingZone}
@@ -575,11 +575,11 @@ const Zone_Engine_func string = `func (se *Engine) Zone(zoneID ZoneID) Zone {
 	return Zone{zone: currentZone}
 }`
 
-const ID_Zone_func string = `func (_zone Zone) ID(se *Engine) ZoneID {
+const _ID_Zone_func string = `func (_zone Zone) ID(se *Engine) ZoneID {
 	return _zone.zone.ID
 }`
 
-const Players_Zone_func string = `func (_zone Zone) Players(se *Engine) []Player {
+const _Players_Zone_func string = `func (_zone Zone) Players(se *Engine) []Player {
 	zone := se.Zone(_zone.zone.ID)
 	var players []Player
 	for _, playerID := range zone.zone.Players {
@@ -588,7 +588,7 @@ const Players_Zone_func string = `func (_zone Zone) Players(se *Engine) []Player
 	return players
 }`
 
-const Items_Zone_func string = `func (_zone Zone) Items(se *Engine) []ZoneItem {
+const _Items_Zone_func string = `func (_zone Zone) Items(se *Engine) []ZoneItem {
 	zone := se.Zone(_zone.zone.ID)
 	var items []ZoneItem
 	for _, zoneItemID := range zone.zone.Items {
@@ -597,7 +597,7 @@ const Items_Zone_func string = `func (_zone Zone) Items(se *Engine) []ZoneItem {
 	return items
 }`
 
-const Tags_Zone_func string = `func (_zone Zone) Tags(se *Engine) []string {
+const _Tags_Zone_func string = `func (_zone Zone) Tags(se *Engine) []string {
 	zone := se.Zone(_zone.zone.ID)
 	var tags []string
 	for _, element := range zone.zone.Tags {
@@ -696,7 +696,7 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 	return deduped
 }`
 
-const RemovePlayers_Zone_func string = `func (_zone Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
+const _RemovePlayers_Zone_func string = `func (_zone Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
@@ -726,7 +726,7 @@ const RemovePlayers_Zone_func string = `func (_zone Zone) RemovePlayers(se *Engi
 	return zone
 }`
 
-const RemoveItems_Zone_func string = `func (_zone Zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) Zone {
+const _RemoveItems_Zone_func string = `func (_zone Zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) Zone {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
@@ -756,7 +756,7 @@ const RemoveItems_Zone_func string = `func (_zone Zone) RemoveItems(se *Engine, 
 	return zone
 }`
 
-const RemoveItems_Player_func string = `func (_player Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
+const _RemoveItems_Player_func string = `func (_player Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
 	player := se.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return player
@@ -786,7 +786,7 @@ const RemoveItems_Player_func string = `func (_player Player) RemoveItems(se *En
 	return player
 }`
 
-const RemoveTags_Zone_func string = `func (_zone Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
+const _RemoveTags_Zone_func string = `func (_zone Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
@@ -815,7 +815,7 @@ const RemoveTags_Zone_func string = `func (_zone Zone) RemoveTags(se *Engine, ta
 	return zone
 }`
 
-const SetLevel_GearScore_func string = `func (_gearScore GearScore) SetLevel(se *Engine, newLevel int) GearScore {
+const _SetLevel_GearScore_func string = `func (_gearScore GearScore) SetLevel(se *Engine, newLevel int) GearScore {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
 		return gearScore
@@ -826,7 +826,7 @@ const SetLevel_GearScore_func string = `func (_gearScore GearScore) SetLevel(se 
 	return gearScore
 }`
 
-const SetScore_GearScore_func string = `func (_gearScore GearScore) SetScore(se *Engine, newScore int) GearScore {
+const _SetScore_GearScore_func string = `func (_gearScore GearScore) SetScore(se *Engine, newScore int) GearScore {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
 		return gearScore
@@ -837,7 +837,7 @@ const SetScore_GearScore_func string = `func (_gearScore GearScore) SetScore(se 
 	return gearScore
 }`
 
-const SetX_Position_func string = `func (_position Position) SetX(se *Engine, newX float64) Position {
+const _SetX_Position_func string = `func (_position Position) SetX(se *Engine, newX float64) Position {
 	position := se.Position(_position.position.ID)
 	if position.position.OperationKind_ == OperationKindDelete {
 		return position
@@ -848,7 +848,7 @@ const SetX_Position_func string = `func (_position Position) SetX(se *Engine, ne
 	return position
 }`
 
-const SetY_Position_func string = `func (_position Position) SetY(se *Engine, newY float64) Position {
+const _SetY_Position_func string = `func (_position Position) SetY(se *Engine, newY float64) Position {
 	position := se.Position(_position.position.ID)
 	if position.position.OperationKind_ == OperationKindDelete {
 		return position
@@ -859,19 +859,19 @@ const SetY_Position_func string = `func (_position Position) SetY(se *Engine, ne
 	return position
 }`
 
-const GearScoreID_type string = `type GearScoreID int`
+const _GearScoreID_type string = `type GearScoreID int`
 
-const ItemID_type string = `type ItemID int`
+const _ItemID_type string = `type ItemID int`
 
-const PlayerID_type string = `type PlayerID int`
+const _PlayerID_type string = `type PlayerID int`
 
-const PositionID_type string = `type PositionID int`
+const _PositionID_type string = `type PositionID int`
 
-const ZoneID_type string = `type ZoneID int`
+const _ZoneID_type string = `type ZoneID int`
 
-const ZoneItemID_type string = `type ZoneItemID int`
+const _ZoneItemID_type string = `type ZoneItemID int`
 
-const State_type string = `type State struct {
+const _State_type string = `type State struct {
 	GearScore	map[GearScoreID]gearScoreCore	` + "`" + `json:"gearScore"` + "`" + `
 	Item		map[ItemID]itemCore		` + "`" + `json:"item"` + "`" + `
 	Player		map[PlayerID]playerCore		` + "`" + `json:"player"` + "`" + `
@@ -892,7 +892,7 @@ const zoneCore_type string = `type zoneCore struct {
 	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
 }`
 
-const Zone_type string = `type Zone struct{ zone zoneCore }`
+const _Zone_type string = `type Zone struct{ zone zoneCore }`
 
 const zoneItemCore_type string = `type zoneItemCore struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
@@ -902,7 +902,7 @@ const zoneItemCore_type string = `type zoneItemCore struct {
 	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
-const ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
+const _ZoneItem_type string = `type ZoneItem struct{ zoneItem zoneItemCore }`
 
 const itemCore_type string = `type itemCore struct {
 	ID		ItemID		` + "`" + `json:"id"` + "`" + `
@@ -911,7 +911,7 @@ const itemCore_type string = `type itemCore struct {
 	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
-const Item_type string = `type Item struct{ item itemCore }`
+const _Item_type string = `type Item struct{ item itemCore }`
 
 const playerCore_type string = `type playerCore struct {
 	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
@@ -922,7 +922,7 @@ const playerCore_type string = `type playerCore struct {
 	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
-const Player_type string = `type Player struct{ player playerCore }`
+const _Player_type string = `type Player struct{ player playerCore }`
 
 const gearScoreCore_type string = `type gearScoreCore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
@@ -932,7 +932,7 @@ const gearScoreCore_type string = `type gearScoreCore struct {
 	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
-const GearScore_type string = `type GearScore struct{ gearScore gearScoreCore }`
+const _GearScore_type string = `type GearScore struct{ gearScore gearScoreCore }`
 
 const positionCore_type string = `type positionCore struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
@@ -942,16 +942,16 @@ const positionCore_type string = `type positionCore struct {
 	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
 }`
 
-const Position_type string = `type Position struct{ position positionCore }`
+const _Position_type string = `type Position struct{ position positionCore }`
 
-const OperationKind_type string = `type OperationKind string`
+const _OperationKind_type string = `type OperationKind string`
 
-const OperationKindDelete_type string = `const (
+const _OperationKindDelete_type string = `const (
 	OperationKindDelete	OperationKind	= "DELETE"
 	OperationKindUpdate			= "UPDATE"
 )`
 
-const Engine_type string = `type Engine struct {
+const _Engine_type string = `type Engine struct {
 	State	State
 	Patch	State
 	IDgen	int
@@ -961,13 +961,13 @@ const newEngine_func string = `func newEngine() *Engine {
 	return &Engine{IDgen: 1, Patch: newState(), State: newState()}
 }`
 
-const GenerateID_Engine_func string = `func (se *Engine) GenerateID() int {
+const _GenerateID_Engine_func string = `func (se *Engine) GenerateID() int {
 	newID := se.IDgen
 	se.IDgen = se.IDgen + 1
 	return newID
 }`
 
-const UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
+const _UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
 	for _, gearScore := range se.Patch.GearScore {
 		if gearScore.OperationKind_ == OperationKindDelete {
 			delete(se.State.GearScore, gearScore.ID)
@@ -1030,7 +1030,7 @@ const UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
 	}
 }`
 
-const Tree_type string = `type Tree struct {
+const _Tree_type string = `type Tree struct {
 	GearScore	map[GearScoreID]tGearScore	` + "`" + `json:"gearScore"` + "`" + `
 	Item		map[ItemID]tItem		` + "`" + `json:"item"` + "`" + `
 	Player		map[PlayerID]tPlayer		` + "`" + `json:"player"` + "`" + `

@@ -31,7 +31,7 @@ func TestWriteTree(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			Tree_type,
+			_Tree_type,
 			newTree_func,
 		}, "\n"))
 

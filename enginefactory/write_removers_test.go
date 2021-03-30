@@ -13,10 +13,10 @@ func TestWriteRemovers(t *testing.T) {
 
 		actual := utils.FormatCode(sf.buf.String())
 		expected := utils.FormatCode(strings.Join([]string{
-			RemoveItems_Player_func,
-			RemoveItems_Zone_func,
-			RemovePlayers_Zone_func,
-			RemoveTags_Zone_func,
+			_RemoveItems_Player_func,
+			_RemoveItems_Zone_func,
+			_RemovePlayers_Zone_func,
+			_RemoveTags_Zone_func,
 		}, "\n"))
 
 		if expected != actual {
