@@ -1,18 +1,20 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeTree() *stateFactory {
 	decls := newDeclSet()
-	decls.file.Type().Id("Tree").Struct(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+	decls.file.Type().Id("Tree").Struct(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 		s := treeWriter{configType}
 		return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 	}))
 
 	decls.file.Func().Id("newTree").Params().Id("Tree").Block(
-		Return(Id("Tree").Values(forEachTypeInAST(s.ast, func(configType stateConfigType) *Statement {
+		Return(Id("Tree").Values(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			s := treeWriter{configType}
 			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 		}))),
@@ -23,7 +25,7 @@ func (s *stateFactory) writeTree() *stateFactory {
 }
 
 type treeWriter struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (s treeWriter) fieldName() string {
@@ -45,7 +47,7 @@ func (s treeWriter) fieldTag() string {
 func (s *stateFactory) writeTreeElements() *stateFactory {
 	decls := newDeclSet()
 
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		e := treeElementWriter{
 			t: configType,
@@ -53,7 +55,7 @@ func (s *stateFactory) writeTreeElements() *stateFactory {
 
 		decls.file.Type().Id(e.name()).Struct(
 			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
-			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+			forEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
@@ -66,8 +68,8 @@ func (s *stateFactory) writeTreeElements() *stateFactory {
 }
 
 type treeElementWriter struct {
-	t stateConfigType
-	f *stateConfigField
+	t ast.ConfigType
+	f *ast.Field
 }
 
 func (e treeElementWriter) fieldValue() string {

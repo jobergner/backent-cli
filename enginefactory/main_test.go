@@ -1,6 +1,8 @@
 package enginefactory
 
-func newSimpleASTExample() *stateConfigAST {
+import "bar-cli/ast"
+
+func newSimpleASTExample() *ast.AST {
 	data := map[interface{}]interface{}{
 		"player": map[interface{}]interface{}{
 			"items":     "[]item",
@@ -29,9 +31,6 @@ func newSimpleASTExample() *stateConfigAST {
 		},
 	}
 
-	// TODO: make prettier
-	simpleAST := buildRudimentaryStateConfigAST(data)
-	simpleAST.fillInReferences().fillInParentalInfo()
-
+	simpleAST := ast.Parse(data, map[interface{}]interface{}{})
 	return simpleAST
 }

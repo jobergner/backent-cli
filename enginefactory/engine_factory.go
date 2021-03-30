@@ -7,6 +7,8 @@ import (
 	"go/token"
 	"strings"
 
+	"bar-cli/ast"
+
 	"github.com/dave/jennifer/jen"
 	"github.com/gertd/go-pluralize"
 )
@@ -18,18 +20,18 @@ func title(name string) string {
 	return strings.Title(name)
 }
 
-func forEachFieldInType(configType stateConfigType, fn func(field stateConfigField) *jen.Statement) *jen.Statement {
+func forEachFieldInType(configType ast.ConfigType, fn func(field ast.Field) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
-	configType.rangeFields(func(field stateConfigField) {
+	configType.RangeFields(func(field ast.Field) {
 		statements = append(statements, fn(field))
 		statements = append(statements, jen.Line())
 	})
 	return &statements
 }
 
-func forEachTypeInAST(ast *stateConfigAST, fn func(configType stateConfigType) *jen.Statement) *jen.Statement {
+func forEachTypeInAST(config *ast.AST, fn func(configType ast.ConfigType) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
-	ast.rangeTypes(func(configType stateConfigType) {
+	config.RangeTypes(func(configType ast.ConfigType) {
 		statements = append(statements, fn(configType))
 		statements = append(statements, jen.Line())
 	})
@@ -71,15 +73,15 @@ func (d declSet) render(buf *bytes.Buffer) {
 // can have the coherent adder method of "AddPiece"
 var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
-type stateFactory struct {
-	ast *stateConfigAST
-	buf *bytes.Buffer
+type engineFactory struct {
+	config *ast.AST
+	buf    *bytes.Buffer
 }
 
-// WriteEngineFrom writes source code for a given StateConfig
+// WriteEngineFrom writes source code for a given State-/ActionsConfig
 func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
-	stateConfigAST := buildStateConfigASTFrom(stateConfigData)
-	s := newStateFactory(stateConfigAST).
+	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
+	s := newStateFactory(config).
 		writePackageName().
 		writeOperationKind().
 		writeIDs().
@@ -109,29 +111,29 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	return s.writtenSourceCode()
 }
 
-func (s *stateFactory) writePackageName() *stateFactory {
+func (s *engineFactory) writePackageName() *engineFactory {
 	s.buf.WriteString("package state\n")
 	return s
 }
 
-func newStateFactory(ast *stateConfigAST) *stateFactory {
-	return &stateFactory{
-		ast: ast,
-		buf: &bytes.Buffer{},
+func newStateFactory(config *ast.AST) *engineFactory {
+	return &engineFactory{
+		config: config,
+		buf:    &bytes.Buffer{},
 	}
 }
 
-func (s *stateFactory) writtenSourceCode() []byte {
+func (s *engineFactory) writtenSourceCode() []byte {
 	return s.buf.Bytes()
 }
 
-func (s *stateFactory) format() error {
-	ast, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
+func (s *engineFactory) format() error {
+	config, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
 	if err != nil {
 		return err
 	}
 
 	s.buf.Reset()
-	err = format.Node(s.buf, token.NewFileSet(), ast)
+	err = format.Node(s.buf, token.NewFileSet(), config)
 	return err
 }

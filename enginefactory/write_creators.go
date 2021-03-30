@@ -1,12 +1,14 @@
 package enginefactory
 
 import (
+	"bar-cli/ast"
+
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *stateFactory) writeCreators() *stateFactory {
 	decls := newDeclSet()
-	s.ast.rangeTypes(func(configType stateConfigType) {
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		cw := creatorWrapper{
 			t: configType,
@@ -25,7 +27,7 @@ func (s *stateFactory) writeCreators() *stateFactory {
 			c.declareElement(),
 			c.generateID(),
 			onlyIf(!configType.IsRootType, c.setHasParent()),
-			forEachFieldInType(configType, func(field stateConfigField) *Statement {
+			forEachFieldInType(configType, func(field ast.Field) *Statement {
 				c.f = &field
 				if field.HasSliceValue || field.ValueType.IsBasicType {
 					return Empty()
@@ -46,7 +48,7 @@ func (s *stateFactory) writeCreators() *stateFactory {
 }
 
 type creatorWrapper struct {
-	t stateConfigType
+	t ast.ConfigType
 }
 
 func (cw creatorWrapper) receiverParams() *Statement {
@@ -73,8 +75,8 @@ func (cw creatorWrapper) createElement() *Statement {
 }
 
 type creator struct {
-	t stateConfigType
-	f *stateConfigField
+	t ast.ConfigType
+	f *ast.Field
 }
 
 func (c creator) receiverParams() *Statement {
