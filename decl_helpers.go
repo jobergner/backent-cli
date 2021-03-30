@@ -10,15 +10,25 @@ import (
 
 func evalDeclName(decl ast.Decl, containingFileName string) string {
 	if isImportDecl(decl) {
-		return evalImportName(containingFileName) + "_import"
+		declName := evalImportName(containingFileName) + "_import"
+		return ensureLowerCase(declName)
 	}
 	if isFuncDecl(decl) {
-		return getFuncName(decl.(*ast.FuncDecl)) + "_func"
+		declName := getFuncName(decl.(*ast.FuncDecl)) + "_func"
+		return ensureLowerCase(declName)
 	}
 	if isGenDecl(decl) {
-		return getGenDeclName(decl.(*ast.GenDecl)) + "_type"
+		declName := getGenDeclName(decl.(*ast.GenDecl)) + "_type"
+		return ensureLowerCase(declName)
 	}
-	panic("unknown decl kind")
+	panic("unknown decl name")
+}
+
+func ensureLowerCase(s string) string {
+	if string(s[0]) == strings.ToUpper(string(s[0])) {
+		return "_" + strings.ToLower(string(s[0])) + string(s[1:len(s)])
+	}
+	return s
 }
 
 func stringifyDecl(decl ast.Decl) string {
