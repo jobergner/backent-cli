@@ -15,7 +15,7 @@ func TestValidateDataConflictingSingular(t *testing.T) {
 			},
 		}
 
-		actualErrors := thematicalValidation(data, false, true, true)
+		actualErrors := validateConflictingSingular(data)
 		expectedErrors := []error{
 			newValidationErrorConflictingSingular("foot", "feet", "foot"),
 		}

@@ -16,7 +16,7 @@ func TestValidateDataNonObjectType(t *testing.T) {
 			},
 		}
 
-		actualErrors := thematicalValidation(data, false, true, true)
+		actualErrors := validateNonObjectType(data)
 		expectedErrors := []error{
 			newValidationErrorNonObjectType("foo"),
 			newValidationErrorNonObjectType("bar"),
