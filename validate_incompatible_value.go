@@ -50,6 +50,7 @@ func isSliceOfType(valueString string) bool {
 	return false
 }
 
+// TODO refactor!
 func isCompatibleValue(valueString string) bool {
 	if isSliceOfType(valueString) {
 		return true
@@ -64,5 +65,14 @@ func isCompatibleValue(valueString string) bool {
 		return false
 	}
 
+	if isSliceOfSlice(valueString) {
+		return false
+	}
+
 	return true
+}
+
+func isSliceOfSlice(valueString string) bool {
+	re := regexp.MustCompile(`\[\]\[\]`)
+	return re.MatchString(valueString)
 }

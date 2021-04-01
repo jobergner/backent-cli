@@ -17,6 +17,7 @@ func TestValidateDataIncompatibleMethod(t *testing.T) {
 				"fan": "[]float64",
 				"lan": "bar",
 				"boe": "**[]int",
+				"bor": "[][]int",
 			},
 		}
 
@@ -26,6 +27,7 @@ func TestValidateDataIncompatibleMethod(t *testing.T) {
 			newValidationErrorIncompatibleValue("[2]int", "bal", "foo"),
 			newValidationErrorIncompatibleValue("*int", "buf", "foo"),
 			newValidationErrorIncompatibleValue("**[]int", "boe", "foo"),
+			newValidationErrorIncompatibleValue("[][]int", "bor", "foo"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
