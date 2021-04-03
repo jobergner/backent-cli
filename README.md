@@ -250,7 +250,5 @@ Writing code generation with jennifer was tedious but the written code is very m
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
-- rename project
-- figure out if sync.Pool is helpful for managing tree structs (cause theyre very big)
-- is entityKind still relevant (used for parentage)
-
+- find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
+- golden files for generated code
