@@ -49,3 +49,7 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrConflictingSingular | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}". | Due to the way state will be used two field names cannot have the same singular form. |
 | ErrUnavailableFieldName | "{KeyName}" not an available name. | Due to internal usage of this FieldName it is unavailable. |
 <br/>
+
+
+TODO:
+- let IDs of types be a valid type (like playerID) and treat them as int
