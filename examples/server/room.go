@@ -1,25 +1,26 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"time"
 )
 
 type Room struct {
-	clients           map[*Client]bool
-	broadcastChannel  chan []byte
-	registerChannel   chan *Client
-	unregisterChannel chan *Client
-	state             int
+	clients              map[*Client]bool
+	clientMessageChannel chan []byte
+	registerChannel      chan *Client
+	unregisterChannel    chan *Client
+	state                *Engine
 }
 
 func newRoom() *Room {
 	return &Room{
-		broadcastChannel:  make(chan []byte),
-		registerChannel:   make(chan *Client),
-		unregisterChannel: make(chan *Client),
-		clients:           make(map[*Client]bool),
-		state:             0,
+		clientMessageChannel: make(chan []byte),
+		registerChannel:      make(chan *Client),
+		unregisterChannel:    make(chan *Client),
+		clients:              make(map[*Client]bool),
+		state:                newEngine(),
 	}
 }
 
@@ -40,6 +41,7 @@ func (r *Room) broadcastStateToClients() error {
 		case client.messageChannel <- []byte("true"):
 		default:
 			r.unregisterClient(client)
+			return errors.New("client dropped")
 		}
 	}
 	return nil
@@ -56,7 +58,7 @@ func (r *Room) runHandleConnections() {
 	}
 }
 
-func (r *Room) runBroadcastRoomState() {
+func (r *Room) runBroadcastState() {
 	ticker := time.NewTicker(time.Second)
 	for {
 		<-ticker.C
@@ -67,16 +69,17 @@ func (r *Room) runBroadcastRoomState() {
 	}
 }
 
-func (r *Room) handleClientBroadcast(message []byte) error {
-	r.state = r.state + 1
+func (r *Room) handleClientMessage(msg []byte) error {
+	// r.state = r.state + 1
+
 	log.Println(r.state)
 	return nil
 }
 
-func (r *Room) runWatchClientBroadcasts() {
+func (r *Room) runWatchClientMessages() {
 	for {
-		message := <-r.broadcastChannel
-		err := r.handleClientBroadcast(message)
+		msg := <-r.clientMessageChannel
+		err := r.handleClientMessage(msg)
 		if err != nil {
 			log.Println(err)
 		}
@@ -85,6 +88,6 @@ func (r *Room) runWatchClientBroadcasts() {
 
 func (r *Room) Deploy() {
 	go r.runHandleConnections()
-	go r.runWatchClientBroadcasts()
-	go r.runBroadcastRoomState()
+	go r.runWatchClientMessages()
+	go r.runBroadcastState()
 }
