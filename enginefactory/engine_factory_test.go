@@ -3,7 +3,7 @@ package enginefactory
 import (
 	"bar-cli/ast"
 	"bar-cli/examples"
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"io/ioutil"
 	"testing"
 )
@@ -17,7 +17,7 @@ func TestStateFactory(t *testing.T) {
 		actual := WriteEngineFrom(examples.StateConfig)
 
 		if string(expected) != string(actual) {
-			t.Errorf(utils.Diff(string(actual), string(expected)))
+			t.Errorf(testutils.Diff(string(actual), string(expected)))
 		}
 	})
 }

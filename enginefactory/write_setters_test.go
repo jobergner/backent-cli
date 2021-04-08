@@ -1,7 +1,7 @@
 package enginefactory
 
 import (
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"strings"
 	"testing"
 )
@@ -12,7 +12,7 @@ func TestWriteSetters(t *testing.T) {
 		sf.writeSetters()
 
 		actual := sf.buf.String()
-		expected := utils.FormatCode(strings.Join([]string{
+		expected := testutils.FormatCode(strings.Join([]string{
 			_SetLevel_GearScore_func,
 			_SetScore_GearScore_func,
 			_SetX_Position_func,
@@ -20,7 +20,7 @@ func TestWriteSetters(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 }

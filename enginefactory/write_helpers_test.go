@@ -1,7 +1,7 @@
 package enginefactory
 
 import (
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"strings"
 	"testing"
 )
@@ -11,8 +11,8 @@ func TestWriteHelpers(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeDeduplicate()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			deduplicateGearScoreIDs_func,
 			deduplicateItemIDs_func,
 			deduplicatePlayerIDs_func,
@@ -22,7 +22,7 @@ func TestWriteHelpers(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 }

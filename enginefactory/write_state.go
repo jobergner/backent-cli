@@ -2,35 +2,36 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeIDs() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
-		decls.file.Type().Id(title(configType.Name) + "ID").Int()
+		decls.File.Type().Id(title(configType.Name) + "ID").Int()
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeState() *EngineFactory {
-	decls := newDeclSet()
-	decls.file.Type().Id("State").Struct(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+	decls := NewDeclSet()
+	decls.File.Type().Id("State").Struct(ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 		s := stateWriter{configType}
 		return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 	}))
 
-	decls.file.Func().Id("newState").Params().Id("State").Block(
-		Return(Id("State").Values(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+	decls.File.Func().Id("newState").Params().Id("State").Block(
+		Return(Id("State").Values(ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			s := stateWriter{configType}
 			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 		}))),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
@@ -55,7 +56,7 @@ func (s stateWriter) fieldTag() string {
 }
 
 func (s *EngineFactory) writeElements() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
@@ -63,9 +64,9 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			t: configType,
 		}
 
-		decls.file.Type().Id(e.name()).Struct(
+		decls.File.Type().Id(e.name()).Struct(
 			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
-			forEachFieldInType(configType, func(field ast.Field) *Statement {
+			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
@@ -73,10 +74,10 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			onlyIf(!configType.IsRootType, Id("HasParent_").Bool().Id(e.metaFieldTag("hasParent_")).Line()),
 		)
 
-		decls.file.Type().Id(title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
+		decls.File.Type().Id(title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

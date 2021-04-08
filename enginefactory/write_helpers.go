@@ -2,19 +2,20 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeDeduplicate() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		d := deduplicator{
 			t: configType,
 		}
 
-		decls.file.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
+		decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
 			d.defineCheck(),
 			d.defineDeduped(),
 			For(d.loopConditions("a")).Block(
@@ -28,7 +29,7 @@ func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 		)
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

@@ -1,7 +1,7 @@
 package enginefactory
 
 import (
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"strings"
 	"testing"
 )
@@ -11,21 +11,21 @@ func TestWriteAssembling(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTree()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			assembleTree_Engine_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes assemble tree element", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTreeElement()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			assembleGearScore_Engine_func,
 			assembleItem_Engine_func,
 			assemblePlayer_Engine_func,
@@ -35,7 +35,7 @@ func TestWriteAssembling(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 }
