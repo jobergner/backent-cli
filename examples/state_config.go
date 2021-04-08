@@ -27,18 +27,3 @@ var StateConfig = map[interface{}]interface{}{
 		"score": "int",
 	},
 }
-
-var ActionsConfig = map[interface{}]interface{}{
-	"movePlayer": map[interface{}]interface{}{
-		"playerID": "int",
-		"changeX":  "int",
-		"changeY":  "int",
-	},
-	"addItemToPlayer": map[interface{}]interface{}{
-		"item":     "item",
-		"playerID": "int",
-	},
-	"spawnZoneItems": map[interface{}]interface{}{
-		"items": "[]item",
-	},
-}
