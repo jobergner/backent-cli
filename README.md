@@ -248,6 +248,9 @@ When the output is not as expected you might as well guess where the issue is wi
 Writing code generation with jennifer was tedious but the written code is very maintainable compared to templates.
 
 
+### actions convenience
+the user should be able to pass entire objects as parameters instead of destructuring objects into many parameters in order to conveniently have all the data available on the server
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
