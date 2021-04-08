@@ -2,19 +2,20 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeCreators() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		cw := creatorWrapper{
 			t: configType,
 		}
 
-		decls.file.Func().Params(cw.receiverParams()).Id(cw.name()).Params().Id(cw.returns()).Block(
+		decls.File.Func().Params(cw.receiverParams()).Id(cw.name()).Params().Id(cw.returns()).Block(
 			Return(cw.createElement()),
 		)
 
@@ -23,11 +24,11 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			f: nil,
 		}
 
-		decls.file.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
+		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
 			c.declareElement(),
 			c.generateID(),
 			onlyIf(!configType.IsRootType, c.setHasParent()),
-			forEachFieldInType(configType, func(field ast.Field) *Statement {
+			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				c.f = &field
 				if field.HasSliceValue || field.ValueType.IsBasicType {
 					return Empty()
@@ -43,7 +44,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 		)
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

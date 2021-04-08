@@ -1,7 +1,7 @@
 package enginefactory
 
 import (
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"strings"
 	"testing"
 )
@@ -11,8 +11,8 @@ func TestWriteState(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeIDs()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			_GearScoreID_type,
 			_ItemID_type,
 			_PlayerID_type,
@@ -22,29 +22,29 @@ func TestWriteState(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeState()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			_State_type,
 			newState_func,
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 	t.Run("writes elements", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeElements()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			gearScoreCore_type,
 			_GearScore_type,
 			itemCore_type,
@@ -60,7 +60,7 @@ func TestWriteState(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 }

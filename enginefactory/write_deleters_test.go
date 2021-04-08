@@ -1,7 +1,7 @@
 package enginefactory
 
 import (
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"strings"
 	"testing"
 )
@@ -11,8 +11,8 @@ func TestWriteDeleters(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeDeleters()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			_DeleteGearScore_Engine_func,
 			deleteGearScore_Engine_func,
 			_DeleteItem_Engine_func,
@@ -28,7 +28,7 @@ func TestWriteDeleters(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 }

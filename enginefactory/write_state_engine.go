@@ -2,34 +2,35 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeOperationKind() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
-	decls.file.Type().Id("OperationKind").String()
+	decls.File.Type().Id("OperationKind").String()
 
-	decls.file.Const().Defs(
+	decls.File.Const().Defs(
 		Id("OperationKindDelete").Id("OperationKind").Op("=").Lit("DELETE"),
 		Id("OperationKindUpdate").Op("=").Lit("UPDATE"),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeEngine() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
-	decls.file.Type().Id("Engine").Struct(
+	decls.File.Type().Id("Engine").Struct(
 		Id("State").Id("State"),
 		Id("Patch").Id("State"),
 		Id("IDgen").Int(),
 	)
 
-	decls.file.Func().Id("newEngine").Params().Id("*Engine").Block(
+	decls.File.Func().Id("newEngine").Params().Id("*Engine").Block(
 		Return(Id("&Engine").Values(Dict{
 			Id("State"): Id("newState").Call(),
 			Id("Patch"): Id("newState").Call(),
@@ -37,30 +38,30 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 		})),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeGenerateID() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
-	decls.file.Func().Params(Id("se").Id("*Engine")).Id("GenerateID").Params().Int().Block(
+	decls.File.Func().Params(Id("se").Id("*Engine")).Id("GenerateID").Params().Int().Block(
 		Id("newID").Op(":=").Id("se").Dot("IDgen"),
 		Id("se").Dot("IDgen").Op("=").Id("se").Dot("IDgen").Op("+").Lit(1),
 		Return(Id("newID")),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeUpdateState() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
 	u := updateState{}
 
-	decls.file.Func().Params(u.receiverParams()).Id("UpdateState").Params().Block(
-		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+	decls.File.Func().Params(u.receiverParams()).Id("UpdateState").Params().Block(
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.t = &configType
 			return For(u.loopPatchElementsConditions()).Block(
 				If(u.isOperationKindDelete()).Block(
@@ -70,7 +71,7 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 				),
 			)
 		}),
-		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.t = &configType
 			return For(u.loopPatchKeysConditions()).Block(
 				u.clearElementFromPatch(),
@@ -78,7 +79,7 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 		}),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

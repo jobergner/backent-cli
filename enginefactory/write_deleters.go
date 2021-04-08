@@ -2,19 +2,20 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeDeleters() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		tw := typeDeleterWrapper{
 			t: configType,
 		}
 
-		decls.file.Func().Params(tw.receiverParams()).Id(tw.name()).Params(tw.params()).Block(
+		decls.File.Func().Params(tw.receiverParams()).Id(tw.name()).Params(tw.params()).Block(
 			onlyIf(!configType.IsRootType, tw.getElement()),
 			onlyIf(!configType.IsRootType, If(tw.hasParent()).Block(
 				Return(),
@@ -27,11 +28,11 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			f: nil,
 		}
 
-		decls.file.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Block(
+		decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Block(
 			t.getElement(),
 			t.setOperationKind(),
 			t.updateElementInPatch(),
-			forEachFieldInType(configType, func(field ast.Field) *Statement {
+			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				t.f = &field
 				if field.ValueType.IsBasicType {
 					return Empty()
@@ -46,7 +47,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 		)
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

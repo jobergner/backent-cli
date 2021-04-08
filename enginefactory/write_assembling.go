@@ -1,19 +1,21 @@
 package enginefactory
 
 import (
+	. "bar-cli/factoryutils"
+
 	. "github.com/dave/jennifer/jen"
 
 	"bar-cli/ast"
 )
 
 func (s *EngineFactory) writeAssembleTree() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
 	a := assembleTreeWriter{}
 
-	decls.file.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
+	decls.File.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
 		Id("tree").Op(":=").Id("newTree").Call(),
-		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
 
 			if a.t.IsRootType {
@@ -39,7 +41,7 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 			}
 
 		}),
-		forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
 
 			if a.t.IsRootType {
@@ -72,7 +74,7 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 		Return(Id("tree")),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
@@ -111,7 +113,7 @@ func (a assembleTreeWriter) stateLoopConditions() *Statement {
 }
 
 func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		a := assembleElement{
@@ -119,13 +121,13 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 			f: nil,
 		}
 
-		decls.file.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Params(a.returns()).Block(
+		decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Params(a.returns()).Block(
 			a.getElementFromPatch(),
 			If(Id("!hasUpdated")).Block(
 				a.earlyReturn(),
 			),
 			a.declareTreeElement(),
-			forEachFieldInType(configType, func(field ast.Field) *Statement {
+			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				a.f = &field
 
 				if a.f.ValueType.IsBasicType {
@@ -147,7 +149,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 			}),
 			a.setID(),
 			a.setOperationKind(),
-			forEachFieldInType(configType, func(field ast.Field) *Statement {
+			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				a.f = &field
 
 				if !a.f.ValueType.IsBasicType {
@@ -160,7 +162,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 		)
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 
 }

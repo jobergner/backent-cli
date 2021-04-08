@@ -2,25 +2,26 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeTree() *EngineFactory {
-	decls := newDeclSet()
-	decls.file.Type().Id("Tree").Struct(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+	decls := NewDeclSet()
+	decls.File.Type().Id("Tree").Struct(ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 		s := treeWriter{configType}
 		return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 	}))
 
-	decls.file.Func().Id("newTree").Params().Id("Tree").Block(
-		Return(Id("Tree").Values(forEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+	decls.File.Func().Id("newTree").Params().Id("Tree").Block(
+		Return(Id("Tree").Values(ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			s := treeWriter{configType}
 			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 		}))),
 	)
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 
@@ -45,7 +46,7 @@ func (s treeWriter) fieldTag() string {
 }
 
 func (s *EngineFactory) writeTreeElements() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
@@ -53,9 +54,9 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 			t: configType,
 		}
 
-		decls.file.Type().Id(e.name()).Struct(
+		decls.File.Type().Id(e.name()).Struct(
 			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
-			forEachFieldInType(configType, func(field ast.Field) *Statement {
+			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
@@ -63,7 +64,7 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 		)
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

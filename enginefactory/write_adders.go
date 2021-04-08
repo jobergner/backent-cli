@@ -2,12 +2,13 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeAdders() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
 
@@ -20,7 +21,7 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 				f: field,
 			}
 
-			decls.file.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Id(a.returns()).Block(
+			decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Id(a.returns()).Block(
 				a.reassignElement(),
 				If(a.isOperationKindDelete()).Block(
 					Return(a.earlyReturn()),
@@ -34,7 +35,7 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 		})
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

@@ -1,7 +1,7 @@
 package enginefactory
 
 import (
-	"bar-cli/utils"
+	"bar-cli/testutils"
 	"strings"
 	"testing"
 )
@@ -11,8 +11,8 @@ func TestWriteRemovers(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeRemovers()
 
-		actual := utils.FormatCode(sf.buf.String())
-		expected := utils.FormatCode(strings.Join([]string{
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
 			_RemoveItems_Player_func,
 			_RemoveItems_Zone_func,
 			_RemovePlayers_Zone_func,
@@ -20,7 +20,7 @@ func TestWriteRemovers(t *testing.T) {
 		}, "\n"))
 
 		if expected != actual {
-			t.Errorf(utils.Diff(actual, expected))
+			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
 }

@@ -2,18 +2,19 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 func (s *EngineFactory) writeGetters() *EngineFactory {
-	decls := newDeclSet()
+	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		t := typeGetter{
 			t: configType,
 		}
 
-		decls.file.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
+		decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
 			t.definePatchingElement(),
 			If(Id("ok")).Block(
 				Return(t.earlyReturn()),
@@ -26,7 +27,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			t: configType,
 		}
 
-		decls.file.Func().Params(i.receiverParams()).Id(i.name()).Params(i.params()).Id(i.returns()).Block(
+		decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params(i.params()).Id(i.returns()).Block(
 			Return(i.returnID()),
 		)
 
@@ -36,7 +37,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				f: field,
 			}
 
-			decls.file.Func().Params(f.receiverParams()).Id(f.name()).Params(f.params()).Id(f.returns()).Block(
+			decls.File.Func().Params(f.receiverParams()).Id(f.name()).Params(f.params()).Id(f.returns()).Block(
 				f.reassignElement(),
 				// if slice
 				onlyIf(field.HasSliceValue, f.declareSliceOfElements()),
@@ -51,7 +52,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 
 	})
 
-	decls.render(s.buf)
+	decls.Render(s.buf)
 	return s
 }
 

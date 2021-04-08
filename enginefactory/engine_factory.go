@@ -20,52 +20,6 @@ func title(name string) string {
 	return strings.Title(name)
 }
 
-func forEachFieldInType(configType ast.ConfigType, fn func(field ast.Field) *jen.Statement) *jen.Statement {
-	var statements jen.Statement
-	configType.RangeFields(func(field ast.Field) {
-		statements = append(statements, fn(field))
-		statements = append(statements, jen.Line())
-	})
-	return &statements
-}
-
-func forEachTypeInAST(config *ast.AST, fn func(configType ast.ConfigType) *jen.Statement) *jen.Statement {
-	var statements jen.Statement
-	config.RangeTypes(func(configType ast.ConfigType) {
-		statements = append(statements, fn(configType))
-		statements = append(statements, jen.Line())
-	})
-	return &statements
-}
-
-func onlyIf(is bool, statement *jen.Statement) *jen.Statement {
-	if is {
-		return statement
-	}
-	return jen.Empty()
-}
-
-type declSet struct {
-	file *jen.File
-}
-
-func newDeclSet() declSet {
-	return declSet{
-		file: jen.NewFile("main"),
-	}
-}
-
-func (d declSet) render(buf *bytes.Buffer) {
-	var _buf bytes.Buffer
-	err := d.file.Render(&_buf)
-	if err != nil {
-		panic(err)
-	}
-	code := strings.TrimPrefix(_buf.String(), "package main")
-	code = strings.TrimSpace(code)
-	buf.WriteString("\n" + code + "\n")
-}
-
 // pluralizeClient is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
 // with getting the singular form of a plural, this field:
@@ -76,6 +30,13 @@ var pluralizeClient *pluralize.Client = pluralize.NewClient()
 type EngineFactory struct {
 	config *ast.AST
 	buf    *bytes.Buffer
+}
+
+func onlyIf(is bool, statement *jen.Statement) *jen.Statement {
+	if is {
+		return statement
+	}
+	return jen.Empty()
 }
 
 // WriteEngineFrom writes source code for a given State-/ActionsConfig
