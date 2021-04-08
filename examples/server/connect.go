@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"net/http"
-	"nhooyr.io/websocket"
 	"time"
+
+	"nhooyr.io/websocket"
 )
 
 type Connector interface {
@@ -20,7 +21,7 @@ type Connection struct {
 }
 
 func NewConnection(conn *websocket.Conn, r *http.Request) *Connection {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*1000)
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
 	return &Connection{
 		Conn:          conn,
 		ctx:           ctx,
@@ -38,8 +39,8 @@ func (c *Connection) ReadMessage() (int, []byte, error) {
 	return int(msgType), msg, err
 }
 
-func (c *Connection) WriteMessage(message []byte) error {
-	err := c.Conn.Write(c.ctx, websocket.MessageText, message)
+func (c *Connection) WriteMessage(msg []byte) error {
+	err := c.Conn.Write(c.ctx, websocket.MessageText, msg)
 	if err != nil {
 		return err
 	}

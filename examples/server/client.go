@@ -36,30 +36,30 @@ func (c *Client) assignToRoom(room *Room) {
 	c.room = room
 }
 
-func (c *Client) broadcastInRoom(message []byte) {
-	c.room.broadcastChannel <- message
+func (c *Client) messageRoom(msg []byte) {
+	c.room.clientMessageChannel <- msg
 }
 
 func (c *Client) runReadMessages() {
 	defer c.discontinue()
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			break
 		}
 
-		c.broadcastInRoom(message)
+		c.messageRoom(msg)
 	}
 }
 
 func (c *Client) runWriteMessages() {
 	defer c.discontinue()
 	for {
-		message, ok := <-c.messageChannel
+		msg, ok := <-c.messageChannel
 		if !ok {
 			return
 		}
-		c.conn.WriteMessage(message)
+		c.conn.WriteMessage(msg)
 	}
 }

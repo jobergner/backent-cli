@@ -36,6 +36,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 		log.Println(err)
 	}
 
+	// wait until client disconnects
 	<-r.Context().Done()
 }
 
