@@ -36,20 +36,30 @@ func (c *Client) assignToRoom(room *Room) {
 	c.room = room
 }
 
-func (c *Client) messageRoom(msg []byte) {
+func (c *Client) forwardToRoom(msg message) {
 	c.room.clientMessageChannel <- msg
 }
 
 func (c *Client) runReadMessages() {
 	defer c.discontinue()
 	for {
-		_, msg, err := c.conn.ReadMessage()
+		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			break
 		}
 
-		c.messageRoom(msg)
+		var msg message
+		err = msg.UnmarshalJSON(msgBytes)
+		if err != nil {
+			log.Println(err)
+		}
+
+		if msg.Kind == messageKindInit {
+			c.room.requestInit(c)
+		} else {
+			c.forwardToRoom(msg)
+		}
 	}
 }
 
