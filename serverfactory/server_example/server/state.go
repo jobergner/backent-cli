@@ -1,4 +1,4 @@
-package main
+package state
 
 type OperationKind string
 
