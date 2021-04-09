@@ -1,11 +1,11 @@
 package state
 
 import (
-	"log"
+	"errors"
 )
 
 const (
-	messageKindAction_MovePlayer messageKind = iota + messageKindInit
+	messageKindAction_MovePlayer messageKind = iota + 1 + messageKindInit
 	messageKindAction_addItemToPlayer
 	messageKindAction_spawnZoneItems
 )
@@ -16,7 +16,7 @@ type _MovePlayerParams struct {
 	ChangeY  float64  `json:"changeY"`
 }
 
-type _addItemToPlayer struct {
+type _addItemToPlayerParams struct {
 	Item     tItem    `json:"item"`
 	PlayerID PlayerID `json:"playerID"`
 }
@@ -26,14 +26,37 @@ type _spawnZoneItemsParams struct {
 }
 
 type actions struct {
-	movePlayerParams     func(PlayerID, float64, float64)
+	movePlayer           func(PlayerID, float64, float64)
 	addItemToPlayer      func(tItem, PlayerID)
 	spawnZoneItemsParams func([]tItem)
 }
 
-func (r *Room) handleClientMessage(msg []byte) error {
-	// r.state = r.state + 1
+func (r *Room) processClientMessage(msg message) error {
+	switch messageKind(msg.Kind) {
+	case messageKindAction_addItemToPlayer:
+		var params _addItemToPlayerParams
+		err := params.UnmarshalJSON(msg.Content)
+		if err != nil {
+			return err
+		}
+		r.actions.addItemToPlayer(params.Item, params.PlayerID)
+	case messageKindAction_MovePlayer:
+		var params _MovePlayerParams
+		err := params.UnmarshalJSON(msg.Content)
+		if err != nil {
+			return err
+		}
+		r.actions.movePlayer(params.PlayerID, params.ChangeX, params.ChangeY)
+	case messageKindAction_spawnZoneItems:
+		var params _spawnZoneItemsParams
+		err := params.UnmarshalJSON(msg.Content)
+		if err != nil {
+			return err
+		}
+		r.actions.spawnZoneItemsParams(params.Items)
+	default:
+		return errors.New("unknown message kind")
+	}
 
-	log.Println(r.state)
 	return nil
 }
