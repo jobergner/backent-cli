@@ -19,10 +19,7 @@ func main() {
 	defer c.Close(websocket.StatusInternalError, "the sky is falling")
 	go runReadMessages(c, ctx)
 
-	err = wsjson.Write(ctx, c, "hi")
-	if err != nil {
-		panic(err)
-	}
+	go runSendMSG(ctx, c)
 
 	time.Sleep(time.Second * 100)
 
@@ -39,5 +36,31 @@ func runReadMessages(conn *websocket.Conn, ctx context.Context) {
 		}
 
 		log.Println(string(message))
+	}
+}
+
+type messageKind int
+
+const (
+	messageKindInit messageKind = iota + 1
+)
+
+type message struct {
+	Kind    messageKind `json:"kind"`
+	Content []byte      `json:"content"`
+}
+
+func runSendMSG(ctx context.Context, con *websocket.Conn) {
+	ticker := time.NewTicker(time.Second)
+	msg := message{
+		Kind:    2,
+		Content: []byte(`{"playerID": 1, "changeX": 1.1, "changeY": 1.1}`),
+	}
+	for {
+		<-ticker.C
+		err := wsjson.Write(ctx, con, msg)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

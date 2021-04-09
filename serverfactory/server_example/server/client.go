@@ -18,13 +18,13 @@ func newClient(websocketConnector Connector) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := Client{
+	c := Client{
 		conn:           websocketConnector,
 		messageChannel: make(chan []byte, 256),
 		id:             clientID,
 	}
 
-	return &client, nil
+	return &c, nil
 }
 
 func (c *Client) discontinue() {

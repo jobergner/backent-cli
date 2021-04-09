@@ -20,18 +20,18 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 		return
 	}
 
-	client, err := newClient(NewConnection(websocketConnection, r))
+	c, err := newClient(NewConnection(websocketConnection, r))
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client.assignToRoom(room)
-	room.registerChannel <- client
+	c.assignToRoom(room)
+	room.registerChannel <- c
 
-	go client.runReadMessages()
-	go client.runWriteMessages()
+	go c.runReadMessages()
+	go c.runWriteMessages()
 
-	err = client.conn.WriteMessage([]byte("hello"))
+	err = c.conn.WriteMessage([]byte("hello"))
 	if err != nil {
 		log.Println(err)
 	}

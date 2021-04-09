@@ -17,11 +17,18 @@ type Room struct {
 
 func newRoom() *Room {
 	return &Room{
+		clients:              make(map[*Client]bool),
 		clientMessageChannel: make(chan message),
 		registerChannel:      make(chan *Client),
 		unregisterChannel:    make(chan *Client),
-		clients:              make(map[*Client]bool),
+		initRequests:         make(map[*Client]bool),
 		state:                newEngine(),
+		// TODO not like this
+		actions: actions{
+			movePlayer: func(a PlayerID, x float64, y float64) {
+				log.Println("moving player..")
+			},
+		},
 	}
 }
 
