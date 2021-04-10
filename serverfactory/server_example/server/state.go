@@ -33,7 +33,9 @@ type Engine struct {
 }
 
 func newEngine() *Engine {
-	return &Engine{IDgen: 1, Patch: newState(), State: newState()}
+	e := &Engine{IDgen: 1, Patch: newState(), State: newState()}
+	e.CreateZone().AddPlayer(e).AddItem(e)
+	return e
 }
 func (se *Engine) GenerateID() int {
 	newID := se.IDgen

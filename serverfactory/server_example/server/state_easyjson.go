@@ -60,29 +60,50 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer(out *jwriter.W
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.Item != 0 {
 		const prefix string = ",\"item\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Item))
 	}
-	{
+	if in.Position != 0 {
 		const prefix string = ",\"position\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Position))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
-	{
+	if in.HasParent_ {
 		const prefix string = ",\"hasParent_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Bool(bool(in.HasParent_))
 	}
 	out.RawByte('}')
@@ -217,17 +238,21 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer1(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if len(in.Items) != 0 {
 		const prefix string = ",\"items\":"
-		out.RawString(prefix)
-		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v4, v5 := range in.Items {
 				if v4 > 0 {
@@ -238,12 +263,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer1(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if len(in.Players) != 0 {
 		const prefix string = ",\"players\":"
-		out.RawString(prefix)
-		if in.Players == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v6, v7 := range in.Players {
 				if v6 > 0 {
@@ -254,12 +282,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer1(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if len(in.Tags) != 0 {
 		const prefix string = ",\"tags\":"
-		out.RawString(prefix)
-		if in.Tags == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v8, v9 := range in.Tags {
 				if v8 > 0 {
@@ -270,9 +301,14 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer1(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -358,32 +394,40 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer2(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.Item != nil {
 		const prefix string = ",\"item\":"
-		out.RawString(prefix)
-		if in.Item == nil {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
-			(*in.Item).MarshalEasyJSON(out)
+			out.RawString(prefix)
 		}
+		(*in.Item).MarshalEasyJSON(out)
 	}
-	{
+	if in.Position != nil {
 		const prefix string = ",\"position\":"
-		out.RawString(prefix)
-		if in.Position == nil {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
-			(*in.Position).MarshalEasyJSON(out)
+			out.RawString(prefix)
 		}
+		(*in.Position).MarshalEasyJSON(out)
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -518,17 +562,21 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer3(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if len(in.Items) != 0 {
 		const prefix string = ",\"items\":"
-		out.RawString(prefix)
-		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v13, v14 := range in.Items {
 				if v13 > 0 {
@@ -539,12 +587,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer3(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if len(in.Players) != 0 {
 		const prefix string = ",\"players\":"
-		out.RawString(prefix)
-		if in.Players == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v15, v16 := range in.Players {
 				if v15 > 0 {
@@ -555,12 +606,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer3(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if len(in.Tags) != 0 {
 		const prefix string = ",\"tags\":"
-		out.RawString(prefix)
-		if in.Tags == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v17, v18 := range in.Tags {
 				if v17 > 0 {
@@ -571,9 +625,14 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer3(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -643,24 +702,40 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer4(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.X != 0 {
 		const prefix string = ",\"x\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Float64(float64(in.X))
 	}
-	{
+	if in.Y != 0 {
 		const prefix string = ",\"y\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Float64(float64(in.Y))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -769,26 +844,31 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer5(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.GearScore != nil {
 		const prefix string = ",\"gearScore\":"
-		out.RawString(prefix)
-		if in.GearScore == nil {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
-			(*in.GearScore).MarshalEasyJSON(out)
+			out.RawString(prefix)
 		}
+		(*in.GearScore).MarshalEasyJSON(out)
 	}
-	{
+	if len(in.Items) != 0 {
 		const prefix string = ",\"items\":"
-		out.RawString(prefix)
-		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v20, v21 := range in.Items {
 				if v20 > 0 {
@@ -799,18 +879,24 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer5(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if in.Position != nil {
 		const prefix string = ",\"position\":"
-		out.RawString(prefix)
-		if in.Position == nil {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
-			(*in.Position).MarshalEasyJSON(out)
+			out.RawString(prefix)
 		}
+		(*in.Position).MarshalEasyJSON(out)
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -886,23 +972,30 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer6(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.GearScore != nil {
 		const prefix string = ",\"gearScore\":"
-		out.RawString(prefix)
-		if in.GearScore == nil {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
-			(*in.GearScore).MarshalEasyJSON(out)
+			out.RawString(prefix)
 		}
+		(*in.GearScore).MarshalEasyJSON(out)
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -972,24 +1065,40 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer7(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.Level != 0 {
 		const prefix string = ",\"level\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Level))
 	}
-	{
+	if in.Score != 0 {
 		const prefix string = ",\"score\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Score))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
 	out.RawByte('}')
@@ -1061,29 +1170,50 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer8(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.X != 0 {
 		const prefix string = ",\"x\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Float64(float64(in.X))
 	}
-	{
+	if in.Y != 0 {
 		const prefix string = ",\"y\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Float64(float64(in.Y))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
-	{
+	if in.HasParent_ {
 		const prefix string = ",\"hasParent_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Bool(bool(in.HasParent_))
 	}
 	out.RawByte('}')
@@ -1178,22 +1308,31 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer9(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.GearScore != 0 {
 		const prefix string = ",\"gearScore\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.GearScore))
 	}
-	{
+	if len(in.Items) != 0 {
 		const prefix string = ",\"items\":"
-		out.RawString(prefix)
-		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('[')
 			for v23, v24 := range in.Items {
 				if v23 > 0 {
@@ -1204,19 +1343,34 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer9(out *jwriter.
 			out.RawByte(']')
 		}
 	}
-	{
+	if in.Position != 0 {
 		const prefix string = ",\"position\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Position))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
-	{
+	if in.HasParent_ {
 		const prefix string = ",\"hasParent_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Bool(bool(in.HasParent_))
 	}
 	out.RawByte('}')
@@ -1286,24 +1440,40 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer10(out *jwriter
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.GearScore != 0 {
 		const prefix string = ",\"gearScore\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.GearScore))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
-	{
+	if in.HasParent_ {
 		const prefix string = ",\"hasParent_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Bool(bool(in.HasParent_))
 	}
 	out.RawByte('}')
@@ -1375,29 +1545,50 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer11(out *jwriter
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ID != 0 {
 		const prefix string = ",\"id\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	{
+	if in.Level != 0 {
 		const prefix string = ",\"level\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Level))
 	}
-	{
+	if in.Score != 0 {
 		const prefix string = ",\"score\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.Score))
 	}
-	{
+	if in.OperationKind_ != "" {
 		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.OperationKind_))
 	}
-	{
+	if in.HasParent_ {
 		const prefix string = ",\"hasParent_\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Bool(bool(in.HasParent_))
 	}
 	out.RawByte('}')
@@ -1568,7 +1759,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.GearScore = make(map[GearScoreID]tGearScore)
+				if !in.IsDelim('}') {
+					out.GearScore = make(map[GearScoreID]tGearScore)
+				} else {
+					out.GearScore = nil
+				}
 				for !in.IsDelim('}') {
 					key := GearScoreID(in.IntStr())
 					in.WantColon()
@@ -1584,7 +1779,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Item = make(map[ItemID]tItem)
+				if !in.IsDelim('}') {
+					out.Item = make(map[ItemID]tItem)
+				} else {
+					out.Item = nil
+				}
 				for !in.IsDelim('}') {
 					key := ItemID(in.IntStr())
 					in.WantColon()
@@ -1600,7 +1799,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Player = make(map[PlayerID]tPlayer)
+				if !in.IsDelim('}') {
+					out.Player = make(map[PlayerID]tPlayer)
+				} else {
+					out.Player = nil
+				}
 				for !in.IsDelim('}') {
 					key := PlayerID(in.IntStr())
 					in.WantColon()
@@ -1616,7 +1819,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Position = make(map[PositionID]tPosition)
+				if !in.IsDelim('}') {
+					out.Position = make(map[PositionID]tPosition)
+				} else {
+					out.Position = nil
+				}
 				for !in.IsDelim('}') {
 					key := PositionID(in.IntStr())
 					in.WantColon()
@@ -1632,7 +1839,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Zone = make(map[ZoneID]tZone)
+				if !in.IsDelim('}') {
+					out.Zone = make(map[ZoneID]tZone)
+				} else {
+					out.Zone = nil
+				}
 				for !in.IsDelim('}') {
 					key := ZoneID(in.IntStr())
 					in.WantColon()
@@ -1648,7 +1859,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.ZoneItem = make(map[ZoneItemID]tZoneItem)
+				if !in.IsDelim('}') {
+					out.ZoneItem = make(map[ZoneItemID]tZoneItem)
+				} else {
+					out.ZoneItem = nil
+				}
 				for !in.IsDelim('}') {
 					key := ZoneItemID(in.IntStr())
 					in.WantColon()
@@ -1673,12 +1888,11 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer14(out *jwriter
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if len(in.GearScore) != 0 {
 		const prefix string = ",\"gearScore\":"
+		first = false
 		out.RawString(prefix[1:])
-		if in.GearScore == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
-		} else {
+		{
 			out.RawByte('{')
 			v31First := true
 			for v31Name, v31Value := range in.GearScore {
@@ -1694,12 +1908,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer14(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Item) != 0 {
 		const prefix string = ",\"item\":"
-		out.RawString(prefix)
-		if in.Item == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v32First := true
 			for v32Name, v32Value := range in.Item {
@@ -1715,12 +1932,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer14(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Player) != 0 {
 		const prefix string = ",\"player\":"
-		out.RawString(prefix)
-		if in.Player == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v33First := true
 			for v33Name, v33Value := range in.Player {
@@ -1736,12 +1956,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer14(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Position) != 0 {
 		const prefix string = ",\"position\":"
-		out.RawString(prefix)
-		if in.Position == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v34First := true
 			for v34Name, v34Value := range in.Position {
@@ -1757,12 +1980,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer14(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Zone) != 0 {
 		const prefix string = ",\"zone\":"
-		out.RawString(prefix)
-		if in.Zone == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v35First := true
 			for v35Name, v35Value := range in.Zone {
@@ -1778,12 +2004,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer14(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.ZoneItem) != 0 {
 		const prefix string = ",\"zoneItem\":"
-		out.RawString(prefix)
-		if in.ZoneItem == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v36First := true
 			for v36Name, v36Value := range in.ZoneItem {
@@ -1849,7 +2078,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer15(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.GearScore = make(map[GearScoreID]gearScoreCore)
+				if !in.IsDelim('}') {
+					out.GearScore = make(map[GearScoreID]gearScoreCore)
+				} else {
+					out.GearScore = nil
+				}
 				for !in.IsDelim('}') {
 					key := GearScoreID(in.IntStr())
 					in.WantColon()
@@ -1865,7 +2098,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer15(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Item = make(map[ItemID]itemCore)
+				if !in.IsDelim('}') {
+					out.Item = make(map[ItemID]itemCore)
+				} else {
+					out.Item = nil
+				}
 				for !in.IsDelim('}') {
 					key := ItemID(in.IntStr())
 					in.WantColon()
@@ -1881,7 +2118,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer15(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Player = make(map[PlayerID]playerCore)
+				if !in.IsDelim('}') {
+					out.Player = make(map[PlayerID]playerCore)
+				} else {
+					out.Player = nil
+				}
 				for !in.IsDelim('}') {
 					key := PlayerID(in.IntStr())
 					in.WantColon()
@@ -1897,7 +2138,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer15(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Position = make(map[PositionID]positionCore)
+				if !in.IsDelim('}') {
+					out.Position = make(map[PositionID]positionCore)
+				} else {
+					out.Position = nil
+				}
 				for !in.IsDelim('}') {
 					key := PositionID(in.IntStr())
 					in.WantColon()
@@ -1913,7 +2158,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer15(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.Zone = make(map[ZoneID]zoneCore)
+				if !in.IsDelim('}') {
+					out.Zone = make(map[ZoneID]zoneCore)
+				} else {
+					out.Zone = nil
+				}
 				for !in.IsDelim('}') {
 					key := ZoneID(in.IntStr())
 					in.WantColon()
@@ -1929,7 +2178,11 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer15(in *jlexer.L
 				in.Skip()
 			} else {
 				in.Delim('{')
-				out.ZoneItem = make(map[ZoneItemID]zoneItemCore)
+				if !in.IsDelim('}') {
+					out.ZoneItem = make(map[ZoneItemID]zoneItemCore)
+				} else {
+					out.ZoneItem = nil
+				}
 				for !in.IsDelim('}') {
 					key := ZoneItemID(in.IntStr())
 					in.WantColon()
@@ -1954,12 +2207,11 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer15(out *jwriter
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if len(in.GearScore) != 0 {
 		const prefix string = ",\"gearScore\":"
+		first = false
 		out.RawString(prefix[1:])
-		if in.GearScore == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
-		} else {
+		{
 			out.RawByte('{')
 			v43First := true
 			for v43Name, v43Value := range in.GearScore {
@@ -1975,12 +2227,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer15(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Item) != 0 {
 		const prefix string = ",\"item\":"
-		out.RawString(prefix)
-		if in.Item == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v44First := true
 			for v44Name, v44Value := range in.Item {
@@ -1996,12 +2251,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer15(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Player) != 0 {
 		const prefix string = ",\"player\":"
-		out.RawString(prefix)
-		if in.Player == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v45First := true
 			for v45Name, v45Value := range in.Player {
@@ -2017,12 +2275,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer15(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Position) != 0 {
 		const prefix string = ",\"position\":"
-		out.RawString(prefix)
-		if in.Position == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v46First := true
 			for v46Name, v46Value := range in.Position {
@@ -2038,12 +2299,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer15(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.Zone) != 0 {
 		const prefix string = ",\"zone\":"
-		out.RawString(prefix)
-		if in.Zone == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v47First := true
 			for v47Name, v47Value := range in.Zone {
@@ -2059,12 +2323,15 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer15(out *jwriter
 			out.RawByte('}')
 		}
 	}
-	{
+	if len(in.ZoneItem) != 0 {
 		const prefix string = ",\"zoneItem\":"
-		out.RawString(prefix)
-		if in.ZoneItem == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
 		} else {
+			out.RawString(prefix)
+		}
+		{
 			out.RawByte('{')
 			v48First := true
 			for v48Name, v48Value := range in.ZoneItem {
@@ -2381,19 +2648,30 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer20(out *jwriter
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if true {
 		const prefix string = ",\"State\":"
+		first = false
 		out.RawString(prefix[1:])
 		(in.State).MarshalEasyJSON(out)
 	}
-	{
+	if true {
 		const prefix string = ",\"Patch\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		(in.Patch).MarshalEasyJSON(out)
 	}
-	{
+	if in.IDgen != 0 {
 		const prefix string = ",\"IDgen\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.IDgen))
 	}
 	out.RawByte('}')

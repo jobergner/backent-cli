@@ -20,7 +20,7 @@ func newClient(websocketConnector Connector) (*Client, error) {
 	}
 	c := Client{
 		conn:           websocketConnector,
-		messageChannel: make(chan []byte, 256),
+		messageChannel: make(chan []byte, 32),
 		id:             clientID,
 	}
 
@@ -55,11 +55,7 @@ func (c *Client) runReadMessages() {
 			log.Println(err)
 		}
 
-		if msg.Kind == messageKindInit {
-			c.room.requestInit(c)
-		} else {
-			c.forwardToRoom(msg)
-		}
+		c.forwardToRoom(msg)
 	}
 }
 

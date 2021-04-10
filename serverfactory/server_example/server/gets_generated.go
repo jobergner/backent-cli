@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	messageKindAction_MovePlayer messageKind = iota + 1 + messageKindInit
+	messageKindAction_MovePlayer messageKind = iota + 1
 	messageKindAction_addItemToPlayer
 	messageKindAction_spawnZoneItems
 )
@@ -26,9 +26,9 @@ type _spawnZoneItemsParams struct {
 }
 
 type actions struct {
-	movePlayer           func(PlayerID, float64, float64)
-	addItemToPlayer      func(tItem, PlayerID)
-	spawnZoneItemsParams func([]tItem)
+	movePlayer           func(PlayerID, float64, float64, *Engine)
+	addItemToPlayer      func(tItem, PlayerID, *Engine)
+	spawnZoneItemsParams func([]tItem, *Engine)
 }
 
 func (r *Room) processClientMessage(msg message) error {
@@ -39,21 +39,21 @@ func (r *Room) processClientMessage(msg message) error {
 		if err != nil {
 			return err
 		}
-		r.actions.addItemToPlayer(params.Item, params.PlayerID)
+		r.actions.addItemToPlayer(params.Item, params.PlayerID, r.state)
 	case messageKindAction_MovePlayer:
 		var params _MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.movePlayer(params.PlayerID, params.ChangeX, params.ChangeY)
+		r.actions.movePlayer(params.PlayerID, params.ChangeX, params.ChangeY, r.state)
 	case messageKindAction_spawnZoneItems:
 		var params _spawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.spawnZoneItemsParams(params.Items)
+		r.actions.spawnZoneItemsParams(params.Items, r.state)
 	default:
 		return errors.New("unknown message kind")
 	}

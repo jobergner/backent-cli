@@ -10,7 +10,7 @@ type Room struct {
 	clientMessageChannel chan message
 	registerChannel      chan *Client
 	unregisterChannel    chan *Client
-	initRequests         map[*Client]bool
+	incomingClients      map[*Client]bool
 	state                *Engine
 	actions              actions
 }
@@ -21,29 +21,27 @@ func newRoom() *Room {
 		clientMessageChannel: make(chan message),
 		registerChannel:      make(chan *Client),
 		unregisterChannel:    make(chan *Client),
-		initRequests:         make(map[*Client]bool),
+		incomingClients:      make(map[*Client]bool),
 		state:                newEngine(),
 		// TODO not like this
 		actions: actions{
-			movePlayer: func(a PlayerID, x float64, y float64) {
+			movePlayer: func(a PlayerID, x float64, y float64, e *Engine) {
 				log.Println("moving player..")
+				e.Player(a).Position(e).SetX(e, x)
 			},
 		},
 	}
 }
 
 func (r *Room) registerClient(client *Client) {
-	r.clients[client] = true
-}
-
-func (r *Room) requestInit(client *Client) {
-	r.initRequests[client] = true
+	r.incomingClients[client] = true
 }
 
 func (r *Room) unregisterClient(client *Client) {
 	if _, ok := r.clients[client]; ok {
 		close(client.messageChannel)
 		delete(r.clients, client)
+		delete(r.incomingClients, client)
 	}
 }
 
@@ -73,13 +71,13 @@ func (r *Room) runHandleConnections() {
 	}
 }
 
-func (r *Room) handleInitRequests() error {
+func (r *Room) answerInitRequests() error {
 	stateBytes, err := r.state.State.MarshalJSON()
 	if err != nil {
 		return err
 	}
 
-	for client := range r.initRequests {
+	for client := range r.incomingClients {
 		select {
 		case client.messageChannel <- stateBytes:
 		default:
@@ -87,13 +85,19 @@ func (r *Room) handleInitRequests() error {
 			// TODO what do?
 			log.Println("client dropped")
 		}
-		delete(r.initRequests, client)
 	}
 
 	return nil
 }
 
-func (r *Room) runBroadcastPatch() {
+func (r *Room) promoteIncomingClients() {
+	for client := range r.incomingClients {
+		r.clients[client] = true
+		delete(r.incomingClients, client)
+	}
+}
+
+func (r *Room) runProcessingFrames() {
 	ticker := time.NewTicker(time.Second)
 	for {
 		<-ticker.C
@@ -102,10 +106,11 @@ func (r *Room) runBroadcastPatch() {
 			log.Println(err)
 		}
 		r.state.UpdateState()
-		err = r.handleInitRequests()
+		err = r.answerInitRequests()
 		if err != nil {
 			log.Println(err)
 		}
+		r.promoteIncomingClients()
 		err = r.broadcastPatchToClients(patchBytes)
 		if err != nil {
 			log.Println(err)
@@ -126,5 +131,5 @@ func (r *Room) runWatchClientMessages() {
 func (r *Room) Deploy() {
 	go r.runHandleConnections()
 	go r.runWatchClientMessages()
-	go r.runBroadcastPatch()
+	go r.runProcessingFrames()
 }
