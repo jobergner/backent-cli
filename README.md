@@ -255,3 +255,4 @@ the user should be able to pass entire objects as parameters instead of destruct
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
 - golden files for generated code
+- what happens if the user 'gets' an element that isnt there and manipulates it

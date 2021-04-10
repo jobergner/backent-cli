@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"time"
+
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
-	"time"
 )
 
 func main() {
@@ -50,14 +52,17 @@ type message struct {
 	Content []byte      `json:"content"`
 }
 
+var newx = 1.1
+
 func runSendMSG(ctx context.Context, con *websocket.Conn) {
 	ticker := time.NewTicker(time.Second)
-	msg := message{
-		Kind:    2,
-		Content: []byte(`{"playerID": 1, "changeX": 1.1, "changeY": 1.1}`),
-	}
 	for {
 		<-ticker.C
+		newx += 1
+		msg := message{
+			Kind:    1,
+			Content: []byte(`{"playerID": 2, "changeX": ` + fmt.Sprintf("%f", newx) + `, "changeY": 0}`),
+		}
 		err := wsjson.Write(ctx, con, msg)
 		if err != nil {
 			panic(err)
