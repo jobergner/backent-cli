@@ -1,88 +1,88 @@
 package state
 
-func (se *Engine) CreateGearScore() GearScore {
+func (se *Engine) CreateGearScore() gearScore {
 	return se.createGearScore(false)
 }
 
-func (se *Engine) createGearScore(hasParent bool) GearScore {
-	var gearScore gearScoreCore
-	gearScore.ID = GearScoreID(se.GenerateID())
-	gearScore.HasParent_ = hasParent
-	gearScore.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[gearScore.ID] = gearScore
-	return GearScore{gearScore: gearScore}
+func (se *Engine) createGearScore(hasParent bool) gearScore {
+	var element gearScoreCore
+	element.ID = GearScoreID(se.GenerateID())
+	element.HasParent_ = hasParent
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.GearScore[element.ID] = element
+	return gearScore{gearScore: element}
 }
 
-func (se *Engine) CreatePosition() Position {
+func (se *Engine) CreatePosition() position {
 	return se.createPosition(false)
 }
 
-func (se *Engine) createPosition(hasParent bool) Position {
-	var position positionCore
-	position.ID = PositionID(se.GenerateID())
-	position.HasParent_ = hasParent
-	position.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[position.ID] = position
-	return Position{position: position}
+func (se *Engine) createPosition(hasParent bool) position {
+	var element positionCore
+	element.ID = PositionID(se.GenerateID())
+	element.HasParent_ = hasParent
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.Position[element.ID] = element
+	return position{position: element}
 }
 
-func (se *Engine) CreateItem() Item {
+func (se *Engine) CreateItem() item {
 	return se.createItem(false)
 }
 
-func (se *Engine) createItem(hasParent bool) Item {
-	var item itemCore
-	item.ID = ItemID(se.GenerateID())
-	item.HasParent_ = hasParent
+func (se *Engine) createItem(hasParent bool) item {
+	var element itemCore
+	element.ID = ItemID(se.GenerateID())
+	element.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
-	item.GearScore = elementGearScore.gearScore.ID
-	item.OperationKind_ = OperationKindUpdate
-	se.Patch.Item[item.ID] = item
-	return Item{item: item}
+	element.GearScore = elementGearScore.gearScore.ID
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.Item[element.ID] = element
+	return item{item: element}
 }
 
-func (se *Engine) CreateZoneItem() ZoneItem {
+func (se *Engine) CreateZoneItem() zoneItem {
 	return se.createZoneItem(false)
 }
 
-func (se *Engine) createZoneItem(hasParent bool) ZoneItem {
-	var zoneItem zoneItemCore
-	zoneItem.ID = ZoneItemID(se.GenerateID())
-	zoneItem.HasParent_ = hasParent
+func (se *Engine) createZoneItem(hasParent bool) zoneItem {
+	var element zoneItemCore
+	element.ID = ZoneItemID(se.GenerateID())
+	element.HasParent_ = hasParent
 	elementItem := se.createItem(true)
-	zoneItem.Item = elementItem.item.ID
+	element.Item = elementItem.item.ID
 	elementPosition := se.createPosition(true)
-	zoneItem.Position = elementPosition.position.ID
-	zoneItem.OperationKind_ = OperationKindUpdate
-	se.Patch.ZoneItem[zoneItem.ID] = zoneItem
-	return ZoneItem{zoneItem: zoneItem}
+	element.Position = elementPosition.position.ID
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.ZoneItem[element.ID] = element
+	return zoneItem{zoneItem: element}
 }
 
-func (se *Engine) CreatePlayer() Player {
+func (se *Engine) CreatePlayer() player {
 	return se.createPlayer(false)
 }
 
-func (se *Engine) createPlayer(hasParent bool) Player {
-	var player playerCore
-	player.ID = PlayerID(se.GenerateID())
-	player.HasParent_ = hasParent
+func (se *Engine) createPlayer(hasParent bool) player {
+	var element playerCore
+	element.ID = PlayerID(se.GenerateID())
+	element.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
-	player.GearScore = elementGearScore.gearScore.ID
+	element.GearScore = elementGearScore.gearScore.ID
 	elementPosition := se.createPosition(true)
-	player.Position = elementPosition.position.ID
-	player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.ID] = player
-	return Player{player: player}
+	element.Position = elementPosition.position.ID
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[element.ID] = element
+	return player{player: element}
 }
 
-func (se *Engine) CreateZone() Zone {
+func (se *Engine) CreateZone() zone {
 	return se.createZone()
 }
 
-func (se *Engine) createZone() Zone {
-	var zone zoneCore
-	zone.ID = ZoneID(se.GenerateID())
-	zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.ID] = zone
-	return Zone{zone: zone}
+func (se *Engine) createZone() zone {
+	var element zoneCore
+	element.ID = ZoneID(se.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[element.ID] = element
+	return zone{zone: element}
 }

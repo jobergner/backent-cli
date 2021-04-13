@@ -35,7 +35,7 @@ type zoneCore struct {
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
-type Zone struct{ zone zoneCore }
+type zone struct{ zone zoneCore }
 
 type zoneItemCore struct {
 	ID             ZoneItemID    `json:"id"`
@@ -45,7 +45,7 @@ type zoneItemCore struct {
 	HasParent_     bool          `json:"hasParent_"`
 }
 
-type ZoneItem struct{ zoneItem zoneItemCore }
+type zoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
 	ID             ItemID        `json:"id"`
@@ -54,7 +54,7 @@ type itemCore struct {
 	HasParent_     bool          `json:"hasParent_"`
 }
 
-type Item struct{ item itemCore }
+type item struct{ item itemCore }
 
 type playerCore struct {
 	ID             PlayerID      `json:"id"`
@@ -65,7 +65,7 @@ type playerCore struct {
 	HasParent_     bool          `json:"hasParent_"`
 }
 
-type Player struct{ player playerCore }
+type player struct{ player playerCore }
 
 type gearScoreCore struct {
 	ID             GearScoreID   `json:"id"`
@@ -75,7 +75,7 @@ type gearScoreCore struct {
 	HasParent_     bool          `json:"hasParent_"`
 }
 
-type GearScore struct{ gearScore gearScoreCore }
+type gearScore struct{ gearScore gearScoreCore }
 
 type positionCore struct {
 	ID             PositionID    `json:"id"`
@@ -85,4 +85,4 @@ type positionCore struct {
 	HasParent_     bool          `json:"hasParent_"`
 }
 
-type Position struct{ position positionCore }
+type position struct{ position positionCore }

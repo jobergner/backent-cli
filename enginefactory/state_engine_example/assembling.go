@@ -1,235 +1,235 @@
 package state
 
-func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (tGearScore, bool) {
-	gearScore, hasUpdated := se.Patch.GearScore[gearScoreID]
+func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (GearScore, bool) {
+	gearScoreData, hasUpdated := se.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
-		return tGearScore{}, false
+		return GearScore{}, false
 	}
 
-	var treeGearScore tGearScore
+	var gearScore GearScore
 
-	treeGearScore.ID = gearScore.ID
-	treeGearScore.OperationKind_ = gearScore.OperationKind_
-	treeGearScore.Level = gearScore.Level
-	treeGearScore.Score = gearScore.Score
-	return treeGearScore, true
+	gearScore.ID = gearScoreData.ID
+	gearScore.OperationKind_ = gearScoreData.OperationKind_
+	gearScore.Level = gearScoreData.Level
+	gearScore.Score = gearScoreData.Score
+	return gearScore, true
 }
 
-func (se *Engine) assemblePosition(positionID PositionID) (tPosition, bool) {
-	position, hasUpdated := se.Patch.Position[positionID]
+func (se *Engine) assemblePosition(positionID PositionID) (Position, bool) {
+	positionData, hasUpdated := se.Patch.Position[positionID]
 	if !hasUpdated {
-		return tPosition{}, false
+		return Position{}, false
 	}
 
-	var treePosition tPosition
+	var position Position
 
-	treePosition.ID = position.ID
-	treePosition.OperationKind_ = position.OperationKind_
-	treePosition.X = position.X
-	treePosition.Y = position.Y
-	return treePosition, true
+	position.ID = positionData.ID
+	position.OperationKind_ = positionData.OperationKind_
+	position.X = positionData.X
+	position.Y = positionData.Y
+	return position, true
 }
 
-func (se *Engine) assembleItem(itemID ItemID) (tItem, bool) {
-	item, hasUpdated := se.Patch.Item[itemID]
+func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
+	itemData, hasUpdated := se.Patch.Item[itemID]
 	if !hasUpdated {
-		item = se.State.Item[itemID]
+		itemData = se.State.Item[itemID]
 	}
 
-	var treeItem tItem
+	var item Item
 
-	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(item.GearScore); gearScoreHasUpdated {
+	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(itemData.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
-		treeItem.GearScore = &treeGearScore
+		item.GearScore = &treeGearScore
 	}
 
-	treeItem.ID = item.ID
-	treeItem.OperationKind_ = item.OperationKind_
+	item.ID = itemData.ID
+	item.OperationKind_ = itemData.OperationKind_
 
-	return treeItem, hasUpdated
+	return item, hasUpdated
 }
 
-func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (tZoneItem, bool) {
-	zoneItem, hasUpdated := se.Patch.ZoneItem[zoneItemID]
+func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (ZoneItem, bool) {
+	zoneItemData, hasUpdated := se.Patch.ZoneItem[zoneItemID]
 	if !hasUpdated {
-		zoneItem = se.State.ZoneItem[zoneItemID]
+		zoneItemData = se.State.ZoneItem[zoneItemID]
 	}
 
-	var treeZoneItem tZoneItem
+	var zoneItem ZoneItem
 
-	if treeItem, itemHasUpdated := se.assembleItem(zoneItem.Item); itemHasUpdated {
+	if treeItem, itemHasUpdated := se.assembleItem(zoneItemData.Item); itemHasUpdated {
 		hasUpdated = true
-		treeZoneItem.Item = &treeItem
+		zoneItem.Item = &treeItem
 	}
-	if treePosition, positionHasUpdated := se.assemblePosition(zoneItem.Position); positionHasUpdated {
+	if treePosition, positionHasUpdated := se.assemblePosition(zoneItemData.Position); positionHasUpdated {
 		hasUpdated = true
-		treeZoneItem.Position = &treePosition
+		zoneItem.Position = &treePosition
 	}
 
-	treeZoneItem.ID = zoneItem.ID
-	treeZoneItem.OperationKind_ = zoneItem.OperationKind_
-	return treeZoneItem, hasUpdated
+	zoneItem.ID = zoneItemData.ID
+	zoneItem.OperationKind_ = zoneItemData.OperationKind_
+	return zoneItem, hasUpdated
 
 }
 
-func (se *Engine) assemblePlayer(playerID PlayerID) (tPlayer, bool) {
-	player, hasUpdated := se.Patch.Player[playerID]
+func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
+	playerData, hasUpdated := se.Patch.Player[playerID]
 	if !hasUpdated {
-		player = se.State.Player[playerID]
+		playerData = se.State.Player[playerID]
 	}
 
-	var treePlayer tPlayer
+	var player Player
 
-	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(player.GearScore); gearScoreHasUpdated {
+	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(playerData.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
-		treePlayer.GearScore = &treeGearScore
+		player.GearScore = &treeGearScore
 	}
-	for _, itemID := range deduplicateItemIDs(se.State.Player[player.ID].Items, se.Patch.Player[player.ID].Items) {
+	for _, itemID := range deduplicateItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
 		if treeItem, itemHasUpdated := se.assembleItem(itemID); itemHasUpdated {
 			hasUpdated = true
-			treePlayer.Items = append(treePlayer.Items, treeItem)
+			player.Items = append(player.Items, treeItem)
 		}
 	}
-	if treePosition, positionHasUpdated := se.assemblePosition(player.Position); positionHasUpdated {
+	if treePosition, positionHasUpdated := se.assemblePosition(playerData.Position); positionHasUpdated {
 		hasUpdated = true
-		treePlayer.Position = &treePosition
+		player.Position = &treePosition
 	}
 
-	treePlayer.ID = player.ID
-	treePlayer.OperationKind_ = player.OperationKind_
-	return treePlayer, hasUpdated
+	player.ID = playerData.ID
+	player.OperationKind_ = playerData.OperationKind_
+	return player, hasUpdated
 }
 
-func (se *Engine) assembleZone(zoneID ZoneID) (tZone, bool) {
-	zone, hasUpdated := se.Patch.Zone[zoneID]
+func (se *Engine) assembleZone(zoneID ZoneID) (Zone, bool) {
+	zoneData, hasUpdated := se.Patch.Zone[zoneID]
 	if !hasUpdated {
-		zone = se.State.Zone[zoneID]
+		zoneData = se.State.Zone[zoneID]
 	}
 
-	var treeZone tZone
+	var zone Zone
 
-	for _, zoneItemID := range deduplicateZoneItemIDs(se.State.Zone[zone.ID].Items, se.Patch.Zone[zone.ID].Items) {
+	for _, zoneItemID := range deduplicateZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
 		if treeZoneItem, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
 			hasUpdated = true
-			treeZone.Items = append(treeZone.Items, treeZoneItem)
+			zone.Items = append(zone.Items, treeZoneItem)
 		}
 	}
-	for _, playerID := range deduplicatePlayerIDs(se.State.Zone[zone.ID].Players, se.Patch.Zone[zone.ID].Players) {
+	for _, playerID := range deduplicatePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
 		if treePlayer, playerHasUpdated := se.assemblePlayer(playerID); playerHasUpdated {
 			hasUpdated = true
-			treeZone.Players = append(treeZone.Players, treePlayer)
+			zone.Players = append(zone.Players, treePlayer)
 		}
 	}
 
-	treeZone.ID = zone.ID
-	treeZone.OperationKind_ = zone.OperationKind_
-	treeZone.Tags = zone.Tags
-	return treeZone, hasUpdated
+	zone.ID = zoneData.ID
+	zone.OperationKind_ = zoneData.OperationKind_
+	zone.Tags = zoneData.Tags
+	return zone, hasUpdated
 }
 
 func (se *Engine) assembleTree() Tree {
 	tree := newTree()
-	for _, gearScore := range se.Patch.GearScore {
-		if !gearScore.HasParent_ {
-			treeGearScore, hasUpdated := se.assembleGearScore(gearScore.ID)
+	for _, gearScoreData := range se.Patch.GearScore {
+		if !gearScoreData.HasParent_ {
+			gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID)
 			if hasUpdated {
-				tree.GearScore[gearScore.ID] = treeGearScore
+				tree.GearScore[gearScoreData.ID] = gearScore
 			}
 		}
 	}
-	for _, item := range se.Patch.Item {
-		if !item.HasParent_ {
-			treeItem, hasUpdated := se.assembleItem(item.ID)
+	for _, itemData := range se.Patch.Item {
+		if !itemData.HasParent_ {
+			item, hasUpdated := se.assembleItem(itemData.ID)
 			if hasUpdated {
-				tree.Item[item.ID] = treeItem
+				tree.Item[itemData.ID] = item
 			}
 		}
 	}
-	for _, player := range se.Patch.Player {
-		if !player.HasParent_ {
-			treePlayer, hasUpdated := se.assemblePlayer(player.ID)
+	for _, playerData := range se.Patch.Player {
+		if !playerData.HasParent_ {
+			player, hasUpdated := se.assemblePlayer(playerData.ID)
 			if hasUpdated {
-				tree.Player[player.ID] = treePlayer
+				tree.Player[playerData.ID] = player
 			}
 		}
 	}
-	for _, position := range se.Patch.Position {
-		if !position.HasParent_ {
-			treePosition, hasUpdated := se.assemblePosition(position.ID)
+	for _, positionData := range se.Patch.Position {
+		if !positionData.HasParent_ {
+			position, hasUpdated := se.assemblePosition(positionData.ID)
 			if hasUpdated {
-				tree.Position[position.ID] = treePosition
+				tree.Position[positionData.ID] = position
 			}
 		}
 	}
-	for _, zone := range se.Patch.Zone {
-		treeZone, hasUpdated := se.assembleZone(zone.ID)
+	for _, zoneData := range se.Patch.Zone {
+		zone, hasUpdated := se.assembleZone(zoneData.ID)
 		if hasUpdated {
-			tree.Zone[zone.ID] = treeZone
+			tree.Zone[zoneData.ID] = zone
 		}
 	}
-	for _, zoneItem := range se.Patch.ZoneItem {
-		if !zoneItem.HasParent_ {
-			treeZoneItem, hasUpdated := se.assembleZoneItem(zoneItem.ID)
+	for _, zoneItemData := range se.Patch.ZoneItem {
+		if !zoneItemData.HasParent_ {
+			zoneItem, hasUpdated := se.assembleZoneItem(zoneItemData.ID)
 			if hasUpdated {
-				tree.ZoneItem[zoneItem.ID] = treeZoneItem
+				tree.ZoneItem[zoneItemData.ID] = zoneItem
 			}
 		}
 	}
 
-	for _, gearScore := range se.State.GearScore {
-		if !gearScore.HasParent_ {
-			if _, ok := tree.GearScore[gearScore.ID]; !ok {
-				treeGearScore, hasUpdated := se.assembleGearScore(gearScore.ID)
+	for _, gearScoreData := range se.State.GearScore {
+		if !gearScoreData.HasParent_ {
+			if _, ok := tree.GearScore[gearScoreData.ID]; !ok {
+				gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID)
 				if hasUpdated {
-					tree.GearScore[gearScore.ID] = treeGearScore
+					tree.GearScore[gearScoreData.ID] = gearScore
 				}
 			}
 		}
 	}
-	for _, item := range se.State.Item {
-		if !item.HasParent_ {
-			if _, ok := tree.Item[item.ID]; !ok {
-				treeItem, hasUpdated := se.assembleItem(item.ID)
+	for _, itemData := range se.State.Item {
+		if !itemData.HasParent_ {
+			if _, ok := tree.Item[itemData.ID]; !ok {
+				item, hasUpdated := se.assembleItem(itemData.ID)
 				if hasUpdated {
-					tree.Item[item.ID] = treeItem
+					tree.Item[itemData.ID] = item
 				}
 			}
 		}
 	}
-	for _, player := range se.State.Player {
-		if !player.HasParent_ {
-			if _, ok := tree.Player[player.ID]; !ok {
-				treePlayer, hasUpdated := se.assemblePlayer(player.ID)
+	for _, playerData := range se.State.Player {
+		if !playerData.HasParent_ {
+			if _, ok := tree.Player[playerData.ID]; !ok {
+				player, hasUpdated := se.assemblePlayer(playerData.ID)
 				if hasUpdated {
-					tree.Player[player.ID] = treePlayer
+					tree.Player[playerData.ID] = player
 				}
 			}
 		}
 	}
-	for _, position := range se.State.Position {
-		if !position.HasParent_ {
-			if _, ok := tree.Position[position.ID]; !ok {
-				treePosition, hasUpdated := se.assemblePosition(position.ID)
+	for _, positionData := range se.State.Position {
+		if !positionData.HasParent_ {
+			if _, ok := tree.Position[positionData.ID]; !ok {
+				position, hasUpdated := se.assemblePosition(positionData.ID)
 				if hasUpdated {
-					tree.Position[position.ID] = treePosition
+					tree.Position[positionData.ID] = position
 				}
 			}
 		}
 	}
-	for _, zone := range se.State.Zone {
-		if _, ok := tree.Zone[zone.ID]; !ok {
-			treeZone, hasUpdated := se.assembleZone(zone.ID)
+	for _, zoneData := range se.State.Zone {
+		if _, ok := tree.Zone[zoneData.ID]; !ok {
+			zone, hasUpdated := se.assembleZone(zoneData.ID)
 			if hasUpdated {
-				tree.Zone[zone.ID] = treeZone
+				tree.Zone[zoneData.ID] = zone
 			}
 		}
 	}
-	for _, zoneItem := range se.State.ZoneItem {
-		if !zoneItem.HasParent_ {
-			if _, ok := tree.ZoneItem[zoneItem.ID]; !ok {
-				treeZoneItem, hasUpdated := se.assembleZoneItem(zoneItem.ID)
+	for _, zoneItemData := range se.State.ZoneItem {
+		if !zoneItemData.HasParent_ {
+			if _, ok := tree.ZoneItem[zoneItemData.ID]; !ok {
+				zoneItem, hasUpdated := se.assembleZoneItem(zoneItemData.ID)
 				if hasUpdated {
-					tree.ZoneItem[zoneItem.ID] = treeZoneItem
+					tree.ZoneItem[zoneItemData.ID] = zoneItem
 				}
 			}
 		}

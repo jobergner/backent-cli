@@ -1,156 +1,156 @@
 package state
 
-func (se *Engine) Player(playerID PlayerID) Player {
+func (se *Engine) Player(playerID PlayerID) player {
 	patchingPlayer, ok := se.Patch.Player[playerID]
 	if ok {
-		return Player{player: patchingPlayer}
+		return player{player: patchingPlayer}
 	}
 	currentPlayer := se.State.Player[playerID]
-	return Player{player: currentPlayer}
+	return player{player: currentPlayer}
 }
 
-func (_player Player) ID(se *Engine) PlayerID {
+func (_player player) ID(se *Engine) PlayerID {
 	return _player.player.ID
 }
 
-func (_player Player) Items(se *Engine) []Item {
+func (_player player) Items(se *Engine) []item {
 	player := se.Player(_player.player.ID)
-	var items []Item
+	var items []item
 	for _, itemID := range player.player.Items {
 		items = append(items, se.Item(itemID))
 	}
 	return items
 }
 
-func (_player Player) GearScore(se *Engine) GearScore {
+func (_player player) GearScore(se *Engine) gearScore {
 	player := se.Player(_player.player.ID)
 	return se.GearScore(player.player.GearScore)
 }
 
-func (_player Player) Position(se *Engine) Position {
+func (_player player) Position(se *Engine) position {
 	player := se.Player(_player.player.ID)
 	return se.Position(player.player.Position)
 }
 
-func (se *Engine) GearScore(gearScoreID GearScoreID) GearScore {
+func (se *Engine) GearScore(gearScoreID GearScoreID) gearScore {
 	patchingGearScore, ok := se.Patch.GearScore[gearScoreID]
 	if ok {
-		return GearScore{gearScore: patchingGearScore}
+		return gearScore{gearScore: patchingGearScore}
 	}
 	currentGearScore := se.State.GearScore[gearScoreID]
-	return GearScore{gearScore: currentGearScore}
+	return gearScore{gearScore: currentGearScore}
 }
 
-func (_gearScore GearScore) ID(se *Engine) GearScoreID {
+func (_gearScore gearScore) ID(se *Engine) GearScoreID {
 	return _gearScore.gearScore.ID
 }
 
-func (_gearScore GearScore) Level(se *Engine) int {
+func (_gearScore gearScore) Level(se *Engine) int {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Level
 }
 
-func (_gearScore GearScore) Score(se *Engine) int {
+func (_gearScore gearScore) Score(se *Engine) int {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Score
 }
 
-func (se *Engine) Item(itemID ItemID) Item {
+func (se *Engine) Item(itemID ItemID) item {
 	patchingItem, ok := se.Patch.Item[itemID]
 	if ok {
-		return Item{item: patchingItem}
+		return item{item: patchingItem}
 	}
 	currentItem := se.State.Item[itemID]
-	return Item{item: currentItem}
+	return item{item: currentItem}
 }
 
-func (_item Item) ID(se *Engine) ItemID {
+func (_item item) ID(se *Engine) ItemID {
 	return _item.item.ID
 }
 
-func (_item Item) GearScore(se *Engine) GearScore {
+func (_item item) GearScore(se *Engine) gearScore {
 	item := se.Item(_item.item.ID)
 	return se.GearScore(item.item.GearScore)
 }
 
-func (se *Engine) Position(positionID PositionID) Position {
+func (se *Engine) Position(positionID PositionID) position {
 	patchingPosition, ok := se.Patch.Position[positionID]
 	if ok {
-		return Position{position: patchingPosition}
+		return position{position: patchingPosition}
 	}
 	currentPosition := se.State.Position[positionID]
-	return Position{position: currentPosition}
+	return position{position: currentPosition}
 }
 
-func (_position Position) ID(se *Engine) PositionID {
+func (_position position) ID(se *Engine) PositionID {
 	return _position.position.ID
 }
 
-func (_position Position) X(se *Engine) float64 {
+func (_position position) X(se *Engine) float64 {
 	position := se.Position(_position.position.ID)
 	return position.position.X
 }
 
-func (_position Position) Y(se *Engine) float64 {
+func (_position position) Y(se *Engine) float64 {
 	position := se.Position(_position.position.ID)
 	return position.position.Y
 }
 
-func (se *Engine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
+func (se *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
 	patchingZoneItem, ok := se.Patch.ZoneItem[zoneItemID]
 	if ok {
-		return ZoneItem{zoneItem: patchingZoneItem}
+		return zoneItem{zoneItem: patchingZoneItem}
 	}
 	currentZoneItem := se.State.ZoneItem[zoneItemID]
-	return ZoneItem{zoneItem: currentZoneItem}
+	return zoneItem{zoneItem: currentZoneItem}
 }
 
-func (_zoneItem ZoneItem) ID(se *Engine) ZoneItemID {
+func (_zoneItem zoneItem) ID(se *Engine) ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }
 
-func (_zoneItem ZoneItem) Position(se *Engine) Position {
+func (_zoneItem zoneItem) Position(se *Engine) position {
 	zoneItem := se.ZoneItem(_zoneItem.zoneItem.ID)
 	return se.Position(zoneItem.zoneItem.Position)
 }
 
-func (_zoneItem ZoneItem) Item(se *Engine) Item {
+func (_zoneItem zoneItem) Item(se *Engine) item {
 	zoneItem := se.ZoneItem(_zoneItem.zoneItem.ID)
 	return se.Item(zoneItem.zoneItem.Item)
 }
 
-func (se *Engine) Zone(zoneID ZoneID) Zone {
+func (se *Engine) Zone(zoneID ZoneID) zone {
 	patchingZone, ok := se.Patch.Zone[zoneID]
 	if ok {
-		return Zone{zone: patchingZone}
+		return zone{zone: patchingZone}
 	}
 	currentZone := se.State.Zone[zoneID]
-	return Zone{zone: currentZone}
+	return zone{zone: currentZone}
 }
 
-func (_zone Zone) ID(se *Engine) ZoneID {
+func (_zone zone) ID(se *Engine) ZoneID {
 	return _zone.zone.ID
 }
 
-func (_zone Zone) Players(se *Engine) []Player {
+func (_zone zone) Players(se *Engine) []player {
 	zone := se.Zone(_zone.zone.ID)
-	var players []Player
+	var players []player
 	for _, playerID := range zone.zone.Players {
 		players = append(players, se.Player(playerID))
 	}
 	return players
 }
 
-func (_zone Zone) Items(se *Engine) []ZoneItem {
+func (_zone zone) Items(se *Engine) []zoneItem {
 	zone := se.Zone(_zone.zone.ID)
-	var items []ZoneItem
+	var items []zoneItem
 	for _, zoneItemID := range zone.zone.Items {
 		items = append(items, se.ZoneItem(zoneItemID))
 	}
 	return items
 }
 
-func (_zone Zone) Tags(se *Engine) []string {
+func (_zone zone) Tags(se *Engine) []string {
 	zone := se.Zone(_zone.zone.ID)
 	var tags []string
 	for _, element := range zone.zone.Tags {
