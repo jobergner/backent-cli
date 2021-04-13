@@ -77,7 +77,7 @@ func (t typeGetter) params() *Statement {
 }
 
 func (t typeGetter) returns() string {
-	return title(t.t.Name)
+	return t.t.Name
 }
 
 func (t typeGetter) definePatchingElement() *Statement {
@@ -85,7 +85,7 @@ func (t typeGetter) definePatchingElement() *Statement {
 }
 
 func (t typeGetter) earlyReturn() *Statement {
-	return Id(title(t.t.Name)).Values(Dict{Id(t.t.Name): Id("patching" + title(t.t.Name))})
+	return Id(t.t.Name).Values(Dict{Id(t.t.Name): Id("patching" + title(t.t.Name))})
 }
 
 func (t typeGetter) defineCurrentElement() *Statement {
@@ -93,7 +93,7 @@ func (t typeGetter) defineCurrentElement() *Statement {
 }
 
 func (t typeGetter) finalReturn() *Statement {
-	return Id(title(t.t.Name)).Values(Dict{Id(t.t.Name): Id("current" + title(t.t.Name))})
+	return Id(t.t.Name).Values(Dict{Id(t.t.Name): Id("current" + title(t.t.Name))})
 }
 
 type idGetter struct {
@@ -105,7 +105,7 @@ func (i idGetter) receiverName() string {
 }
 
 func (i idGetter) receiverParams() *Statement {
-	return Id(i.receiverName()).Id(title(i.t.Name))
+	return Id(i.receiverName()).Id(i.t.Name)
 }
 
 func (i idGetter) name() string {
@@ -134,7 +134,7 @@ func (f fieldGetter) receiverName() string {
 }
 
 func (f fieldGetter) receiverParams() *Statement {
-	return Id(f.receiverName()).Id(title(f.t.Name))
+	return Id(f.receiverName()).Id(f.t.Name)
 }
 
 func (f fieldGetter) name() string {
@@ -155,7 +155,7 @@ func (f fieldGetter) returns() string {
 	if f.f.ValueType.IsBasicType {
 		return val + f.f.ValueType.Name
 	}
-	return val + title(f.f.ValueType.Name)
+	return val + f.f.ValueType.Name
 }
 
 func (f fieldGetter) reassignElement() *Statement {

@@ -13,10 +13,10 @@ func TestWriteSetters(t *testing.T) {
 
 		actual := sf.buf.String()
 		expected := testutils.FormatCode(strings.Join([]string{
-			_SetLevel_GearScore_func,
-			_SetScore_GearScore_func,
-			_SetX_Position_func,
-			_SetY_Position_func,
+			_SetLevel_gearScore_func,
+			_SetScore_gearScore_func,
+			_SetX_position_func,
+			_SetY_position_func,
 		}, "\n"))
 
 		if expected != actual {

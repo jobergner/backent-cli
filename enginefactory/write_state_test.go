@@ -46,17 +46,17 @@ func TestWriteState(t *testing.T) {
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
 			gearScoreCore_type,
-			_GearScore_type,
+			gearScore_type,
 			itemCore_type,
-			_Item_type,
+			item_type,
 			playerCore_type,
-			_Player_type,
+			player_type,
 			positionCore_type,
-			_Position_type,
+			position_type,
 			zoneCore_type,
-			_Zone_type,
+			zone_type,
 			zoneItemCore_type,
-			_ZoneItem_type,
+			zoneItem_type,
 		}, "\n"))
 
 		if expected != actual {

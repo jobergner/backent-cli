@@ -63,7 +63,7 @@ type remover struct {
 }
 
 func (r remover) receiverParams() *Statement {
-	return Id(r.receiverName()).Id(title(r.t.Name))
+	return Id(r.receiverName()).Id(r.t.Name)
 }
 
 func (r remover) name() string {
@@ -85,7 +85,7 @@ func (r remover) params() *Statement {
 }
 
 func (r remover) returns() string {
-	return title(r.t.Name)
+	return r.t.Name
 }
 
 func (r remover) reassignElement() *Statement {

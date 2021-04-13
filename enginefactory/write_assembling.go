@@ -82,34 +82,38 @@ type assembleTreeWriter struct {
 	t *ast.ConfigType
 }
 
+func (a assembleTreeWriter) dataElementName() string {
+	return a.t.Name + "Data"
+}
+
 func (a assembleTreeWriter) receiverParams() *Statement {
 	return Id("se").Id("*Engine")
 }
 
 func (a assembleTreeWriter) patchLoopConditions() *Statement {
-	return List(Id("_"), Id(a.t.Name)).Op(":=").Range().Id("se").Dot("Patch").Dot(title(a.t.Name))
+	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("se").Dot("Patch").Dot(title(a.t.Name))
 }
 
 func (a assembleTreeWriter) elementHasNoParent() *Statement {
-	return Id("!" + a.t.Name).Dot("HasParent_")
+	return Id("!" + a.dataElementName()).Dot("HasParent_")
 }
 
 func (a assembleTreeWriter) elementNonExistentInTree() (*Statement, *Statement) {
-	condition := List(Id("_"), Id("ok")).Op(":=").Id("tree").Dot(title(a.t.Name)).Index(Id(a.t.Name).Dot("ID"))
+	condition := List(Id("_"), Id("ok")).Op(":=").Id("tree").Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID"))
 	return condition, Id("!ok")
 }
 
 func (a assembleTreeWriter) assembleItem() *Statement {
-	variableNames := List(Id("tree"+title(a.t.Name)), Id("hasUpdated"))
-	return variableNames.Op(":=").Id("se").Dot("assemble" + title(a.t.Name)).Call(Id(a.t.Name).Dot("ID"))
+	variableNames := List(Id(a.t.Name), Id("hasUpdated"))
+	return variableNames.Op(":=").Id("se").Dot("assemble" + title(a.t.Name)).Call(Id(a.dataElementName()).Dot("ID"))
 }
 
 func (a assembleTreeWriter) setElementInTree() *Statement {
-	return Id("tree").Dot(title(a.t.Name)).Index(Id(a.t.Name).Dot("ID")).Op("=").Id("tree" + title(a.t.Name))
+	return Id("tree").Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Op("=").Id(a.t.Name)
 }
 
 func (a assembleTreeWriter) stateLoopConditions() *Statement {
-	return List(Id("_"), Id(a.t.Name)).Op(":=").Range().Id("se").Dot("State").Dot(title(a.t.Name))
+	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("se").Dot("State").Dot(title(a.t.Name))
 }
 
 func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
@@ -142,7 +146,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 						),
 					)
 				}
-				return If(a.elementHasUpdated(Id(configType.Name).Dot(title(field.Name)))).Block(
+				return If(a.elementHasUpdated(Id(a.dataElementName()).Dot(title(field.Name)))).Block(
 					a.setHasUpdatedTrue(),
 					a.setFieldElement(),
 				)
@@ -173,11 +177,15 @@ type assembleElement struct {
 }
 
 func (a assembleElement) treeElementName() string {
-	return "tree" + title(a.t.Name)
+	return a.t.Name
+}
+
+func (a assembleElement) dataElementName() string {
+	return a.t.Name + "Data"
 }
 
 func (a assembleElement) treeTypeName() string {
-	return "t" + title(a.t.Name)
+	return title(a.t.Name)
 }
 
 func (a assembleElement) receiverParams() *Statement {
@@ -201,14 +209,14 @@ func (a assembleElement) returns() (*Statement, *Statement) {
 }
 
 func (a assembleElement) getElementFromPatch() *Statement {
-	return List(Id(a.t.Name), Id("hasUpdated")).Op(":=").Id("se").Dot("Patch").Dot(title(a.t.Name)).Index(Id(a.idParam()))
+	return List(Id(a.dataElementName()), Id("hasUpdated")).Op(":=").Id("se").Dot("Patch").Dot(title(a.t.Name)).Index(Id(a.idParam()))
 }
 
 func (a assembleElement) earlyReturn() *Statement {
 	if a.t.IsLeafType {
 		return Return(List(Id(a.treeTypeName()).Values(), Lit(false)))
 	}
-	return Id(a.t.Name).Op("=").Id("se").Dot("State").Dot(title(a.t.Name)).Index(Id(a.idParam()))
+	return Id(a.dataElementName()).Op("=").Id("se").Dot("State").Dot(title(a.t.Name)).Index(Id(a.idParam()))
 }
 
 func (a assembleElement) declareTreeElement() *Statement {
@@ -216,7 +224,7 @@ func (a assembleElement) declareTreeElement() *Statement {
 }
 
 func (a assembleElement) typeFieldOn(from string) *Statement {
-	return Id("se").Dot(from).Dot(title(a.t.Name)).Index(Id(a.t.Name).Dot("ID")).Dot(title(a.f.Name))
+	return Id("se").Dot(from).Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Dot(title(a.f.Name))
 }
 
 func (a assembleElement) sliceFieldLoopConditions() *Statement {
@@ -245,15 +253,15 @@ func (a assembleElement) setFieldElement() *Statement {
 }
 
 func (a assembleElement) setField() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(a.t.Name).Dot(title(a.f.Name))
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(a.dataElementName()).Dot(title(a.f.Name))
 }
 
 func (a assembleElement) setID() *Statement {
-	return Id(a.treeElementName()).Dot("ID").Op("=").Id(a.t.Name).Dot("ID")
+	return Id(a.treeElementName()).Dot("ID").Op("=").Id(a.dataElementName()).Dot("ID")
 }
 
 func (a assembleElement) setOperationKind() *Statement {
-	return Id(a.treeElementName()).Dot("OperationKind_").Op("=").Id(a.t.Name).Dot("OperationKind_")
+	return Id(a.treeElementName()).Dot("OperationKind_").Op("=").Id(a.dataElementName()).Dot("OperationKind_")
 }
 
 func (a assembleElement) finalReturn() (*Statement, *Statement) {
