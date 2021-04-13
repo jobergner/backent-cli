@@ -60,3 +60,16 @@ func (r *Room) processClientMessage(msg message) error {
 
 	return nil
 }
+
+func Start(
+	movePlayer func(PlayerID, float64, float64, *Engine),
+	addItemToPlayer func(tItem, PlayerID, *Engine),
+	spawnZoneItemsParams func([]tItem, *Engine),
+	onDeploy func(*Engine),
+	onFrameTick func(*Engine),
+) {
+	log.Println("Hello World")
+	a := actions{movePlayer, addItemToPlayer, spawnZoneItemsParams}
+	setupRoutes(a, onDeploy, onFrameTick)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}

@@ -31,25 +31,14 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 	go c.runReadMessages()
 	go c.runWriteMessages()
 
-	err = c.conn.WriteMessage([]byte("hello"))
-	if err != nil {
-		log.Println(err)
-	}
-
 	// wait until client disconnects
 	<-r.Context().Done()
 }
 
-func setupRoutes() {
-	room := newRoom()
+func setupRoutes(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) {
+	room := newRoom(a, onDeploy, onFrameTick)
 	room.Deploy()
 
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { wsEndpoint(w, r, room) })
-}
-
-func Start() {
-	log.Println("Hello World")
-	setupRoutes()
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }

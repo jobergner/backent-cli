@@ -13,9 +13,11 @@ type Room struct {
 	incomingClients      map[*Client]bool
 	state                *Engine
 	actions              actions
+	onDeploy             func(*Engine)
+	onFrameTick          func(*Engine)
 }
 
-func newRoom() *Room {
+func newRoom(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) *Room {
 	return &Room{
 		clients:              make(map[*Client]bool),
 		clientMessageChannel: make(chan message),
@@ -23,13 +25,9 @@ func newRoom() *Room {
 		unregisterChannel:    make(chan *Client),
 		incomingClients:      make(map[*Client]bool),
 		state:                newEngine(),
-		// TODO not like this
-		actions: actions{
-			movePlayer: func(a PlayerID, x float64, y float64, e *Engine) {
-				log.Println("moving player..")
-				e.Player(a).Position(e).SetX(e, x)
-			},
-		},
+		onDeploy:             onDeploy,
+		onFrameTick:          onFrameTick,
+		actions:              a,
 	}
 }
 
@@ -129,6 +127,7 @@ func (r *Room) runWatchClientMessages() {
 }
 
 func (r *Room) Deploy() {
+	r.onDeploy(r.state)
 	go r.runHandleConnections()
 	go r.runWatchClientMessages()
 	go r.runProcessingFrames()

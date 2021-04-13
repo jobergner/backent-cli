@@ -256,3 +256,8 @@ the user should be able to pass entire objects as parameters instead of destruct
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
 - golden files for generated code
 - what happens if the user 'gets' an element that isnt there and manipulates it
+- in engine use easyjson comments only for required structs eg
+```
+//easyjson:json
+type A struct {}
+```
