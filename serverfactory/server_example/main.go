@@ -1,14 +1,18 @@
 package main
 
 import (
-	server "bar-cli/serverfactory/server_example/server"
+	state "bar-cli/serverfactory/server_example/server"
+	"log"
 )
 
 func main() {
-	server.Start(actions{
-		movePlayer: func(a PlayerID, x float64, y float64, e *Engine) {
+	state.Start(
+		func(a state.PlayerID, x float64, y float64, e *state.Engine) {
 			log.Println("moving player..")
 			e.Player(a).Position(e).SetX(e, x)
 		},
-	})
+		func(state.TITem, state.PlayerID, *state.Engine) {}, func([]state.TITem, *state.Engine) {},
+		func(*state.Engine) {},
+		func(*state.Engine) {},
+	)
 }

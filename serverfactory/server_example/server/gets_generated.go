@@ -2,6 +2,8 @@ package state
 
 import (
 	"errors"
+	"log"
+	"net/http"
 )
 
 const (
@@ -17,18 +19,18 @@ type _MovePlayerParams struct {
 }
 
 type _addItemToPlayerParams struct {
-	Item     tItem    `json:"item"`
+	Item     TITem    `json:"item"`
 	PlayerID PlayerID `json:"playerID"`
 }
 
 type _spawnZoneItemsParams struct {
-	Items []tItem `json:"items"`
+	Items []TITem `json:"items"`
 }
 
 type actions struct {
 	movePlayer           func(PlayerID, float64, float64, *Engine)
-	addItemToPlayer      func(tItem, PlayerID, *Engine)
-	spawnZoneItemsParams func([]tItem, *Engine)
+	addItemToPlayer      func(TITem, PlayerID, *Engine)
+	spawnZoneItemsParams func([]TITem, *Engine)
 }
 
 func (r *Room) processClientMessage(msg message) error {
@@ -63,8 +65,8 @@ func (r *Room) processClientMessage(msg message) error {
 
 func Start(
 	movePlayer func(PlayerID, float64, float64, *Engine),
-	addItemToPlayer func(tItem, PlayerID, *Engine),
-	spawnZoneItemsParams func([]tItem, *Engine),
+	addItemToPlayer func(TITem, PlayerID, *Engine),
+	spawnZoneItemsParams func([]TITem, *Engine),
 	onDeploy func(*Engine),
 	onFrameTick func(*Engine),
 ) {

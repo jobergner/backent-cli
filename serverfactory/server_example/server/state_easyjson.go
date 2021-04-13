@@ -364,7 +364,7 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer2(in *jlexer.Le
 				out.Item = nil
 			} else {
 				if out.Item == nil {
-					out.Item = new(tItem)
+					out.Item = new(TITem)
 				}
 				(*out.Item).UnmarshalEasyJSON(in)
 			}
@@ -803,15 +803,15 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer5(in *jlexer.Le
 				in.Delim('[')
 				if out.Items == nil {
 					if !in.IsDelim(']') {
-						out.Items = make([]tItem, 0, 2)
+						out.Items = make([]TITem, 0, 2)
 					} else {
-						out.Items = []tItem{}
+						out.Items = []TITem{}
 					}
 				} else {
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v19 tItem
+					var v19 TITem
 					(v19).UnmarshalEasyJSON(in)
 					out.Items = append(out.Items, v19)
 					in.WantComma()
@@ -925,7 +925,7 @@ func (v *tPlayer) UnmarshalJSON(data []byte) error {
 func (v *tPlayer) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer5(l, v)
 }
-func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer6(in *jlexer.Lexer, out *tItem) {
+func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer6(in *jlexer.Lexer, out *TITem) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -968,7 +968,7 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer6(in *jlexer.Le
 		in.Consumed()
 	}
 }
-func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer6(out *jwriter.Writer, in tItem) {
+func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer6(out *jwriter.Writer, in TITem) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1002,26 +1002,26 @@ func easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer6(out *jwriter.
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v tItem) MarshalJSON() ([]byte, error) {
+func (v TITem) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v tItem) MarshalEasyJSON(w *jwriter.Writer) {
+func (v TITem) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjsonBd887cf1EncodeBarCliServerfactoryServerExampleServer6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *tItem) UnmarshalJSON(data []byte) error {
+func (v *TITem) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *tItem) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *TITem) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer6(l, v)
 }
 func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer7(in *jlexer.Lexer, out *tGearScore) {
@@ -1780,14 +1780,14 @@ func easyjsonBd887cf1DecodeBarCliServerfactoryServerExampleServer14(in *jlexer.L
 			} else {
 				in.Delim('{')
 				if !in.IsDelim('}') {
-					out.Item = make(map[ItemID]tItem)
+					out.Item = make(map[ItemID]TITem)
 				} else {
 					out.Item = nil
 				}
 				for !in.IsDelim('}') {
 					key := ItemID(in.IntStr())
 					in.WantColon()
-					var v26 tItem
+					var v26 TITem
 					(v26).UnmarshalEasyJSON(in)
 					(out.Item)[key] = v26
 					in.WantComma()

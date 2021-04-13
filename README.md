@@ -261,3 +261,4 @@ the user should be able to pass entire objects as parameters instead of destruct
 //easyjson:json
 type A struct {}
 ```
+- treeitems need to be exported to be used as action parameters
