@@ -74,7 +74,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			onlyIf(!configType.IsRootType, Id("HasParent_").Bool().Id(e.metaFieldTag("hasParent_")).Line()),
 		)
 
-		decls.File.Type().Id(title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
+		decls.File.Type().Id(configType.Name).Struct(Id(configType.Name).Id(e.name()))
 	})
 
 	decls.Render(s.buf)

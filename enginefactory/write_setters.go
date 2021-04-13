@@ -44,7 +44,7 @@ type setter struct {
 }
 
 func (s setter) receiverParams() *Statement {
-	return Id(s.receiverName()).Id(title(s.t.Name))
+	return Id(s.receiverName()).Id(s.t.Name)
 }
 
 func (s setter) name() string {
@@ -63,7 +63,7 @@ func (s setter) params() *Statement {
 }
 
 func (s setter) returns() string {
-	return title(s.t.Name)
+	return s.t.Name
 }
 
 func (s setter) reassignElement() *Statement {

@@ -45,7 +45,7 @@ type adder struct {
 }
 
 func (a adder) receiverParams() *Statement {
-	return Id(a.receiverName()).Id(title(a.t.Name))
+	return Id(a.receiverName()).Id(a.t.Name)
 }
 
 func (a adder) name() string {
@@ -67,7 +67,7 @@ func (a adder) returns() string {
 	if a.f.ValueType.IsBasicType {
 		return ""
 	}
-	return title(a.f.ValueType.Name)
+	return a.f.ValueType.Name
 }
 
 func (a adder) reassignElement() *Statement {
@@ -82,7 +82,7 @@ func (a adder) earlyReturn() *Statement {
 	if a.f.ValueType.IsBasicType {
 		return Empty()
 	}
-	return Id(title(a.f.ValueType.Name)).Values(Dict{
+	return Id(a.f.ValueType.Name).Values(Dict{
 		Id(a.f.ValueType.Name): Id(a.f.ValueType.Name + "Core").Values(Dict{
 			Id("OperationKind_"): Id("OperationKindDelete"),
 		})})

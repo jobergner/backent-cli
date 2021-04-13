@@ -61,7 +61,7 @@ func (cw creatorWrapper) name() string {
 }
 
 func (cw creatorWrapper) returns() string {
-	return title(cw.t.Name)
+	return cw.t.Name
 }
 
 func (cw creatorWrapper) createElement() *Statement {
@@ -89,7 +89,7 @@ func (c creator) name() string {
 }
 
 func (c creator) returns() string {
-	return title(c.t.Name)
+	return c.t.Name
 }
 
 func (c creator) hasParentParam() string {
@@ -107,34 +107,34 @@ func (c creator) params() *Statement {
 }
 
 func (c creator) declareElement() *Statement {
-	return Var().Id(c.t.Name).Id(c.t.Name + "Core")
+	return Var().Id("element").Id(c.t.Name + "Core")
 }
 
 func (c creator) generateID() *Statement {
-	return Id(c.t.Name).Dot("ID").Op("=").Id(title(c.t.Name) + "ID").Call(Id("se").Dot("GenerateID").Call())
+	return Id("element").Dot("ID").Op("=").Id(title(c.t.Name) + "ID").Call(Id("se").Dot("GenerateID").Call())
 }
 
 func (c creator) setHasParent() *Statement {
-	return Id(c.t.Name).Dot("HasParent_").Op("=").Id(c.hasParentParam())
+	return Id("element").Dot("HasParent_").Op("=").Id(c.hasParentParam())
 }
 
 func (c creator) createChildElement() *Statement {
 	return Id("element" + title(c.f.Name)).Op(":=").Id("se").Dot("create" + title(c.f.ValueType.Name)).Call(Lit(true))
 }
 func (c creator) setChildElement() *Statement {
-	return Id(c.t.Name).Dot(title(c.f.Name)).Op("=").Id("element" + title(c.f.Name)).Dot(c.f.ValueType.Name).Dot("ID")
+	return Id("element").Dot(title(c.f.Name)).Op("=").Id("element" + title(c.f.Name)).Dot(c.f.ValueType.Name).Dot("ID")
 }
 
 func (c creator) setOperationKind() *Statement {
-	return Id(c.t.Name).Dot("OperationKind_").Op("=").Id("OperationKindUpdate")
+	return Id("element").Dot("OperationKind_").Op("=").Id("OperationKindUpdate")
 }
 
 func (c creator) updateElementInPatch() *Statement {
-	return Id("se").Dot("Patch").Dot(title(c.t.Name)).Index(Id(c.t.Name).Dot("ID")).Op("=").Id(c.t.Name)
+	return Id("se").Dot("Patch").Dot(title(c.t.Name)).Index(Id("element").Dot("ID")).Op("=").Id("element")
 }
 
 func (c creator) returnElement() *Statement {
-	return Id(title(c.t.Name)).Values(Dict{
-		Id(c.t.Name): Id(c.t.Name),
+	return Id(c.t.Name).Values(Dict{
+		Id(c.t.Name): Id("element"),
 	})
 }

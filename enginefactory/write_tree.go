@@ -38,7 +38,7 @@ func (s treeWriter) mapKey() *Statement {
 }
 
 func (s treeWriter) mapValue() string {
-	return "t" + title(s.t.Name)
+	return title(s.t.Name)
 }
 
 func (s treeWriter) fieldTag() string {
@@ -82,10 +82,10 @@ func (e treeElementWriter) fieldValue() string {
 	}
 
 	if e.f.HasSliceValue {
-		return "[]" + "t" + title(e.f.ValueType.Name)
+		return "[]" + title(e.f.ValueType.Name)
 	}
 
-	return "*" + "t" + title(e.f.ValueType.Name)
+	return "*" + title(e.f.ValueType.Name)
 }
 
 func (e treeElementWriter) fieldTag() string {
@@ -101,7 +101,7 @@ func (e treeElementWriter) fieldName() string {
 }
 
 func (e treeElementWriter) name() string {
-	return "t" + title(e.t.Name)
+	return title(e.t.Name)
 }
 
 func (e treeElementWriter) idType() string {
