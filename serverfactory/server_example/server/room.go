@@ -103,6 +103,7 @@ func (r *Room) runProcessingFrames() {
 		if err != nil {
 			log.Println(err)
 		}
+//TODO: state is being manipulated by actions and here (2 different routines) 
 		r.state.UpdateState()
 		err = r.answerInitRequests()
 		if err != nil {
