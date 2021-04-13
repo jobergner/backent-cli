@@ -1,9 +1,9 @@
 package state
 
-func (_zone Zone) AddPlayer(se *Engine) Player {
+func (_zone zone) AddPlayer(se *Engine) player {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
-		return Player{player: playerCore{OperationKind_: OperationKindDelete}}
+		return player{player: playerCore{OperationKind_: OperationKindDelete}}
 	}
 	player := se.createPlayer(true)
 	zone.zone.Players = append(zone.zone.Players, player.player.ID)
@@ -12,10 +12,10 @@ func (_zone Zone) AddPlayer(se *Engine) Player {
 	return player
 }
 
-func (_zone Zone) AddItem(se *Engine) ZoneItem {
+func (_zone zone) AddItem(se *Engine) zoneItem {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
-		return ZoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
+		return zoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
 	}
 	zoneItem := se.createZoneItem(true)
 	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
@@ -24,7 +24,7 @@ func (_zone Zone) AddItem(se *Engine) ZoneItem {
 	return zoneItem
 }
 
-func (_zone Zone) AddTags(se *Engine, tags ...string) {
+func (_zone zone) AddTags(se *Engine, tags ...string) {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return
@@ -34,10 +34,10 @@ func (_zone Zone) AddTags(se *Engine, tags ...string) {
 	se.Patch.Zone[zone.zone.ID] = zone.zone
 }
 
-func (_player Player) AddItem(se *Engine) Item {
+func (_player player) AddItem(se *Engine) item {
 	player := se.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
-		return Item{item: itemCore{OperationKind_: OperationKindDelete}}
+		return item{item: itemCore{OperationKind_: OperationKindDelete}}
 	}
 	item := se.createItem(true)
 	player.player.Items = append(player.player.Items, item.item.ID)

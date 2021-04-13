@@ -1,6 +1,6 @@
 package state
 
-func (_gearScore GearScore) SetLevel(se *Engine, newLevel int) GearScore {
+func (_gearScore gearScore) SetLevel(se *Engine, newLevel int) gearScore {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
 		return gearScore
@@ -11,7 +11,7 @@ func (_gearScore GearScore) SetLevel(se *Engine, newLevel int) GearScore {
 	return gearScore
 }
 
-func (_gearScore GearScore) SetScore(se *Engine, newScore int) GearScore {
+func (_gearScore gearScore) SetScore(se *Engine, newScore int) gearScore {
 	gearScore := se.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
 		return gearScore
@@ -22,7 +22,7 @@ func (_gearScore GearScore) SetScore(se *Engine, newScore int) GearScore {
 	return gearScore
 }
 
-func (_position Position) SetX(se *Engine, newX float64) Position {
+func (_position position) SetX(se *Engine, newX float64) position {
 	position := se.Position(_position.position.ID)
 	if position.position.OperationKind_ == OperationKindDelete {
 		return position
@@ -33,7 +33,7 @@ func (_position Position) SetX(se *Engine, newX float64) Position {
 	return position
 }
 
-func (_position Position) SetY(se *Engine, newY float64) Position {
+func (_position position) SetY(se *Engine, newY float64) position {
 	position := se.Position(_position.position.ID)
 	if position.position.OperationKind_ == OperationKindDelete {
 		return position

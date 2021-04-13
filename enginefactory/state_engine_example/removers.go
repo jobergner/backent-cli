@@ -1,6 +1,6 @@
 package state
 
-func (_zone Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
+func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
@@ -30,7 +30,7 @@ func (_zone Zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) Zone {
 	return zone
 }
 
-func (_zone Zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) Zone {
+func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
@@ -60,7 +60,7 @@ func (_zone Zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) Zone {
 	return zone
 }
 
-func (_player Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
+func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
 	player := se.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return player
@@ -90,7 +90,7 @@ func (_player Player) RemoveItems(se *Engine, itemsToRemove ...ItemID) Player {
 	return player
 }
 
-func (_zone Zone) RemoveTags(se *Engine, tagsToRemove ...string) Zone {
+func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
 	zone := se.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
