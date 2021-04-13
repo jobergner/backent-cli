@@ -20,7 +20,7 @@ type Room struct {
 func newRoom(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) *Room {
 	return &Room{
 		clients:              make(map[*Client]bool),
-		clientMessageChannel: make(chan message),
+		clientMessageChannel: make(chan message, 264),
 		registerChannel:      make(chan *Client),
 		unregisterChannel:    make(chan *Client),
 		incomingClients:      make(map[*Client]bool),
@@ -95,32 +95,55 @@ func (r *Room) promoteIncomingClients() {
 	}
 }
 
+func (r *Room) processFrame() error {
+	for msg := range r.clientMessageChannel {
+		err := r.processClientMessage(msg)
+		if err != nil {
+			return err
+		}
+	}
+
+	r.onFrameTick(r.state)
+
+	return nil
+}
+
+func (r *Room) publishPatch() error {
+	patchBytes, err := r.state.Patch.MarshalJSON()
+	if err != nil {
+		return err
+	}
+	//TODO: state is being manipulated by actions and here (2 different routines)
+	err = r.broadcastPatchToClients(patchBytes)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Room) handleIncomingClients() error {
+	err := r.answerInitRequests()
+	if err != nil {
+		return err
+	}
+	r.promoteIncomingClients()
+	return nil
+}
+
 func (r *Room) runProcessingFrames() {
 	ticker := time.NewTicker(time.Second)
 	for {
 		<-ticker.C
-		patchBytes, err := r.state.Patch.MarshalJSON()
+		err := r.processFrame()
 		if err != nil {
 			log.Println(err)
 		}
-//TODO: state is being manipulated by actions and here (2 different routines) 
+		err = r.publishPatch()
+		if err != nil {
+			log.Println(err)
+		}
 		r.state.UpdateState()
-		err = r.answerInitRequests()
-		if err != nil {
-			log.Println(err)
-		}
-		r.promoteIncomingClients()
-		err = r.broadcastPatchToClients(patchBytes)
-		if err != nil {
-			log.Println(err)
-		}
-	}
-}
-
-func (r *Room) runWatchClientMessages() {
-	for {
-		msg := <-r.clientMessageChannel
-		err := r.processClientMessage(msg)
+		err = r.handleIncomingClients()
 		if err != nil {
 			log.Println(err)
 		}
@@ -130,6 +153,5 @@ func (r *Room) runWatchClientMessages() {
 func (r *Room) Deploy() {
 	r.onDeploy(r.state)
 	go r.runHandleConnections()
-	go r.runWatchClientMessages()
 	go r.runProcessingFrames()
 }

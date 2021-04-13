@@ -37,7 +37,12 @@ func (c *Client) assignToRoom(room *Room) {
 }
 
 func (c *Client) forwardToRoom(msg message) {
-	c.room.clientMessageChannel <- msg
+	select {
+	case c.room.clientMessageChannel <- msg:
+	default:
+		// TODO what do?
+		log.Println("message dropped")
+	}
 }
 
 func (c *Client) runReadMessages() {

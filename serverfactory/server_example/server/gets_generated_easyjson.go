@@ -103,15 +103,15 @@ func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer1(in *jlexer.Le
 				in.Delim('[')
 				if out.Items == nil {
 					if !in.IsDelim(']') {
-						out.Items = make([]tItem, 0, 2)
+						out.Items = make([]TITem, 0, 2)
 					} else {
-						out.Items = []tItem{}
+						out.Items = []TITem{}
 					}
 				} else {
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v1 tItem
+					var v1 TITem
 					easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in, &v1)
 					out.Items = append(out.Items, v1)
 					in.WantComma()
@@ -174,7 +174,7 @@ func (v *_spawnZoneItemsParams) UnmarshalJSON(data []byte) error {
 func (v *_spawnZoneItemsParams) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer1(l, v)
 }
-func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in *jlexer.Lexer, out *tItem) {
+func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in *jlexer.Lexer, out *TITem) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -217,7 +217,7 @@ func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in *jlexer.Le
 		in.Consumed()
 	}
 }
-func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(out *jwriter.Writer, in tItem) {
+func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(out *jwriter.Writer, in TITem) {
 	out.RawByte('{')
 	first := true
 	_ = first

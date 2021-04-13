@@ -645,7 +645,7 @@ func (_position Position) SetY(se *Engine, newY float64) Position {
 
 type Tree struct {
 	GearScore map[GearScoreID]tGearScore `json:"gearScore"`
-	Item      map[ItemID]tItem           `json:"item"`
+	Item      map[ItemID]TITem           `json:"item"`
 	Player    map[PlayerID]tPlayer       `json:"player"`
 	Position  map[PositionID]tPosition   `json:"position"`
 	Zone      map[ZoneID]tZone           `json:"zone"`
@@ -653,7 +653,7 @@ type Tree struct {
 }
 
 func newTree() Tree {
-	return Tree{GearScore: make(map[GearScoreID]tGearScore), Item: make(map[ItemID]tItem), Player: make(map[PlayerID]tPlayer), Position: make(map[PositionID]tPosition), Zone: make(map[ZoneID]tZone), ZoneItem: make(map[ZoneItemID]tZoneItem)}
+	return Tree{GearScore: make(map[GearScoreID]tGearScore), Item: make(map[ItemID]TITem), Player: make(map[PlayerID]tPlayer), Position: make(map[PositionID]tPosition), Zone: make(map[ZoneID]tZone), ZoneItem: make(map[ZoneItemID]tZoneItem)}
 }
 
 type tGearScore struct {
@@ -662,7 +662,7 @@ type tGearScore struct {
 	Score          int           `json:"score"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
-type tItem struct {
+type TITem struct {
 	ID             ItemID        `json:"id"`
 	GearScore      *tGearScore   `json:"gearScore"`
 	OperationKind_ OperationKind `json:"operationKind_"`
@@ -670,7 +670,7 @@ type tItem struct {
 type tPlayer struct {
 	ID             PlayerID      `json:"id"`
 	GearScore      *tGearScore   `json:"gearScore"`
-	Items          []tItem       `json:"items"`
+	Items          []TITem       `json:"items"`
 	Position       *tPosition    `json:"position"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
@@ -689,7 +689,7 @@ type tZone struct {
 }
 type tZoneItem struct {
 	ID             ZoneItemID    `json:"id"`
-	Item           *tItem        `json:"item"`
+	Item           *TITem        `json:"item"`
 	Position       *tPosition    `json:"position"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
@@ -814,12 +814,12 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (tGearScore, bool) 
 	treeGearScore.Score = gearScore.Score
 	return treeGearScore, true
 }
-func (se *Engine) assembleItem(itemID ItemID) (tItem, bool) {
+func (se *Engine) assembleItem(itemID ItemID) (TITem, bool) {
 	item, hasUpdated := se.Patch.Item[itemID]
 	if !hasUpdated {
 		item = se.State.Item[itemID]
 	}
-	var treeItem tItem
+	var treeItem TITem
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(item.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
 		treeItem.GearScore = &treeGearScore
