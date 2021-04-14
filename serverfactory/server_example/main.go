@@ -11,7 +11,7 @@ func main() {
 			log.Println("moving player..")
 			e.Player(a).Position(e).SetX(e, x)
 		},
-		func(state.TITem, state.PlayerID, *state.Engine) {}, func([]state.TITem, *state.Engine) {},
+		func(state.Item, state.PlayerID, *state.Engine) {}, func([]state.Item, *state.Engine) {},
 		func(*state.Engine) {},
 		func(*state.Engine) {},
 	)
