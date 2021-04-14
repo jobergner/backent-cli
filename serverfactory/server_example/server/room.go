@@ -44,7 +44,6 @@ func (r *Room) unregisterClient(client *Client) {
 }
 
 func (r *Room) broadcastPatchToClients(patchBytes []byte) error {
-
 	for client := range r.clients {
 		select {
 		case client.messageChannel <- patchBytes:
@@ -96,10 +95,16 @@ func (r *Room) promoteIncomingClients() {
 }
 
 func (r *Room) processFrame() error {
-	for msg := range r.clientMessageChannel {
-		err := r.processClientMessage(msg)
-		if err != nil {
-			return err
+Exit:
+	for {
+		select {
+		case msg := <-r.clientMessageChannel:
+			err := r.processClientMessage(msg)
+			if err != nil {
+				return err
+			}
+		default:
+			break Exit
 		}
 	}
 
@@ -113,7 +118,6 @@ func (r *Room) publishPatch() error {
 	if err != nil {
 		return err
 	}
-	//TODO: state is being manipulated by actions and here (2 different routines)
 	err = r.broadcastPatchToClients(patchBytes)
 	if err != nil {
 		return err

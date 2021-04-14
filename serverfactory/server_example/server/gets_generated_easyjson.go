@@ -103,16 +103,16 @@ func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer1(in *jlexer.Le
 				in.Delim('[')
 				if out.Items == nil {
 					if !in.IsDelim(']') {
-						out.Items = make([]TITem, 0, 2)
+						out.Items = make([]Item, 0, 2)
 					} else {
-						out.Items = []TITem{}
+						out.Items = []Item{}
 					}
 				} else {
 					out.Items = (out.Items)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v1 TITem
-					easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in, &v1)
+					var v1 Item
+					(v1).UnmarshalEasyJSON(in)
 					out.Items = append(out.Items, v1)
 					in.WantComma()
 				}
@@ -132,18 +132,17 @@ func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer1(out *jwriter.
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if len(in.Items) != 0 {
 		const prefix string = ",\"items\":"
+		first = false
 		out.RawString(prefix[1:])
-		if in.Items == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
+		{
 			out.RawByte('[')
 			for v2, v3 := range in.Items {
 				if v2 > 0 {
 					out.RawByte(',')
 				}
-				easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(out, v3)
+				(v3).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -174,138 +173,7 @@ func (v *_spawnZoneItemsParams) UnmarshalJSON(data []byte) error {
 func (v *_spawnZoneItemsParams) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer1(l, v)
 }
-func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in *jlexer.Lexer, out *TITem) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "id":
-			out.ID = ItemID(in.Int())
-		case "gearScore":
-			if in.IsNull() {
-				in.Skip()
-				out.GearScore = nil
-			} else {
-				if out.GearScore == nil {
-					out.GearScore = new(tGearScore)
-				}
-				easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer3(in, out.GearScore)
-			}
-		case "operationKind_":
-			out.OperationKind_ = OperationKind(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(out *jwriter.Writer, in TITem) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"id\":"
-		out.RawString(prefix[1:])
-		out.Int(int(in.ID))
-	}
-	{
-		const prefix string = ",\"gearScore\":"
-		out.RawString(prefix)
-		if in.GearScore == nil {
-			out.RawString("null")
-		} else {
-			easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer3(out, *in.GearScore)
-		}
-	}
-	{
-		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
-		out.String(string(in.OperationKind_))
-	}
-	out.RawByte('}')
-}
-func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer3(in *jlexer.Lexer, out *tGearScore) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "id":
-			out.ID = GearScoreID(in.Int())
-		case "level":
-			out.Level = int(in.Int())
-		case "score":
-			out.Score = int(in.Int())
-		case "operationKind_":
-			out.OperationKind_ = OperationKind(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer3(out *jwriter.Writer, in tGearScore) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"id\":"
-		out.RawString(prefix[1:])
-		out.Int(int(in.ID))
-	}
-	{
-		const prefix string = ",\"level\":"
-		out.RawString(prefix)
-		out.Int(int(in.Level))
-	}
-	{
-		const prefix string = ",\"score\":"
-		out.RawString(prefix)
-		out.Int(int(in.Score))
-	}
-	{
-		const prefix string = ",\"operationKind_\":"
-		out.RawString(prefix)
-		out.String(string(in.OperationKind_))
-	}
-	out.RawByte('}')
-}
-func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer4(in *jlexer.Lexer, out *_addItemToPlayerParams) {
+func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in *jlexer.Lexer, out *_addItemToPlayerParams) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -325,7 +193,7 @@ func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer4(in *jlexer.Le
 		}
 		switch key {
 		case "item":
-			easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(in, &out.Item)
+			(out.Item).UnmarshalEasyJSON(in)
 		case "playerID":
 			out.PlayerID = PlayerID(in.Int())
 		default:
@@ -338,18 +206,24 @@ func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer4(in *jlexer.Le
 		in.Consumed()
 	}
 }
-func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer4(out *jwriter.Writer, in _addItemToPlayerParams) {
+func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(out *jwriter.Writer, in _addItemToPlayerParams) {
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if true {
 		const prefix string = ",\"item\":"
+		first = false
 		out.RawString(prefix[1:])
-		easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(out, in.Item)
+		(in.Item).MarshalEasyJSON(out)
 	}
-	{
+	if in.PlayerID != 0 {
 		const prefix string = ",\"playerID\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int(int(in.PlayerID))
 	}
 	out.RawByte('}')
@@ -358,27 +232,27 @@ func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer4(out *jwriter.
 // MarshalJSON supports json.Marshaler interface
 func (v _addItemToPlayerParams) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer4(&w, v)
+	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _addItemToPlayerParams) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer4(w, v)
+	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_addItemToPlayerParams) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer4(&r, v)
+	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_addItemToPlayerParams) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer4(l, v)
+	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer2(l, v)
 }
-func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer5(in *jlexer.Lexer, out *_MovePlayerParams) {
+func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer3(in *jlexer.Lexer, out *_MovePlayerParams) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -413,23 +287,34 @@ func easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer5(in *jlexer.Le
 		in.Consumed()
 	}
 }
-func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer5(out *jwriter.Writer, in _MovePlayerParams) {
+func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer3(out *jwriter.Writer, in _MovePlayerParams) {
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.PlayerID != 0 {
 		const prefix string = ",\"playerID\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int(int(in.PlayerID))
 	}
-	{
+	if in.ChangeX != 0 {
 		const prefix string = ",\"changeX\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Float64(float64(in.ChangeX))
 	}
-	{
+	if in.ChangeY != 0 {
 		const prefix string = ",\"changeY\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Float64(float64(in.ChangeY))
 	}
 	out.RawByte('}')
@@ -438,23 +323,23 @@ func easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer5(out *jwriter.
 // MarshalJSON supports json.Marshaler interface
 func (v _MovePlayerParams) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer5(&w, v)
+	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v _MovePlayerParams) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer5(w, v)
+	easyjson48d448a9EncodeBarCliServerfactoryServerExampleServer3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *_MovePlayerParams) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer5(&r, v)
+	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *_MovePlayerParams) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer5(l, v)
+	easyjson48d448a9DecodeBarCliServerfactoryServerExampleServer3(l, v)
 }

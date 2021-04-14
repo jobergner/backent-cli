@@ -19,18 +19,18 @@ type _MovePlayerParams struct {
 }
 
 type _addItemToPlayerParams struct {
-	Item     TITem    `json:"item"`
+	Item     Item     `json:"item"`
 	PlayerID PlayerID `json:"playerID"`
 }
 
 type _spawnZoneItemsParams struct {
-	Items []TITem `json:"items"`
+	Items []Item `json:"items"`
 }
 
 type actions struct {
 	movePlayer           func(PlayerID, float64, float64, *Engine)
-	addItemToPlayer      func(TITem, PlayerID, *Engine)
-	spawnZoneItemsParams func([]TITem, *Engine)
+	addItemToPlayer      func(Item, PlayerID, *Engine)
+	spawnZoneItemsParams func([]Item, *Engine)
 }
 
 func (r *Room) processClientMessage(msg message) error {
@@ -65,8 +65,8 @@ func (r *Room) processClientMessage(msg message) error {
 
 func Start(
 	movePlayer func(PlayerID, float64, float64, *Engine),
-	addItemToPlayer func(TITem, PlayerID, *Engine),
-	spawnZoneItemsParams func([]TITem, *Engine),
+	addItemToPlayer func(Item, PlayerID, *Engine),
+	spawnZoneItemsParams func([]Item, *Engine),
 	onDeploy func(*Engine),
 	onFrameTick func(*Engine),
 ) {
