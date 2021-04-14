@@ -52,6 +52,13 @@ func TestEngine(t *testing.T) {
 		_item := se.Patch.Item[item.ID(se)]
 		assert.Equal(t, OperationKindDelete, _item.OperationKind_)
 	})
+	t.Run("does not allow creation if element by 'getting' an non-existing one", func(t *testing.T) {
+		se := newEngine()
+		gearScore := se.GearScore(GearScoreID(999))
+		gearScore.SetLevel(se, 2)
+		gearScoreLevel := se.Patch.GearScore[GearScoreID(0)].Level
+		assert.NotEqual(t, gearScoreLevel, 2)
+	})
 }
 
 func TestUpdateState(t *testing.T) {
