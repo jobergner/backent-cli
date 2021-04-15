@@ -12,6 +12,15 @@ type ServerFactory struct {
 	buf    *bytes.Buffer
 }
 
+func (s ServerFactory) isIDTypeOfType(typeName string) bool {
+	for _, configType := range s.config.Types {
+		if configType.Name+"ID" == typeName {
+			return true
+		}
+	}
+	return false
+}
+
 func newServerFactory(config *ast.AST) *ServerFactory {
 	return &ServerFactory{
 		config: config,
