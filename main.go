@@ -13,7 +13,7 @@ func check(err error) {
 	}
 }
 
-func scanFiles(directoryPath, excludedIdentifier string) []inputFile {
+func scanFiles(directoryPath, excludedIdentifier, onlyIdentifier string) []inputFile {
 	var files []inputFile
 	excludeExp := regexp.MustCompile(excludedIdentifier)
 
@@ -28,6 +28,9 @@ func scanFiles(directoryPath, excludedIdentifier string) []inputFile {
 			continue
 		}
 		if excludeExp.MatchString(fileName) {
+			continue
+		}
+		if onlyIdentifier != "" && fileName != onlyIdentifier {
 			continue
 		}
 
@@ -46,9 +49,10 @@ func main() {
 	packageName := flag.String("package", "main", "package name")
 	outputDeclsPrefix := flag.String("prefix", "", "prefix of output declaraton names")
 	excludedIdentifier := flag.String("exclude", "$^", "files to exclude")
+	onlyIdentifier := flag.String("only", "", "the only file to include")
 	flag.Parse()
 
-	inputFiles := scanFiles(*inputDirectoryFlag, *excludedIdentifier)
+	inputFiles := scanFiles(*inputDirectoryFlag, *excludedIdentifier, *onlyIdentifier)
 	outputFile := newOutputFile(*outputFileName, *outputDeclsPrefix, *packageName)
 	for _, inputFile := range inputFiles {
 		for _, decl := range inputFile.decls {
