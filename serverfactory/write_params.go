@@ -17,7 +17,7 @@ func (s *ServerFactory) writeParameters() *ServerFactory {
 
 		decls.File.Type().Id("_" + action.Name + "Params").Struct(ForEachParamInAction(action, func(param ast.Field) *Statement {
 			p.p = &param
-			return Id(p.fieldName()).Id(p.paramType()).Id(p.fieldTag())
+			return Id(p.fieldName()).Id(p.paramType(s)).Id(p.fieldTag())
 		}))
 	})
 
@@ -34,15 +34,15 @@ func (p paramsWriter) fieldName() string {
 	return title(p.p.Name)
 }
 
-func (p paramsWriter) paramType() string {
-	var s string
+func (p paramsWriter) paramType(s *ServerFactory) string {
+	var typeName string
 	if p.p.HasSliceValue {
-		s += "[]"
+		typeName += "[]"
 	}
-	if p.p.ValueType.IsBasicType {
-		return s + p.p.ValueType.Name
+	if s.isIDTypeOfType(p.p.ValueType.Name) || !p.p.ValueType.IsBasicType {
+		return typeName + title(p.p.ValueType.Name)
 	}
-	return s + title(p.p.ValueType.Name)
+	return typeName + p.p.ValueType.Name
 }
 
 func (p paramsWriter) fieldTag() string {
