@@ -251,6 +251,10 @@ Writing code generation with jennifer was tedious but the written code is very m
 ### actions convenience
 the user should be able to pass entire objects as parameters instead of destructuring objects into many parameters in order to conveniently have all the data available on the server
 
+### 'getting' non-existing element
+'getting' a non existing element may lead to the creation of an element with the ID 0 when a 'setter' is used on it. To avoid this 'getters' will return an 
+element with OperationKindDelete when asked to return a non-existing element, so all manipulating operations know not to put it in the patch.
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)

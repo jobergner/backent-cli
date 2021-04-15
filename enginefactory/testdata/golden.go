@@ -356,8 +356,11 @@ func (se *Engine) GearScore(gearScoreID GearScoreID) gearScore {
 	if ok {
 		return gearScore{gearScore: patchingGearScore}
 	}
-	currentGearScore := se.State.GearScore[gearScoreID]
-	return gearScore{gearScore: currentGearScore}
+	currentGearScore, ok := se.State.GearScore[gearScoreID]
+	if ok {
+		return gearScore{gearScore: currentGearScore}
+	}
+	return gearScore{gearScore: gearScoreCore{OperationKind_: OperationKindDelete}}
 }
 func (_gearScore gearScore) ID(se *Engine) GearScoreID {
 	return _gearScore.gearScore.ID
@@ -375,8 +378,11 @@ func (se *Engine) Item(itemID ItemID) item {
 	if ok {
 		return item{item: patchingItem}
 	}
-	currentItem := se.State.Item[itemID]
-	return item{item: currentItem}
+	currentItem, ok := se.State.Item[itemID]
+	if ok {
+		return item{item: currentItem}
+	}
+	return item{item: itemCore{OperationKind_: OperationKindDelete}}
 }
 func (_item item) ID(se *Engine) ItemID {
 	return _item.item.ID
@@ -390,8 +396,11 @@ func (se *Engine) Player(playerID PlayerID) player {
 	if ok {
 		return player{player: patchingPlayer}
 	}
-	currentPlayer := se.State.Player[playerID]
-	return player{player: currentPlayer}
+	currentPlayer, ok := se.State.Player[playerID]
+	if ok {
+		return player{player: currentPlayer}
+	}
+	return player{player: playerCore{OperationKind_: OperationKindDelete}}
 }
 func (_player player) ID(se *Engine) PlayerID {
 	return _player.player.ID
@@ -417,8 +426,11 @@ func (se *Engine) Position(positionID PositionID) position {
 	if ok {
 		return position{position: patchingPosition}
 	}
-	currentPosition := se.State.Position[positionID]
-	return position{position: currentPosition}
+	currentPosition, ok := se.State.Position[positionID]
+	if ok {
+		return position{position: currentPosition}
+	}
+	return position{position: positionCore{OperationKind_: OperationKindDelete}}
 }
 func (_position position) ID(se *Engine) PositionID {
 	return _position.position.ID
@@ -436,8 +448,11 @@ func (se *Engine) Zone(zoneID ZoneID) zone {
 	if ok {
 		return zone{zone: patchingZone}
 	}
-	currentZone := se.State.Zone[zoneID]
-	return zone{zone: currentZone}
+	currentZone, ok := se.State.Zone[zoneID]
+	if ok {
+		return zone{zone: currentZone}
+	}
+	return zone{zone: zoneCore{OperationKind_: OperationKindDelete}}
 }
 func (_zone zone) ID(se *Engine) ZoneID {
 	return _zone.zone.ID
@@ -471,8 +486,11 @@ func (se *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
 	if ok {
 		return zoneItem{zoneItem: patchingZoneItem}
 	}
-	currentZoneItem := se.State.ZoneItem[zoneItemID]
-	return zoneItem{zoneItem: currentZoneItem}
+	currentZoneItem, ok := se.State.ZoneItem[zoneItemID]
+	if ok {
+		return zoneItem{zoneItem: currentZoneItem}
+	}
+	return zoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
 }
 func (_zoneItem zoneItem) ID(se *Engine) ZoneItemID {
 	return _zoneItem.zoneItem.ID
