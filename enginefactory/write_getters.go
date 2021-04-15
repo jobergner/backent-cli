@@ -17,9 +17,12 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 		decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
 			t.definePatchingElement(),
 			If(Id("ok")).Block(
-				Return(t.earlyReturn()),
+				Return(t.earlyReturnPatching()),
 			),
 			t.defineCurrentElement(),
+			If(Id("ok")).Block(
+				Return(t.earlyReturnCurrent()),
+			),
 			Return(t.finalReturn()),
 		)
 
@@ -84,16 +87,20 @@ func (t typeGetter) definePatchingElement() *Statement {
 	return List(Id("patching"+title(t.t.Name)), Id("ok")).Op(":=").Id("se").Dot("Patch").Dot(title(t.t.Name)).Index(Id(t.idParam()))
 }
 
-func (t typeGetter) earlyReturn() *Statement {
+func (t typeGetter) earlyReturnPatching() *Statement {
 	return Id(t.t.Name).Values(Dict{Id(t.t.Name): Id("patching" + title(t.t.Name))})
 }
 
 func (t typeGetter) defineCurrentElement() *Statement {
-	return Id("current" + title(t.t.Name)).Op(":=").Id("se").Dot("State").Dot(title(t.t.Name)).Index(Id(t.idParam()))
+	return List(Id("current"+title(t.t.Name)), Id("ok")).Op(":=").Id("se").Dot("State").Dot(title(t.t.Name)).Index(Id(t.idParam()))
+}
+
+func (t typeGetter) earlyReturnCurrent() *Statement {
+	return Id(t.t.Name).Values(Dict{Id(t.t.Name): Id("current" + title(t.t.Name))})
 }
 
 func (t typeGetter) finalReturn() *Statement {
-	return Id(t.t.Name).Values(Dict{Id(t.t.Name): Id("current" + title(t.t.Name))})
+	return Id(t.t.Name).Values(Dict{Id(t.t.Name): Id(t.t.Name + "Core").Values(Dict{Id("OperationKind_"): Id("OperationKindDelete")})})
 }
 
 type idGetter struct {
