@@ -50,6 +50,28 @@ type Action struct {
 	Params map[string]Field
 }
 
+func (a *AST) RangeActions(fn func(action Action)) {
+	var keys []string
+	for key := range a.Actions {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fn(a.Actions[key])
+	}
+}
+
+func (a *Action) RangeParams(fn func(field Field)) {
+	var keys []string
+	for key := range a.Params {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fn(a.Params[key])
+	}
+}
+
 type Field struct {
 	Name          string
 	ValueType     *ConfigType // references the field's value's Type

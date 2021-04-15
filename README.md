@@ -258,11 +258,8 @@ element with OperationKindDelete when asked to return a non-existing element, so
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
-- golden files for generated code
-- what happens if the user 'gets' an element that isnt there and manipulates it
 - in engine use easyjson comments only for required structs eg
 ```
 //easyjson:json
 type A struct {}
 ```
-- treeitems need to be exported to be used as action parameters

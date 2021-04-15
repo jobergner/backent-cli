@@ -13,9 +13,9 @@ const (
 )
 
 type _MovePlayerParams struct {
-	PlayerID PlayerID `json:"playerID"`
 	ChangeX  float64  `json:"changeX"`
 	ChangeY  float64  `json:"changeY"`
+	PlayerID PlayerID `json:"playerID"`
 }
 
 type _addItemToPlayerParams struct {
