@@ -28,9 +28,9 @@ type _spawnZoneItemsParams struct {
 }
 
 type actions struct {
-	movePlayer           func(PlayerID, float64, float64, *Engine)
-	addItemToPlayer      func(Item, PlayerID, *Engine)
-	spawnZoneItemsParams func([]Item, *Engine)
+	MovePlayer      func(PlayerID, float64, float64, *Engine)
+	addItemToPlayer func(Item, PlayerID, *Engine)
+	spawnZoneItems  func([]Item, *Engine)
 }
 
 func (r *Room) processClientMessage(msg message) error {
@@ -48,14 +48,14 @@ func (r *Room) processClientMessage(msg message) error {
 		if err != nil {
 			return err
 		}
-		r.actions.movePlayer(params.PlayerID, params.ChangeX, params.ChangeY, r.state)
+		r.actions.MovePlayer(params.PlayerID, params.ChangeX, params.ChangeY, r.state)
 	case messageKindAction_spawnZoneItems:
 		var params _spawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.spawnZoneItemsParams(params.Items, r.state)
+		r.actions.spawnZoneItems(params.Items, r.state)
 	default:
 		return errors.New("unknown message kind")
 	}
