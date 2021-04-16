@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strings"
 )
 
 // AST is an abstract syntax tree of a state and actions configuration.
@@ -20,7 +21,7 @@ func (a *AST) RangeTypes(fn func(configType ConfigType)) {
 	for key := range a.Types {
 		keys = append(keys, key)
 	}
-	sort.Strings(keys)
+	sort.Slice(keys, caseInsensitiveSort(keys))
 	for _, key := range keys {
 		fn(a.Types[key])
 	}
@@ -39,7 +40,7 @@ func (t *ConfigType) RangeFields(fn func(field Field)) {
 	for key := range t.Fields {
 		keys = append(keys, key)
 	}
-	sort.Strings(keys)
+	sort.Slice(keys, caseInsensitiveSort(keys))
 	for _, key := range keys {
 		fn(t.Fields[key])
 	}
@@ -55,7 +56,7 @@ func (a *AST) RangeActions(fn func(action Action)) {
 	for key := range a.Actions {
 		keys = append(keys, key)
 	}
-	sort.Strings(keys)
+	sort.Slice(keys, caseInsensitiveSort(keys))
 	for _, key := range keys {
 		fn(a.Actions[key])
 	}
@@ -66,9 +67,15 @@ func (a *Action) RangeParams(fn func(field Field)) {
 	for key := range a.Params {
 		keys = append(keys, key)
 	}
-	sort.Strings(keys)
+	sort.Slice(keys, caseInsensitiveSort(keys))
 	for _, key := range keys {
 		fn(a.Params[key])
+	}
+}
+
+func caseInsensitiveSort(keys []string) func(i, j int) bool {
+	return func(i, j int) bool {
+		return strings.ToLower(keys[i]) < strings.ToLower(keys[j])
 	}
 }
 

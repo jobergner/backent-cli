@@ -14,7 +14,7 @@ func newSimpleASTExample() *ast.AST {
 }
 
 func TestWriteParameters(t *testing.T) {
-	t.Run("writes deduplicate", func(t *testing.T) {
+	t.Run("writes parameters", func(t *testing.T) {
 		sf := newServerFactory(newSimpleASTExample())
 		sf.writeParameters()
 

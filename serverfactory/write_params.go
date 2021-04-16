@@ -15,7 +15,7 @@ func (s *ServerFactory) writeParameters() *ServerFactory {
 			a: action,
 		}
 
-		decls.File.Type().Id("_" + action.Name + "Params").Struct(ForEachParamInAction(action, func(param ast.Field) *Statement {
+		decls.File.Type().Id(p.name()).Struct(ForEachParamInAction(action, func(param ast.Field) *Statement {
 			p.p = &param
 			return Id(p.fieldName()).Id(p.paramType(s)).Id(p.fieldTag())
 		}))
@@ -28,6 +28,10 @@ func (s *ServerFactory) writeParameters() *ServerFactory {
 type paramsWriter struct {
 	a ast.Action
 	p *ast.Field
+}
+
+func (p paramsWriter) name() string {
+	return "_" + p.a.Name + "Params"
 }
 
 func (p paramsWriter) fieldName() string {

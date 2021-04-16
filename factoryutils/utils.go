@@ -35,6 +35,15 @@ func ForEachTypeInAST(config *ast.AST, fn func(configType ast.ConfigType) *jen.S
 	return &statements
 }
 
+func ForEachActionInAST(config *ast.AST, fn func(action ast.Action) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	config.RangeActions(func(action ast.Action) {
+		statements = append(statements, fn(action))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 type DeclSet struct {
 	File *jen.File
 }

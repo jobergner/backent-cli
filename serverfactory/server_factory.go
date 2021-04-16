@@ -12,6 +12,11 @@ type ServerFactory struct {
 	buf    *bytes.Buffer
 }
 
+// isIDTypeOfType evaluates whether a given type name is the respective ID-Type
+// of a user-defined type.
+// Background:
+// Every user-defined type has a generated ID type.
+// E.g. a defined type "person" has its ID-Type "PersonID" generated automatically
 func (s ServerFactory) isIDTypeOfType(typeName string) bool {
 	for _, configType := range s.config.Types {
 		if configType.Name+"ID" == typeName {
