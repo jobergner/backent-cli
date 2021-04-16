@@ -54,7 +54,7 @@ func (p processClientMessageWriter) actionMessageKind() string {
 }
 
 func (p processClientMessageWriter) declareParams() *Statement {
-	return Var().Id("params").Id("_" + p.a.Name + "Params")
+	return Var().Id("params").Id(title(p.a.Name) + "Params")
 }
 
 func (p processClientMessageWriter) unmarshalMessageContent() *Statement {
@@ -62,10 +62,5 @@ func (p processClientMessageWriter) unmarshalMessageContent() *Statement {
 }
 
 func (p processClientMessageWriter) callAction() *Statement {
-	return Id("r").Dot("actions").Dot(p.a.Name).Call(
-		ForEachParamInAction(*p.a, func(param ast.Field) *Statement {
-			p.p = &param
-			return Id("params").Dot(p.p.Name).Id(",")
-		}).Id("r").Dot("state"),
-	)
+	return Id("r").Dot("actions").Dot(p.a.Name).Call(Id("params"), Id("r").Dot("state"))
 }

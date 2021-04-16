@@ -7,11 +7,12 @@ import (
 
 func main() {
 	state.Start(
-		func(a state.PlayerID, x float64, y float64, e *state.Engine) {
+		func(p state.MovePlayerParams, e *state.Engine) {
 			log.Println("moving player..")
-			e.Player(a).Position(e).SetX(e, x)
+			e.Player(p.PlayerID).Position(e).SetX(e, p.ChangeX)
 		},
-		func(state.Item, state.PlayerID, *state.Engine) {}, func([]state.Item, *state.Engine) {},
+		func(a state.AddItemToPlayerParams, e *state.Engine) {},
+		func(a state.SpawnZoneItemsParams, e *state.Engine) {},
 		func(*state.Engine) {},
 		func(*state.Engine) {},
 	)

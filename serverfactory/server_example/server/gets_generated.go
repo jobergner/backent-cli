@@ -12,50 +12,50 @@ const (
 	messageKindAction_spawnZoneItems
 )
 
-type _MovePlayerParams struct {
+type MovePlayerParams struct {
 	ChangeX  float64  `json:"changeX"`
 	ChangeY  float64  `json:"changeY"`
 	PlayerID PlayerID `json:"playerID"`
 }
 
-type _addItemToPlayerParams struct {
+type AddItemToPlayerParams struct {
 	Item     Item     `json:"item"`
 	PlayerID PlayerID `json:"playerID"`
 }
 
-type _spawnZoneItemsParams struct {
+type SpawnZoneItemsParams struct {
 	Items []Item `json:"items"`
 }
 
 type actions struct {
-	MovePlayer      func(PlayerID, float64, float64, *Engine)
-	addItemToPlayer func(Item, PlayerID, *Engine)
-	spawnZoneItems  func([]Item, *Engine)
+	MovePlayer      func(MovePlayerParams, *Engine)
+	addItemToPlayer func(AddItemToPlayerParams, *Engine)
+	spawnZoneItems  func(SpawnZoneItemsParams, *Engine)
 }
 
 func (r *Room) processClientMessage(msg message) error {
 	switch messageKind(msg.Kind) {
 	case messageKindAction_addItemToPlayer:
-		var params _addItemToPlayerParams
+		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.addItemToPlayer(params.Item, params.PlayerID, r.state)
+		r.actions.addItemToPlayer(params, r.state)
 	case messageKindAction_MovePlayer:
-		var params _MovePlayerParams
+		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.MovePlayer(params.PlayerID, params.ChangeX, params.ChangeY, r.state)
+		r.actions.MovePlayer(params, r.state)
 	case messageKindAction_spawnZoneItems:
-		var params _spawnZoneItemsParams
+		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.spawnZoneItems(params.Items, r.state)
+		r.actions.spawnZoneItems(params, r.state)
 	default:
 		return errors.New("unknown message kind")
 	}
@@ -64,9 +64,9 @@ func (r *Room) processClientMessage(msg message) error {
 }
 
 func Start(
-	movePlayer func(PlayerID, float64, float64, *Engine),
-	addItemToPlayer func(Item, PlayerID, *Engine),
-	spawnZoneItemsParams func([]Item, *Engine),
+	movePlayer func(MovePlayerParams, *Engine),
+	addItemToPlayer func(AddItemToPlayerParams, *Engine),
+	spawnZoneItemsParams func(SpawnZoneItemsParams, *Engine),
 	onDeploy func(*Engine),
 	onFrameTick func(*Engine),
 ) {

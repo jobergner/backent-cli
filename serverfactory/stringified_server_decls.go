@@ -14,57 +14,57 @@ const messageKindAction_MovePlayer_type string = `const (
 	messageKindAction_spawnZoneItems
 )`
 
-const __MovePlayerParams_type string = `type _MovePlayerParams struct {
+const _MovePlayerParams_type string = `type MovePlayerParams struct {
 	ChangeX		float64		` + "`" + `json:"changeX"` + "`" + `
 	ChangeY		float64		` + "`" + `json:"changeY"` + "`" + `
 	PlayerID	PlayerID	` + "`" + `json:"playerID"` + "`" + `
 }`
 
-const __addItemToPlayerParams_type string = `type _addItemToPlayerParams struct {
+const _AddItemToPlayerParams_type string = `type AddItemToPlayerParams struct {
 	Item		Item		` + "`" + `json:"item"` + "`" + `
 	PlayerID	PlayerID	` + "`" + `json:"playerID"` + "`" + `
 }`
 
-const __spawnZoneItemsParams_type string = `type _spawnZoneItemsParams struct {
+const _SpawnZoneItemsParams_type string = `type SpawnZoneItemsParams struct {
 	Items []Item ` + "`" + `json:"items"` + "`" + `
 }`
 
 const actions_type string = `type actions struct {
-	MovePlayer	func(PlayerID, float64, float64, *Engine)
-	addItemToPlayer	func(Item, PlayerID, *Engine)
-	spawnZoneItems	func([]Item, *Engine)
+	MovePlayer	func(MovePlayerParams, *Engine)
+	addItemToPlayer	func(AddItemToPlayerParams, *Engine)
+	spawnZoneItems	func(SpawnZoneItemsParams, *Engine)
 }`
 
 const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg message) error {
 	switch messageKind(msg.Kind) {
 	case messageKindAction_addItemToPlayer:
-		var params _addItemToPlayerParams
+		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.addItemToPlayer(params.Item, params.PlayerID, r.state)
+		r.actions.addItemToPlayer(params, r.state)
 	case messageKindAction_MovePlayer:
-		var params _MovePlayerParams
+		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.MovePlayer(params.PlayerID, params.ChangeX, params.ChangeY, r.state)
+		r.actions.MovePlayer(params, r.state)
 	case messageKindAction_spawnZoneItems:
-		var params _spawnZoneItemsParams
+		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.spawnZoneItems(params.Items, r.state)
+		r.actions.spawnZoneItems(params, r.state)
 	default:
 		return errors.New("unknown message kind")
 	}
 	return nil
 }`
 
-const _Start_func string = `func Start(movePlayer func(PlayerID, float64, float64, *Engine), addItemToPlayer func(Item, PlayerID, *Engine), spawnZoneItemsParams func([]Item, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) {
+const _Start_func string = `func Start(movePlayer func(MovePlayerParams, *Engine), addItemToPlayer func(AddItemToPlayerParams, *Engine), spawnZoneItemsParams func(SpawnZoneItemsParams, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) {
 	log.Println("Hello World")
 	a := actions{movePlayer, addItemToPlayer, spawnZoneItemsParams}
 	setupRoutes(a, onDeploy, onFrameTick)
