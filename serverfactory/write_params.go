@@ -31,7 +31,7 @@ type paramsWriter struct {
 }
 
 func (p paramsWriter) name() string {
-	return "_" + p.a.Name + "Params"
+	return title(p.a.Name) + "Params"
 }
 
 func (p paramsWriter) fieldName() string {

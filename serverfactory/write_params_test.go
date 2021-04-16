@@ -20,9 +20,9 @@ func TestWriteParameters(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			__MovePlayerParams_type,
-			__addItemToPlayerParams_type,
-			__spawnZoneItemsParams_type,
+			_AddItemToPlayerParams_type,
+			_MovePlayerParams_type,
+			_SpawnZoneItemsParams_type,
 		}, "\n"))
 
 		if expected != actual {
