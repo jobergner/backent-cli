@@ -8,10 +8,10 @@ const gets_generated_go_import string = `import (
 	"net/http"
 )`
 
-const messageKindAction_MovePlayer_type string = `const (
-	messageKindAction_MovePlayer	messageKind	= iota + 1
-	messageKindAction_addItemToPlayer
-	messageKindAction_spawnZoneItems
+const messageKindAction_addItemToPlayer_type string = `const (
+	messageKindAction_addItemToPlayer	messageKind	= 1
+	messageKindAction_movePlayer		messageKind	= 2
+	messageKindAction_spawnZoneItems	messageKind	= 3
 )`
 
 const _MovePlayerParams_type string = `type MovePlayerParams struct {
@@ -30,8 +30,8 @@ const _SpawnZoneItemsParams_type string = `type SpawnZoneItemsParams struct {
 }`
 
 const actions_type string = `type actions struct {
-	MovePlayer	func(MovePlayerParams, *Engine)
 	addItemToPlayer	func(AddItemToPlayerParams, *Engine)
+	movePlayer	func(MovePlayerParams, *Engine)
 	spawnZoneItems	func(SpawnZoneItemsParams, *Engine)
 }`
 
@@ -44,13 +44,13 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 			return err
 		}
 		r.actions.addItemToPlayer(params, r.state)
-	case messageKindAction_MovePlayer:
+	case messageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-		r.actions.MovePlayer(params, r.state)
+		r.actions.movePlayer(params, r.state)
 	case messageKindAction_spawnZoneItems:
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
