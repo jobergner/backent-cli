@@ -55,4 +55,4 @@ TODO:
 - let IDs of types be a valid type (like playerID) and treat them as int
 - consider not allowing capitalized field/param key names
 - consider not alloweing types with ID suffix
-- prevent definition of action name coexisting with action of same name but capitalized (eg. "Action" & "action")
+- only allow lower case actions
