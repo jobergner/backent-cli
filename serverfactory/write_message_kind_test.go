@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-func TestWriteActions(t *testing.T) {
-	t.Run("writes actions", func(t *testing.T) {
+func TestWriteMessageKinds(t *testing.T) {
+	t.Run("writes message kinds", func(t *testing.T) {
 		sf := newServerFactory(newSimpleASTExample())
-		sf.writeActions()
+		sf.writeMessageKinds()
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			actions_type,
+			messageKindAction_addItemToPlayer_type,
 		}, "\n"))
 
 		if expected != actual {

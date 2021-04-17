@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-func TestWriteActions(t *testing.T) {
-	t.Run("writes actions", func(t *testing.T) {
+func TestWriteStart(t *testing.T) {
+	t.Run("writes start", func(t *testing.T) {
 		sf := newServerFactory(newSimpleASTExample())
-		sf.writeActions()
+		sf.writeStart()
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			actions_type,
+			_Start_func,
 		}, "\n"))
 
 		if expected != actual {

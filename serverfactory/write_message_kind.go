@@ -7,12 +7,14 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *ServerFactory) writeActions() *ServerFactory {
+func (s *ServerFactory) writeMessageKinds() *ServerFactory {
 	decls := NewDeclSet()
 
-	decls.File.Type().Id("actions").Struct(
+	_iota := 0
+	decls.File.Const().Defs(
 		ForEachActionInAST(s.config, func(action ast.Action) *Statement {
-			return Id(action.Name).Func().Params(Id(title(action.Name)+"Params"), Id("*Engine"))
+			_iota += 1
+			return Id("messageKindAction_" + action.Name).Id("messageKind").Op("=").Lit(_iota)
 		}),
 	)
 

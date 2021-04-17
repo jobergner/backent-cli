@@ -64,9 +64,8 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 	return nil
 }`
 
-const _Start_func string = `func Start(movePlayer func(MovePlayerParams, *Engine), addItemToPlayer func(AddItemToPlayerParams, *Engine), spawnZoneItemsParams func(SpawnZoneItemsParams, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) {
-	log.Println("Hello World")
-	a := actions{movePlayer, addItemToPlayer, spawnZoneItemsParams}
+const _Start_func string = `func Start(addItemToPlayer func(AddItemToPlayerParams, *Engine), movePlayer func(MovePlayerParams, *Engine), spawnZoneItems func(SpawnZoneItemsParams, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) {
+	a := actions{addItemToPlayer, movePlayer, spawnZoneItems}
 	setupRoutes(a, onDeploy, onFrameTick)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }`
