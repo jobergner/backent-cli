@@ -1,7 +1,7 @@
 package examples
 
 var ActionsConfig = map[interface{}]interface{}{
-	"MovePlayer": map[interface{}]interface{}{
+	"movePlayer": map[interface{}]interface{}{
 		"playerID": "playerID",
 		"changeX":  "float64",
 		"changeY":  "float64",
