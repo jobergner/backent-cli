@@ -103,6 +103,8 @@ func generalValidation(data map[interface{}]interface{}) (errs []error) {
 }
 
 func thematicalValidationActions(data map[interface{}]interface{}) (errs []error) {
+	capitalizationErrs := validateIllegalCapitalization(data)
+	errs = append(errs, capitalizationErrs...)
 
 	nonObjectTypeErrs := validateNonObjectType(data)
 	errs = append(errs, nonObjectTypeErrs...)
