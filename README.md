@@ -255,6 +255,25 @@ the user should be able to pass entire objects as parameters instead of destruct
 'getting' a non existing element may lead to the creation of an element with the ID 0 when a 'setter' is used on it. To avoid this 'getters' will return an 
 element with OperationKindDelete when asked to return a non-existing element, so all manipulating operations know not to put it in the patch.
 
+### reference objects
+the user may want to just reference an object within an object e.g.
+```
+type player struct {
+   target *player // targeted combat (e.g. WoW)
+}
+```
+this should be possible. However some things need to be considered:
+- references will be (as expected) indicated by a star (*player) within the config, but remain IDs in the state (playerID). this way no pointers will be used
+- fields with references will need setter methods (with the entire object as parameter), an "IsSet" (false if ID == 0) and an "Unset" method
+- when marshalling the tree into JSON recursiveness would be a problem (maybe instead of a pointer to the object a description of the object is used e.g. `{elementKind, elementID}`, and the referenced object is inserted into the tree. this would be an exception since the referenced object itself would not have to be an updated element in order to appear in the tree)
+
+### ugh
+```
+type player struct {
+   target npc/enemy/player // necessary, if yes, how do???
+}
+```
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
