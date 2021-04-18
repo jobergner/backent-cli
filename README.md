@@ -271,6 +271,7 @@ this should be possible. However some things need to be considered:
 - adding/removing from a slice of references must not create/delete the element
 - the getter method would not exist on the `{elementKind, elementID}` element, but on the parent element
 - only self defined types can be used wiht references (not string, int etc.)
+- for the client's convenience a get from reference method would be needed to get the in the tree referenced element out of the state
 
 ### the any type
 `anyOf<player,enemy>`
