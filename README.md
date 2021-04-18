@@ -267,7 +267,8 @@ this should be possible. However some things need to be considered:
 - fields with references will need setter methods (with the entire object as parameter), an `IsSet` (false if ID == 0) and an `Unset` method
 - when marshalling the tree into JSON recursiveness would be a problem (maybe instead of a pointer to the object a description of the object is used e.g. `{elementKind, elementID}`, and the referenced object is inserted into the tree. this would be an exception since the referenced object itself would not have to be an updated element in order to appear in the tree)
 - deleting elements would now require to check the state for any references of that element and call `Unset` on it.
-- adding/removing from a slice of references must not create/delete the element 
+- adding/removing from a slice of references must not create/delete the element
+- for the client's convenience a get from reference method would be needed to get the in the tree referenced element out of the state
 
 ### the any type
 maybe an `any` type should be a thing. where a user can assign any type to a field. in the data the value of the field would be `{elementKind, elementID}`.
