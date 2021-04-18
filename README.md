@@ -264,15 +264,19 @@ type player struct {
 ```
 this should be possible. However some things need to be considered:
 - references will be (as expected) indicated by a star (*player) within the config, but remain IDs in the state (playerID). this way no pointers will be used
-- fields with references will need setter methods (with the entire object as parameter), an "IsSet" (false if ID == 0) and an "Unset" method
+- fields with references will need setter methods (with the entire object as parameter), an `IsSet` (false if ID == 0) and an `Unset` method
 - when marshalling the tree into JSON recursiveness would be a problem (maybe instead of a pointer to the object a description of the object is used e.g. `{elementKind, elementID}`, and the referenced object is inserted into the tree. this would be an exception since the referenced object itself would not have to be an updated element in order to appear in the tree)
+- deleting elements would now require to check the state for any references of that element and call `Unset` on it.
+- adding/removing from a slice of references must not create/delete the element 
 
-### ugh
-```
-type player struct {
-   target npc/enemy/player // necessary, if yes, how do???
-}
-```
+### the any type
+maybe an `any` type should be a thing. where a user can assign any type to a field. in the data the value of the field would be `{elementKind, elementID}`.
+The user would have to figure out by themselves what `elementKind` is and use the respective getter method for it.
+An `*any` type would come with more complexity (see #reference objects)
+
+generating interfaces for quick access. defining `anyOf<player,enemy>` could generate an interface including all overlapping getter methods.
+In this case the data representing the element would be th einterface. This would require for all elements to have an `ElementKind` getter method.
+on creation the first element in the list would be created for this field. Fields with interfaces would need a setter method for controlling the element kind that is set.
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
