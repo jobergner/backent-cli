@@ -263,20 +263,24 @@ type player struct {
 }
 ```
 this should be possible. However some things need to be considered:
-- references will be (as expected) indicated by a star (*player) within the config, but remain IDs in the state (playerID). this way no pointers will be used
+- for each element kind a wrapper is created (`player` => `playerRef`) which wraps all getters, setters, removers etc. but also adds the `IsSet`, `Unset` and `Set(Player)` method. (these meta methods need to be reserved in validator)
+- references will be (as expected) indicated by a star (*player) within the config, and represented by `ElementReference{elementKind, elementID}` in the data. this way no pointers will be used
 - fields with references will need setter methods (with the entire object as parameter), an `IsSet` (false if ID == 0) and an `Unset` method
-- when marshalling the tree into JSON recursiveness would be a problem (maybe instead of a pointer to the object a description of the object is used e.g. `{elementKind, elementID}`, and the referenced object is inserted into the tree. this would be an exception since the referenced object itself would not have to be an updated element in order to appear in the tree)
+- when marshalling the tree into JSON recursiveness will not be a problem as the item will be represented as `{elementKind, elementID}` within the JSON
 - deleting elements would now require to check the state for any references of that element and call `Unset` on it.
-- adding/removing from a slice of references must not create/delete the element 
+- adding/removing from a slice of references must not create/delete the element
+- the getter method would not exist on the `{elementKind, elementID}` element, but on the parent element
+- only self defined types can be used wiht references (not string, int etc.)
 
 ### the any type
-maybe an `any` type should be a thing. where a user can assign any type to a field. in the data the value of the field would be `{elementKind, elementID}`.
-The user would have to figure out by themselves what `elementKind` is and use the respective getter method for it.
-An `*any` type would come with more complexity (see #reference objects)
-
-generating interfaces for quick access. defining `anyOf<player,enemy>` could generate an interface including all overlapping getter methods.
-In this case the data representing the element would be th einterface. This would require for all elements to have an `ElementKind` getter method.
-on creation the first element in the list would be created for this field. Fields with interfaces would need a setter method for controlling the element kind that is set.
+`anyOf<player,enemy>`
+- in the data the value will be represented as `{ElementKind, ElementID}` called `anyOfEnemyPlayer` (alphabetical order). by creation of ast duplicates need to be taken care of (when the `anyOf<player,enemy>` is used in multiple fields)
+- for each compilation of `anyOf<...>` a reference type will also be generated (e.g. `anyOfEnemyPlayerRef`). It will have the same setters methods as a reference type except for main setter `SetPlayer(Player)` and `SetEnemy(Enemy)`. However, unlike in usual references, the `anyOfEnemyPlayerRef` struct will not impletmend all all getters, setters, removers etc., but include the getter methods for each element kind
+- by creation of the value the item mentioned first will be used (e.g. `player` when `anyOf<player,enemy>`), except if its a reference type
+- the item used can be set by a `SetPlayer()`, or `SetEnemy()` method, which call create for respective element. The previously existing element would be deleted. If the any type is a pointer, the setters will require the entire object as parameter.
+- getter methods are not callable on the parent element of the field, but on the `{elementKind, elementID}` element itself
+- getter methods will always be callable, but if the value is set to `player` and the `Enemy` method is called the behaviour will be the same as when getting an object which does not exist
+- when used as reference (`*anyOf<player,enemy>`) the element also gains the `IsSet` and `Unset` method.
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
