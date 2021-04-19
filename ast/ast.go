@@ -80,10 +80,11 @@ func caseInsensitiveSort(keys []string) func(i, j int) bool {
 }
 
 type Field struct {
-	Name          string
-	ValueType     *ConfigType // references the field's value's Type
-	ValueString   string      // the original value represented as string (eg. "[]Person")
-	HasSliceValue bool        // if the value is a slice value (eg. []string)
+	Name            string
+	ValueType       *ConfigType // references the field's value's Type
+	ValueString     string      // the original value represented as string (eg. "[]Person")
+	HasSliceValue   bool        // if the value is a slice value (eg. []string)
+	HasPointerValue bool        // if the value is a pointer value (eg. *foo, []*foo)
 }
 
 func newAST() *AST {
@@ -147,9 +148,10 @@ func buildTypeStructure(configTypeData map[interface{}]interface{}, typeName str
 		valueString := getSring(value)
 
 		field := Field{
-			Name:          fieldName,
-			HasSliceValue: isSliceValue(valueString),
-			ValueString:   valueString,
+			Name:            fieldName,
+			HasSliceValue:   isSliceValue(valueString),
+			HasPointerValue: isPointerValue(valueString),
+			ValueString:     valueString,
 		}
 
 		configType.Fields[fieldName] = field
@@ -220,8 +222,10 @@ func (s *AST) evalLeafTypes() {
 	for stateConfigTypeName, stateConfigType := range s.Types {
 		isLeafType := true
 		for _, stateConfigField := range stateConfigType.Fields {
-			if !stateConfigField.ValueType.IsBasicType {
-				isLeafType = false
+			if !stateConfigField.HasPointerValue {
+				if !stateConfigField.ValueType.IsBasicType {
+					isLeafType = false
+				}
 			}
 		}
 		if isLeafType {
@@ -237,7 +241,9 @@ func (a *AST) evalRootTypes() {
 		for _, _stateConfigType := range a.Types {
 			for _, stateConfigField := range _stateConfigType.Fields {
 				if stateConfigField.ValueType.Name == stateConfigTypeName {
-					isRootType = false
+					if !stateConfigField.HasPointerValue {
+						isRootType = false
+					}
 				}
 			}
 		}
@@ -254,6 +260,11 @@ func (a *AST) evalRootTypes() {
 // "string" -> false
 func isSliceValue(valueString string) bool {
 	re := regexp.MustCompile(`\[\]`)
+	return re.MatchString(valueString)
+}
+
+func isPointerValue(valueString string) bool {
+	re := regexp.MustCompile(`\*`)
 	return re.MatchString(valueString)
 }
 

@@ -272,6 +272,7 @@ this should be possible. However some things need to be considered:
 - the getter method would not exist on the `{elementKind, elementID}` element, but on the parent element
 - only self defined types can be used wiht references (not string, int etc.)
 - for the client's convenience a get from reference method would be needed to get the in the tree referenced element out of the state
+- can not be used on basic types
 
 ### the any type
 `anyOf<player,enemy>`
@@ -282,6 +283,7 @@ this should be possible. However some things need to be considered:
 - getter methods are not callable on the parent element of the field, but on the `{elementKind, elementID}` element itself
 - getter methods will always be callable, but if the value is set to `player` and the `Enemy` method is called the behaviour will be the same as when getting an object which does not exist
 - when used as reference (`*anyOf<player,enemy>`) the element also gains the `IsSet` and `Unset` method.
+- can not be used on basic types
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
