@@ -208,33 +208,27 @@ func (se *Engine) setElementUpdated(id int, kind ElementKind) {
 	switch kind {
 	case ElementKindGearScore:
 		gearScore := se.GearScore(GearScoreID(id))
-		gearScore.gearScore.OperationKind_ = OperationKindUpdate
-		se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
+		se.updateGearScore(gearScore.gearScore)
 		break
 	case ElementKindItem:
 		item := se.Item(ItemID(id))
-		item.item.OperationKind_ = OperationKindUpdate
-		se.Patch.Item[item.item.ID] = item.item
+		se.updateItem(item.item)
 		break
 	case ElementKindPlayer:
 		player := se.Player(PlayerID(id))
-		player.player.OperationKind_ = OperationKindUpdate
-		se.Patch.Player[player.player.ID] = player.player
+		se.updatePlayer(player.player)
 		break
 	case ElementKindPosition:
 		position := se.Position(PositionID(id))
-		position.position.OperationKind_ = OperationKindUpdate
-		se.Patch.Position[position.position.ID] = position.position
+		se.updatePosition(position.position)
 		break
 	case ElementKindZone:
 		zone := se.Zone(ZoneID(id))
-		zone.zone.OperationKind_ = OperationKindUpdate
-		se.Patch.Zone[zone.zone.ID] = zone.zone
+		se.updateZone(zone.zone)
 		break
 	case ElementKindZoneItem:
 		zoneItem := se.ZoneItem(ZoneItemID(id))
-		zoneItem.zoneItem.OperationKind_ = OperationKindUpdate
-		se.Patch.ZoneItem[zoneItem.zoneItem.ID] = zoneItem.zoneItem
+		se.updateZoneItem(zoneItem.zoneItem)
 		break
 	}
 }
