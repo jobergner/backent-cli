@@ -7,6 +7,17 @@ type PositionID int
 type ZoneID int
 type ZoneItemID int
 
+type ElementKind string
+
+const (
+	ElementKindGearScore ElementKind = "GearScore"
+	ElementKindItem      ElementKind = "Item"
+	ElementKindPlayer    ElementKind = "Player"
+	ElementKindPosition  ElementKind = "Position"
+	ElementKindZone      ElementKind = "Zone"
+	ElementKindZoneItem  ElementKind = "ZoneItem"
+)
+
 type State struct {
 	GearScore map[GearScoreID]gearScoreCore `json:"gearScore"`
 	Item      map[ItemID]itemCore           `json:"item"`
@@ -49,6 +60,7 @@ type zoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
 	ID             ItemID        `json:"id"`
+	BoundTo        playerRef     `json:"boundTo"`
 	GearScore      GearScoreID   `json:"gearScore"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 	HasParent_     bool          `json:"hasParent_"`
@@ -59,6 +71,7 @@ type item struct{ item itemCore }
 type playerCore struct {
 	ID             PlayerID      `json:"id"`
 	GearScore      GearScoreID   `json:"gearScore"`
+	GuildMembers   []playerRef   `json:"guildMembers"`
 	Items          []ItemID      `json:"items"`
 	Position       PositionID    `json:"position"`
 	OperationKind_ OperationKind `json:"operationKind_"`
