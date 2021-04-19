@@ -45,6 +45,7 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
+	item.BoundTo = ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer}
 
 	return item, hasUpdated
 }
@@ -97,6 +98,9 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 
 	player.ID = playerData.ID
 	player.OperationKind_ = playerData.OperationKind_
+	for _, guildMember := range playerData.GuildMembers {
+		player.GuildMembers = append(player.GuildMembers, ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer})
+	}
 	return player, hasUpdated
 }
 
