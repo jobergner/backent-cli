@@ -270,6 +270,7 @@ func TestValidateStateConfig(t *testing.T) {
 			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
 			newValidationErrorIncompatibleValue("*[]int", "unt", "baz"),
+			newValidationErrorIncompatibleValue("[]*int", "rnt", "baz"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

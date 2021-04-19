@@ -41,13 +41,9 @@ func validateIncompatibleValueObject(
 	return
 }
 
-func isSliceOfType(valueString string) bool {
-	re := regexp.MustCompile(`\[\][A-Za-z]+[0-9]*`)
-	includesSliceOfType := re.MatchString(valueString)
-	if includesSliceOfType && len(re.FindString(valueString)) == len(valueString) {
-		return true
-	}
-	return false
+func isPointerType(valueString string) bool {
+	re := regexp.MustCompile(`\*[A-Za-z]*`)
+	return re.MatchString(valueString)
 }
 
 func isCompatibleValue(valueString string) bool {
@@ -59,6 +55,10 @@ func isCompatibleValue(valueString string) bool {
 	}
 
 	if len(match) != len(valueString) {
+		return false
+	}
+
+	if isPointerType(valueString) && containsOnlyBasicTypes(valueString) {
 		return false
 	}
 
