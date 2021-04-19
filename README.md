@@ -43,7 +43,7 @@ map[interface{}]interface{}{
 Despite the fact that each of these errors would find a place in one of the above mentioned categories, they are listed separately from them since they are specific to the use case, and not related to the validation of actual go declarations at all.
 | Error | Text | Meaning |
 |---|---------|----------|
-| ErrIncompatibleValue | value "{ValueString}" assigned to "{KeyName}" in "{ParentObject}" is incompatible. | The assigned value can't be used, as only golang's basic types, self defined types, and slices of them can be used. |
+| ErrIncompatibleValue | value "{ValueString}" assigned to "{KeyName}" in "{ParentObject}" is incompatible. | The assigned value can't be used, as only golang's basic types, self defined types, and slices and pointers of them can be used. |
 | ErrNonObjectType | type "{TypeName}" is not an object type. | The defined type is not an object. |
 | ErrIllegalCapitalization | {type/field name} "{literal}" starts with a capital letter. | A type or field name starts with a capital letter, which is not allowed. |
 | ErrConflictingSingular | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}". | Due to the way state will be used two field names cannot have the same singular form. |
@@ -53,6 +53,4 @@ Despite the fact that each of these errors would find a place in one of the abov
 
 TODO:
 - let IDs of types be a valid type (like playerID) and treat them as int
-- consider not allowing capitalized field/param key names
 - consider not alloweing types with ID suffix
-- only allow lower case actions
