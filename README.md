@@ -264,12 +264,12 @@ type player struct {
 ```
 this should be possible. However some things need to be considered:
 - for each element kind a wrapper is created (`player` => `playerRef`) which wraps all getters, setters, removers etc. but also adds the `IsSet`, `Unset` and `Set(Player)` method. (these meta methods need to be reserved in validator)
-- references will be (as expected) indicated by a star (*player) within the config, and represented by `ElementReference{elementKind, elementID}` in the data. this way no pointers will be used
+- references will be (as expected) indicated by a star (*player) within the config, and represented by `ElementReference{elementID, parentID, parentKind}` in the data. this way no pointers will be used
 - fields with references will need setter methods (with the entire object as parameter), an `IsSet` (false if ID == 0) and an `Unset` method
-- when marshalling the tree into JSON recursiveness will not be a problem as the item will be represented as `{elementKind, elementID}` within the JSON
+- when marshalling the tree into JSON recursiveness will not be a problem as the item will be represented as `{elementID, parentID, parentKind}` within the JSON
 - deleting elements would now require to check the state for any references of that element and call `Unset` on it.
 - adding/removing from a slice of references must not create/delete the element
-- the getter method would not exist on the `{elementKind, elementID}` element, but on the parent element
+- the getter method would not exist on the `{elementID, parentID, parentKind}` element, but on the parent element
 - only self defined types can be used wiht references (not string, int etc.)
 - for the client's convenience a get from reference method would be needed to get the in the tree referenced element out of the state
 - can not be used on basic types
