@@ -20,6 +20,11 @@ func newTree() Tree {
 	}
 }
 
+type ElementReference struct {
+	ID          int
+	ElementKind ElementKind
+}
+
 type ZoneItem struct {
 	ID             ZoneItemID    `json:"id"`
 	Item           *Item         `json:"item"`
@@ -28,9 +33,10 @@ type ZoneItem struct {
 }
 
 type Item struct {
-	ID             ItemID        `json:"id"`
-	GearScore      *GearScore    `json:"gearScore"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID             ItemID           `json:"id"`
+	BoundTo        ElementReference `json:"boundTo"`
+	GearScore      *GearScore       `json:"gearScore"`
+	OperationKind_ OperationKind    `json:"operationKind_"`
 }
 
 type Position struct {
@@ -48,11 +54,12 @@ type GearScore struct {
 }
 
 type Player struct {
-	ID             PlayerID      `json:"id"`
-	GearScore      *GearScore    `json:"gearScore"`
-	Items          []Item        `json:"items"`
-	Position       *Position     `json:"position"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID             PlayerID           `json:"id"`
+	GearScore      *GearScore         `json:"gearScore"`
+	GuildMembers   []ElementReference `json:"guildMembers"`
+	Items          []Item             `json:"items"`
+	Position       *Position          `json:"position"`
+	OperationKind_ OperationKind      `json:"operationKind_"`
 }
 
 type Zone struct {
