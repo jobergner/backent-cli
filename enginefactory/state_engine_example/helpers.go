@@ -107,3 +107,75 @@ func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
 
 	return deduped
 }
+
+func (se Engine) allGearScoreIDs() []GearScoreID {
+	var stateGearScoreIDs []GearScoreID
+	for gearScoreID := range se.State.GearScore {
+		stateGearScoreIDs = append(stateGearScoreIDs, gearScoreID)
+	}
+	var patchGearScoreIDs []GearScoreID
+	for gearScoreID := range se.Patch.GearScore {
+		patchGearScoreIDs = append(patchGearScoreIDs, gearScoreID)
+	}
+	return deduplicateGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
+}
+
+func (se Engine) allItemIDs() []ItemID {
+	var stateItemIDs []ItemID
+	for itemID := range se.State.Item {
+		stateItemIDs = append(stateItemIDs, itemID)
+	}
+	var patchItemIDs []ItemID
+	for itemID := range se.Patch.Item {
+		patchItemIDs = append(patchItemIDs, itemID)
+	}
+	return deduplicateItemIDs(stateItemIDs, patchItemIDs)
+}
+
+func (se Engine) allPlayerIDs() []PlayerID {
+	var statePlayerIDs []PlayerID
+	for playerID := range se.State.Player {
+		statePlayerIDs = append(statePlayerIDs, playerID)
+	}
+	var patchPlayerIDs []PlayerID
+	for playerID := range se.Patch.Player {
+		patchPlayerIDs = append(patchPlayerIDs, playerID)
+	}
+	return deduplicatePlayerIDs(statePlayerIDs, patchPlayerIDs)
+}
+
+func (se Engine) allPositionIDs() []PositionID {
+	var statePositionIDs []PositionID
+	for positionID := range se.State.Position {
+		statePositionIDs = append(statePositionIDs, positionID)
+	}
+	var patchPositionIDs []PositionID
+	for positionID := range se.Patch.Position {
+		patchPositionIDs = append(patchPositionIDs, positionID)
+	}
+	return deduplicatePositionIDs(statePositionIDs, patchPositionIDs)
+}
+
+func (se Engine) allZoneIDs() []ZoneID {
+	var stateZoneIDs []ZoneID
+	for zoneID := range se.State.Zone {
+		stateZoneIDs = append(stateZoneIDs, zoneID)
+	}
+	var patchZoneIDs []ZoneID
+	for zoneID := range se.Patch.Zone {
+		patchZoneIDs = append(patchZoneIDs, zoneID)
+	}
+	return deduplicateZoneIDs(stateZoneIDs, patchZoneIDs)
+}
+
+func (se Engine) allZoneItemIDs() []ZoneItemID {
+	var stateZoneItemIDs []ZoneItemID
+	for zoneItemID := range se.State.ZoneItem {
+		stateZoneItemIDs = append(stateZoneItemIDs, zoneItemID)
+	}
+	var patchZoneItemIDs []ZoneItemID
+	for zoneItemID := range se.Patch.ZoneItem {
+		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
+	}
+	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
+}

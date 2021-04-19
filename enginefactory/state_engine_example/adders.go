@@ -45,3 +45,13 @@ func (_player player) AddItem(se *Engine) item {
 	se.Patch.Player[player.player.ID] = player.player
 	return item
 }
+
+func (_player player) AddGuildMember(se *Engine, playerID PlayerID) {
+	player := se.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return
+	}
+	player.player.GuildMembers = append(player.player.GuildMembers, playerSliceRef{playerID, int(player.player.ID), ElementKindPlayer})
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
+}

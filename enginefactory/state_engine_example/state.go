@@ -69,13 +69,13 @@ type itemCore struct {
 type item struct{ item itemCore }
 
 type playerCore struct {
-	ID             PlayerID      `json:"id"`
-	GearScore      GearScoreID   `json:"gearScore"`
-	GuildMembers   []playerRef   `json:"guildMembers"`
-	Items          []ItemID      `json:"items"`
-	Position       PositionID    `json:"position"`
-	OperationKind_ OperationKind `json:"operationKind_"`
-	HasParent_     bool          `json:"hasParent_"`
+	ID             PlayerID         `json:"id"`
+	GearScore      GearScoreID      `json:"gearScore"`
+	GuildMembers   []playerSliceRef `json:"guildMembers"`
+	Items          []ItemID         `json:"items"`
+	Position       PositionID       `json:"position"`
+	OperationKind_ OperationKind    `json:"operationKind_"`
+	HasParent_     bool             `json:"hasParent_"`
 }
 
 type player struct{ player playerCore }

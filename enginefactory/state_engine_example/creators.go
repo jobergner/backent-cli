@@ -36,6 +36,7 @@ func (se *Engine) createItem(hasParent bool) item {
 	element.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
+	element.BoundTo = playerRef{parentID: int(element.ID), parentKind: ElementKindItem}
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.Item[element.ID] = element
 	return item{item: element}
