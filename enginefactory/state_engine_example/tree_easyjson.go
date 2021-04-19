@@ -988,7 +988,15 @@ func easyjson19a9978cDecodeBarCliEnginefactoryStateEngineExample5(in *jlexer.Lex
 		case "id":
 			out.ID = ItemID(in.Int())
 		case "boundTo":
-			(out.BoundTo).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+				out.BoundTo = nil
+			} else {
+				if out.BoundTo == nil {
+					out.BoundTo = new(ElementReference)
+				}
+				(*out.BoundTo).UnmarshalEasyJSON(in)
+			}
 		case "gearScore":
 			if in.IsNull() {
 				in.Skip()
@@ -1021,7 +1029,7 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(out *jwriter.W
 		out.RawString(prefix[1:])
 		out.Int(int(in.ID))
 	}
-	if true {
+	if in.BoundTo != nil {
 		const prefix string = ",\"boundTo\":"
 		if first {
 			first = false
@@ -1029,7 +1037,7 @@ func easyjson19a9978cEncodeBarCliEnginefactoryStateEngineExample5(out *jwriter.W
 		} else {
 			out.RawString(prefix)
 		}
-		(in.BoundTo).MarshalEasyJSON(out)
+		(*in.BoundTo).MarshalEasyJSON(out)
 	}
 	if in.GearScore != nil {
 		const prefix string = ",\"gearScore\":"

@@ -33,10 +33,10 @@ type ZoneItem struct {
 }
 
 type Item struct {
-	ID             ItemID           `json:"id"`
-	BoundTo        ElementReference `json:"boundTo"`
-	GearScore      *GearScore       `json:"gearScore"`
-	OperationKind_ OperationKind    `json:"operationKind_"`
+	ID             ItemID            `json:"id"`
+	BoundTo        *ElementReference `json:"boundTo"`
+	GearScore      *GearScore        `json:"gearScore"`
+	OperationKind_ OperationKind     `json:"operationKind_"`
 }
 
 type Position struct {
