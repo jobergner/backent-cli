@@ -194,7 +194,7 @@ func (se *Engine) updatePlayer(player playerCore) {
 	for _, itemID := range se.allItemIDs() {
 		element := se.Item(itemID)
 		if element.item.BoundTo.id == player.ID {
-			if _, alreadyUpdating := se.Patch.Item[itemID]; !alreadyUpdating {
+			if _, alreadyUpdating := se.Patch.Item[element.item.ID]; !alreadyUpdating {
 				se.updateItem(element.item)
 			}
 		}
@@ -203,8 +203,8 @@ func (se *Engine) updatePlayer(player playerCore) {
 		element := se.Player(playerID)
 		for _, ref := range element.player.GuildMembers {
 			if ref.id == player.ID {
-				if _, alreadyUpdating := se.Patch.Player[ref.id]; !alreadyUpdating {
-					se.updatePlayer(player)
+				if _, alreadyUpdating := se.Patch.Player[element.player.ID]; !alreadyUpdating {
+					se.updatePlayer(element.player)
 				}
 			}
 		}

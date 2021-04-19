@@ -48,7 +48,7 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 	if itemData.BoundTo.id != 0 {
 		item.BoundTo = &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer}
 	}
-
+	item.Name = itemData.Name
 	return item, hasUpdated
 }
 

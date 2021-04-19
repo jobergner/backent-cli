@@ -87,7 +87,7 @@ func (_item item) GearScore(se *Engine) gearScore {
 	return se.GearScore(item.item.GearScore)
 }
 
-func (_item item) BoundTo(se *Engine) playerRef {
+func (_item item) BoundTo(se *Engine) itemBoundToRef {
 	item := se.Item(_item.item.ID)
 	return item.item.BoundTo
 }

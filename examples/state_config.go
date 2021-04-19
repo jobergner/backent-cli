@@ -21,6 +21,7 @@ var StateConfig = map[interface{}]interface{}{
 		"y": "float64",
 	},
 	"item": map[interface{}]interface{}{
+		"name":      "string",
 		"gearScore": "gearScore",
 		"boundTo":   "*player",
 	},
