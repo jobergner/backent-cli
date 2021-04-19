@@ -25,8 +25,7 @@ func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
 		return zone
 	}
 	zone.zone.Players = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	se.updateZone(zone.zone)
 	return zone
 }
 
@@ -55,8 +54,7 @@ func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
 		return zone
 	}
 	zone.zone.Items = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	se.updateZone(zone.zone)
 	return zone
 }
 
@@ -85,8 +83,7 @@ func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
 		return player
 	}
 	player.player.Items = newElements
-	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	se.updatePlayer(player.player)
 	return player
 }
 
@@ -114,8 +111,7 @@ func (_player player) RemoveGuildMembers(se *Engine, guildMembersToRemove ...Pla
 		return player
 	}
 	player.player.GuildMembers = newElements
-	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	se.updatePlayer(player.player)
 	return player
 }
 
@@ -143,7 +139,6 @@ func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
 		return zone
 	}
 	zone.zone.Tags = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	se.updateZone(zone.zone)
 	return zone
 }
