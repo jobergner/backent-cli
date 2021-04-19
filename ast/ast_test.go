@@ -19,8 +19,10 @@ func TestStateConfigAST(t *testing.T) {
 			"city":        "string",
 		},
 		"person": map[interface{}]interface{}{
-			"name": "string",
-			"age":  "int",
+			"name":       "string",
+			"age":        "int",
+			"friends":    "[]*person",
+			"secondHome": "*house",
 		},
 	}
 
@@ -47,9 +49,10 @@ func TestStateConfigAST(t *testing.T) {
 					Name: "removeResidents",
 					Params: map[string]Field{
 						"residents": {
-							Name:          "residents",
-							ValueString:   "[]person",
-							HasSliceValue: true,
+							Name:            "residents",
+							ValueString:     "[]person",
+							HasSliceValue:   true,
+							HasPointerValue: false,
 						},
 					},
 				},
@@ -57,19 +60,22 @@ func TestStateConfigAST(t *testing.T) {
 					Name: "changeAddress",
 					Params: map[string]Field{
 						"newStreet": {
-							Name:          "newStreet",
-							ValueString:   "string",
-							HasSliceValue: false,
+							Name:            "newStreet",
+							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 						"newHouseNumber": {
-							Name:          "newHouseNumber",
-							ValueString:   "int",
-							HasSliceValue: false,
+							Name:            "newHouseNumber",
+							ValueString:     "int",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 						"newCity": {
-							Name:          "newCity",
-							ValueString:   "string",
-							HasSliceValue: false,
+							Name:            "newCity",
+							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 					},
 				},
@@ -77,9 +83,10 @@ func TestStateConfigAST(t *testing.T) {
 					Name: "renamePerson",
 					Params: map[string]Field{
 						"newName": {
-							Name:          "newName",
-							ValueString:   "string",
-							HasSliceValue: false,
+							Name:            "newName",
+							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 					},
 				},
@@ -89,19 +96,22 @@ func TestStateConfigAST(t *testing.T) {
 					Name: "house",
 					Fields: map[string]Field{
 						"residents": {
-							Name:          "residents",
-							ValueString:   "[]person",
-							HasSliceValue: true,
+							Name:            "residents",
+							ValueString:     "[]person",
+							HasSliceValue:   true,
+							HasPointerValue: false,
 						},
 						"livingSpace": {
-							Name:          "livingSpace",
-							ValueString:   "int",
-							HasSliceValue: false,
+							Name:            "livingSpace",
+							ValueString:     "int",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 						"address": {
-							Name:          "address",
-							ValueString:   "address",
-							HasSliceValue: false,
+							Name:            "address",
+							ValueString:     "address",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 					},
 				},
@@ -109,19 +119,22 @@ func TestStateConfigAST(t *testing.T) {
 					Name: "address",
 					Fields: map[string]Field{
 						"street": {
-							Name:          "street",
-							ValueString:   "string",
-							HasSliceValue: false,
+							Name:            "street",
+							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 						"houseNumber": {
-							Name:          "houseNumber",
-							ValueString:   "int",
-							HasSliceValue: false,
+							Name:            "houseNumber",
+							ValueString:     "int",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 						"city": {
-							Name:          "city",
-							ValueString:   "string",
-							HasSliceValue: false,
+							Name:            "city",
+							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 					},
 				},
@@ -129,14 +142,28 @@ func TestStateConfigAST(t *testing.T) {
 					Name: "person",
 					Fields: map[string]Field{
 						"name": {
-							Name:          "name",
-							ValueString:   "string",
-							HasSliceValue: false,
+							Name:            "name",
+							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
 						},
 						"age": {
-							Name:          "age",
-							ValueString:   "int",
-							HasSliceValue: false,
+							Name:            "age",
+							ValueString:     "int",
+							HasSliceValue:   false,
+							HasPointerValue: false,
+						},
+						"friends": {
+							Name:            "friends",
+							ValueString:     "[]*person",
+							HasSliceValue:   true,
+							HasPointerValue: true,
+						},
+						"secondHome": {
+							Name:            "secondHome",
+							ValueString:     "*house",
+							HasSliceValue:   false,
+							HasPointerValue: true,
 						},
 					},
 				},
@@ -181,6 +208,12 @@ func TestStateConfigAST(t *testing.T) {
 		ageField := personType.Fields["age"]
 		assert.Equal(t, ageField.ValueType.Name, "int")
 		assert.Equal(t, ageField.ValueType.IsBasicType, true)
+		friendsField := personType.Fields["friends"]
+		assert.Equal(t, friendsField.ValueType.Name, "person")
+		assert.Equal(t, friendsField.ValueType.IsBasicType, false)
+		secondHomeField := personType.Fields["secondHome"]
+		assert.Equal(t, secondHomeField.ValueType.Name, "house")
+		assert.Equal(t, secondHomeField.ValueType.IsBasicType, false)
 
 		removeResidentsAction := actual.Actions["removeResidents"]
 		residentsParam := removeResidentsAction.Params["residents"]
