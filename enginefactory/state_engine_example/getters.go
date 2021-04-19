@@ -30,6 +30,11 @@ func (_player player) GearScore(se *Engine) gearScore {
 	return se.GearScore(player.player.GearScore)
 }
 
+func (_player player) GuildMembers(se *Engine) []playerSliceRef {
+	player := se.Player(_player.player.ID)
+	return player.player.GuildMembers
+}
+
 func (_player player) Position(se *Engine) position {
 	player := se.Player(_player.player.ID)
 	return se.Position(player.player.Position)
@@ -80,6 +85,11 @@ func (_item item) ID(se *Engine) ItemID {
 func (_item item) GearScore(se *Engine) gearScore {
 	item := se.Item(_item.item.ID)
 	return se.GearScore(item.item.GearScore)
+}
+
+func (_item item) BoundTo(se *Engine) playerRef {
+	item := se.Item(_item.item.ID)
+	return item.item.BoundTo
 }
 
 func (se *Engine) Position(positionID PositionID) position {

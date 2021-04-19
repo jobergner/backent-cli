@@ -1,5 +1,15 @@
 package state
 
+type gearScoreSliceRef struct {
+	id         GearScoreID
+	parentID   int
+	parentKind ElementKind
+}
+
+func (ref gearScoreSliceRef) Get(se *Engine) gearScore {
+	return se.GearScore(ref.id)
+}
+
 type gearScoreRef struct {
 	id         GearScoreID
 	parentID   int
@@ -20,8 +30,18 @@ func (ref *gearScoreRef) Set(se *Engine, id GearScoreID) {
 	se.setElementUpdated(ref.parentID, ref.parentKind)
 }
 
-func (ref *gearScoreRef) Get(se *Engine) gearScore {
+func (ref gearScoreRef) Get(se *Engine) gearScore {
 	return se.GearScore(ref.id)
+}
+
+type itemSliceRef struct {
+	id         ItemID
+	parentID   int
+	parentKind ElementKind
+}
+
+func (ref itemSliceRef) Get(se *Engine) item {
+	return se.Item(ref.id)
 }
 
 type itemRef struct {
@@ -44,8 +64,18 @@ func (ref *itemRef) Set(se *Engine, id ItemID) {
 	se.setElementUpdated(ref.parentID, ref.parentKind)
 }
 
-func (ref *itemRef) Get(se *Engine) item {
+func (ref itemRef) Get(se *Engine) item {
 	return se.Item(ref.id)
+}
+
+type playerSliceRef struct {
+	id         PlayerID
+	parentID   int
+	parentKind ElementKind
+}
+
+func (ref playerSliceRef) Get(se *Engine) player {
+	return se.Player(ref.id)
 }
 
 type playerRef struct {
@@ -68,8 +98,18 @@ func (ref *playerRef) Set(se *Engine, id PlayerID) {
 	se.setElementUpdated(ref.parentID, ref.parentKind)
 }
 
-func (ref *playerRef) Get(se *Engine) player {
+func (ref playerRef) Get(se *Engine) player {
 	return se.Player(ref.id)
+}
+
+type positionSliceRef struct {
+	id         PositionID
+	parentID   int
+	parentKind ElementKind
+}
+
+func (ref positionSliceRef) Get(se *Engine) position {
+	return se.Position(ref.id)
 }
 
 type positionRef struct {
@@ -92,8 +132,18 @@ func (ref *positionRef) Set(se *Engine, id PositionID) {
 	se.setElementUpdated(ref.parentID, ref.parentKind)
 }
 
-func (ref *positionRef) Get(se *Engine) position {
+func (ref positionRef) Get(se *Engine) position {
 	return se.Position(ref.id)
+}
+
+type zoneSliceRef struct {
+	id         ZoneID
+	parentID   int
+	parentKind ElementKind
+}
+
+func (ref zoneSliceRef) Get(se *Engine) zone {
+	return se.Zone(ref.id)
 }
 
 type zoneRef struct {
@@ -116,8 +166,18 @@ func (ref *zoneRef) Set(se *Engine, id ZoneID) {
 	se.setElementUpdated(ref.parentID, ref.parentKind)
 }
 
-func (ref *zoneRef) Get(se *Engine) zone {
+func (ref zoneRef) Get(se *Engine) zone {
 	return se.Zone(ref.id)
+}
+
+type zoneItemSliceRef struct {
+	id         ZoneItemID
+	parentID   int
+	parentKind ElementKind
+}
+
+func (ref zoneItemSliceRef) Get(se *Engine) zoneItem {
+	return se.ZoneItem(ref.id)
 }
 
 type zoneItemRef struct {
@@ -140,7 +200,7 @@ func (ref *zoneItemRef) Set(se *Engine, id ZoneItemID) {
 	se.setElementUpdated(ref.parentID, ref.parentKind)
 }
 
-func (ref *zoneItemRef) Get(se *Engine) zoneItem {
+func (ref zoneItemRef) Get(se *Engine) zoneItem {
 	return se.ZoneItem(ref.id)
 }
 
