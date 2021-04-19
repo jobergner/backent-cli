@@ -36,6 +36,7 @@ type Item struct {
 	ID             ItemID            `json:"id"`
 	BoundTo        *ElementReference `json:"boundTo"`
 	GearScore      *GearScore        `json:"gearScore"`
+	Name           string            `json:"name"`
 	OperationKind_ OperationKind     `json:"operationKind_"`
 }
 

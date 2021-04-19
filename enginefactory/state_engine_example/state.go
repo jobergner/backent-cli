@@ -59,11 +59,12 @@ type zoneItemCore struct {
 type zoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
-	ID             ItemID        `json:"id"`
-	BoundTo        playerRef     `json:"boundTo"`
-	GearScore      GearScoreID   `json:"gearScore"`
-	OperationKind_ OperationKind `json:"operationKind_"`
-	HasParent_     bool          `json:"hasParent_"`
+	ID             ItemID         `json:"id"`
+	BoundTo        itemBoundToRef `json:"boundTo"`
+	GearScore      GearScoreID    `json:"gearScore"`
+	Name           string         `json:"name"`
+	OperationKind_ OperationKind  `json:"operationKind_"`
+	HasParent_     bool           `json:"hasParent_"`
 }
 
 type item struct{ item itemCore }

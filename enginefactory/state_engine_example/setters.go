@@ -39,3 +39,13 @@ func (_position position) SetY(se *Engine, newY float64) position {
 	se.updatePosition(position.position)
 	return position
 }
+
+func (_item item) SetX(se *Engine, nameName string) item {
+	item := se.Item(_item.item.ID)
+	if item.item.OperationKind_ == OperationKindDelete {
+		return item
+	}
+	item.item.Name = nameName
+	se.updateItem(item.item)
+	return item
+}

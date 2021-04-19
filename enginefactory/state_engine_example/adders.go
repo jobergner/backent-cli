@@ -47,6 +47,6 @@ func (_player player) AddGuildMember(se *Engine, playerID PlayerID) {
 	if player.player.OperationKind_ == OperationKindDelete {
 		return
 	}
-	player.player.GuildMembers = append(player.player.GuildMembers, playerSliceRef{playerID, int(player.player.ID), ElementKindPlayer})
+	player.player.GuildMembers = append(player.player.GuildMembers, playerSliceRef{playerID, int(player.player.ID)})
 	se.updatePlayer(player.player)
 }
