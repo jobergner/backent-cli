@@ -251,6 +251,8 @@ func TestValidateStateConfig(t *testing.T) {
 				"bal":        "***bar",
 				"slap":       "**[]**bar",
 				"arg":        "*foo",
+				"unt":        "*[]int",
+				"rnt":        "[]*int",
 				"barg":       "[3]foo",
 				"iD":         "string",
 				"hasParent_": "bool",
@@ -266,8 +268,8 @@ func TestValidateStateConfig(t *testing.T) {
 			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
 			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
 			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
-			newValidationErrorIncompatibleValue("*foo", "arg", "baz"),
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
+			newValidationErrorIncompatibleValue("*[]int", "unt", "baz"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
@@ -315,7 +317,6 @@ func TestValidateActionsConfig(t *testing.T) {
 			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
 			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
 			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
-			newValidationErrorIncompatibleValue("*foo", "arg", "baz"),
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
 			newValidationErrorTypeNotFound("fooAction", "barAction"),
 			newValidationErrorIllegalCapitalization("BazAction", literalKindType),

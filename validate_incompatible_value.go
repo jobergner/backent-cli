@@ -50,22 +50,15 @@ func isSliceOfType(valueString string) bool {
 	return false
 }
 
-// TODO refactor!
 func isCompatibleValue(valueString string) bool {
-	if isSliceOfType(valueString) {
-		return true
-	}
+	re := regexp.MustCompile(`\[\]\*?[A-Za-z]+[0-9]*|\*?[A-Za-z]+[0-9]*`)
+	match := re.FindString(valueString)
 
-	extractedTypes := extractTypes(valueString)
-	if len(extractedTypes) != 1 {
+	if match == "" {
 		return false
 	}
 
-	if len(valueString) != len(extractedTypes[0]) {
-		return false
-	}
-
-	if isSliceOfSlice(valueString) {
+	if len(match) != len(valueString) {
 		return false
 	}
 
