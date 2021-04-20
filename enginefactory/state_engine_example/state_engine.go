@@ -3,8 +3,9 @@ package state
 type OperationKind string
 
 const (
-	OperationKindDelete OperationKind = "DELETE"
-	OperationKindUpdate               = "UPDATE"
+	OperationKindDelete       OperationKind = "DELETE"
+	OperationKindUpdate       OperationKind = "UPDATE"
+	OperationKindRefUnchanged OperationKind = "UNCHANGED"
 )
 
 type Engine struct {
