@@ -179,3 +179,51 @@ func (se Engine) allZoneItemIDs() []ZoneItemID {
 	}
 	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
 }
+
+func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference {
+	if itemData.BoundTo.id != 0 {
+		_, hasUpdated := se.Patch.Player[itemData.BoundTo.id]
+		justGotSet := se.State.Item[itemData.ID].BoundTo.id == 0
+		operationKind := OperationKindRefUnchanged
+		if hasUpdated || justGotSet {
+			operationKind = OperationKindUpdate
+		}
+		return &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
+	} else if se.State.Item[itemData.ID].BoundTo.id != 0 {
+		return &ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
+	}
+	return nil
+}
+
+func (se *Engine) evalPlayerGuildMembersElementRefs(playerData playerCore) []ElementReference {
+	var refs []ElementReference
+	for _, guildMember := range playerData.GuildMembers {
+		_, hasUpdated := se.Patch.Player[guildMember.id]
+		justGotSet := true
+		for _, previousGuildMembers := range se.State.Player[playerData.ID].GuildMembers {
+			if previousGuildMembers.id == guildMember.id {
+				justGotSet = false
+			}
+		}
+		operationKind := OperationKindRefUnchanged
+		if hasUpdated || justGotSet {
+			operationKind = OperationKindUpdate
+		}
+		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
+		refs = append(refs, ref)
+	}
+	// TODO figure out way to maintain order in refernece slice
+	for _, previousGuildMember := range se.State.Player[playerData.ID].GuildMembers {
+		refGotDeleted := true
+		for _, currentGuildMember := range playerData.GuildMembers {
+			if previousGuildMember.id == currentGuildMember.id {
+				refGotDeleted = false
+			}
+		}
+		if refGotDeleted {
+			ref := ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
+			refs = append(refs, ref)
+		}
+	}
+	return refs
+}
