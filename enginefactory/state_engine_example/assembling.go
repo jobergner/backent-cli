@@ -47,7 +47,15 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 	item.OperationKind_ = itemData.OperationKind_
 	if itemData.BoundTo.id != 0 {
 		_, hasUpdated := se.Patch.Player[itemData.BoundTo.id]
-		ref := ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, HasUpdated: hasUpdated}
+		justGotSet := se.State.Item[itemData.ID].BoundTo.id == 0
+		operationKind := OperationKindRefUnchanged
+		if hasUpdated || justGotSet {
+			operationKind = OperationKindUpdate
+		}
+		ref := ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
+		item.BoundTo = &ref
+	} else if se.State.Item[itemData.ID].BoundTo.id != 0 {
+		ref := ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
 		item.BoundTo = &ref
 	}
 	item.Name = itemData.Name
@@ -104,8 +112,31 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 	player.OperationKind_ = playerData.OperationKind_
 	for _, guildMember := range playerData.GuildMembers {
 		_, hasUpdated := se.Patch.Player[guildMember.id]
-		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, HasUpdated: hasUpdated}
+		justGotSet := true
+		for _, previousGuildMembers := range se.State.Player[playerData.ID].GuildMembers {
+			if previousGuildMembers.id == guildMember.id {
+				justGotSet = false
+			}
+		}
+		operationKind := OperationKindRefUnchanged
+		if hasUpdated || justGotSet {
+			operationKind = OperationKindUpdate
+		}
+		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
 		player.GuildMembers = append(player.GuildMembers, ref)
+	}
+	// TODO figure out way to maintain order in refernece slice
+	for _, previousGuildMember := range se.State.Player[playerData.ID].GuildMembers {
+		refGotDeleted := true
+		for _, currentGuildMember := range playerData.GuildMembers {
+			if previousGuildMember.id == currentGuildMember.id {
+				refGotDeleted = false
+			}
+		}
+		if refGotDeleted {
+			ref := ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
+			player.GuildMembers = append(player.GuildMembers, ref)
+		}
 	}
 	return player, hasUpdated
 }

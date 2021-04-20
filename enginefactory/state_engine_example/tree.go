@@ -32,9 +32,9 @@ func newTree() Tree {
 }
 
 type ElementReference struct {
-	ID          int         `json:"id"`
-	ElementKind ElementKind `json:"elementKind"`
-	HasUpdated  bool        `json:"hasUpdated"`
+	ID             int           `json:"id"`
+	ElementKind    ElementKind   `json:"elementKind"`
+	OperationKind_ OperationKind `json:"operationKind_"`
 }
 
 type ZoneItem struct {
