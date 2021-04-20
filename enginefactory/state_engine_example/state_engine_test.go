@@ -85,6 +85,18 @@ func TestReferences(t *testing.T) {
 		_, ok := se.Patch.Item[item.ID(se)]
 		assert.True(t, ok)
 	})
+	t.Run("deletes reference off element if referenced element gets deleted (1/2)", func(t *testing.T) {
+		se := newEngine()
+		player1 := se.CreatePlayer()
+		player2 := se.CreatePlayer()
+		player1.AddGuildMember(se, player2.ID(se))
+
+		se.UpdateState()
+		se.DeletePlayer(player2.ID(se))
+		player1_updated, ok := se.Patch.Player[player1.ID(se)]
+		assert.True(t, ok)
+		assert.Equal(t, 0, len(player1_updated.GuildMembers))
+	})
 }
 
 func TestUpdateState(t *testing.T) {

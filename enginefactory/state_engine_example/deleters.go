@@ -9,19 +9,21 @@ func (se *Engine) DeletePlayer(playerID PlayerID) {
 }
 func (se *Engine) deletePlayer(playerID PlayerID) {
 	player := se.Player(playerID).player
-	player.OperationKind_ = OperationKindDelete
-	se.Patch.Player[player.ID] = player
-	for _, itemID := range se.allItemIDs() {
-		item := se.Item(itemID)
+	for _, id := range se.allItemIDs() {
+		item := se.Item(id)
 		if item.item.BoundTo.id == playerID {
 			item.item.BoundTo.Unset(se)
 		}
 	}
-	se.deleteGearScore(player.GearScore)
-	for _, playerID := range se.allPlayerIDs() {
-		player := se.Player(playerID)
+	for _, id := range se.allPlayerIDs() {
+		player := se.Player(id)
 		player.RemoveGuildMembers(se, playerID)
 	}
+
+	player.OperationKind_ = OperationKindDelete
+	se.Patch.Player[player.ID] = player
+
+	se.deleteGearScore(player.GearScore)
 	for _, itemID := range player.Items {
 		se.deleteItem(itemID)
 	}
