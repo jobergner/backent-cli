@@ -1,5 +1,16 @@
 package state
 
+type ElementKind string
+
+const (
+	ElementKindGearScore ElementKind = "GearScore"
+	ElementKindItem      ElementKind = "Item"
+	ElementKindPlayer    ElementKind = "Player"
+	ElementKindPosition  ElementKind = "Position"
+	ElementKindZone      ElementKind = "Zone"
+	ElementKindZoneItem  ElementKind = "ZoneItem"
+)
+
 type Tree struct {
 	GearScore map[GearScoreID]GearScore `json:"gearScore"`
 	Item      map[ItemID]Item           `json:"item"`
@@ -21,8 +32,9 @@ func newTree() Tree {
 }
 
 type ElementReference struct {
-	ID          int
-	ElementKind ElementKind
+	ID          int         `json:"id"`
+	ElementKind ElementKind `json:"elementKind"`
+	HasUpdated  bool        `json:"hasUpdated"`
 }
 
 type ZoneItem struct {

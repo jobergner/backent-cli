@@ -7,17 +7,6 @@ type PositionID int
 type ZoneID int
 type ZoneItemID int
 
-type ElementKind string
-
-const (
-	ElementKindGearScore ElementKind = "GearScore"
-	ElementKindItem      ElementKind = "Item"
-	ElementKindPlayer    ElementKind = "Player"
-	ElementKindPosition  ElementKind = "Position"
-	ElementKindZone      ElementKind = "Zone"
-	ElementKindZoneItem  ElementKind = "ZoneItem"
-)
-
 type State struct {
 	GearScore map[GearScoreID]gearScoreCore `json:"gearScore"`
 	Item      map[ItemID]itemCore           `json:"item"`
