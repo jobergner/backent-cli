@@ -46,7 +46,9 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
 	if itemData.BoundTo.id != 0 {
-		item.BoundTo = &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer}
+		_, hasUpdated := se.Patch.Player[itemData.BoundTo.id]
+		ref := ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, HasUpdated: hasUpdated}
+		item.BoundTo = &ref
 	}
 	item.Name = itemData.Name
 	return item, hasUpdated
@@ -101,7 +103,9 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 	player.ID = playerData.ID
 	player.OperationKind_ = playerData.OperationKind_
 	for _, guildMember := range playerData.GuildMembers {
-		player.GuildMembers = append(player.GuildMembers, ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer})
+		_, hasUpdated := se.Patch.Player[guildMember.id]
+		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, HasUpdated: hasUpdated}
+		player.GuildMembers = append(player.GuildMembers, ref)
 	}
 	return player, hasUpdated
 }
