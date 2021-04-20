@@ -180,6 +180,7 @@ func (se Engine) allZoneItemIDs() []ZoneItemID {
 	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
 }
 
+// TODO extensive testing
 func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference {
 	if itemData.BoundTo.id != 0 {
 		_, hasUpdated := se.Patch.Player[itemData.BoundTo.id]
@@ -195,24 +196,10 @@ func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference
 	return nil
 }
 
+// TODO extensive testing
 func (se *Engine) evalPlayerGuildMembersElementRefs(playerData playerCore) []ElementReference {
 	var refs []ElementReference
-	for _, guildMember := range playerData.GuildMembers {
-		_, hasUpdated := se.Patch.Player[guildMember.id]
-		justGotSet := true
-		for _, previousGuildMembers := range se.State.Player[playerData.ID].GuildMembers {
-			if previousGuildMembers.id == guildMember.id {
-				justGotSet = false
-			}
-		}
-		operationKind := OperationKindRefUnchanged
-		if hasUpdated || justGotSet {
-			operationKind = OperationKindUpdate
-		}
-		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
-		refs = append(refs, ref)
-	}
-	// TODO figure out way to maintain order in refernece slice
+	var evalProgressionIndex int
 	for _, previousGuildMember := range se.State.Player[playerData.ID].GuildMembers {
 		refGotDeleted := true
 		for _, currentGuildMember := range playerData.GuildMembers {
@@ -223,7 +210,15 @@ func (se *Engine) evalPlayerGuildMembersElementRefs(playerData playerCore) []Ele
 		if refGotDeleted {
 			ref := ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
 			refs = append(refs, ref)
+		} else {
+			ref := ElementReference{ID: int(previousGuildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindRefUnchanged}
+			refs = append(refs, ref)
+			evalProgressionIndex += 1
 		}
+	}
+	for _, guildMember := range playerData.GuildMembers[evalProgressionIndex:] {
+		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindUpdate}
+		refs = append(refs, ref)
 	}
 	return refs
 }
