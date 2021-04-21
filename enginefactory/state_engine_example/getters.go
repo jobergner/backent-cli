@@ -191,6 +191,10 @@ func (_zone zone) Tags(se *Engine) []string {
 	return tags
 }
 
+func (ref itemBoundToRef) ID(se *Engine) PlayerID {
+	return ref.itemBoundToRef.ReferencedElementID
+}
+
 func (se *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) itemBoundToRef {
 	patchingRef, ok := se.Patch.ItemBoundToRef[itemBoundToRefID]
 	if ok {
@@ -201,6 +205,10 @@ func (se *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) itemBoundToR
 		return itemBoundToRef{itemBoundToRef: currentRef}
 	}
 	return itemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind_: OperationKindDelete}}
+}
+
+func (ref playerGuildMemberRef) ID(se *Engine) PlayerID {
+	return ref.playerGuildMemberRef.ReferencedElementID
 }
 
 func (se *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) playerGuildMemberRef {
