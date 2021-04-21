@@ -93,7 +93,7 @@ func (_player player) RemoveGuildMembers(se *Engine, guildMembersToRemove ...Pla
 		return player
 	}
 	var wereElementsAltered bool
-	var newElements []playerSliceRef
+	var newElements []playerGuildMembersSliceRef
 	for _, element := range player.player.GuildMembers {
 		var toBeRemoved bool
 		for _, elementToRemove := range guildMembersToRemove {
