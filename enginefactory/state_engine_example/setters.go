@@ -6,7 +6,8 @@ func (_gearScore gearScore) SetLevel(se *Engine, newLevel int) gearScore {
 		return gearScore
 	}
 	gearScore.gearScore.Level = newLevel
-	se.updateGearScore(gearScore.gearScore)
+	gearScore.gearScore.OperationKind_ = OperationKindUpdate
+	se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
 	return gearScore
 }
 
@@ -16,7 +17,8 @@ func (_gearScore gearScore) SetScore(se *Engine, newScore int) gearScore {
 		return gearScore
 	}
 	gearScore.gearScore.Score = newScore
-	se.updateGearScore(gearScore.gearScore)
+	gearScore.gearScore.OperationKind_ = OperationKindUpdate
+	se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
 	return gearScore
 }
 
@@ -26,7 +28,8 @@ func (_position position) SetX(se *Engine, newX float64) position {
 		return position
 	}
 	position.position.X = newX
-	se.updatePosition(position.position)
+	position.position.OperationKind_ = OperationKindUpdate
+	se.Patch.Position[position.position.ID] = position.position
 	return position
 }
 
@@ -36,16 +39,30 @@ func (_position position) SetY(se *Engine, newY float64) position {
 		return position
 	}
 	position.position.Y = newY
-	se.updatePosition(position.position)
+	position.position.OperationKind_ = OperationKindUpdate
+	se.Patch.Position[position.position.ID] = position.position
 	return position
 }
 
-func (_item item) SetX(se *Engine, nameName string) item {
+func (_item item) SetName(se *Engine, nameName string) item {
 	item := se.Item(_item.item.ID)
 	if item.item.OperationKind_ == OperationKindDelete {
 		return item
 	}
 	item.item.Name = nameName
-	se.updateItem(item.item)
+	item.item.OperationKind_ = OperationKindUpdate
+	se.Patch.Item[item.item.ID] = item.item
+	return item
+}
+
+func (_item item) SetBoundTo(se *Engine, playerID PlayerID) item {
+	item := se.Item(_item.item.ID)
+	if item.item.OperationKind_ == OperationKindDelete {
+		return item
+	}
+	ref := se.createItemBoundToRef()
+	item.item.BoundTo = ref.ID
+	item.item.OperationKind_ = OperationKindUpdate
+	se.Patch.Item[item.item.ID] = item.item
 	return item
 }

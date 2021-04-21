@@ -61,68 +61,68 @@ func TestEngine(t *testing.T) {
 	})
 }
 
-func TestReferences(t *testing.T) {
-	t.Run("puts element in patch if an element it has a reference in it's fields gets updated (1/2)", func(t *testing.T) {
-		se := newEngine()
-		player1 := se.CreatePlayer()
-		player2 := se.CreatePlayer()
-		player1.AddGuildMember(se, player2.ID(se))
+// func TestReferences(t *testing.T) {
+// 	t.Run("puts element in patch if an element it has a reference in it's fields gets updated (1/2)", func(t *testing.T) {
+// 		se := newEngine()
+// 		player1 := se.CreatePlayer()
+// 		player2 := se.CreatePlayer()
+// 		player1.AddGuildMember(se, player2.ID(se))
 
-		assert.Equal(t, player1.GuildMembers(se)[0].id, player2.ID(se))
-		se.UpdateState()
-		player2.AddItem(se)
-		_, ok := se.Patch.Player[player1.ID(se)]
-		assert.True(t, ok)
-	})
-	t.Run("puts element in patch if an element it has a reference in it's fields gets updated (2/2)", func(t *testing.T) {
-		se := newEngine()
-		player := se.CreatePlayer()
-		item := se.CreateItem()
-		item.BoundTo(se).Set(se, player.ID(se))
-		se.UpdateState()
+// 		assert.Equal(t, player1.GuildMembers(se)[0].id, player2.ID(se))
+// 		se.UpdateState()
+// 		player2.AddItem(se)
+// 		_, ok := se.Patch.Player[player1.ID(se)]
+// 		assert.True(t, ok)
+// 	})
+// 	t.Run("puts element in patch if an element it has a reference in it's fields gets updated (2/2)", func(t *testing.T) {
+// 		se := newEngine()
+// 		player := se.CreatePlayer()
+// 		item := se.CreateItem()
+// 		item.BoundTo(se).Set(se, player.ID(se))
+// 		se.UpdateState()
 
-		player.AddItem(se)
-		_, ok := se.Patch.Item[item.ID(se)]
-		assert.True(t, ok)
-	})
-	t.Run("deletes reference off element if referenced element gets deleted (1/3)", func(t *testing.T) {
-		se := newEngine()
-		player1 := se.CreatePlayer()
-		player2 := se.CreatePlayer()
-		player1.AddGuildMember(se, player2.ID(se))
+// 		player.AddItem(se)
+// 		_, ok := se.Patch.Item[item.ID(se)]
+// 		assert.True(t, ok)
+// 	})
+// 	t.Run("deletes reference off element if referenced element gets deleted (1/3)", func(t *testing.T) {
+// 		se := newEngine()
+// 		player1 := se.CreatePlayer()
+// 		player2 := se.CreatePlayer()
+// 		player1.AddGuildMember(se, player2.ID(se))
 
-		se.UpdateState()
-		se.DeletePlayer(player2.ID(se))
-		player1_updated, ok := se.Patch.Player[player1.ID(se)]
-		assert.True(t, ok)
-		assert.Equal(t, 0, len(player1_updated.GuildMembers))
-	})
-	t.Run("deletes reference off element if referenced element gets deleted (2/3)", func(t *testing.T) {
-		se := newEngine()
-		player := se.CreatePlayer()
-		item := se.CreateItem()
-		item.BoundTo(se).Set(se, player.ID(se))
-		se.UpdateState()
+// 		se.UpdateState()
+// 		se.DeletePlayer(player2.ID(se))
+// 		player1_updated, ok := se.Patch.Player[player1.ID(se)]
+// 		assert.True(t, ok)
+// 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
+// 	})
+// 	t.Run("deletes reference off element if referenced element gets deleted (2/3)", func(t *testing.T) {
+// 		se := newEngine()
+// 		player := se.CreatePlayer()
+// 		item := se.CreateItem()
+// 		item.BoundTo(se).Set(se, player.ID(se))
+// 		se.UpdateState()
 
-		se.deletePlayer(player.ID(se))
-		_, ok := se.Patch.Item[item.ID(se)]
-		assert.True(t, ok)
-		assert.False(t, se.Item(item.ID(se)).BoundTo(se).IsSet(se))
-	})
-	t.Run("deletes reference off element if referenced element gets deleted (3/3)", func(t *testing.T) {
-		se := newEngine()
-		zone := se.CreateZone()
-		player1 := se.CreatePlayer()
-		player2 := zone.AddPlayer(se)
-		player1.AddGuildMember(se, player2.ID(se))
+// 		se.deletePlayer(player.ID(se))
+// 		_, ok := se.Patch.Item[item.ID(se)]
+// 		assert.True(t, ok)
+// 		assert.False(t, se.Item(item.ID(se)).BoundTo(se).IsSet(se))
+// 	})
+// 	t.Run("deletes reference off element if referenced element gets deleted (3/3)", func(t *testing.T) {
+// 		se := newEngine()
+// 		zone := se.CreateZone()
+// 		player1 := se.CreatePlayer()
+// 		player2 := zone.AddPlayer(se)
+// 		player1.AddGuildMember(se, player2.ID(se))
 
-		se.UpdateState()
-		zone.RemovePlayers(se, player2.ID(se))
-		player1_updated, ok := se.Patch.Player[player1.ID(se)]
-		assert.True(t, ok)
-		assert.Equal(t, 0, len(player1_updated.GuildMembers))
-	})
-}
+// 		se.UpdateState()
+// 		zone.RemovePlayers(se, player2.ID(se))
+// 		player1_updated, ok := se.Patch.Player[player1.ID(se)]
+// 		assert.True(t, ok)
+// 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
+// 	})
+// }
 
 func TestUpdateState(t *testing.T) {
 	t.Run("clears patch", func(t *testing.T) {
@@ -394,180 +394,180 @@ func TestTree(t *testing.T) {
 	})
 }
 
-func TestEvalPlayerGuildMembersElementRefs(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		se := newEngine()
-		player1 := se.CreatePlayer()
-		player2 := se.CreatePlayer()
-		player3 := se.CreatePlayer()
-		se.UpdateState()
-		player1.AddGuildMember(se, player2.ID(se))
-		player1.AddGuildMember(se, player3.ID(se))
+// func TestEvalPlayerGuildMembersElementRefs(t *testing.T) {
+// 	t.Run("", func(t *testing.T) {
+// 		se := newEngine()
+// 		player1 := se.CreatePlayer()
+// 		player2 := se.CreatePlayer()
+// 		player3 := se.CreatePlayer()
+// 		se.UpdateState()
+// 		player1.AddGuildMember(se, player2.ID(se))
+// 		player1.AddGuildMember(se, player3.ID(se))
 
-		actual1 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
-		expected1 := []ElementReference{
-			{
-				ID:             int(player2.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindUpdate,
-			},
-			{
-				ID:             int(player3.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindUpdate,
-			},
-		}
+// 		actual1 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
+// 		expected1 := []ElementReference{
+// 			{
+// 				ID:             int(player2.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindUpdate,
+// 			},
+// 			{
+// 				ID:             int(player3.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindUpdate,
+// 			},
+// 		}
 
-		assert.Equal(t, expected1, actual1)
-		se.UpdateState()
+// 		assert.Equal(t, expected1, actual1)
+// 		se.UpdateState()
 
-		player4 := se.CreatePlayer()
-		player1.AddGuildMember(se, player4.ID(se))
-		actual2 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
-		expected2 := []ElementReference{
-			{
-				ID:             int(player2.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player3.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player4.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindUpdate,
-			},
-		}
+// 		player4 := se.CreatePlayer()
+// 		player1.AddGuildMember(se, player4.ID(se))
+// 		actual2 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
+// 		expected2 := []ElementReference{
+// 			{
+// 				ID:             int(player2.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player3.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player4.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindUpdate,
+// 			},
+// 		}
 
-		assert.Equal(t, expected2, actual2)
-		se.UpdateState()
+// 		assert.Equal(t, expected2, actual2)
+// 		se.UpdateState()
 
-		player1.RemoveGuildMembers(se, player3.player.ID)
+// 		player1.RemoveGuildMembers(se, player3.player.ID)
 
-		actual3 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
-		expected3 := []ElementReference{
-			{
-				ID:             int(player2.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player3.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindDelete,
-			},
-			{
-				ID:             int(player4.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-		}
+// 		actual3 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
+// 		expected3 := []ElementReference{
+// 			{
+// 				ID:             int(player2.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player3.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindDelete,
+// 			},
+// 			{
+// 				ID:             int(player4.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 		}
 
-		assert.Equal(t, expected3, actual3)
-		se.UpdateState()
+// 		assert.Equal(t, expected3, actual3)
+// 		se.UpdateState()
 
-		player5 := se.CreatePlayer()
-		player1.AddGuildMember(se, player5.ID(se))
+// 		player5 := se.CreatePlayer()
+// 		player1.AddGuildMember(se, player5.ID(se))
 
-		actual4 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
-		expected4 := []ElementReference{
-			{
-				ID:             int(player2.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player4.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player5.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindUpdate,
-			},
-		}
+// 		actual4 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
+// 		expected4 := []ElementReference{
+// 			{
+// 				ID:             int(player2.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player4.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player5.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindUpdate,
+// 			},
+// 		}
 
-		assert.Equal(t, expected4, actual4)
-		se.UpdateState()
+// 		assert.Equal(t, expected4, actual4)
+// 		se.UpdateState()
 
-		player1.RemoveGuildMembers(se, player5.player.ID)
-		player6 := se.CreatePlayer()
-		player1.AddGuildMember(se, player6.ID(se))
+// 		player1.RemoveGuildMembers(se, player5.player.ID)
+// 		player6 := se.CreatePlayer()
+// 		player1.AddGuildMember(se, player6.ID(se))
 
-		actual5 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
-		expected5 := []ElementReference{
-			{
-				ID:             int(player2.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player4.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindRefUnchanged,
-			},
-			{
-				ID:             int(player5.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindDelete,
-			},
-			{
-				ID:             int(player6.player.ID),
-				ElementKind:    ElementKindPlayer,
-				OperationKind_: OperationKindUpdate,
-			},
-		}
+// 		actual5 := se.evalPlayerGuildMembersElementRefs(se.Player(player1.player.ID).player)
+// 		expected5 := []ElementReference{
+// 			{
+// 				ID:             int(player2.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player4.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindRefUnchanged,
+// 			},
+// 			{
+// 				ID:             int(player5.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindDelete,
+// 			},
+// 			{
+// 				ID:             int(player6.player.ID),
+// 				ElementKind:    ElementKindPlayer,
+// 				OperationKind_: OperationKindUpdate,
+// 			},
+// 		}
 
-		assert.Equal(t, expected5, actual5)
-	})
-}
+// 		assert.Equal(t, expected5, actual5)
+// 	})
+// }
 
-func TestEvalItemBoundToElementRef(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		se := newEngine()
-		item := se.CreateItem()
+// func TestEvalItemBoundToElementRef(t *testing.T) {
+// 	t.Run("", func(t *testing.T) {
+// 		se := newEngine()
+// 		item := se.CreateItem()
 
-		actual := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
-		var expected *ElementReference
+// 		actual := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
+// 		var expected *ElementReference
 
-		assert.Equal(t, expected, actual)
-		se.UpdateState()
+// 		assert.Equal(t, expected, actual)
+// 		se.UpdateState()
 
-		player := se.CreatePlayer()
-		item.item.BoundTo.Set(se, player.player.ID)
+// 		player := se.CreatePlayer()
+// 		item.item.BoundTo.Set(se, player.player.ID)
 
-		actual2 := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
-		expected2 := &ElementReference{
-			ID:             int(player.player.ID),
-			ElementKind:    ElementKindPlayer,
-			OperationKind_: OperationKindUpdate,
-		}
+// 		actual2 := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
+// 		expected2 := &ElementReference{
+// 			ID:             int(player.player.ID),
+// 			ElementKind:    ElementKindPlayer,
+// 			OperationKind_: OperationKindUpdate,
+// 		}
 
-		assert.Equal(t, expected2, actual2)
-		se.UpdateState()
+// 		assert.Equal(t, expected2, actual2)
+// 		se.UpdateState()
 
-		actual3 := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
-		expected3 := &ElementReference{
-			ID:             int(player.player.ID),
-			ElementKind:    ElementKindPlayer,
-			OperationKind_: OperationKindRefUnchanged,
-		}
+// 		actual3 := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
+// 		expected3 := &ElementReference{
+// 			ID:             int(player.player.ID),
+// 			ElementKind:    ElementKindPlayer,
+// 			OperationKind_: OperationKindRefUnchanged,
+// 		}
 
-		assert.Equal(t, expected3, actual3)
-		se.UpdateState()
+// 		assert.Equal(t, expected3, actual3)
+// 		se.UpdateState()
 
-		item.BoundTo(se).Unset(se)
-		actual4 := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
-		expected4 := &ElementReference{
-			ID:             int(player.player.ID),
-			ElementKind:    ElementKindPlayer,
-			OperationKind_: OperationKindDelete,
-		}
+// 		item.BoundTo(se).Unset(se)
+// 		actual4 := se.evalItemBoundToElementRef(se.Item(item.item.ID).item)
+// 		expected4 := &ElementReference{
+// 			ID:             int(player.player.ID),
+// 			ElementKind:    ElementKindPlayer,
+// 			OperationKind_: OperationKindDelete,
+// 		}
 
-		assert.Equal(t, expected4, actual4)
-	})
-}
+// 		assert.Equal(t, expected4, actual4)
+// 	})
+// }

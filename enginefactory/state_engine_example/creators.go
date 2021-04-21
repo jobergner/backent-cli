@@ -36,7 +36,6 @@ func (se *Engine) createItem(hasParent bool) item {
 	element.HasParent_ = hasParent
 	elementGearScore := se.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
-	element.BoundTo = itemBoundToRef{parentID: element.ID}
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.Item[element.ID] = element
 	return item{item: element}
@@ -86,4 +85,20 @@ func (se *Engine) createZone() zone {
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.Zone[element.ID] = element
 	return zone{zone: element}
+}
+
+func (se *Engine) createItemBoundToRef() itemBoundToRefCore {
+	var element itemBoundToRefCore
+	element.ID = ItemBoundToRefID(se.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.ItemBoundToRef[element.ID] = element
+	return element
+}
+
+func (se *Engine) createPlayerGuildMemberRef() playerGuildMemberRefCore {
+	var element playerGuildMemberRefCore
+	element.ID = PlayerGuildMemberRefID(se.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.PlayerGuildMemberRef[element.ID] = element
+	return element
 }

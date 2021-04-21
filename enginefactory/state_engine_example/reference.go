@@ -1,39 +1,29 @@
 package state
 
-type itemBoundToRef struct {
-	id       PlayerID
-	parentID ItemID
-	isSet    bool
+func (_ref itemBoundToRef) IsSet(se *Engine) bool {
+	ref := se.itemBoundToRef(_ref.itemBoundToRef.ID)
+	item := se.Item(ref.itemBoundToRef.ParentID).item
+	return item.BoundTo != 0
 }
 
-func (ref itemBoundToRef) IsSet(se *Engine) bool {
-	return ref.isSet
+func (_ref itemBoundToRef) Unset(se *Engine) {
+	ref := se.itemBoundToRef(_ref.itemBoundToRef.ID)
+	se.deleteItemBoundToRef(ref.itemBoundToRef.ID)
+	item := se.Item(ref.itemBoundToRef.ParentID).item
+	if item.OperationKind_ == OperationKindDelete {
+		return
+	}
+	item.BoundTo = 0
+	item.OperationKind_ = OperationKindUpdate
+	se.Patch.Item[item.ID] = item
 }
 
-func (ref itemBoundToRef) Unset(se *Engine) {
-	ref.isSet = false
-	item := se.Item(ref.parentID).item
-	item.BoundTo = ref
-	se.updateItem(item)
+func (_ref itemBoundToRef) Get(se *Engine) player {
+	ref := se.itemBoundToRef(_ref.itemBoundToRef.ID)
+	return se.Player(ref.itemBoundToRef.ReferencedElementID)
 }
 
-func (ref itemBoundToRef) Set(se *Engine, id PlayerID) {
-	ref.id = id
-	ref.isSet = true
-	item := se.Item(ref.parentID).item
-	item.BoundTo = ref
-	se.updateItem(item)
-}
-
-func (ref itemBoundToRef) Get(se *Engine) player {
-	return se.Player(ref.id)
-}
-
-type playerGuildMembersSliceRef struct {
-	id       PlayerID
-	parentID PlayerID
-}
-
-func (ref playerGuildMembersSliceRef) Get(se *Engine) player {
-	return se.Player(ref.id)
+func (_ref playerGuildMemberRef) Get(se *Engine) player {
+	ref := se.playerGuildMemberRef(_ref.playerGuildMemberRef.ID)
+	return se.Player(ref.playerGuildMemberRef.ReferencedElementID)
 }

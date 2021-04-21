@@ -7,7 +7,8 @@ func (_zone zone) AddPlayer(se *Engine) player {
 	}
 	player := se.createPlayer(true)
 	zone.zone.Players = append(zone.zone.Players, player.player.ID)
-	se.updateZone(zone.zone)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return player
 }
 
@@ -18,7 +19,8 @@ func (_zone zone) AddItem(se *Engine) zoneItem {
 	}
 	zoneItem := se.createZoneItem(true)
 	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
-	se.updateZone(zone.zone)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return zoneItem
 }
 
@@ -28,7 +30,8 @@ func (_zone zone) AddTags(se *Engine, tags ...string) {
 		return
 	}
 	zone.zone.Tags = append(zone.zone.Tags, tags...)
-	se.updateZone(zone.zone)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 }
 
 func (_player player) AddItem(se *Engine) item {
@@ -38,7 +41,8 @@ func (_player player) AddItem(se *Engine) item {
 	}
 	item := se.createItem(true)
 	player.player.Items = append(player.player.Items, item.item.ID)
-	se.updatePlayer(player.player)
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
 	return item
 }
 
@@ -47,6 +51,8 @@ func (_player player) AddGuildMember(se *Engine, playerID PlayerID) {
 	if player.player.OperationKind_ == OperationKindDelete {
 		return
 	}
-	player.player.GuildMembers = append(player.player.GuildMembers, playerGuildMembersSliceRef{playerID, player.player.ID})
-	se.updatePlayer(player.player)
+	ref := se.createPlayerGuildMemberRef()
+	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
 }

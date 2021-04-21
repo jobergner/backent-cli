@@ -25,7 +25,8 @@ func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
 		return zone
 	}
 	zone.zone.Players = newElements
-	se.updateZone(zone.zone)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
@@ -54,7 +55,8 @@ func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
 		return zone
 	}
 	zone.zone.Items = newElements
-	se.updateZone(zone.zone)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
@@ -83,7 +85,8 @@ func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
 		return player
 	}
 	player.player.Items = newElements
-	se.updatePlayer(player.player)
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
@@ -93,25 +96,28 @@ func (_player player) RemoveGuildMembers(se *Engine, guildMembersToRemove ...Pla
 		return player
 	}
 	var wereElementsAltered bool
-	var newElements []playerGuildMembersSliceRef
-	for _, element := range player.player.GuildMembers {
+	var newElements []PlayerGuildMemberRefID
+	for _, refElement := range player.player.GuildMembers {
+		element := se.playerGuildMemberRef(refElement).playerGuildMemberRef.ReferencedElementID
 		var toBeRemoved bool
 		for _, elementToRemove := range guildMembersToRemove {
-			if element.id == elementToRemove {
+			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
+				se.deletePlayerGuildMemberRef(refElement)
 				break
 			}
 		}
 		if !toBeRemoved {
-			newElements = append(newElements, element)
+			newElements = append(newElements, refElement)
 		}
 	}
 	if !wereElementsAltered {
 		return player
 	}
 	player.player.GuildMembers = newElements
-	se.updatePlayer(player.player)
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
@@ -139,6 +145,7 @@ func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
 		return zone
 	}
 	zone.zone.Tags = newElements
-	se.updateZone(zone.zone)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
