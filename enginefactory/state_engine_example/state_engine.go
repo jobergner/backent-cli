@@ -3,9 +3,8 @@ package state
 type OperationKind string
 
 const (
-	OperationKindDelete       OperationKind = "DELETE"
-	OperationKindUpdate       OperationKind = "UPDATE"
-	OperationKindRefUnchanged OperationKind = "UNCHANGED"
+	OperationKindDelete OperationKind = "DELETE"
+	OperationKindUpdate OperationKind = "UPDATE"
 )
 
 type Engine struct {
@@ -26,6 +25,36 @@ func (se *Engine) GenerateID() int {
 	newID := se.IDgen
 	se.IDgen = se.IDgen + 1
 	return newID
+}
+
+func (se *Engine) updateReferenceRelationships() {
+	for _, player := range se.Patch.Player {
+		if player.OperationKind_ == OperationKindDelete {
+			// delete all references of this element in other elements
+			for _, itemID := range se.allItemIDs() {
+				_item := se.Item(itemID)
+				if _item.BoundTo(se).ID(se) == player.ID {
+					_item.BoundTo(se).Unset(se)
+				}
+			}
+			for _, playerID := range se.allPlayerIDs() {
+				_player := se.Player(playerID)
+				_player.RemoveGuildMembers(se, playerID)
+			}
+		} else {
+			// update all elements referencing this element
+			for _, itemID := range se.allItemIDs() {
+				_item := se.Item(itemID)
+				if _item.BoundTo(se).ID(se) == player.ID {
+					// _item.BoundTo(se).Unset(se) same as below
+				}
+			}
+			for _, playerID := range se.allPlayerIDs() {
+				_player := se.Player(playerID)
+				se.updateElementsReferencingPlayer(_player.player, []PlayerID{})
+			}
+		}
+	}
 }
 
 func (se *Engine) UpdateState() {
@@ -71,6 +100,7 @@ func (se *Engine) UpdateState() {
 			se.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
+	// TODO dont forget to update, delete references
 
 	for key := range se.Patch.GearScore {
 		delete(se.Patch.GearScore, key)
