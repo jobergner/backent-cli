@@ -6,14 +6,18 @@ type PlayerID int
 type PositionID int
 type ZoneID int
 type ZoneItemID int
+type PlayerGuildMemberRefID int
+type ItemBoundToRefID int
 
 type State struct {
-	GearScore map[GearScoreID]gearScoreCore `json:"gearScore"`
-	Item      map[ItemID]itemCore           `json:"item"`
-	Player    map[PlayerID]playerCore       `json:"player"`
-	Position  map[PositionID]positionCore   `json:"position"`
-	Zone      map[ZoneID]zoneCore           `json:"zone"`
-	ZoneItem  map[ZoneItemID]zoneItemCore   `json:"zoneItem"`
+	GearScore            map[GearScoreID]gearScoreCore                       `json:"gearScore"`
+	Item                 map[ItemID]itemCore                                 `json:"item"`
+	ItemBoundToRef       map[ItemBoundToRefID]itemBoundToRefCore             `json:"itemBoundToRef"`
+	Player               map[PlayerID]playerCore                             `json:"player"`
+	PlayerGuildMemberRef map[PlayerGuildMemberRefID]playerGuildMemberRefCore `json:"playerGuildMemberRef"`
+	Position             map[PositionID]positionCore                         `json:"position"`
+	Zone                 map[ZoneID]zoneCore                                 `json:"zone"`
+	ZoneItem             map[ZoneItemID]zoneItemCore                         `json:"zoneItem"`
 }
 
 func newState() State {
@@ -48,24 +52,24 @@ type zoneItemCore struct {
 type zoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
-	ID             ItemID         `json:"id"`
-	BoundTo        itemBoundToRef `json:"boundTo"`
-	GearScore      GearScoreID    `json:"gearScore"`
-	Name           string         `json:"name"`
-	OperationKind_ OperationKind  `json:"operationKind_"`
-	HasParent_     bool           `json:"hasParent_"`
+	ID             ItemID           `json:"id"`
+	BoundTo        ItemBoundToRefID `json:"boundTo"`
+	GearScore      GearScoreID      `json:"gearScore"`
+	Name           string           `json:"name"`
+	OperationKind_ OperationKind    `json:"operationKind_"`
+	HasParent_     bool             `json:"hasParent_"`
 }
 
 type item struct{ item itemCore }
 
 type playerCore struct {
-	ID             PlayerID                     `json:"id"`
-	GearScore      GearScoreID                  `json:"gearScore"`
-	GuildMembers   []playerGuildMembersSliceRef `json:"guildMembers"`
-	Items          []ItemID                     `json:"items"`
-	Position       PositionID                   `json:"position"`
-	OperationKind_ OperationKind                `json:"operationKind_"`
-	HasParent_     bool                         `json:"hasParent_"`
+	ID             PlayerID                 `json:"id"`
+	GearScore      GearScoreID              `json:"gearScore"`
+	GuildMembers   []PlayerGuildMemberRefID `json:"guildMembers"`
+	Items          []ItemID                 `json:"items"`
+	Position       PositionID               `json:"position"`
+	OperationKind_ OperationKind            `json:"operationKind_"`
+	HasParent_     bool                     `json:"hasParent_"`
 }
 
 type player struct{ player playerCore }
@@ -89,3 +93,21 @@ type positionCore struct {
 }
 
 type position struct{ position positionCore }
+
+type itemBoundToRefCore struct {
+	ID                  ItemBoundToRefID `json:"id"`
+	ParentID            ItemID           `json:"parentID"`
+	ReferencedElementID PlayerID         `json:"referencedElementID"`
+	OperationKind_      OperationKind    `json:"operationKind_"`
+}
+
+type itemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }
+
+type playerGuildMemberRefCore struct {
+	ID                  PlayerGuildMemberRefID `json:"id"`
+	ParentID            PlayerID               `json:"parentID"`
+	ReferencedElementID PlayerID               `json:"referencedElementID"`
+	OperationKind_      OperationKind          `json:"operationKind_"`
+}
+
+type playerGuildMemberRef struct{ playerGuildMemberRef playerGuildMemberRefCore }

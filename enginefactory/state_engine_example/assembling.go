@@ -45,7 +45,7 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
-	item.BoundTo = se.evalItemBoundToElementRef(itemData)
+	// item.BoundTo = se.evalItemBoundToElementRef(itemData)
 	item.Name = itemData.Name
 	return item, hasUpdated
 }
@@ -98,7 +98,7 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 
 	player.ID = playerData.ID
 	player.OperationKind_ = playerData.OperationKind_
-	player.GuildMembers = se.evalPlayerGuildMembersElementRefs(playerData)
+	// player.GuildMembers = se.evalPlayerGuildMembersElementRefs(playerData)
 	return player, hasUpdated
 }
 

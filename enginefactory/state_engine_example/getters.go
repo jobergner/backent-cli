@@ -30,9 +30,13 @@ func (_player player) GearScore(se *Engine) gearScore {
 	return se.GearScore(player.player.GearScore)
 }
 
-func (_player player) GuildMembers(se *Engine) []playerGuildMembersSliceRef {
+func (_player player) GuildMembers(se *Engine) []playerGuildMemberRef {
 	player := se.Player(_player.player.ID)
-	return player.player.GuildMembers
+	var guildMembers []playerGuildMemberRef
+	for _, refID := range player.player.GuildMembers {
+		guildMembers = append(guildMembers, se.playerGuildMemberRef(refID))
+	}
+	return guildMembers
 }
 
 func (_player player) Position(se *Engine) position {
@@ -89,7 +93,7 @@ func (_item item) GearScore(se *Engine) gearScore {
 
 func (_item item) BoundTo(se *Engine) itemBoundToRef {
 	item := se.Item(_item.item.ID)
-	return item.item.BoundTo
+	return se.itemBoundToRef(item.item.BoundTo)
 }
 
 func (se *Engine) Position(positionID PositionID) position {
@@ -185,4 +189,28 @@ func (_zone zone) Tags(se *Engine) []string {
 		tags = append(tags, element)
 	}
 	return tags
+}
+
+func (se *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) itemBoundToRef {
+	patchingRef, ok := se.Patch.ItemBoundToRef[itemBoundToRefID]
+	if ok {
+		return itemBoundToRef{itemBoundToRef: patchingRef}
+	}
+	currentRef, ok := se.State.ItemBoundToRef[itemBoundToRefID]
+	if ok {
+		return itemBoundToRef{itemBoundToRef: currentRef}
+	}
+	return itemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind_: OperationKindDelete}}
+}
+
+func (se *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) playerGuildMemberRef {
+	patchingRef, ok := se.Patch.PlayerGuildMemberRef[playerGuildMemberRefID]
+	if ok {
+		return playerGuildMemberRef{playerGuildMemberRef: patchingRef}
+	}
+	currentRef, ok := se.State.PlayerGuildMemberRef[playerGuildMemberRefID]
+	if ok {
+		return playerGuildMemberRef{playerGuildMemberRef: currentRef}
+	}
+	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind_: OperationKindDelete}}
 }

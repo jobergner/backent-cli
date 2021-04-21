@@ -9,21 +9,12 @@ func (se *Engine) DeletePlayer(playerID PlayerID) {
 }
 func (se *Engine) deletePlayer(playerID PlayerID) {
 	player := se.Player(playerID).player
-	for _, id := range se.allItemIDs() {
-		item := se.Item(id)
-		if item.item.BoundTo.id == playerID {
-			item.item.BoundTo.Unset(se)
-		}
-	}
-	for _, id := range se.allPlayerIDs() {
-		player := se.Player(id)
-		player.RemoveGuildMembers(se, playerID)
-	}
-
 	player.OperationKind_ = OperationKindDelete
 	se.Patch.Player[player.ID] = player
-
 	se.deleteGearScore(player.GearScore)
+	for _, guildMember := range player.GuildMembers {
+		se.deletePlayerGuildMemberRef(guildMember)
+	}
 	for _, itemID := range player.Items {
 		se.deleteItem(itemID)
 	}
@@ -67,6 +58,7 @@ func (se *Engine) deleteItem(itemID ItemID) {
 	item := se.Item(itemID).item
 	item.OperationKind_ = OperationKindDelete
 	se.Patch.Item[item.ID] = item
+	se.deleteItemBoundToRef(item.BoundTo)
 	se.deleteGearScore(item.GearScore)
 }
 
@@ -98,4 +90,16 @@ func (se *Engine) deleteZone(zoneID ZoneID) {
 	for _, playerID := range zone.Players {
 		se.deletePlayer(playerID)
 	}
+}
+
+func (se *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) {
+	playerGuildMemberRef := se.playerGuildMemberRef(playerGuildMemberRefID).playerGuildMemberRef
+	playerGuildMemberRef.OperationKind_ = OperationKindDelete
+	se.Patch.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
+}
+
+func (se *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
+	itemBoundToRef := se.itemBoundToRef(itemBoundToRefID).itemBoundToRef
+	itemBoundToRef.OperationKind_ = OperationKindDelete
+	se.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
 }

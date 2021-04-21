@@ -285,6 +285,16 @@ this should be possible. However some things need to be considered:
 - when used as reference (`*anyOf<player,enemy>`) the element also gains the `IsSet` and `Unset` method.
 - can not be used on basic types
 
+
+### reduce complexity in references
+right now its a bit of a mess. references definitely made the code base a lot more complex. There are too many different places where reference logic ist handled (updaters, setters, removers, adders, assembling) and the logic works very differently from the rest of the element handling. There will always be extra logic to references, as they are optional values.
+changes i want to introduce:
+- add OperationKinds to references -> handling becomes similar to other elements
+- references do not always need to be communicated, only when changed
+- introduce ids to references themselves. as a slice of references may contain the same referenced element twice, and if a reference was to appear without an id, it'd be ambigous which reference is meant.
+- updating elements based on whether they contain a reference to an updated element should be it's own step within the updating cycle. atm it happens everytime an element is updated
+-> this concludes that references better be their own type in a state object, like every other element
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
