@@ -182,21 +182,20 @@ func (se Engine) allZoneItemIDs() []ZoneItemID {
 
 // TODO extensive testing
 func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference {
-	if itemData.BoundTo.id != 0 {
+	if itemData.BoundTo.isSet {
 		_, hasUpdated := se.Patch.Player[itemData.BoundTo.id]
-		justGotSet := se.State.Item[itemData.ID].BoundTo.id == 0
+		justGotSet := !se.State.Item[itemData.ID].BoundTo.isSet
 		operationKind := OperationKindRefUnchanged
 		if hasUpdated || justGotSet {
 			operationKind = OperationKindUpdate
 		}
 		return &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
 	} else if se.State.Item[itemData.ID].BoundTo.id != 0 {
-		return &ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
+		return &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
 	}
 	return nil
 }
 
-// TODO extensive testing
 func (se *Engine) evalPlayerGuildMembersElementRefs(playerData playerCore) []ElementReference {
 	var refs []ElementReference
 	var evalProgressionIndex int
@@ -208,7 +207,7 @@ func (se *Engine) evalPlayerGuildMembersElementRefs(playerData playerCore) []Ele
 			}
 		}
 		if refGotDeleted {
-			ref := ElementReference{ID: 0, ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
+			ref := ElementReference{ID: int(previousGuildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
 			refs = append(refs, ref)
 		} else {
 			ref := ElementReference{ID: int(previousGuildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindRefUnchanged}
