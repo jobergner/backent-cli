@@ -30,7 +30,7 @@ func (_player player) GearScore(se *Engine) gearScore {
 	return se.GearScore(player.player.GearScore)
 }
 
-func (_player player) GuildMembers(se *Engine) []playerSliceRef {
+func (_player player) GuildMembers(se *Engine) []playerGuildMembersSliceRef {
 	player := se.Player(_player.player.ID)
 	return player.player.GuildMembers
 }
