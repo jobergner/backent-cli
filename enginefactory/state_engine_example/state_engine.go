@@ -70,6 +70,13 @@ func (se *Engine) updateReferenceRelationships() {
 }
 
 func (se *Engine) UpdateState() {
+	for _, equipmentSet := range se.Patch.EquipmentSet {
+		if equipmentSet.OperationKind_ == OperationKindDelete {
+			delete(se.State.EquipmentSet, equipmentSet.ID)
+		} else {
+			se.State.EquipmentSet[equipmentSet.ID] = equipmentSet
+		}
+	}
 	for _, gearScore := range se.Patch.GearScore {
 		if gearScore.OperationKind_ == OperationKindDelete {
 			delete(se.State.GearScore, gearScore.ID)

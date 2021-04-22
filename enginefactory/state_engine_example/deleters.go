@@ -92,6 +92,22 @@ func (se *Engine) deleteZone(zoneID ZoneID) {
 	}
 }
 
+func (se *Engine) DeleteEquipmentSet(equipmentSetID EquipmentSetID) {
+	equipmentSet := se.EquipmentSet(equipmentSetID).equipmentSet
+	if equipmentSet.HasParent_ {
+		return
+	}
+	se.deleteEquipmentSet(equipmentSetID)
+}
+func (se *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
+	equipmentSet := se.EquipmentSet(equipmentSetID).equipmentSet
+	equipmentSet.OperationKind_ = OperationKindDelete
+	se.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
+	for _, equipmentSet := range equipmentSet.Equipment {
+		se.deleteEquipmentSetEquipmentRef(equipmentSet)
+	}
+}
+
 func (se *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) {
 	playerGuildMemberRef := se.playerGuildMemberRef(playerGuildMemberRefID).playerGuildMemberRef
 	playerGuildMemberRef.OperationKind_ = OperationKindDelete
@@ -102,4 +118,10 @@ func (se *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
 	itemBoundToRef := se.itemBoundToRef(itemBoundToRefID).itemBoundToRef
 	itemBoundToRef.OperationKind_ = OperationKindDelete
 	se.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
+}
+
+func (se *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) {
+	equipmentSetEquipmentRef := se.equipmentSetEquipmentRef(equipmentSetEquipmentRefID).equipmentSetEquipmentRef
+	equipmentSetEquipmentRef.OperationKind_ = OperationKindDelete
+	se.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
 }

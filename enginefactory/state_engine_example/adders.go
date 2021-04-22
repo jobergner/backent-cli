@@ -56,3 +56,25 @@ func (_player player) AddGuildMember(se *Engine, playerID PlayerID) {
 	player.player.OperationKind_ = OperationKindUpdate
 	se.Patch.Player[player.player.ID] = player.player
 }
+
+func (_player player) AddEquipmentSet(se *Engine, equipmentSetID EquipmentSetID) {
+	player := se.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return
+	}
+	ref := se.createPlayerEquipmentSetRef()
+	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
+}
+
+func (_equipmentSet equipmentSet) AddEquipment(se *Engine, itemID ItemID) {
+	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	if equipmentSet.equipmentSet.OperationKind_ == OperationKindDelete {
+		return
+	}
+	ref := se.createEquipmentSetEquipmentRef()
+	equipmentSet.equipmentSet.Equipment = append(equipmentSet.equipmentSet.Equipment, ref.ID)
+	equipmentSet.equipmentSet.OperationKind_ = OperationKindUpdate
+	se.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+}

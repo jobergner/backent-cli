@@ -96,9 +96,39 @@ func (se *Engine) createItemBoundToRef() itemBoundToRefCore {
 }
 
 func (se *Engine) createPlayerGuildMemberRef() playerGuildMemberRefCore {
+	// TODO: ReferencedElementID, ParentID ??? in param
 	var element playerGuildMemberRefCore
 	element.ID = PlayerGuildMemberRefID(se.GenerateID())
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.PlayerGuildMemberRef[element.ID] = element
+	return element
+}
+
+func (se *Engine) CreateEquipmentSet() equipmentSet {
+	return se.createEquipmentSet(false)
+}
+
+func (se *Engine) createEquipmentSet(hasParent bool) equipmentSet {
+	var element equipmentSetCore
+	element.ID = EquipmentSetID(se.GenerateID())
+	element.HasParent_ = hasParent
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.EquipmentSet[element.ID] = element
+	return equipmentSet{equipmentSet: element}
+}
+
+func (se *Engine) createEquipmentSetEquipmentRef() equipmentSetEquipmentRefCore {
+	var element equipmentSetEquipmentRefCore
+	element.ID = EquipmentSetEquipmentRefID(se.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.EquipmentSetEquipmentRef[element.ID] = element
+	return element
+}
+
+func (se *Engine) createPlayerEquipmentSetRef() playerEquipmentSetRefCore {
+	var element playerEquipmentSetRefCore
+	element.ID = PlayerEquipmentSetRefID(se.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	se.Patch.PlayerEquipmentSetRef[element.ID] = element
 	return element
 }

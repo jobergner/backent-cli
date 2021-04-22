@@ -66,3 +66,14 @@ func (_item item) SetBoundTo(se *Engine, playerID PlayerID) item {
 	se.Patch.Item[item.item.ID] = item.item
 	return item
 }
+
+func (_equipmentSet equipmentSet) SetName(se *Engine, nameName string) equipmentSet {
+	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	if equipmentSet.equipmentSet.OperationKind_ == OperationKindDelete {
+		return equipmentSet
+	}
+	equipmentSet.equipmentSet.Name = nameName
+	equipmentSet.equipmentSet.OperationKind_ = OperationKindUpdate
+	se.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+	return equipmentSet
+}

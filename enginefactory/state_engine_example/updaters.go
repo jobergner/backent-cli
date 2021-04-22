@@ -27,3 +27,7 @@ func (se *Engine) updatePlayerGuildMemberRef(ref playerGuildMemberRef) {
 		}
 	}
 }
+func (se *Engine) updateEquipmentSetEquipmentRef(ref equipmentSetEquipmentRef) {
+	ref.equipmentSetEquipmentRef.OperationKind_ = OperationKindUpdate
+	se.Patch.EquipmentSetEquipmentRef[ref.equipmentSetEquipmentRef.ID] = ref.equipmentSetEquipmentRef
+}
