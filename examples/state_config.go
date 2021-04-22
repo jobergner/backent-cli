@@ -2,10 +2,11 @@ package examples
 
 var StateConfig = map[interface{}]interface{}{
 	"player": map[interface{}]interface{}{
-		"items":        "[]item",
-		"gearScore":    "gearScore",
-		"position":     "position",
-		"guildMembers": "[]*player",
+		"items":         "[]item",
+		"equipmentSets": "[]*equipmentSet",
+		"gearScore":     "gearScore",
+		"position":      "position",
+		"guildMembers":  "[]*player",
 	},
 	"zone": map[interface{}]interface{}{
 		"items":   "[]zoneItem",
@@ -28,5 +29,9 @@ var StateConfig = map[interface{}]interface{}{
 	"gearScore": map[interface{}]interface{}{
 		"level": "int",
 		"score": "int",
+	},
+	"equipmentSet": map[interface{}]interface{}{
+		"name":      "string",
+		"equipment": "[]*item",
 	},
 }

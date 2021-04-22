@@ -144,6 +144,24 @@ func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGu
 	return deduped
 }
 
+func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []EquipmentSetEquipmentRefID) []EquipmentSetEquipmentRefID {
+
+	check := make(map[EquipmentSetEquipmentRefID]bool)
+	deduped := make([]EquipmentSetEquipmentRefID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
 func (se Engine) allGearScoreIDs() []GearScoreID {
 	var stateGearScoreIDs []GearScoreID
 	for gearScoreID := range se.State.GearScore {
@@ -238,6 +256,18 @@ func (se Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
 		patchPlayerGuildMemberRefIDs = append(patchPlayerGuildMemberRefIDs, playerGuildMemberRefID)
 	}
 	return deduplicatePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
+}
+
+func (se Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
+	var stateEquipmentSetEquipmentRefIDs []EquipmentSetEquipmentRefID
+	for equipmentSetEquipmentRefID := range se.State.EquipmentSetEquipmentRef {
+		stateEquipmentSetEquipmentRefIDs = append(stateEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
+	}
+	var patchEquipmentSetEquipmentRefIDs []EquipmentSetEquipmentRefID
+	for equipmentSetEquipmentRefID := range se.Patch.EquipmentSetEquipmentRef {
+		patchEquipmentSetEquipmentRefIDs = append(patchEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
+	}
+	return deduplicateEquipmentSetEquipmentRefIDs(stateEquipmentSetEquipmentRefIDs, patchEquipmentSetEquipmentRefIDs)
 }
 
 // func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference {

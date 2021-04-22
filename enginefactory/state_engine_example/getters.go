@@ -222,3 +222,36 @@ func (se *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberR
 	}
 	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind_: OperationKindDelete}}
 }
+
+func (se *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
+	patchingEquipmentSet, ok := se.Patch.EquipmentSet[equipmentSetID]
+	if ok {
+		return equipmentSet{equipmentSet: patchingEquipmentSet}
+	}
+	currentEquipmentSet, ok := se.State.EquipmentSet[equipmentSetID]
+	if ok {
+		return equipmentSet{equipmentSet: currentEquipmentSet}
+	}
+	return equipmentSet{equipmentSet: equipmentSetCore{OperationKind_: OperationKindDelete}}
+}
+
+func (_equipmentSet equipmentSet) Equipment(se *Engine) []equipmentSetEquipmentRef {
+	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	var equipment []equipmentSetEquipmentRef
+	for _, refID := range equipmentSet.equipmentSet.Equipment {
+		equipment = append(equipment, se.equipmentSetEquipmentRef(refID))
+	}
+	return equipment
+}
+
+func (se *Engine) equipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) equipmentSetEquipmentRef {
+	patchingRef, ok := se.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
+	if ok {
+		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: patchingRef}
+	}
+	currentRef, ok := se.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
+	if ok {
+		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: currentRef}
+	}
+	return equipmentSetEquipmentRef{equipmentSetEquipmentRef: equipmentSetEquipmentRefCore{OperationKind_: OperationKindDelete}}
+}

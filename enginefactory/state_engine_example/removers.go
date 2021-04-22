@@ -149,3 +149,34 @@ func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
 	se.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
+
+func (_equipmentSet equipmentSet) RemoveEquipment(se *Engine, itemsToRemove ...ItemID) equipmentSet {
+	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	if equipmentSet.equipmentSet.OperationKind_ == OperationKindDelete {
+		return equipmentSet
+	}
+	var wereElementsAltered bool
+	var newElements []EquipmentSetEquipmentRefID
+	for _, refElement := range equipmentSet.equipmentSet.Equipment {
+		element := se.equipmentSetEquipmentRef(refElement).equipmentSetEquipmentRef.ReferencedElementID
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				se.deleteEquipmentSetEquipmentRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return equipmentSet
+	}
+	equipmentSet.equipmentSet.Equipment = newElements
+	equipmentSet.equipmentSet.OperationKind_ = OperationKindUpdate
+	se.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+	return equipmentSet
+}

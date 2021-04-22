@@ -27,3 +27,8 @@ func (_ref playerGuildMemberRef) Get(se *Engine) player {
 	ref := se.playerGuildMemberRef(_ref.playerGuildMemberRef.ID)
 	return se.Player(ref.playerGuildMemberRef.ReferencedElementID)
 }
+
+func (_ref equipmentSetEquipmentRef) Get(se *Engine) item {
+	ref := se.equipmentSetEquipmentRef(_ref.equipmentSetEquipmentRef.ID)
+	return se.Item(ref.equipmentSetEquipmentRef.ReferencedElementID)
+}
