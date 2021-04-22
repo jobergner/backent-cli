@@ -46,12 +46,12 @@ func (se *Engine) updateReferenceRelationships() {
 			for _, itemID := range se.allItemIDs() {
 				_item := se.Item(itemID)
 				if _item.BoundTo(se).ID(se) == player.ID {
-					// _item.BoundTo(se).Unset(se) same as below
+					se.updateItemUpstream(_item.item)
 				}
 			}
 			for _, playerID := range se.allPlayerIDs() {
 				_player := se.Player(playerID)
-				se.updateElementsReferencingPlayer(_player.player, []PlayerID{})
+				se.updatePlayerUpstream(_player.player, []PlayerID{})
 			}
 		}
 	}

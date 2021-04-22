@@ -294,6 +294,7 @@ changes i want to introduce:
 - introduce ids to references themselves. as a slice of references may contain the same referenced element twice, and if a reference was to appear without an id, it'd be ambigous which reference is meant.
 - updating elements based on whether they contain a reference to an updated element should be it's own step within the updating cycle. atm it happens everytime an element is updated
 -> this concludes that references better be their own type in a state object, like every other element
+- updating all elements referencing an updating element is recursive and very complex -> a better solution is required
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
