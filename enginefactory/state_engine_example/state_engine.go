@@ -8,16 +8,18 @@ const (
 )
 
 type Engine struct {
-	State State
-	Patch State
-	IDgen int
+	State          State
+	Patch          State
+	IDgen          int
+	ReferenceWatch updatedRefsMap
 }
 
 func newEngine() *Engine {
 	return &Engine{
-		IDgen: 1,
-		Patch: newState(),
-		State: newState(),
+		IDgen:          1,
+		Patch:          newState(),
+		State:          newState(),
+		ReferenceWatch: make(updatedRefsMap),
 	}
 }
 
@@ -31,30 +33,40 @@ func (se *Engine) updateReferenceRelationships() {
 	for _, player := range se.Patch.Player {
 		if player.OperationKind_ == OperationKindDelete {
 			// delete all references of this element in other elements
-			for _, itemID := range se.allItemIDs() {
-				_item := se.Item(itemID)
-				if _item.BoundTo(se).ID(se) == player.ID {
-					_item.BoundTo(se).Unset(se)
+			for _, refID := range se.allItemBoundToRefIDs() {
+				ref := se.itemBoundToRef(refID)
+				if ref.itemBoundToRef.ReferencedElementID == player.ID {
+					ref.Unset(se)
 				}
 			}
-			for _, playerID := range se.allPlayerIDs() {
-				_player := se.Player(playerID)
-				_player.RemoveGuildMembers(se, playerID)
+			for _, refID := range se.allPlayerGuildMemberRefIDs() {
+				ref := se.playerGuildMemberRef(refID)
+				if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
+					referencedElement := se.Player(ref.ID(se))
+					referencedElement.RemoveGuildMembers(se, player.ID)
+				}
 			}
 		} else {
-			// update all elements referencing this element
-			for _, itemID := range se.allItemIDs() {
-				_item := se.Item(itemID)
-				if _item.BoundTo(se).ID(se) == player.ID {
-					se.updateItemUpstream(_item.item)
+			// update all references of this element
+			for _, refID := range se.allItemBoundToRefIDs() {
+				ref := se.itemBoundToRef(refID)
+				if ref.itemBoundToRef.ReferencedElementID == player.ID {
+					se.updateItemBoundToRef(ref)
 				}
 			}
-			for _, playerID := range se.allPlayerIDs() {
-				_player := se.Player(playerID)
-				se.updatePlayerUpstream(_player.player, []PlayerID{})
+			for _, refID := range se.allPlayerGuildMemberRefIDs() {
+				ref := se.playerGuildMemberRef(refID)
+				if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
+					se.updatePlayerGuildMemberRef(ref)
+				}
 			}
 		}
 	}
+
+	for key := range se.ReferenceWatch {
+		delete(se.ReferenceWatch, key)
+	}
+
 }
 
 func (se *Engine) UpdateState() {

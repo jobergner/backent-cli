@@ -108,6 +108,42 @@ func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
 	return deduped
 }
 
+func deduplicateItemBoundToRefIDs(a []ItemBoundToRefID, b []ItemBoundToRefID) []ItemBoundToRefID {
+
+	check := make(map[ItemBoundToRefID]bool)
+	deduped := make([]ItemBoundToRefID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGuildMemberRefID) []PlayerGuildMemberRefID {
+
+	check := make(map[PlayerGuildMemberRefID]bool)
+	deduped := make([]PlayerGuildMemberRefID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
 func (se Engine) allGearScoreIDs() []GearScoreID {
 	var stateGearScoreIDs []GearScoreID
 	for gearScoreID := range se.State.GearScore {
@@ -178,6 +214,30 @@ func (se Engine) allZoneItemIDs() []ZoneItemID {
 		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
 	}
 	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
+}
+
+func (se Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
+	var stateItemBoundToRefIDs []ItemBoundToRefID
+	for itemBoundToRefID := range se.State.ItemBoundToRef {
+		stateItemBoundToRefIDs = append(stateItemBoundToRefIDs, itemBoundToRefID)
+	}
+	var patchItemBoundToRefIDs []ItemBoundToRefID
+	for itemBoundToRefID := range se.Patch.ItemBoundToRef {
+		patchItemBoundToRefIDs = append(patchItemBoundToRefIDs, itemBoundToRefID)
+	}
+	return deduplicateItemBoundToRefIDs(stateItemBoundToRefIDs, patchItemBoundToRefIDs)
+}
+
+func (se Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
+	var statePlayerGuildMemberRefIDs []PlayerGuildMemberRefID
+	for playerGuildMemberRefID := range se.State.PlayerGuildMemberRef {
+		statePlayerGuildMemberRefIDs = append(statePlayerGuildMemberRefIDs, playerGuildMemberRefID)
+	}
+	var patchPlayerGuildMemberRefIDs []PlayerGuildMemberRefID
+	for playerGuildMemberRefID := range se.Patch.PlayerGuildMemberRef {
+		patchPlayerGuildMemberRefIDs = append(patchPlayerGuildMemberRefIDs, playerGuildMemberRefID)
+	}
+	return deduplicatePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
 }
 
 // func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference {

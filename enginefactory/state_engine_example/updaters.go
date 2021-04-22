@@ -1,47 +1,29 @@
 package state
 
-func (se *Engine) updateGearScoreUpstream(gearScore gearScoreCore) {
-	gearScore.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[gearScore.ID] = gearScore
+type updatedRefsMap map[int]bool
+
+func (se *Engine) updateItemBoundToRef(ref itemBoundToRef) {
+	ref.itemBoundToRef.OperationKind_ = OperationKindUpdate
+	se.Patch.ItemBoundToRef[ref.itemBoundToRef.ID] = ref.itemBoundToRef
 }
-func (se *Engine) updateItemUpstream(item itemCore) {
-	item.OperationKind_ = OperationKindUpdate
-	se.Patch.Item[item.ID] = item
-}
-func (se *Engine) updatePlayerUpstream(player playerCore, updatedPlayerIDs []PlayerID) {
-	for _, itemID := range se.allItemIDs() {
-		_item := se.Item(itemID)
-		if _item.BoundTo(se).ID(se) == player.ID {
-			se.updateItemUpstream(_item.item)
-		}
-	}
-	for _, playerID := range se.allPlayerIDs() {
-		_player := se.Player(playerID)
-	OUTER:
-		for _, ref := range _player.GuildMembers(se) {
-			if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
-				for _, updatedPlayerID := range updatedPlayerIDs {
-					if ref.playerGuildMemberRef.ReferencedElementID == updatedPlayerID {
-						continue OUTER
-					}
-				}
-				updatedPlayerIDs = append(updatedPlayerIDs, player.ID)
-				se.updatePlayerUpstream(_player.player, updatedPlayerIDs)
+func (se *Engine) updatePlayerGuildMemberRef(ref playerGuildMemberRef) {
+	ref.playerGuildMemberRef.OperationKind_ = OperationKindUpdate
+	se.Patch.PlayerGuildMemberRef[ref.playerGuildMemberRef.ID] = ref.playerGuildMemberRef
+	se.ReferenceWatch[int(ref.playerGuildMemberRef.ID)] = true
+	for _, refID := range se.allItemBoundToRefIDs() {
+		_ref := se.itemBoundToRef(refID)
+		if _ref.itemBoundToRef.ReferencedElementID == ref.playerGuildMemberRef.ParentID {
+			if _, ok := se.ReferenceWatch[int(_ref.itemBoundToRef.ID)]; !ok {
+				se.updateItemBoundToRef(_ref)
 			}
 		}
 	}
-	player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.ID] = player
-}
-func (se *Engine) updatePositionUpstream(position positionCore) {
-	position.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[position.ID] = position
-}
-func (se *Engine) updateZoneUpstream(zone zoneCore) {
-	zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.ID] = zone
-}
-func (se *Engine) updateZoneItemUpstream(zoneItem zoneItemCore) {
-	zoneItem.OperationKind_ = OperationKindUpdate
-	se.Patch.ZoneItem[zoneItem.ID] = zoneItem
+	for _, refID := range se.allPlayerGuildMemberRefIDs() {
+		_ref := se.playerGuildMemberRef(refID)
+		if _ref.playerGuildMemberRef.ReferencedElementID == ref.playerGuildMemberRef.ParentID {
+			if _, ok := se.ReferenceWatch[int(_ref.playerGuildMemberRef.ID)]; !ok {
+				se.updatePlayerGuildMemberRef(_ref)
+			}
+		}
+	}
 }
