@@ -19,6 +19,19 @@ func (se *Engine) deletePlayer(playerID PlayerID) {
 		se.deleteItem(itemID)
 	}
 	se.deletePosition(player.Position)
+	for _, refID := range se.allPlayerGuildMemberRefIDs() {
+		ref := se.playerGuildMemberRef(refID)
+		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
+			parent := se.Player(ref.playerGuildMemberRef.ParentID)
+			parent.RemoveGuildMembers(se, playerID)
+		}
+	}
+	for _, refID := range se.allItemBoundToRefIDs() {
+		ref := se.itemBoundToRef(refID)
+		if ref.itemBoundToRef.ReferencedElementID == playerID {
+			// TODO
+		}
+	}
 }
 
 func (se *Engine) DeleteGearScore(gearScoreID GearScoreID) {
