@@ -283,6 +283,20 @@ What if references were already implemented:
   - adders/removers should not create/delete the element
   - deleters need to search all elements for references of deleted element and set them to 0/remove them
   - (need to figure out when and how to stop recursiveness in tree (logic that is required anyway))
+  - how to you know when a reference got deleted when there is no OperationKindDelete on it? you just dont
+- maybe references must appear in tree as a reference. the element is then retrieved by a getter method which returns a fully rendered json
+Problems: 
+- no OperationKindDelete when the reference is deleted
+- no OperationKindUpdate (slice is empty) when reference is added
+- when a reference is added/set the parent element receives an OperationKindUpdate, but the field of the reference may still appear as nil
+- when a reference is removed/unset there the parent element does receive an OperationKindUpdate, but the field of the reference will appear empty
+- without true OperationKinds there can't be optional fields like references
+there needs to be some kind of object which maintains the operation state of the reference in order to achieve optional fields!
+right now there is no need for recursive tree climbing, as the tree assembling goes top down an inlcudes all everything until it hits a reference with OperationKindDelete anyway
+when an element which is mentioned in a reference gets deleted, immediately all references need to be looked at and deleted
+Problem: the parent object and field needs to be mentioned in order to remove the referenceID from a slice
+god damn iT!!!!!!
+
 
 ### the any type
 `anyOf<player,enemy>`
