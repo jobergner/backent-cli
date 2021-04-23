@@ -60,7 +60,7 @@ func (_item item) SetBoundTo(se *Engine, playerID PlayerID) item {
 	if item.item.OperationKind_ == OperationKindDelete {
 		return item
 	}
-	ref := se.createItemBoundToRef()
+	ref := se.createItemBoundToRef(playerID, item.item.ID)
 	item.item.BoundTo = ref.ID
 	item.item.OperationKind_ = OperationKindUpdate
 	se.Patch.Item[item.item.ID] = item.item

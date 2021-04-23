@@ -19,7 +19,7 @@ type State struct {
 	Item                     map[ItemID]itemCore                                         `json:"item"`
 	ItemBoundToRef           map[ItemBoundToRefID]itemBoundToRefCore                     `json:"itemBoundToRef"`
 	Player                   map[PlayerID]playerCore                                     `json:"player"`
-	PlayerEquipmentSetRef    map[PlayerEquipmentSerRefID]playerEquipmentSetRefCore       `json:"PlayerEquipmentSerRef"`
+	PlayerEquipmentSetRef    map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore       `json:"PlayerEquipmentSerRef"`
 	PlayerGuildMemberRef     map[PlayerGuildMemberRefID]playerGuildMemberRefCore         `json:"playerGuildMemberRef"`
 	Position                 map[PositionID]positionCore                                 `json:"position"`
 	Zone                     map[ZoneID]zoneCore                                         `json:"zone"`
