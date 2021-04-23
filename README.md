@@ -273,6 +273,16 @@ this should be possible. However some things need to be considered:
 - only self defined types can be used wiht references (not string, int etc.)
 - for the client's convenience a get from reference method would be needed to get the in the tree referenced element out of the state
 - can not be used on basic types
+What if references were already implemented:
+- a reference is just an id to the element
+- when a referenced element gets updated, the assembling step automatically includes it -> no need for recursive, expensive searching
+- Updates and Deletes are already taken care of
+- slices are also dealt with in assembling step
+- only extra logic is:
+  - setters/unsetters for non slice references
+  - adders/removers should not create/delete the element
+  - deleters need to search all elements for references of deleted element and set them to 0/remove them
+  - (need to figure out when and how to stop recursiveness in tree (logic that is required anyway))
 
 ### the any type
 `anyOf<player,enemy>`

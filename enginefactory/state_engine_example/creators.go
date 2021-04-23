@@ -87,17 +87,20 @@ func (se *Engine) createZone() zone {
 	return zone{zone: element}
 }
 
-func (se *Engine) createItemBoundToRef() itemBoundToRefCore {
+func (se *Engine) createItemBoundToRef(referencedElementID PlayerID, parentID ItemID) itemBoundToRefCore {
 	var element itemBoundToRefCore
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
 	element.ID = ItemBoundToRefID(se.GenerateID())
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.ItemBoundToRef[element.ID] = element
 	return element
 }
 
-func (se *Engine) createPlayerGuildMemberRef() playerGuildMemberRefCore {
-	// TODO: ReferencedElementID, ParentID ??? in param
+func (se *Engine) createPlayerGuildMemberRef(referencedElementID PlayerID, parentID PlayerID) playerGuildMemberRefCore {
 	var element playerGuildMemberRefCore
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
 	element.ID = PlayerGuildMemberRefID(se.GenerateID())
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.PlayerGuildMemberRef[element.ID] = element
@@ -117,16 +120,20 @@ func (se *Engine) createEquipmentSet(hasParent bool) equipmentSet {
 	return equipmentSet{equipmentSet: element}
 }
 
-func (se *Engine) createEquipmentSetEquipmentRef() equipmentSetEquipmentRefCore {
+func (se *Engine) createEquipmentSetEquipmentRef(referencedElementID ItemID, parentID EquipmentSetID) equipmentSetEquipmentRefCore {
 	var element equipmentSetEquipmentRefCore
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
 	element.ID = EquipmentSetEquipmentRefID(se.GenerateID())
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.EquipmentSetEquipmentRef[element.ID] = element
 	return element
 }
 
-func (se *Engine) createPlayerEquipmentSetRef() playerEquipmentSetRefCore {
+func (se *Engine) createPlayerEquipmentSetRef(referencedElementID EquipmentSetID, parentID PlayerID) playerEquipmentSetRefCore {
 	var element playerEquipmentSetRefCore
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
 	element.ID = PlayerEquipmentSetRefID(se.GenerateID())
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.PlayerEquipmentSetRef[element.ID] = element
