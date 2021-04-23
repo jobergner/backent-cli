@@ -8,18 +8,18 @@ const (
 )
 
 type Engine struct {
-	State          State
-	Patch          State
-	IDgen          int
-	ReferenceWatch updatedRefsMap
+	State State
+	Patch State
+	IDgen int
+	// ReferenceWatch updatedRefsMap
 }
 
 func newEngine() *Engine {
 	return &Engine{
-		IDgen:          1,
-		Patch:          newState(),
-		State:          newState(),
-		ReferenceWatch: make(updatedRefsMap),
+		IDgen: 1,
+		Patch: newState(),
+		State: newState(),
+		// ReferenceWatch: make(updatedRefsMap),
 	}
 }
 
@@ -29,45 +29,45 @@ func (se *Engine) GenerateID() int {
 	return newID
 }
 
-func (se *Engine) updateReferenceRelationships() {
-	for _, player := range se.Patch.Player {
-		if player.OperationKind_ == OperationKindDelete {
-			// delete all references of this element in other elements
-			for _, refID := range se.allItemBoundToRefIDs() {
-				ref := se.itemBoundToRef(refID)
-				if ref.itemBoundToRef.ReferencedElementID == player.ID {
-					ref.Unset(se)
-				}
-			}
-			for _, refID := range se.allPlayerGuildMemberRefIDs() {
-				ref := se.playerGuildMemberRef(refID)
-				if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
-					referencedElement := se.Player(ref.ID(se))
-					referencedElement.RemoveGuildMembers(se, player.ID)
-				}
-			}
-		} else {
-			// update all references of this element
-			for _, refID := range se.allItemBoundToRefIDs() {
-				ref := se.itemBoundToRef(refID)
-				if ref.itemBoundToRef.ReferencedElementID == player.ID {
-					se.updateItemBoundToRef(ref)
-				}
-			}
-			for _, refID := range se.allPlayerGuildMemberRefIDs() {
-				ref := se.playerGuildMemberRef(refID)
-				if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
-					se.updatePlayerGuildMemberRef(ref)
-				}
-			}
-		}
-	}
+// func (se *Engine) updateReferenceRelationships() {
+// 	for _, player := range se.Patch.Player {
+// 		if player.OperationKind_ == OperationKindDelete {
+// 			// delete all references of this element in other elements
+// 			for _, refID := range se.allItemBoundToRefIDs() {
+// 				ref := se.itemBoundToRef(refID)
+// 				if ref.itemBoundToRef.ReferencedElementID == player.ID {
+// 					ref.Unset(se)
+// 				}
+// 			}
+// 			for _, refID := range se.allPlayerGuildMemberRefIDs() {
+// 				ref := se.playerGuildMemberRef(refID)
+// 				if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
+// 					referencedElement := se.Player(ref.ID(se))
+// 					referencedElement.RemoveGuildMembers(se, player.ID)
+// 				}
+// 			}
+// 		} else {
+// 			// update all references of this element
+// 			for _, refID := range se.allItemBoundToRefIDs() {
+// 				ref := se.itemBoundToRef(refID)
+// 				if ref.itemBoundToRef.ReferencedElementID == player.ID {
+// 					se.updateItemBoundToRef(ref)
+// 				}
+// 			}
+// 			for _, refID := range se.allPlayerGuildMemberRefIDs() {
+// 				ref := se.playerGuildMemberRef(refID)
+// 				if ref.playerGuildMemberRef.ReferencedElementID == player.ID {
+// 					se.updatePlayerGuildMemberRef(ref)
+// 				}
+// 			}
+// 		}
+// 	}
 
-	for key := range se.ReferenceWatch {
-		delete(se.ReferenceWatch, key)
-	}
+// 	for key := range se.ReferenceWatch {
+// 		delete(se.ReferenceWatch, key)
+// 	}
 
-}
+// }
 
 func (se *Engine) UpdateState() {
 	for _, equipmentSet := range se.Patch.EquipmentSet {
