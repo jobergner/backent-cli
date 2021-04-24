@@ -398,7 +398,7 @@ func (se *Engine) itemBoundToRefToElementRef(itemID ItemID) (*ElementReference, 
 	return nil, false
 }
 
-func (se *Engine) playerGuildMemberRefToElementRef(playerID PlayerID) ([]ElementReference, bool) {
+func (se *Engine) playerGuildMemberRefsToElementRefs(playerID PlayerID) ([]ElementReference, bool) {
 	var anyHaveUpdated bool
 
 	statePlayer := se.State.Player[playerID]
@@ -424,7 +424,7 @@ func (se *Engine) playerGuildMemberRefToElementRef(playerID PlayerID) ([]Element
 	return refs, anyHaveUpdated
 }
 
-func (se *Engine) playerEquipmentSetRefToElementRef(playerID PlayerID) ([]ElementReference, bool) {
+func (se *Engine) playerEquipmentSetRefsToElementRefs(playerID PlayerID) ([]ElementReference, bool) {
 	var anyHaveUpdated bool
 
 	statePlayer := se.State.Player[playerID]
@@ -450,7 +450,7 @@ func (se *Engine) playerEquipmentSetRefToElementRef(playerID PlayerID) ([]Elemen
 	return refs, anyHaveUpdated
 }
 
-func (se *Engine) equipmentSetEquipmentRefToElementRef(equipmentSetID EquipmentSetID) ([]ElementReference, bool) {
+func (se *Engine) equipmentSetEquipmentRefsToElementRefs(equipmentSetID EquipmentSetID) ([]ElementReference, bool) {
 	var anyHaveUpdated bool
 
 	stateEquipmentSet := se.State.EquipmentSet[equipmentSetID]

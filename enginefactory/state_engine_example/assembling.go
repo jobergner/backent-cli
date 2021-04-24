@@ -38,7 +38,10 @@ func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID) (Equipment
 
 	var equipmentSet EquipmentSet
 
-	equipmentSet.Equipment, hasUpdated = se.equipmentSetEquipmentRefToElementRef(equipmentSetID)
+	if refs, refHasUpdated := se.equipmentSetEquipmentRefsToElementRefs(equipmentSetID); refHasUpdated {
+		equipmentSet.Equipment = refs
+		hasUpdated = true
+	}
 
 	equipmentSet.ID = equipmentSetData.ID
 	equipmentSet.OperationKind_ = equipmentSetData.OperationKind_
@@ -54,12 +57,14 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 
 	var item Item
 
+	if refs, refHasUpdated := se.itemBoundToRefToElementRef(itemID); refHasUpdated {
+		item.BoundTo = refs
+		hasUpdated = true
+	}
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(itemData.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
 		item.GearScore = &treeGearScore
 	}
-
-	item.BoundTo, hasUpdated = se.itemBoundToRefToElementRef(itemID)
 
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
@@ -98,9 +103,17 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 
 	var player Player
 
+	if refs, refHasUpdated := se.playerEquipmentSetRefsToElementRefs(playerID); refHasUpdated {
+		player.EquipmentSets = refs
+		hasUpdated = true
+	}
 	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(playerData.GearScore); gearScoreHasUpdated {
 		hasUpdated = true
 		player.GearScore = &treeGearScore
+	}
+	if refs, refHasUpdated := se.playerGuildMemberRefsToElementRefs(playerID); refHasUpdated {
+		player.GuildMembers = refs
+		hasUpdated = true
 	}
 	for _, itemID := range mergeItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
 		if treeItem, itemHasUpdated := se.assembleItem(itemID); itemHasUpdated {
@@ -112,9 +125,6 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 		hasUpdated = true
 		player.Position = &treePosition
 	}
-
-	player.EquipmentSets, hasUpdated = se.playerEquipmentSetRefToElementRef(playerID)
-	player.GuildMembers, hasUpdated = se.playerGuildMemberRefToElementRef(playerID)
 
 	player.ID = playerData.ID
 	player.OperationKind_ = playerData.OperationKind_
