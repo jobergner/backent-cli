@@ -2,8 +2,7 @@ package state
 
 func (_ref itemBoundToRef) IsSet(se *Engine) bool {
 	ref := se.itemBoundToRef(_ref.itemBoundToRef.ID)
-	item := se.Item(ref.itemBoundToRef.ParentID).item
-	return item.BoundTo != 0
+	return ref.itemBoundToRef.ID != 0
 }
 
 func (_ref itemBoundToRef) Unset(se *Engine) {

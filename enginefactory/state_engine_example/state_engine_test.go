@@ -84,7 +84,8 @@ func TestReferences(t *testing.T) {
 		se.deletePlayer(player.ID(se))
 		_, ok := se.Patch.Item[item.ID(se)]
 		assert.True(t, ok)
-		assert.False(t, se.Item(item.ID(se)).BoundTo(se).IsSet(se))
+		_, isSet := se.Item(item.ID(se)).BoundTo(se)
+		assert.False(t, isSet)
 	})
 	t.Run("deletes reference off element if referenced element gets deleted (3/3)", func(t *testing.T) {
 		se := newEngine()

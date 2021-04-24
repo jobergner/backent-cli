@@ -91,9 +91,9 @@ func (_item item) GearScore(se *Engine) gearScore {
 	return se.GearScore(item.item.GearScore)
 }
 
-func (_item item) BoundTo(se *Engine) itemBoundToRef {
+func (_item item) BoundTo(se *Engine) (itemBoundToRef, bool) {
 	item := se.Item(_item.item.ID)
-	return se.itemBoundToRef(item.item.BoundTo)
+	return se.itemBoundToRef(item.item.BoundTo), item.item.BoundTo != 0
 }
 
 func (se *Engine) Position(positionID PositionID) position {
