@@ -28,12 +28,17 @@ type State struct {
 
 func newState() State {
 	return State{
-		GearScore: make(map[GearScoreID]gearScoreCore),
-		Item:      make(map[ItemID]itemCore),
-		Player:    make(map[PlayerID]playerCore),
-		Position:  make(map[PositionID]positionCore),
-		Zone:      make(map[ZoneID]zoneCore),
-		ZoneItem:  make(map[ZoneItemID]zoneItemCore),
+		EquipmentSet:             make(map[EquipmentSetID]equipmentSetCore),
+		EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore),
+		GearScore:                make(map[GearScoreID]gearScoreCore),
+		Item:                     make(map[ItemID]itemCore),
+		ItemBoundToRef:           make(map[ItemBoundToRefID]itemBoundToRefCore),
+		Player:                   make(map[PlayerID]playerCore),
+		PlayerEquipmentSetRef:    make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore),
+		PlayerGuildMemberRef:     make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore),
+		Position:                 make(map[PositionID]positionCore),
+		Zone:                     make(map[ZoneID]zoneCore),
+		ZoneItem:                 make(map[ZoneItemID]zoneItemCore),
 	}
 }
 

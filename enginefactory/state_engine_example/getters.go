@@ -223,6 +223,18 @@ func (se *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberR
 	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind_: OperationKindDelete}}
 }
 
+func (se *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
+	patchingRef, ok := se.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: patchingRef}
+	}
+	currentRef, ok := se.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: currentRef}
+	}
+	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind_: OperationKindDelete}}
+}
+
 func (se *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
 	patchingEquipmentSet, ok := se.Patch.EquipmentSet[equipmentSetID]
 	if ok {

@@ -90,6 +90,37 @@ func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
 	return player
 }
 
+func (_player player) RemoveEquipmentSets(se *Engine, equipmentSetsToRemove ...EquipmentSetID) player {
+	player := se.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return player
+	}
+	var wereElementsAltered bool
+	var newElements []PlayerEquipmentSetRefID
+	for _, refElement := range player.player.EquipmentSets {
+		element := se.playerEquipmentSetRef(refElement).playerEquipmentSetRef.ReferencedElementID
+		var toBeRemoved bool
+		for _, elementToRemove := range equipmentSetsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				se.deletePlayerEquipmentSetRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return player
+	}
+	player.player.EquipmentSets = newElements
+	player.player.OperationKind_ = OperationKindUpdate
+	se.Patch.Player[player.player.ID] = player.player
+	return player
+}
+
 func (_player player) RemoveGuildMembers(se *Engine, guildMembersToRemove ...PlayerID) player {
 	player := se.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
