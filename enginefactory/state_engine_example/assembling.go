@@ -85,7 +85,7 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 		hasUpdated = true
 		player.GearScore = &treeGearScore
 	}
-	for _, itemID := range deduplicateItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
+	for _, itemID := range mergeItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
 		if treeItem, itemHasUpdated := se.assembleItem(itemID); itemHasUpdated {
 			hasUpdated = true
 			player.Items = append(player.Items, treeItem)
@@ -110,13 +110,13 @@ func (se *Engine) assembleZone(zoneID ZoneID) (Zone, bool) {
 
 	var zone Zone
 
-	for _, zoneItemID := range deduplicateZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
+	for _, zoneItemID := range mergeZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
 		if treeZoneItem, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
 			hasUpdated = true
 			zone.Items = append(zone.Items, treeZoneItem)
 		}
 	}
-	for _, playerID := range deduplicatePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
+	for _, playerID := range mergePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
 		if treePlayer, playerHasUpdated := se.assemblePlayer(playerID); playerHasUpdated {
 			hasUpdated = true
 			zone.Players = append(zone.Players, treePlayer)

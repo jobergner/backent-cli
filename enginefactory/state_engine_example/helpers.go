@@ -1,167 +1,5 @@
 package state
 
-func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
-
-	check := make(map[GearScoreID]bool)
-	deduped := make([]GearScoreID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
-
-	check := make(map[ItemID]bool)
-	deduped := make([]ItemID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
-
-	check := make(map[PlayerID]bool)
-	deduped := make([]PlayerID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
-
-	check := make(map[PositionID]bool)
-	deduped := make([]PositionID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
-
-	check := make(map[ZoneID]bool)
-	deduped := make([]ZoneID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
-
-	check := make(map[ZoneItemID]bool)
-	deduped := make([]ZoneItemID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicateItemBoundToRefIDs(a []ItemBoundToRefID, b []ItemBoundToRefID) []ItemBoundToRefID {
-
-	check := make(map[ItemBoundToRefID]bool)
-	deduped := make([]ItemBoundToRefID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGuildMemberRefID) []PlayerGuildMemberRefID {
-
-	check := make(map[PlayerGuildMemberRefID]bool)
-	deduped := make([]PlayerGuildMemberRefID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
-func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []EquipmentSetEquipmentRefID) []EquipmentSetEquipmentRefID {
-
-	check := make(map[EquipmentSetEquipmentRefID]bool)
-	deduped := make([]EquipmentSetEquipmentRefID, 0)
-	for _, val := range a {
-		check[val] = true
-	}
-	for _, val := range b {
-		check[val] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, val)
-	}
-
-	return deduped
-}
-
 func (se Engine) allGearScoreIDs() []GearScoreID {
 	var stateGearScoreIDs []GearScoreID
 	for gearScoreID := range se.State.GearScore {
@@ -171,7 +9,7 @@ func (se Engine) allGearScoreIDs() []GearScoreID {
 	for gearScoreID := range se.Patch.GearScore {
 		patchGearScoreIDs = append(patchGearScoreIDs, gearScoreID)
 	}
-	return deduplicateGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
+	return mergeGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
 }
 
 func (se Engine) allItemIDs() []ItemID {
@@ -183,7 +21,7 @@ func (se Engine) allItemIDs() []ItemID {
 	for itemID := range se.Patch.Item {
 		patchItemIDs = append(patchItemIDs, itemID)
 	}
-	return deduplicateItemIDs(stateItemIDs, patchItemIDs)
+	return mergeItemIDs(stateItemIDs, patchItemIDs)
 }
 
 func (se Engine) allPlayerIDs() []PlayerID {
@@ -195,7 +33,7 @@ func (se Engine) allPlayerIDs() []PlayerID {
 	for playerID := range se.Patch.Player {
 		patchPlayerIDs = append(patchPlayerIDs, playerID)
 	}
-	return deduplicatePlayerIDs(statePlayerIDs, patchPlayerIDs)
+	return mergePlayerIDs(statePlayerIDs, patchPlayerIDs)
 }
 
 func (se Engine) allPositionIDs() []PositionID {
@@ -207,7 +45,7 @@ func (se Engine) allPositionIDs() []PositionID {
 	for positionID := range se.Patch.Position {
 		patchPositionIDs = append(patchPositionIDs, positionID)
 	}
-	return deduplicatePositionIDs(statePositionIDs, patchPositionIDs)
+	return mergePositionIDs(statePositionIDs, patchPositionIDs)
 }
 
 func (se Engine) allZoneIDs() []ZoneID {
@@ -219,7 +57,7 @@ func (se Engine) allZoneIDs() []ZoneID {
 	for zoneID := range se.Patch.Zone {
 		patchZoneIDs = append(patchZoneIDs, zoneID)
 	}
-	return deduplicateZoneIDs(stateZoneIDs, patchZoneIDs)
+	return mergeZoneIDs(stateZoneIDs, patchZoneIDs)
 }
 
 func (se Engine) allZoneItemIDs() []ZoneItemID {
@@ -231,7 +69,7 @@ func (se Engine) allZoneItemIDs() []ZoneItemID {
 	for zoneItemID := range se.Patch.ZoneItem {
 		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
 	}
-	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
+	return mergeZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
 }
 
 func (se Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
@@ -243,7 +81,7 @@ func (se Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
 	for itemBoundToRefID := range se.Patch.ItemBoundToRef {
 		patchItemBoundToRefIDs = append(patchItemBoundToRefIDs, itemBoundToRefID)
 	}
-	return deduplicateItemBoundToRefIDs(stateItemBoundToRefIDs, patchItemBoundToRefIDs)
+	return mergeItemBoundToRefIDs(stateItemBoundToRefIDs, patchItemBoundToRefIDs)
 }
 
 func (se Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
@@ -255,7 +93,19 @@ func (se Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
 	for playerGuildMemberRefID := range se.Patch.PlayerGuildMemberRef {
 		patchPlayerGuildMemberRefIDs = append(patchPlayerGuildMemberRefIDs, playerGuildMemberRefID)
 	}
-	return deduplicatePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
+	return mergePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
+}
+
+func (se Engine) allPlayerEquipmentSetRefIDs() []PlayerEquipmentSetRefID {
+	var statePlayerEquipmentSetRefIDs []PlayerEquipmentSetRefID
+	for playerEquipmentSetRefID := range se.State.PlayerEquipmentSetRef {
+		statePlayerEquipmentSetRefIDs = append(statePlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
+	}
+	var patchPlayerEquipmentSetRefIDs []PlayerEquipmentSetRefID
+	for playerEquipmentSetRefID := range se.Patch.PlayerEquipmentSetRef {
+		patchPlayerEquipmentSetRefIDs = append(patchPlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
+	}
+	return mergePlayerEquipmentSetRefIDs(statePlayerEquipmentSetRefIDs, patchPlayerEquipmentSetRefIDs)
 }
 
 func (se Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
@@ -267,46 +117,253 @@ func (se Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
 	for equipmentSetEquipmentRefID := range se.Patch.EquipmentSetEquipmentRef {
 		patchEquipmentSetEquipmentRefIDs = append(patchEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
 	}
-	return deduplicateEquipmentSetEquipmentRefIDs(stateEquipmentSetEquipmentRefIDs, patchEquipmentSetEquipmentRefIDs)
+	return mergeEquipmentSetEquipmentRefIDs(stateEquipmentSetEquipmentRefIDs, patchEquipmentSetEquipmentRefIDs)
 }
 
-// func (se *Engine) evalItemBoundToElementRef(itemData itemCore) *ElementReference {
-// 	if itemData.BoundTo.isSet {
-// 		_, hasUpdated := se.Patch.Player[itemData.BoundTo.id]
-// 		justGotSet := !se.State.Item[itemData.ID].BoundTo.isSet
-// 		operationKind := OperationKindRefUnchanged
-// 		if hasUpdated || justGotSet {
-// 			operationKind = OperationKindUpdate
-// 		}
-// 		return &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, OperationKind_: operationKind}
-// 	} else if se.State.Item[itemData.ID].BoundTo.id != 0 {
-// 		return &ElementReference{ID: int(itemData.BoundTo.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
-// 	}
-// 	return nil
-// }
+func mergeGearScoreIDs(currentIDs, nextIDs []GearScoreID) []GearScoreID {
+	ids := make([]GearScoreID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
 
-// func (se *Engine) evalPlayerGuildMembersElementRefs(playerData playerCore) []ElementReference {
-// 	var refs []ElementReference
-// 	var evalProgressionIndex int
-// 	for _, previousGuildMember := range se.State.Player[playerData.ID].GuildMembers {
-// 		refGotDeleted := true
-// 		for _, currentGuildMember := range playerData.GuildMembers {
-// 			if previousGuildMember.id == currentGuildMember.id {
-// 				refGotDeleted = false
-// 			}
-// 		}
-// 		if refGotDeleted {
-// 			ref := ElementReference{ID: int(previousGuildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindDelete}
-// 			refs = append(refs, ref)
-// 		} else {
-// 			ref := ElementReference{ID: int(previousGuildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindRefUnchanged}
-// 			refs = append(refs, ref)
-// 			evalProgressionIndex += 1
-// 		}
-// 	}
-// 	for _, guildMember := range playerData.GuildMembers[evalProgressionIndex:] {
-// 		ref := ElementReference{ID: int(guildMember.id), ElementKind: ElementKindPlayer, OperationKind_: OperationKindUpdate}
-// 		refs = append(refs, ref)
-// 	}
-// 	return refs
-// }
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeItemIDs(currentIDs, nextIDs []ItemID) []ItemID {
+	ids := make([]ItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergePlayerIDs(currentIDs, nextIDs []PlayerID) []PlayerID {
+	ids := make([]PlayerID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergePositionIDs(currentIDs, nextIDs []PositionID) []PositionID {
+	ids := make([]PositionID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeZoneIDs(currentIDs, nextIDs []ZoneID) []ZoneID {
+	ids := make([]ZoneID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeZoneItemIDs(currentIDs, nextIDs []ZoneItemID) []ZoneItemID {
+	ids := make([]ZoneItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeEquipmentSetIDs(currentIDs, nextIDs []EquipmentSetID) []EquipmentSetID {
+	ids := make([]EquipmentSetID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeItemBoundToRefIDs(currentIDs, nextIDs []ItemBoundToRefID) []ItemBoundToRefID {
+	ids := make([]ItemBoundToRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeEquipmentSetEquipmentRefIDs(currentIDs, nextIDs []EquipmentSetEquipmentRefID) []EquipmentSetEquipmentRefID {
+	ids := make([]EquipmentSetEquipmentRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergePlayerGuildMemberRefIDs(currentIDs, nextIDs []PlayerGuildMemberRefID) []PlayerGuildMemberRefID {
+	ids := make([]PlayerGuildMemberRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergePlayerEquipmentSetRefIDs(currentIDs, nextIDs []PlayerEquipmentSetRefID) []PlayerEquipmentSetRefID {
+	ids := make([]PlayerEquipmentSetRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func (se *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
+	for _, refID := range se.allItemBoundToRefIDs() {
+		ref := se.itemBoundToRef(refID)
+		if ref.itemBoundToRef.ReferencedElementID == playerID {
+			ref.Unset(se)
+		}
+	}
+}
+
+func (se *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
+	for _, refID := range se.allPlayerGuildMemberRefIDs() {
+		ref := se.playerGuildMemberRef(refID)
+		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
+			parent := se.Player(ref.playerGuildMemberRef.ParentID)
+			parent.RemoveGuildMembers(se, playerID)
+		}
+	}
+}
+
+func (se *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID EquipmentSetID) {
+	for _, refID := range se.allPlayerEquipmentSetRefIDs() {
+		ref := se.playerEquipmentSetRef(refID)
+		if ref.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
+			parent := se.Player(ref.playerEquipmentSetRef.ParentID)
+			parent.RemoveEquipmentSets(se, equipmentSetID)
+		}
+	}
+}
+
+func (se *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
+	for _, refID := range se.allEquipmentSetEquipmentRefIDs() {
+		ref := se.equipmentSetEquipmentRef(refID)
+		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
+			parent := se.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
+			parent.RemoveEquipment(se, itemID)
+		}
+	}
+}

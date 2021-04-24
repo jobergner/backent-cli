@@ -11,6 +11,8 @@ func (se *Engine) deletePlayer(playerID PlayerID) {
 	player := se.Player(playerID).player
 	player.OperationKind_ = OperationKindDelete
 	se.Patch.Player[player.ID] = player
+	se.dereferencePlayerGuildMemberRefs(playerID)
+	se.dereferenceItemBoundToRefs(playerID)
 	se.deleteGearScore(player.GearScore)
 	for _, guildMember := range player.GuildMembers {
 		se.deletePlayerGuildMemberRef(guildMember)
@@ -19,19 +21,6 @@ func (se *Engine) deletePlayer(playerID PlayerID) {
 		se.deleteItem(itemID)
 	}
 	se.deletePosition(player.Position)
-	for _, refID := range se.allPlayerGuildMemberRefIDs() {
-		ref := se.playerGuildMemberRef(refID)
-		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
-			parent := se.Player(ref.playerGuildMemberRef.ParentID)
-			parent.RemoveGuildMembers(se, playerID)
-		}
-	}
-	for _, refID := range se.allItemBoundToRefIDs() {
-		ref := se.itemBoundToRef(refID)
-		if ref.itemBoundToRef.ReferencedElementID == playerID {
-			// TODO
-		}
-	}
 }
 
 func (se *Engine) DeleteGearScore(gearScoreID GearScoreID) {
@@ -116,6 +105,7 @@ func (se *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	equipmentSet := se.EquipmentSet(equipmentSetID).equipmentSet
 	equipmentSet.OperationKind_ = OperationKindDelete
 	se.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
+	se.dereferencePlayerEquipmentSetRefs(equipmentSetID)
 	for _, equipmentSet := range equipmentSet.Equipment {
 		se.deleteEquipmentSetEquipmentRef(equipmentSet)
 	}
@@ -125,6 +115,12 @@ func (se *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildM
 	playerGuildMemberRef := se.playerGuildMemberRef(playerGuildMemberRefID).playerGuildMemberRef
 	playerGuildMemberRef.OperationKind_ = OperationKindDelete
 	se.Patch.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
+}
+
+func (se *Engine) deletePlayerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) {
+	playerEquipmentSetRef := se.playerEquipmentSetRef(playerEquipmentSetRefID).playerEquipmentSetRef
+	playerEquipmentSetRef.OperationKind_ = OperationKindDelete
+	se.Patch.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
 }
 
 func (se *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {

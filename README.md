@@ -294,13 +294,13 @@ Problems:
 there needs to be some kind of object which maintains the operation state of the reference in order to achieve optional fields!
 right now there is no need for recursive tree climbing, as the tree assembling goes top down an inlcudes all everything until it hits a reference with OperationKindDelete anyway
 when an element which is mentioned in a reference gets deleted, immediately all references need to be looked at and deleted
-elements with non-slice references are empty (id == 0) when element is created
-Problem: the parent object and field needs to be mentioned in order to remove the referenceID from a slice
+elements with non-slice references are empty (id == 0) when element is created because otherwise the functionality would be even more different from the slice references
+Problem: the parent object and field needs to be mentioned in order to remove the referenceID from a slice when referenced element gets deleted
 god damn iT!!!!!!
 When a reference is deleted, the field containing the reference ID is set to 0. but then there is no way for the assembler to include the reference with the ReferenceKindDelete
-there needs to be a way to delay setting the id=0 and straight away removing the reference id from a reference slice
-ids arent straight away set to zero/reference ids removed from slice, but getters wont return them anymore (not returning references with OPKDelete)
-id=0/ref removing happens after tree assembling
+there needs to be a way to delay setting the id=0 and straight away removing the reference id from a reference slice --> no, there needs to be a diff func
+ids arent straight away set to zero/reference ids removed from slice, but getters wont return them anymore (not returning references with OPKDelete) --> also no
+id=0/ref removing happens after tree assembling -->> nope
 -- need a diff function for ALL slices (even normal slices dont even work atm) and single references to use in assembling
 -- because then i can set id=0 right away/remove ids from slice
 getting a single reference should prob have 2 return values, (ref,ok). is !ok when ref is not set
