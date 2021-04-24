@@ -149,6 +149,7 @@ func (se *Engine) assembleZone(zoneID ZoneID) (Zone, bool) {
 }
 
 func (se *Engine) assembleTree() Tree {
+	//TODO	test (A LOT) and and figure out if i can't just do state-patch simulatiouesly with allids helpers
 	tree := newTree()
 
 	for _, equipmentSetData := range se.Patch.EquipmentSet {

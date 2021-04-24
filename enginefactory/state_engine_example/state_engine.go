@@ -124,4 +124,16 @@ func (se *Engine) UpdateState() {
 	for key := range se.Patch.ZoneItem {
 		delete(se.Patch.ZoneItem, key)
 	}
+	for key := range se.Patch.EquipmentSetEquipmentRef {
+		delete(se.Patch.EquipmentSetEquipmentRef, key)
+	}
+	for key := range se.Patch.ItemBoundToRef {
+		delete(se.Patch.ItemBoundToRef, key)
+	}
+	for key := range se.Patch.PlayerEquipmentSetRef {
+		delete(se.Patch.PlayerEquipmentSetRef, key)
+	}
+	for key := range se.Patch.PlayerGuildMemberRef {
+		delete(se.Patch.PlayerGuildMemberRef, key)
+	}
 }
