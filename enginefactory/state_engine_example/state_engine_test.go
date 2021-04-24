@@ -1,6 +1,7 @@
 package state
 
 import (
+	"bar-cli/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -252,8 +253,12 @@ func TestTree(t *testing.T) {
 
 		_actual, _ := actual.MarshalJSON()
 		_expected, _ := expected.MarshalJSON()
+		actualString := string(_actual)
+		expectedString := string(_expected)
 
-		assert.Equal(t, string(_expected), string(_actual))
+		if expectedString != actualString {
+			t.Errorf(testutils.Diff(actualString, expectedString))
+		}
 	})
 	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
 		se := newEngine()
@@ -286,8 +291,12 @@ func TestTree(t *testing.T) {
 
 		_actual, _ := actual.MarshalJSON()
 		_expected, _ := expected.MarshalJSON()
+		actualString := string(_actual)
+		expectedString := string(_expected)
 
-		assert.Equal(t, string(_expected), string(_actual))
+		if expectedString != actualString {
+			t.Errorf(testutils.Diff(actualString, expectedString))
+		}
 	})
 	t.Run("assembles tree based on added item", func(t *testing.T) {
 		se := newEngine()
@@ -325,8 +334,12 @@ func TestTree(t *testing.T) {
 
 		_actual, _ := actual.MarshalJSON()
 		_expected, _ := expected.MarshalJSON()
+		actualString := string(_actual)
+		expectedString := string(_expected)
 
-		assert.Equal(t, string(_expected), string(_actual))
+		if expectedString != actualString {
+			t.Errorf(testutils.Diff(actualString, expectedString))
+		}
 	})
 	t.Run("assembles tree based on removed item", func(t *testing.T) {
 		se := newEngine()
@@ -367,8 +380,12 @@ func TestTree(t *testing.T) {
 
 		_actual, _ := actual.MarshalJSON()
 		_expected, _ := expected.MarshalJSON()
+		actualString := string(_actual)
+		expectedString := string(_expected)
 
-		assert.Equal(t, string(_expected), string(_actual))
+		if expectedString != actualString {
+			t.Errorf(testutils.Diff(actualString, expectedString))
+		}
 	})
 }
 
