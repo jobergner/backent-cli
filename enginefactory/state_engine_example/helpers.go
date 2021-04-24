@@ -370,29 +370,38 @@ func (se *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
 
 func (se *Engine) itemBoundToRefToElementRef(itemID ItemID) (*ElementReference, bool) {
 	stateItem := se.State.Item[itemID]
-	patchItem := se.Patch.Item[itemID]
+	patchItem, itemIsInPatch := se.Patch.Item[itemID]
 
-	if stateItem.BoundTo == 0 && patchItem.BoundTo == 0 {
+	// ref not set at all
+	if stateItem.BoundTo == 0 && (!itemIsInPatch || patchItem.BoundTo == 0) {
 		return nil, false
 	}
 
-	if stateItem.BoundTo != 0 && patchItem.BoundTo != 0 {
-		_, hasUpdated := se.Patch.ItemBoundToRef[patchItem.BoundTo]
-		if !hasUpdated {
-			return nil, false
+	// immediate replacement of refs
+	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
+		if stateItem.BoundTo != patchItem.BoundTo {
+			referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
+			return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}, true
 		}
-		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
-		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}, true
 	}
 
-	if stateItem.BoundTo != 0 && patchItem.BoundTo == 0 {
+	// ref was definitely removed
+	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo == 0) {
 		referencedElement := se.Player(se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID)
 		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindDelete}, true
 	}
 
-	if stateItem.BoundTo == 0 && patchItem.BoundTo != 0 {
+	// ref was definitely created
+	if stateItem.BoundTo == 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
 		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
 		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}, true
+	}
+
+	// referenced element got updated
+	if stateItem.BoundTo != 0 {
+		if referencedElement, ok := se.Patch.Player[se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID]; ok {
+			return &ElementReference{int(referencedElement.ID), ElementKindPlayer, OperationKindUpdate}, true
+		}
 	}
 
 	return nil, false
