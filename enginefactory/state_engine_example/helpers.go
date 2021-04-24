@@ -367,3 +367,99 @@ func (se *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
 		}
 	}
 }
+
+func (se *Engine) itemBoundToRefToElementRef(itemID ItemID) *ElementReference {
+	stateItem := se.State.Item[itemID]
+	patchItem := se.Patch.Item[itemID]
+
+	if stateItem.BoundTo == 0 && patchItem.BoundTo == 0 {
+		return nil
+	}
+
+	if stateItem.BoundTo != 0 && patchItem.BoundTo != 0 {
+		_, hasUpdated := se.Patch.ItemBoundToRef[patchItem.BoundTo]
+		if !hasUpdated {
+			return nil
+		}
+		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
+		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}
+	}
+
+	if stateItem.BoundTo != 0 && patchItem.BoundTo == 0 {
+		referencedElement := se.Player(se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID)
+		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindDelete}
+	}
+
+	if stateItem.BoundTo == 0 && patchItem.BoundTo != 0 {
+		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
+		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}
+	}
+
+	return nil
+}
+
+func (se *Engine) playerGuildMemberRefToElementRef(playerID PlayerID) []ElementReference {
+	statePlayer := se.State.Player[playerID]
+	patchPlayer := se.Patch.Player[playerID]
+
+	var refs []ElementReference
+
+	for _, refID := range mergePlayerGuildMemberRefIDs(statePlayer.GuildMembers, patchPlayer.GuildMembers) {
+
+		if patchRef, hasUpdated := se.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
+			refs = append(refs, ElementReference{int(patchRef.ReferencedElementID), ElementKindPlayer, patchRef.OperationKind_})
+			continue
+		}
+
+		ref := se.playerGuildMemberRef(refID).playerGuildMemberRef
+		if _, hasUpdated := se.Patch.Player[ref.ReferencedElementID]; hasUpdated {
+			refs = append(refs, ElementReference{int(ref.ReferencedElementID), ElementKindPlayer, OperationKindUpdate})
+		}
+	}
+
+	return refs
+}
+
+func (se *Engine) playerEquipmentSetRefToElementRef(playerID PlayerID) []ElementReference {
+	statePlayer := se.State.Player[playerID]
+	patchPlayer := se.Patch.Player[playerID]
+
+	var refs []ElementReference
+
+	for _, refID := range mergePlayerEquipmentSetRefIDs(statePlayer.EquipmentSets, patchPlayer.EquipmentSets) {
+
+		if patchRef, hasUpdated := se.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
+			refs = append(refs, ElementReference{int(patchRef.ReferencedElementID), ElementKindPlayer, patchRef.OperationKind_})
+			continue
+		}
+
+		ref := se.playerEquipmentSetRef(refID).playerEquipmentSetRef
+		if _, hasUpdated := se.Patch.EquipmentSet[ref.ReferencedElementID]; hasUpdated {
+			refs = append(refs, ElementReference{int(ref.ReferencedElementID), ElementKindPlayer, OperationKindUpdate})
+		}
+	}
+
+	return refs
+}
+
+func (se *Engine) equipmentSetEquipmentRefToElementRef(equipmentSetID EquipmentSetID) []ElementReference {
+	stateEquipmentSet := se.State.EquipmentSet[equipmentSetID]
+	patchEquipmentSet := se.Patch.EquipmentSet[equipmentSetID]
+
+	var refs []ElementReference
+
+	for _, refID := range mergeEquipmentSetEquipmentRefIDs(stateEquipmentSet.Equipment, patchEquipmentSet.Equipment) {
+
+		if patchRef, hasUpdated := se.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
+			refs = append(refs, ElementReference{int(patchRef.ReferencedElementID), ElementKindEquipmentSet, patchRef.OperationKind_})
+			continue
+		}
+
+		ref := se.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
+		if _, hasUpdated := se.Patch.Item[ref.ReferencedElementID]; hasUpdated {
+			refs = append(refs, ElementReference{int(ref.ReferencedElementID), ElementKindEquipmentSet, OperationKindUpdate})
+		}
+	}
+
+	return refs
+}

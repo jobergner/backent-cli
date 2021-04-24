@@ -433,4 +433,14 @@ func TestDiffPlayerIDs(t *testing.T) {
 
 		assert.Equal(t, expected, actual)
 	})
+	t.Run("", func(t *testing.T) {
+		inputCurrentIDs := []PlayerID{1, 2, 3, 4}
+		inputNextIDs := []PlayerID{1, 3}
+
+		expected := []PlayerID{1, 2, 3, 4}
+
+		actual := mergePlayerIDs(inputCurrentIDs, inputNextIDs)
+
+		assert.Equal(t, expected, actual)
+	})
 }
