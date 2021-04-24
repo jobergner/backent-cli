@@ -387,6 +387,51 @@ func TestTree(t *testing.T) {
 			t.Errorf(testutils.Diff(actualString, expectedString))
 		}
 	})
+	t.Run("includes elements which have references of updating elements", func(t *testing.T) {
+		se := newEngine()
+		item := se.createItem(false).SetName(se, "myItem")
+		player := se.createPlayer(false)
+		item.SetBoundTo(se, player.ID(se))
+
+		se.UpdateState()
+		playerItem := player.AddItem(se)
+
+		actual := se.assembleTree()
+		expected := newTree()
+		expected.Item = map[ItemID]Item{
+			item.ID(se): {
+				ID:             item.ID(se),
+				Name:           "myItem",
+				BoundTo:        &ElementReference{int(player.ID(se)), ElementKindPlayer, OperationKindUpdate},
+				OperationKind_: OperationKindUpdate,
+			},
+		}
+		expected.Player = map[PlayerID]Player{
+			player.ID(se): {
+				ID: player.ID(se),
+				Items: []Item{
+					{
+						ID:             playerItem.ID(se),
+						OperationKind_: OperationKindUpdate,
+						GearScore: &GearScore{
+							ID:             playerItem.GearScore(se).ID(se),
+							OperationKind_: OperationKindUpdate,
+						},
+					},
+				},
+				OperationKind_: OperationKindUpdate,
+			},
+		}
+
+		_actual, _ := actual.MarshalJSON()
+		_expected, _ := expected.MarshalJSON()
+		actualString := string(_actual)
+		expectedString := string(_expected)
+
+		if expectedString != actualString {
+			t.Errorf(testutils.Diff(actualString, expectedString))
+		}
+	})
 }
 
 func TestDiffPlayerIDs(t *testing.T) {
