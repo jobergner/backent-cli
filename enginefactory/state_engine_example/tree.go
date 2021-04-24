@@ -3,21 +3,23 @@ package state
 type ElementKind string
 
 const (
-	ElementKindGearScore ElementKind = "GearScore"
-	ElementKindItem      ElementKind = "Item"
-	ElementKindPlayer    ElementKind = "Player"
-	ElementKindPosition  ElementKind = "Position"
-	ElementKindZone      ElementKind = "Zone"
-	ElementKindZoneItem  ElementKind = "ZoneItem"
+	ElementKindEquipmentSet ElementKind = "EquipmentSet"
+	ElementKindGearScore    ElementKind = "GearScore"
+	ElementKindItem         ElementKind = "Item"
+	ElementKindPlayer       ElementKind = "Player"
+	ElementKindPosition     ElementKind = "Position"
+	ElementKindZone         ElementKind = "Zone"
+	ElementKindZoneItem     ElementKind = "ZoneItem"
 )
 
 type Tree struct {
-	GearScore map[GearScoreID]GearScore `json:"gearScore"`
-	Item      map[ItemID]Item           `json:"item"`
-	Player    map[PlayerID]Player       `json:"player"`
-	Position  map[PositionID]Position   `json:"position"`
-	Zone      map[ZoneID]Zone           `json:"zone"`
-	ZoneItem  map[ZoneItemID]ZoneItem   `json:"zoneItem"`
+	EquipmentSet map[EquipmentSetID]EquipmentSet `json:"equipmentSet"`
+	GearScore    map[GearScoreID]GearScore       `json:"gearScore"`
+	Item         map[ItemID]Item                 `json:"item"`
+	Player       map[PlayerID]Player             `json:"player"`
+	Position     map[PositionID]Position         `json:"position"`
+	Zone         map[ZoneID]Zone                 `json:"zone"`
+	ZoneItem     map[ZoneItemID]ZoneItem         `json:"zoneItem"`
 }
 
 func newTree() Tree {
@@ -50,6 +52,13 @@ type Item struct {
 	GearScore      *GearScore        `json:"gearScore"`
 	Name           string            `json:"name"`
 	OperationKind_ OperationKind     `json:"operationKind_"`
+}
+
+type EquipmentSet struct {
+	ID             EquipmentSetID     `json:"id"`
+	Name           string             `json:"name"`
+	Equipment      []ElementReference `json:"equipment"`
+	OperationKind_ OperationKind      `json:"operationKind_"`
 }
 
 type Position struct {

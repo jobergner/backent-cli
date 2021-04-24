@@ -30,6 +30,21 @@ func (se *Engine) assemblePosition(positionID PositionID) (Position, bool) {
 	return position, true
 }
 
+func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID) (EquipmentSet, bool) {
+	equipmentSetData, hasUpdated := se.Patch.EquipmentSet[equipmentSetID]
+	if !hasUpdated {
+		equipmentSetData = se.State.EquipmentSet[equipmentSetID]
+	}
+
+	var equipmentSet EquipmentSet
+
+	equipmentSet.ID = equipmentSetData.ID
+	equipmentSet.OperationKind_ = equipmentSetData.OperationKind_
+	// equipmentSet.BoundTo = se.evalEquipmentSetBoundToElementRef(equipmentSetData)
+	equipmentSet.Name = equipmentSetData.Name
+	return equipmentSet, hasUpdated
+}
+
 func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 	itemData, hasUpdated := se.Patch.Item[itemID]
 	if !hasUpdated {
@@ -45,7 +60,7 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
-	// item.BoundTo = se.evalItemBoundToElementRef(itemData)
+	item.BoundTo = se.itemBoundToRefToElementRef(itemID)
 	item.Name = itemData.Name
 	return item, hasUpdated
 }
@@ -131,6 +146,13 @@ func (se *Engine) assembleZone(zoneID ZoneID) (Zone, bool) {
 
 func (se *Engine) assembleTree() Tree {
 	tree := newTree()
+
+	for _, equipmentSetData := range se.Patch.EquipmentSet {
+		equipmentSet, hasUpdated := se.assembleEquipmentSet(equipmentSetData.ID)
+		if hasUpdated {
+			tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+		}
+	}
 	for _, gearScoreData := range se.Patch.GearScore {
 		if !gearScoreData.HasParent_ {
 			gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID)
@@ -178,6 +200,14 @@ func (se *Engine) assembleTree() Tree {
 		}
 	}
 
+	for _, equipmentSetData := range se.State.EquipmentSet {
+		if _, ok := tree.EquipmentSet[equipmentSetData.ID]; !ok {
+			equipmentSet, hasUpdated := se.assembleEquipmentSet(equipmentSetData.ID)
+			if hasUpdated {
+				tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+			}
+		}
+	}
 	for _, gearScoreData := range se.State.GearScore {
 		if !gearScoreData.HasParent_ {
 			if _, ok := tree.GearScore[gearScoreData.ID]; !ok {

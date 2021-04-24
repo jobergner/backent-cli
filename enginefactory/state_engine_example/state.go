@@ -111,7 +111,6 @@ type equipmentSetCore struct {
 	Name           string                       `json:"name"`
 	Equipment      []EquipmentSetEquipmentRefID `json:"equipment"`
 	OperationKind_ OperationKind                `json:"operationKind_"`
-	HasParent_     bool                         `json:"hasParent_"`
 }
 
 type equipmentSet struct{ equipmentSet equipmentSetCore }

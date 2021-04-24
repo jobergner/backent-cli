@@ -95,10 +95,6 @@ func (se *Engine) deleteZone(zoneID ZoneID) {
 }
 
 func (se *Engine) DeleteEquipmentSet(equipmentSetID EquipmentSetID) {
-	equipmentSet := se.EquipmentSet(equipmentSetID).equipmentSet
-	if equipmentSet.HasParent_ {
-		return
-	}
 	se.deleteEquipmentSet(equipmentSetID)
 }
 func (se *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {

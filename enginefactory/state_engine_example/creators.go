@@ -108,13 +108,12 @@ func (se *Engine) createPlayerGuildMemberRef(referencedElementID PlayerID, paren
 }
 
 func (se *Engine) CreateEquipmentSet() equipmentSet {
-	return se.createEquipmentSet(false)
+	return se.createEquipmentSet()
 }
 
-func (se *Engine) createEquipmentSet(hasParent bool) equipmentSet {
+func (se *Engine) createEquipmentSet() equipmentSet {
 	var element equipmentSetCore
 	element.ID = EquipmentSetID(se.GenerateID())
-	element.HasParent_ = hasParent
 	element.OperationKind_ = OperationKindUpdate
 	se.Patch.EquipmentSet[element.ID] = element
 	return equipmentSet{equipmentSet: element}
