@@ -38,9 +38,10 @@ func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID) (Equipment
 
 	var equipmentSet EquipmentSet
 
+	equipmentSet.Equipment, hasUpdated = se.equipmentSetEquipmentRefToElementRef(equipmentSetID)
+
 	equipmentSet.ID = equipmentSetData.ID
 	equipmentSet.OperationKind_ = equipmentSetData.OperationKind_
-	// equipmentSet.BoundTo = se.evalEquipmentSetBoundToElementRef(equipmentSetData)
 	equipmentSet.Name = equipmentSetData.Name
 	return equipmentSet, hasUpdated
 }
@@ -58,9 +59,10 @@ func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
 		item.GearScore = &treeGearScore
 	}
 
+	item.BoundTo, hasUpdated = se.itemBoundToRefToElementRef(itemID)
+
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
-	item.BoundTo = se.itemBoundToRefToElementRef(itemID)
 	item.Name = itemData.Name
 	return item, hasUpdated
 }
@@ -111,9 +113,11 @@ func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
 		player.Position = &treePosition
 	}
 
+	player.EquipmentSets, hasUpdated = se.playerEquipmentSetRefToElementRef(playerID)
+	player.GuildMembers, hasUpdated = se.playerGuildMemberRefToElementRef(playerID)
+
 	player.ID = playerData.ID
 	player.OperationKind_ = playerData.OperationKind_
-	// player.GuildMembers = se.evalPlayerGuildMembersElementRefs(playerData)
 	return player, hasUpdated
 }
 

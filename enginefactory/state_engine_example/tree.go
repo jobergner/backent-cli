@@ -77,6 +77,7 @@ type GearScore struct {
 
 type Player struct {
 	ID             PlayerID           `json:"id"`
+	EquipmentSets  []ElementReference `json:"equipmentSets"`
 	GearScore      *GearScore         `json:"gearScore"`
 	GuildMembers   []ElementReference `json:"guildMembers"`
 	Items          []Item             `json:"items"`
