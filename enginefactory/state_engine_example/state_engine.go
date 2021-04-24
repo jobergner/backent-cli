@@ -77,7 +77,34 @@ func (se *Engine) UpdateState() {
 			se.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
-	// TODO dont forget to update, delete references
+	for _, equipmentSetEquipmentRef := range se.Patch.EquipmentSetEquipmentRef {
+		if equipmentSetEquipmentRef.OperationKind_ == OperationKindDelete {
+			delete(se.State.EquipmentSetEquipmentRef, equipmentSetEquipmentRef.ID)
+		} else {
+			se.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
+		}
+	}
+	for _, itemBoundToRef := range se.Patch.ItemBoundToRef {
+		if itemBoundToRef.OperationKind_ == OperationKindDelete {
+			delete(se.State.ItemBoundToRef, itemBoundToRef.ID)
+		} else {
+			se.State.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
+		}
+	}
+	for _, playerEquipmentSetRef := range se.Patch.PlayerEquipmentSetRef {
+		if playerEquipmentSetRef.OperationKind_ == OperationKindDelete {
+			delete(se.State.PlayerEquipmentSetRef, playerEquipmentSetRef.ID)
+		} else {
+			se.State.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
+		}
+	}
+	for _, playerGuildMemberRef := range se.Patch.PlayerGuildMemberRef {
+		if playerGuildMemberRef.OperationKind_ == OperationKindDelete {
+			delete(se.State.PlayerGuildMemberRef, playerGuildMemberRef.ID)
+		} else {
+			se.State.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
+		}
+	}
 
 	for key := range se.Patch.GearScore {
 		delete(se.Patch.GearScore, key)
