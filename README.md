@@ -54,3 +54,4 @@ Despite the fact that each of these errors would find a place in one of the abov
 TODO:
 - let IDs of types be a valid type (like playerID) and treat them as int
 - consider not alloweing types with ID suffix
+- consider not allowing pointers in action params
