@@ -282,10 +282,10 @@ func TestTree(t *testing.T) {
 							Level:          1,
 							OperationKind_: OperationKindUpdate,
 						},
-						OperationKind_: OperationKindUpdate,
+						OperationKind_: OperationKindUnchanged,
 					},
 				},
-				OperationKind_: OperationKindUpdate,
+				OperationKind_: OperationKindUnchanged,
 			},
 		}
 
@@ -328,7 +328,7 @@ func TestTree(t *testing.T) {
 						OperationKind_: OperationKindUpdate,
 					},
 				},
-				OperationKind_: OperationKindUpdate,
+				OperationKind_: OperationKindUnchanged,
 			},
 		}
 
@@ -374,7 +374,7 @@ func TestTree(t *testing.T) {
 						OperationKind_: OperationKindUpdate,
 					},
 				},
-				OperationKind_: OperationKindUpdate,
+				OperationKind_: OperationKindUnchanged,
 			},
 		}
 
@@ -402,8 +402,8 @@ func TestTree(t *testing.T) {
 			item.ID(se): {
 				ID:             item.ID(se),
 				Name:           "myItem",
-				BoundTo:        &ElementReference{int(player.ID(se)), ElementKindPlayer, OperationKindUpdate},
-				OperationKind_: OperationKindUpdate,
+				BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID(se)), ElementKindPlayer, OperationKindUpdate},
+				OperationKind_: OperationKindUnchanged,
 			},
 		}
 		expected.Player = map[PlayerID]Player{

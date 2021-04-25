@@ -380,27 +380,27 @@ func (se *Engine) itemBoundToRefToElementRef(itemID ItemID) (*ElementReference, 
 	// immediate replacement of refs
 	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
 		if stateItem.BoundTo != patchItem.BoundTo {
-			referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
-			return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}, true
+			referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID).player
+			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedElement.OperationKind_}, true
 		}
 	}
 
 	// ref was definitely removed
 	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo == 0) {
-		referencedElement := se.Player(se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID)
-		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindDelete}, true
+		referencedElement := se.Player(se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID).player
+		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedElement.OperationKind_}, true
 	}
 
 	// ref was definitely created
 	if stateItem.BoundTo == 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
-		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID)
-		return &ElementReference{int(referencedElement.ID(se)), ElementKindPlayer, OperationKindUpdate}, true
+		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID).player
+		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedElement.OperationKind_}, true
 	}
 
 	// referenced element got updated
 	if stateItem.BoundTo != 0 {
 		if referencedElement, ok := se.Patch.Player[se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID]; ok {
-			return &ElementReference{int(referencedElement.ID), ElementKindPlayer, OperationKindUpdate}, true
+			return &ElementReference{OperationKindUnchanged, int(referencedElement.ID), ElementKindPlayer, referencedElement.OperationKind_}, true
 		}
 	}
 
@@ -418,14 +418,15 @@ func (se *Engine) playerGuildMemberRefsToElementRefs(playerID PlayerID) ([]Eleme
 	for _, refID := range mergePlayerGuildMemberRefIDs(statePlayer.GuildMembers, patchPlayer.GuildMembers) {
 
 		if patchRef, hasUpdated := se.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
-			refs = append(refs, ElementReference{int(patchRef.ReferencedElementID), ElementKindPlayer, patchRef.OperationKind_})
+			referencedElement := se.Player(patchRef.ReferencedElementID).player
+			refs = append(refs, ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 			continue
 		}
 
 		ref := se.playerGuildMemberRef(refID).playerGuildMemberRef
-		if _, hasUpdated := se.Patch.Player[ref.ReferencedElementID]; hasUpdated {
-			refs = append(refs, ElementReference{int(ref.ReferencedElementID), ElementKindPlayer, OperationKindUpdate})
+		if referencedElement, hasUpdated := se.Patch.Player[ref.ReferencedElementID]; hasUpdated {
+			refs = append(refs, ElementReference{OperationKindUpdate, int(ref.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 		}
 	}
@@ -444,14 +445,15 @@ func (se *Engine) playerEquipmentSetRefsToElementRefs(playerID PlayerID) ([]Elem
 	for _, refID := range mergePlayerEquipmentSetRefIDs(statePlayer.EquipmentSets, patchPlayer.EquipmentSets) {
 
 		if patchRef, hasUpdated := se.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
-			refs = append(refs, ElementReference{int(patchRef.ReferencedElementID), ElementKindPlayer, patchRef.OperationKind_})
+			referencedElement := se.EquipmentSet(patchRef.ReferencedElementID).equipmentSet
+			refs = append(refs, ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 			continue
 		}
 
 		ref := se.playerEquipmentSetRef(refID).playerEquipmentSetRef
-		if _, hasUpdated := se.Patch.EquipmentSet[ref.ReferencedElementID]; hasUpdated {
-			refs = append(refs, ElementReference{int(ref.ReferencedElementID), ElementKindPlayer, OperationKindUpdate})
+		if referencedElement, hasUpdated := se.Patch.EquipmentSet[ref.ReferencedElementID]; hasUpdated {
+			refs = append(refs, ElementReference{OperationKindUpdate, int(ref.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 		}
 	}
@@ -470,15 +472,16 @@ func (se *Engine) equipmentSetEquipmentRefsToElementRefs(equipmentSetID Equipmen
 	for _, refID := range mergeEquipmentSetEquipmentRefIDs(stateEquipmentSet.Equipment, patchEquipmentSet.Equipment) {
 
 		if patchRef, hasUpdated := se.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
-			refs = append(refs, ElementReference{int(patchRef.ReferencedElementID), ElementKindEquipmentSet, patchRef.OperationKind_})
+			referencedElement := se.Item(patchRef.ReferencedElementID).item
+			refs = append(refs, ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindEquipmentSet, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 			continue
 		}
 
 		ref := se.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
-		if _, hasUpdated := se.Patch.Item[ref.ReferencedElementID]; hasUpdated {
+		if referencedElement, hasUpdated := se.Patch.Item[ref.ReferencedElementID]; hasUpdated {
+			refs = append(refs, ElementReference{OperationKindUpdate, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedElement.OperationKind_})
 			anyHaveUpdated = true
-			refs = append(refs, ElementReference{int(ref.ReferencedElementID), ElementKindEquipmentSet, OperationKindUpdate})
 		}
 	}
 
