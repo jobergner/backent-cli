@@ -3,8 +3,9 @@ package state
 type OperationKind string
 
 const (
-	OperationKindDelete OperationKind = "DELETE"
-	OperationKindUpdate OperationKind = "UPDATE"
+	OperationKindDelete    OperationKind = "DELETE"
+	OperationKindUpdate    OperationKind = "UPDATE"
+	OperationKindUnchanged OperationKind = "UNCHANGED"
 )
 
 type Engine struct {
@@ -32,6 +33,7 @@ func (se *Engine) UpdateState() {
 		if equipmentSet.OperationKind_ == OperationKindDelete {
 			delete(se.State.EquipmentSet, equipmentSet.ID)
 		} else {
+			equipmentSet.OperationKind_ = OperationKindUnchanged
 			se.State.EquipmentSet[equipmentSet.ID] = equipmentSet
 		}
 	}
@@ -39,6 +41,7 @@ func (se *Engine) UpdateState() {
 		if gearScore.OperationKind_ == OperationKindDelete {
 			delete(se.State.GearScore, gearScore.ID)
 		} else {
+			gearScore.OperationKind_ = OperationKindUnchanged
 			se.State.GearScore[gearScore.ID] = gearScore
 		}
 	}
@@ -46,6 +49,7 @@ func (se *Engine) UpdateState() {
 		if item.OperationKind_ == OperationKindDelete {
 			delete(se.State.Item, item.ID)
 		} else {
+			item.OperationKind_ = OperationKindUnchanged
 			se.State.Item[item.ID] = item
 		}
 	}
@@ -53,6 +57,7 @@ func (se *Engine) UpdateState() {
 		if player.OperationKind_ == OperationKindDelete {
 			delete(se.State.Player, player.ID)
 		} else {
+			player.OperationKind_ = OperationKindUnchanged
 			se.State.Player[player.ID] = player
 		}
 	}
@@ -60,6 +65,7 @@ func (se *Engine) UpdateState() {
 		if position.OperationKind_ == OperationKindDelete {
 			delete(se.State.Position, position.ID)
 		} else {
+			position.OperationKind_ = OperationKindUnchanged
 			se.State.Position[position.ID] = position
 		}
 	}
@@ -67,6 +73,7 @@ func (se *Engine) UpdateState() {
 		if zone.OperationKind_ == OperationKindDelete {
 			delete(se.State.Zone, zone.ID)
 		} else {
+			zone.OperationKind_ = OperationKindUnchanged
 			se.State.Zone[zone.ID] = zone
 		}
 	}
@@ -74,6 +81,7 @@ func (se *Engine) UpdateState() {
 		if zoneItem.OperationKind_ == OperationKindDelete {
 			delete(se.State.ZoneItem, zoneItem.ID)
 		} else {
+			zoneItem.OperationKind_ = OperationKindUnchanged
 			se.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
@@ -81,6 +89,7 @@ func (se *Engine) UpdateState() {
 		if equipmentSetEquipmentRef.OperationKind_ == OperationKindDelete {
 			delete(se.State.EquipmentSetEquipmentRef, equipmentSetEquipmentRef.ID)
 		} else {
+			equipmentSetEquipmentRef.OperationKind_ = OperationKindUnchanged
 			se.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
 		}
 	}
@@ -88,6 +97,7 @@ func (se *Engine) UpdateState() {
 		if itemBoundToRef.OperationKind_ == OperationKindDelete {
 			delete(se.State.ItemBoundToRef, itemBoundToRef.ID)
 		} else {
+			itemBoundToRef.OperationKind_ = OperationKindUnchanged
 			se.State.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
 		}
 	}
@@ -95,6 +105,7 @@ func (se *Engine) UpdateState() {
 		if playerEquipmentSetRef.OperationKind_ == OperationKindDelete {
 			delete(se.State.PlayerEquipmentSetRef, playerEquipmentSetRef.ID)
 		} else {
+			playerEquipmentSetRef.OperationKind_ = OperationKindUnchanged
 			se.State.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
 		}
 	}
@@ -102,6 +113,7 @@ func (se *Engine) UpdateState() {
 		if playerGuildMemberRef.OperationKind_ == OperationKindDelete {
 			delete(se.State.PlayerGuildMemberRef, playerGuildMemberRef.ID)
 		} else {
+			playerGuildMemberRef.OperationKind_ = OperationKindUnchanged
 			se.State.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
 		}
 	}

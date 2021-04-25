@@ -51,6 +51,9 @@ func (_player player) AddGuildMember(se *Engine, playerID PlayerID) {
 	if player.player.OperationKind_ == OperationKindDelete {
 		return
 	}
+	if se.Player(playerID).player.OperationKind_ == OperationKindDelete {
+		return
+	}
 	ref := se.createPlayerGuildMemberRef(playerID, player.player.ID)
 	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
 	player.player.OperationKind_ = OperationKindUpdate
@@ -62,6 +65,9 @@ func (_player player) AddEquipmentSet(se *Engine, equipmentSetID EquipmentSetID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return
 	}
+	if se.EquipmentSet(equipmentSetID).equipmentSet.OperationKind_ == OperationKindDelete {
+		return
+	}
 	ref := se.createPlayerEquipmentSetRef(equipmentSetID, player.player.ID)
 	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
 	player.player.OperationKind_ = OperationKindUpdate
@@ -71,6 +77,9 @@ func (_player player) AddEquipmentSet(se *Engine, equipmentSetID EquipmentSetID)
 func (_equipmentSet equipmentSet) AddEquipment(se *Engine, itemID ItemID) {
 	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind_ == OperationKindDelete {
+		return
+	}
+	if se.Item(itemID).item.OperationKind_ == OperationKindDelete {
 		return
 	}
 	ref := se.createEquipmentSetEquipmentRef(itemID, equipmentSet.equipmentSet.ID)
