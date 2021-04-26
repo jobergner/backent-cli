@@ -213,12 +213,12 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
 	expectedTree := newTree()
 	define(se, &expectedTree)
 	actualTree := se.assembleTree()
-	actual, _ := actualTree.MarshalJSON()
-	expected, _ := expectedTree.MarshalJSON()
-	actualString := string(actual)
-	expectedString := string(expected)
 
-	if expectedString != actualString {
+	if !assert.ObjectsAreEqual(expectedTree, actualTree) {
+		actual, _ := actualTree.MarshalJSON()
+		expected, _ := expectedTree.MarshalJSON()
+		actualString := string(actual)
+		expectedString := string(expected)
 		onFail(testutils.Diff(actualString, expectedString))
 	}
 }
@@ -434,6 +434,7 @@ func TestTree(t *testing.T) {
 				se.UpdateState()
 
 				item := player1.AddItem(se)
+				player1.AddGuildMember(se, player2.ID(se))
 
 				expectedTree.Player = map[PlayerID]Player{
 					player1.ID(se): {
@@ -444,6 +445,14 @@ func TestTree(t *testing.T) {
 								BoundTo:        nil,
 								GearScore:      &GearScore{ID: item.GearScore(se).ID(se), OperationKind_: OperationKindUpdate},
 								OperationKind_: OperationKindUpdate,
+							},
+						},
+						GuildMembers: []ElementReference{
+							{
+								OperationKind_:        OperationKindUpdate,
+								ElementID:             int(player2.ID(se)),
+								ElementKind:           ElementKindPlayer,
+								ElementOperationKind_: OperationKindUnchanged,
 							},
 						},
 						OperationKind_: OperationKindUpdate,
