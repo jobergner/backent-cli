@@ -24,12 +24,13 @@ type Tree struct {
 
 func newTree() Tree {
 	return Tree{
-		GearScore: make(map[GearScoreID]GearScore),
-		Item:      make(map[ItemID]Item),
-		Player:    make(map[PlayerID]Player),
-		Position:  make(map[PositionID]Position),
-		Zone:      make(map[ZoneID]Zone),
-		ZoneItem:  make(map[ZoneItemID]ZoneItem),
+		EquipmentSet: make(map[EquipmentSetID]EquipmentSet),
+		GearScore:    make(map[GearScoreID]GearScore),
+		Item:         make(map[ItemID]Item),
+		Player:       make(map[PlayerID]Player),
+		Position:     make(map[PositionID]Position),
+		Zone:         make(map[ZoneID]Zone),
+		ZoneItem:     make(map[ZoneItemID]ZoneItem),
 	}
 }
 
