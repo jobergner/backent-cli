@@ -247,6 +247,10 @@ func (se *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
 	return equipmentSet{equipmentSet: equipmentSetCore{OperationKind_: OperationKindDelete}}
 }
 
+func (_equipmentSet equipmentSet) ID(se *Engine) EquipmentSetID {
+	return _equipmentSet.equipmentSet.ID
+}
+
 func (_equipmentSet equipmentSet) Equipment(se *Engine) []equipmentSetEquipmentRef {
 	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	var equipment []equipmentSetEquipmentRef

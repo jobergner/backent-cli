@@ -118,6 +118,9 @@ func (se *Engine) UpdateState() {
 		}
 	}
 
+	for key := range se.Patch.EquipmentSet {
+		delete(se.Patch.EquipmentSet, key)
+	}
 	for key := range se.Patch.GearScore {
 		delete(se.Patch.GearScore, key)
 	}
