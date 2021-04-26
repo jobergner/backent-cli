@@ -426,7 +426,7 @@ func (se *Engine) playerGuildMemberRefsToElementRefs(playerID PlayerID) ([]Eleme
 
 		ref := se.playerGuildMemberRef(refID).playerGuildMemberRef
 		if referencedElement, hasUpdated := se.Patch.Player[ref.ReferencedElementID]; hasUpdated {
-			refs = append(refs, ElementReference{OperationKindUpdate, int(ref.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
+			refs = append(refs, ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 		}
 	}
@@ -453,7 +453,7 @@ func (se *Engine) playerEquipmentSetRefsToElementRefs(playerID PlayerID) ([]Elem
 
 		ref := se.playerEquipmentSetRef(refID).playerEquipmentSetRef
 		if referencedElement, hasUpdated := se.Patch.EquipmentSet[ref.ReferencedElementID]; hasUpdated {
-			refs = append(refs, ElementReference{OperationKindUpdate, int(ref.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
+			refs = append(refs, ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindPlayer, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 		}
 	}
@@ -480,7 +480,7 @@ func (se *Engine) equipmentSetEquipmentRefsToElementRefs(equipmentSetID Equipmen
 
 		ref := se.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
 		if referencedElement, hasUpdated := se.Patch.Item[ref.ReferencedElementID]; hasUpdated {
-			refs = append(refs, ElementReference{OperationKindUpdate, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedElement.OperationKind_})
+			refs = append(refs, ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedElement.OperationKind_})
 			anyHaveUpdated = true
 		}
 	}
