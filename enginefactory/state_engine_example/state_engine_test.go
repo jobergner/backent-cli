@@ -224,309 +224,309 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
 }
 
 func TestTree(t *testing.T) {
-	// t.Run("assembles elements in a tree", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			zone := se.CreateZone()
-	// 			player1 := zone.AddPlayer(se)
-	// 			player2 := zone.AddPlayer(se)
+	t.Run("assembles elements in a tree", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zone := se.CreateZone()
+				player1 := zone.AddPlayer(se)
+				player2 := zone.AddPlayer(se)
 
-	// 			expectedTree.Zone = map[ZoneID]Zone{
-	// 				zone.ID(se): {
-	// 					ID: zone.ID(se),
-	// 					Players: []Player{
-	// 						{
-	// 							ID: player1.ID(se),
-	// 							GearScore: &GearScore{
-	// 								ID:             player1.GearScore(se).ID(se),
-	// 								OperationKind_: OperationKindUpdate,
-	// 							},
-	// 							OperationKind_: OperationKindUpdate,
-	// 							Position: &Position{
-	// 								ID:             player1.Position(se).ID(se),
-	// 								OperationKind_: OperationKindUpdate,
-	// 							},
-	// 						},
-	// 						{
-	// 							ID: player2.ID(se),
-	// 							GearScore: &GearScore{
-	// 								ID:             player2.GearScore(se).ID(se),
-	// 								OperationKind_: OperationKindUpdate,
-	// 							},
-	// 							OperationKind_: OperationKindUpdate,
-	// 							Position: &Position{
-	// 								ID:             player2.Position(se).ID(se),
-	// 								OperationKind_: OperationKindUpdate,
-	// 							},
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUpdate,
-	// 				},
-	// 			}
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
-	// t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			zone := se.CreateZone()
-	// 			player1 := zone.AddPlayer(se)
-	// 			_ = zone.AddPlayer(se)
-	// 			se.UpdateState()
-	// 			player1.GearScore(se).SetLevel(se, 1)
+				expectedTree.Zone = map[ZoneID]Zone{
+					zone.ID(se): {
+						ID: zone.ID(se),
+						Players: []Player{
+							{
+								ID: player1.ID(se),
+								GearScore: &GearScore{
+									ID:             player1.GearScore(se).ID(se),
+									OperationKind_: OperationKindUpdate,
+								},
+								OperationKind_: OperationKindUpdate,
+								Position: &Position{
+									ID:             player1.Position(se).ID(se),
+									OperationKind_: OperationKindUpdate,
+								},
+							},
+							{
+								ID: player2.ID(se),
+								GearScore: &GearScore{
+									ID:             player2.GearScore(se).ID(se),
+									OperationKind_: OperationKindUpdate,
+								},
+								OperationKind_: OperationKindUpdate,
+								Position: &Position{
+									ID:             player2.Position(se).ID(se),
+									OperationKind_: OperationKindUpdate,
+								},
+							},
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zone := se.CreateZone()
+				player1 := zone.AddPlayer(se)
+				_ = zone.AddPlayer(se)
+				se.UpdateState()
+				player1.GearScore(se).SetLevel(se, 1)
 
-	// 			expectedTree.Zone = map[ZoneID]Zone{
-	// 				zone.ID(se): {
-	// 					ID: zone.ID(se),
-	// 					Players: []Player{
-	// 						{
-	// 							ID: player1.ID(se),
-	// 							GearScore: &GearScore{
-	// 								ID:             player1.GearScore(se).ID(se),
-	// 								Level:          1,
-	// 								OperationKind_: OperationKindUpdate,
-	// 							},
-	// 							OperationKind_: OperationKindUnchanged,
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUnchanged,
-	// 				},
-	// 			}
+				expectedTree.Zone = map[ZoneID]Zone{
+					zone.ID(se): {
+						ID: zone.ID(se),
+						Players: []Player{
+							{
+								ID: player1.ID(se),
+								GearScore: &GearScore{
+									ID:             player1.GearScore(se).ID(se),
+									Level:          1,
+									OperationKind_: OperationKindUpdate,
+								},
+								OperationKind_: OperationKindUnchanged,
+							},
+						},
+						OperationKind_: OperationKindUnchanged,
+					},
+				}
 
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
-	// t.Run("assembles tree based on added item", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			zone := se.CreateZone()
-	// 			player1 := zone.AddPlayer(se)
-	// 			_ = zone.AddPlayer(se)
-	// 			se.UpdateState()
-	// 			player1item1 := player1.AddItem(se)
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("assembles tree based on added item", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zone := se.CreateZone()
+				player1 := zone.AddPlayer(se)
+				_ = zone.AddPlayer(se)
+				se.UpdateState()
+				player1item1 := player1.AddItem(se)
 
-	// 			expectedTree.Zone = map[ZoneID]Zone{
-	// 				zone.ID(se): {
-	// 					ID: zone.ID(se),
-	// 					Players: []Player{
-	// 						{
-	// 							ID: player1.ID(se),
-	// 							Items: []Item{
-	// 								{
-	// 									ID:             player1item1.ID(se),
-	// 									OperationKind_: OperationKindUpdate,
-	// 									GearScore: &GearScore{
-	// 										ID:             player1item1.GearScore(se).ID(se),
-	// 										OperationKind_: OperationKindUpdate,
-	// 									},
-	// 								},
-	// 							},
-	// 							OperationKind_: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUnchanged,
-	// 				},
-	// 			}
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
-	// t.Run("assembles tree based on removed item", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			zone := se.CreateZone()
-	// 			player1 := zone.AddPlayer(se)
-	// 			_ = zone.AddPlayer(se)
-	// 			_ = player1.AddItem(se)
-	// 			player1item2 := player1.AddItem(se)
+				expectedTree.Zone = map[ZoneID]Zone{
+					zone.ID(se): {
+						ID: zone.ID(se),
+						Players: []Player{
+							{
+								ID: player1.ID(se),
+								Items: []Item{
+									{
+										ID:             player1item1.ID(se),
+										OperationKind_: OperationKindUpdate,
+										GearScore: &GearScore{
+											ID:             player1item1.GearScore(se).ID(se),
+											OperationKind_: OperationKindUpdate,
+										},
+									},
+								},
+								OperationKind_: OperationKindUpdate,
+							},
+						},
+						OperationKind_: OperationKindUnchanged,
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("assembles tree based on removed item", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zone := se.CreateZone()
+				player1 := zone.AddPlayer(se)
+				_ = zone.AddPlayer(se)
+				_ = player1.AddItem(se)
+				player1item2 := player1.AddItem(se)
 
-	// 			se.UpdateState()
+				se.UpdateState()
 
-	// 			player1.RemoveItems(se, player1item2.ID(se))
+				player1.RemoveItems(se, player1item2.ID(se))
 
-	// 			expectedTree.Zone = map[ZoneID]Zone{
-	// 				zone.ID(se): {
-	// 					ID: zone.ID(se),
-	// 					Players: []Player{
-	// 						{
-	// 							ID: player1.ID(se),
-	// 							Items: []Item{
-	// 								{
-	// 									ID:             player1item2.ID(se),
-	// 									OperationKind_: OperationKindDelete,
-	// 									GearScore: &GearScore{
-	// 										ID:             player1item2.item.GearScore,
-	// 										OperationKind_: OperationKindDelete,
-	// 									},
-	// 								},
-	// 							},
-	// 							OperationKind_: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUnchanged,
-	// 				},
-	// 			}
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
-	// t.Run("includes element which has reference of updating element", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			item := se.createItem(false).SetName(se, "myItem")
-	// 			player := se.createPlayer(false)
-	// 			item.SetBoundTo(se, player.ID(se))
+				expectedTree.Zone = map[ZoneID]Zone{
+					zone.ID(se): {
+						ID: zone.ID(se),
+						Players: []Player{
+							{
+								ID: player1.ID(se),
+								Items: []Item{
+									{
+										ID:             player1item2.ID(se),
+										OperationKind_: OperationKindDelete,
+										GearScore: &GearScore{
+											ID:             player1item2.item.GearScore,
+											OperationKind_: OperationKindDelete,
+										},
+									},
+								},
+								OperationKind_: OperationKindUpdate,
+							},
+						},
+						OperationKind_: OperationKindUnchanged,
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("includes element which has reference of updating element", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				item := se.createItem(false).SetName(se, "myItem")
+				player := se.createPlayer(false)
+				item.SetBoundTo(se, player.ID(se))
 
-	// 			se.UpdateState()
+				se.UpdateState()
 
-	// 			playerItem := player.AddItem(se)
+				playerItem := player.AddItem(se)
 
-	// 			expectedTree.Item = map[ItemID]Item{
-	// 				item.ID(se): {
-	// 					ID:             item.ID(se),
-	// 					Name:           "myItem",
-	// 					BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID(se)), ElementKindPlayer, OperationKindUpdate},
-	// 					OperationKind_: OperationKindUnchanged,
-	// 				},
-	// 			}
-	// 			expectedTree.Player = map[PlayerID]Player{
-	// 				player.ID(se): {
-	// 					ID: player.ID(se),
-	// 					Items: []Item{
-	// 						{
-	// 							ID:             playerItem.ID(se),
-	// 							OperationKind_: OperationKindUpdate,
-	// 							GearScore: &GearScore{
-	// 								ID:             playerItem.GearScore(se).ID(se),
-	// 								OperationKind_: OperationKindUpdate,
-	// 							},
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUpdate,
-	// 				},
-	// 			}
+				expectedTree.Item = map[ItemID]Item{
+					item.ID(se): {
+						ID:             item.ID(se),
+						Name:           "myItem",
+						BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID(se)), ElementKindPlayer, OperationKindUpdate},
+						OperationKind_: OperationKindUnchanged,
+					},
+				}
+				expectedTree.Player = map[PlayerID]Player{
+					player.ID(se): {
+						ID: player.ID(se),
+						Items: []Item{
+							{
+								ID:             playerItem.ID(se),
+								OperationKind_: OperationKindUpdate,
+								GearScore: &GearScore{
+									ID:             playerItem.GearScore(se).ID(se),
+									OperationKind_: OperationKindUpdate,
+								},
+							},
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+				}
 
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
-	// t.Run("includes elements which have references of updating elements", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			player1 := se.createPlayer(false)
-	// 			player2 := se.createPlayer(false)
-	// 			player3 := se.createPlayer(false)
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("includes elements which have references of updating elements", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				player2 := se.createPlayer(false)
+				player3 := se.createPlayer(false)
 
-	// 			player2.AddGuildMember(se, player1.ID(se))
-	// 			player3.AddGuildMember(se, player1.ID(se))
+				player2.AddGuildMember(se, player1.ID(se))
+				player3.AddGuildMember(se, player1.ID(se))
 
-	// 			se.UpdateState()
+				se.UpdateState()
 
-	// 			item := player1.AddItem(se)
-	// 			player1.AddGuildMember(se, player2.ID(se))
+				item := player1.AddItem(se)
+				player1.AddGuildMember(se, player2.ID(se))
 
-	// 			expectedTree.Player = map[PlayerID]Player{
-	// 				player1.ID(se): {
-	// 					ID: player1.ID(se),
-	// 					Items: []Item{
-	// 						{
-	// 							ID:             item.ID(se),
-	// 							BoundTo:        nil,
-	// 							GearScore:      &GearScore{ID: item.GearScore(se).ID(se), OperationKind_: OperationKindUpdate},
-	// 							OperationKind_: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 					GuildMembers: []ElementReference{
-	// 						{
-	// 							OperationKind_:        OperationKindUpdate,
-	// 							ElementID:             int(player2.ID(se)),
-	// 							ElementKind:           ElementKindPlayer,
-	// 							ElementOperationKind_: OperationKindUnchanged,
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUpdate,
-	// 				},
-	// 				player2.ID(se): {
-	// 					ID:             player2.ID(se),
-	// 					OperationKind_: OperationKindUnchanged,
-	// 					GuildMembers: []ElementReference{
-	// 						{
-	// 							OperationKind_:        OperationKindUnchanged,
-	// 							ElementID:             int(player1.ID(se)),
-	// 							ElementKind:           ElementKindPlayer,
-	// 							ElementOperationKind_: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 				},
-	// 				player3.ID(se): {
-	// 					ID:             player3.ID(se),
-	// 					OperationKind_: OperationKindUnchanged,
-	// 					GuildMembers: []ElementReference{
-	// 						{
-	// 							OperationKind_:        OperationKindUnchanged,
-	// 							ElementID:             int(player1.ID(se)),
-	// 							ElementKind:           ElementKindPlayer,
-	// 							ElementOperationKind_: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 				},
-	// 			}
+				expectedTree.Player = map[PlayerID]Player{
+					player1.ID(se): {
+						ID: player1.ID(se),
+						Items: []Item{
+							{
+								ID:             item.ID(se),
+								BoundTo:        nil,
+								GearScore:      &GearScore{ID: item.GearScore(se).ID(se), OperationKind_: OperationKindUpdate},
+								OperationKind_: OperationKindUpdate,
+							},
+						},
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:           OperationKindUpdate,
+								ElementID:               int(player2.ID(se)),
+								ElementKind:             ElementKindPlayer,
+								DownstreamOperationKind: OperationKindUpdate,
+							},
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+					player2.ID(se): {
+						ID:             player2.ID(se),
+						OperationKind_: OperationKindUnchanged,
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:           OperationKindUnchanged,
+								ElementID:               int(player1.ID(se)),
+								ElementKind:             ElementKindPlayer,
+								DownstreamOperationKind: OperationKindUpdate,
+							},
+						},
+					},
+					player3.ID(se): {
+						ID:             player3.ID(se),
+						OperationKind_: OperationKindUnchanged,
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:           OperationKindUnchanged,
+								ElementID:               int(player1.ID(se)),
+								ElementKind:             ElementKindPlayer,
+								DownstreamOperationKind: OperationKindUpdate,
+							},
+						},
+					},
+				}
 
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
-	// t.Run("does not break when element references itself", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			player := se.createPlayer(false)
-	// 			player.AddGuildMember(se, player.ID(se))
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("does not break when element references itself", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player := se.createPlayer(false)
+				player.AddGuildMember(se, player.ID(se))
 
-	// 			se.UpdateState()
+				se.UpdateState()
 
-	// 			player.AddGuildMember(se, player.ID(se))
+				player.AddGuildMember(se, player.ID(se))
 
-	// 			expectedTree.Player = map[PlayerID]Player{
-	// 				player.ID(se): {
-	// 					ID: player.ID(se),
-	// 					GuildMembers: []ElementReference{
-	// 						{
-	// 							OperationKind_:        OperationKindUnchanged,
-	// 							ElementID:             int(player.ID(se)),
-	// 							ElementKind:           ElementKindPlayer,
-	// 							ElementOperationKind_: OperationKindUpdate,
-	// 						},
-	// 						{
-	// 							OperationKind_:        OperationKindUpdate,
-	// 							ElementID:             int(player.ID(se)),
-	// 							ElementKind:           ElementKindPlayer,
-	// 							ElementOperationKind_: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 					OperationKind_: OperationKindUpdate,
-	// 				},
-	// 			}
+				expectedTree.Player = map[PlayerID]Player{
+					player.ID(se): {
+						ID: player.ID(se),
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:           OperationKindUnchanged,
+								ElementID:               int(player.ID(se)),
+								ElementKind:             ElementKindPlayer,
+								DownstreamOperationKind: OperationKindUpdate,
+							},
+							{
+								OperationKind:           OperationKindUpdate,
+								ElementID:               int(player.ID(se)),
+								ElementKind:             ElementKindPlayer,
+								DownstreamOperationKind: OperationKindUpdate,
+							},
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+				}
 
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
 	t.Run("includes all elements in a reference chain", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
