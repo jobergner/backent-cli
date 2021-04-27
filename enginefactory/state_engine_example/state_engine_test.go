@@ -547,12 +547,12 @@ func TestTree(t *testing.T) {
 						ID:   item.ID(se),
 						Name: "myName",
 						BoundTo: &ElementReference{
-							OperationKind_:        OperationKindUnchanged,
-							ElementID:             int(player.ID(se)),
-							ElementKind:           ElementKindPlayer,
-							ElementOperationKind_: OperationKindUnchanged,
+							OperationKind:           OperationKindUnchanged,
+							ElementID:               int(player.ID(se)),
+							ElementKind:             ElementKindPlayer,
+							DownstreamOperationKind: OperationKindUpdate,
 						},
-						OperationKind_: OperationKindUnchanged,
+						OperationKind_: OperationKindUpdate,
 					},
 				}
 				expectedTree.Player = map[PlayerID]Player{
@@ -560,10 +560,10 @@ func TestTree(t *testing.T) {
 						ID: player.ID(se),
 						EquipmentSets: []ElementReference{
 							{
-								OperationKind_:        OperationKindUnchanged,
-								ElementID:             int(equipmentSet.ID(se)),
-								ElementKind:           ElementKindEquipmentSet,
-								ElementOperationKind_: OperationKindUnchanged,
+								OperationKind:           OperationKindUnchanged,
+								ElementID:               int(equipmentSet.ID(se)),
+								ElementKind:             ElementKindEquipmentSet,
+								DownstreamOperationKind: OperationKindUpdate,
 							},
 						},
 						OperationKind_: OperationKindUnchanged,
@@ -574,10 +574,10 @@ func TestTree(t *testing.T) {
 						ID: equipmentSet.ID(se),
 						Equipment: []ElementReference{
 							{
-								OperationKind_:        OperationKindUnchanged,
-								ElementID:             int(item.ID(se)),
-								ElementKind:           ElementKindItem,
-								ElementOperationKind_: OperationKindUpdate,
+								OperationKind:           OperationKindUnchanged,
+								ElementID:               int(item.ID(se)),
+								ElementKind:             ElementKindItem,
+								DownstreamOperationKind: OperationKindUpdate,
 							},
 						},
 						OperationKind_: OperationKindUnchanged,
