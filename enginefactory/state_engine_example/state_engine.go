@@ -11,6 +11,7 @@ const (
 type Engine struct {
 	State State
 	Patch State
+	Tree  Tree
 	IDgen int
 }
 
@@ -19,6 +20,7 @@ func newEngine() *Engine {
 		IDgen: 1,
 		Patch: newState(),
 		State: newState(),
+		Tree:  newTree(),
 	}
 }
 
