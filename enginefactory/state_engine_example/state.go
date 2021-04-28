@@ -48,6 +48,7 @@ type zoneCore struct {
 	Players        []PlayerID    `json:"players"`
 	Tags           []string      `json:"tags"`
 	OperationKind_ OperationKind `json:"operationKind_"`
+	engine         *Engine
 }
 
 type zone struct{ zone zoneCore }
@@ -58,6 +59,7 @@ type zoneItemCore struct {
 	Position       PositionID    `json:"position"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 	HasParent_     bool          `json:"hasParent_"`
+	engine         *Engine
 }
 
 type zoneItem struct{ zoneItem zoneItemCore }
@@ -69,6 +71,7 @@ type itemCore struct {
 	Name           string           `json:"name"`
 	OperationKind_ OperationKind    `json:"operationKind_"`
 	HasParent_     bool             `json:"hasParent_"`
+	engine         *Engine
 }
 
 type item struct{ item itemCore }
@@ -82,6 +85,7 @@ type playerCore struct {
 	Position       PositionID                `json:"position"`
 	OperationKind_ OperationKind             `json:"operationKind_"`
 	HasParent_     bool                      `json:"hasParent_"`
+	engine         *Engine
 }
 
 type player struct{ player playerCore }
@@ -92,6 +96,7 @@ type gearScoreCore struct {
 	Score          int           `json:"score"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 	HasParent_     bool          `json:"hasParent_"`
+	engine         *Engine
 }
 
 type gearScore struct{ gearScore gearScoreCore }
@@ -102,6 +107,7 @@ type positionCore struct {
 	Y              float64       `json:"y"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 	HasParent_     bool          `json:"hasParent_"`
+	engine         *Engine
 }
 
 type position struct{ position positionCore }
@@ -111,6 +117,7 @@ type equipmentSetCore struct {
 	Name           string                       `json:"name"`
 	Equipment      []EquipmentSetEquipmentRefID `json:"equipment"`
 	OperationKind_ OperationKind                `json:"operationKind_"`
+	engine         *Engine
 }
 
 type equipmentSet struct{ equipmentSet equipmentSetCore }
@@ -120,6 +127,7 @@ type itemBoundToRefCore struct {
 	ParentID            ItemID           `json:"parentID"`
 	ReferencedElementID PlayerID         `json:"referencedElementID"`
 	OperationKind_      OperationKind    `json:"operationKind_"`
+	engine              *Engine
 }
 
 type itemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }
@@ -129,6 +137,7 @@ type playerGuildMemberRefCore struct {
 	ParentID            PlayerID               `json:"parentID"`
 	ReferencedElementID PlayerID               `json:"referencedElementID"`
 	OperationKind_      OperationKind          `json:"operationKind_"`
+	engine              *Engine
 }
 
 type playerGuildMemberRef struct{ playerGuildMemberRef playerGuildMemberRefCore }
@@ -138,6 +147,7 @@ type equipmentSetEquipmentRefCore struct {
 	ParentID            EquipmentSetID             `json:"parentID"`
 	ReferencedElementID ItemID                     `json:"referencedElementID"`
 	OperationKind_      OperationKind              `json:"operationKind_"`
+	engine              *Engine
 }
 
 type equipmentSetEquipmentRef struct{ equipmentSetEquipmentRef equipmentSetEquipmentRefCore }
@@ -147,6 +157,7 @@ type playerEquipmentSetRefCore struct {
 	ParentID            PlayerID                `json:"parentID"`
 	ReferencedElementID EquipmentSetID          `json:"referencedElementID"`
 	OperationKind_      OperationKind           `json:"operationKind_"`
+	engine              *Engine
 }
 
 type playerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }

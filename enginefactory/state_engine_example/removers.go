@@ -1,7 +1,7 @@
 package state
 
-func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
-	zone := se.Zone(_zone.zone.ID)
+func (_zone zone) RemovePlayers(playersToRemove ...PlayerID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
 	}
@@ -13,7 +13,7 @@ func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deletePlayer(element)
+				zone.zone.engine.deletePlayer(element)
 				break
 			}
 		}
@@ -26,12 +26,12 @@ func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
 	}
 	zone.zone.Players = newElements
 	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
-func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
-	zone := se.Zone(_zone.zone.ID)
+func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
 	}
@@ -43,7 +43,7 @@ func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deleteZoneItem(element)
+				zone.zone.engine.deleteZoneItem(element)
 				break
 			}
 		}
@@ -56,12 +56,12 @@ func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
 	}
 	zone.zone.Items = newElements
 	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
-func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
-	player := se.Player(_player.player.ID)
+func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
+	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return player
 	}
@@ -73,7 +73,7 @@ func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deleteItem(element)
+				player.player.engine.deleteItem(element)
 				break
 			}
 		}
@@ -86,25 +86,25 @@ func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
 	}
 	player.player.Items = newElements
 	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
-func (_player player) RemoveEquipmentSets(se *Engine, equipmentSetsToRemove ...EquipmentSetID) player {
-	player := se.Player(_player.player.ID)
+func (_player player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetID) player {
+	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
 	var newElements []PlayerEquipmentSetRefID
 	for _, refElement := range player.player.EquipmentSets {
-		element := se.playerEquipmentSetRef(refElement).playerEquipmentSetRef.ReferencedElementID
+		element := player.player.engine.playerEquipmentSetRef(refElement).playerEquipmentSetRef.ReferencedElementID
 		var toBeRemoved bool
 		for _, elementToRemove := range equipmentSetsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deletePlayerEquipmentSetRef(refElement)
+				player.player.engine.deletePlayerEquipmentSetRef(refElement)
 				break
 			}
 		}
@@ -117,25 +117,25 @@ func (_player player) RemoveEquipmentSets(se *Engine, equipmentSetsToRemove ...E
 	}
 	player.player.EquipmentSets = newElements
 	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
-func (_player player) RemoveGuildMembers(se *Engine, guildMembersToRemove ...PlayerID) player {
-	player := se.Player(_player.player.ID)
+func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) player {
+	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
 	var newElements []PlayerGuildMemberRefID
 	for _, refElement := range player.player.GuildMembers {
-		element := se.playerGuildMemberRef(refElement).playerGuildMemberRef.ReferencedElementID
+		element := player.player.engine.playerGuildMemberRef(refElement).playerGuildMemberRef.ReferencedElementID
 		var toBeRemoved bool
 		for _, elementToRemove := range guildMembersToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deletePlayerGuildMemberRef(refElement)
+				player.player.engine.deletePlayerGuildMemberRef(refElement)
 				break
 			}
 		}
@@ -148,12 +148,12 @@ func (_player player) RemoveGuildMembers(se *Engine, guildMembersToRemove ...Pla
 	}
 	player.player.GuildMembers = newElements
 	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
-func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
-	zone := se.Zone(_zone.zone.ID)
+func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
 		return zone
 	}
@@ -177,25 +177,25 @@ func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
 	}
 	zone.zone.Tags = newElements
 	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
-func (_equipmentSet equipmentSet) RemoveEquipment(se *Engine, itemsToRemove ...ItemID) equipmentSet {
-	equipmentSet := se.EquipmentSet(_equipmentSet.equipmentSet.ID)
+func (_equipmentSet equipmentSet) RemoveEquipment(itemsToRemove ...ItemID) equipmentSet {
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind_ == OperationKindDelete {
 		return equipmentSet
 	}
 	var wereElementsAltered bool
 	var newElements []EquipmentSetEquipmentRefID
 	for _, refElement := range equipmentSet.equipmentSet.Equipment {
-		element := se.equipmentSetEquipmentRef(refElement).equipmentSetEquipmentRef.ReferencedElementID
+		element := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refElement).equipmentSetEquipmentRef.ReferencedElementID
 		var toBeRemoved bool
 		for _, elementToRemove := range itemsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deleteEquipmentSetEquipmentRef(refElement)
+				equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(refElement)
 				break
 			}
 		}
@@ -208,6 +208,6 @@ func (_equipmentSet equipmentSet) RemoveEquipment(se *Engine, itemsToRemove ...I
 	}
 	equipmentSet.equipmentSet.Equipment = newElements
 	equipmentSet.equipmentSet.OperationKind_ = OperationKindUpdate
-	se.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 	return equipmentSet
 }

@@ -30,3 +30,11 @@ pkg: bar-cli/enginefactory/state_engine_example
 BenchmarkEngine-12    	   46394	     26410 ns/op	    8250 B/op	      45 allocs/op
 PASS
 ok  	bar-cli/enginefactory/state_engine_example	1.492s
+
+Mi 28. Apr 16:53:15 CEST 2021
+goos: linux
+goarch: amd64
+pkg: bar-cli/enginefactory/state_engine_example
+BenchmarkEngine-12    	   42894	     27073 ns/op	    8979 B/op	      45 allocs/op
+PASS
+ok  	bar-cli/enginefactory/state_engine_example	1.449s

@@ -276,8 +276,8 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck) (
 		if check == nil {
 			check = newRecursionCheck()
 		}
-		if _, hasUpdatedDownstream := se.assemblePlayer(ref.ID(se), check); hasUpdatedDownstream {
-			return &ElementReference{OperationKindUnchanged, int(ref.ID(se)), ElementKindPlayer, ReferencedDataModified}, true
+		if _, hasUpdatedDownstream := se.assemblePlayer(ref.ID(), check); hasUpdatedDownstream {
+			return &ElementReference{OperationKindUnchanged, int(ref.ID()), ElementKindPlayer, ReferencedDataModified}, true
 		}
 	}
 
