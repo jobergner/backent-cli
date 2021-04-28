@@ -1,5 +1,12 @@
 package state
 
+type ReferencedDataStatus string
+
+const (
+	ReferencedDataModified  ReferencedDataStatus = "MODIFIED"
+	ReferencedDataUnchanged ReferencedDataStatus = "UNCHANGED"
+)
+
 type ElementKind string
 
 const (
@@ -35,10 +42,10 @@ func newTree() Tree {
 }
 
 type ElementReference struct {
-	OperationKind           OperationKind `json:"operationKind_"`
-	ElementID               int           `json:"id"`
-	ElementKind             ElementKind   `json:"elementKind"`
-	DownstreamOperationKind OperationKind `json:"downstreamOperationKind"`
+	OperationKind        OperationKind        `json:"operationKind_"`
+	ElementID            int                  `json:"id"`
+	ElementKind          ElementKind          `json:"elementKind"`
+	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 }
 
 type ZoneItem struct {
