@@ -220,13 +220,6 @@ func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck) (Zone, bool
 	return zone, hasUpdated
 }
 
-func okToRDS(ok OperationKind) ReferencedDataStatus {
-	if ok == OperationKindUpdate || ok == OperationKindDelete {
-		return ReferencedDataModified
-	}
-	return ReferencedDataUnchanged
-}
-
 func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck) (*ElementReference, bool) {
 	stateItem := se.State.Item[itemID]
 	patchItem, itemIsInPatch := se.Patch.Item[itemID]
@@ -240,23 +233,44 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck) (
 	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
 		if stateItem.BoundTo != patchItem.BoundTo {
 			referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID).player
-			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, okToRDS(referencedElement.OperationKind_)}, true
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
 		}
 	}
 
 	// ref was definitely removed
 	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo == 0) {
 		referencedElement := se.Player(se.itemBoundToRef(stateItem.BoundTo).itemBoundToRef.ReferencedElementID).player
-		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, okToRDS(referencedElement.OperationKind_)}, true
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
 	}
 
 	// ref was definitely created
 	if stateItem.BoundTo == 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
 		referencedElement := se.Player(se.itemBoundToRef(patchItem.BoundTo).itemBoundToRef.ReferencedElementID).player
-		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, okToRDS(referencedElement.OperationKind_)}, true
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
 	}
 
-	// referenced element got updated
+	// OperationKindUpdate element got updated
 	if stateItem.BoundTo != 0 {
 		ref := se.itemBoundToRef(stateItem.BoundTo)
 		if check == nil {
@@ -343,7 +357,6 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 }
 
 func (se *Engine) assembleTree() Tree {
-	//TODO	test (A LOT) and and figure out if i can't just do state-patch simulatiouesly with allids helpers
 	for _, equipmentSetData := range se.Patch.EquipmentSet {
 		equipmentSet, hasUpdated := se.assembleEquipmentSet(equipmentSetData.ID, nil)
 		if hasUpdated {
