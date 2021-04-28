@@ -11,54 +11,47 @@ func TestEngine(t *testing.T) {
 	t.Run("creates elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		_, ok := se.Patch.GearScore[gearScore.ID(se)]
+		_, ok := se.Patch.GearScore[gearScore.ID()]
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		_gearScore := se.GearScore(gearScore.ID(se))
-		assert.NotZero(t, _gearScore.ID(se))
+		_gearScore := se.GearScore(gearScore.ID())
+		assert.NotZero(t, _gearScore.ID())
 	})
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		_gearScore := se.Patch.GearScore[gearScore.ID(se)]
+		_gearScore := se.Patch.GearScore[gearScore.ID()]
 		assert.Zero(t, _gearScore.Level)
-		gearScore.SetLevel(se, 10)
-		_gearScore = se.Patch.GearScore[gearScore.ID(se)]
+		gearScore.SetLevel(10)
+		_gearScore = se.Patch.GearScore[gearScore.ID()]
 		assert.NotZero(t, _gearScore.Level)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		se.deleteGearScore(gearScore.ID(se))
-		_gearScore := se.Patch.GearScore[gearScore.ID(se)]
+		se.deleteGearScore(gearScore.ID())
+		_gearScore := se.Patch.GearScore[gearScore.ID()]
 		assert.Equal(t, OperationKindDelete, _gearScore.OperationKind_)
 	})
 	t.Run("adds elements", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		item := player.AddItem(se)
-		playerItem := player.Items(se)[0]
-		assert.NotZero(t, playerItem.ID(se))
-		_, ok := se.Patch.Item[item.ID(se)]
+		item := player.AddItem()
+		playerItem := player.Items()[0]
+		assert.NotZero(t, playerItem.ID())
+		_, ok := se.Patch.Item[item.ID()]
 		assert.True(t, ok)
 	})
 	t.Run("removes elements", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		item := player.AddItem(se)
-		player.RemoveItems(se, item.ID(se))
-		_item := se.Patch.Item[item.ID(se)]
+		item := player.AddItem()
+		player.RemoveItems(item.ID())
+		_item := se.Patch.Item[item.ID()]
 		assert.Equal(t, OperationKindDelete, _item.OperationKind_)
-	})
-	t.Run("does not allow creation if element by 'getting' an non-existing one", func(t *testing.T) {
-		se := newEngine()
-		gearScore := se.GearScore(GearScoreID(999))
-		gearScore.SetLevel(se, 2)
-		gearScoreLevel := se.Patch.GearScore[GearScoreID(0)].Level
-		assert.NotEqual(t, gearScoreLevel, 2)
 	})
 }
 
@@ -67,11 +60,11 @@ func TestReferences(t *testing.T) {
 		se := newEngine()
 		player1 := se.CreatePlayer()
 		player2 := se.CreatePlayer()
-		player1.AddGuildMember(se, player2.ID(se))
+		player1.AddGuildMember(player2.ID())
 
 		se.UpdateState()
-		se.DeletePlayer(player2.ID(se))
-		player1_updated, ok := se.Patch.Player[player1.ID(se)]
+		se.DeletePlayer(player2.ID())
+		player1_updated, ok := se.Patch.Player[player1.ID()]
 		assert.True(t, ok)
 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
 	})
@@ -79,25 +72,25 @@ func TestReferences(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
 		item := se.CreateItem()
-		item.SetBoundTo(se, player.ID(se))
+		item.SetBoundTo(player.ID())
 		se.UpdateState()
 
-		se.deletePlayer(player.ID(se))
-		_, ok := se.Patch.Item[item.ID(se)]
+		se.deletePlayer(player.ID())
+		_, ok := se.Patch.Item[item.ID()]
 		assert.True(t, ok)
-		_, isSet := se.Item(item.ID(se)).BoundTo(se)
+		_, isSet := se.Item(item.ID()).BoundTo()
 		assert.False(t, isSet)
 	})
 	t.Run("deletes reference off element if referenced element gets deleted (3/3)", func(t *testing.T) {
 		se := newEngine()
 		zone := se.CreateZone()
 		player1 := se.CreatePlayer()
-		player2 := zone.AddPlayer(se)
-		player1.AddGuildMember(se, player2.ID(se))
+		player2 := zone.AddPlayer()
+		player1.AddGuildMember(player2.ID())
 
 		se.UpdateState()
-		zone.RemovePlayers(se, player2.ID(se))
-		player1_updated, ok := se.Patch.Player[player1.ID(se)]
+		zone.RemovePlayers(player2.ID())
+		player1_updated, ok := se.Patch.Player[player1.ID()]
 		assert.True(t, ok)
 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
 	})
@@ -114,35 +107,35 @@ func TestUpdateState(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
-		_, ok := se.Patch.GearScore[gearScore.ID(se)]
+		_, ok := se.Patch.GearScore[gearScore.ID()]
 		assert.False(t, ok)
-		_, ok = se.State.GearScore[gearScore.ID(se)]
+		_, ok = se.State.GearScore[gearScore.ID()]
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
-		assert.Zero(t, gearScore.Level(se))
-		gearScore.SetLevel(se, 1)
-		assert.Equal(t, gearScore.Level(se), 1)
+		assert.Zero(t, gearScore.Level())
+		gearScore.SetLevel(1)
+		assert.Equal(t, gearScore.Level(), 1)
 	})
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
-		gearScore := se.CreateGearScore().SetLevel(se, 1)
+		gearScore := se.CreateGearScore().SetLevel(1)
 		se.UpdateState()
-		_gearScore := se.State.GearScore[gearScore.ID(se)]
+		_gearScore := se.State.GearScore[gearScore.ID()]
 		assert.Equal(t, _gearScore.Level, 1)
-		_, ok := se.Patch.GearScore[gearScore.ID(se)]
+		_, ok := se.Patch.GearScore[gearScore.ID()]
 		assert.False(t, ok)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
-		se.deleteGearScore(gearScore.ID(se))
+		se.deleteGearScore(gearScore.ID())
 		se.UpdateState()
-		_, ok := se.State.GearScore[gearScore.ID(se)]
+		_, ok := se.State.GearScore[gearScore.ID()]
 		assert.False(t, ok)
 	})
 	t.Run("does not delete on illegal delete element with parent", func(t *testing.T) {
@@ -151,22 +144,22 @@ func TestUpdateState(t *testing.T) {
 	t.Run("adds elements", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		item := player.AddItem(se)
+		item := player.AddItem()
 		se.UpdateState()
-		_, ok := se.State.Item[item.ID(se)]
+		_, ok := se.State.Item[item.ID()]
 		assert.True(t, ok)
-		_player, ok := se.State.Player[player.ID(se)]
+		_player, ok := se.State.Player[player.ID()]
 		_itemID := _player.Items[0]
 		assert.NotZero(t, _itemID)
 	})
 	t.Run("removes elements", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		item := player.AddItem(se)
+		item := player.AddItem()
 		se.UpdateState()
-		player.RemoveItems(se, item.ID(se))
+		player.RemoveItems(item.ID())
 		se.UpdateState()
-		_, ok := se.State.Item[item.ID(se)]
+		_, ok := se.State.Item[item.ID()]
 		assert.False(t, ok)
 	})
 }
@@ -175,36 +168,35 @@ func TestActionsOnDeletedItems(t *testing.T) {
 	t.Run("does not set attribute on element which is set to be deleted", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		assert.Equal(t, 0, gearScore.Level(se))
-		se.DeleteGearScore(gearScore.ID(se))
-		gearScore.SetLevel(se, 1)
-		assert.Equal(t, 0, gearScore.Level(se))
+		assert.Equal(t, 0, gearScore.Level())
+		se.DeleteGearScore(gearScore.ID())
+		gearScore.SetLevel(1)
+		assert.Equal(t, 0, gearScore.Level())
 	})
 	t.Run("does not add child on element which is set to be deleted", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		se.DeletePlayer(player.ID(se))
-		item := player.AddItem(se)
+		se.DeletePlayer(player.ID())
+		item := player.AddItem()
 		assert.Equal(t, OperationKindDelete, item.item.OperationKind_)
-		se.UpdateState()
-		assert.Equal(t, 0, len(se.Player(player.ID(se)).Items(se)))
+		assert.Equal(t, 0, len(se.Player(player.ID()).Items()))
 	})
 	t.Run("does not remove child on element which is set to be deleted", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		item := player.AddItem(se)
+		item := player.AddItem()
 		se.UpdateState()
-		assert.Equal(t, 1, len(se.Player(player.ID(se)).Items(se)))
-		se.DeletePlayer(player.ID(se))
-		player.RemoveItems(se, item.ID(se))
-		assert.Equal(t, 1, len(se.Player(player.ID(se)).Items(se)))
+		assert.Equal(t, 1, len(se.Player(player.ID()).Items()))
+		se.DeletePlayer(player.ID())
+		player.RemoveItems(item.ID())
+		assert.Equal(t, 1, len(se.Player(player.ID()).Items()))
 	})
 	t.Run("does not delete element which is a child of another element", func(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
-		item := player.AddItem(se)
-		se.DeleteItem(item.ID(se))
-		assert.Equal(t, 1, len(se.Player(player.ID(se)).Items(se)))
+		item := player.AddItem()
+		se.DeleteItem(item.ID())
+		assert.Equal(t, 1, len(se.Player(player.ID()).Items()))
 	})
 }
 
@@ -228,34 +220,34 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				zone := se.CreateZone()
-				player1 := zone.AddPlayer(se)
-				player2 := zone.AddPlayer(se)
+				player1 := zone.AddPlayer()
+				player2 := zone.AddPlayer()
 
 				expectedTree.Zone = map[ZoneID]Zone{
-					zone.ID(se): {
-						ID: zone.ID(se),
+					zone.ID(): {
+						ID: zone.ID(),
 						Players: []Player{
 							{
-								ID: player1.ID(se),
+								ID: player1.ID(),
 								GearScore: &GearScore{
-									ID:             player1.GearScore(se).ID(se),
+									ID:             player1.GearScore().ID(),
 									OperationKind_: OperationKindUpdate,
 								},
 								OperationKind_: OperationKindUpdate,
 								Position: &Position{
-									ID:             player1.Position(se).ID(se),
+									ID:             player1.Position().ID(),
 									OperationKind_: OperationKindUpdate,
 								},
 							},
 							{
-								ID: player2.ID(se),
+								ID: player2.ID(),
 								GearScore: &GearScore{
-									ID:             player2.GearScore(se).ID(se),
+									ID:             player2.GearScore().ID(),
 									OperationKind_: OperationKindUpdate,
 								},
 								OperationKind_: OperationKindUpdate,
 								Position: &Position{
-									ID:             player2.Position(se).ID(se),
+									ID:             player2.Position().ID(),
 									OperationKind_: OperationKindUpdate,
 								},
 							},
@@ -273,19 +265,19 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				zone := se.CreateZone()
-				player1 := zone.AddPlayer(se)
-				_ = zone.AddPlayer(se)
+				player1 := zone.AddPlayer()
+				_ = zone.AddPlayer()
 				se.UpdateState()
-				player1.GearScore(se).SetLevel(se, 1)
+				player1.GearScore().SetLevel(1)
 
 				expectedTree.Zone = map[ZoneID]Zone{
-					zone.ID(se): {
-						ID: zone.ID(se),
+					zone.ID(): {
+						ID: zone.ID(),
 						Players: []Player{
 							{
-								ID: player1.ID(se),
+								ID: player1.ID(),
 								GearScore: &GearScore{
-									ID:             player1.GearScore(se).ID(se),
+									ID:             player1.GearScore().ID(),
 									Level:          1,
 									OperationKind_: OperationKindUpdate,
 								},
@@ -306,23 +298,23 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				zone := se.CreateZone()
-				player1 := zone.AddPlayer(se)
-				_ = zone.AddPlayer(se)
+				player1 := zone.AddPlayer()
+				_ = zone.AddPlayer()
 				se.UpdateState()
-				player1item1 := player1.AddItem(se)
+				player1item1 := player1.AddItem()
 
 				expectedTree.Zone = map[ZoneID]Zone{
-					zone.ID(se): {
-						ID: zone.ID(se),
+					zone.ID(): {
+						ID: zone.ID(),
 						Players: []Player{
 							{
-								ID: player1.ID(se),
+								ID: player1.ID(),
 								Items: []Item{
 									{
-										ID:             player1item1.ID(se),
+										ID:             player1item1.ID(),
 										OperationKind_: OperationKindUpdate,
 										GearScore: &GearScore{
-											ID:             player1item1.GearScore(se).ID(se),
+											ID:             player1item1.GearScore().ID(),
 											OperationKind_: OperationKindUpdate,
 										},
 									},
@@ -343,24 +335,24 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				zone := se.CreateZone()
-				player1 := zone.AddPlayer(se)
-				_ = zone.AddPlayer(se)
-				_ = player1.AddItem(se)
-				player1item2 := player1.AddItem(se)
+				player1 := zone.AddPlayer()
+				_ = zone.AddPlayer()
+				_ = player1.AddItem()
+				player1item2 := player1.AddItem()
 
 				se.UpdateState()
 
-				player1.RemoveItems(se, player1item2.ID(se))
+				player1.RemoveItems(player1item2.ID())
 
 				expectedTree.Zone = map[ZoneID]Zone{
-					zone.ID(se): {
-						ID: zone.ID(se),
+					zone.ID(): {
+						ID: zone.ID(),
 						Players: []Player{
 							{
-								ID: player1.ID(se),
+								ID: player1.ID(),
 								Items: []Item{
 									{
-										ID:             player1item2.ID(se),
+										ID:             player1item2.ID(),
 										OperationKind_: OperationKindDelete,
 										GearScore: &GearScore{
 											ID:             player1item2.item.GearScore,
@@ -383,31 +375,31 @@ func TestTree(t *testing.T) {
 	t.Run("includes element which has reference of updating element", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				item := se.createItem(false).SetName(se, "myItem")
+				item := se.createItem(false).SetName("myItem")
 				player := se.createPlayer(false)
-				item.SetBoundTo(se, player.ID(se))
+				item.SetBoundTo(player.ID())
 
 				se.UpdateState()
 
-				playerItem := player.AddItem(se)
+				playerItem := player.AddItem()
 
 				expectedTree.Item = map[ItemID]Item{
-					item.ID(se): {
-						ID:             item.ID(se),
+					item.ID(): {
+						ID:             item.ID(),
 						Name:           "myItem",
-						BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID(se)), ElementKindPlayer, ReferencedDataModified},
+						BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID()), ElementKindPlayer, ReferencedDataModified},
 						OperationKind_: OperationKindUnchanged,
 					},
 				}
 				expectedTree.Player = map[PlayerID]Player{
-					player.ID(se): {
-						ID: player.ID(se),
+					player.ID(): {
+						ID: player.ID(),
 						Items: []Item{
 							{
-								ID:             playerItem.ID(se),
+								ID:             playerItem.ID(),
 								OperationKind_: OperationKindUpdate,
 								GearScore: &GearScore{
-									ID:             playerItem.GearScore(se).ID(se),
+									ID:             playerItem.GearScore().ID(),
 									OperationKind_: OperationKindUpdate,
 								},
 							},
@@ -429,54 +421,54 @@ func TestTree(t *testing.T) {
 				player2 := se.createPlayer(false)
 				player3 := se.createPlayer(false)
 
-				player2.AddGuildMember(se, player1.ID(se))
-				player3.AddGuildMember(se, player1.ID(se))
+				player2.AddGuildMember(player1.ID())
+				player3.AddGuildMember(player1.ID())
 
 				se.UpdateState()
 
-				item := player1.AddItem(se)
-				player1.AddGuildMember(se, player2.ID(se))
+				item := player1.AddItem()
+				player1.AddGuildMember(player2.ID())
 
 				expectedTree.Player = map[PlayerID]Player{
-					player1.ID(se): {
-						ID: player1.ID(se),
+					player1.ID(): {
+						ID: player1.ID(),
 						Items: []Item{
 							{
-								ID:             item.ID(se),
+								ID:             item.ID(),
 								BoundTo:        nil,
-								GearScore:      &GearScore{ID: item.GearScore(se).ID(se), OperationKind_: OperationKindUpdate},
+								GearScore:      &GearScore{ID: item.GearScore().ID(), OperationKind_: OperationKindUpdate},
 								OperationKind_: OperationKindUpdate,
 							},
 						},
 						GuildMembers: []ElementReference{
 							{
 								OperationKind:        OperationKindUpdate,
-								ElementID:            int(player2.ID(se)),
+								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
 						},
 						OperationKind_: OperationKindUpdate,
 					},
-					player2.ID(se): {
-						ID:             player2.ID(se),
+					player2.ID(): {
+						ID:             player2.ID(),
 						OperationKind_: OperationKindUnchanged,
 						GuildMembers: []ElementReference{
 							{
 								OperationKind:        OperationKindUnchanged,
-								ElementID:            int(player1.ID(se)),
+								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
 						},
 					},
-					player3.ID(se): {
-						ID:             player3.ID(se),
+					player3.ID(): {
+						ID:             player3.ID(),
 						OperationKind_: OperationKindUnchanged,
 						GuildMembers: []ElementReference{
 							{
 								OperationKind:        OperationKindUnchanged,
-								ElementID:            int(player1.ID(se)),
+								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
@@ -494,25 +486,25 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				player := se.createPlayer(false)
-				player.AddGuildMember(se, player.ID(se))
+				player.AddGuildMember(player.ID())
 
 				se.UpdateState()
 
-				player.AddGuildMember(se, player.ID(se))
+				player.AddGuildMember(player.ID())
 
 				expectedTree.Player = map[PlayerID]Player{
-					player.ID(se): {
-						ID: player.ID(se),
+					player.ID(): {
+						ID: player.ID(),
 						GuildMembers: []ElementReference{
 							{
 								OperationKind:        OperationKindUnchanged,
-								ElementID:            int(player.ID(se)),
+								ElementID:            int(player.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
 							{
 								OperationKind:        OperationKindUpdate,
-								ElementID:            int(player.ID(se)),
+								ElementID:            int(player.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
@@ -534,21 +526,21 @@ func TestTree(t *testing.T) {
 				item := se.createItem(false)
 				equipmentSet := se.createEquipmentSet()
 
-				player.AddEquipmentSet(se, equipmentSet.ID(se))
-				equipmentSet.AddEquipment(se, item.ID(se))
-				item.SetBoundTo(se, player.ID(se))
+				player.AddEquipmentSet(equipmentSet.ID())
+				equipmentSet.AddEquipment(item.ID())
+				item.SetBoundTo(player.ID())
 
 				se.UpdateState()
 
-				item.SetName(se, "myName")
+				item.SetName("myName")
 
 				expectedTree.Item = map[ItemID]Item{
-					item.ID(se): {
-						ID:   item.ID(se),
+					item.ID(): {
+						ID:   item.ID(),
 						Name: "myName",
 						BoundTo: &ElementReference{
 							OperationKind:        OperationKindUnchanged,
-							ElementID:            int(player.ID(se)),
+							ElementID:            int(player.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
 						},
@@ -556,12 +548,12 @@ func TestTree(t *testing.T) {
 					},
 				}
 				expectedTree.Player = map[PlayerID]Player{
-					player.ID(se): {
-						ID: player.ID(se),
+					player.ID(): {
+						ID: player.ID(),
 						EquipmentSets: []ElementReference{
 							{
 								OperationKind:        OperationKindUnchanged,
-								ElementID:            int(equipmentSet.ID(se)),
+								ElementID:            int(equipmentSet.ID()),
 								ElementKind:          ElementKindEquipmentSet,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
@@ -570,12 +562,12 @@ func TestTree(t *testing.T) {
 					},
 				}
 				expectedTree.EquipmentSet = map[EquipmentSetID]EquipmentSet{
-					equipmentSet.ID(se): {
-						ID: equipmentSet.ID(se),
+					equipmentSet.ID(): {
+						ID: equipmentSet.ID(),
 						Equipment: []ElementReference{
 							{
 								OperationKind:        OperationKindUnchanged,
-								ElementID:            int(item.ID(se)),
+								ElementID:            int(item.ID()),
 								ElementKind:          ElementKindItem,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
@@ -597,19 +589,19 @@ func TestTree(t *testing.T) {
 				player2 := se.createPlayer(false)
 				item := se.createItem(false)
 
-				item.SetBoundTo(se, player1.ID(se))
-				player2.AddGuildMember(se, player1.ID(se))
+				item.SetBoundTo(player1.ID())
+				player2.AddGuildMember(player1.ID())
 
 				se.UpdateState()
 
-				player1.GearScore(se).SetLevel(se, 1)
+				player1.GearScore().SetLevel(1)
 
 				expectedTree.Item = map[ItemID]Item{
-					item.ID(se): {
-						ID: item.ID(se),
+					item.ID(): {
+						ID: item.ID(),
 						BoundTo: &ElementReference{
 							OperationKind:        OperationKindUnchanged,
-							ElementID:            int(player1.ID(se)),
+							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
 						},
@@ -617,22 +609,22 @@ func TestTree(t *testing.T) {
 					},
 				}
 				expectedTree.Player = map[PlayerID]Player{
-					player1.ID(se): {
-						ID:             player1.ID(se),
+					player1.ID(): {
+						ID:             player1.ID(),
 						OperationKind_: OperationKindUnchanged,
 						GearScore: &GearScore{
-							ID:             player1.GearScore(se).ID(se),
+							ID:             player1.GearScore().ID(),
 							Level:          1,
 							OperationKind_: OperationKindUpdate,
 						},
 					},
-					player2.ID(se): {
-						ID:             player2.ID(se),
+					player2.ID(): {
+						ID:             player2.ID(),
 						OperationKind_: OperationKindUnchanged,
 						GuildMembers: []ElementReference{
 							{
 								OperationKind:        OperationKindUnchanged,
-								ElementID:            int(player1.ID(se)),
+								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},
@@ -651,17 +643,17 @@ func TestTree(t *testing.T) {
 				player1 := se.createPlayer(false)
 				item := se.createItem(false)
 
-				item.SetBoundTo(se, player1.ID(se))
+				item.SetBoundTo(player1.ID())
 
 				se.UpdateState()
 
-				item.GearScore(se).SetLevel(se, 1)
+				item.GearScore().SetLevel(1)
 
 				expectedTree.Item = map[ItemID]Item{
-					item.ID(se): {
-						ID: item.ID(se),
+					item.ID(): {
+						ID: item.ID(),
 						GearScore: &GearScore{
-							ID:             item.GearScore(se).ID(se),
+							ID:             item.GearScore().ID(),
 							Level:          1,
 							OperationKind_: OperationKindUpdate,
 						},
@@ -682,17 +674,17 @@ func TestTree(t *testing.T) {
 				item := se.createItem(false)
 
 				se.UpdateState()
-				item.SetBoundTo(se, player1.ID(se))
-				player2.AddGuildMember(se, player1.ID(se))
+				item.SetBoundTo(player1.ID())
+				player2.AddGuildMember(player1.ID())
 
-				player1.GearScore(se).SetLevel(se, 1)
+				player1.GearScore().SetLevel(1)
 
 				expectedTree.Item = map[ItemID]Item{
-					item.ID(se): {
-						ID: item.ID(se),
+					item.ID(): {
+						ID: item.ID(),
 						BoundTo: &ElementReference{
 							OperationKind:        OperationKindUpdate,
-							ElementID:            int(player1.ID(se)),
+							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
 						},
@@ -700,21 +692,21 @@ func TestTree(t *testing.T) {
 					},
 				}
 				expectedTree.Player = map[PlayerID]Player{
-					player1.ID(se): {
-						ID:             player1.ID(se),
+					player1.ID(): {
+						ID:             player1.ID(),
 						OperationKind_: OperationKindUnchanged,
 						GearScore: &GearScore{
-							ID:             player1.GearScore(se).ID(se),
+							ID:             player1.GearScore().ID(),
 							Level:          1,
 							OperationKind_: OperationKindUpdate,
 						},
 					},
-					player2.ID(se): {
-						ID: player2.ID(se),
+					player2.ID(): {
+						ID: player2.ID(),
 						GuildMembers: []ElementReference{
 							{
 								OperationKind:        OperationKindUpdate,
-								ElementID:            int(player1.ID(se)),
+								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 							},

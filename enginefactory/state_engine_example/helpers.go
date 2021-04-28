@@ -333,7 +333,7 @@ func (se *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
 	for _, refID := range se.allItemBoundToRefIDs() {
 		ref := se.itemBoundToRef(refID)
 		if ref.itemBoundToRef.ReferencedElementID == playerID {
-			ref.Unset(se)
+			ref.Unset()
 		}
 	}
 }
@@ -343,7 +343,7 @@ func (se *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
 		ref := se.playerGuildMemberRef(refID)
 		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
 			parent := se.Player(ref.playerGuildMemberRef.ParentID)
-			parent.RemoveGuildMembers(se, playerID)
+			parent.RemoveGuildMembers(playerID)
 		}
 	}
 }
@@ -353,7 +353,7 @@ func (se *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID EquipmentSetI
 		ref := se.playerEquipmentSetRef(refID)
 		if ref.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
 			parent := se.Player(ref.playerEquipmentSetRef.ParentID)
-			parent.RemoveEquipmentSets(se, equipmentSetID)
+			parent.RemoveEquipmentSets(equipmentSetID)
 		}
 	}
 }
@@ -363,7 +363,7 @@ func (se *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
 		ref := se.equipmentSetEquipmentRef(refID)
 		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
 			parent := se.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
-			parent.RemoveEquipment(se, itemID)
+			parent.RemoveEquipment(itemID)
 		}
 	}
 }
