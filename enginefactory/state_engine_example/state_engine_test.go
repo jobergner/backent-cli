@@ -590,6 +590,144 @@ func TestTree(t *testing.T) {
 			},
 		)
 	})
+	t.Run("recursively travels tree to find if any downstream data has updated", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				player2 := se.createPlayer(false)
+				item := se.createItem(false)
+
+				item.SetBoundTo(se, player1.ID(se))
+				player2.AddGuildMember(se, player1.ID(se))
+
+				se.UpdateState()
+
+				player1.GearScore(se).SetLevel(se, 1)
+
+				expectedTree.Item = map[ItemID]Item{
+					item.ID(se): {
+						ID: item.ID(se),
+						BoundTo: &ElementReference{
+							OperationKind:        OperationKindUnchanged,
+							ElementID:            int(player1.ID(se)),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataModified,
+						},
+						OperationKind_: OperationKindUnchanged,
+					},
+				}
+				expectedTree.Player = map[PlayerID]Player{
+					player1.ID(se): {
+						ID:             player1.ID(se),
+						OperationKind_: OperationKindUnchanged,
+						GearScore: &GearScore{
+							ID:             player1.GearScore(se).ID(se),
+							Level:          1,
+							OperationKind_: OperationKindUpdate,
+						},
+					},
+					player2.ID(se): {
+						ID:             player2.ID(se),
+						OperationKind_: OperationKindUnchanged,
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:        OperationKindUnchanged,
+								ElementID:            int(player1.ID(se)),
+								ElementKind:          ElementKindPlayer,
+								ReferencedDataStatus: ReferencedDataModified,
+							},
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("does not include references if nothing related to them got updated", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				item := se.createItem(false)
+
+				item.SetBoundTo(se, player1.ID(se))
+
+				se.UpdateState()
+
+				item.GearScore(se).SetLevel(se, 1)
+
+				expectedTree.Item = map[ItemID]Item{
+					item.ID(se): {
+						ID: item.ID(se),
+						GearScore: &GearScore{
+							ID:             item.GearScore(se).ID(se),
+							Level:          1,
+							OperationKind_: OperationKindUpdate,
+						},
+						OperationKind_: OperationKindUnchanged,
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("considers downstream updated data even if reference got assigned after state update", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				player2 := se.createPlayer(false)
+				item := se.createItem(false)
+
+				se.UpdateState()
+				item.SetBoundTo(se, player1.ID(se))
+				player2.AddGuildMember(se, player1.ID(se))
+
+				player1.GearScore(se).SetLevel(se, 1)
+
+				expectedTree.Item = map[ItemID]Item{
+					item.ID(se): {
+						ID: item.ID(se),
+						BoundTo: &ElementReference{
+							OperationKind:        OperationKindUpdate,
+							ElementID:            int(player1.ID(se)),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataModified,
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+				}
+				expectedTree.Player = map[PlayerID]Player{
+					player1.ID(se): {
+						ID:             player1.ID(se),
+						OperationKind_: OperationKindUnchanged,
+						GearScore: &GearScore{
+							ID:             player1.GearScore(se).ID(se),
+							Level:          1,
+							OperationKind_: OperationKindUpdate,
+						},
+					},
+					player2.ID(se): {
+						ID: player2.ID(se),
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:        OperationKindUpdate,
+								ElementID:            int(player1.ID(se)),
+								ElementKind:          ElementKindPlayer,
+								ReferencedDataStatus: ReferencedDataModified,
+							},
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
 }
 
 func TestMergePlayerIDs(t *testing.T) {
