@@ -74,6 +74,8 @@ with patch batching this should be possible.
 - maintains an "action receiver" file where the new action gets registered in a switch
 - a server with socket endpoint
 - (sm.finish() dont know if really needed)
+￼
+1
 - create neat CLI with actions like 'register actions' (looks for file with action_ prefix), 'generate from config'
 
 ### validating input:
@@ -315,6 +317,16 @@ getting a single reference should prob have 2 return values, (ref,ok). is !ok wh
 - getter methods will always be callable, but if the value is set to `player` and the `Enemy` method is called the behaviour will be the same as when getting an object which does not exist
 - when used as reference (`*anyOf<player,enemy>`) the element also gains the `IsSet` and `Unset` method.
 - can not be used on basic types
+-----
+- for each combination of elements a new element kind is created (`eg. anyOf<enemy,player>` -> `anyOfEnemyPlayer`)
+- in the data it will be represented as `{ElementKind, ElementID}`
+- will have `func (any anyOfEnemyPlayer) SetPlayer()` method. this way it can be decided whether it holds and `enemy` or `player` element (does not need to have knowledge of it's parent element)
+- will have `func (any anyOfEnemyPlayer) Player()` as getters
+- when a `player` element is being deleted, the deletion method will also have to check all `any` types which include `player` and delete them as well
+- on deletion of an `any` type, the `any` type itself, and the contained element will be deleted
+- the default value will be the first element kind mentioned
+- when assembling a tree the `assembleAnyOfEnemyPlayer` method will return an interface
+- references should be able to be used as expected with not additional complication
 
 
 ### reduce complexity in references
