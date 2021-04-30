@@ -327,6 +327,16 @@ func (_anyOfPlayerZone anyOfPlayerZone) ID() AnyOfPlayerZoneID {
 	return _anyOfPlayerZone.anyOfPlayerZone.ID
 }
 
+func (_anyOfPlayerZone anyOfPlayerZone) Player() player {
+	anyOfPlayerZone := _anyOfPlayerZone.anyOfPlayerZone.engine.anyOfPlayerZone(_anyOfPlayerZone.anyOfPlayerZone.ID)
+	return anyOfPlayerZone.anyOfPlayerZone.engine.Player(anyOfPlayerZone.anyOfPlayerZone.Player)
+}
+
+func (_anyOfPlayerZone anyOfPlayerZone) Zone() zone {
+	anyOfPlayerZone := _anyOfPlayerZone.anyOfPlayerZone.engine.anyOfPlayerZone(_anyOfPlayerZone.anyOfPlayerZone.ID)
+	return anyOfPlayerZone.anyOfPlayerZone.engine.Zone(anyOfPlayerZone.anyOfPlayerZone.Zone)
+}
+
 func (engine *Engine) anyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID) anyOfPlayerZone {
 	patchingRef, ok := engine.Patch.AnyOfPlayerZone[anyOfPlayerZoneID]
 	if ok {
@@ -341,6 +351,16 @@ func (engine *Engine) anyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID) anyOf
 
 func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ID() AnyOfPlayerZoneItemID {
 	return _anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID
+}
+
+func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) Player() player {
+	anyOfPlayerZoneItem := _anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.anyOfPlayerZoneItem(_anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID)
+	return anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.Player(anyOfPlayerZoneItem.anyOfPlayerZoneItem.Player)
+}
+
+func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ZoneItem() zoneItem {
+	anyOfPlayerZoneItem := _anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.anyOfPlayerZoneItem(_anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID)
+	return anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.ZoneItem(anyOfPlayerZoneItem.anyOfPlayerZoneItem.ZoneItem)
 }
 
 func (engine *Engine) anyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID) anyOfPlayerZoneItem {

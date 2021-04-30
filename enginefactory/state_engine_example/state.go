@@ -179,6 +179,7 @@ type playerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCo
 
 type anyOfPlayerZoneCore struct {
 	ID             AnyOfPlayerZoneID `json:"id"`
+	ElementKind    ElementKind       `json:"elementKind"`
 	Player         PlayerID          `json:"player"`
 	Zone           ZoneID            `json:"zone"`
 	OperationKind_ OperationKind     `json:"operationKind_"`
@@ -189,8 +190,9 @@ type anyOfPlayerZone struct{ anyOfPlayerZone anyOfPlayerZoneCore }
 
 type anyOfPlayerZoneItemCore struct {
 	ID             AnyOfPlayerZoneItemID `json:"id"`
+	ElementKind    ElementKind           `json:"elementKind"`
 	Player         PlayerID              `json:"player"`
-	ZoneItem       ZoneItem              `json:"zoneItem"`
+	ZoneItem       ZoneItemID            `json:"zoneItem"`
 	OperationKind_ OperationKind         `json:"operationKind_"`
 	engine         *Engine
 }

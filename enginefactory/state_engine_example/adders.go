@@ -60,6 +60,38 @@ func (_player player) AddGuildMember(playerID PlayerID) {
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 }
 
+func (_player player) AddTargetedByPlayer(playerID PlayerID) {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return
+	}
+	if player.player.engine.Player(playerID).player.OperationKind_ == OperationKindDelete {
+		return
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false).anyOfPlayerZoneItem
+	anyContainer.setPlayer(playerID)
+	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
+	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
+	player.player.OperationKind_ = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+}
+
+func (_player player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind_ == OperationKindDelete {
+		return
+	}
+	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind_ == OperationKindDelete {
+		return
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false).anyOfPlayerZoneItem
+	anyContainer.setZoneItem(zoneItemID)
+	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
+	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
+	player.player.OperationKind_ = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+}
+
 func (_player player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
