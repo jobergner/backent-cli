@@ -7,6 +7,8 @@ var StateConfig = map[interface{}]interface{}{
 		"gearScore":     "gearScore",
 		"position":      "position",
 		"guildMembers":  "[]*player",
+		"target":        "*anyOf<player,zoneItem>",
+		"targetedBy":    "*[]anyOf<player,zoneItem>",
 	},
 	"zone": map[interface{}]interface{}{
 		"items":   "[]zoneItem",
@@ -25,6 +27,7 @@ var StateConfig = map[interface{}]interface{}{
 		"name":      "string",
 		"gearScore": "gearScore",
 		"boundTo":   "*player",
+		"origin":    "anyOf<player,zone>",
 	},
 	"gearScore": map[interface{}]interface{}{
 		"level": "int",

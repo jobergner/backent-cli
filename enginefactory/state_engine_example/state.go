@@ -11,8 +11,14 @@ type PlayerGuildMemberRefID int
 type ItemBoundToRefID int
 type EquipmentSetEquipmentRefID int
 type PlayerEquipmentSetRefID int
+type AnyOfPlayerZoneItemID int
+type AnyOfPlayerZoneID int
+type PlayerTargetRefID int
+type PlayerTargetedByRefID int
 
 type State struct {
+	AnyOfPlayerZone          map[AnyOfPlayerZoneID]anyOfPlayerZoneCore                   `json:"anyOfPlayerZone"`
+	AnyOfPlayerZoneItem      map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore           `json:"anyOfPlayerZoneItem"`
 	EquipmentSet             map[EquipmentSetID]equipmentSetCore                         `json:"equipmentSet"`
 	EquipmentSetEquipmentRef map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore `json:"equipmentSetEquipmentRef"`
 	GearScore                map[GearScoreID]gearScoreCore                               `json:"gearScore"`
@@ -21,6 +27,8 @@ type State struct {
 	Player                   map[PlayerID]playerCore                                     `json:"player"`
 	PlayerEquipmentSetRef    map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore       `json:"PlayerEquipmentSerRef"`
 	PlayerGuildMemberRef     map[PlayerGuildMemberRefID]playerGuildMemberRefCore         `json:"playerGuildMemberRef"`
+	PlayerTargetRef          map[PlayerTargetRefID]playerTargetRefCore                   `json:"playerTargetRef"`
+	PlayerTargetedByRef      map[PlayerTargetedByRefID]playerTargetedByRefCore           `json:"playerTargetedByRef"`
 	Position                 map[PositionID]positionCore                                 `json:"position"`
 	Zone                     map[ZoneID]zoneCore                                         `json:"zone"`
 	ZoneItem                 map[ZoneItemID]zoneItemCore                                 `json:"zoneItem"`
@@ -28,6 +36,8 @@ type State struct {
 
 func newState() State {
 	return State{
+		AnyOfPlayerZone:          make(map[AnyOfPlayerZoneID]anyOfPlayerZoneCore),
+		AnyOfPlayerZoneItem:      make(map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore),
 		EquipmentSet:             make(map[EquipmentSetID]equipmentSetCore),
 		EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore),
 		GearScore:                make(map[GearScoreID]gearScoreCore),
@@ -36,6 +46,8 @@ func newState() State {
 		Player:                   make(map[PlayerID]playerCore),
 		PlayerEquipmentSetRef:    make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore),
 		PlayerGuildMemberRef:     make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore),
+		PlayerTargetRef:          make(map[PlayerTargetRefID]playerTargetRefCore),
+		PlayerTargetedByRef:      make(map[PlayerTargetedByRefID]playerTargetedByRefCore),
 		Position:                 make(map[PositionID]positionCore),
 		Zone:                     make(map[ZoneID]zoneCore),
 		ZoneItem:                 make(map[ZoneItemID]zoneItemCore),
@@ -65,12 +77,13 @@ type zoneItemCore struct {
 type zoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
-	ID             ItemID           `json:"id"`
-	BoundTo        ItemBoundToRefID `json:"boundTo"`
-	GearScore      GearScoreID      `json:"gearScore"`
-	Name           string           `json:"name"`
-	OperationKind_ OperationKind    `json:"operationKind_"`
-	HasParent_     bool             `json:"hasParent_"`
+	ID             ItemID            `json:"id"`
+	BoundTo        ItemBoundToRefID  `json:"boundTo"`
+	GearScore      GearScoreID       `json:"gearScore"`
+	Name           string            `json:"name"`
+	Origin         AnyOfPlayerZoneID `json:"origin"`
+	OperationKind_ OperationKind     `json:"operationKind_"`
+	HasParent_     bool              `json:"hasParent_"`
 	engine         *Engine
 }
 
@@ -83,6 +96,8 @@ type playerCore struct {
 	GuildMembers   []PlayerGuildMemberRefID  `json:"guildMembers"`
 	Items          []ItemID                  `json:"items"`
 	Position       PositionID                `json:"position"`
+	Target         PlayerTargetRefID         `json:"target"`
+	TargetedBy     []PlayerTargetedByRefID   `json:"targetedBy"`
 	OperationKind_ OperationKind             `json:"operationKind_"`
 	HasParent_     bool                      `json:"hasParent_"`
 	engine         *Engine
@@ -161,3 +176,43 @@ type playerEquipmentSetRefCore struct {
 }
 
 type playerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }
+
+type anyOfPlayerZoneCore struct {
+	ID             AnyOfPlayerZoneID `json:"id"`
+	Player         PlayerID          `json:"player"`
+	Zone           ZoneID            `json:"zone"`
+	OperationKind_ OperationKind     `json:"operationKind_"`
+	engine         *Engine
+}
+
+type anyOfPlayerZone struct{ anyOfPlayerZone anyOfPlayerZoneCore }
+
+type anyOfPlayerZoneItemCore struct {
+	ID             AnyOfPlayerZoneItemID `json:"id"`
+	Player         PlayerID              `json:"player"`
+	ZoneItem       ZoneItem              `json:"zoneItem"`
+	OperationKind_ OperationKind         `json:"operationKind_"`
+	engine         *Engine
+}
+
+type anyOfPlayerZoneItem struct{ anyOfPlayerZoneItem anyOfPlayerZoneItemCore }
+
+type playerTargetRef struct{ playerTargetRef playerTargetRefCore }
+
+type playerTargetRefCore struct {
+	ID                  PlayerTargetRefID     `json:"id"`
+	ParentID            PlayerID              `json:"parentID"`
+	ReferencedElementID AnyOfPlayerZoneItemID `json:"referencedElementID"`
+	OperationKind_      OperationKind         `json:"operationKind_"`
+	engine              *Engine
+}
+
+type playerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }
+
+type playerTargetedByRefCore struct {
+	ID                  PlayerTargetedByRefID `json:"id"`
+	ParentID            PlayerID              `json:"parentID"`
+	ReferencedElementID AnyOfPlayerZoneItemID `json:"referencedElementID"`
+	OperationKind_      OperationKind         `json:"operationKind_"`
+	engine              *Engine
+}
