@@ -149,3 +149,47 @@ func (engine *Engine) createPlayerEquipmentSetRef(referencedElementID EquipmentS
 	engine.Patch.PlayerEquipmentSetRef[element.ID] = element
 	return element
 }
+
+func (engine *Engine) createPlayerTargetRef(referencedElementID AnyOfPlayerZoneItemID, parentID PlayerID) playerTargetRefCore {
+	var element playerTargetRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = PlayerTargetRefID(engine.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	engine.Patch.PlayerTargetRef[element.ID] = element
+	return element
+}
+
+func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayerZoneItemID, parentID PlayerID) playerTargetedByRefCore {
+	var element playerTargetedByRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = PlayerTargetedByRefID(engine.GenerateID())
+	element.OperationKind_ = OperationKindUpdate
+	engine.Patch.PlayerTargetedByRef[element.ID] = element
+	return element
+}
+
+func (engine *Engine) createAnyOfPlayerZoneItem() anyOfPlayerZoneItem {
+	var element anyOfPlayerZoneItemCore
+	element.engine = engine
+	element.ID = AnyOfPlayerZoneItemID(engine.GenerateID())
+	elementPlayer := engine.createPlayer(true)
+	element.Player = elementPlayer.player.ID
+	element.OperationKind_ = OperationKindUpdate
+	engine.Patch.AnyOfPlayerZoneItem[element.ID] = element
+	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: element}
+}
+
+func (engine *Engine) createAnyOfPlayerZone() anyOfPlayerZone {
+	var element anyOfPlayerZoneCore
+	element.engine = engine
+	element.ID = AnyOfPlayerZoneID(engine.GenerateID())
+	elementPlayer := engine.createPlayer(true)
+	element.Player = elementPlayer.player.ID
+	element.OperationKind_ = OperationKindUpdate
+	engine.Patch.AnyOfPlayerZone[element.ID] = element
+	return anyOfPlayerZone{anyOfPlayerZone: element}
+}

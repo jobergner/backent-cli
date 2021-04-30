@@ -16,6 +16,20 @@ func (_player player) ID() PlayerID {
 	return _player.player.ID
 }
 
+func (_player player) Target() (playerTargetRef, bool) {
+	player := _player.player.engine.Player(_player.player.ID)
+	return player.player.engine.playerTargetRef(player.player.Target), player.player.Target != 0
+}
+
+func (_player player) TargetedBy() []playerTargetedByRef {
+	player := _player.player.engine.Player(_player.player.ID)
+	var guildMembers []playerTargetedByRef
+	for _, refID := range player.player.TargetedBy {
+		guildMembers = append(guildMembers, player.player.engine.playerTargetedByRef(refID))
+	}
+	return guildMembers
+}
+
 func (_player player) Items() []item {
 	player := _player.player.engine.Player(_player.player.ID)
 	var items []item
@@ -94,6 +108,11 @@ func (_item item) GearScore() gearScore {
 func (_item item) BoundTo() (itemBoundToRef, bool) {
 	item := _item.item.engine.Item(_item.item.ID)
 	return item.item.engine.itemBoundToRef(item.item.BoundTo), item.item.BoundTo != 0
+}
+
+func (_item item) Origin() anyOfPlayerZone {
+	item := _item.item.engine.Item(_item.item.ID)
+	return item.item.engine.anyOfPlayerZone(item.item.Origin)
 }
 
 func (engine *Engine) Position(positionID PositionID) position {
@@ -270,4 +289,68 @@ func (engine *Engine) equipmentSetEquipmentRef(equipmentSetEquipmentRefID Equipm
 		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: currentRef}
 	}
 	return equipmentSetEquipmentRef{equipmentSetEquipmentRef: equipmentSetEquipmentRefCore{OperationKind_: OperationKindDelete}}
+}
+
+func (ref playerTargetRef) ID() AnyOfPlayerZoneItemID {
+	return ref.playerTargetRef.ReferencedElementID
+}
+
+func (engine *Engine) playerTargetRef(playerTargetRefID PlayerTargetRefID) playerTargetRef {
+	patchingRef, ok := engine.Patch.PlayerTargetRef[playerTargetRefID]
+	if ok {
+		return playerTargetRef{playerTargetRef: patchingRef}
+	}
+	currentRef, ok := engine.State.PlayerTargetRef[playerTargetRefID]
+	if ok {
+		return playerTargetRef{playerTargetRef: currentRef}
+	}
+	return playerTargetRef{playerTargetRef: playerTargetRefCore{OperationKind_: OperationKindDelete}}
+}
+
+func (ref playerTargetedByRef) ID() AnyOfPlayerZoneItemID {
+	return ref.playerTargetedByRef.ReferencedElementID
+}
+
+func (engine *Engine) playerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) playerTargetedByRef {
+	patchingRef, ok := engine.Patch.PlayerTargetedByRef[playerTargetedByRefID]
+	if ok {
+		return playerTargetedByRef{playerTargetedByRef: patchingRef}
+	}
+	currentRef, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]
+	if ok {
+		return playerTargetedByRef{playerTargetedByRef: currentRef}
+	}
+	return playerTargetedByRef{playerTargetedByRef: playerTargetedByRefCore{OperationKind_: OperationKindDelete}}
+}
+
+func (_anyOfPlayerZone anyOfPlayerZone) ID() AnyOfPlayerZoneID {
+	return _anyOfPlayerZone.anyOfPlayerZone.ID
+}
+
+func (engine *Engine) anyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID) anyOfPlayerZone {
+	patchingRef, ok := engine.Patch.AnyOfPlayerZone[anyOfPlayerZoneID]
+	if ok {
+		return anyOfPlayerZone{anyOfPlayerZone: patchingRef}
+	}
+	currentRef, ok := engine.State.AnyOfPlayerZone[anyOfPlayerZoneID]
+	if ok {
+		return anyOfPlayerZone{anyOfPlayerZone: currentRef}
+	}
+	return anyOfPlayerZone{anyOfPlayerZone: anyOfPlayerZoneCore{OperationKind_: OperationKindDelete}}
+}
+
+func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ID() AnyOfPlayerZoneItemID {
+	return _anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID
+}
+
+func (engine *Engine) anyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID) anyOfPlayerZoneItem {
+	patchingRef, ok := engine.Patch.AnyOfPlayerZoneItem[anyOfPlayerZoneItemID]
+	if ok {
+		return anyOfPlayerZoneItem{anyOfPlayerZoneItem: patchingRef}
+	}
+	currentRef, ok := engine.State.AnyOfPlayerZoneItem[anyOfPlayerZoneItemID]
+	if ok {
+		return anyOfPlayerZoneItem{anyOfPlayerZoneItem: currentRef}
+	}
+	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: anyOfPlayerZoneItemCore{OperationKind_: OperationKindDelete}}
 }
