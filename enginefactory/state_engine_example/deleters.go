@@ -9,10 +9,8 @@ func (engine *Engine) DeletePlayer(playerID PlayerID) {
 }
 func (engine *Engine) deletePlayer(playerID PlayerID) {
 	player := engine.Player(playerID).player
-	player.OperationKind_ = OperationKindDelete
-	engine.Patch.Player[player.ID] = player
-	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferenceItemBoundToRefs(playerID)
+	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.deleteGearScore(player.GearScore)
 	for _, guildMember := range player.GuildMembers {
 		engine.deletePlayerGuildMemberRef(guildMember)
@@ -21,6 +19,8 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 		engine.deleteItem(itemID)
 	}
 	engine.deletePosition(player.Position)
+	player.OperationKind_ = OperationKindDelete
+	engine.Patch.Player[player.ID] = player
 }
 
 func (engine *Engine) DeleteGearScore(gearScoreID GearScoreID) {
@@ -58,10 +58,10 @@ func (engine *Engine) DeleteItem(itemID ItemID) {
 }
 func (engine *Engine) deleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
-	item.OperationKind_ = OperationKindDelete
-	engine.Patch.Item[item.ID] = item
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
+	item.OperationKind_ = OperationKindDelete
+	engine.Patch.Item[item.ID] = item
 }
 
 func (engine *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
@@ -73,10 +73,10 @@ func (engine *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
 }
 func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
-	zoneItem.OperationKind_ = OperationKindDelete
-	engine.Patch.ZoneItem[zoneItem.ID] = zoneItem
 	engine.deleteItem(zoneItem.Item)
 	engine.deletePosition(zoneItem.Position)
+	zoneItem.OperationKind_ = OperationKindDelete
+	engine.Patch.ZoneItem[zoneItem.ID] = zoneItem
 }
 
 func (engine *Engine) DeleteZone(zoneID ZoneID) {
@@ -84,14 +84,14 @@ func (engine *Engine) DeleteZone(zoneID ZoneID) {
 }
 func (engine *Engine) deleteZone(zoneID ZoneID) {
 	zone := engine.Zone(zoneID).zone
-	zone.OperationKind_ = OperationKindDelete
-	engine.Patch.Zone[zone.ID] = zone
 	for _, zoneItemID := range zone.Items {
 		engine.deleteZoneItem(zoneItemID)
 	}
 	for _, playerID := range zone.Players {
 		engine.deletePlayer(playerID)
 	}
+	zone.OperationKind_ = OperationKindDelete
+	engine.Patch.Zone[zone.ID] = zone
 }
 
 func (engine *Engine) DeleteEquipmentSet(equipmentSetID EquipmentSetID) {
@@ -99,12 +99,12 @@ func (engine *Engine) DeleteEquipmentSet(equipmentSetID EquipmentSetID) {
 }
 func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	equipmentSet := engine.EquipmentSet(equipmentSetID).equipmentSet
-	equipmentSet.OperationKind_ = OperationKindDelete
-	engine.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
 	engine.dereferencePlayerEquipmentSetRefs(equipmentSetID)
 	for _, equipmentSet := range equipmentSet.Equipment {
 		engine.deleteEquipmentSetEquipmentRef(equipmentSet)
 	}
+	equipmentSet.OperationKind_ = OperationKindDelete
+	engine.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
 }
 
 func (engine *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) {
@@ -129,4 +129,16 @@ func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID 
 	equipmentSetEquipmentRef := engine.equipmentSetEquipmentRef(equipmentSetEquipmentRefID).equipmentSetEquipmentRef
 	equipmentSetEquipmentRef.OperationKind_ = OperationKindDelete
 	engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
+}
+
+func (engine *Engine) deletePlayerTargetRef(playerTargetRefID PlayerTargetRefID) {
+	playerTargetRef := engine.playerTargetRef(playerTargetRefID).playerTargetRef
+	playerTargetRef.OperationKind_ = OperationKindDelete
+	engine.Patch.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
+}
+
+func (engine *Engine) deletePlayerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) {
+	playerTargetedByRef := engine.playerTargetedByRef(playerTargetedByRefID).playerTargetedByRef
+	playerTargetedByRef.OperationKind_ = OperationKindDelete
+	engine.Patch.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
 }

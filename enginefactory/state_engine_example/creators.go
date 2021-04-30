@@ -39,6 +39,8 @@ func (engine *Engine) createItem(hasParent bool) item {
 	element.HasParent_ = hasParent
 	elementGearScore := engine.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
+	elementOrigin := engine.createAnyOfPlayerZone(true)
+	element.Origin = elementOrigin.anyOfPlayerZone.ID
 	element.OperationKind_ = OperationKindUpdate
 	engine.Patch.Item[element.ID] = element
 	return item{item: element}
@@ -172,23 +174,27 @@ func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayerZ
 	return element
 }
 
-func (engine *Engine) createAnyOfPlayerZoneItem() anyOfPlayerZoneItem {
+func (engine *Engine) createAnyOfPlayerZoneItem(setDefaultValue bool) anyOfPlayerZoneItem {
 	var element anyOfPlayerZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfPlayerZoneItemID(engine.GenerateID())
-	elementPlayer := engine.createPlayer(true)
-	element.Player = elementPlayer.player.ID
+	if setDefaultValue {
+		elementPlayer := engine.createPlayer(true)
+		element.Player = elementPlayer.player.ID
+	}
 	element.OperationKind_ = OperationKindUpdate
 	engine.Patch.AnyOfPlayerZoneItem[element.ID] = element
 	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: element}
 }
 
-func (engine *Engine) createAnyOfPlayerZone() anyOfPlayerZone {
+func (engine *Engine) createAnyOfPlayerZone(setDefaultValue bool) anyOfPlayerZone {
 	var element anyOfPlayerZoneCore
 	element.engine = engine
 	element.ID = AnyOfPlayerZoneID(engine.GenerateID())
-	elementPlayer := engine.createPlayer(true)
-	element.Player = elementPlayer.player.ID
+	if setDefaultValue {
+		elementPlayer := engine.createPlayer(true)
+		element.Player = elementPlayer.player.ID
+	}
 	element.OperationKind_ = OperationKindUpdate
 	engine.Patch.AnyOfPlayerZone[element.ID] = element
 	return anyOfPlayerZone{anyOfPlayerZone: element}
