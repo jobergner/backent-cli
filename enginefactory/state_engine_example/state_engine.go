@@ -119,6 +119,46 @@ func (se *Engine) UpdateState() {
 			se.State.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
 		}
 	}
+	for _, playerTargetRef := range se.Patch.PlayerTargetRef {
+		if playerTargetRef.OperationKind_ == OperationKindDelete {
+			delete(se.State.PlayerTargetRef, playerTargetRef.ID)
+		} else {
+			playerTargetRef.OperationKind_ = OperationKindUnchanged
+			se.State.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
+		}
+	}
+	for _, playerTargetedByRef := range se.Patch.PlayerTargetedByRef {
+		if playerTargetedByRef.OperationKind_ == OperationKindDelete {
+			delete(se.State.PlayerTargetedByRef, playerTargetedByRef.ID)
+		} else {
+			playerTargetedByRef.OperationKind_ = OperationKindUnchanged
+			se.State.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
+		}
+	}
+	for _, anyOfItemPlayerZoneItem := range se.Patch.AnyOfItemPlayerZoneItem {
+		if anyOfItemPlayerZoneItem.OperationKind_ == OperationKindDelete {
+			delete(se.State.AnyOfItemPlayerZoneItem, anyOfItemPlayerZoneItem.ID)
+		} else {
+			anyOfItemPlayerZoneItem.OperationKind_ = OperationKindUnchanged
+			se.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
+		}
+	}
+	for _, anyOfPlayerZone := range se.Patch.AnyOfPlayerZone {
+		if anyOfPlayerZone.OperationKind_ == OperationKindDelete {
+			delete(se.State.AnyOfPlayerZone, anyOfPlayerZone.ID)
+		} else {
+			anyOfPlayerZone.OperationKind_ = OperationKindUnchanged
+			se.State.AnyOfPlayerZone[anyOfPlayerZone.ID] = anyOfPlayerZone
+		}
+	}
+	for _, anyOfPlayerZoneItem := range se.Patch.AnyOfPlayerZoneItem {
+		if anyOfPlayerZoneItem.OperationKind_ == OperationKindDelete {
+			delete(se.State.AnyOfPlayerZoneItem, anyOfPlayerZoneItem.ID)
+		} else {
+			anyOfPlayerZoneItem.OperationKind_ = OperationKindUnchanged
+			se.State.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
+		}
+	}
 
 	for key := range se.Patch.EquipmentSet {
 		delete(se.Patch.EquipmentSet, key)
@@ -152,5 +192,20 @@ func (se *Engine) UpdateState() {
 	}
 	for key := range se.Patch.PlayerGuildMemberRef {
 		delete(se.Patch.PlayerGuildMemberRef, key)
+	}
+	for key := range se.Patch.PlayerTargetRef {
+		delete(se.Patch.PlayerTargetRef, key)
+	}
+	for key := range se.Patch.PlayerTargetedByRef {
+		delete(se.Patch.PlayerTargetedByRef, key)
+	}
+	for key := range se.Patch.AnyOfItemPlayerZoneItem {
+		delete(se.Patch.AnyOfItemPlayerZoneItem, key)
+	}
+	for key := range se.Patch.AnyOfPlayerZone {
+		delete(se.Patch.AnyOfPlayerZone, key)
+	}
+	for key := range se.Patch.AnyOfPlayerZoneItem {
+		delete(se.Patch.AnyOfPlayerZoneItem, key)
 	}
 }

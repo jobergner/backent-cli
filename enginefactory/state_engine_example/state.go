@@ -11,12 +11,14 @@ type PlayerGuildMemberRefID int
 type ItemBoundToRefID int
 type EquipmentSetEquipmentRefID int
 type PlayerEquipmentSetRefID int
+type AnyOfItemPlayerZoneItemID int
 type AnyOfPlayerZoneItemID int
 type AnyOfPlayerZoneID int
 type PlayerTargetRefID int
 type PlayerTargetedByRefID int
 
 type State struct {
+	AnyOfItemPlayerZoneItem  map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore   `json:"anyOfItemPlayerZoneItem"`
 	AnyOfPlayerZone          map[AnyOfPlayerZoneID]anyOfPlayerZoneCore                   `json:"anyOfPlayerZone"`
 	AnyOfPlayerZoneItem      map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore           `json:"anyOfPlayerZoneItem"`
 	EquipmentSet             map[EquipmentSetID]equipmentSetCore                         `json:"equipmentSet"`
@@ -36,6 +38,7 @@ type State struct {
 
 func newState() State {
 	return State{
+		AnyOfItemPlayerZoneItem:  make(map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore),
 		AnyOfPlayerZone:          make(map[AnyOfPlayerZoneID]anyOfPlayerZoneCore),
 		AnyOfPlayerZoneItem:      make(map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore),
 		EquipmentSet:             make(map[EquipmentSetID]equipmentSetCore),
@@ -55,11 +58,12 @@ func newState() State {
 }
 
 type zoneCore struct {
-	ID             ZoneID        `json:"id"`
-	Items          []ZoneItemID  `json:"items"`
-	Players        []PlayerID    `json:"players"`
-	Tags           []string      `json:"tags"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID             ZoneID                      `json:"id"`
+	Interactables  []AnyOfItemPlayerZoneItemID `json:"interactables"`
+	Items          []ZoneItemID                `json:"items"`
+	Players        []PlayerID                  `json:"players"`
+	Tags           []string                    `json:"tags"`
+	OperationKind_ OperationKind               `json:"operationKind_"`
 	engine         *Engine
 }
 
@@ -199,7 +203,17 @@ type anyOfPlayerZoneItemCore struct {
 
 type anyOfPlayerZoneItem struct{ anyOfPlayerZoneItem anyOfPlayerZoneItemCore }
 
-type playerTargetRef struct{ playerTargetRef playerTargetRefCore }
+type anyOfItemPlayerZoneItemCore struct {
+	ID             AnyOfItemPlayerZoneItemID `json:"id"`
+	ElementKind    ElementKind               `json:"elementKind"`
+	Item           ItemID                    `json:"item"`
+	Player         PlayerID                  `json:"player"`
+	ZoneItem       ZoneItemID                `json:"zoneItem"`
+	OperationKind_ OperationKind             `json:"operationKind_"`
+	engine         *Engine
+}
+
+type anyOfItemPlayerZoneItem struct{ anyOfItemPlayerZoneItem anyOfItemPlayerZoneItemCore }
 
 type playerTargetRefCore struct {
 	ID                  PlayerTargetRefID     `json:"id"`
@@ -209,7 +223,7 @@ type playerTargetRefCore struct {
 	engine              *Engine
 }
 
-type playerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }
+type playerTargetRef struct{ playerTargetRef playerTargetRefCore }
 
 type playerTargetedByRefCore struct {
 	ID                  PlayerTargetedByRefID `json:"id"`
@@ -218,3 +232,5 @@ type playerTargetedByRefCore struct {
 	OperationKind_      OperationKind         `json:"operationKind_"`
 	engine              *Engine
 }
+
+type playerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }

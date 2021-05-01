@@ -60,6 +60,111 @@ func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
 	return zone
 }
 
+func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
+	var newElements []AnyOfItemPlayerZoneItemID
+	for _, anyContainerID := range zone.zone.Interactables {
+		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		element := anyContainer.Item().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				zone.zone.engine.deleteItem(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+		}
+	}
+	if !wereElementsAltered {
+		return zone
+	}
+	zone.zone.Interactables = newElements
+	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
+}
+
+func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
+	var newElements []AnyOfItemPlayerZoneItemID
+	for _, anyContainerID := range zone.zone.Interactables {
+		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		element := anyContainer.Player().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range playersToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				zone.zone.engine.deletePlayer(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+		}
+	}
+	if !wereElementsAltered {
+		return zone
+	}
+	zone.zone.Interactables = newElements
+	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
+}
+
+func (_zone zone) RemoveInteracableZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
+	var newElements []AnyOfItemPlayerZoneItemID
+	for _, anyContainerID := range zone.zone.Interactables {
+		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		element := anyContainer.ZoneItem().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range zoneItemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				zone.zone.engine.deleteZoneItem(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+		}
+	}
+	if !wereElementsAltered {
+		return zone
+	}
+	zone.zone.Interactables = newElements
+	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
+}
+
 func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {

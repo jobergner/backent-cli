@@ -171,3 +171,12 @@ func (engine *Engine) deleteAnyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID,
 	anyOfPlayerZone.OperationKind_ = OperationKindDelete
 	engine.Patch.AnyOfPlayerZone[anyOfPlayerZone.ID] = anyOfPlayerZone
 }
+
+func (engine *Engine) deleteAnyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfItemPlayerZoneItemID, deleteChild bool) {
+	anyOfItemPlayerZoneItem := engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID).anyOfItemPlayerZoneItem
+	if deleteChild {
+		anyOfItemPlayerZoneItem.deleteChild()
+	}
+	anyOfItemPlayerZoneItem.OperationKind_ = OperationKindDelete
+	engine.Patch.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
+}
