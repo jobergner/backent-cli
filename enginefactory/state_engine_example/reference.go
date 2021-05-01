@@ -59,60 +59,95 @@ func (_ref playerTargetedByRef) Get() anyOfPlayerZoneItem {
 	return _ref.playerTargetedByRef.engine.anyOfPlayerZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 }
 
-func (se *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
-	for _, refID := range se.allItemBoundToRefIDs() {
-		ref := se.itemBoundToRef(refID)
+func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
+	for _, refID := range engine.allItemBoundToRefIDs() {
+		ref := engine.itemBoundToRef(refID)
 		if ref.itemBoundToRef.ReferencedElementID == playerID {
 			ref.Unset()
 		}
 	}
 }
 
-func (se *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
-	for _, refID := range se.allPlayerGuildMemberRefIDs() {
-		ref := se.playerGuildMemberRef(refID)
+func (engine *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
+	for _, refID := range engine.allPlayerGuildMemberRefIDs() {
+		ref := engine.playerGuildMemberRef(refID)
 		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
-			parent := se.Player(ref.playerGuildMemberRef.ParentID)
+			parent := engine.Player(ref.playerGuildMemberRef.ParentID)
 			parent.RemoveGuildMembers(playerID)
 		}
 	}
 }
 
-func (se *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID EquipmentSetID) {
-	for _, refID := range se.allPlayerEquipmentSetRefIDs() {
-		ref := se.playerEquipmentSetRef(refID)
+func (engine *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID EquipmentSetID) {
+	for _, refID := range engine.allPlayerEquipmentSetRefIDs() {
+		ref := engine.playerEquipmentSetRef(refID)
 		if ref.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
-			parent := se.Player(ref.playerEquipmentSetRef.ParentID)
+			parent := engine.Player(ref.playerEquipmentSetRef.ParentID)
 			parent.RemoveEquipmentSets(equipmentSetID)
 		}
 	}
 }
 
-func (se *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
-	for _, refID := range se.allEquipmentSetEquipmentRefIDs() {
-		ref := se.equipmentSetEquipmentRef(refID)
+func (engine *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
+	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
+		ref := engine.equipmentSetEquipmentRef(refID)
 		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
-			parent := se.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
+			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
 			parent.RemoveEquipment(itemID)
 		}
 	}
 }
 
-func (se *Engine) dereferencePlayerTargetRefs(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID) {
-	for _, refID := range se.allPlayerTargetRefIDs() {
-		ref := se.playerTargetRef(refID)
-		if ref.playerTargetRef.ReferencedElementID == anyOfPlayerZoneItemID {
+func (engine *Engine) dereferencePlayerTargetPlayerRefs(playerID PlayerID) {
+	for _, refID := range engine.allPlayerTargetRefIDs() {
+		ref := engine.playerTargetRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
+			return
+		}
+		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
 			ref.Unset()
 		}
 	}
 }
 
-func (se *Engine) dereferencePlayerTargetedByRefs(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID) {
-	for _, refID := range se.allPlayerTargetedByRefIDs() {
-		ref := se.playerTargetedByRef(refID)
-		if ref.playerTargetedByRef.ReferencedElementID == anyOfPlayerZoneItemID {
-			parent := se.Player(ref.playerTargetedByRef.ParentID)
-			parent.removeTargetedBy(anyOfPlayerZoneItemID)
+func (engine *Engine) dereferencePlayerTargetZoneItemRefs(zoneItemID ZoneItemID) {
+	for _, refID := range engine.allPlayerTargetRefIDs() {
+		ref := engine.playerTargetRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
+			return
+		}
+		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
+			ref.Unset()
+		}
+	}
+}
+
+func (engine *Engine) dereferencePlayerTargetedByPlayerRefs(playerID PlayerID) {
+	for _, refID := range engine.allPlayerTargetedByRefIDs() {
+		ref := engine.playerTargetedByRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
+			continue
+		}
+		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
+			parent := engine.Player(ref.playerTargetedByRef.ParentID)
+			parent.RemoveTargetedByPlayer(playerID)
+		}
+	}
+}
+
+func (engine *Engine) dereferencePlayerTargetedByZoneItemRefs(zoneItemID ZoneItemID) {
+	for _, refID := range engine.allPlayerTargetedByRefIDs() {
+		ref := engine.playerTargetedByRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
+			continue
+		}
+		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
+			parent := engine.Player(ref.playerTargetedByRef.ParentID)
+			parent.RemoveTargetedByZoneItem(zoneItemID)
 		}
 	}
 }

@@ -11,7 +11,8 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	player := engine.Player(playerID).player
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
-	// TODO needs to dereference (deletes reference) all references of any-types which contain this player
+	engine.dereferencePlayerTargetPlayerRefs(playerID)
+	engine.dereferencePlayerTargetedByPlayerRefs(playerID)
 	engine.deleteGearScore(player.GearScore)
 	for _, guildMember := range player.GuildMembers {
 		engine.deletePlayerGuildMemberRef(guildMember)
@@ -20,6 +21,10 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 		engine.deleteItem(itemID)
 	}
 	engine.deletePosition(player.Position)
+	engine.deletePlayerTargetRef(player.Target)
+	for _, targetedBy := range player.TargetedBy {
+		engine.deletePlayerTargetedByRef(targetedBy)
+	}
 	player.OperationKind_ = OperationKindDelete
 	engine.Patch.Player[player.ID] = player
 }
@@ -61,6 +66,7 @@ func (engine *Engine) deleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
+	engine.deleteAnyOfPlayerZone(item.Origin, true)
 	item.OperationKind_ = OperationKindDelete
 	engine.Patch.Item[item.ID] = item
 }
@@ -74,6 +80,8 @@ func (engine *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
 }
 func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
+	engine.dereferencePlayerTargetZoneItemRefs(zoneItemID)
+	engine.dereferencePlayerTargetedByZoneItemRefs(zoneItemID)
 	engine.deleteItem(zoneItem.Item)
 	engine.deletePosition(zoneItem.Position)
 	zoneItem.OperationKind_ = OperationKindDelete
@@ -134,27 +142,32 @@ func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID 
 
 func (engine *Engine) deletePlayerTargetRef(playerTargetRefID PlayerTargetRefID) {
 	playerTargetRef := engine.playerTargetRef(playerTargetRefID).playerTargetRef
+	engine.deleteAnyOfPlayerZoneItem(playerTargetRef.ReferencedElementID, false)
 	playerTargetRef.OperationKind_ = OperationKindDelete
 	engine.Patch.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
 }
 
 func (engine *Engine) deletePlayerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) {
 	playerTargetedByRef := engine.playerTargetedByRef(playerTargetedByRefID).playerTargetedByRef
+	engine.deleteAnyOfPlayerZoneItem(playerTargetedByRef.ReferencedElementID, false)
 	playerTargetedByRef.OperationKind_ = OperationKindDelete
 	engine.Patch.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
 }
 
-// TODO: since I have a setDefaultValue bool in creators, i need an optional delete downstream bool here
-// when removing the any type as part of a reference, i dont want to delete the contained element
-// when deleting an element (item) i want to delete the contained element (origin (player, zone))
-func (engine *Engine) deleteAnyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID) {
+func (engine *Engine) deleteAnyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID, deleteChild bool) {
 	anyOfPlayerZoneItem := engine.anyOfPlayerZoneItem(anyOfPlayerZoneItemID).anyOfPlayerZoneItem
+	if deleteChild {
+		anyOfPlayerZoneItem.deleteChild()
+	}
 	anyOfPlayerZoneItem.OperationKind_ = OperationKindDelete
 	engine.Patch.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
 }
 
-func (engine *Engine) deleteAnyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID) {
+func (engine *Engine) deleteAnyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID, deleteChild bool) {
 	anyOfPlayerZone := engine.anyOfPlayerZone(anyOfPlayerZoneID).anyOfPlayerZone
+	if deleteChild {
+		anyOfPlayerZone.deleteChild()
+	}
 	anyOfPlayerZone.OperationKind_ = OperationKindDelete
 	engine.Patch.AnyOfPlayerZone[anyOfPlayerZone.ID] = anyOfPlayerZone
 }
