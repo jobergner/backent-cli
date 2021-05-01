@@ -152,8 +152,7 @@ func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) playe
 	return player
 }
 
-// TODO since adders create an any container, removers need to remove it
-func (_player player) removeTargetedBy(targetedByToRemove ...AnyOfPlayerZoneItemID) player {
+func (_player player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind_ == OperationKindDelete {
 		return player
@@ -161,9 +160,13 @@ func (_player player) removeTargetedBy(targetedByToRemove ...AnyOfPlayerZoneItem
 	var wereElementsAltered bool
 	var newElements []PlayerTargetedByRefID
 	for _, refElement := range player.player.TargetedBy {
-		element := player.player.engine.playerTargetedByRef(refElement).playerTargetedByRef.ReferencedElementID
+		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
+		element := anyContainer.ZoneItem().ID()
+		if element == 0 {
+			continue
+		}
 		var toBeRemoved bool
-		for _, elementToRemove := range targetedByToRemove {
+		for _, elementToRemove := range zoneItemsToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true

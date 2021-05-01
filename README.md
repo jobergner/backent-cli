@@ -326,7 +326,12 @@ getting a single reference should prob have 2 return values, (ref,ok). is !ok wh
 - on deletion of an `any` type, the `any` type itself, and the contained element will be deleted
 - the default value will be the first element kind mentioned
 - when assembling a tree the `assembleAnyOfEnemyPlayer` method will return an interface
-- references should be able to be used as expected with not additional complication
+- references should be able to be used as expected with not additional complication 
+- since adders create an any container, removers need to remove it
+- since I have a setDefaultValue bool in creators, i need an optional delete downstream bool in any-deleters
+when removing the any type as part of a reference, i dont want to delete the contained element
+when deleting an element (item) i want to delete the contained element
+- deleting a reference if an any type should automatically remove the any type
 
 
 ### reduce complexity in references
@@ -343,3 +348,4 @@ changes i want to introduce:
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
 - are objects with no direct usage (only references) root objects?
+- is redeclaring via getter always necessary, or only after exported methods were used

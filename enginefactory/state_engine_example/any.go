@@ -25,6 +25,16 @@ func (_any anyOfPlayerZoneItemCore) setPlayer(playerID PlayerID) {
 	any.engine.Patch.AnyOfPlayerZoneItem[any.ID] = any
 }
 
+func (_any anyOfPlayerZoneItemCore) deleteChild() {
+	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+	switch any.ElementKind {
+	case ElementKindPlayer:
+		any.engine.deletePlayer(any.Player)
+	case ElementKindZoneItem:
+		any.engine.deleteZoneItem(any.ZoneItem)
+	}
+}
+
 func (_any anyOfPlayerZone) Kind() ElementKind {
 	any := _any.anyOfPlayerZone.engine.anyOfPlayerZone(_any.anyOfPlayerZone.ID)
 	return any.anyOfPlayerZone.ElementKind
@@ -38,6 +48,16 @@ func (_any anyOfPlayerZoneCore) setZone(zoneItemID ZoneID) {
 	any.ElementKind = ElementKindZone
 	any.Zone = zoneItemID
 	any.engine.Patch.AnyOfPlayerZone[any.ID] = any
+}
+
+func (_any anyOfPlayerZoneCore) deleteChild() {
+	any := _any.engine.anyOfPlayerZone(_any.ID).anyOfPlayerZone
+	switch any.ElementKind {
+	case ElementKindPlayer:
+		any.engine.deletePlayer(any.Player)
+	case ElementKindZone:
+		any.engine.deleteZone(any.Zone)
+	}
 }
 
 func (_any anyOfPlayerZoneCore) setPlayer(playerID PlayerID) {
