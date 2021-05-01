@@ -199,3 +199,16 @@ func (engine *Engine) createAnyOfPlayerZone(setDefaultValue bool) anyOfPlayerZon
 	engine.Patch.AnyOfPlayerZone[element.ID] = element
 	return anyOfPlayerZone{anyOfPlayerZone: element}
 }
+
+func (engine *Engine) createAnyOfItemPlayerZoneItem(setDefaultValue bool) anyOfItemPlayerZoneItem {
+	var element anyOfItemPlayerZoneItemCore
+	element.engine = engine
+	element.ID = AnyOfItemPlayerZoneItemID(engine.GenerateID())
+	if setDefaultValue {
+		elementItem := engine.createItem(true)
+		element.Item = elementItem.item.ID
+	}
+	element.OperationKind_ = OperationKindUpdate
+	engine.Patch.AnyOfItemPlayerZoneItem[element.ID] = element
+	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: element}
+}

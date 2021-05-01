@@ -192,6 +192,15 @@ func (_zone zone) Players() []player {
 	return players
 }
 
+func (_zone zone) Interactables() []anyOfItemPlayerZoneItem {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	var anyContainers []anyOfItemPlayerZoneItem
+	for _, anyOfItemPlayerZoneItemID := range zone.zone.Interactables {
+		anyContainers = append(anyContainers, zone.zone.engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID))
+	}
+	return anyContainers
+}
+
 func (_zone zone) Items() []zoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var items []zoneItem
@@ -373,4 +382,31 @@ func (engine *Engine) anyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneI
 		return anyOfPlayerZoneItem{anyOfPlayerZoneItem: currentRef}
 	}
 	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: anyOfPlayerZoneItemCore{OperationKind_: OperationKindDelete}}
+}
+
+func (engine *Engine) anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfItemPlayerZoneItemID) anyOfItemPlayerZoneItem {
+	patchingRef, ok := engine.Patch.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItemID]
+	if ok {
+		return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: patchingRef}
+	}
+	currentRef, ok := engine.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItemID]
+	if ok {
+		return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: currentRef}
+	}
+	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: anyOfItemPlayerZoneItemCore{OperationKind_: OperationKindDelete}}
+}
+
+func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) Player() player {
+	anyOfItemPlayerZoneItem := _anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ID)
+	return anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.Player(anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.Player)
+}
+
+func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) ZoneItem() zoneItem {
+	anyOfItemPlayerZoneItem := _anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ID)
+	return anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.ZoneItem(anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ZoneItem)
+}
+
+func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) Item() item {
+	anyOfItemPlayerZoneItem := _anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ID)
+	return anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.Item(anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.Item)
 }

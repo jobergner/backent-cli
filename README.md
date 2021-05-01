@@ -349,3 +349,4 @@ changes i want to introduce:
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
 - are objects with no direct usage (only references) root objects?
 - is redeclaring via getter always necessary, or only after exported methods were used
+- anyOf<item,zone,player> and anyOf<itemZone,player> both produce the `anyOfItemZonePlayer` type => bad!

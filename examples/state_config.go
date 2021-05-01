@@ -8,12 +8,13 @@ var StateConfig = map[interface{}]interface{}{
 		"position":      "position",
 		"guildMembers":  "[]*player",
 		"target":        "*anyOf<player,zoneItem>",
-		"targetedBy":    "*[]anyOf<player,zoneItem>",
+		"targetedBy":    "[]*anyOf<player,zoneItem>",
 	},
 	"zone": map[interface{}]interface{}{
-		"items":   "[]zoneItem",
-		"players": "[]player",
-		"tags":    "[]string",
+		"items":         "[]zoneItem",
+		"players":       "[]player",
+		"tags":          "[]string",
+		"interactables": "[]anyOf<item,player,zoneItem>",
 	},
 	"zoneItem": map[interface{}]interface{}{
 		"position": "position",

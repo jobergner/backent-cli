@@ -24,6 +24,48 @@ func (_zone zone) AddItem() zoneItem {
 	return zoneItem
 }
 
+func (_zone zone) AddInteractablePlayer() player {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return player{player: playerCore{OperationKind_: OperationKindDelete}}
+	}
+	player := zone.zone.engine.createPlayer(true)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
+	anyContainer.anyOfItemPlayerZoneItem.setPlayer(player.player.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return player
+}
+
+func (_zone zone) AddInteractableZoneItem() zoneItem {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return zoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
+	}
+	zoneItem := zone.zone.engine.createZoneItem(true)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
+	anyContainer.anyOfItemPlayerZoneItem.setZoneItem(zoneItem.zoneItem.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zoneItem
+}
+
+func (_zone zone) AddInteractableItem() item {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind_ == OperationKindDelete {
+		return item{item: itemCore{OperationKind_: OperationKindDelete}}
+	}
+	item := zone.zone.engine.createItem(true)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
+	anyContainer.anyOfItemPlayerZoneItem.setItem(item.item.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return item
+}
+
 func (_zone zone) AddTags(tags ...string) {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind_ == OperationKindDelete {
