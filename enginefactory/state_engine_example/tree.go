@@ -101,3 +101,25 @@ type Zone struct {
 	Tags           []string      `json:"tags"`
 	OperationKind_ OperationKind `json:"operationKind_"`
 }
+
+type recursionCheck struct {
+	equipmentSet map[EquipmentSetID]bool
+	gearScore    map[GearScoreID]bool
+	item         map[ItemID]bool
+	player       map[PlayerID]bool
+	position     map[PositionID]bool
+	zone         map[ZoneID]bool
+	zoneItem     map[ZoneItemID]bool
+}
+
+func newRecursionCheck() *recursionCheck {
+	return &recursionCheck{
+		equipmentSet: make(map[EquipmentSetID]bool),
+		gearScore:    make(map[GearScoreID]bool),
+		item:         make(map[ItemID]bool),
+		player:       make(map[PlayerID]bool),
+		position:     make(map[PositionID]bool),
+		zone:         make(map[ZoneID]bool),
+		zoneItem:     make(map[ZoneItemID]bool),
+	}
+}
