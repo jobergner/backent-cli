@@ -351,6 +351,11 @@ changes i want to introduce:
 - typescript might be the only viable option
 problem with using typescript is, that I'm not willing to write another AST and generator for it, especially since the relevant parts are already taken care of.
 currently my best option is to assemble the tree server side, make sure all necessary data is included, and use json-path for references within the tree.
+- assembling the tree has to be changed in these ways:
+  - when a reference is created, the referenced object needs to be included in it's entirety(!!!) -> something like a forceInclude parameter needs to be added
+  - when a reference is included due to the referenced element having changend, a json-path to that element within the tree needs to be included
+  - maybe passing a config object downstream is a good idea
+  - a forceInclude parameter would also be for assembling the entire state in a tree for an initial state push
 
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
