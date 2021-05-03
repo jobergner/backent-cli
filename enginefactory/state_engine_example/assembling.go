@@ -4,10 +4,10 @@ type assembleConfig struct {
 	forceInclude bool
 }
 
-func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool) {
+func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
-			return GearScore{}, false
+			return GearScore{}, false, false
 		} else {
 			check.gearScore[gearScoreID] = true
 		}
@@ -15,7 +15,7 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionChe
 
 	gearScoreData, hasUpdated := se.Patch.GearScore[gearScoreID]
 	if !hasUpdated && !config.forceInclude {
-		return GearScore{}, false
+		return GearScore{}, false, false
 	}
 
 	var gearScore GearScore
@@ -24,13 +24,13 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionChe
 	gearScore.OperationKind_ = gearScoreData.OperationKind_
 	gearScore.Level = gearScoreData.Level
 	gearScore.Score = gearScoreData.Score
-	return gearScore, true
+	return gearScore, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool) {
+func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.position[positionID]; alreadyExists {
-			return Position{}, false
+			return Position{}, false, false
 		} else {
 			check.position[positionID] = true
 		}
@@ -38,7 +38,7 @@ func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck,
 
 	positionData, hasUpdated := se.Patch.Position[positionID]
 	if !hasUpdated && !config.forceInclude {
-		return Position{}, false
+		return Position{}, false, false
 	}
 
 	var position Position
@@ -47,13 +47,13 @@ func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck,
 	position.OperationKind_ = positionData.OperationKind_
 	position.X = positionData.X
 	position.Y = positionData.Y
-	return position, true
+	return position, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool) {
+func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
-			return EquipmentSet{}, false
+			return EquipmentSet{}, false, false
 		} else {
 			check.equipmentSet[equipmentSetID] = true
 		}
@@ -76,13 +76,13 @@ func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *rec
 	equipmentSet.ID = equipmentSetData.ID
 	equipmentSet.OperationKind_ = equipmentSetData.OperationKind_
 	equipmentSet.Name = equipmentSetData.Name
-	return equipmentSet, hasUpdated || config.forceInclude
+	return equipmentSet, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool) {
+func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.item[itemID]; alreadyExists {
-			return Item{}, false
+			return Item{}, false, false
 		} else {
 			check.item[itemID] = true
 		}
@@ -99,21 +99,23 @@ func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config asse
 		item.BoundTo = refs
 		hasUpdated = true
 	}
-	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(itemData.GearScore, check, config); gearScoreHasUpdated {
-		hasUpdated = true
+	if treeGearScore, include, gearScoreHasUpdated := se.assembleGearScore(itemData.GearScore, check, config); include {
+		if gearScoreHasUpdated {
+			hasUpdated = true
+		}
 		item.GearScore = &treeGearScore
 	}
 
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
 	item.Name = itemData.Name
-	return item, hasUpdated || config.forceInclude
+	return item, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool) {
+func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
-			return ZoneItem{}, false
+			return ZoneItem{}, false, false
 		} else {
 			check.zoneItem[zoneItemID] = true
 		}
@@ -126,25 +128,28 @@ func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck,
 
 	var zoneItem ZoneItem
 
-	if treeItem, itemHasUpdated := se.assembleItem(zoneItemData.Item, check, config); itemHasUpdated {
-		hasUpdated = true
+	if treeItem, include, itemHasUpdated := se.assembleItem(zoneItemData.Item, check, config); include {
+		if itemHasUpdated {
+			hasUpdated = true
+		}
 		zoneItem.Item = &treeItem
 	}
-	if treePosition, positionHasUpdated := se.assemblePosition(zoneItemData.Position, check, config); positionHasUpdated {
-		hasUpdated = true
+	if treePosition, include, positionHasUpdated := se.assemblePosition(zoneItemData.Position, check, config); include {
+		if positionHasUpdated {
+			hasUpdated = true
+		}
 		zoneItem.Position = &treePosition
 	}
 
 	zoneItem.ID = zoneItemData.ID
 	zoneItem.OperationKind_ = zoneItemData.OperationKind_
-	return zoneItem, hasUpdated || config.forceInclude
-
+	return zoneItem, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool) {
+func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.player[playerID]; alreadyExists {
-			return Player{}, false
+			return Player{}, false, false
 		} else {
 			check.player[playerID] = true
 		}
@@ -163,8 +168,10 @@ func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, confi
 			player.EquipmentSets = append(player.EquipmentSets, ref)
 		}
 	}
-	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(playerData.GearScore, check, config); gearScoreHasUpdated {
-		hasUpdated = true
+	if treeGearScore, include, gearScoreHasUpdated := se.assembleGearScore(playerData.GearScore, check, config); include {
+		if gearScoreHasUpdated {
+			hasUpdated = true
+		}
 		player.GearScore = &treeGearScore
 	}
 	for _, refID := range mergePlayerGuildMemberRefIDs(se.State.Player[playerID].GuildMembers, se.Patch.Player[playerID].GuildMembers) {
@@ -174,25 +181,29 @@ func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, confi
 		}
 	}
 	for _, itemID := range mergeItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
-		if treeItem, itemHasUpdated := se.assembleItem(itemID, check, config); itemHasUpdated {
-			hasUpdated = true
+		if treeItem, include, itemHasUpdated := se.assembleItem(itemID, check, config); include {
+			if itemHasUpdated {
+				hasUpdated = true
+			}
 			player.Items = append(player.Items, treeItem)
 		}
 	}
-	if treePosition, positionHasUpdated := se.assemblePosition(playerData.Position, check, config); positionHasUpdated {
-		hasUpdated = true
+	if treePosition, include, positionHasUpdated := se.assemblePosition(playerData.Position, check, config); include {
+		if positionHasUpdated {
+			hasUpdated = true
+		}
 		player.Position = &treePosition
 	}
 
 	player.ID = playerData.ID
 	player.OperationKind_ = playerData.OperationKind_
-	return player, hasUpdated || config.forceInclude
+	return player, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool) {
+func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zone[zoneID]; alreadyExists {
-			return Zone{}, false
+			return Zone{}, false, false
 		} else {
 			check.zone[zoneID] = true
 		}
@@ -206,14 +217,18 @@ func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config asse
 	var zone Zone
 
 	for _, zoneItemID := range mergeZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
-		if treeZoneItem, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID, check, config); zoneItemHasUpdated {
-			hasUpdated = true
+		if treeZoneItem, include, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID, check, config); include {
+			if zoneItemHasUpdated {
+				hasUpdated = true
+			}
 			zone.Items = append(zone.Items, treeZoneItem)
 		}
 	}
 	for _, playerID := range mergePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
-		if treePlayer, playerHasUpdated := se.assemblePlayer(playerID, check, config); playerHasUpdated {
-			hasUpdated = true
+		if treePlayer, include, playerHasUpdated := se.assemblePlayer(playerID, check, config); include {
+			if playerHasUpdated {
+				hasUpdated = true
+			}
 			zone.Players = append(zone.Players, treePlayer)
 		}
 	}
@@ -221,7 +236,7 @@ func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config asse
 	zone.ID = zoneData.ID
 	zone.OperationKind_ = zoneData.OperationKind_
 	zone.Tags = zoneData.Tags
-	return zone, hasUpdated || config.forceInclude
+	return zone, hasUpdated || config.forceInclude, hasUpdated
 }
 
 func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*ElementReference, bool) {
@@ -241,7 +256,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		return &ElementReference{ref.itemBoundToRef.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
@@ -256,7 +271,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
@@ -270,7 +285,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
@@ -285,7 +300,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 				check = newRecursionCheck()
 			}
 			referencedDataStatus := ReferencedDataUnchanged
-			if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+			if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
 			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true
@@ -298,7 +313,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 		if check == nil {
 			check = newRecursionCheck()
 		}
-		if _, hasUpdatedDownstream := se.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
 			return &ElementReference{OperationKindUnchanged, int(ref.ID()), ElementKindPlayer, ReferencedDataModified}, true
 		}
 	}
@@ -314,7 +329,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindPlayer, referencedDataStatus}, true
@@ -326,7 +341,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		if patchRef.OperationKind_ == OperationKindUpdate {
@@ -339,7 +354,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 	if check == nil {
 		check = newRecursionCheck()
 	}
-	if _, hasUpdatedDownstream := se.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
+	if _, _, hasUpdatedDownstream := se.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
 		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindPlayer, ReferencedDataModified}, true
 	}
 
@@ -354,7 +369,7 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus}, true
@@ -366,7 +381,7 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		if patchRef.OperationKind_ == OperationKindUpdate {
@@ -379,7 +394,7 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 	if check == nil {
 		check = newRecursionCheck()
 	}
-	if _, hasUpdatedDownstream := se.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
+	if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
 		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindEquipmentSet, ReferencedDataModified}, true
 	}
 
@@ -394,7 +409,7 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindItem, referencedDataStatus}, true
@@ -406,7 +421,7 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if _, _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		if patchRef.OperationKind_ == OperationKindUpdate {
@@ -419,7 +434,7 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 	if check == nil {
 		check = newRecursionCheck()
 	}
-	if _, hasUpdatedDownstream := se.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
+	if _, _, hasUpdatedDownstream := se.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
 		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindItem, ReferencedDataModified}, true
 	}
 
@@ -433,53 +448,53 @@ func (se *Engine) assembleTree() Tree {
 	}
 
 	for _, equipmentSetData := range se.Patch.EquipmentSet {
-		equipmentSet, hasUpdated := se.assembleEquipmentSet(equipmentSetData.ID, nil, config)
-		if hasUpdated {
+		equipmentSet, include, _ := se.assembleEquipmentSet(equipmentSetData.ID, nil, config)
+		if include {
 			se.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
 		}
 	}
 	for _, gearScoreData := range se.Patch.GearScore {
 		if !gearScoreData.HasParent_ {
-			gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID, nil, config)
-			if hasUpdated {
+			gearScore, include, _ := se.assembleGearScore(gearScoreData.ID, nil, config)
+			if include {
 				se.Tree.GearScore[gearScoreData.ID] = gearScore
 			}
 		}
 	}
 	for _, itemData := range se.Patch.Item {
 		if !itemData.HasParent_ {
-			item, hasUpdated := se.assembleItem(itemData.ID, nil, config)
-			if hasUpdated {
+			item, include, _ := se.assembleItem(itemData.ID, nil, config)
+			if include {
 				se.Tree.Item[itemData.ID] = item
 			}
 		}
 	}
 	for _, playerData := range se.Patch.Player {
 		if !playerData.HasParent_ {
-			player, hasUpdated := se.assemblePlayer(playerData.ID, nil, config)
-			if hasUpdated {
+			player, include, _ := se.assemblePlayer(playerData.ID, nil, config)
+			if include {
 				se.Tree.Player[playerData.ID] = player
 			}
 		}
 	}
 	for _, positionData := range se.Patch.Position {
 		if !positionData.HasParent_ {
-			position, hasUpdated := se.assemblePosition(positionData.ID, nil, config)
-			if hasUpdated {
+			position, include, _ := se.assemblePosition(positionData.ID, nil, config)
+			if include {
 				se.Tree.Position[positionData.ID] = position
 			}
 		}
 	}
 	for _, zoneData := range se.Patch.Zone {
-		zone, hasUpdated := se.assembleZone(zoneData.ID, nil, config)
-		if hasUpdated {
+		zone, include, _ := se.assembleZone(zoneData.ID, nil, config)
+		if include {
 			se.Tree.Zone[zoneData.ID] = zone
 		}
 	}
 	for _, zoneItemData := range se.Patch.ZoneItem {
 		if !zoneItemData.HasParent_ {
-			zoneItem, hasUpdated := se.assembleZoneItem(zoneItemData.ID, nil, config)
-			if hasUpdated {
+			zoneItem, include, _ := se.assembleZoneItem(zoneItemData.ID, nil, config)
+			if include {
 				se.Tree.ZoneItem[zoneItemData.ID] = zoneItem
 			}
 		}
@@ -487,8 +502,8 @@ func (se *Engine) assembleTree() Tree {
 
 	for _, equipmentSetData := range se.State.EquipmentSet {
 		if _, ok := se.Tree.EquipmentSet[equipmentSetData.ID]; !ok {
-			equipmentSet, hasUpdated := se.assembleEquipmentSet(equipmentSetData.ID, nil, config)
-			if hasUpdated {
+			equipmentSet, include, _ := se.assembleEquipmentSet(equipmentSetData.ID, nil, config)
+			if include {
 				se.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
 			}
 		}
@@ -496,8 +511,8 @@ func (se *Engine) assembleTree() Tree {
 	for _, gearScoreData := range se.State.GearScore {
 		if !gearScoreData.HasParent_ {
 			if _, ok := se.Tree.GearScore[gearScoreData.ID]; !ok {
-				gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID, nil, config)
-				if hasUpdated {
+				gearScore, include, _ := se.assembleGearScore(gearScoreData.ID, nil, config)
+				if include {
 					se.Tree.GearScore[gearScoreData.ID] = gearScore
 				}
 			}
@@ -506,8 +521,8 @@ func (se *Engine) assembleTree() Tree {
 	for _, itemData := range se.State.Item {
 		if !itemData.HasParent_ {
 			if _, ok := se.Tree.Item[itemData.ID]; !ok {
-				item, hasUpdated := se.assembleItem(itemData.ID, nil, config)
-				if hasUpdated {
+				item, include, _ := se.assembleItem(itemData.ID, nil, config)
+				if include {
 					se.Tree.Item[itemData.ID] = item
 				}
 			}
@@ -516,8 +531,8 @@ func (se *Engine) assembleTree() Tree {
 	for _, playerData := range se.State.Player {
 		if !playerData.HasParent_ {
 			if _, ok := se.Tree.Player[playerData.ID]; !ok {
-				player, hasUpdated := se.assemblePlayer(playerData.ID, nil, config)
-				if hasUpdated {
+				player, include, _ := se.assemblePlayer(playerData.ID, nil, config)
+				if include {
 					se.Tree.Player[playerData.ID] = player
 				}
 			}
@@ -526,8 +541,8 @@ func (se *Engine) assembleTree() Tree {
 	for _, positionData := range se.State.Position {
 		if !positionData.HasParent_ {
 			if _, ok := se.Tree.Position[positionData.ID]; !ok {
-				position, hasUpdated := se.assemblePosition(positionData.ID, nil, config)
-				if hasUpdated {
+				position, include, _ := se.assemblePosition(positionData.ID, nil, config)
+				if include {
 					se.Tree.Position[positionData.ID] = position
 				}
 			}
@@ -535,8 +550,8 @@ func (se *Engine) assembleTree() Tree {
 	}
 	for _, zoneData := range se.State.Zone {
 		if _, ok := se.Tree.Zone[zoneData.ID]; !ok {
-			zone, hasUpdated := se.assembleZone(zoneData.ID, nil, config)
-			if hasUpdated {
+			zone, include, _ := se.assembleZone(zoneData.ID, nil, config)
+			if include {
 				se.Tree.Zone[zoneData.ID] = zone
 			}
 		}
@@ -544,8 +559,8 @@ func (se *Engine) assembleTree() Tree {
 	for _, zoneItemData := range se.State.ZoneItem {
 		if !zoneItemData.HasParent_ {
 			if _, ok := se.Tree.ZoneItem[zoneItemData.ID]; !ok {
-				zoneItem, hasUpdated := se.assembleZoneItem(zoneItemData.ID, nil, config)
-				if hasUpdated {
+				zoneItem, include, _ := se.assembleZoneItem(zoneItemData.ID, nil, config)
+				if include {
 					se.Tree.ZoneItem[zoneItemData.ID] = zoneItem
 				}
 			}
