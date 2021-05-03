@@ -723,20 +723,34 @@ func TestTree(t *testing.T) {
 	t.Run("has ReferencedDataUnchanged when data was not changed", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				item := se.CreateItem()
+				item1 := se.CreateItem()
 				player := se.CreatePlayer()
-				item.SetBoundTo(player.ID())
+				item1.SetBoundTo(player.ID())
+
+				item2 := se.CreateItem()
 
 				se.UpdateState()
 
-				ref, _ := item.BoundTo()
+				ref, _ := item1.BoundTo()
 				ref.Unset()
 
+				item2.SetBoundTo(player.ID())
+
 				expectedTree.Item = map[ItemID]Item{
-					item.ID(): {
-						ID: item.ID(),
+					item1.ID(): {
+						ID: item1.ID(),
 						BoundTo: &ElementReference{
 							OperationKind:        OperationKindDelete,
+							ElementID:            int(player.ID()),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataUnchanged,
+						},
+						OperationKind_: OperationKindUpdate,
+					},
+					item2.ID(): {
+						ID: item2.ID(),
+						BoundTo: &ElementReference{
+							OperationKind:        OperationKindUpdate,
 							ElementID:            int(player.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,

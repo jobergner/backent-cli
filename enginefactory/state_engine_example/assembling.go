@@ -320,7 +320,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindPlayer, referencedDataStatus}, true
 	}
 
-	if patchRef, hasUpdated := se.Patch.PlayerGuildMemberRef[refID]; hasUpdated || config.forceInclude {
+	if patchRef, hasUpdated := se.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
 		referencedElement := se.Player(patchRef.ReferencedElementID).player
 		if check == nil {
 			check = newRecursionCheck()
