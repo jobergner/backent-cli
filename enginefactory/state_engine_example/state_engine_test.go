@@ -724,38 +724,59 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				item1 := se.CreateItem()
-				player := se.CreatePlayer()
-				item1.SetBoundTo(player.ID())
+				item1.SetName("item1")
+				player1 := se.CreatePlayer()
+				item1.SetBoundTo(player1.ID())
 
 				item2 := se.CreateItem()
+				item2.SetName("item2")
+
+				player2 := se.CreatePlayer()
 
 				se.UpdateState()
 
 				ref, _ := item1.BoundTo()
 				ref.Unset()
 
-				item2.SetBoundTo(player.ID())
+				item2.SetBoundTo(player1.ID())
+				player2.AddGuildMember(player1.ID())
 
 				expectedTree.Item = map[ItemID]Item{
 					item1.ID(): {
-						ID: item1.ID(),
+						ID:   item1.ID(),
+						Name: "item1",
 						BoundTo: &ElementReference{
 							OperationKind:        OperationKindDelete,
-							ElementID:            int(player.ID()),
+							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
 						},
 						OperationKind_: OperationKindUpdate,
 					},
 					item2.ID(): {
-						ID: item2.ID(),
+						ID:   item2.ID(),
+						Name: "item2",
 						BoundTo: &ElementReference{
 							OperationKind:        OperationKindUpdate,
-							ElementID:            int(player.ID()),
+							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
 						},
 						OperationKind_: OperationKindUpdate,
+					},
+				}
+				expectedTree.Player = map[PlayerID]Player{
+					player2.ID(): {
+						ID:             player2.ID(),
+						OperationKind_: OperationKindUpdate,
+						GuildMembers: []ElementReference{
+							{
+								OperationKind:        OperationKindUpdate,
+								ElementID:            int(player1.ID()),
+								ElementKind:          ElementKindPlayer,
+								ReferencedDataStatus: ReferencedDataUnchanged,
+							},
+						},
 					},
 				}
 			},
