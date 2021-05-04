@@ -1,73 +1,100 @@
 package state
 
 const (
-	equipmentSetIdentifier int = -1
-	gearScoreIdentifier    int = -2
-	itemIdentifier         int = -3
-	playerIdentifier       int = -4
-	positionIdentifier     int = -5
-	zoneIdentifier         int = -6
-	zoneItemIdentifier     int = -7
+	itemsIdentifier         int = -1
+	gearScoreIdentifier     int = -2
+	positionIdentifier      int = -3
+	targetIdentifier        int = -4
+	playersIdentifier       int = -5
+	interactablesIdentifier int = -6
+	itemIdentifier          int = -7
+	originIdentifier        int = -8
 )
 
 type path []int
 
-func newPath(elementIdentifier, id int) []int {
+func newPath(elementIdentifier, id int) path {
 	return []int{elementIdentifier, id}
 }
 
-func (p path) equipmentSet() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, equipmentSetIdentifier)
-	return tmp
+func newEmptyPath() path {
+	var p path
+	return p
 }
 
-func (p path) gearScore() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, gearScoreIdentifier)
-	return tmp
+func (p path) items() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, itemsIdentifier)
+	return newPath
 }
 
-func (p path) item() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, itemIdentifier)
-	return tmp
+func (p path) gearScore() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, gearScoreIdentifier)
+	return newPath
 }
 
-func (p path) player() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, playerIdentifier)
-	return tmp
+func (p path) position() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, positionIdentifier)
+	return newPath
 }
 
-func (p path) position() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, positionIdentifier)
-	return tmp
+func (p path) target() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, targetIdentifier)
+	return newPath
 }
 
-func (p path) zone() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, zoneIdentifier)
-	return tmp
+func (p path) players() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, playersIdentifier)
+	return newPath
 }
 
-func (p path) zoneItem() []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, zoneItemIdentifier)
-	return tmp
+func (p path) interactables() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, interactablesIdentifier)
+	return newPath
 }
 
-func (p path) index(i int) []int {
-	tmp := make([]int, len(p)+1)
-	copy(tmp, p)
-	tmp = append(tmp, i)
-	return tmp
+func (p path) item() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, itemIdentifier)
+	return newPath
+}
+
+func (p path) origin() path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, originIdentifier)
+	return newPath
+}
+
+func (p path) index(i int) path {
+	newPath := make([]int, len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, i)
+	return newPath
+}
+
+func (p path) equals(parentPath path) bool {
+	if len(p) != len(parentPath) {
+		return false
+	}
+
+	for i, segment := range parentPath {
+		if segment != p[i] {
+			return false
+		}
+	}
+
+	return true
 }
