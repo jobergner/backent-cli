@@ -1,7 +1,8 @@
 package state
 
 type assembleConfig struct {
-	forceInclude bool
+	forceInclude  bool // include everything, regardless of update status
+	fromReference bool // indicates line of assembling originates from reference, no path building intended
 }
 
 func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
