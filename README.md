@@ -359,6 +359,8 @@ currently my best option is to assemble the tree server side, make sure all nece
   - the id of the root element
   - on every field with slice values (index)
 - when elements are added/removed, the indeces can change for all elements within the slice
+- a path tracker can track all paths. it will persist through multiple UpdateStates
+- when a child of an element is assembled, the assembler checks if the path of that child already exists. if not, or the path has updated, a new path is created and tracked
 
 
 ### TODO
