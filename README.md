@@ -352,6 +352,15 @@ changes i want to introduce:
 problem with using typescript is, that I'm not willing to write another AST and generator for it, especially since the relevant parts are already taken care of.
 currently my best option is to assemble the tree server side, make sure all necessary data is included, and use json-path for references within the tree.
 
+### building a JSON path
+- when an element is being referenced, the client needs to know where in the tree the element is to retrieve it (except when the reference was created, then the referenced element is included fully)
+- since we know the trees structure at compile time, we can generate all possible paths along with it
+- there are however dynamic elements to a path:
+  - the id of the root element
+  - on every field with slice values (index)
+- when elements are added/removed, the indeces can change for all elements within the slice
+
+
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)

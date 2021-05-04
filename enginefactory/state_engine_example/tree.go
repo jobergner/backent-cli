@@ -123,3 +123,25 @@ func newRecursionCheck() *recursionCheck {
 		zoneItem:     make(map[ZoneItemID]bool),
 	}
 }
+
+type pathTrack struct {
+	equipmentSet map[EquipmentSetID]path
+	gearScore    map[GearScoreID]path
+	item         map[ItemID]path
+	player       map[PlayerID]path
+	position     map[PositionID]path
+	zone         map[ZoneID]path
+	zoneItem     map[ZoneItemID]path
+}
+
+func newPathTrack() pathTrack {
+	return pathTrack{
+		equipmentSet: make(map[EquipmentSetID]path),
+		gearScore:    make(map[GearScoreID]path),
+		item:         make(map[ItemID]path),
+		player:       make(map[PlayerID]path),
+		position:     make(map[PositionID]path),
+		zone:         make(map[ZoneID]path),
+		zoneItem:     make(map[ZoneItemID]path),
+	}
+}
