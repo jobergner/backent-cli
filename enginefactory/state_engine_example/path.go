@@ -1,5 +1,28 @@
 package state
 
+type pathTrack struct {
+	_iterations  int
+	equipmentSet map[EquipmentSetID]path
+	gearScore    map[GearScoreID]path
+	item         map[ItemID]path
+	player       map[PlayerID]path
+	position     map[PositionID]path
+	zone         map[ZoneID]path
+	zoneItem     map[ZoneItemID]path
+}
+
+func newPathTrack() pathTrack {
+	return pathTrack{
+		equipmentSet: make(map[EquipmentSetID]path),
+		gearScore:    make(map[GearScoreID]path),
+		item:         make(map[ItemID]path),
+		player:       make(map[PlayerID]path),
+		position:     make(map[PositionID]path),
+		zone:         make(map[ZoneID]path),
+		zoneItem:     make(map[ZoneItemID]path),
+	}
+}
+
 const (
 	itemsIdentifier         int = -1
 	gearScoreIdentifier     int = -2
@@ -9,6 +32,10 @@ const (
 	interactablesIdentifier int = -6
 	itemIdentifier          int = -7
 	originIdentifier        int = -8
+	equipmentSetIdentifier  int = -9
+	playerIdentifier        int = -10
+	zoneIdentifier          int = -11
+	zoneItemIdentifier      int = -12
 )
 
 type path []int
@@ -23,63 +50,63 @@ func newEmptyPath() path {
 }
 
 func (p path) items() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, itemsIdentifier)
 	return newPath
 }
 
 func (p path) gearScore() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, gearScoreIdentifier)
 	return newPath
 }
 
 func (p path) position() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, positionIdentifier)
 	return newPath
 }
 
 func (p path) target() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, targetIdentifier)
 	return newPath
 }
 
 func (p path) players() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, playersIdentifier)
 	return newPath
 }
 
 func (p path) interactables() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, interactablesIdentifier)
 	return newPath
 }
 
 func (p path) item() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, itemIdentifier)
 	return newPath
 }
 
 func (p path) origin() path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, originIdentifier)
 	return newPath
 }
 
 func (p path) index(i int) path {
-	newPath := make([]int, len(p)+1)
+	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, i)
 	return newPath
@@ -171,7 +198,7 @@ func (se *Engine) walkPlayer(playerID PlayerID, p path) {
 
 	for i, itemID := range mergeItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
 		var itemsPath path
-		if existingPath, pathExists := se.PathTrack.item[itemID]; !pathExists && !existingPath.equals(p) {
+		if existingPath, pathExists := se.PathTrack.item[itemID]; !pathExists || !existingPath.equals(p) {
 			itemsPath = p.items().index(i)
 		} else {
 			itemsPath = existingPath
@@ -198,7 +225,7 @@ func (se *Engine) walkZone(zoneID ZoneID, p path) {
 
 	for i, zoneItemID := range mergeZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
 		var itemsPath path
-		if existingPath, pathExists := se.PathTrack.zoneItem[zoneItemID]; !pathExists && !existingPath.equals(p) {
+		if existingPath, pathExists := se.PathTrack.zoneItem[zoneItemID]; !pathExists || !existingPath.equals(p) {
 			itemsPath = p.items().index(i)
 		} else {
 			itemsPath = existingPath
@@ -208,7 +235,7 @@ func (se *Engine) walkZone(zoneID ZoneID, p path) {
 
 	for i, playerID := range mergePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
 		var playersPath path
-		if existingPath, pathExists := se.PathTrack.player[playerID]; !pathExists && !existingPath.equals(p) {
+		if existingPath, pathExists := se.PathTrack.player[playerID]; !pathExists || !existingPath.equals(p) {
 			playersPath = p.players().index(i)
 		} else {
 			playersPath = existingPath
@@ -223,89 +250,113 @@ func (se *Engine) walkTree() {
 
 	walkedCheck := newRecursionCheck()
 
-	for _, equipmentSetData := range se.Patch.EquipmentSet {
-		se.walkEquipmentSet(equipmentSetData.ID, newEmptyPath())
+	for id, equipmentSetData := range se.Patch.EquipmentSet {
+		se.walkEquipmentSet(equipmentSetData.ID, newPath(equipmentSetIdentifier, int(id)))
 		walkedCheck.equipmentSet[equipmentSetData.ID] = true
 	}
-	for _, gearScoreData := range se.Patch.GearScore {
+	for id, gearScoreData := range se.Patch.GearScore {
 		if !gearScoreData.HasParent_ {
-			se.walkGearScore(gearScoreData.ID, newEmptyPath())
+			se.walkGearScore(gearScoreData.ID, newPath(gearScoreIdentifier, int(id)))
 			walkedCheck.gearScore[gearScoreData.ID] = true
 		}
 	}
-	for _, itemData := range se.Patch.Item {
+	for id, itemData := range se.Patch.Item {
 		if !itemData.HasParent_ {
-			se.walkItem(itemData.ID, newEmptyPath())
+			se.walkItem(itemData.ID, newPath(itemIdentifier, int(id)))
 			walkedCheck.item[itemData.ID] = true
 		}
 	}
-	for _, playerData := range se.Patch.Player {
+	for id, playerData := range se.Patch.Player {
 		if !playerData.HasParent_ {
-			se.walkPlayer(playerData.ID, newEmptyPath())
+			se.walkPlayer(playerData.ID, newPath(playerIdentifier, int(id)))
 			walkedCheck.player[playerData.ID] = true
 		}
 	}
-	for _, positionData := range se.Patch.Position {
+	for id, positionData := range se.Patch.Position {
 		if !positionData.HasParent_ {
-			se.walkPosition(positionData.ID, newEmptyPath())
+			se.walkPosition(positionData.ID, newPath(positionIdentifier, int(id)))
 			walkedCheck.position[positionData.ID] = true
 		}
 	}
-	for _, zoneData := range se.Patch.Zone {
-		se.walkZone(zoneData.ID, newEmptyPath())
+	for id, zoneData := range se.Patch.Zone {
+		se.walkZone(zoneData.ID, newPath(zoneIdentifier, int(id)))
 		walkedCheck.zone[zoneData.ID] = true
 	}
-	for _, zoneItemData := range se.Patch.ZoneItem {
+	for id, zoneItemData := range se.Patch.ZoneItem {
 		if !zoneItemData.HasParent_ {
-			se.walkZoneItem(zoneItemData.ID, newEmptyPath())
+			se.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
 			walkedCheck.zoneItem[zoneItemData.ID] = true
 		}
 	}
 
-	for _, equipmentSetData := range se.State.EquipmentSet {
+	for id, equipmentSetData := range se.State.EquipmentSet {
 		if _, ok := walkedCheck.equipmentSet[equipmentSetData.ID]; !ok {
-			se.walkEquipmentSet(equipmentSetData.ID, newEmptyPath())
+			se.walkEquipmentSet(equipmentSetData.ID, newPath(equipmentSetIdentifier, int(id)))
 		}
 	}
-	for _, gearScoreData := range se.State.GearScore {
+	for id, gearScoreData := range se.State.GearScore {
 		if !gearScoreData.HasParent_ {
 			if _, ok := walkedCheck.gearScore[gearScoreData.ID]; !ok {
-				se.walkGearScore(gearScoreData.ID, newEmptyPath())
+				se.walkGearScore(gearScoreData.ID, newPath(gearScoreIdentifier, int(id)))
 			}
 		}
 	}
-	for _, itemData := range se.State.Item {
+	for id, itemData := range se.State.Item {
 		if !itemData.HasParent_ {
 			if _, ok := walkedCheck.item[itemData.ID]; !ok {
-				se.walkItem(itemData.ID, newEmptyPath())
+				se.walkItem(itemData.ID, newPath(itemIdentifier, int(id)))
 			}
 		}
 	}
-	for _, playerData := range se.State.Player {
+	for id, playerData := range se.State.Player {
 		if !playerData.HasParent_ {
 			if _, ok := walkedCheck.player[playerData.ID]; !ok {
-				se.walkPlayer(playerData.ID, newEmptyPath())
+				se.walkPlayer(playerData.ID, newPath(playerIdentifier, int(id)))
 			}
 		}
 	}
-	for _, positionData := range se.State.Position {
+	for id, positionData := range se.State.Position {
 		if !positionData.HasParent_ {
 			if _, ok := walkedCheck.position[positionData.ID]; !ok {
-				se.walkPosition(positionData.ID, newEmptyPath())
+				se.walkPosition(positionData.ID, newPath(positionIdentifier, int(id)))
 			}
 		}
 	}
-	for _, zoneData := range se.State.Zone {
+	for id, zoneData := range se.State.Zone {
 		if _, ok := walkedCheck.zone[zoneData.ID]; !ok {
-			se.walkZone(zoneData.ID, newEmptyPath())
+			se.walkZone(zoneData.ID, newPath(zoneIdentifier, int(id)))
 		}
 	}
-	for _, zoneItemData := range se.State.ZoneItem {
+	for id, zoneItemData := range se.State.ZoneItem {
 		if !zoneItemData.HasParent_ {
 			if _, ok := walkedCheck.zoneItem[zoneItemData.ID]; !ok {
-				se.walkZoneItem(zoneItemData.ID, newEmptyPath())
+				se.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
 			}
 		}
 	}
 
+	se.PathTrack._iterations += 1
+	if se.PathTrack._iterations == 100 {
+		for key := range se.PathTrack.equipmentSet {
+			delete(se.PathTrack.equipmentSet, key)
+		}
+		for key := range se.PathTrack.gearScore {
+			delete(se.PathTrack.gearScore, key)
+		}
+		for key := range se.PathTrack.item {
+			delete(se.PathTrack.item, key)
+		}
+		for key := range se.PathTrack.player {
+			delete(se.PathTrack.player, key)
+		}
+		for key := range se.PathTrack.position {
+			delete(se.PathTrack.position, key)
+		}
+		for key := range se.PathTrack.zone {
+			delete(se.PathTrack.zone, key)
+		}
+		for key := range se.PathTrack.zoneItem {
+			delete(se.PathTrack.zoneItem, key)
+		}
+	}
 }
