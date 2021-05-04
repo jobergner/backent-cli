@@ -267,7 +267,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return &ElementReference{ref.itemBoundToRef.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true, ref.itemBoundToRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return &ElementReference{ref.itemBoundToRef.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, se.PathTrack.player[referencedElement.ID]}, true, ref.itemBoundToRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely created
@@ -282,7 +282,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true, referencedDataStatus == ReferencedDataModified
+		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, se.PathTrack.player[referencedElement.ID]}, true, referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely removed
@@ -296,7 +296,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true, referencedDataStatus == ReferencedDataModified
+		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, se.PathTrack.player[referencedElement.ID]}, true, referencedDataStatus == ReferencedDataModified
 	}
 
 	// immediate replacement of refs
@@ -311,7 +311,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus}, true, referencedDataStatus == ReferencedDataModified
+			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, se.PathTrack.player[referencedElement.ID]}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -322,7 +322,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			check = newRecursionCheck()
 		}
 		if _, _, hasUpdatedDownstream := se.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
-			return &ElementReference{OperationKindUnchanged, int(ref.ID()), ElementKindPlayer, ReferencedDataModified}, true, true
+			return &ElementReference{OperationKindUnchanged, int(ref.ID()), ElementKindPlayer, ReferencedDataModified, se.PathTrack.player[ref.itemBoundToRef.ReferencedElementID]}, true, true
 		}
 	}
 
@@ -340,7 +340,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindPlayer, referencedDataStatus}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindPlayer, referencedDataStatus, se.PathTrack.player[referencedElement.ID]}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := se.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
@@ -355,7 +355,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 		if patchRef.OperationKind_ == OperationKindUpdate {
 			config.forceInclude = true
 		}
-		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindPlayer, referencedDataStatus}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindPlayer, referencedDataStatus, se.PathTrack.player[referencedElement.ID]}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := se.playerGuildMemberRef(refID).playerGuildMemberRef
@@ -363,7 +363,7 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 		check = newRecursionCheck()
 	}
 	if _, _, hasUpdatedDownstream := se.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindPlayer, ReferencedDataModified}, true, true
+		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindPlayer, ReferencedDataModified, se.PathTrack.player[ref.ReferencedElementID]}, true, true
 	}
 
 	return ElementReference{}, false, false
@@ -380,7 +380,7 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 		if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus, se.PathTrack.equipmentSet[referencedElement.ID]}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := se.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
@@ -395,7 +395,7 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 		if patchRef.OperationKind_ == OperationKindUpdate {
 			config.forceInclude = true
 		}
-		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus, se.PathTrack.equipmentSet[referencedElement.ID]}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := se.playerEquipmentSetRef(refID).playerEquipmentSetRef
@@ -403,7 +403,7 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 		check = newRecursionCheck()
 	}
 	if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindEquipmentSet, ReferencedDataModified}, true, true
+		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindEquipmentSet, ReferencedDataModified, se.PathTrack.equipmentSet[ref.ReferencedElementID]}, true, true
 	}
 
 	return ElementReference{}, false, false
@@ -420,7 +420,7 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 		if _, _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindItem, referencedDataStatus}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindItem, referencedDataStatus, se.PathTrack.item[referencedElement.ID]}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := se.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
@@ -435,7 +435,7 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 		if patchRef.OperationKind_ == OperationKindUpdate {
 			config.forceInclude = true
 		}
-		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindItem, referencedDataStatus}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindItem, referencedDataStatus, se.PathTrack.item[referencedElement.ID]}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := se.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
@@ -443,7 +443,7 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 		check = newRecursionCheck()
 	}
 	if _, _, hasUpdatedDownstream := se.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindItem, ReferencedDataModified}, true, true
+		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindItem, ReferencedDataModified, se.PathTrack.item[ref.ReferencedElementID]}, true, true
 	}
 
 	return ElementReference{}, false, false

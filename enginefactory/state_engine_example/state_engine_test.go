@@ -204,6 +204,7 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
 	se := newEngine()
 	expectedTree := newTree()
 	define(se, &expectedTree)
+	se.walkTree()
 	actualTree := se.assembleTree()
 
 	if !assert.ObjectsAreEqual(expectedTree, actualTree) {
@@ -387,7 +388,7 @@ func TestTree(t *testing.T) {
 					item.ID(): {
 						ID:             item.ID(),
 						Name:           "myItem",
-						BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID()), ElementKindPlayer, ReferencedDataModified},
+						BoundTo:        &ElementReference{OperationKindUnchanged, int(player.ID()), ElementKindPlayer, ReferencedDataModified, newEmptyPath()},
 						OperationKind_: OperationKindUnchanged,
 					},
 				}
