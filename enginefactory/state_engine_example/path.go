@@ -1,5 +1,7 @@
 package state
 
+import "strconv"
+
 type pathTrack struct {
 	_iterations  int
 	equipmentSet map[EquipmentSetID]path
@@ -359,4 +361,50 @@ func (se *Engine) walkTree() {
 			delete(se.PathTrack.zoneItem, key)
 		}
 	}
+}
+
+func (p path) toJSONPath() string {
+	jsonPath := "$"
+
+	for i, seg := range p {
+		if seg < 0 {
+			jsonPath += "." + pathIdentifierToString(seg)
+		} else if i == 1 {
+			jsonPath += "." + strconv.Itoa(seg)
+		} else {
+			jsonPath += "[" + strconv.Itoa(seg) + "]"
+		}
+	}
+
+	return jsonPath
+}
+
+func pathIdentifierToString(identifier int) string {
+	switch identifier {
+	case itemsIdentifier:
+		return "items"
+	case gearScoreIdentifier:
+		return "gearScore"
+	case positionIdentifier:
+		return "position"
+	case targetIdentifier:
+		return "target"
+	case playersIdentifier:
+		return "players"
+	case interactablesIdentifier:
+		return "interactables"
+	case itemIdentifier:
+		return "item"
+	case originIdentifier:
+		return "origin"
+	case equipmentSetIdentifier:
+		return "equipmentSet"
+	case playerIdentifier:
+		return "player"
+	case zoneIdentifier:
+		return "zone"
+	case zoneItemIdentifier:
+		return "zone"
+	}
+	return ""
 }

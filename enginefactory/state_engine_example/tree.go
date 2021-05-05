@@ -46,7 +46,7 @@ type ElementReference struct {
 	ElementID            int                  `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
-	ElementPath          path                 `json:"elementPath"`
+	ElementPath          string               `json:"elementPath"`
 }
 
 type ZoneItem struct {
