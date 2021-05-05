@@ -404,7 +404,7 @@ func pathIdentifierToString(identifier int) string {
 	case zoneIdentifier:
 		return "zone"
 	case zoneItemIdentifier:
-		return "zone"
+		return "zoneItem"
 	}
 	return ""
 }
