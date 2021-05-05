@@ -959,6 +959,43 @@ func TestTree(t *testing.T) {
 			},
 		)
 	})
+	t.Run("recursively referenced player has correct ReferencedDataStatus", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				player1.AddGuildMember(player1.ID())
+
+				se.UpdateState()
+
+				player1.GearScore().SetLevel(1)
+
+				expectedTree.Player = map[PlayerID]Player{
+					player1.ID(): {
+						ID: player1.ID(),
+						GearScore: &GearScore{
+							ID:             player1.GearScore().ID(),
+							OperationKind_: OperationKindUpdate,
+							Level:          1,
+						},
+						OperationKind_: OperationKindUnchanged,
+						GuildMembers: []PlayerReference{
+							{
+								OperationKind:        OperationKindUnchanged,
+								ElementID:            player1.ID(),
+								ElementKind:          ElementKindPlayer,
+								ReferencedDataStatus: ReferencedDataModified,
+								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+							},
+						},
+					},
+				}
+
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
 }
 
 func TestMergePlayerIDs(t *testing.T) {
