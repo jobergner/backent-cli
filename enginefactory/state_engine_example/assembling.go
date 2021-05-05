@@ -5,17 +5,17 @@ type assembleConfig struct {
 }
 
 func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
-			return GearScore{}, false, true
-		} else {
-			check.gearScore[gearScoreID] = true
-		}
-	}
-
 	gearScoreData, hasUpdated := se.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
 		gearScoreData, _ = se.State.GearScore[gearScoreID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
+			return GearScore{}, false, hasUpdated
+		} else {
+			check.gearScore[gearScoreID] = true
+		}
 	}
 
 	var gearScore GearScore
@@ -28,17 +28,17 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionChe
 }
 
 func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.position[positionID]; alreadyExists {
-			return Position{}, false, true
-		} else {
-			check.position[positionID] = true
-		}
-	}
-
 	positionData, hasUpdated := se.Patch.Position[positionID]
 	if !hasUpdated {
 		positionData, _ = se.State.Position[positionID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.position[positionID]; alreadyExists {
+			return Position{}, false, hasUpdated
+		} else {
+			check.position[positionID] = true
+		}
 	}
 
 	var position Position
@@ -51,17 +51,17 @@ func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck,
 }
 
 func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
-			return EquipmentSet{}, false, true
-		} else {
-			check.equipmentSet[equipmentSetID] = true
-		}
-	}
-
 	equipmentSetData, hasUpdated := se.Patch.EquipmentSet[equipmentSetID]
 	if !hasUpdated {
 		equipmentSetData = se.State.EquipmentSet[equipmentSetID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
+			return EquipmentSet{}, false, hasUpdated
+		} else {
+			check.equipmentSet[equipmentSetID] = true
+		}
 	}
 
 	var equipmentSet EquipmentSet
@@ -82,17 +82,17 @@ func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *rec
 }
 
 func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.item[itemID]; alreadyExists {
-			return Item{}, false, true
-		} else {
-			check.item[itemID] = true
-		}
-	}
-
 	itemData, hasUpdated := se.Patch.Item[itemID]
 	if !hasUpdated {
 		itemData = se.State.Item[itemID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.item[itemID]; alreadyExists {
+			return Item{}, false, hasUpdated
+		} else {
+			check.item[itemID] = true
+		}
 	}
 
 	var item Item
@@ -117,17 +117,17 @@ func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config asse
 }
 
 func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
-			return ZoneItem{}, false, true
-		} else {
-			check.zoneItem[zoneItemID] = true
-		}
-	}
-
 	zoneItemData, hasUpdated := se.Patch.ZoneItem[zoneItemID]
 	if !hasUpdated {
 		zoneItemData = se.State.ZoneItem[zoneItemID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
+			return ZoneItem{}, false, hasUpdated
+		} else {
+			check.zoneItem[zoneItemID] = true
+		}
 	}
 
 	var zoneItem ZoneItem
@@ -151,17 +151,17 @@ func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck,
 }
 
 func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.player[playerID]; alreadyExists {
-			return Player{}, false, true
-		} else {
-			check.player[playerID] = true
-		}
-	}
-
 	playerData, hasUpdated := se.Patch.Player[playerID]
 	if !hasUpdated {
 		playerData = se.State.Player[playerID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.player[playerID]; alreadyExists {
+			return Player{}, false, hasUpdated
+		} else {
+			check.player[playerID] = true
+		}
 	}
 
 	var player Player
@@ -209,17 +209,17 @@ func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, confi
 }
 
 func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.zone[zoneID]; alreadyExists {
-			return Zone{}, false, true
-		} else {
-			check.zone[zoneID] = true
-		}
-	}
-
 	zoneData, hasUpdated := se.Patch.Zone[zoneID]
 	if !hasUpdated {
 		zoneData = se.State.Zone[zoneID]
+	}
+
+	if check != nil {
+		if alreadyExists := check.zone[zoneID]; alreadyExists {
+			return Zone{}, false, hasUpdated
+		} else {
+			check.zone[zoneID] = true
+		}
 	}
 
 	var zone Zone
