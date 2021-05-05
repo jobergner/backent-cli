@@ -7,15 +7,15 @@ type assembleConfig struct {
 func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
-			return GearScore{}, false, false
+			return GearScore{}, false, true
 		} else {
 			check.gearScore[gearScoreID] = true
 		}
 	}
 
 	gearScoreData, hasUpdated := se.Patch.GearScore[gearScoreID]
-	if !hasUpdated && !config.forceInclude {
-		return GearScore{}, false, false
+	if !hasUpdated {
+		gearScoreData, _ = se.State.GearScore[gearScoreID]
 	}
 
 	var gearScore GearScore
@@ -30,15 +30,15 @@ func (se *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionChe
 func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.position[positionID]; alreadyExists {
-			return Position{}, false, false
+			return Position{}, false, true
 		} else {
 			check.position[positionID] = true
 		}
 	}
 
 	positionData, hasUpdated := se.Patch.Position[positionID]
-	if !hasUpdated && !config.forceInclude {
-		return Position{}, false, false
+	if !hasUpdated {
+		positionData, _ = se.State.Position[positionID]
 	}
 
 	var position Position
@@ -53,7 +53,7 @@ func (se *Engine) assemblePosition(positionID PositionID, check *recursionCheck,
 func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
-			return EquipmentSet{}, false, false
+			return EquipmentSet{}, false, true
 		} else {
 			check.equipmentSet[equipmentSetID] = true
 		}
@@ -84,7 +84,7 @@ func (se *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *rec
 func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.item[itemID]; alreadyExists {
-			return Item{}, false, false
+			return Item{}, false, true
 		} else {
 			check.item[itemID] = true
 		}
@@ -119,7 +119,7 @@ func (se *Engine) assembleItem(itemID ItemID, check *recursionCheck, config asse
 func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
-			return ZoneItem{}, false, false
+			return ZoneItem{}, false, true
 		} else {
 			check.zoneItem[zoneItemID] = true
 		}
@@ -153,7 +153,7 @@ func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck,
 func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.player[playerID]; alreadyExists {
-			return Player{}, false, false
+			return Player{}, false, true
 		} else {
 			check.player[playerID] = true
 		}
@@ -211,7 +211,7 @@ func (se *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, confi
 func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zone[zoneID]; alreadyExists {
-			return Zone{}, false, false
+			return Zone{}, false, true
 		} else {
 			check.zone[zoneID] = true
 		}
@@ -247,7 +247,7 @@ func (se *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config asse
 	return zone, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*ElementReference, bool, bool) {
+func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*PlayerReference, bool, bool) {
 	stateItem := se.State.Item[itemID]
 	patchItem, itemIsInPatch := se.Patch.Item[itemID]
 
@@ -268,7 +268,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := se.PathTrack.player[referencedElement.ID]
-		return &ElementReference{ref.itemBoundToRef.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath()}, true, ref.itemBoundToRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return &PlayerReference{ref.itemBoundToRef.OperationKind_, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.itemBoundToRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely created
@@ -280,11 +280,12 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			check = newRecursionCheck()
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		element, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config)
+		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := se.PathTrack.player[referencedElement.ID]
-		return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath()}, true, referencedDataStatus == ReferencedDataModified
+		return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely removed
@@ -299,7 +300,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := se.PathTrack.player[referencedElement.ID]
-		return &ElementReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath()}, true, referencedDataStatus == ReferencedDataModified
+		return &PlayerReference{OperationKindDelete, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
 	}
 
 	// immediate replacement of refs
@@ -315,7 +316,7 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := se.PathTrack.player[referencedElement.ID]
-			return &ElementReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath()}, true, referencedDataStatus == ReferencedDataModified
+			return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -327,14 +328,14 @@ func (se *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, c
 		}
 		if _, _, hasUpdatedDownstream := se.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
 			path, _ := se.PathTrack.player[ref.itemBoundToRef.ReferencedElementID]
-			return &ElementReference{OperationKindUnchanged, int(ref.ID()), ElementKindPlayer, ReferencedDataModified, path.toJSONPath()}, true, true
+			return &PlayerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 		}
 	}
 
 	return nil, false, false
 }
 
-func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (ElementReference, bool, bool) {
+func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (PlayerReference, bool, bool) {
 	if config.forceInclude {
 		ref := se.playerGuildMemberRef(refID).playerGuildMemberRef
 		referencedElement := se.Player(ref.ReferencedElementID).player
@@ -346,23 +347,28 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := se.PathTrack.player[referencedElement.ID]
-		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindPlayer, referencedDataStatus, path.toJSONPath()}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return PlayerReference{ref.OperationKind_, ref.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := se.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
+		if patchRef.OperationKind_ == OperationKindUpdate {
+			config.forceInclude = true
+		}
 		referencedElement := se.Player(patchRef.ReferencedElementID).player
 		if check == nil {
 			check = newRecursionCheck()
 		}
+		element, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config)
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, _, hasUpdatedDownstream := se.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
+		var el *Player
 		if patchRef.OperationKind_ == OperationKindUpdate {
-			config.forceInclude = true
+			el = &element
 		}
 		path, _ := se.PathTrack.player[referencedElement.ID]
-		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindPlayer, referencedDataStatus, path.toJSONPath()}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return PlayerReference{patchRef.OperationKind_, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := se.playerGuildMemberRef(refID).playerGuildMemberRef
@@ -371,13 +377,13 @@ func (se *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, che
 	}
 	if _, _, hasUpdatedDownstream := se.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
 		path, _ := se.PathTrack.player[ref.ReferencedElementID]
-		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindPlayer, ReferencedDataModified, path.toJSONPath()}, true, true
+		return PlayerReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 	}
 
-	return ElementReference{}, false, false
+	return PlayerReference{}, false, false
 }
 
-func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (ElementReference, bool, bool) {
+func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (EquipmentSetReference, bool, bool) {
 	if config.forceInclude {
 		ref := se.playerEquipmentSetRef(refID).playerEquipmentSetRef
 		referencedElement := se.EquipmentSet(ref.ReferencedElementID).equipmentSet
@@ -389,23 +395,28 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := se.PathTrack.equipmentSet[referencedElement.ID]
-		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath()}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return EquipmentSetReference{ref.OperationKind_, ref.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := se.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
+		if patchRef.OperationKind_ == OperationKindUpdate {
+			config.forceInclude = true
+		}
 		referencedElement := se.EquipmentSet(patchRef.ReferencedElementID).equipmentSet
 		if check == nil {
 			check = newRecursionCheck()
 		}
+		element, _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config)
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
+		var el *EquipmentSet
 		if patchRef.OperationKind_ == OperationKindUpdate {
-			config.forceInclude = true
+			el = &element
 		}
 		path, _ := se.PathTrack.equipmentSet[referencedElement.ID]
-		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath()}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return EquipmentSetReference{patchRef.OperationKind_, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := se.playerEquipmentSetRef(refID).playerEquipmentSetRef
@@ -414,13 +425,13 @@ func (se *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, c
 	}
 	if _, _, hasUpdatedDownstream := se.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
 		path, _ := se.PathTrack.equipmentSet[ref.ReferencedElementID]
-		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindEquipmentSet, ReferencedDataModified, path.toJSONPath()}, true, true
+		return EquipmentSetReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 	}
 
-	return ElementReference{}, false, false
+	return EquipmentSetReference{}, false, false
 }
 
-func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (ElementReference, bool, bool) {
+func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (ItemReference, bool, bool) {
 	if config.forceInclude {
 		ref := se.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
 		referencedElement := se.Item(ref.ReferencedElementID).item
@@ -432,23 +443,28 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := se.PathTrack.item[referencedElement.ID]
-		return ElementReference{ref.OperationKind_, int(ref.ReferencedElementID), ElementKindItem, referencedDataStatus, path.toJSONPath()}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ItemReference{ref.OperationKind_, ref.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := se.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
+		if patchRef.OperationKind_ == OperationKindUpdate {
+			config.forceInclude = true
+		}
 		referencedElement := se.Item(patchRef.ReferencedElementID).item
 		if check == nil {
 			check = newRecursionCheck()
 		}
+		element, _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config)
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, _, hasUpdatedDownstream := se.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
+		var el *Item
 		if patchRef.OperationKind_ == OperationKindUpdate {
-			config.forceInclude = true
+			el = &element
 		}
 		path, _ := se.PathTrack.item[referencedElement.ID]
-		return ElementReference{patchRef.OperationKind_, int(patchRef.ReferencedElementID), ElementKindItem, referencedDataStatus, path.toJSONPath()}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ItemReference{patchRef.OperationKind_, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := se.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
@@ -457,10 +473,10 @@ func (se *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRe
 	}
 	if _, _, hasUpdatedDownstream := se.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
 		path, _ := se.PathTrack.item[ref.ReferencedElementID]
-		return ElementReference{OperationKindUnchanged, int(ref.ReferencedElementID), ElementKindItem, ReferencedDataModified, path.toJSONPath()}, true, true
+		return ItemReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 	}
 
-	return ElementReference{}, false, false
+	return ItemReference{}, false, false
 }
 
 func (se *Engine) assembleTree() Tree {
