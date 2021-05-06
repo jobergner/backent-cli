@@ -111,6 +111,31 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		item.GearScore = &treeGearScore
 	}
 
+	if anyContainer := engine.anyOfPlayerZone(itemData.Origin).anyOfPlayerZone; anyContainer.ElementKind == ElementKindPlayer {
+		playerID := anyContainer.Player
+		if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+			if playerHasUpdated {
+				hasUpdated = true
+			}
+			item.Origin = &treePlayer
+		}
+	} else if anyContainer.ElementKind == ElementKindZone {
+		zoneID := anyContainer.Zone
+		if treeZone, include, zoneHasUpdated := engine.assembleZone(zoneID, check, config); include {
+			if zoneHasUpdated {
+				hasUpdated = true
+			}
+			item.Origin = &treeZone
+		}
+	}
+
+	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
+		if gearScoreHasUpdated {
+			hasUpdated = true
+		}
+		item.GearScore = &treeGearScore
+	}
+
 	item.ID = itemData.ID
 	item.OperationKind_ = itemData.OperationKind_
 	item.Name = itemData.Name
