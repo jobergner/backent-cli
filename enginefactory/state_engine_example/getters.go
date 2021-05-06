@@ -110,9 +110,9 @@ func (_item item) BoundTo() (itemBoundToRef, bool) {
 	return item.item.engine.itemBoundToRef(item.item.BoundTo), item.item.BoundTo != 0
 }
 
-func (_item item) Origin() anyOfPlayerZone {
+func (_item item) Origin() anyOfPlayerPosition {
 	item := _item.item.engine.Item(_item.item.ID)
-	return item.item.engine.anyOfPlayerZone(item.item.Origin)
+	return item.item.engine.anyOfPlayerPosition(item.item.Origin)
 }
 
 func (engine *Engine) Position(positionID PositionID) position {
@@ -332,30 +332,30 @@ func (engine *Engine) playerTargetedByRef(playerTargetedByRefID PlayerTargetedBy
 	return playerTargetedByRef{playerTargetedByRef: playerTargetedByRefCore{OperationKind_: OperationKindDelete}}
 }
 
-func (_anyOfPlayerZone anyOfPlayerZone) ID() AnyOfPlayerZoneID {
-	return _anyOfPlayerZone.anyOfPlayerZone.ID
+func (_anyOfPlayerZone anyOfPlayerPosition) ID() AnyOfPlayerPositionID {
+	return _anyOfPlayerZone.anyOfPlayerPosition.ID
 }
 
-func (_anyOfPlayerZone anyOfPlayerZone) Player() player {
-	anyOfPlayerZone := _anyOfPlayerZone.anyOfPlayerZone.engine.anyOfPlayerZone(_anyOfPlayerZone.anyOfPlayerZone.ID)
-	return anyOfPlayerZone.anyOfPlayerZone.engine.Player(anyOfPlayerZone.anyOfPlayerZone.Player)
+func (_anyOfPlayerZone anyOfPlayerPosition) Player() player {
+	anyOfPlayerPosition := _anyOfPlayerZone.anyOfPlayerPosition.engine.anyOfPlayerPosition(_anyOfPlayerZone.anyOfPlayerPosition.ID)
+	return anyOfPlayerPosition.anyOfPlayerPosition.engine.Player(anyOfPlayerPosition.anyOfPlayerPosition.Player)
 }
 
-func (_anyOfPlayerZone anyOfPlayerZone) Zone() zone {
-	anyOfPlayerZone := _anyOfPlayerZone.anyOfPlayerZone.engine.anyOfPlayerZone(_anyOfPlayerZone.anyOfPlayerZone.ID)
-	return anyOfPlayerZone.anyOfPlayerZone.engine.Zone(anyOfPlayerZone.anyOfPlayerZone.Zone)
+func (_anyOfPlayerPosition anyOfPlayerPosition) Position() position {
+	anyOfPlayerPosition := _anyOfPlayerPosition.anyOfPlayerPosition.engine.anyOfPlayerPosition(_anyOfPlayerPosition.anyOfPlayerPosition.ID)
+	return anyOfPlayerPosition.anyOfPlayerPosition.engine.Position(anyOfPlayerPosition.anyOfPlayerPosition.Position)
 }
 
-func (engine *Engine) anyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID) anyOfPlayerZone {
-	patchingRef, ok := engine.Patch.AnyOfPlayerZone[anyOfPlayerZoneID]
+func (engine *Engine) anyOfPlayerPosition(anyOfPlayerZoneID AnyOfPlayerPositionID) anyOfPlayerPosition {
+	patchingRef, ok := engine.Patch.AnyOfPlayerPosition[anyOfPlayerZoneID]
 	if ok {
-		return anyOfPlayerZone{anyOfPlayerZone: patchingRef}
+		return anyOfPlayerPosition{anyOfPlayerPosition: patchingRef}
 	}
-	currentRef, ok := engine.State.AnyOfPlayerZone[anyOfPlayerZoneID]
+	currentRef, ok := engine.State.AnyOfPlayerPosition[anyOfPlayerZoneID]
 	if ok {
-		return anyOfPlayerZone{anyOfPlayerZone: currentRef}
+		return anyOfPlayerPosition{anyOfPlayerPosition: currentRef}
 	}
-	return anyOfPlayerZone{anyOfPlayerZone: anyOfPlayerZoneCore{OperationKind_: OperationKindDelete}}
+	return anyOfPlayerPosition{anyOfPlayerPosition: anyOfPlayerPositionCore{OperationKind_: OperationKindDelete}}
 }
 
 func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ID() AnyOfPlayerZoneItemID {

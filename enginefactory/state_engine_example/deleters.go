@@ -163,13 +163,13 @@ func (engine *Engine) deleteAnyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlaye
 	engine.Patch.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
 }
 
-func (engine *Engine) deleteAnyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerZoneID, deleteChild bool) {
-	anyOfPlayerZone := engine.anyOfPlayerZone(anyOfPlayerZoneID).anyOfPlayerZone
+func (engine *Engine) deleteAnyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerPositionID, deleteChild bool) {
+	anyOfPlayerPosition := engine.anyOfPlayerPosition(anyOfPlayerZoneID).anyOfPlayerPosition
 	if deleteChild {
-		anyOfPlayerZone.deleteChild()
+		anyOfPlayerPosition.deleteChild()
 	}
-	anyOfPlayerZone.OperationKind_ = OperationKindDelete
-	engine.Patch.AnyOfPlayerZone[anyOfPlayerZone.ID] = anyOfPlayerZone
+	anyOfPlayerPosition.OperationKind_ = OperationKindDelete
+	engine.Patch.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
 }
 
 func (engine *Engine) deleteAnyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfItemPlayerZoneItemID, deleteChild bool) {

@@ -28,7 +28,7 @@ var StateConfig = map[interface{}]interface{}{
 		"name":      "string",
 		"gearScore": "gearScore",
 		"boundTo":   "*player",
-		"origin":    "anyOf<player,zone>",
+		"origin":    "anyOf<player,position>",
 	},
 	"gearScore": map[interface{}]interface{}{
 		"level": "int",

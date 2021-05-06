@@ -111,7 +111,7 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		item.GearScore = &treeGearScore
 	}
 
-	if anyContainer := engine.anyOfPlayerZone(itemData.Origin).anyOfPlayerZone; anyContainer.ElementKind == ElementKindPlayer {
+	if anyContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition; anyContainer.ElementKind == ElementKindPlayer {
 		playerID := anyContainer.Player
 		if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
 			if playerHasUpdated {
@@ -119,13 +119,13 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 			}
 			item.Origin = &treePlayer
 		}
-	} else if anyContainer.ElementKind == ElementKindZone {
-		zoneID := anyContainer.Zone
-		if treeZone, include, zoneHasUpdated := engine.assembleZone(zoneID, check, config); include {
-			if zoneHasUpdated {
+	} else if anyContainer.ElementKind == ElementKindPosition {
+		positionID := anyContainer.Position
+		if treePosition, include, positionHasUpdated := engine.assemblePosition(positionID, check, config); include {
+			if positionHasUpdated {
 				hasUpdated = true
 			}
-			item.Origin = &treeZone
+			item.Origin = &treePosition
 		}
 	}
 
