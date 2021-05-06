@@ -8,8 +8,8 @@ func (engine *Engine) createGearScore(hasParent bool) gearScore {
 	var element gearScoreCore
 	element.engine = engine
 	element.ID = GearScoreID(engine.GenerateID())
-	element.HasParent_ = hasParent
-	element.OperationKind_ = OperationKindUpdate
+	element.HasParent = hasParent
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.GearScore[element.ID] = element
 	return gearScore{gearScore: element}
 }
@@ -22,8 +22,8 @@ func (engine *Engine) createPosition(hasParent bool) position {
 	var element positionCore
 	element.engine = engine
 	element.ID = PositionID(engine.GenerateID())
-	element.HasParent_ = hasParent
-	element.OperationKind_ = OperationKindUpdate
+	element.HasParent = hasParent
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.Position[element.ID] = element
 	return position{position: element}
 }
@@ -36,12 +36,12 @@ func (engine *Engine) createItem(hasParent bool) item {
 	var element itemCore
 	element.engine = engine
 	element.ID = ItemID(engine.GenerateID())
-	element.HasParent_ = hasParent
+	element.HasParent = hasParent
 	elementGearScore := engine.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
 	elementOrigin := engine.createAnyOfPlayerZone(true)
 	element.Origin = elementOrigin.anyOfPlayerPosition.ID
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.Item[element.ID] = element
 	return item{item: element}
 }
@@ -54,12 +54,12 @@ func (engine *Engine) createZoneItem(hasParent bool) zoneItem {
 	var element zoneItemCore
 	element.engine = engine
 	element.ID = ZoneItemID(engine.GenerateID())
-	element.HasParent_ = hasParent
+	element.HasParent = hasParent
 	elementItem := engine.createItem(true)
 	element.Item = elementItem.item.ID
 	elementPosition := engine.createPosition(true)
 	element.Position = elementPosition.position.ID
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.ZoneItem[element.ID] = element
 	return zoneItem{zoneItem: element}
 }
@@ -72,12 +72,12 @@ func (engine *Engine) createPlayer(hasParent bool) player {
 	var element playerCore
 	element.engine = engine
 	element.ID = PlayerID(engine.GenerateID())
-	element.HasParent_ = hasParent
+	element.HasParent = hasParent
 	elementGearScore := engine.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
 	elementPosition := engine.createPosition(true)
 	element.Position = elementPosition.position.ID
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.Player[element.ID] = element
 	return player{player: element}
 }
@@ -90,7 +90,7 @@ func (engine *Engine) createZone() zone {
 	var element zoneCore
 	element.engine = engine
 	element.ID = ZoneID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.Zone[element.ID] = element
 	return zone{zone: element}
 }
@@ -101,7 +101,7 @@ func (engine *Engine) createItemBoundToRef(referencedElementID PlayerID, parentI
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = ItemBoundToRefID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.ItemBoundToRef[element.ID] = element
 	return element
 }
@@ -112,7 +112,7 @@ func (engine *Engine) createPlayerGuildMemberRef(referencedElementID PlayerID, p
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerGuildMemberRefID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerGuildMemberRef[element.ID] = element
 	return element
 }
@@ -125,7 +125,7 @@ func (engine *Engine) createEquipmentSet() equipmentSet {
 	var element equipmentSetCore
 	element.engine = engine
 	element.ID = EquipmentSetID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.EquipmentSet[element.ID] = element
 	return equipmentSet{equipmentSet: element}
 }
@@ -136,7 +136,7 @@ func (engine *Engine) createEquipmentSetEquipmentRef(referencedElementID ItemID,
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = EquipmentSetEquipmentRefID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.EquipmentSetEquipmentRef[element.ID] = element
 	return element
 }
@@ -147,7 +147,7 @@ func (engine *Engine) createPlayerEquipmentSetRef(referencedElementID EquipmentS
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerEquipmentSetRefID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerEquipmentSetRef[element.ID] = element
 	return element
 }
@@ -158,7 +158,7 @@ func (engine *Engine) createPlayerTargetRef(referencedElementID AnyOfPlayerZoneI
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerTargetRefID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerTargetRef[element.ID] = element
 	return element
 }
@@ -169,7 +169,7 @@ func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayerZ
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerTargetedByRefID(engine.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerTargetedByRef[element.ID] = element
 	return element
 }
@@ -182,7 +182,7 @@ func (engine *Engine) createAnyOfPlayerZoneItem(setDefaultValue bool) anyOfPlaye
 		elementPlayer := engine.createPlayer(true)
 		element.Player = elementPlayer.player.ID
 	}
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.AnyOfPlayerZoneItem[element.ID] = element
 	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: element}
 }
@@ -195,7 +195,7 @@ func (engine *Engine) createAnyOfPlayerZone(setDefaultValue bool) anyOfPlayerPos
 		elementPlayer := engine.createPlayer(true)
 		element.Player = elementPlayer.player.ID
 	}
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.AnyOfPlayerPosition[element.ID] = element
 	return anyOfPlayerPosition{anyOfPlayerPosition: element}
 }
@@ -208,7 +208,7 @@ func (engine *Engine) createAnyOfItemPlayerZoneItem(setDefaultValue bool) anyOfI
 		elementItem := engine.createItem(true)
 		element.Item = elementItem.item.ID
 	}
-	element.OperationKind_ = OperationKindUpdate
+	element.OperationKind = OperationKindUpdate
 	engine.Patch.AnyOfItemPlayerZoneItem[element.ID] = element
 	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: element}
 }

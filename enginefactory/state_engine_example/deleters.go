@@ -2,7 +2,7 @@ package state
 
 func (engine *Engine) DeletePlayer(playerID PlayerID) {
 	player := engine.Player(playerID).player
-	if player.HasParent_ {
+	if player.HasParent {
 		return
 	}
 	engine.deletePlayer(playerID)
@@ -25,39 +25,39 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	for _, targetedBy := range player.TargetedBy {
 		engine.deletePlayerTargetedByRef(targetedBy)
 	}
-	player.OperationKind_ = OperationKindDelete
+	player.OperationKind = OperationKindDelete
 	engine.Patch.Player[player.ID] = player
 }
 
 func (engine *Engine) DeleteGearScore(gearScoreID GearScoreID) {
 	gearScore := engine.GearScore(gearScoreID).gearScore
-	if gearScore.HasParent_ {
+	if gearScore.HasParent {
 		return
 	}
 	engine.deleteGearScore(gearScoreID)
 }
 func (engine *Engine) deleteGearScore(gearScoreID GearScoreID) {
 	gearScore := engine.GearScore(gearScoreID).gearScore
-	gearScore.OperationKind_ = OperationKindDelete
+	gearScore.OperationKind = OperationKindDelete
 	engine.Patch.GearScore[gearScore.ID] = gearScore
 }
 
 func (engine *Engine) DeletePosition(positionID PositionID) {
 	position := engine.Position(positionID).position
-	if position.HasParent_ {
+	if position.HasParent {
 		return
 	}
 	engine.deletePosition(positionID)
 }
 func (engine *Engine) deletePosition(positionID PositionID) {
 	position := engine.Position(positionID).position
-	position.OperationKind_ = OperationKindDelete
+	position.OperationKind = OperationKindDelete
 	engine.Patch.Position[position.ID] = position
 }
 
 func (engine *Engine) DeleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
-	if item.HasParent_ {
+	if item.HasParent {
 		return
 	}
 	engine.deleteItem(itemID)
@@ -67,13 +67,13 @@ func (engine *Engine) deleteItem(itemID ItemID) {
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
 	engine.deleteAnyOfPlayerZone(item.Origin, true)
-	item.OperationKind_ = OperationKindDelete
+	item.OperationKind = OperationKindDelete
 	engine.Patch.Item[item.ID] = item
 }
 
 func (engine *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
-	if zoneItem.HasParent_ {
+	if zoneItem.HasParent {
 		return
 	}
 	engine.deleteZoneItem(zoneItemID)
@@ -84,7 +84,7 @@ func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	engine.dereferencePlayerTargetedByZoneItemRefs(zoneItemID)
 	engine.deleteItem(zoneItem.Item)
 	engine.deletePosition(zoneItem.Position)
-	zoneItem.OperationKind_ = OperationKindDelete
+	zoneItem.OperationKind = OperationKindDelete
 	engine.Patch.ZoneItem[zoneItem.ID] = zoneItem
 }
 
@@ -99,7 +99,7 @@ func (engine *Engine) deleteZone(zoneID ZoneID) {
 	for _, playerID := range zone.Players {
 		engine.deletePlayer(playerID)
 	}
-	zone.OperationKind_ = OperationKindDelete
+	zone.OperationKind = OperationKindDelete
 	engine.Patch.Zone[zone.ID] = zone
 }
 
@@ -112,45 +112,45 @@ func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	for _, equipmentSet := range equipmentSet.Equipment {
 		engine.deleteEquipmentSetEquipmentRef(equipmentSet)
 	}
-	equipmentSet.OperationKind_ = OperationKindDelete
+	equipmentSet.OperationKind = OperationKindDelete
 	engine.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
 }
 
 func (engine *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) {
 	playerGuildMemberRef := engine.playerGuildMemberRef(playerGuildMemberRefID).playerGuildMemberRef
-	playerGuildMemberRef.OperationKind_ = OperationKindDelete
+	playerGuildMemberRef.OperationKind = OperationKindDelete
 	engine.Patch.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
 }
 
 func (engine *Engine) deletePlayerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) {
 	playerEquipmentSetRef := engine.playerEquipmentSetRef(playerEquipmentSetRefID).playerEquipmentSetRef
-	playerEquipmentSetRef.OperationKind_ = OperationKindDelete
+	playerEquipmentSetRef.OperationKind = OperationKindDelete
 	engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
 }
 
 func (engine *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
 	itemBoundToRef := engine.itemBoundToRef(itemBoundToRefID).itemBoundToRef
-	itemBoundToRef.OperationKind_ = OperationKindDelete
+	itemBoundToRef.OperationKind = OperationKindDelete
 	engine.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
 }
 
 func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) {
 	equipmentSetEquipmentRef := engine.equipmentSetEquipmentRef(equipmentSetEquipmentRefID).equipmentSetEquipmentRef
-	equipmentSetEquipmentRef.OperationKind_ = OperationKindDelete
+	equipmentSetEquipmentRef.OperationKind = OperationKindDelete
 	engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
 }
 
 func (engine *Engine) deletePlayerTargetRef(playerTargetRefID PlayerTargetRefID) {
 	playerTargetRef := engine.playerTargetRef(playerTargetRefID).playerTargetRef
 	engine.deleteAnyOfPlayerZoneItem(playerTargetRef.ReferencedElementID, false)
-	playerTargetRef.OperationKind_ = OperationKindDelete
+	playerTargetRef.OperationKind = OperationKindDelete
 	engine.Patch.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
 }
 
 func (engine *Engine) deletePlayerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) {
 	playerTargetedByRef := engine.playerTargetedByRef(playerTargetedByRefID).playerTargetedByRef
 	engine.deleteAnyOfPlayerZoneItem(playerTargetedByRef.ReferencedElementID, false)
-	playerTargetedByRef.OperationKind_ = OperationKindDelete
+	playerTargetedByRef.OperationKind = OperationKindDelete
 	engine.Patch.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
 }
 
@@ -159,7 +159,7 @@ func (engine *Engine) deleteAnyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlaye
 	if deleteChild {
 		anyOfPlayerZoneItem.deleteChild()
 	}
-	anyOfPlayerZoneItem.OperationKind_ = OperationKindDelete
+	anyOfPlayerZoneItem.OperationKind = OperationKindDelete
 	engine.Patch.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
 }
 
@@ -168,7 +168,7 @@ func (engine *Engine) deleteAnyOfPlayerZone(anyOfPlayerZoneID AnyOfPlayerPositio
 	if deleteChild {
 		anyOfPlayerPosition.deleteChild()
 	}
-	anyOfPlayerPosition.OperationKind_ = OperationKindDelete
+	anyOfPlayerPosition.OperationKind = OperationKindDelete
 	engine.Patch.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
 }
 
@@ -177,6 +177,6 @@ func (engine *Engine) deleteAnyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID An
 	if deleteChild {
 		anyOfItemPlayerZoneItem.deleteChild()
 	}
-	anyOfItemPlayerZoneItem.OperationKind_ = OperationKindDelete
+	anyOfItemPlayerZoneItem.OperationKind = OperationKindDelete
 	engine.Patch.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
 }

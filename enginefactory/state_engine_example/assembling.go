@@ -21,7 +21,7 @@ func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursio
 	var gearScore GearScore
 
 	gearScore.ID = gearScoreData.ID
-	gearScore.OperationKind_ = gearScoreData.OperationKind_
+	gearScore.OperationKind = gearScoreData.OperationKind
 	gearScore.Level = gearScoreData.Level
 	gearScore.Score = gearScoreData.Score
 	return gearScore, hasUpdated || config.forceInclude, hasUpdated
@@ -44,7 +44,7 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 	var position Position
 
 	position.ID = positionData.ID
-	position.OperationKind_ = positionData.OperationKind_
+	position.OperationKind_ = positionData.OperationKind
 	position.X = positionData.X
 	position.Y = positionData.Y
 	return position, hasUpdated || config.forceInclude, hasUpdated
@@ -76,7 +76,7 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 	}
 
 	equipmentSet.ID = equipmentSetData.ID
-	equipmentSet.OperationKind_ = equipmentSetData.OperationKind_
+	equipmentSet.OperationKind = equipmentSetData.OperationKind
 	equipmentSet.Name = equipmentSetData.Name
 	return equipmentSet, hasUpdated || config.forceInclude, hasUpdated
 }
@@ -137,7 +137,7 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 	}
 
 	item.ID = itemData.ID
-	item.OperationKind_ = itemData.OperationKind_
+	item.OperationKind = itemData.OperationKind
 	item.Name = itemData.Name
 	return item, hasUpdated || config.forceInclude, hasUpdated
 }
@@ -173,7 +173,7 @@ func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCh
 	}
 
 	zoneItem.ID = zoneItemData.ID
-	zoneItem.OperationKind_ = zoneItemData.OperationKind_
+	zoneItem.OperationKind = zoneItemData.OperationKind
 	return zoneItem, hasUpdated || config.forceInclude, hasUpdated
 }
 
@@ -242,7 +242,7 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 	}
 
 	player.ID = playerData.ID
-	player.OperationKind_ = playerData.OperationKind_
+	player.OperationKind = playerData.OperationKind
 	return player, hasUpdated || config.forceInclude, hasUpdated
 }
 
@@ -309,7 +309,7 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 	}
 
 	zone.ID = zoneData.ID
-	zone.OperationKind_ = zoneData.OperationKind_
+	zone.OperationKind = zoneData.OperationKind
 	zone.Tags = zoneData.Tags
 	return zone, hasUpdated || config.forceInclude, hasUpdated
 }
@@ -336,7 +336,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
 			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
 			if check == nil {
@@ -347,7 +347,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind_, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -486,7 +486,7 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := engine.PathTrack.player[referencedElement.ID]
-		return &PlayerReference{ref.itemBoundToRef.OperationKind_, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.itemBoundToRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return &PlayerReference{ref.itemBoundToRef.OperationKind, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.itemBoundToRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely created
@@ -566,7 +566,7 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{ref.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return AnyOfPlayerZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
 			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
 			if check == nil {
@@ -577,12 +577,12 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{ref.OperationKind_, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return AnyOfPlayerZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
 	if patchRef, hasUpdated := engine.Patch.PlayerTargetedByRef[refID]; hasUpdated {
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			config.forceInclude = true
 		}
 		if anyContainer := engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
@@ -596,11 +596,11 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			var el *Player
-			if patchRef.OperationKind_ == OperationKindUpdate {
+			if patchRef.OperationKind == OperationKindUpdate {
 				el = &element
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{patchRef.OperationKind_, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return AnyOfPlayerZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
 			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
 			if check == nil {
@@ -612,11 +612,11 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			var el *ZoneItem
-			if patchRef.OperationKind_ == OperationKindUpdate {
+			if patchRef.OperationKind == OperationKindUpdate {
 				el = &element
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{patchRef.OperationKind_, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return AnyOfPlayerZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -651,11 +651,11 @@ func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID,
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := engine.PathTrack.player[referencedElement.ID]
-		return PlayerReference{ref.OperationKind_, ref.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return PlayerReference{ref.OperationKind, ref.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := engine.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			config.forceInclude = true
 		}
 		referencedElement := engine.Player(patchRef.ReferencedElementID).player
@@ -668,11 +668,11 @@ func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID,
 			referencedDataStatus = ReferencedDataModified
 		}
 		var el *Player
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			el = &element
 		}
 		path, _ := engine.PathTrack.player[referencedElement.ID]
-		return PlayerReference{patchRef.OperationKind_, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return PlayerReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
@@ -699,11 +699,11 @@ func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefI
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := engine.PathTrack.equipmentSet[referencedElement.ID]
-		return EquipmentSetReference{ref.OperationKind_, ref.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return EquipmentSetReference{ref.OperationKind, ref.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := engine.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			config.forceInclude = true
 		}
 		referencedElement := engine.EquipmentSet(patchRef.ReferencedElementID).equipmentSet
@@ -716,11 +716,11 @@ func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefI
 			referencedDataStatus = ReferencedDataModified
 		}
 		var el *EquipmentSet
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			el = &element
 		}
 		path, _ := engine.PathTrack.equipmentSet[referencedElement.ID]
-		return EquipmentSetReference{patchRef.OperationKind_, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return EquipmentSetReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
@@ -747,11 +747,11 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 			referencedDataStatus = ReferencedDataModified
 		}
 		path, _ := engine.PathTrack.item[referencedElement.ID]
-		return ItemReference{ref.OperationKind_, ref.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ItemReference{ref.OperationKind, ref.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := engine.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			config.forceInclude = true
 		}
 		referencedElement := engine.Item(patchRef.ReferencedElementID).item
@@ -764,11 +764,11 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 			referencedDataStatus = ReferencedDataModified
 		}
 		var el *Item
-		if patchRef.OperationKind_ == OperationKindUpdate {
+		if patchRef.OperationKind == OperationKindUpdate {
 			el = &element
 		}
 		path, _ := engine.PathTrack.item[referencedElement.ID]
-		return ItemReference{patchRef.OperationKind_, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind_ == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return ItemReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
@@ -796,7 +796,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, gearScoreData := range engine.Patch.GearScore {
-		if !gearScoreData.HasParent_ {
+		if !gearScoreData.HasParent {
 			gearScore, include, _ := engine.assembleGearScore(gearScoreData.ID, nil, config)
 			if include {
 				engine.Tree.GearScore[gearScoreData.ID] = gearScore
@@ -804,7 +804,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, itemData := range engine.Patch.Item {
-		if !itemData.HasParent_ {
+		if !itemData.HasParent {
 			item, include, _ := engine.assembleItem(itemData.ID, nil, config)
 			if include {
 				engine.Tree.Item[itemData.ID] = item
@@ -812,7 +812,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, playerData := range engine.Patch.Player {
-		if !playerData.HasParent_ {
+		if !playerData.HasParent {
 			player, include, _ := engine.assemblePlayer(playerData.ID, nil, config)
 			if include {
 				engine.Tree.Player[playerData.ID] = player
@@ -820,7 +820,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, positionData := range engine.Patch.Position {
-		if !positionData.HasParent_ {
+		if !positionData.HasParent {
 			position, include, _ := engine.assemblePosition(positionData.ID, nil, config)
 			if include {
 				engine.Tree.Position[positionData.ID] = position
@@ -834,7 +834,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItemData := range engine.Patch.ZoneItem {
-		if !zoneItemData.HasParent_ {
+		if !zoneItemData.HasParent {
 			zoneItem, include, _ := engine.assembleZoneItem(zoneItemData.ID, nil, config)
 			if include {
 				engine.Tree.ZoneItem[zoneItemData.ID] = zoneItem
@@ -851,7 +851,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, gearScoreData := range engine.State.GearScore {
-		if !gearScoreData.HasParent_ {
+		if !gearScoreData.HasParent {
 			if _, ok := engine.Tree.GearScore[gearScoreData.ID]; !ok {
 				gearScore, include, _ := engine.assembleGearScore(gearScoreData.ID, nil, config)
 				if include {
@@ -861,7 +861,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, itemData := range engine.State.Item {
-		if !itemData.HasParent_ {
+		if !itemData.HasParent {
 			if _, ok := engine.Tree.Item[itemData.ID]; !ok {
 				item, include, _ := engine.assembleItem(itemData.ID, nil, config)
 				if include {
@@ -871,7 +871,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, playerData := range engine.State.Player {
-		if !playerData.HasParent_ {
+		if !playerData.HasParent {
 			if _, ok := engine.Tree.Player[playerData.ID]; !ok {
 				player, include, _ := engine.assemblePlayer(playerData.ID, nil, config)
 				if include {
@@ -881,7 +881,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, positionData := range engine.State.Position {
-		if !positionData.HasParent_ {
+		if !positionData.HasParent {
 			if _, ok := engine.Tree.Position[positionData.ID]; !ok {
 				position, include, _ := engine.assemblePosition(positionData.ID, nil, config)
 				if include {
@@ -899,7 +899,7 @@ func (engine *Engine) assembleTree() Tree {
 		}
 	}
 	for _, zoneItemData := range engine.State.ZoneItem {
-		if !zoneItemData.HasParent_ {
+		if !zoneItemData.HasParent {
 			if _, ok := engine.Tree.ZoneItem[zoneItemData.ID]; !ok {
 				zoneItem, include, _ := engine.assembleZoneItem(zoneItemData.ID, nil, config)
 				if include {
