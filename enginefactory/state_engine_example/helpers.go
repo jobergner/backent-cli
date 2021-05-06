@@ -388,3 +388,60 @@ func mergePlayerEquipmentSetRefIDs(currentIDs, nextIDs []PlayerEquipmentSetRefID
 
 	return ids
 }
+
+func mergeAnyOfPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfPlayerZoneItemID) []AnyOfPlayerZoneItemID {
+	ids := make([]AnyOfPlayerZoneItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeAnyOfPlayerPositionIDs(currentIDs, nextIDs []AnyOfPlayerPositionID) []AnyOfPlayerPositionID {
+	ids := make([]AnyOfPlayerPositionID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
+func mergeAnyOfItemPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfItemPlayerZoneItemID) []AnyOfItemPlayerZoneItemID {
+	ids := make([]AnyOfItemPlayerZoneItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
