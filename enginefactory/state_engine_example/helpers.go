@@ -370,6 +370,25 @@ func mergePlayerGuildMemberRefIDs(currentIDs, nextIDs []PlayerGuildMemberRefID) 
 	return ids
 }
 
+func mergePlayerTargetedByRefIDs(currentIDs, nextIDs []PlayerTargetedByRefID) []PlayerTargetedByRefID {
+	ids := make([]PlayerTargetedByRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+
+	return ids
+}
+
 func mergePlayerEquipmentSetRefIDs(currentIDs, nextIDs []PlayerEquipmentSetRefID) []PlayerEquipmentSetRefID {
 	ids := make([]PlayerEquipmentSetRefID, len(currentIDs))
 	copy(ids, currentIDs)

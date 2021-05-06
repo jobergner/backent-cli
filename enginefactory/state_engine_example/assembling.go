@@ -241,6 +241,15 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		player.Target = ref
 	}
 
+	for _, refID := range mergePlayerTargetedByRefIDs(engine.State.Player[playerID].TargetedBy, engine.Patch.Player[playerID].TargetedBy) {
+		if ref, include, refHasUpdated := engine.assemblePlayerTargetedByRef(refID, check, config); include {
+			if refHasUpdated {
+				hasUpdated = true
+			}
+			player.TargetedBy = append(player.TargetedBy, ref)
+		}
+	}
+
 	player.ID = playerData.ID
 	player.OperationKind = playerData.OperationKind
 	return player, hasUpdated || config.forceInclude, hasUpdated
