@@ -37,41 +37,41 @@ func (_any anyOfPlayerZoneItemCore) deleteChild() {
 	}
 }
 
-func (_any anyOfPlayerZone) Kind() ElementKind {
-	any := _any.anyOfPlayerZone.engine.anyOfPlayerZone(_any.anyOfPlayerZone.ID)
-	return any.anyOfPlayerZone.ElementKind
+func (_any anyOfPlayerPosition) Kind() ElementKind {
+	any := _any.anyOfPlayerPosition.engine.anyOfPlayerPosition(_any.anyOfPlayerPosition.ID)
+	return any.anyOfPlayerPosition.ElementKind
 }
 
-func (_any anyOfPlayerZoneCore) setZone(zoneItemID ZoneID) {
-	any := _any.engine.anyOfPlayerZone(_any.ID).anyOfPlayerZone
+func (_any anyOfPlayerPositionCore) setZone(positionID PositionID) {
+	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
 	if any.Player != 0 {
 		any.engine.deletePlayer(any.Player)
 		any.Player = 0
 	}
 	any.ElementKind = ElementKindZone
-	any.Zone = zoneItemID
-	any.engine.Patch.AnyOfPlayerZone[any.ID] = any
+	any.Position = positionID
+	any.engine.Patch.AnyOfPlayerPosition[any.ID] = any
 }
 
-func (_any anyOfPlayerZoneCore) deleteChild() {
-	any := _any.engine.anyOfPlayerZone(_any.ID).anyOfPlayerZone
+func (_any anyOfPlayerPositionCore) deleteChild() {
+	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
 	switch any.ElementKind {
 	case ElementKindPlayer:
 		any.engine.deletePlayer(any.Player)
 	case ElementKindZone:
-		any.engine.deleteZone(any.Zone)
+		any.engine.deletePosition(any.Position)
 	}
 }
 
-func (_any anyOfPlayerZoneCore) setPlayer(playerID PlayerID) {
-	any := _any.engine.anyOfPlayerZone(_any.ID).anyOfPlayerZone
-	if any.Zone != 0 {
-		any.engine.deleteZone(any.Zone)
-		any.Zone = 0
+func (_any anyOfPlayerPositionCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+	if any.Position != 0 {
+		any.engine.deletePosition(any.Position)
+		any.Position = 0
 	}
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
-	any.engine.Patch.AnyOfPlayerZone[any.ID] = any
+	any.engine.Patch.AnyOfPlayerPosition[any.ID] = any
 }
 
 func (_any anyOfItemPlayerZoneItem) Kind() ElementKind {

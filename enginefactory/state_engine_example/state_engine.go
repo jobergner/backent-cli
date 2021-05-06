@@ -145,12 +145,12 @@ func (se *Engine) UpdateState() {
 			se.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
 		}
 	}
-	for _, anyOfPlayerZone := range se.Patch.AnyOfPlayerZone {
-		if anyOfPlayerZone.OperationKind_ == OperationKindDelete {
-			delete(se.State.AnyOfPlayerZone, anyOfPlayerZone.ID)
+	for _, anyOfPlayerPosition := range se.Patch.AnyOfPlayerPosition {
+		if anyOfPlayerPosition.OperationKind_ == OperationKindDelete {
+			delete(se.State.AnyOfPlayerPosition, anyOfPlayerPosition.ID)
 		} else {
-			anyOfPlayerZone.OperationKind_ = OperationKindUnchanged
-			se.State.AnyOfPlayerZone[anyOfPlayerZone.ID] = anyOfPlayerZone
+			anyOfPlayerPosition.OperationKind_ = OperationKindUnchanged
+			se.State.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
 		}
 	}
 	for _, anyOfPlayerZoneItem := range se.Patch.AnyOfPlayerZoneItem {
@@ -204,8 +204,8 @@ func (se *Engine) UpdateState() {
 	for key := range se.Patch.AnyOfItemPlayerZoneItem {
 		delete(se.Patch.AnyOfItemPlayerZoneItem, key)
 	}
-	for key := range se.Patch.AnyOfPlayerZone {
-		delete(se.Patch.AnyOfPlayerZone, key)
+	for key := range se.Patch.AnyOfPlayerPosition {
+		delete(se.Patch.AnyOfPlayerPosition, key)
 	}
 	for key := range se.Patch.AnyOfPlayerZoneItem {
 		delete(se.Patch.AnyOfPlayerZoneItem, key)
