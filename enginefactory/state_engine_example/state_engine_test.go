@@ -247,8 +247,8 @@ func TestTree(t *testing.T) {
 								},
 								OperationKind: OperationKindUpdate,
 								Position: &Position{
-									ID:             player1.Position().ID(),
-									OperationKind_: OperationKindUpdate,
+									ID:            player1.Position().ID(),
+									OperationKind: OperationKindUpdate,
 								},
 							},
 							{
@@ -259,8 +259,8 @@ func TestTree(t *testing.T) {
 								},
 								OperationKind: OperationKindUpdate,
 								Position: &Position{
-									ID:             player2.Position().ID(),
-									OperationKind_: OperationKindUpdate,
+									ID:            player2.Position().ID(),
+									OperationKind: OperationKindUpdate,
 								},
 							},
 						},
@@ -329,6 +329,18 @@ func TestTree(t *testing.T) {
 											ID:            player1item1.GearScore().ID(),
 											OperationKind: OperationKindUpdate,
 										},
+										Origin: &Player{
+											ID:            player1item1.Origin().Player().ID(),
+											OperationKind: OperationKindUpdate,
+											GearScore: &GearScore{
+												ID:            player1item1.Origin().Player().GearScore().ID(),
+												OperationKind: OperationKindUpdate,
+											},
+											Position: &Position{
+												ID:            player1item1.Origin().Player().Position().ID(),
+												OperationKind: OperationKindUpdate,
+											},
+										},
 									},
 								},
 								OperationKind: OperationKindUpdate,
@@ -369,6 +381,18 @@ func TestTree(t *testing.T) {
 										GearScore: &GearScore{
 											ID:            player1item2.item.GearScore,
 											OperationKind: OperationKindDelete,
+										},
+										Origin: &Player{
+											ID:            player1item2.Origin().Player().ID(),
+											OperationKind: OperationKindDelete,
+											GearScore: &GearScore{
+												ID:            player1item2.Origin().Player().GearScore().ID(),
+												OperationKind: OperationKindDelete,
+											},
+											Position: &Position{
+												ID:            player1item2.Origin().Player().Position().ID(),
+												OperationKind: OperationKindDelete,
+											},
 										},
 									},
 								},
@@ -414,6 +438,18 @@ func TestTree(t *testing.T) {
 									ID:            playerItem.GearScore().ID(),
 									OperationKind: OperationKindUpdate,
 								},
+								Origin: &Player{
+									ID:            playerItem.Origin().Player().ID(),
+									OperationKind: OperationKindUpdate,
+									GearScore: &GearScore{
+										ID:            playerItem.Origin().Player().GearScore().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+									Position: &Position{
+										ID:            playerItem.Origin().Player().Position().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+								},
 							},
 						},
 						OperationKind: OperationKindUpdate,
@@ -446,9 +482,21 @@ func TestTree(t *testing.T) {
 						ID: player1.ID(),
 						Items: []Item{
 							{
-								ID:            item.ID(),
-								BoundTo:       nil,
-								GearScore:     &GearScore{ID: item.GearScore().ID(), OperationKind: OperationKindUpdate},
+								ID:        item.ID(),
+								BoundTo:   nil,
+								GearScore: &GearScore{ID: item.GearScore().ID(), OperationKind: OperationKindUpdate},
+								Origin: &Player{
+									ID:            item.Origin().Player().ID(),
+									OperationKind: OperationKindUpdate,
+									GearScore: &GearScore{
+										ID:            item.Origin().Player().GearScore().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+									Position: &Position{
+										ID:            item.Origin().Player().Position().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+								},
 								OperationKind: OperationKindUpdate,
 							},
 						},
@@ -467,8 +515,8 @@ func TestTree(t *testing.T) {
 										OperationKind: OperationKindUnchanged,
 									},
 									Position: &Position{
-										ID:             player2.Position().ID(),
-										OperationKind_: OperationKindUnchanged,
+										ID:            player2.Position().ID(),
+										OperationKind: OperationKindUnchanged,
 									},
 									GuildMembers: []PlayerReference{
 										{
@@ -553,8 +601,8 @@ func TestTree(t *testing.T) {
 										OperationKind: OperationKindUnchanged,
 									},
 									Position: &Position{
-										ID:             player.Position().ID(),
-										OperationKind_: OperationKindUnchanged,
+										ID:            player.Position().ID(),
+										OperationKind: OperationKindUnchanged,
 									},
 									GuildMembers: []PlayerReference{
 										{
@@ -768,8 +816,8 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUpdate,
 								},
 								Position: &Position{
-									ID:             player1.Position().ID(),
-									OperationKind_: OperationKindUnchanged,
+									ID:            player1.Position().ID(),
+									OperationKind: OperationKindUnchanged,
 								},
 							},
 						},
@@ -804,8 +852,8 @@ func TestTree(t *testing.T) {
 										OperationKind: OperationKindUpdate,
 									},
 									Position: &Position{
-										ID:             player1.Position().ID(),
-										OperationKind_: OperationKindUnchanged,
+										ID:            player1.Position().ID(),
+										OperationKind: OperationKindUnchanged,
 									},
 								},
 							},
@@ -870,8 +918,8 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUnchanged,
 								},
 								Position: &Position{
-									ID:             player1.Position().ID(),
-									OperationKind_: OperationKindUnchanged,
+									ID:            player1.Position().ID(),
+									OperationKind: OperationKindUnchanged,
 								},
 							},
 						},
@@ -897,8 +945,8 @@ func TestTree(t *testing.T) {
 										OperationKind: OperationKindUnchanged,
 									},
 									Position: &Position{
-										ID:             player1.Position().ID(),
-										OperationKind_: OperationKindUnchanged,
+										ID:            player1.Position().ID(),
+										OperationKind: OperationKindUnchanged,
 									},
 								},
 							},
@@ -944,9 +992,9 @@ func TestTree(t *testing.T) {
 									Level:         8,
 								},
 								Position: &Position{
-									ID:             player.Position().ID(),
-									OperationKind_: OperationKindUnchanged,
-									X:              10,
+									ID:            player.Position().ID(),
+									OperationKind: OperationKindUnchanged,
+									X:             10,
 								},
 								GuildMembers: []PlayerReference{
 									{
@@ -961,6 +1009,124 @@ func TestTree(t *testing.T) {
 							},
 						},
 						OperationKind: OperationKindUpdate,
+					},
+				}
+
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("builds any kind", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				item1 := se.createItem(false)
+
+				item2 := se.createItem(false)
+				item2.Origin().SetPosition()
+
+				expectedTree.Item = map[ItemID]Item{
+					item1.ID(): {
+						ID: item1.ID(),
+						GearScore: &GearScore{
+							ID:            item1.GearScore().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Origin: &Player{
+							ID:            item1.Origin().Player().ID(),
+							OperationKind: OperationKindUpdate,
+							GearScore: &GearScore{
+								ID:            item1.Origin().Player().GearScore().ID(),
+								OperationKind: OperationKindUpdate,
+							},
+							Position: &Position{
+								ID:            item1.Origin().Player().Position().ID(),
+								OperationKind: OperationKindUpdate,
+							},
+						},
+						OperationKind: OperationKindUpdate,
+					},
+					item2.ID(): {
+						ID: item2.ID(),
+						GearScore: &GearScore{
+							ID:            item2.GearScore().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Origin: &Position{
+							ID:            item2.Origin().Position().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						OperationKind: OperationKindUpdate,
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("builds []any kinds", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zone := se.createZone()
+				item := zone.AddInteractableItem()
+				zoneItem := zone.AddInteractableZoneItem()
+
+				expectedTree.Zone = map[ZoneID]Zone{
+					zone.ID(): {
+						ID:            zone.ID(),
+						OperationKind: OperationKindUpdate,
+						Interactables: []interface{}{
+							Item{
+								ID: item.ID(),
+								GearScore: &GearScore{
+									ID:            item.GearScore().ID(),
+									OperationKind: OperationKindUpdate,
+								},
+								Origin: &Player{
+									ID:            item.Origin().Player().ID(),
+									OperationKind: OperationKindUpdate,
+									GearScore: &GearScore{
+										ID:            item.Origin().Player().GearScore().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+									Position: &Position{
+										ID:            item.Origin().Player().Position().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+								},
+								OperationKind: OperationKindUpdate,
+							},
+							ZoneItem{
+								ID:            zoneItem.ID(),
+								OperationKind: OperationKindUpdate,
+								Position: &Position{
+									ID:            zoneItem.Position().ID(),
+									OperationKind: OperationKindUpdate,
+								},
+								Item: &Item{
+									ID:            zoneItem.Item().ID(),
+									OperationKind: OperationKindUpdate,
+									GearScore: &GearScore{
+										ID:            zoneItem.Item().GearScore().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+									Origin: &Player{
+										ID:            zoneItem.Item().Origin().Player().ID(),
+										OperationKind: OperationKindUpdate,
+										GearScore: &GearScore{
+											ID:            zoneItem.Item().Origin().Player().GearScore().ID(),
+											OperationKind: OperationKindUpdate,
+										},
+										Position: &Position{
+											ID:            zoneItem.Item().Origin().Player().Position().ID(),
+											OperationKind: OperationKindUpdate,
+										},
+									},
+								},
+							},
+						},
 					},
 				}
 
