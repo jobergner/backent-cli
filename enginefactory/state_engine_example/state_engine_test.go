@@ -96,6 +96,15 @@ func TestReferences(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
 	})
+	t.Run("deletes reference when Set is called on field which already has reference", func(t *testing.T) {
+		se := newEngine()
+		item := se.createItem(false)
+		player := se.createPlayer(false)
+		player2 := se.createPlayer(false)
+		item.SetBoundTo(player.ID())
+		item.SetBoundTo(player2.ID())
+		assert.Equal(t, 1, len(se.Patch.ItemBoundToRef))
+	})
 }
 
 func TestUpdateState(t *testing.T) {
@@ -1129,13 +1138,57 @@ func TestTree(t *testing.T) {
 						},
 					},
 				}
-
 			},
 			func(errText string) {
 				t.Errorf(errText)
 			},
 		)
 	})
+	// t.Run("builds *any kind", func(t *testing.T) {
+	// 	newTreeTest(
+	// 		func(se *Engine, expectedTree *Tree) {
+	// 			player := se.createPlayer(false)
+
+	// 			expectedTree.Item = map[ItemID]Item{
+	// 				item1.ID(): {
+	// 					ID: item1.ID(),
+	// 					GearScore: &GearScore{
+	// 						ID:            item1.GearScore().ID(),
+	// 						OperationKind: OperationKindUpdate,
+	// 					},
+	// 					Origin: &Player{
+	// 						ID:            item1.Origin().Player().ID(),
+	// 						OperationKind: OperationKindUpdate,
+	// 						GearScore: &GearScore{
+	// 							ID:            item1.Origin().Player().GearScore().ID(),
+	// 							OperationKind: OperationKindUpdate,
+	// 						},
+	// 						Position: &Position{
+	// 							ID:            item1.Origin().Player().Position().ID(),
+	// 							OperationKind: OperationKindUpdate,
+	// 						},
+	// 					},
+	// 					OperationKind: OperationKindUpdate,
+	// 				},
+	// 				item2.ID(): {
+	// 					ID: item2.ID(),
+	// 					GearScore: &GearScore{
+	// 						ID:            item2.GearScore().ID(),
+	// 						OperationKind: OperationKindUpdate,
+	// 					},
+	// 					Origin: &Position{
+	// 						ID:            item2.Origin().Position().ID(),
+	// 						OperationKind: OperationKindUpdate,
+	// 					},
+	// 					OperationKind: OperationKindUpdate,
+	// 				},
+	// 			}
+	// 		},
+	// 		func(errText string) {
+	// 			t.Errorf(errText)
+	// 		},
+	// 	)
+	// })
 }
 
 func TestMergePlayerIDs(t *testing.T) {
