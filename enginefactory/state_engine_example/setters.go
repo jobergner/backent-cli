@@ -84,17 +84,42 @@ func (_equipmentSet equipmentSet) SetName(nameName string) equipmentSet {
 	return equipmentSet
 }
 
-// func (_player player) SetTarget(playerID PlayerID) player {
-// 	player := _player.player.engine.Player(_player.player.ID)
-// 	if player.player.OperationKind == OperationKindDelete {
-// 		return player
-// 	}
-// 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
-// 		return player
-// 	}
-// 	ref := player.player.engine.createPlayerBoundToRef(playerID, player.player.ID)
-// 	player.player.BoundTo = ref.ID
-// 	player.player.OperationKind = OperationKindUpdate
-// 	player.player.engine.Patch.Player[player.player.ID] = player.player
-// 	return player
-// }
+func (_player player) SetTargetPlayer(playerID PlayerID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.Target != 0 {
+		player.player.engine.deletePlayerTargetRef(player.player.Target)
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false)
+	anyContainer.anyOfPlayerZoneItem.setPlayer(playerID)
+	ref := player.player.engine.createPlayerTargetRef(anyContainer.anyOfPlayerZoneItem.ID, player.player.ID)
+	player.player.Target = ref.ID
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}
+
+func (_player player) SetTargetZoneItem(zoneItemID ZoneItemID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.Target != 0 {
+		player.player.engine.deletePlayerTargetRef(player.player.Target)
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false)
+	anyContainer.anyOfPlayerZoneItem.setZoneItem(zoneItemID)
+	ref := player.player.engine.createPlayerTargetRef(anyContainer.anyOfPlayerZoneItem.ID, player.player.ID)
+	player.player.Target = ref.ID
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}

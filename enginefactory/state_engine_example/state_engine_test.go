@@ -1144,51 +1144,124 @@ func TestTree(t *testing.T) {
 			},
 		)
 	})
-	// t.Run("builds *any kind", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			player := se.createPlayer(false)
+	t.Run("builds *any kind", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				player2 := se.createPlayer(false)
+				player1.SetTargetPlayer(player2.ID())
 
-	// 			expectedTree.Item = map[ItemID]Item{
-	// 				item1.ID(): {
-	// 					ID: item1.ID(),
-	// 					GearScore: &GearScore{
-	// 						ID:            item1.GearScore().ID(),
-	// 						OperationKind: OperationKindUpdate,
-	// 					},
-	// 					Origin: &Player{
-	// 						ID:            item1.Origin().Player().ID(),
-	// 						OperationKind: OperationKindUpdate,
-	// 						GearScore: &GearScore{
-	// 							ID:            item1.Origin().Player().GearScore().ID(),
-	// 							OperationKind: OperationKindUpdate,
-	// 						},
-	// 						Position: &Position{
-	// 							ID:            item1.Origin().Player().Position().ID(),
-	// 							OperationKind: OperationKindUpdate,
-	// 						},
-	// 					},
-	// 					OperationKind: OperationKindUpdate,
-	// 				},
-	// 				item2.ID(): {
-	// 					ID: item2.ID(),
-	// 					GearScore: &GearScore{
-	// 						ID:            item2.GearScore().ID(),
-	// 						OperationKind: OperationKindUpdate,
-	// 					},
-	// 					Origin: &Position{
-	// 						ID:            item2.Origin().Position().ID(),
-	// 						OperationKind: OperationKindUpdate,
-	// 					},
-	// 					OperationKind: OperationKindUpdate,
-	// 				},
-	// 			}
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 	)
-	// })
+				expectedTree.Player = map[PlayerID]Player{
+					player1.ID(): {
+						ID:            player1.ID(),
+						OperationKind: OperationKindUpdate,
+						GearScore: &GearScore{
+							ID:            player1.GearScore().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Position: &Position{
+							ID:            player1.Position().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Target: &AnyOfPlayerZoneItemReference{
+							OperationKind:        OperationKindUpdate,
+							ElementID:            int(player2.ID()),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataModified,
+							ElementPath:          newPath(playerIdentifier, int(player2.ID())).toJSONPath(),
+							Element: &Player{
+								ID:            player2.ID(),
+								OperationKind: OperationKindUpdate,
+								GearScore: &GearScore{
+									ID:            player2.GearScore().ID(),
+									OperationKind: OperationKindUpdate,
+								},
+								Position: &Position{
+									ID:            player2.Position().ID(),
+									OperationKind: OperationKindUpdate,
+								},
+							},
+						},
+					},
+					player2.ID(): {
+						ID:            player2.ID(),
+						OperationKind: OperationKindUpdate,
+						GearScore: &GearScore{
+							ID:            player2.GearScore().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Position: &Position{
+							ID:            player2.Position().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
+	t.Run("builds []*any kind", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.createPlayer(false)
+				player2 := se.createPlayer(false)
+				player1.AddTargetedByPlayer(player2.ID())
+
+				expectedTree.Player = map[PlayerID]Player{
+					player1.ID(): {
+						ID:            player1.ID(),
+						OperationKind: OperationKindUpdate,
+						GearScore: &GearScore{
+							ID:            player1.GearScore().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Position: &Position{
+							ID:            player1.Position().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						TargetedBy: []AnyOfPlayerZoneItemReference{
+							{
+								OperationKind:        OperationKindUpdate,
+								ElementID:            int(player2.ID()),
+								ElementKind:          ElementKindPlayer,
+								ReferencedDataStatus: ReferencedDataModified,
+								ElementPath:          newPath(playerIdentifier, int(player2.ID())).toJSONPath(),
+								Element: &Player{
+									ID:            player2.ID(),
+									OperationKind: OperationKindUpdate,
+									GearScore: &GearScore{
+										ID:            player2.GearScore().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+									Position: &Position{
+										ID:            player2.Position().ID(),
+										OperationKind: OperationKindUpdate,
+									},
+								},
+							},
+						},
+					},
+					player2.ID(): {
+						ID:            player2.ID(),
+						OperationKind: OperationKindUpdate,
+						GearScore: &GearScore{
+							ID:            player2.GearScore().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+						Position: &Position{
+							ID:            player2.Position().ID(),
+							OperationKind: OperationKindUpdate,
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
 }
 
 func TestMergePlayerIDs(t *testing.T) {
