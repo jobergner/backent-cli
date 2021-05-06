@@ -63,6 +63,9 @@ func (_item item) SetBoundTo(playerID PlayerID) item {
 	if item.item.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return item
 	}
+	if item.item.BoundTo != 0 {
+		item.item.engine.deleteItemBoundToRef(item.item.BoundTo)
+	}
 	ref := item.item.engine.createItemBoundToRef(playerID, item.item.ID)
 	item.item.BoundTo = ref.ID
 	item.item.OperationKind = OperationKindUpdate
@@ -80,3 +83,18 @@ func (_equipmentSet equipmentSet) SetName(nameName string) equipmentSet {
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 	return equipmentSet
 }
+
+// func (_player player) SetTarget(playerID PlayerID) player {
+// 	player := _player.player.engine.Player(_player.player.ID)
+// 	if player.player.OperationKind == OperationKindDelete {
+// 		return player
+// 	}
+// 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+// 		return player
+// 	}
+// 	ref := player.player.engine.createPlayerBoundToRef(playerID, player.player.ID)
+// 	player.player.BoundTo = ref.ID
+// 	player.player.OperationKind = OperationKindUpdate
+// 	player.player.engine.Patch.Player[player.player.ID] = player.player
+// 	return player
+// }
