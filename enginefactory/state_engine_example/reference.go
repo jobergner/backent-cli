@@ -9,11 +9,11 @@ func (_ref itemBoundToRef) Unset() {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
 	_ref.itemBoundToRef.engine.deleteItemBoundToRef(ref.itemBoundToRef.ID)
 	item := _ref.itemBoundToRef.engine.Item(ref.itemBoundToRef.ParentID).item
-	if item.OperationKind_ == OperationKindDelete {
+	if item.OperationKind == OperationKindDelete {
 		return
 	}
 	item.BoundTo = 0
-	item.OperationKind_ = OperationKindUpdate
+	item.OperationKind = OperationKindUpdate
 	_ref.itemBoundToRef.engine.Patch.Item[item.ID] = item
 }
 
@@ -41,11 +41,11 @@ func (_ref playerTargetRef) Unset() {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	_ref.playerTargetRef.engine.deletePlayerTargetRef(ref.playerTargetRef.ID)
 	player := _ref.playerTargetRef.engine.Player(ref.playerTargetRef.ParentID).player
-	if player.OperationKind_ == OperationKindDelete {
+	if player.OperationKind == OperationKindDelete {
 		return
 	}
 	player.Target = 0
-	player.OperationKind_ = OperationKindUpdate
+	player.OperationKind = OperationKindUpdate
 	_ref.playerTargetRef.engine.Patch.Player[player.ID] = player
 }
 

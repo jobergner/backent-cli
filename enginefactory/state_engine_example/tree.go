@@ -41,15 +41,11 @@ func newTree() Tree {
 	}
 }
 
-type treeElement interface {
-	kind() ElementKind
-}
-
 type ZoneItem struct {
-	ID             ZoneItemID    `json:"id"`
-	Item           *Item         `json:"item"`
-	Position       *Position     `json:"position"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID            ZoneItemID    `json:"id"`
+	Item          *Item         `json:"item"`
+	Position      *Position     `json:"position"`
+	OperationKind OperationKind `json:"operationKind_"`
 }
 type ZoneItemReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
@@ -60,17 +56,13 @@ type ZoneItemReference struct {
 	ZoneItem             *ZoneItem            `json:"zoneItem"`
 }
 
-func (zoneItem ZoneItem) kind() ElementKind {
-	return ElementKindZoneItem
-}
-
 type Item struct {
-	ID             ItemID           `json:"id"`
-	BoundTo        *PlayerReference `json:"boundTo"`
-	GearScore      *GearScore       `json:"gearScore"`
-	Name           string           `json:"name"`
-	Origin         treeElement      `json:"origin"`
-	OperationKind_ OperationKind    `json:"operationKind_"`
+	ID            ItemID           `json:"id"`
+	BoundTo       *PlayerReference `json:"boundTo"`
+	GearScore     *GearScore       `json:"gearScore"`
+	Name          string           `json:"name"`
+	Origin        interface{}      `json:"origin"`
+	OperationKind OperationKind    `json:"operationKind_"`
 }
 type ItemReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
@@ -81,15 +73,11 @@ type ItemReference struct {
 	Item                 *Item                `json:"item"`
 }
 
-func (item Item) kind() ElementKind {
-	return ElementKindItem
-}
-
 type EquipmentSet struct {
-	ID             EquipmentSetID  `json:"id"`
-	Name           string          `json:"name"`
-	Equipment      []ItemReference `json:"equipment"`
-	OperationKind_ OperationKind   `json:"operationKind_"`
+	ID            EquipmentSetID  `json:"id"`
+	Name          string          `json:"name"`
+	Equipment     []ItemReference `json:"equipment"`
+	OperationKind OperationKind   `json:"operationKind_"`
 }
 type EquipmentSetReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
@@ -98,10 +86,6 @@ type EquipmentSetReference struct {
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
 	EquipmentSet         *EquipmentSet        `json:"equipmentSet"`
-}
-
-func (equipmentSet EquipmentSet) kind() ElementKind {
-	return ElementKindEquipmentSet
 }
 
 type Position struct {
@@ -119,15 +103,11 @@ type PositionReference struct {
 	Position             *Position            `json:"position"`
 }
 
-func (position Position) kind() ElementKind {
-	return ElementKindPosition
-}
-
 type GearScore struct {
-	ID             GearScoreID   `json:"id"`
-	Level          int           `json:"level"`
-	Score          int           `json:"score"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID            GearScoreID   `json:"id"`
+	Level         int           `json:"level"`
+	Score         int           `json:"score"`
+	OperationKind OperationKind `json:"operationKind_"`
 }
 type GearScoreReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
@@ -138,20 +118,16 @@ type GearScoreReference struct {
 	GearScore            *GearScore           `json:"gearScore"`
 }
 
-func (gearScore GearScore) kind() ElementKind {
-	return ElementKindGearScore
-}
-
 type Player struct {
-	ID             PlayerID                       `json:"id"`
-	EquipmentSets  []EquipmentSetReference        `json:"equipmentSets"`
-	GearScore      *GearScore                     `json:"gearScore"`
-	GuildMembers   []PlayerReference              `json:"guildMembers"`
-	Items          []Item                         `json:"items"`
-	Position       *Position                      `json:"position"`
-	Target         *AnyOfPlayerZoneItemReference  `json:"target"`
-	TargetedBy     []AnyOfPlayerZoneItemReference `json:"targetedBy"`
-	OperationKind_ OperationKind                  `json:"operationKind_"`
+	ID            PlayerID                       `json:"id"`
+	EquipmentSets []EquipmentSetReference        `json:"equipmentSets"`
+	GearScore     *GearScore                     `json:"gearScore"`
+	GuildMembers  []PlayerReference              `json:"guildMembers"`
+	Items         []Item                         `json:"items"`
+	Position      *Position                      `json:"position"`
+	Target        *AnyOfPlayerZoneItemReference  `json:"target"`
+	TargetedBy    []AnyOfPlayerZoneItemReference `json:"targetedBy"`
+	OperationKind OperationKind                  `json:"operationKind_"`
 }
 type PlayerReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
@@ -162,17 +138,13 @@ type PlayerReference struct {
 	Player               *Player              `json:"player"`
 }
 
-func (player Player) kind() ElementKind {
-	return ElementKindPlayer
-}
-
 type Zone struct {
-	ID             ZoneID        `json:"id"`
-	Interactables  []treeElement `json:"interactables"`
-	Items          []ZoneItem    `json:"items"`
-	Players        []Player      `json:"players"`
-	Tags           []string      `json:"tags"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID            ZoneID        `json:"id"`
+	Interactables []interface{} `json:"interactables"`
+	Items         []ZoneItem    `json:"items"`
+	Players       []Player      `json:"players"`
+	Tags          []string      `json:"tags"`
+	OperationKind OperationKind `json:"operationKind_"`
 }
 type ZoneReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
@@ -183,17 +155,13 @@ type ZoneReference struct {
 	Zone                 *Zone                `json:"zone"`
 }
 
-func (zone Zone) kind() ElementKind {
-	return ElementKindZone
-}
-
 type AnyOfPlayerZoneItemReference struct {
 	OperationKind        OperationKind        `json:"operationKind_"`
 	ElementID            int                  `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Element              treeElement          `json:"element"`
+	Element              interface{}          `json:"element"`
 }
 
 type recursionCheck struct {

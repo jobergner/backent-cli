@@ -2,7 +2,7 @@ package state
 
 func (_zone zone) RemovePlayers(playersToRemove ...PlayerID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -25,14 +25,14 @@ func (_zone zone) RemovePlayers(playersToRemove ...PlayerID) zone {
 		return zone
 	}
 	zone.zone.Players = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
 func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -55,14 +55,14 @@ func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
 		return zone
 	}
 	zone.zone.Items = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
 func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -90,14 +90,14 @@ func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
 		return zone
 	}
 	zone.zone.Interactables = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
 func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -125,14 +125,14 @@ func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
 		return zone
 	}
 	zone.zone.Interactables = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
 func (_zone zone) RemoveInteracableZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -160,14 +160,14 @@ func (_zone zone) RemoveInteracableZoneItem(zoneItemsToRemove ...ZoneItemID) zon
 		return zone
 	}
 	zone.zone.Interactables = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
 func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
 	player := _player.player.engine.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
+	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
@@ -190,14 +190,14 @@ func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
 		return player
 	}
 	player.player.Items = newElements
-	player.player.OperationKind_ = OperationKindUpdate
+	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
 func (_player player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetID) player {
 	player := _player.player.engine.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
+	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
@@ -221,14 +221,14 @@ func (_player player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetI
 		return player
 	}
 	player.player.EquipmentSets = newElements
-	player.player.OperationKind_ = OperationKindUpdate
+	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
 func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) player {
 	player := _player.player.engine.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
+	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
@@ -252,14 +252,14 @@ func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) playe
 		return player
 	}
 	player.player.GuildMembers = newElements
-	player.player.OperationKind_ = OperationKindUpdate
+	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
 func (_player player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) player {
 	player := _player.player.engine.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
+	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
@@ -287,14 +287,14 @@ func (_player player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) 
 		return player
 	}
 	player.player.TargetedBy = newElements
-	player.player.OperationKind_ = OperationKindUpdate
+	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
 func (_player player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) player {
 	player := _player.player.engine.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
+	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
@@ -322,14 +322,14 @@ func (_player player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) player
 		return player
 	}
 	player.player.TargetedBy = newElements
-	player.player.OperationKind_ = OperationKindUpdate
+	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
 
 func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -351,14 +351,14 @@ func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
 		return zone
 	}
 	zone.zone.Tags = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
+	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }
 
 func (_equipmentSet equipmentSet) RemoveEquipment(itemsToRemove ...ItemID) equipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
-	if equipmentSet.equipmentSet.OperationKind_ == OperationKindDelete {
+	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
 	}
 	var wereElementsAltered bool
@@ -382,7 +382,7 @@ func (_equipmentSet equipmentSet) RemoveEquipment(itemsToRemove ...ItemID) equip
 		return equipmentSet
 	}
 	equipmentSet.equipmentSet.Equipment = newElements
-	equipmentSet.equipmentSet.OperationKind_ = OperationKindUpdate
+	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 	return equipmentSet
 }

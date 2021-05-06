@@ -257,25 +257,25 @@ func (se *Engine) walkTree() {
 		walkedCheck.equipmentSet[equipmentSetData.ID] = true
 	}
 	for id, gearScoreData := range se.Patch.GearScore {
-		if !gearScoreData.HasParent_ {
+		if !gearScoreData.HasParent {
 			se.walkGearScore(gearScoreData.ID, newPath(gearScoreIdentifier, int(id)))
 			walkedCheck.gearScore[gearScoreData.ID] = true
 		}
 	}
 	for id, itemData := range se.Patch.Item {
-		if !itemData.HasParent_ {
+		if !itemData.HasParent {
 			se.walkItem(itemData.ID, newPath(itemIdentifier, int(id)))
 			walkedCheck.item[itemData.ID] = true
 		}
 	}
 	for id, playerData := range se.Patch.Player {
-		if !playerData.HasParent_ {
+		if !playerData.HasParent {
 			se.walkPlayer(playerData.ID, newPath(playerIdentifier, int(id)))
 			walkedCheck.player[playerData.ID] = true
 		}
 	}
 	for id, positionData := range se.Patch.Position {
-		if !positionData.HasParent_ {
+		if !positionData.HasParent {
 			se.walkPosition(positionData.ID, newPath(positionIdentifier, int(id)))
 			walkedCheck.position[positionData.ID] = true
 		}
@@ -285,7 +285,7 @@ func (se *Engine) walkTree() {
 		walkedCheck.zone[zoneData.ID] = true
 	}
 	for id, zoneItemData := range se.Patch.ZoneItem {
-		if !zoneItemData.HasParent_ {
+		if !zoneItemData.HasParent {
 			se.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
 			walkedCheck.zoneItem[zoneItemData.ID] = true
 		}
@@ -297,28 +297,28 @@ func (se *Engine) walkTree() {
 		}
 	}
 	for id, gearScoreData := range se.State.GearScore {
-		if !gearScoreData.HasParent_ {
+		if !gearScoreData.HasParent {
 			if _, ok := walkedCheck.gearScore[gearScoreData.ID]; !ok {
 				se.walkGearScore(gearScoreData.ID, newPath(gearScoreIdentifier, int(id)))
 			}
 		}
 	}
 	for id, itemData := range se.State.Item {
-		if !itemData.HasParent_ {
+		if !itemData.HasParent {
 			if _, ok := walkedCheck.item[itemData.ID]; !ok {
 				se.walkItem(itemData.ID, newPath(itemIdentifier, int(id)))
 			}
 		}
 	}
 	for id, playerData := range se.State.Player {
-		if !playerData.HasParent_ {
+		if !playerData.HasParent {
 			if _, ok := walkedCheck.player[playerData.ID]; !ok {
 				se.walkPlayer(playerData.ID, newPath(playerIdentifier, int(id)))
 			}
 		}
 	}
 	for id, positionData := range se.State.Position {
-		if !positionData.HasParent_ {
+		if !positionData.HasParent {
 			if _, ok := walkedCheck.position[positionData.ID]; !ok {
 				se.walkPosition(positionData.ID, newPath(positionIdentifier, int(id)))
 			}
@@ -330,7 +330,7 @@ func (se *Engine) walkTree() {
 		}
 	}
 	for id, zoneItemData := range se.State.ZoneItem {
-		if !zoneItemData.HasParent_ {
+		if !zoneItemData.HasParent {
 			if _, ok := walkedCheck.zoneItem[zoneItemData.ID]; !ok {
 				se.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
 			}

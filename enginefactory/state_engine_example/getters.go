@@ -9,7 +9,7 @@ func (engine *Engine) Player(playerID PlayerID) player {
 	if ok {
 		return player{player: currentPlayer}
 	}
-	return player{player: playerCore{OperationKind_: OperationKindDelete}}
+	return player{player: playerCore{OperationKind: OperationKindDelete}}
 }
 
 func (_player player) ID() PlayerID {
@@ -67,7 +67,7 @@ func (engine *Engine) GearScore(gearScoreID GearScoreID) gearScore {
 	if ok {
 		return gearScore{gearScore: currentGearScore}
 	}
-	return gearScore{gearScore: gearScoreCore{OperationKind_: OperationKindDelete}}
+	return gearScore{gearScore: gearScoreCore{OperationKind: OperationKindDelete}}
 }
 
 func (_gearScore gearScore) ID() GearScoreID {
@@ -93,7 +93,7 @@ func (engine *Engine) Item(itemID ItemID) item {
 	if ok {
 		return item{item: currentItem}
 	}
-	return item{item: itemCore{OperationKind_: OperationKindDelete}}
+	return item{item: itemCore{OperationKind: OperationKindDelete}}
 }
 
 func (_item item) ID() ItemID {
@@ -124,7 +124,7 @@ func (engine *Engine) Position(positionID PositionID) position {
 	if ok {
 		return position{position: currentPosition}
 	}
-	return position{position: positionCore{OperationKind_: OperationKindDelete}}
+	return position{position: positionCore{OperationKind: OperationKindDelete}}
 }
 
 func (_position position) ID() PositionID {
@@ -150,7 +150,7 @@ func (engine *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
 	if ok {
 		return zoneItem{zoneItem: currentZoneItem}
 	}
-	return zoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
+	return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete}}
 }
 
 func (_zoneItem zoneItem) ID() ZoneItemID {
@@ -176,7 +176,7 @@ func (engine *Engine) Zone(zoneID ZoneID) zone {
 	if ok {
 		return zone{zone: currentZone}
 	}
-	return zone{zone: zoneCore{OperationKind_: OperationKindDelete}}
+	return zone{zone: zoneCore{OperationKind: OperationKindDelete}}
 }
 
 func (_zone zone) ID() ZoneID {
@@ -232,7 +232,7 @@ func (engine *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) itemBoun
 	if ok {
 		return itemBoundToRef{itemBoundToRef: currentRef}
 	}
-	return itemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind_: OperationKindDelete}}
+	return itemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind: OperationKindDelete}}
 }
 
 func (ref playerGuildMemberRef) ID() PlayerID {
@@ -248,7 +248,7 @@ func (engine *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMem
 	if ok {
 		return playerGuildMemberRef{playerGuildMemberRef: currentRef}
 	}
-	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind_: OperationKindDelete}}
+	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind: OperationKindDelete}}
 }
 
 func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
@@ -260,7 +260,7 @@ func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipm
 	if ok {
 		return playerEquipmentSetRef{playerEquipmentSetRef: currentRef}
 	}
-	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind_: OperationKindDelete}}
+	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete}}
 }
 
 func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
@@ -272,7 +272,7 @@ func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
 	if ok {
 		return equipmentSet{equipmentSet: currentEquipmentSet}
 	}
-	return equipmentSet{equipmentSet: equipmentSetCore{OperationKind_: OperationKindDelete}}
+	return equipmentSet{equipmentSet: equipmentSetCore{OperationKind: OperationKindDelete}}
 }
 
 func (_equipmentSet equipmentSet) ID() EquipmentSetID {
@@ -297,7 +297,7 @@ func (engine *Engine) equipmentSetEquipmentRef(equipmentSetEquipmentRefID Equipm
 	if ok {
 		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: currentRef}
 	}
-	return equipmentSetEquipmentRef{equipmentSetEquipmentRef: equipmentSetEquipmentRefCore{OperationKind_: OperationKindDelete}}
+	return equipmentSetEquipmentRef{equipmentSetEquipmentRef: equipmentSetEquipmentRefCore{OperationKind: OperationKindDelete}}
 }
 
 func (ref playerTargetRef) ID() AnyOfPlayerZoneItemID {
@@ -313,7 +313,7 @@ func (engine *Engine) playerTargetRef(playerTargetRefID PlayerTargetRefID) playe
 	if ok {
 		return playerTargetRef{playerTargetRef: currentRef}
 	}
-	return playerTargetRef{playerTargetRef: playerTargetRefCore{OperationKind_: OperationKindDelete}}
+	return playerTargetRef{playerTargetRef: playerTargetRefCore{OperationKind: OperationKindDelete}}
 }
 
 func (ref playerTargetedByRef) ID() AnyOfPlayerZoneItemID {
@@ -329,7 +329,7 @@ func (engine *Engine) playerTargetedByRef(playerTargetedByRefID PlayerTargetedBy
 	if ok {
 		return playerTargetedByRef{playerTargetedByRef: currentRef}
 	}
-	return playerTargetedByRef{playerTargetedByRef: playerTargetedByRefCore{OperationKind_: OperationKindDelete}}
+	return playerTargetedByRef{playerTargetedByRef: playerTargetedByRefCore{OperationKind: OperationKindDelete}}
 }
 
 func (_anyOfPlayerZone anyOfPlayerPosition) ID() AnyOfPlayerPositionID {
@@ -355,7 +355,7 @@ func (engine *Engine) anyOfPlayerPosition(anyOfPlayerZoneID AnyOfPlayerPositionI
 	if ok {
 		return anyOfPlayerPosition{anyOfPlayerPosition: currentRef}
 	}
-	return anyOfPlayerPosition{anyOfPlayerPosition: anyOfPlayerPositionCore{OperationKind_: OperationKindDelete}}
+	return anyOfPlayerPosition{anyOfPlayerPosition: anyOfPlayerPositionCore{OperationKind: OperationKindDelete}}
 }
 
 func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ID() AnyOfPlayerZoneItemID {
@@ -381,7 +381,7 @@ func (engine *Engine) anyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneI
 	if ok {
 		return anyOfPlayerZoneItem{anyOfPlayerZoneItem: currentRef}
 	}
-	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: anyOfPlayerZoneItemCore{OperationKind_: OperationKindDelete}}
+	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: anyOfPlayerZoneItemCore{OperationKind: OperationKindDelete}}
 }
 
 func (engine *Engine) anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfItemPlayerZoneItemID) anyOfItemPlayerZoneItem {
@@ -393,7 +393,7 @@ func (engine *Engine) anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfIte
 	if ok {
 		return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: currentRef}
 	}
-	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: anyOfItemPlayerZoneItemCore{OperationKind_: OperationKindDelete}}
+	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: anyOfItemPlayerZoneItemCore{OperationKind: OperationKindDelete}}
 }
 
 func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) Player() player {
