@@ -32,6 +32,7 @@ func TestEngine(t *testing.T) {
 	t.Run("deletes elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
+		se.UpdateState()
 		se.deleteGearScore(gearScore.ID())
 		_gearScore := se.Patch.GearScore[gearScore.ID()]
 		assert.Equal(t, OperationKindDelete, _gearScore.OperationKind)
@@ -49,6 +50,7 @@ func TestEngine(t *testing.T) {
 		se := newEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
+		se.UpdateState()
 		player.RemoveItems(item.ID())
 		_item := se.Patch.Item[item.ID()]
 		assert.Equal(t, OperationKindDelete, _item.OperationKind)
@@ -165,10 +167,19 @@ func TestUpdateState(t *testing.T) {
 }
 
 func TestActionsOnDeletedItems(t *testing.T) {
+	t.Run("does not set attribute on element which was deleted even before entering State", func(t *testing.T) {
+		se := newEngine()
+		gearScore := se.CreateGearScore()
+		assert.Equal(t, 0, gearScore.Level())
+		se.DeleteGearScore(gearScore.ID())
+		gearScore.SetLevel(1)
+		assert.Equal(t, 0, gearScore.Level())
+	})
 	t.Run("does not set attribute on element which is set to be deleted", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
 		assert.Equal(t, 0, gearScore.Level())
+		se.UpdateState()
 		se.DeleteGearScore(gearScore.ID())
 		gearScore.SetLevel(1)
 		assert.Equal(t, 0, gearScore.Level())
@@ -950,43 +961,6 @@ func TestTree(t *testing.T) {
 							},
 						},
 						OperationKind: OperationKindUpdate,
-					},
-				}
-
-			},
-			func(errText string) {
-				t.Errorf(errText)
-			},
-		)
-	})
-	t.Run("recursively referenced player has correct ReferencedDataStatus", func(t *testing.T) {
-		newTreeTest(
-			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				player1.AddGuildMember(player1.ID())
-
-				se.UpdateState()
-
-				player1.GearScore().SetLevel(1)
-
-				expectedTree.Player = map[PlayerID]Player{
-					player1.ID(): {
-						ID: player1.ID(),
-						GearScore: &GearScore{
-							ID:            player1.GearScore().ID(),
-							OperationKind: OperationKindUpdate,
-							Level:         1,
-						},
-						OperationKind: OperationKindUnchanged,
-						GuildMembers: []PlayerReference{
-							{
-								OperationKind:        OperationKindUnchanged,
-								ElementID:            player1.ID(),
-								ElementKind:          ElementKindPlayer,
-								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
-							},
-						},
 					},
 				}
 

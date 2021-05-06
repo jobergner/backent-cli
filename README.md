@@ -369,3 +369,4 @@ currently my best option is to assemble the tree server side, make sure all nece
 - are objects with no direct usage (only references) root objects?
 - is redeclaring via getter always necessary, or only after exported methods were used
 - anyOf<item,zone,player> and anyOf<itemZone,player> both produce the `anyOfItemZonePlayer` type => bad!
+- consider deleting elements directly out of patch if delete is called on item which is not even in state (cause currently the client could receive OperationKindDelete elements which have not even existed at that point)
