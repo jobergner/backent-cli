@@ -44,7 +44,7 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 	var position Position
 
 	position.ID = positionData.ID
-	position.OperationKind_ = positionData.OperationKind
+	position.OperationKind = positionData.OperationKind
 	position.X = positionData.X
 	position.Y = positionData.Y
 	return position, hasUpdated || config.forceInclude, hasUpdated

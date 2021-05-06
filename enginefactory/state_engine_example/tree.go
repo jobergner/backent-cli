@@ -62,10 +62,10 @@ type Item struct {
 	GearScore     *GearScore       `json:"gearScore"`
 	Name          string           `json:"name"`
 	Origin        interface{}      `json:"origin"`
-	OperationKind OperationKind    `json:"operationKind_"`
+	OperationKind OperationKind    `json:"operationKind"`
 }
 type ItemReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            ItemID               `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
@@ -77,10 +77,10 @@ type EquipmentSet struct {
 	ID            EquipmentSetID  `json:"id"`
 	Name          string          `json:"name"`
 	Equipment     []ItemReference `json:"equipment"`
-	OperationKind OperationKind   `json:"operationKind_"`
+	OperationKind OperationKind   `json:"operationKind"`
 }
 type EquipmentSetReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            EquipmentSetID       `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
@@ -89,13 +89,13 @@ type EquipmentSetReference struct {
 }
 
 type Position struct {
-	ID             PositionID    `json:"id"`
-	X              float64       `json:"x"`
-	Y              float64       `json:"y"`
-	OperationKind_ OperationKind `json:"operationKind_"`
+	ID            PositionID    `json:"id"`
+	X             float64       `json:"x"`
+	Y             float64       `json:"y"`
+	OperationKind OperationKind `json:"operationKind"`
 }
 type PositionReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            PositionID           `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
@@ -107,10 +107,10 @@ type GearScore struct {
 	ID            GearScoreID   `json:"id"`
 	Level         int           `json:"level"`
 	Score         int           `json:"score"`
-	OperationKind OperationKind `json:"operationKind_"`
+	OperationKind OperationKind `json:"operationKind"`
 }
 type GearScoreReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            GearScoreID          `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
@@ -127,10 +127,10 @@ type Player struct {
 	Position      *Position                      `json:"position"`
 	Target        *AnyOfPlayerZoneItemReference  `json:"target"`
 	TargetedBy    []AnyOfPlayerZoneItemReference `json:"targetedBy"`
-	OperationKind OperationKind                  `json:"operationKind_"`
+	OperationKind OperationKind                  `json:"operationKind"`
 }
 type PlayerReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            PlayerID             `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
@@ -144,10 +144,10 @@ type Zone struct {
 	Items         []ZoneItem    `json:"items"`
 	Players       []Player      `json:"players"`
 	Tags          []string      `json:"tags"`
-	OperationKind OperationKind `json:"operationKind_"`
+	OperationKind OperationKind `json:"operationKind"`
 }
 type ZoneReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            ZoneID               `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
@@ -156,7 +156,7 @@ type ZoneReference struct {
 }
 
 type AnyOfPlayerZoneItemReference struct {
-	OperationKind        OperationKind        `json:"operationKind_"`
+	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            int                  `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
