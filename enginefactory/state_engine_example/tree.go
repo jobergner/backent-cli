@@ -61,6 +61,7 @@ type Item struct {
 	BoundTo        *PlayerReference `json:"boundTo"`
 	GearScore      *GearScore       `json:"gearScore"`
 	Name           string           `json:"name"`
+	Origin         interface{}      `json:"origin"`
 	OperationKind_ OperationKind    `json:"operationKind_"`
 }
 type ItemReference struct {
