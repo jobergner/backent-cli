@@ -7,8 +7,8 @@ import (
 var unavailableFiledNames = []string{
 	"id",
 	"iD",
-	"operationKind_",
-	"hasParent_",
+	"operationKind",
+	"hasParent",
 }
 
 func isUnavailableFiledName(fieldName string) bool {
