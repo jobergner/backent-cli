@@ -23,7 +23,7 @@ func TestStateConfigAST(t *testing.T) {
 			"age":        "int",
 			"friends":    "[]*person",
 			"secondHome": "*house",
-			// "foo":        "anyOf<house,person>",
+			"foo":        "anyOf<address,person>",
 			// "bar":        "*anyOf<house,person>",
 			// "baz":        "[]anyOf<house,person>",
 			// "ban":        "[]*anyOf<house,person>",
@@ -57,6 +57,7 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "[]person",
 							HasSliceValue:   true,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 					},
 				},
@@ -68,18 +69,21 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "string",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"newHouseNumber": {
 							Name:            "newHouseNumber",
 							ValueString:     "int",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"newCity": {
 							Name:            "newCity",
 							ValueString:     "string",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 					},
 				},
@@ -91,6 +95,7 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "string",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 					},
 				},
@@ -104,18 +109,21 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "[]person",
 							HasSliceValue:   true,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"livingSpace": {
 							Name:            "livingSpace",
 							ValueString:     "int",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"address": {
 							Name:            "address",
 							ValueString:     "address",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 					},
 				},
@@ -127,18 +135,21 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "string",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"houseNumber": {
 							Name:            "houseNumber",
 							ValueString:     "int",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"city": {
 							Name:            "city",
 							ValueString:     "string",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 					},
 				},
@@ -150,24 +161,36 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "string",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"age": {
 							Name:            "age",
 							ValueString:     "int",
 							HasSliceValue:   false,
 							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"friends": {
 							Name:            "friends",
 							ValueString:     "[]*person",
 							HasSliceValue:   true,
 							HasPointerValue: true,
+							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"secondHome": {
 							Name:            "secondHome",
 							ValueString:     "*house",
 							HasSliceValue:   false,
 							HasPointerValue: true,
+							ValueTypes:      make(map[string]*ConfigType),
+						},
+						"foo": {
+							Name:            "foo",
+							ValueString:     "anyOf<address,person>",
+							HasSliceValue:   false,
+							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
+							HasAnyValue:     true,
 						},
 					},
 				},
@@ -185,55 +208,55 @@ func TestStateConfigAST(t *testing.T) {
 
 		houseType := actual.Types["house"]
 		livingSpaceField := houseType.Fields["livingSpace"]
-		assert.Equal(t, livingSpaceField.ValueTypes[0].Name, "int")
-		assert.Equal(t, livingSpaceField.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, livingSpaceField.ValueTypes["int"].Name, "int")
+		assert.Equal(t, livingSpaceField.ValueTypes["int"].IsBasicType, true)
 		residentsField := houseType.Fields["residents"]
-		assert.Equal(t, residentsField.ValueTypes[0].Name, "person")
-		assert.Equal(t, residentsField.ValueTypes[0].IsBasicType, false)
+		assert.Equal(t, residentsField.ValueTypes["person"].Name, "person")
+		assert.Equal(t, residentsField.ValueTypes["person"].IsBasicType, false)
 		addressField := houseType.Fields["address"]
-		assert.Equal(t, addressField.ValueTypes[0].Name, "address")
-		assert.Equal(t, addressField.ValueTypes[0].IsBasicType, false)
+		assert.Equal(t, addressField.ValueTypes["address"].Name, "address")
+		assert.Equal(t, addressField.ValueTypes["address"].IsBasicType, false)
 
 		addressType := actual.Types["address"]
 		streetField := addressType.Fields["street"]
-		assert.Equal(t, streetField.ValueTypes[0].Name, "string")
-		assert.Equal(t, streetField.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, streetField.ValueTypes["string"].Name, "string")
+		assert.Equal(t, streetField.ValueTypes["string"].IsBasicType, true)
 		houseNumberField := addressType.Fields["houseNumber"]
-		assert.Equal(t, houseNumberField.ValueTypes[0].Name, "int")
-		assert.Equal(t, houseNumberField.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, houseNumberField.ValueTypes["int"].Name, "int")
+		assert.Equal(t, houseNumberField.ValueTypes["int"].IsBasicType, true)
 		cityField := addressType.Fields["city"]
-		assert.Equal(t, cityField.ValueTypes[0].Name, "string")
-		assert.Equal(t, cityField.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, cityField.ValueTypes["string"].Name, "string")
+		assert.Equal(t, cityField.ValueTypes["string"].IsBasicType, true)
 
 		personType := actual.Types["person"]
 		NameField := personType.Fields["name"]
-		assert.Equal(t, NameField.ValueTypes[0].Name, "string")
-		assert.Equal(t, NameField.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, NameField.ValueTypes["string"].Name, "string")
+		assert.Equal(t, NameField.ValueTypes["string"].IsBasicType, true)
 		ageField := personType.Fields["age"]
-		assert.Equal(t, ageField.ValueTypes[0].Name, "int")
-		assert.Equal(t, ageField.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, ageField.ValueTypes["int"].Name, "int")
+		assert.Equal(t, ageField.ValueTypes["int"].IsBasicType, true)
 		friendsField := personType.Fields["friends"]
-		assert.Equal(t, friendsField.ValueTypes[0].Name, "person")
-		assert.Equal(t, friendsField.ValueTypes[0].IsBasicType, false)
+		assert.Equal(t, friendsField.ValueTypes["person"].Name, "person")
+		assert.Equal(t, friendsField.ValueTypes["person"].IsBasicType, false)
 		secondHomeField := personType.Fields["secondHome"]
-		assert.Equal(t, secondHomeField.ValueTypes[0].Name, "house")
-		assert.Equal(t, secondHomeField.ValueTypes[0].IsBasicType, false)
+		assert.Equal(t, secondHomeField.ValueTypes["house"].Name, "house")
+		assert.Equal(t, secondHomeField.ValueTypes["house"].IsBasicType, false)
 
 		removeResidentsAction := actual.Actions["removeResidents"]
 		residentsParam := removeResidentsAction.Params["residents"]
-		assert.Equal(t, residentsParam.ValueTypes[0].Name, "person")
-		assert.Equal(t, residentsParam.ValueTypes[0].IsBasicType, false)
+		assert.Equal(t, residentsParam.ValueTypes["person"].Name, "person")
+		assert.Equal(t, residentsParam.ValueTypes["person"].IsBasicType, false)
 
 		changeAddressAction := actual.Actions["changeAddress"]
 		newStreetParam := changeAddressAction.Params["newStreet"]
-		assert.Equal(t, newStreetParam.ValueTypes[0].Name, "string")
-		assert.Equal(t, newStreetParam.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, newStreetParam.ValueTypes["string"].Name, "string")
+		assert.Equal(t, newStreetParam.ValueTypes["string"].IsBasicType, true)
 		newHouseNumberParam := changeAddressAction.Params["newHouseNumber"]
-		assert.Equal(t, newHouseNumberParam.ValueTypes[0].Name, "int")
-		assert.Equal(t, newHouseNumberParam.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, newHouseNumberParam.ValueTypes["int"].Name, "int")
+		assert.Equal(t, newHouseNumberParam.ValueTypes["int"].IsBasicType, true)
 		newCityParam := changeAddressAction.Params["newCity"]
-		assert.Equal(t, newCityParam.ValueTypes[0].Name, "string")
-		assert.Equal(t, newCityParam.ValueTypes[0].IsBasicType, true)
+		assert.Equal(t, newCityParam.ValueTypes["string"].Name, "string")
+		assert.Equal(t, newCityParam.ValueTypes["string"].IsBasicType, true)
 
 		assert.Equal(t, personType.ReferencedBy, []*Field{&friendsField})
 		assert.Equal(t, houseType.ReferencedBy, []*Field{&secondHomeField})
@@ -247,7 +270,7 @@ func TestStateConfigAST(t *testing.T) {
 		assert.True(t, actual.Types["house"].IsRootType)
 		assert.False(t, actual.Types["house"].IsLeafType)
 		assert.False(t, actual.Types["person"].IsRootType)
-		assert.True(t, actual.Types["person"].IsLeafType)
+		assert.False(t, actual.Types["person"].IsLeafType)
 		assert.False(t, actual.Types["address"].IsRootType)
 		assert.True(t, actual.Types["address"].IsLeafType)
 	})
