@@ -28,11 +28,12 @@ func (a *AST) RangeTypes(fn func(configType ConfigType)) {
 }
 
 type ConfigType struct {
-	Name        string
-	Fields      map[string]Field
-	IsBasicType bool // is of one of Go's basic types (string, rune, int etc.)
-	IsRootType  bool // is not implemented into any other types and thus can not have a parent
-	IsLeafType  bool // does not implement any other user-defined types in any of its fields
+	Name         string
+	Fields       map[string]Field
+	ReferencedBy []*Field
+	IsBasicType  bool // is of one of Go's basic types (string, rune, int etc.)
+	IsRootType   bool // is not implemented into any other types and thus can not have a parent
+	IsLeafType   bool // does not implement any other user-defined types in any of its fields
 }
 
 func (t *ConfigType) RangeFields(fn func(field Field)) {
@@ -81,10 +82,11 @@ func caseInsensitiveSort(keys []string) func(i, j int) bool {
 
 type Field struct {
 	Name            string
-	ValueType       *ConfigType // references the field's value's Type
-	ValueString     string      // the original value represented as string (eg. "[]Person")
-	HasSliceValue   bool        // if the value is a slice value (eg. []string)
-	HasPointerValue bool        // if the value is a pointer value (eg. *foo, []*foo)
+	ValueTypes      []*ConfigType // references the field's value's Type
+	ValueString     string        // the original value represented as string (eg. "[]Person")
+	HasSliceValue   bool          // if the value is a slice value (eg. []string)
+	HasPointerValue bool          // if the value is a pointer value (eg. *foo, []*foo)
+	HasAnyValue     bool
 }
 
 func newAST() *AST {
@@ -152,6 +154,7 @@ func buildTypeStructure(configTypeData map[interface{}]interface{}, typeName str
 			HasSliceValue:   isSliceValue(valueString),
 			HasPointerValue: isPointerValue(valueString),
 			ValueString:     valueString,
+			HasAnyValue:     isAnyValue(valueString),
 		}
 
 		configType.Fields[fieldName] = field
@@ -186,6 +189,18 @@ func (a *AST) fillInReferences() *AST {
 		configType := _configType
 		for fieldName, field := range configType.Fields {
 			a.assignFieldTypeReference(&field)
+			if field.HasPointerValue {
+				for _, fieldValueType := range field.ValueTypes {
+					if configTypeName == fieldValueType.Name {
+						f := field
+						configType.ReferencedBy = append(configType.ReferencedBy, &f)
+					} else {
+						f := field
+						fieldValueType.ReferencedBy = append(fieldValueType.ReferencedBy, &f)
+						a.Types[fieldValueType.Name] = *fieldValueType
+					}
+				}
+			}
 			configType.Fields[fieldName] = field
 		}
 		a.Types[configTypeName] = configType
@@ -203,11 +218,19 @@ func (a *AST) fillInReferences() *AST {
 }
 
 func (a *AST) assignFieldTypeReference(field *Field) {
-	referencedType, ok := a.Types[extractValueType(field.ValueString)]
-	if ok {
-		field.ValueType = &referencedType
+	if field.HasAnyValue {
+		var referencedTypes []*ConfigType
+		for _, typeName := range extractAnyTypes(field.ValueString) {
+			referencedType, _ := a.Types[typeName]
+			referencedTypes = append(referencedTypes, &referencedType)
+		}
 	} else {
-		field.ValueType = &ConfigType{Name: extractValueType(field.ValueString), IsBasicType: true}
+		referencedType, ok := a.Types[extractValueType(field.ValueString)]
+		if ok {
+			field.ValueTypes = append(field.ValueTypes, &referencedType)
+		} else {
+			field.ValueTypes = append(field.ValueTypes, &ConfigType{Name: extractValueType(field.ValueString), IsBasicType: true})
+		}
 	}
 }
 
@@ -223,7 +246,7 @@ func (s *AST) evalLeafTypes() {
 		isLeafType := true
 		for _, stateConfigField := range stateConfigType.Fields {
 			if !stateConfigField.HasPointerValue {
-				if !stateConfigField.ValueType.IsBasicType {
+				if !stateConfigField.ValueTypes[0].IsBasicType {
 					isLeafType = false
 				}
 			}
@@ -240,7 +263,7 @@ func (a *AST) evalRootTypes() {
 		isRootType := true
 		for _, _stateConfigType := range a.Types {
 			for _, stateConfigField := range _stateConfigType.Fields {
-				if stateConfigField.ValueType.Name == stateConfigTypeName {
+				if stateConfigField.ValueTypes[0].Name == stateConfigTypeName {
 					if !stateConfigField.HasPointerValue {
 						isRootType = false
 					}
@@ -266,6 +289,18 @@ func isSliceValue(valueString string) bool {
 func isPointerValue(valueString string) bool {
 	re := regexp.MustCompile(`\*`)
 	return re.MatchString(valueString)
+}
+
+func isAnyValue(valueString string) bool {
+	re := regexp.MustCompile(`anyOf<`)
+	return re.MatchString(valueString)
+}
+
+func extractAnyTypes(valueString string) []string {
+	re := regexp.MustCompile(`<.*>`)
+	s := re.FindString(valueString)
+	typesRe := regexp.MustCompile(`[A-Za-z]*`)
+	return typesRe.FindAllString(s, -1)
 }
 
 // "[]float64" -> float64
