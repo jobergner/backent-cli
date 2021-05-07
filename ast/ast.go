@@ -82,11 +82,18 @@ func caseInsensitiveSort(keys []string) func(i, j int) bool {
 
 type Field struct {
 	Name            string
-	ValueTypes      []*ConfigType // references the field's value's Type
-	ValueString     string        // the original value represented as string (eg. "[]Person")
-	HasSliceValue   bool          // if the value is a slice value (eg. []string)
-	HasPointerValue bool          // if the value is a pointer value (eg. *foo, []*foo)
+	ValueTypes      map[string]*ConfigType // references the field's value's Type
+	ValueString     string                 // the original value represented as string (eg. "[]Person")
+	HasSliceValue   bool                   // if the value is a slice value (eg. []string)
+	HasPointerValue bool                   // if the value is a pointer value (eg. *foo, []*foo)
 	HasAnyValue     bool
+}
+
+func (f Field) ValueType() *ConfigType {
+	for _, valueType := range f.ValueTypes {
+		return valueType
+	}
+	return nil
 }
 
 func newAST() *AST {
@@ -150,6 +157,7 @@ func buildTypeStructure(configTypeData map[interface{}]interface{}, typeName str
 		valueString := getSring(value)
 
 		field := Field{
+			ValueTypes:      make(map[string]*ConfigType),
 			Name:            fieldName,
 			HasSliceValue:   isSliceValue(valueString),
 			HasPointerValue: isPointerValue(valueString),
@@ -171,6 +179,7 @@ func builActionStructure(configActionData map[interface{}]interface{}, actionNam
 		valueString := getSring(value)
 
 		param := Field{
+			ValueTypes:    make(map[string]*ConfigType),
 			Name:          paramName,
 			HasSliceValue: isSliceValue(valueString),
 			ValueString:   valueString,
@@ -219,17 +228,16 @@ func (a *AST) fillInReferences() *AST {
 
 func (a *AST) assignFieldTypeReference(field *Field) {
 	if field.HasAnyValue {
-		var referencedTypes []*ConfigType
 		for _, typeName := range extractAnyTypes(field.ValueString) {
 			referencedType, _ := a.Types[typeName]
-			referencedTypes = append(referencedTypes, &referencedType)
+			field.ValueTypes[referencedType.Name] = &referencedType
 		}
 	} else {
 		referencedType, ok := a.Types[extractValueType(field.ValueString)]
 		if ok {
-			field.ValueTypes = append(field.ValueTypes, &referencedType)
+			field.ValueTypes[referencedType.Name] = &referencedType
 		} else {
-			field.ValueTypes = append(field.ValueTypes, &ConfigType{Name: extractValueType(field.ValueString), IsBasicType: true})
+			field.ValueTypes[extractValueType(field.ValueString)] = &ConfigType{Name: extractValueType(field.ValueString), IsBasicType: true}
 		}
 	}
 }
@@ -246,8 +254,10 @@ func (s *AST) evalLeafTypes() {
 		isLeafType := true
 		for _, stateConfigField := range stateConfigType.Fields {
 			if !stateConfigField.HasPointerValue {
-				if !stateConfigField.ValueTypes[0].IsBasicType {
-					isLeafType = false
+				for _, fieldValueType := range stateConfigField.ValueTypes {
+					if !fieldValueType.IsBasicType {
+						isLeafType = false
+					}
 				}
 			}
 		}
@@ -263,9 +273,11 @@ func (a *AST) evalRootTypes() {
 		isRootType := true
 		for _, _stateConfigType := range a.Types {
 			for _, stateConfigField := range _stateConfigType.Fields {
-				if stateConfigField.ValueTypes[0].Name == stateConfigTypeName {
-					if !stateConfigField.HasPointerValue {
-						isRootType = false
+				for _, fieldValueType := range stateConfigField.ValueTypes {
+					if fieldValueType.Name == stateConfigTypeName {
+						if !stateConfigField.HasPointerValue {
+							isRootType = false
+						}
 					}
 				}
 			}
