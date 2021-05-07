@@ -23,6 +23,10 @@ func TestStateConfigAST(t *testing.T) {
 			"age":        "int",
 			"friends":    "[]*person",
 			"secondHome": "*house",
+			// "foo":        "anyOf<house,person>",
+			// "bar":        "*anyOf<house,person>",
+			// "baz":        "[]anyOf<house,person>",
+			// "ban":        "[]*anyOf<house,person>",
 		},
 	}
 
@@ -181,55 +185,58 @@ func TestStateConfigAST(t *testing.T) {
 
 		houseType := actual.Types["house"]
 		livingSpaceField := houseType.Fields["livingSpace"]
-		assert.Equal(t, livingSpaceField.ValueType.Name, "int")
-		assert.Equal(t, livingSpaceField.ValueType.IsBasicType, true)
+		assert.Equal(t, livingSpaceField.ValueTypes[0].Name, "int")
+		assert.Equal(t, livingSpaceField.ValueTypes[0].IsBasicType, true)
 		residentsField := houseType.Fields["residents"]
-		assert.Equal(t, residentsField.ValueType.Name, "person")
-		assert.Equal(t, residentsField.ValueType.IsBasicType, false)
+		assert.Equal(t, residentsField.ValueTypes[0].Name, "person")
+		assert.Equal(t, residentsField.ValueTypes[0].IsBasicType, false)
 		addressField := houseType.Fields["address"]
-		assert.Equal(t, addressField.ValueType.Name, "address")
-		assert.Equal(t, addressField.ValueType.IsBasicType, false)
+		assert.Equal(t, addressField.ValueTypes[0].Name, "address")
+		assert.Equal(t, addressField.ValueTypes[0].IsBasicType, false)
 
 		addressType := actual.Types["address"]
 		streetField := addressType.Fields["street"]
-		assert.Equal(t, streetField.ValueType.Name, "string")
-		assert.Equal(t, streetField.ValueType.IsBasicType, true)
+		assert.Equal(t, streetField.ValueTypes[0].Name, "string")
+		assert.Equal(t, streetField.ValueTypes[0].IsBasicType, true)
 		houseNumberField := addressType.Fields["houseNumber"]
-		assert.Equal(t, houseNumberField.ValueType.Name, "int")
-		assert.Equal(t, houseNumberField.ValueType.IsBasicType, true)
+		assert.Equal(t, houseNumberField.ValueTypes[0].Name, "int")
+		assert.Equal(t, houseNumberField.ValueTypes[0].IsBasicType, true)
 		cityField := addressType.Fields["city"]
-		assert.Equal(t, cityField.ValueType.Name, "string")
-		assert.Equal(t, cityField.ValueType.IsBasicType, true)
+		assert.Equal(t, cityField.ValueTypes[0].Name, "string")
+		assert.Equal(t, cityField.ValueTypes[0].IsBasicType, true)
 
 		personType := actual.Types["person"]
 		NameField := personType.Fields["name"]
-		assert.Equal(t, NameField.ValueType.Name, "string")
-		assert.Equal(t, NameField.ValueType.IsBasicType, true)
+		assert.Equal(t, NameField.ValueTypes[0].Name, "string")
+		assert.Equal(t, NameField.ValueTypes[0].IsBasicType, true)
 		ageField := personType.Fields["age"]
-		assert.Equal(t, ageField.ValueType.Name, "int")
-		assert.Equal(t, ageField.ValueType.IsBasicType, true)
+		assert.Equal(t, ageField.ValueTypes[0].Name, "int")
+		assert.Equal(t, ageField.ValueTypes[0].IsBasicType, true)
 		friendsField := personType.Fields["friends"]
-		assert.Equal(t, friendsField.ValueType.Name, "person")
-		assert.Equal(t, friendsField.ValueType.IsBasicType, false)
+		assert.Equal(t, friendsField.ValueTypes[0].Name, "person")
+		assert.Equal(t, friendsField.ValueTypes[0].IsBasicType, false)
 		secondHomeField := personType.Fields["secondHome"]
-		assert.Equal(t, secondHomeField.ValueType.Name, "house")
-		assert.Equal(t, secondHomeField.ValueType.IsBasicType, false)
+		assert.Equal(t, secondHomeField.ValueTypes[0].Name, "house")
+		assert.Equal(t, secondHomeField.ValueTypes[0].IsBasicType, false)
 
 		removeResidentsAction := actual.Actions["removeResidents"]
 		residentsParam := removeResidentsAction.Params["residents"]
-		assert.Equal(t, residentsParam.ValueType.Name, "person")
-		assert.Equal(t, residentsParam.ValueType.IsBasicType, false)
+		assert.Equal(t, residentsParam.ValueTypes[0].Name, "person")
+		assert.Equal(t, residentsParam.ValueTypes[0].IsBasicType, false)
 
 		changeAddressAction := actual.Actions["changeAddress"]
 		newStreetParam := changeAddressAction.Params["newStreet"]
-		assert.Equal(t, newStreetParam.ValueType.Name, "string")
-		assert.Equal(t, newStreetParam.ValueType.IsBasicType, true)
+		assert.Equal(t, newStreetParam.ValueTypes[0].Name, "string")
+		assert.Equal(t, newStreetParam.ValueTypes[0].IsBasicType, true)
 		newHouseNumberParam := changeAddressAction.Params["newHouseNumber"]
-		assert.Equal(t, newHouseNumberParam.ValueType.Name, "int")
-		assert.Equal(t, newHouseNumberParam.ValueType.IsBasicType, true)
+		assert.Equal(t, newHouseNumberParam.ValueTypes[0].Name, "int")
+		assert.Equal(t, newHouseNumberParam.ValueTypes[0].IsBasicType, true)
 		newCityParam := changeAddressAction.Params["newCity"]
-		assert.Equal(t, newCityParam.ValueType.Name, "string")
-		assert.Equal(t, newCityParam.ValueType.IsBasicType, true)
+		assert.Equal(t, newCityParam.ValueTypes[0].Name, "string")
+		assert.Equal(t, newCityParam.ValueTypes[0].IsBasicType, true)
+
+		assert.Equal(t, personType.ReferencedBy, []*Field{&friendsField})
+		assert.Equal(t, houseType.ReferencedBy, []*Field{&secondHomeField})
 	})
 
 	t.Run("should fill in parentalInfo", func(t *testing.T) {
