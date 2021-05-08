@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// TODO clean up
+
 // AST is an abstract syntax tree of a state and actions configuration.
 // I could have used Go's own AST, since the way state is configured leans very heavily onto
 // Go's structs, but that would have made things more complicated than they needed to be.
@@ -87,6 +89,17 @@ type Field struct {
 	HasSliceValue   bool                   // if the value is a slice value (eg. []string)
 	HasPointerValue bool                   // if the value is a pointer value (eg. *foo, []*foo)
 	HasAnyValue     bool
+}
+
+func (f *Field) RangeValueTypes(fn func(configType *ConfigType)) {
+	var keys []string
+	for key := range f.ValueTypes {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, caseInsensitiveSort(keys))
+	for _, key := range keys {
+		fn(f.ValueTypes[key])
+	}
 }
 
 func (f Field) ValueType() *ConfigType {
@@ -196,10 +209,10 @@ func builActionStructure(configActionData map[interface{}]interface{}, actionNam
 func (a *AST) fillInReferences() *AST {
 	for configTypeName, _configType := range a.Types {
 		configType := _configType
-		for fieldName, field := range configType.Fields {
+		configType.RangeFields(func(field Field) {
 			a.assignFieldTypeReference(&field)
 			if field.HasPointerValue {
-				for _, fieldValueType := range field.ValueTypes {
+				field.RangeValueTypes(func(fieldValueType *ConfigType) {
 					if configTypeName == fieldValueType.Name {
 						f := field
 						configType.ReferencedBy = append(configType.ReferencedBy, &f)
@@ -208,10 +221,10 @@ func (a *AST) fillInReferences() *AST {
 						fieldValueType.ReferencedBy = append(fieldValueType.ReferencedBy, &f)
 						a.Types[fieldValueType.Name] = *fieldValueType
 					}
-				}
+				})
 			}
-			configType.Fields[fieldName] = field
-		}
+			configType.Fields[field.Name] = field
+		})
 		a.Types[configTypeName] = configType
 	}
 
@@ -311,8 +324,9 @@ func isAnyValue(valueString string) bool {
 func extractAnyTypes(valueString string) []string {
 	re := regexp.MustCompile(`<.*>`)
 	s := re.FindString(valueString)
-	typesRe := regexp.MustCompile(`[A-Za-z]*`)
-	return typesRe.FindAllString(s, -1)
+	typesRe := regexp.MustCompile(`[A-Za-z]+`)
+	types := typesRe.FindAllString(s, -1)
+	return types
 }
 
 // "[]float64" -> float64
