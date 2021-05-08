@@ -1,13 +1,17 @@
 package ast
 
 import (
-	"fmt"
-	"regexp"
 	"sort"
-	"strings"
 )
 
 // TODO clean up
+
+func newAST() *AST {
+	return &AST{
+		Types:   make(map[string]ConfigType),
+		Actions: make(map[string]Action),
+	}
+}
 
 // AST is an abstract syntax tree of a state and actions configuration.
 // I could have used Go's own AST, since the way state is configured leans very heavily onto
@@ -29,31 +33,6 @@ func (a *AST) RangeTypes(fn func(configType ConfigType)) {
 	}
 }
 
-type ConfigType struct {
-	Name         string
-	Fields       map[string]Field
-	ReferencedBy []*Field
-	IsBasicType  bool // is of one of Go's basic types (string, rune, int etc.)
-	IsRootType   bool // is not implemented into any other types and thus can not have a parent
-	IsLeafType   bool // does not implement any other user-defined types in any of its fields
-}
-
-func (t *ConfigType) RangeFields(fn func(field Field)) {
-	var keys []string
-	for key := range t.Fields {
-		keys = append(keys, key)
-	}
-	sort.Slice(keys, caseInsensitiveSort(keys))
-	for _, key := range keys {
-		fn(t.Fields[key])
-	}
-}
-
-type Action struct {
-	Name   string
-	Params map[string]Field
-}
-
 func (a *AST) RangeActions(fn func(action Action)) {
 	var keys []string
 	for key := range a.Actions {
@@ -65,75 +44,10 @@ func (a *AST) RangeActions(fn func(action Action)) {
 	}
 }
 
-func (a *Action) RangeParams(fn func(field Field)) {
-	var keys []string
-	for key := range a.Params {
-		keys = append(keys, key)
-	}
-	sort.Slice(keys, caseInsensitiveSort(keys))
-	for _, key := range keys {
-		fn(a.Params[key])
-	}
-}
-
-func caseInsensitiveSort(keys []string) func(i, j int) bool {
-	return func(i, j int) bool {
-		return strings.ToLower(keys[i]) < strings.ToLower(keys[j])
-	}
-}
-
-type Field struct {
-	Name            string
-	ValueTypes      map[string]*ConfigType // references the field's value's Type
-	ValueString     string                 // the original value represented as string (eg. "[]Person")
-	HasSliceValue   bool                   // if the value is a slice value (eg. []string)
-	HasPointerValue bool                   // if the value is a pointer value (eg. *foo, []*foo)
-	HasAnyValue     bool
-}
-
-func (f *Field) RangeValueTypes(fn func(configType *ConfigType)) {
-	var keys []string
-	for key := range f.ValueTypes {
-		keys = append(keys, key)
-	}
-	sort.Slice(keys, caseInsensitiveSort(keys))
-	for _, key := range keys {
-		fn(f.ValueTypes[key])
-	}
-}
-
-func (f Field) ValueType() *ConfigType {
-	for _, valueType := range f.ValueTypes {
-		return valueType
-	}
-	return nil
-}
-
-func newAST() *AST {
-	return &AST{
-		Types:   make(map[string]ConfigType),
-		Actions: make(map[string]Action),
-	}
-}
-
 func Parse(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) *AST {
 	return buildASTStructure(stateConfigData, actionsConfigData).
 		fillInReferences().
 		fillInParentalInfo()
-}
-
-func newConfigType(name string) ConfigType {
-	return ConfigType{
-		Name:   name,
-		Fields: make(map[string]Field),
-	}
-}
-
-func newAction(name string) Action {
-	return Action{
-		Name:   name,
-		Params: make(map[string]Field),
-	}
 }
 
 // buildASTStructure builds the ast structure including all types and fields
@@ -205,7 +119,7 @@ func builActionStructure(configActionData map[interface{}]interface{}, actionNam
 }
 
 // fillInReferences fills in the references of "Parent" and "ValueType"
-// in Fields
+// in Fields, and "ReferencedBy" in types
 func (a *AST) fillInReferences() *AST {
 	for configTypeName, _configType := range a.Types {
 		configType := _configType
@@ -300,42 +214,4 @@ func (a *AST) evalRootTypes() {
 			a.Types[stateConfigTypeName] = stateConfigType
 		}
 	}
-}
-
-// TODO: all this needs explanation
-
-// "[]string" -> true
-// "string" -> false
-func isSliceValue(valueString string) bool {
-	re := regexp.MustCompile(`\[\]`)
-	return re.MatchString(valueString)
-}
-
-func isPointerValue(valueString string) bool {
-	re := regexp.MustCompile(`\*`)
-	return re.MatchString(valueString)
-}
-
-func isAnyValue(valueString string) bool {
-	re := regexp.MustCompile(`anyOf<`)
-	return re.MatchString(valueString)
-}
-
-func extractAnyTypes(valueString string) []string {
-	re := regexp.MustCompile(`<.*>`)
-	s := re.FindString(valueString)
-	typesRe := regexp.MustCompile(`[A-Za-z]+`)
-	types := typesRe.FindAllString(s, -1)
-	return types
-}
-
-// "[]float64" -> float64
-// "float64" -> float64
-func extractValueType(valueString string) string {
-	re := regexp.MustCompile(`[A-Za-z]+[0-9]*`)
-	return re.FindString(valueString)
-}
-
-func getSring(value interface{}) string {
-	return fmt.Sprintf("%v", value)
 }
