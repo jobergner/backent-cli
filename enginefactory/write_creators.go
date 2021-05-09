@@ -30,7 +30,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			onlyIf(!configType.IsRootType, c.setHasParent()),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				c.f = &field
-				if field.HasSliceValue || field.ValueType.IsBasicType {
+				if field.HasSliceValue || field.ValueType().IsBasicType {
 					return Empty()
 				}
 				return &Statement{
@@ -119,10 +119,10 @@ func (c creator) setHasParent() *Statement {
 }
 
 func (c creator) createChildElement() *Statement {
-	return Id("element" + title(c.f.Name)).Op(":=").Id("se").Dot("create" + title(c.f.ValueType.Name)).Call(Lit(true))
+	return Id("element" + title(c.f.Name)).Op(":=").Id("se").Dot("create" + title(c.f.ValueType().Name)).Call(Lit(true))
 }
 func (c creator) setChildElement() *Statement {
-	return Id("element").Dot(title(c.f.Name)).Op("=").Id("element" + title(c.f.Name)).Dot(c.f.ValueType.Name).Dot("ID")
+	return Id("element").Dot(title(c.f.Name)).Op("=").Id("element" + title(c.f.Name)).Dot(c.f.ValueType().Name).Dot("ID")
 }
 
 func (c creator) setOperationKind() *Statement {

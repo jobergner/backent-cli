@@ -12,7 +12,7 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
 
-			if field.HasSliceValue || !field.ValueType.IsBasicType {
+			if field.HasSliceValue || !field.ValueType().IsBasicType {
 				return
 			}
 
@@ -48,7 +48,7 @@ func (s setter) receiverParams() *Statement {
 }
 
 func (s setter) name() string {
-	if s.f.ValueType.IsBasicType {
+	if s.f.ValueType().IsBasicType {
 		return "Set" + title(s.f.Name)
 	}
 	return "Add" + title(pluralizeClient.Singular(s.f.Name))
@@ -59,7 +59,7 @@ func (s setter) newValueParam() string {
 }
 
 func (s setter) params() *Statement {
-	return List(Id("se").Id("*Engine"), Id(s.newValueParam()).Id(s.f.ValueType.Name))
+	return List(Id("se").Id("*Engine"), Id(s.newValueParam()).Id(s.f.ValueType().Name))
 }
 
 func (s setter) returns() string {

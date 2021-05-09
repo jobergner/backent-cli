@@ -134,13 +134,13 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				a.f = &field
 
-				if a.f.ValueType.IsBasicType {
+				if a.f.ValueType().IsBasicType {
 					return Empty()
 				}
 
 				if field.HasSliceValue {
 					return For(a.sliceFieldLoopConditions()).Block(
-						If(a.elementHasUpdated(Id(field.ValueType.Name+"ID"))).Block(
+						If(a.elementHasUpdated(Id(field.ValueType().Name+"ID"))).Block(
 							a.setHasUpdatedTrue(),
 							a.appendToElementsInField(),
 						),
@@ -156,7 +156,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				a.f = &field
 
-				if !a.f.ValueType.IsBasicType {
+				if !a.f.ValueType().IsBasicType {
 					return Empty()
 				}
 
@@ -228,15 +228,15 @@ func (a assembleElement) typeFieldOn(from string) *Statement {
 }
 
 func (a assembleElement) sliceFieldLoopConditions() *Statement {
-	loopVars := List(Id("_"), Id(a.f.ValueType.Name+"ID"))
-	deduplicateFuncName := "deduplicate" + title(a.f.ValueType.Name) + "IDs"
+	loopVars := List(Id("_"), Id(a.f.ValueType().Name+"ID"))
+	deduplicateFuncName := "deduplicate" + title(a.f.ValueType().Name) + "IDs"
 	return loopVars.Op(":=").Range().Id(deduplicateFuncName).Call(a.typeFieldOn("State"), a.typeFieldOn("Patch"))
 }
 
 func (a assembleElement) elementHasUpdated(fieldIdentifier *Statement) (*Statement, *Statement) {
-	elementHasUpdatedId := Id(a.f.ValueType.Name + "HasUpdated")
-	conditionVars := List(Id("tree"+title(a.f.ValueType.Name)), elementHasUpdatedId)
-	condition := conditionVars.Op(":=").Id("se").Dot("assemble" + title(a.f.ValueType.Name)).Call(fieldIdentifier)
+	elementHasUpdatedId := Id(a.f.ValueType().Name + "HasUpdated")
+	conditionVars := List(Id("tree"+title(a.f.ValueType().Name)), elementHasUpdatedId)
+	condition := conditionVars.Op(":=").Id("se").Dot("assemble" + title(a.f.ValueType().Name)).Call(fieldIdentifier)
 	return condition, elementHasUpdatedId
 }
 
@@ -245,11 +245,11 @@ func (a assembleElement) setHasUpdatedTrue() *Statement {
 }
 
 func (a assembleElement) appendToElementsInField() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(a.f.ValueType.Name)))
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(a.f.ValueType().Name)))
 }
 
 func (a assembleElement) setFieldElement() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id("&" + "tree" + title(a.f.ValueType.Name))
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id("&" + "tree" + title(a.f.ValueType().Name))
 }
 
 func (a assembleElement) setField() *Statement {

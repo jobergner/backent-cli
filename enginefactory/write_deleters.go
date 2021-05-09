@@ -34,7 +34,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			t.updateElementInPatch(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				t.f = &field
-				if field.ValueType.IsBasicType {
+				if field.ValueType().IsBasicType {
 					return Empty()
 				}
 				if !field.HasSliceValue {
@@ -117,13 +117,13 @@ func (t typeDeleter) updateElementInPatch() *Statement {
 }
 
 func (t typeDeleter) loopConditions() *Statement {
-	return List(Id("_"), Id(t.f.ValueType.Name+"ID")).Op(":=").Range().Id(t.t.Name).Dot(title(t.f.Name))
+	return List(Id("_"), Id(t.f.ValueType().Name+"ID")).Op(":=").Range().Id(t.t.Name).Dot(title(t.f.Name))
 }
 
 func (t typeDeleter) deleteElementInLoop() *Statement {
-	return Id("se").Dot("delete" + title(t.f.ValueType.Name)).Call(Id(t.f.ValueType.Name + "ID"))
+	return Id("se").Dot("delete" + title(t.f.ValueType().Name)).Call(Id(t.f.ValueType().Name + "ID"))
 }
 
 func (t typeDeleter) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(t.f.ValueType.Name)).Call(Id(t.t.Name).Dot(title(t.f.ValueType.Name)))
+	return Id("se").Dot("delete" + title(t.f.ValueType().Name)).Call(Id(t.t.Name).Dot(title(t.f.ValueType().Name)))
 }

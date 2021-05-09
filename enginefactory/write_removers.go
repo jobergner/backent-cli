@@ -34,7 +34,7 @@ func (s *EngineFactory) writeRemovers() *EngineFactory {
 						If(r.isElementMatching()).Block(
 							r.setToBeRemovedTrue(),
 							r.setWereElementAlteredTrue(),
-							onlyIf(!field.ValueType.IsBasicType, r.deleteElement()),
+							onlyIf(!field.ValueType().IsBasicType, r.deleteElement()),
 							Break(),
 						),
 					),
@@ -76,10 +76,10 @@ func (r remover) toRemoveParamName() string {
 
 func (r remover) params() *Statement {
 	toRemoveParam := Id(r.toRemoveParamName())
-	if r.f.ValueType.IsBasicType {
-		toRemoveParam = toRemoveParam.Id("..." + r.f.ValueType.Name)
+	if r.f.ValueType().IsBasicType {
+		toRemoveParam = toRemoveParam.Id("..." + r.f.ValueType().Name)
 	} else {
-		toRemoveParam = toRemoveParam.Id("..." + title(r.f.ValueType.Name) + "ID")
+		toRemoveParam = toRemoveParam.Id("..." + title(r.f.ValueType().Name) + "ID")
 	}
 	return List(Id("se").Id("*Engine"), toRemoveParam)
 }
@@ -102,10 +102,10 @@ func (r remover) declareWereElementsAltered() *Statement {
 
 func (r remover) declareNewElements() *Statement {
 	newElementsType := "[]"
-	if r.f.ValueType.IsBasicType {
-		newElementsType = newElementsType + r.f.ValueType.Name
+	if r.f.ValueType().IsBasicType {
+		newElementsType = newElementsType + r.f.ValueType().Name
 	} else {
-		newElementsType = newElementsType + title(r.f.ValueType.Name) + "ID"
+		newElementsType = newElementsType + title(r.f.ValueType().Name) + "ID"
 	}
 	return Var().Id("newElements").Id(newElementsType)
 }
@@ -135,7 +135,7 @@ func (r remover) setWereElementAlteredTrue() *Statement {
 }
 
 func (r remover) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(r.f.ValueType.Name)).Call(Id("element"))
+	return Id("se").Dot("delete" + title(r.f.ValueType().Name)).Call(Id("element"))
 }
 
 func (r remover) isElementRemoved() *Statement {
