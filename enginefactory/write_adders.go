@@ -26,11 +26,11 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 				If(a.isOperationKindDelete()).Block(
 					Return(a.earlyReturn()),
 				),
-				onlyIf(!field.ValueType.IsBasicType, a.createNewElement()),
+				onlyIf(!field.ValueType().IsBasicType, a.createNewElement()),
 				a.appendElement(),
 				a.setOperationKindUpdate(),
 				a.updateElementInPatch(),
-				onlyIf(!field.ValueType.IsBasicType, Return(Id(field.ValueType.Name))),
+				onlyIf(!field.ValueType().IsBasicType, Return(Id(field.ValueType().Name))),
 			)
 		})
 	})
@@ -49,7 +49,7 @@ func (a adder) receiverParams() *Statement {
 }
 
 func (a adder) name() string {
-	if a.f.ValueType.IsBasicType {
+	if a.f.ValueType().IsBasicType {
 		return "Add" + title(a.f.Name)
 	}
 	return "Add" + title(pluralizeClient.Singular(a.f.Name))
@@ -57,17 +57,17 @@ func (a adder) name() string {
 
 func (a adder) params() *Statement {
 	params := Id("se").Id("*Engine")
-	if a.f.ValueType.IsBasicType {
-		return List(params, Id(a.f.Name).Id("..."+a.f.ValueType.Name))
+	if a.f.ValueType().IsBasicType {
+		return List(params, Id(a.f.Name).Id("..."+a.f.ValueType().Name))
 	}
 	return params
 }
 
 func (a adder) returns() string {
-	if a.f.ValueType.IsBasicType {
+	if a.f.ValueType().IsBasicType {
 		return ""
 	}
-	return a.f.ValueType.Name
+	return a.f.ValueType().Name
 }
 
 func (a adder) reassignElement() *Statement {
@@ -79,26 +79,26 @@ func (a adder) isOperationKindDelete() *Statement {
 }
 
 func (a adder) earlyReturn() *Statement {
-	if a.f.ValueType.IsBasicType {
+	if a.f.ValueType().IsBasicType {
 		return Empty()
 	}
-	return Id(a.f.ValueType.Name).Values(Dict{
-		Id(a.f.ValueType.Name): Id(a.f.ValueType.Name + "Core").Values(Dict{
+	return Id(a.f.ValueType().Name).Values(Dict{
+		Id(a.f.ValueType().Name): Id(a.f.ValueType().Name + "Core").Values(Dict{
 			Id("OperationKind_"): Id("OperationKindDelete"),
 		})})
 }
 
 func (a adder) createNewElement() *Statement {
-	return Id(a.f.ValueType.Name).Op(":=").Id("se").Dot("create" + title(a.f.ValueType.Name)).Params(Id("true"))
+	return Id(a.f.ValueType().Name).Op(":=").Id("se").Dot("create" + title(a.f.ValueType().Name)).Params(Id("true"))
 }
 
 func (a adder) appendElement() *Statement {
 
 	var toAppend *Statement
-	if a.f.ValueType.IsBasicType {
+	if a.f.ValueType().IsBasicType {
 		toAppend = Id(a.f.Name + "...")
 	} else {
-		toAppend = Id(a.f.ValueType.Name).Dot(a.f.ValueType.Name).Dot("ID")
+		toAppend = Id(a.f.ValueType().Name).Dot(a.f.ValueType().Name).Dot("ID")
 	}
 
 	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)).Op("=").Append(

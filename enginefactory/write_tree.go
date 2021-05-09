@@ -74,18 +74,18 @@ type treeElementWriter struct {
 }
 
 func (e treeElementWriter) fieldValue() string {
-	if e.f.ValueType.IsBasicType {
+	if e.f.ValueType().IsBasicType {
 		if e.f.HasSliceValue {
-			return "[]" + e.f.ValueType.Name
+			return "[]" + e.f.ValueType().Name
 		}
-		return e.f.ValueType.Name
+		return e.f.ValueType().Name
 	}
 
 	if e.f.HasSliceValue {
-		return "[]" + title(e.f.ValueType.Name)
+		return "[]" + title(e.f.ValueType().Name)
 	}
 
-	return "*" + title(e.f.ValueType.Name)
+	return "*" + title(e.f.ValueType().Name)
 }
 
 func (e treeElementWriter) fieldTag() string {

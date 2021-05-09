@@ -93,10 +93,10 @@ func (e elementWriter) fieldValue() string {
 		value = "[]"
 	}
 
-	if e.f.ValueType.IsBasicType {
-		value += e.f.ValueType.Name
+	if e.f.ValueType().IsBasicType {
+		value += e.f.ValueType().Name
 	} else {
-		value += title(e.f.ValueType.Name) + "ID"
+		value += title(e.f.ValueType().Name) + "ID"
 	}
 
 	return value
