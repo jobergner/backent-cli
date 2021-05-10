@@ -13,12 +13,12 @@ func TestWriteHelpers(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			deduplicateGearScoreIDs_func,
-			deduplicateItemIDs_func,
-			deduplicatePlayerIDs_func,
-			deduplicatePositionIDs_func,
-			deduplicateZoneIDs_func,
-			deduplicateZoneItemIDs_func,
+			deduplicateEquipmentSetEquipmentRefIDs_func,
+			deduplicateItemBoundToRefIDs_func,
+			deduplicatePlayerEquipmentSetRefIDs_func,
+			deduplicatePlayerGuildMemberRefIDs_func,
+			deduplicatePlayerTargetRefIDs_func,
+			deduplicatePlayerTargetedByRefIDs_func,
 		}, "\n"))
 
 		if expected != actual {

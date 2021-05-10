@@ -10,67 +10,73 @@ import (
 func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if !field.HasPointerValue {
+				return
+			}
 
-		d := deduplicator{
-			t: configType,
-		}
+			d := deduplicateWriter{
+				f: field,
+			}
 
-		decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
-			d.defineCheck(),
-			d.defineDeduped(),
-			For(d.loopConditions("a")).Block(
-				d.checkValue(),
-			),
-			For(d.loopConditions("b")).Block(
-				d.checkValue(),
-			),
-			d.loopCheck(),
-			Return(Id("deduped")),
-		)
+			decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
+				d.defineCheck(),
+				d.defineDeduped(),
+				For(d.loopConditions("a")).Block(
+					d.checkValue(),
+				),
+				For(d.loopConditions("b")).Block(
+					d.checkValue(),
+				),
+				d.loopCheck(),
+				Return(Id("deduped")),
+			)
+
+		})
 	})
 
 	decls.Render(s.buf)
 	return s
 }
 
-type deduplicator struct {
-	t ast.ConfigType
+type deduplicateWriter struct {
+	f ast.Field
 }
 
-func (d deduplicator) name() string {
-	return "deduplicate" + title(d.t.Name) + "IDs"
+func (d deduplicateWriter) idType() string {
+	return title(d.f.Parent.Name) + title(pluralizeClient.Singular(d.f.Name)) + "RefID"
 }
 
-func (d deduplicator) idType() string {
-	return title(d.t.Name) + "ID"
+func (d deduplicateWriter) name() string {
+	return "deduplicate" + d.idType() + "s"
 }
 
-func (d deduplicator) params() *Statement {
+func (d deduplicateWriter) params() *Statement {
 	return List(Id("a").Id("[]"+d.idType()), Id("b").Id("[]"+d.idType()))
 }
 
-func (d deduplicator) returns() string {
+func (d deduplicateWriter) returns() string {
 	return "[]" + d.idType()
 }
 
-func (d deduplicator) defineCheck() *Statement {
+func (d deduplicateWriter) defineCheck() *Statement {
 	return Id("check").Op(":=").Make(Map(Id(d.idType())).Bool())
 }
 
-func (d deduplicator) defineDeduped() *Statement {
+func (d deduplicateWriter) defineDeduped() *Statement {
 	return Id("deduped").Op(":=").Make(Id(d.returns()), Lit(0))
 
 }
 
-func (d deduplicator) loopConditions(getsLooped string) *Statement {
+func (d deduplicateWriter) loopConditions(getsLooped string) *Statement {
 	return List(Id("_"), Id("val")).Op(":=").Range().Id(getsLooped)
 }
 
-func (d deduplicator) checkValue() *Statement {
+func (d deduplicateWriter) checkValue() *Statement {
 	return Id("check").Index(Id("val")).Op("=").Id("true")
 }
 
-func (d deduplicator) loopCheck() *Statement {
+func (d deduplicateWriter) loopCheck() *Statement {
 	loop := For(Id("val").Op(":=").Range().Id("check")).Block(
 		Id("deduped").Op("=").Append(Id("deduped"), Id("val")),
 	)
