@@ -108,73 +108,73 @@ func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []
 	return deduped
 }
 
-func (se Engine) allPlayerTargetedByRefIDs() []PlayerTargetedByRefID {
+func (engine Engine) allPlayerTargetedByRefIDs() []PlayerTargetedByRefID {
 	var statePlayerTargetedByRefIDs []PlayerTargetedByRefID
-	for itemBoundToRefID := range se.State.PlayerTargetedByRef {
-		statePlayerTargetedByRefIDs = append(statePlayerTargetedByRefIDs, itemBoundToRefID)
+	for playerTargetedByRefID := range engine.State.PlayerTargetedByRef {
+		statePlayerTargetedByRefIDs = append(statePlayerTargetedByRefIDs, playerTargetedByRefID)
 	}
 	var patchPlayerTargetedByRefIDs []PlayerTargetedByRefID
-	for itemBoundToRefID := range se.Patch.PlayerTargetedByRef {
-		patchPlayerTargetedByRefIDs = append(patchPlayerTargetedByRefIDs, itemBoundToRefID)
+	for playerTargetedByRefID := range engine.Patch.PlayerTargetedByRef {
+		patchPlayerTargetedByRefIDs = append(patchPlayerTargetedByRefIDs, playerTargetedByRefID)
 	}
 	return deduplicatePlayerTargetedByRefIDs(statePlayerTargetedByRefIDs, patchPlayerTargetedByRefIDs)
 }
 
-func (se Engine) allPlayerTargetRefIDs() []PlayerTargetRefID {
+func (engine Engine) allPlayerTargetRefIDs() []PlayerTargetRefID {
 	var statePlayerTargetRefIDs []PlayerTargetRefID
-	for itemBoundToRefID := range se.State.PlayerTargetRef {
-		statePlayerTargetRefIDs = append(statePlayerTargetRefIDs, itemBoundToRefID)
+	for playerTargetRefID := range engine.State.PlayerTargetRef {
+		statePlayerTargetRefIDs = append(statePlayerTargetRefIDs, playerTargetRefID)
 	}
 	var patchPlayerTargetRefIDs []PlayerTargetRefID
-	for itemBoundToRefID := range se.Patch.PlayerTargetRef {
-		patchPlayerTargetRefIDs = append(patchPlayerTargetRefIDs, itemBoundToRefID)
+	for playerTargetRefID := range engine.Patch.PlayerTargetRef {
+		patchPlayerTargetRefIDs = append(patchPlayerTargetRefIDs, playerTargetRefID)
 	}
 	return deduplicatePlayerTargetRefIDs(statePlayerTargetRefIDs, patchPlayerTargetRefIDs)
 }
 
-func (se Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
+func (engine Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
 	var stateItemBoundToRefIDs []ItemBoundToRefID
-	for itemBoundToRefID := range se.State.ItemBoundToRef {
+	for itemBoundToRefID := range engine.State.ItemBoundToRef {
 		stateItemBoundToRefIDs = append(stateItemBoundToRefIDs, itemBoundToRefID)
 	}
 	var patchItemBoundToRefIDs []ItemBoundToRefID
-	for itemBoundToRefID := range se.Patch.ItemBoundToRef {
+	for itemBoundToRefID := range engine.Patch.ItemBoundToRef {
 		patchItemBoundToRefIDs = append(patchItemBoundToRefIDs, itemBoundToRefID)
 	}
 	return deduplicateItemBoundToRefIDs(stateItemBoundToRefIDs, patchItemBoundToRefIDs)
 }
 
-func (se Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
+func (engine Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
 	var statePlayerGuildMemberRefIDs []PlayerGuildMemberRefID
-	for playerGuildMemberRefID := range se.State.PlayerGuildMemberRef {
+	for playerGuildMemberRefID := range engine.State.PlayerGuildMemberRef {
 		statePlayerGuildMemberRefIDs = append(statePlayerGuildMemberRefIDs, playerGuildMemberRefID)
 	}
 	var patchPlayerGuildMemberRefIDs []PlayerGuildMemberRefID
-	for playerGuildMemberRefID := range se.Patch.PlayerGuildMemberRef {
+	for playerGuildMemberRefID := range engine.Patch.PlayerGuildMemberRef {
 		patchPlayerGuildMemberRefIDs = append(patchPlayerGuildMemberRefIDs, playerGuildMemberRefID)
 	}
 	return deduplicatePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
 }
 
-func (se Engine) allPlayerEquipmentSetRefIDs() []PlayerEquipmentSetRefID {
+func (engine Engine) allPlayerEquipmentSetRefIDs() []PlayerEquipmentSetRefID {
 	var statePlayerEquipmentSetRefIDs []PlayerEquipmentSetRefID
-	for playerEquipmentSetRefID := range se.State.PlayerEquipmentSetRef {
+	for playerEquipmentSetRefID := range engine.State.PlayerEquipmentSetRef {
 		statePlayerEquipmentSetRefIDs = append(statePlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
 	}
 	var patchPlayerEquipmentSetRefIDs []PlayerEquipmentSetRefID
-	for playerEquipmentSetRefID := range se.Patch.PlayerEquipmentSetRef {
+	for playerEquipmentSetRefID := range engine.Patch.PlayerEquipmentSetRef {
 		patchPlayerEquipmentSetRefIDs = append(patchPlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
 	}
 	return deduplicatePlayerEquipmentSetRefIDs(statePlayerEquipmentSetRefIDs, patchPlayerEquipmentSetRefIDs)
 }
 
-func (se Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
+func (engine Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
 	var stateEquipmentSetEquipmentRefIDs []EquipmentSetEquipmentRefID
-	for equipmentSetEquipmentRefID := range se.State.EquipmentSetEquipmentRef {
+	for equipmentSetEquipmentRefID := range engine.State.EquipmentSetEquipmentRef {
 		stateEquipmentSetEquipmentRefIDs = append(stateEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
 	}
 	var patchEquipmentSetEquipmentRefIDs []EquipmentSetEquipmentRefID
-	for equipmentSetEquipmentRefID := range se.Patch.EquipmentSetEquipmentRef {
+	for equipmentSetEquipmentRefID := range engine.Patch.EquipmentSetEquipmentRef {
 		patchEquipmentSetEquipmentRefIDs = append(patchEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
 	}
 	return deduplicateEquipmentSetEquipmentRefIDs(stateEquipmentSetEquipmentRefIDs, patchEquipmentSetEquipmentRefIDs)
