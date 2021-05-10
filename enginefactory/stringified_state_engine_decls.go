@@ -2396,6 +2396,22 @@ const mergePlayerTargetedByRefIDs_func string = `func mergePlayerTargetedByRefID
 	return ids
 }`
 
+const mergePlayerTargetRefIDs_func string = `func mergePlayerTargetRefIDs(currentIDs, nextIDs []PlayerTargetRefID) []PlayerTargetRefID {
+	ids := make([]PlayerTargetRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
 const mergePlayerEquipmentSetRefIDs_func string = `func mergePlayerEquipmentSetRefIDs(currentIDs, nextIDs []PlayerEquipmentSetRefID) []PlayerEquipmentSetRefID {
 	ids := make([]PlayerEquipmentSetRefID, len(currentIDs))
 	copy(ids, currentIDs)

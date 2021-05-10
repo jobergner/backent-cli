@@ -43,4 +43,29 @@ func TestWriteHelpers(t *testing.T) {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
+	t.Run("writes merge IDs", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeMergeIDs()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			mergeEquipmentSetIDs_func,
+			mergeGearScoreIDs_func,
+			mergeItemIDs_func,
+			mergePlayerIDs_func,
+			mergePositionIDs_func,
+			mergeZoneIDs_func,
+			mergeZoneItemIDs_func,
+			mergeEquipmentSetEquipmentRefIDs_func,
+			mergeItemBoundToRefIDs_func,
+			mergePlayerEquipmentSetRefIDs_func,
+			mergePlayerGuildMemberRefIDs_func,
+			mergePlayerTargetRefIDs_func,
+			mergePlayerTargetedByRefIDs_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 }
