@@ -2,621 +2,1863 @@
 
 package enginefactory
 
-const _AddPlayer_zone_func string = `func (_zone zone) AddPlayer(se *Engine) player {
-	zone := se.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
-		return player{player: playerCore{OperationKind_: OperationKindDelete}}
+const _AddPlayer_zone_func string = `func (_zone zone) AddPlayer() player {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return player{player: playerCore{OperationKind: OperationKindDelete}}
 	}
-	player := se.createPlayer(true)
+	player := zone.zone.engine.createPlayer(true)
 	zone.zone.Players = append(zone.zone.Players, player.player.ID)
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return player
 }`
 
-const _AddItem_zone_func string = `func (_zone zone) AddItem(se *Engine) zoneItem {
-	zone := se.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
-		return zoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
+const _AddItem_zone_func string = `func (_zone zone) AddItem() zoneItem {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete}}
 	}
-	zoneItem := se.createZoneItem(true)
+	zoneItem := zone.zone.engine.createZoneItem(true)
 	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zoneItem
 }`
 
-const _AddTags_zone_func string = `func (_zone zone) AddTags(se *Engine, tags ...string) {
-	zone := se.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
-		return
+const _AddInteractablePlayer_zone_func string = `func (_zone zone) AddInteractablePlayer() player {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return player{player: playerCore{OperationKind: OperationKindDelete}}
 	}
-	zone.zone.Tags = append(zone.zone.Tags, tags...)
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	player := zone.zone.engine.createPlayer(true)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
+	anyContainer.anyOfItemPlayerZoneItem.setPlayer(player.player.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return player
 }`
 
-const _AddItem_player_func string = `func (_player player) AddItem(se *Engine) item {
-	player := se.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
-		return item{item: itemCore{OperationKind_: OperationKindDelete}}
+const _AddInteractableZoneItem_zone_func string = `func (_zone zone) AddInteractableZoneItem() zoneItem {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete}}
 	}
-	item := se.createItem(true)
-	player.player.Items = append(player.player.Items, item.item.ID)
-	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	zoneItem := zone.zone.engine.createZoneItem(true)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
+	anyContainer.anyOfItemPlayerZoneItem.setZoneItem(zoneItem.zoneItem.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zoneItem
+}`
+
+const _AddInteractableItem_zone_func string = `func (_zone zone) AddInteractableItem() item {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return item{item: itemCore{OperationKind: OperationKindDelete}}
+	}
+	item := zone.zone.engine.createItem(true)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
+	anyContainer.anyOfItemPlayerZoneItem.setItem(item.item.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return item
 }`
 
-const assembleGearScore_Engine_func string = `func (se *Engine) assembleGearScore(gearScoreID GearScoreID) (GearScore, bool) {
-	gearScoreData, hasUpdated := se.Patch.GearScore[gearScoreID]
+const _AddTags_zone_func string = `func (_zone zone) AddTags(tags ...string) {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return
+	}
+	zone.zone.Tags = append(zone.zone.Tags, tags...)
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+}`
+
+const _AddItem_player_func string = `func (_player player) AddItem() item {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return item{item: itemCore{OperationKind: OperationKindDelete}}
+	}
+	item := player.player.engine.createItem(true)
+	player.player.Items = append(player.player.Items, item.item.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return item
+}`
+
+const _AddGuildMember_player_func string = `func (_player player) AddGuildMember(playerID PlayerID) {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return
+	}
+	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return
+	}
+	ref := player.player.engine.createPlayerGuildMemberRef(playerID, player.player.ID)
+	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+}`
+
+const _AddTargetedByPlayer_player_func string = `func (_player player) AddTargetedByPlayer(playerID PlayerID) {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return
+	}
+	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false).anyOfPlayerZoneItem
+	anyContainer.setPlayer(playerID)
+	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
+	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+}`
+
+const _AddTargetedByZoneItem_player_func string = `func (_player player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return
+	}
+	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
+		return
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false).anyOfPlayerZoneItem
+	anyContainer.setZoneItem(zoneItemID)
+	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
+	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+}`
+
+const _AddEquipmentSet_player_func string = `func (_player player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return
+	}
+	if player.player.engine.EquipmentSet(equipmentSetID).equipmentSet.OperationKind == OperationKindDelete {
+		return
+	}
+	ref := player.player.engine.createPlayerEquipmentSetRef(equipmentSetID, player.player.ID)
+	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+}`
+
+const _AddEquipment_equipmentSet_func string = `func (_equipmentSet equipmentSet) AddEquipment(itemID ItemID) {
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
+		return
+	}
+	if equipmentSet.equipmentSet.engine.Item(itemID).item.OperationKind == OperationKindDelete {
+		return
+	}
+	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(itemID, equipmentSet.equipmentSet.ID)
+	equipmentSet.equipmentSet.Equipment = append(equipmentSet.equipmentSet.Equipment, ref.ID)
+	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
+	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+}`
+
+const _Kind_anyOfPlayerZoneItem_func string = `func (_any anyOfPlayerZoneItem) Kind() ElementKind {
+	any := _any.anyOfPlayerZoneItem.engine.anyOfPlayerZoneItem(_any.anyOfPlayerZoneItem.ID)
+	return any.anyOfPlayerZoneItem.ElementKind
+}`
+
+const _SetZoneItem_anyOfPlayerZoneItem_func string = `func (_any anyOfPlayerZoneItem) SetZoneItem() zoneItem {
+	zoneItem := _any.anyOfPlayerZoneItem.engine.createZoneItem(true)
+	_any.anyOfPlayerZoneItem.setZoneItem(zoneItem.ID())
+	return zoneItem
+}`
+
+const setZoneItem_anyOfPlayerZoneItemCore_func string = `func (_any anyOfPlayerZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
+	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+	if any.Player != 0 {
+		any.engine.deletePlayer(any.Player)
+		any.Player = 0
+	}
+	any.ElementKind = ElementKindZoneItem
+	any.ZoneItem = zoneItemID
+	any.engine.Patch.AnyOfPlayerZoneItem[any.ID] = any
+}`
+
+const _SetPlayer_anyOfPlayerZoneItem_func string = `func (_any anyOfPlayerZoneItem) SetPlayer() player {
+	player := _any.anyOfPlayerZoneItem.engine.createPlayer(true)
+	_any.anyOfPlayerZoneItem.setPlayer(player.ID())
+	return player
+}`
+
+const setPlayer_anyOfPlayerZoneItemCore_func string = `func (_any anyOfPlayerZoneItemCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+	if any.ZoneItem != 0 {
+		any.engine.deleteZoneItem(any.ZoneItem)
+		any.ZoneItem = 0
+	}
+	any.ElementKind = ElementKindPlayer
+	any.Player = playerID
+	any.engine.Patch.AnyOfPlayerZoneItem[any.ID] = any
+}`
+
+const deleteChild_anyOfPlayerZoneItemCore_func string = `func (_any anyOfPlayerZoneItemCore) deleteChild() {
+	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+	switch any.ElementKind {
+	case ElementKindPlayer:
+		any.engine.deletePlayer(any.Player)
+	case ElementKindZoneItem:
+		any.engine.deleteZoneItem(any.ZoneItem)
+	}
+}`
+
+const _Kind_anyOfPlayerPosition_func string = `func (_any anyOfPlayerPosition) Kind() ElementKind {
+	any := _any.anyOfPlayerPosition.engine.anyOfPlayerPosition(_any.anyOfPlayerPosition.ID)
+	return any.anyOfPlayerPosition.ElementKind
+}`
+
+const _SetPosition_anyOfPlayerPosition_func string = `func (_any anyOfPlayerPosition) SetPosition() position {
+	position := _any.anyOfPlayerPosition.engine.createPosition(true)
+	_any.anyOfPlayerPosition.setPosition(position.ID())
+	return position
+}`
+
+const setPosition_anyOfPlayerPositionCore_func string = `func (_any anyOfPlayerPositionCore) setPosition(positionID PositionID) {
+	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+	if any.Player != 0 {
+		any.engine.deletePlayer(any.Player)
+		any.Player = 0
+	}
+	any.ElementKind = ElementKindPosition
+	any.Position = positionID
+	any.engine.Patch.AnyOfPlayerPosition[any.ID] = any
+}`
+
+const deleteChild_anyOfPlayerPositionCore_func string = `func (_any anyOfPlayerPositionCore) deleteChild() {
+	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+	switch any.ElementKind {
+	case ElementKindPlayer:
+		any.engine.deletePlayer(any.Player)
+	case ElementKindPosition:
+		any.engine.deletePosition(any.Position)
+	}
+}`
+
+const _SetPlayer_anyOfPlayerPosition_func string = `func (_any anyOfPlayerPosition) SetPlayer() player {
+	player := _any.anyOfPlayerPosition.engine.createPlayer(true)
+	_any.anyOfPlayerPosition.setPlayer(player.ID())
+	return player
+}`
+
+const setPlayer_anyOfPlayerPositionCore_func string = `func (_any anyOfPlayerPositionCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+	if any.Position != 0 {
+		any.engine.deletePosition(any.Position)
+		any.Position = 0
+	}
+	any.ElementKind = ElementKindPlayer
+	any.Player = playerID
+	any.engine.Patch.AnyOfPlayerPosition[any.ID] = any
+}`
+
+const _Kind_anyOfItemPlayerZoneItem_func string = `func (_any anyOfItemPlayerZoneItem) Kind() ElementKind {
+	any := _any.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_any.anyOfItemPlayerZoneItem.ID)
+	return any.anyOfItemPlayerZoneItem.ElementKind
+}`
+
+const _SetZoneItem_anyOfItemPlayerZoneItem_func string = `func (_any anyOfItemPlayerZoneItem) SetZoneItem() zoneItem {
+	zoneItem := _any.anyOfItemPlayerZoneItem.engine.createZoneItem(true)
+	_any.anyOfItemPlayerZoneItem.setZoneItem(zoneItem.ID())
+	return zoneItem
+}`
+
+const setZoneItem_anyOfItemPlayerZoneItemCore_func string = `func (_any anyOfItemPlayerZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
+	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+	if any.Item != 0 {
+		any.engine.deleteItem(any.Item)
+		any.Item = 0
+	}
+	if any.Player != 0 {
+		any.engine.deletePlayer(any.Player)
+		any.Player = 0
+	}
+	any.ElementKind = ElementKindZoneItem
+	any.ZoneItem = zoneItemID
+	any.engine.Patch.AnyOfItemPlayerZoneItem[any.ID] = any
+}`
+
+const _SetPlayer_anyOfItemPlayerZoneItem_func string = `func (_any anyOfItemPlayerZoneItem) SetPlayer() player {
+	player := _any.anyOfItemPlayerZoneItem.engine.createPlayer(true)
+	_any.anyOfItemPlayerZoneItem.setPlayer(player.ID())
+	return player
+}`
+
+const setPlayer_anyOfItemPlayerZoneItemCore_func string = `func (_any anyOfItemPlayerZoneItemCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+	if any.Item != 0 {
+		any.engine.deleteItem(any.Item)
+		any.Item = 0
+	}
+	if any.ZoneItem != 0 {
+		any.engine.deleteZoneItem(any.ZoneItem)
+		any.ZoneItem = 0
+	}
+	any.ElementKind = ElementKindPlayer
+	any.Player = playerID
+	any.engine.Patch.AnyOfItemPlayerZoneItem[any.ID] = any
+}`
+
+const _SetItem_anyOfItemPlayerZoneItem_func string = `func (_any anyOfItemPlayerZoneItem) SetItem() item {
+	item := _any.anyOfItemPlayerZoneItem.engine.createItem(true)
+	_any.anyOfItemPlayerZoneItem.setItem(item.ID())
+	return item
+}`
+
+const setItem_anyOfItemPlayerZoneItemCore_func string = `func (_any anyOfItemPlayerZoneItemCore) setItem(itemID ItemID) {
+	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+	if any.Player != 0 {
+		any.engine.deletePlayer(any.Player)
+		any.Player = 0
+	}
+	if any.ZoneItem != 0 {
+		any.engine.deleteZoneItem(any.ZoneItem)
+		any.ZoneItem = 0
+	}
+	any.ElementKind = ElementKindItem
+	any.Item = itemID
+	any.engine.Patch.AnyOfItemPlayerZoneItem[any.ID] = any
+}`
+
+const deleteChild_anyOfItemPlayerZoneItemCore_func string = `func (_any anyOfItemPlayerZoneItemCore) deleteChild() {
+	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+	switch any.ElementKind {
+	case ElementKindItem:
+		any.engine.deleteItem(any.Item)
+	case ElementKindPlayer:
+		any.engine.deletePlayer(any.Player)
+	case ElementKindZoneItem:
+		any.engine.deleteZoneItem(any.ZoneItem)
+	}
+}`
+
+const assembleConfig_type string = `type assembleConfig struct{ forceInclude bool }`
+
+const assembleGearScore_Engine_func string = `func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
+			return GearScore{}, false, true
+		} else {
+			check.gearScore[gearScoreID] = true
+		}
+	}
+	gearScoreData, hasUpdated := engine.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
-		return GearScore{}, false
+		gearScoreData, _ = engine.State.GearScore[gearScoreID]
 	}
 	var gearScore GearScore
 	gearScore.ID = gearScoreData.ID
-	gearScore.OperationKind_ = gearScoreData.OperationKind_
+	gearScore.OperationKind = gearScoreData.OperationKind
 	gearScore.Level = gearScoreData.Level
 	gearScore.Score = gearScoreData.Score
-	return gearScore, true
+	return gearScore, hasUpdated || config.forceInclude, hasUpdated
 }`
 
-const assemblePosition_Engine_func string = `func (se *Engine) assemblePosition(positionID PositionID) (Position, bool) {
-	positionData, hasUpdated := se.Patch.Position[positionID]
+const assemblePosition_Engine_func string = `func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.position[positionID]; alreadyExists {
+			return Position{}, false, true
+		} else {
+			check.position[positionID] = true
+		}
+	}
+	positionData, hasUpdated := engine.Patch.Position[positionID]
 	if !hasUpdated {
-		return Position{}, false
+		positionData, _ = engine.State.Position[positionID]
 	}
 	var position Position
 	position.ID = positionData.ID
-	position.OperationKind_ = positionData.OperationKind_
+	position.OperationKind = positionData.OperationKind
 	position.X = positionData.X
 	position.Y = positionData.Y
-	return position, true
+	return position, hasUpdated || config.forceInclude, hasUpdated
 }`
 
-const assembleItem_Engine_func string = `func (se *Engine) assembleItem(itemID ItemID) (Item, bool) {
-	itemData, hasUpdated := se.Patch.Item[itemID]
+const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
+			return EquipmentSet{}, false, true
+		} else {
+			check.equipmentSet[equipmentSetID] = true
+		}
+	}
+	equipmentSetData, hasUpdated := engine.Patch.EquipmentSet[equipmentSetID]
 	if !hasUpdated {
-		itemData = se.State.Item[itemID]
+		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
+	}
+	var equipmentSet EquipmentSet
+	for _, refID := range mergeEquipmentSetEquipmentRefIDs(engine.State.EquipmentSet[equipmentSetID].Equipment, engine.Patch.EquipmentSet[equipmentSetID].Equipment) {
+		if ref, include, refHasUpdated := engine.assembleEquipmentSetEquipmentRef(refID, check, config); include {
+			if refHasUpdated {
+				hasUpdated = true
+			}
+			equipmentSet.Equipment = append(equipmentSet.Equipment, ref)
+		}
+	}
+	equipmentSet.ID = equipmentSetData.ID
+	equipmentSet.OperationKind = equipmentSetData.OperationKind
+	equipmentSet.Name = equipmentSetData.Name
+	return equipmentSet, hasUpdated || config.forceInclude, hasUpdated
+}`
+
+const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.item[itemID]; alreadyExists {
+			return Item{}, false, true
+		} else {
+			check.item[itemID] = true
+		}
+	}
+	itemData, hasUpdated := engine.Patch.Item[itemID]
+	if !hasUpdated {
+		itemData = engine.State.Item[itemID]
 	}
 	var item Item
-	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(itemData.GearScore); gearScoreHasUpdated {
-		hasUpdated = true
+	if ref, include, refHasUpdated := engine.assembleItemBoundToRef(itemID, check, config); include {
+		if refHasUpdated {
+			hasUpdated = true
+		}
+		item.BoundTo = ref
+	}
+	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
+		if gearScoreHasUpdated {
+			hasUpdated = true
+		}
+		item.GearScore = &treeGearScore
+	}
+	if anyContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition; anyContainer.ElementKind == ElementKindPlayer {
+		playerID := anyContainer.Player
+		if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+			if playerHasUpdated {
+				hasUpdated = true
+			}
+			item.Origin = &treePlayer
+		}
+	} else if anyContainer.ElementKind == ElementKindPosition {
+		positionID := anyContainer.Position
+		if treePosition, include, positionHasUpdated := engine.assemblePosition(positionID, check, config); include {
+			if positionHasUpdated {
+				hasUpdated = true
+			}
+			item.Origin = &treePosition
+		}
+	}
+	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
+		if gearScoreHasUpdated {
+			hasUpdated = true
+		}
 		item.GearScore = &treeGearScore
 	}
 	item.ID = itemData.ID
-	item.OperationKind_ = itemData.OperationKind_
-	return item, hasUpdated
+	item.OperationKind = itemData.OperationKind
+	item.Name = itemData.Name
+	return item, hasUpdated || config.forceInclude, hasUpdated
 }`
 
-const assembleZoneItem_Engine_func string = `func (se *Engine) assembleZoneItem(zoneItemID ZoneItemID) (ZoneItem, bool) {
-	zoneItemData, hasUpdated := se.Patch.ZoneItem[zoneItemID]
+const assembleZoneItem_Engine_func string = `func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
+			return ZoneItem{}, false, true
+		} else {
+			check.zoneItem[zoneItemID] = true
+		}
+	}
+	zoneItemData, hasUpdated := engine.Patch.ZoneItem[zoneItemID]
 	if !hasUpdated {
-		zoneItemData = se.State.ZoneItem[zoneItemID]
+		zoneItemData = engine.State.ZoneItem[zoneItemID]
 	}
 	var zoneItem ZoneItem
-	if treeItem, itemHasUpdated := se.assembleItem(zoneItemData.Item); itemHasUpdated {
-		hasUpdated = true
+	if treeItem, include, itemHasUpdated := engine.assembleItem(zoneItemData.Item, check, config); include {
+		if itemHasUpdated {
+			hasUpdated = true
+		}
 		zoneItem.Item = &treeItem
 	}
-	if treePosition, positionHasUpdated := se.assemblePosition(zoneItemData.Position); positionHasUpdated {
-		hasUpdated = true
+	if treePosition, include, positionHasUpdated := engine.assemblePosition(zoneItemData.Position, check, config); include {
+		if positionHasUpdated {
+			hasUpdated = true
+		}
 		zoneItem.Position = &treePosition
 	}
 	zoneItem.ID = zoneItemData.ID
-	zoneItem.OperationKind_ = zoneItemData.OperationKind_
-	return zoneItem, hasUpdated
+	zoneItem.OperationKind = zoneItemData.OperationKind
+	return zoneItem, hasUpdated || config.forceInclude, hasUpdated
 }`
 
-const assemblePlayer_Engine_func string = `func (se *Engine) assemblePlayer(playerID PlayerID) (Player, bool) {
-	playerData, hasUpdated := se.Patch.Player[playerID]
+const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.player[playerID]; alreadyExists {
+			return Player{}, false, true
+		} else {
+			check.player[playerID] = true
+		}
+	}
+	playerData, hasUpdated := engine.Patch.Player[playerID]
 	if !hasUpdated {
-		playerData = se.State.Player[playerID]
+		playerData = engine.State.Player[playerID]
 	}
 	var player Player
-	if treeGearScore, gearScoreHasUpdated := se.assembleGearScore(playerData.GearScore); gearScoreHasUpdated {
-		hasUpdated = true
+	for _, refID := range mergePlayerEquipmentSetRefIDs(engine.State.Player[playerID].EquipmentSets, engine.Patch.Player[playerID].EquipmentSets) {
+		if ref, include, refHasUpdated := engine.assemblePlayerEquipmentSetRef(refID, check, config); include {
+			if refHasUpdated {
+				hasUpdated = true
+			}
+			player.EquipmentSets = append(player.EquipmentSets, ref)
+		}
+	}
+	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(playerData.GearScore, check, config); include {
+		if gearScoreHasUpdated {
+			hasUpdated = true
+		}
 		player.GearScore = &treeGearScore
 	}
-	for _, itemID := range deduplicateItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
-		if treeItem, itemHasUpdated := se.assembleItem(itemID); itemHasUpdated {
-			hasUpdated = true
+	for _, refID := range mergePlayerGuildMemberRefIDs(engine.State.Player[playerID].GuildMembers, engine.Patch.Player[playerID].GuildMembers) {
+		if ref, include, refHasUpdated := engine.assemblePlayerGuildMemberRef(refID, check, config); include {
+			if refHasUpdated {
+				hasUpdated = true
+			}
+			player.GuildMembers = append(player.GuildMembers, ref)
+		}
+	}
+	for _, itemID := range mergeItemIDs(engine.State.Player[playerData.ID].Items, engine.Patch.Player[playerData.ID].Items) {
+		if treeItem, include, itemHasUpdated := engine.assembleItem(itemID, check, config); include {
+			if itemHasUpdated {
+				hasUpdated = true
+			}
 			player.Items = append(player.Items, treeItem)
 		}
 	}
-	if treePosition, positionHasUpdated := se.assemblePosition(playerData.Position); positionHasUpdated {
-		hasUpdated = true
+	if treePosition, include, positionHasUpdated := engine.assemblePosition(playerData.Position, check, config); include {
+		if positionHasUpdated {
+			hasUpdated = true
+		}
 		player.Position = &treePosition
 	}
+	if ref, include, refHasUpdated := engine.assemblePlayerTargetRef(playerID, check, config); include {
+		if refHasUpdated {
+			hasUpdated = true
+		}
+		player.Target = ref
+	}
+	for _, refID := range mergePlayerTargetedByRefIDs(engine.State.Player[playerID].TargetedBy, engine.Patch.Player[playerID].TargetedBy) {
+		if ref, include, refHasUpdated := engine.assemblePlayerTargetedByRef(refID, check, config); include {
+			if refHasUpdated {
+				hasUpdated = true
+			}
+			player.TargetedBy = append(player.TargetedBy, ref)
+		}
+	}
 	player.ID = playerData.ID
-	player.OperationKind_ = playerData.OperationKind_
-	return player, hasUpdated
+	player.OperationKind = playerData.OperationKind
+	return player, hasUpdated || config.forceInclude, hasUpdated
 }`
 
-const assembleZone_Engine_func string = `func (se *Engine) assembleZone(zoneID ZoneID) (Zone, bool) {
-	zoneData, hasUpdated := se.Patch.Zone[zoneID]
+const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool, bool) {
+	if check != nil {
+		if alreadyExists := check.zone[zoneID]; alreadyExists {
+			return Zone{}, false, true
+		} else {
+			check.zone[zoneID] = true
+		}
+	}
+	zoneData, hasUpdated := engine.Patch.Zone[zoneID]
 	if !hasUpdated {
-		zoneData = se.State.Zone[zoneID]
+		zoneData = engine.State.Zone[zoneID]
 	}
 	var zone Zone
-	for _, zoneItemID := range deduplicateZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
-		if treeZoneItem, zoneItemHasUpdated := se.assembleZoneItem(zoneItemID); zoneItemHasUpdated {
-			hasUpdated = true
+	for _, anyID := range mergeAnyOfItemPlayerZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
+		if anyContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem; anyContainer.ElementKind == ElementKindItem {
+			itemID := anyContainer.Item
+			if treeItem, include, itemHasUpdated := engine.assembleItem(itemID, check, config); include {
+				if itemHasUpdated {
+					hasUpdated = true
+				}
+				zone.Interactables = append(zone.Interactables, treeItem)
+			}
+		} else if anyContainer.ElementKind == ElementKindPlayer {
+			playerID := anyContainer.Player
+			if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+				if playerHasUpdated {
+					hasUpdated = true
+				}
+				zone.Interactables = append(zone.Interactables, treePlayer)
+			}
+		} else if anyContainer.ElementKind == ElementKindZoneItem {
+			zoneItemID := anyContainer.ZoneItem
+			if treeZoneItem, include, zoneItemHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
+				if zoneItemHasUpdated {
+					hasUpdated = true
+				}
+				zone.Interactables = append(zone.Interactables, treeZoneItem)
+			}
+		}
+	}
+	for _, zoneItemID := range mergeZoneItemIDs(engine.State.Zone[zoneData.ID].Items, engine.Patch.Zone[zoneData.ID].Items) {
+		if treeZoneItem, include, zoneItemHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
+			if zoneItemHasUpdated {
+				hasUpdated = true
+			}
 			zone.Items = append(zone.Items, treeZoneItem)
 		}
 	}
-	for _, playerID := range deduplicatePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
-		if treePlayer, playerHasUpdated := se.assemblePlayer(playerID); playerHasUpdated {
-			hasUpdated = true
+	for _, playerID := range mergePlayerIDs(engine.State.Zone[zoneData.ID].Players, engine.Patch.Zone[zoneData.ID].Players) {
+		if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+			if playerHasUpdated {
+				hasUpdated = true
+			}
 			zone.Players = append(zone.Players, treePlayer)
 		}
 	}
 	zone.ID = zoneData.ID
-	zone.OperationKind_ = zoneData.OperationKind_
+	zone.OperationKind = zoneData.OperationKind
 	zone.Tags = zoneData.Tags
-	return zone, hasUpdated
+	return zone, hasUpdated || config.forceInclude, hasUpdated
 }`
 
-const assembleTree_Engine_func string = `func (se *Engine) assembleTree() Tree {
-	tree := newTree()
-	for _, gearScoreData := range se.Patch.GearScore {
-		if !gearScoreData.HasParent_ {
-			gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID)
-			if hasUpdated {
-				tree.GearScore[gearScoreData.ID] = gearScore
+const assemblePlayerTargetRef_Engine_func string = `func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursionCheck, config assembleConfig) (*AnyOfPlayerZoneItemReference, bool, bool) {
+	statePlayer := engine.State.Player[playerID]
+	patchPlayer, playerIsInPatch := engine.Patch.Player[playerID]
+	if statePlayer.Target == 0 && (!playerIsInPatch || patchPlayer.Target == 0) {
+		return nil, false, false
+	}
+	if config.forceInclude {
+		ref := engine.playerTargetRef(patchPlayer.Target)
+		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+			if check == nil {
+				check = newRecursionCheck()
 			}
-		}
-	}
-	for _, itemData := range se.Patch.Item {
-		if !itemData.HasParent_ {
-			item, hasUpdated := se.assembleItem(itemData.ID)
-			if hasUpdated {
-				tree.Item[itemData.ID] = item
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
 			}
-		}
-	}
-	for _, playerData := range se.Patch.Player {
-		if !playerData.HasParent_ {
-			player, hasUpdated := se.assemblePlayer(playerData.ID)
-			if hasUpdated {
-				tree.Player[playerData.ID] = player
+			path, _ := engine.PathTrack.player[referencedElement.ID]
+			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			if check == nil {
+				check = newRecursionCheck()
 			}
-		}
-	}
-	for _, positionData := range se.Patch.Position {
-		if !positionData.HasParent_ {
-			position, hasUpdated := se.assemblePosition(positionData.ID)
-			if hasUpdated {
-				tree.Position[positionData.ID] = position
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
 			}
+			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
+			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
-	for _, zoneData := range se.Patch.Zone {
-		zone, hasUpdated := se.assembleZone(zoneData.ID)
-		if hasUpdated {
-			tree.Zone[zoneData.ID] = zone
-		}
-	}
-	for _, zoneItemData := range se.Patch.ZoneItem {
-		if !zoneItemData.HasParent_ {
-			zoneItem, hasUpdated := se.assembleZoneItem(zoneItemData.ID)
-			if hasUpdated {
-				tree.ZoneItem[zoneItemData.ID] = zoneItem
+	if statePlayer.Target == 0 && (playerIsInPatch && patchPlayer.Target != 0) {
+		config.forceInclude = true
+		ref := engine.playerTargetRef(patchPlayer.Target)
+		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+			if check == nil {
+				check = newRecursionCheck()
 			}
+			referencedDataStatus := ReferencedDataUnchanged
+			element, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
+			if hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.player[referencedElement.ID]
+			return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			element, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config)
+			if hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
+			return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
-	for _, gearScoreData := range se.State.GearScore {
-		if !gearScoreData.HasParent_ {
-			if _, ok := tree.GearScore[gearScoreData.ID]; !ok {
-				gearScore, hasUpdated := se.assembleGearScore(gearScoreData.ID)
-				if hasUpdated {
-					tree.GearScore[gearScoreData.ID] = gearScore
+	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target == 0) {
+		ref := engine.playerTargetRef(patchPlayer.Target)
+		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.player[referencedElement.ID]
+			return &AnyOfPlayerZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
+			return &AnyOfPlayerZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+		}
+	}
+	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target != 0) {
+		if statePlayer.Target != patchPlayer.Target {
+			ref := engine.playerTargetRef(patchPlayer.Target)
+			if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+				referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+				if check == nil {
+					check = newRecursionCheck()
 				}
-			}
-		}
-	}
-	for _, itemData := range se.State.Item {
-		if !itemData.HasParent_ {
-			if _, ok := tree.Item[itemData.ID]; !ok {
-				item, hasUpdated := se.assembleItem(itemData.ID)
-				if hasUpdated {
-					tree.Item[itemData.ID] = item
+				referencedDataStatus := ReferencedDataUnchanged
+				if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+					referencedDataStatus = ReferencedDataModified
 				}
-			}
-		}
-	}
-	for _, playerData := range se.State.Player {
-		if !playerData.HasParent_ {
-			if _, ok := tree.Player[playerData.ID]; !ok {
-				player, hasUpdated := se.assemblePlayer(playerData.ID)
-				if hasUpdated {
-					tree.Player[playerData.ID] = player
+				path, _ := engine.PathTrack.player[referencedElement.ID]
+				return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+			} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+				referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+				if check == nil {
+					check = newRecursionCheck()
 				}
-			}
-		}
-	}
-	for _, positionData := range se.State.Position {
-		if !positionData.HasParent_ {
-			if _, ok := tree.Position[positionData.ID]; !ok {
-				position, hasUpdated := se.assemblePosition(positionData.ID)
-				if hasUpdated {
-					tree.Position[positionData.ID] = position
+				referencedDataStatus := ReferencedDataUnchanged
+				if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+					referencedDataStatus = ReferencedDataModified
 				}
+				path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
+				return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
 			}
 		}
 	}
-	for _, zoneData := range se.State.Zone {
-		if _, ok := tree.Zone[zoneData.ID]; !ok {
-			zone, hasUpdated := se.assembleZone(zoneData.ID)
-			if hasUpdated {
-				tree.Zone[zoneData.ID] = zone
+	if statePlayer.Target != 0 {
+		ref := engine.playerTargetRef(patchPlayer.Target)
+		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayerZoneItem.Player, check, config); hasUpdatedDownstream {
+				path, _ := engine.PathTrack.player[anyContainer.anyOfPlayerZoneItem.Player]
+				return &AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+			}
+		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
+				path, _ := engine.PathTrack.zoneItem[anyContainer.anyOfPlayerZoneItem.ZoneItem]
+				return &AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 			}
 		}
 	}
-	for _, zoneItemData := range se.State.ZoneItem {
-		if !zoneItemData.HasParent_ {
-			if _, ok := tree.ZoneItem[zoneItemData.ID]; !ok {
-				zoneItem, hasUpdated := se.assembleZoneItem(zoneItemData.ID)
-				if hasUpdated {
-					tree.ZoneItem[zoneItemData.ID] = zoneItem
-				}
-			}
-		}
-	}
-	return tree
+	return nil, false, false
 }`
 
-const _CreateGearScore_Engine_func string = `func (se *Engine) CreateGearScore() gearScore {
-	return se.createGearScore(false)
+const assembleItemBoundToRef_Engine_func string = `func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*PlayerReference, bool, bool) {
+	stateItem := engine.State.Item[itemID]
+	patchItem, itemIsInPatch := engine.Patch.Item[itemID]
+	if stateItem.BoundTo == 0 && (!itemIsInPatch || patchItem.BoundTo == 0) {
+		return nil, false, false
+	}
+	if config.forceInclude {
+		ref := engine.itemBoundToRef(patchItem.BoundTo)
+		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		path, _ := engine.PathTrack.player[referencedElement.ID]
+		return &PlayerReference{ref.itemBoundToRef.OperationKind, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.itemBoundToRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	if stateItem.BoundTo == 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
+		config.forceInclude = true
+		ref := engine.itemBoundToRef(patchItem.BoundTo)
+		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		element, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
+		if hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		path, _ := engine.PathTrack.player[referencedElement.ID]
+		return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
+	}
+	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo == 0) {
+		ref := engine.itemBoundToRef(stateItem.BoundTo)
+		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		path, _ := engine.PathTrack.player[referencedElement.ID]
+		return &PlayerReference{OperationKindDelete, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+	}
+	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
+		if stateItem.BoundTo != patchItem.BoundTo {
+			ref := engine.itemBoundToRef(patchItem.BoundTo)
+			referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.player[referencedElement.ID]
+			return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+		}
+	}
+	if stateItem.BoundTo != 0 {
+		ref := engine.itemBoundToRef(stateItem.BoundTo)
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
+			path, _ := engine.PathTrack.player[ref.itemBoundToRef.ReferencedElementID]
+			return &PlayerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+		}
+	}
+	return nil, false, false
 }`
 
-const createGearScore_Engine_func string = `func (se *Engine) createGearScore(hasParent bool) gearScore {
+const assemblePlayerTargetedByRef_Engine_func string = `func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (AnyOfPlayerZoneItemReference, bool, bool) {
+	if config.forceInclude {
+		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
+		if anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.player[referencedElement.ID]
+			return AnyOfPlayerZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
+			return AnyOfPlayerZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		}
+	}
+	if patchRef, hasUpdated := engine.Patch.PlayerTargetedByRef[refID]; hasUpdated {
+		if patchRef.OperationKind == OperationKindUpdate {
+			config.forceInclude = true
+		}
+		if anyContainer := engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			element, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
+			referencedDataStatus := ReferencedDataUnchanged
+			if hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			var el *Player
+			if patchRef.OperationKind == OperationKindUpdate {
+				el = &element
+			}
+			path, _ := engine.PathTrack.player[referencedElement.ID]
+			return AnyOfPlayerZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			if check == nil {
+				check = newRecursionCheck()
+			}
+			element, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config)
+			referencedDataStatus := ReferencedDataUnchanged
+			if hasUpdatedDownstream {
+				referencedDataStatus = ReferencedDataModified
+			}
+			var el *ZoneItem
+			if patchRef.OperationKind == OperationKindUpdate {
+				el = &element
+			}
+			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
+			return AnyOfPlayerZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		}
+	}
+	ref := engine.playerTargetedByRef(refID).playerTargetedByRef
+	if check == nil {
+		check = newRecursionCheck()
+	}
+	if anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayerZoneItem.Player, check, config); hasUpdatedDownstream {
+			path, _ := engine.PathTrack.player[anyContainer.anyOfPlayerZoneItem.Player]
+			return AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+		}
+	} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+		if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
+			path, _ := engine.PathTrack.zoneItem[anyContainer.anyOfPlayerZoneItem.ZoneItem]
+			return AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+		}
+	}
+	return AnyOfPlayerZoneItemReference{}, false, false
+}`
+
+const assemblePlayerGuildMemberRef_Engine_func string = `func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (PlayerReference, bool, bool) {
+	if config.forceInclude {
+		ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
+		referencedElement := engine.Player(ref.ReferencedElementID).player
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		path, _ := engine.PathTrack.player[referencedElement.ID]
+		return PlayerReference{ref.OperationKind, ref.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	if patchRef, hasUpdated := engine.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
+		if patchRef.OperationKind == OperationKindUpdate {
+			config.forceInclude = true
+		}
+		referencedElement := engine.Player(patchRef.ReferencedElementID).player
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		element, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
+		referencedDataStatus := ReferencedDataUnchanged
+		if hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		var el *Player
+		if patchRef.OperationKind == OperationKindUpdate {
+			el = &element
+		}
+		path, _ := engine.PathTrack.player[referencedElement.ID]
+		return PlayerReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
+	if check == nil {
+		check = newRecursionCheck()
+	}
+	if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
+		path, _ := engine.PathTrack.player[ref.ReferencedElementID]
+		return PlayerReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+	}
+	return PlayerReference{}, false, false
+}`
+
+const assemblePlayerEquipmentSetRef_Engine_func string = `func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (EquipmentSetReference, bool, bool) {
+	if config.forceInclude {
+		ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
+		referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, _, hasUpdatedDownstream := engine.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		path, _ := engine.PathTrack.equipmentSet[referencedElement.ID]
+		return EquipmentSetReference{ref.OperationKind, ref.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	if patchRef, hasUpdated := engine.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
+		if patchRef.OperationKind == OperationKindUpdate {
+			config.forceInclude = true
+		}
+		referencedElement := engine.EquipmentSet(patchRef.ReferencedElementID).equipmentSet
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		element, _, hasUpdatedDownstream := engine.assembleEquipmentSet(referencedElement.ID, check, config)
+		referencedDataStatus := ReferencedDataUnchanged
+		if hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		var el *EquipmentSet
+		if patchRef.OperationKind == OperationKindUpdate {
+			el = &element
+		}
+		path, _ := engine.PathTrack.equipmentSet[referencedElement.ID]
+		return EquipmentSetReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
+	if check == nil {
+		check = newRecursionCheck()
+	}
+	if _, _, hasUpdatedDownstream := engine.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
+		path, _ := engine.PathTrack.equipmentSet[ref.ReferencedElementID]
+		return EquipmentSetReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+	}
+	return EquipmentSetReference{}, false, false
+}`
+
+const assembleEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (ItemReference, bool, bool) {
+	if config.forceInclude {
+		ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
+		referencedElement := engine.Item(ref.ReferencedElementID).item
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, _, hasUpdatedDownstream := engine.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		path, _ := engine.PathTrack.item[referencedElement.ID]
+		return ItemReference{ref.OperationKind, ref.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	if patchRef, hasUpdated := engine.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
+		if patchRef.OperationKind == OperationKindUpdate {
+			config.forceInclude = true
+		}
+		referencedElement := engine.Item(patchRef.ReferencedElementID).item
+		if check == nil {
+			check = newRecursionCheck()
+		}
+		element, _, hasUpdatedDownstream := engine.assembleItem(referencedElement.ID, check, config)
+		referencedDataStatus := ReferencedDataUnchanged
+		if hasUpdatedDownstream {
+			referencedDataStatus = ReferencedDataModified
+		}
+		var el *Item
+		if patchRef.OperationKind == OperationKindUpdate {
+			el = &element
+		}
+		path, _ := engine.PathTrack.item[referencedElement.ID]
+		return ItemReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+	}
+	ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
+	if check == nil {
+		check = newRecursionCheck()
+	}
+	if _, _, hasUpdatedDownstream := engine.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
+		path, _ := engine.PathTrack.item[ref.ReferencedElementID]
+		return ItemReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+	}
+	return ItemReference{}, false, false
+}`
+
+const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() Tree {
+	config := assembleConfig{forceInclude: false}
+	for _, equipmentSetData := range engine.Patch.EquipmentSet {
+		equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
+		if include {
+			engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+		}
+	}
+	for _, gearScoreData := range engine.Patch.GearScore {
+		if !gearScoreData.HasParent {
+			gearScore, include, _ := engine.assembleGearScore(gearScoreData.ID, nil, config)
+			if include {
+				engine.Tree.GearScore[gearScoreData.ID] = gearScore
+			}
+		}
+	}
+	for _, itemData := range engine.Patch.Item {
+		if !itemData.HasParent {
+			item, include, _ := engine.assembleItem(itemData.ID, nil, config)
+			if include {
+				engine.Tree.Item[itemData.ID] = item
+			}
+		}
+	}
+	for _, playerData := range engine.Patch.Player {
+		if !playerData.HasParent {
+			player, include, _ := engine.assemblePlayer(playerData.ID, nil, config)
+			if include {
+				engine.Tree.Player[playerData.ID] = player
+			}
+		}
+	}
+	for _, positionData := range engine.Patch.Position {
+		if !positionData.HasParent {
+			position, include, _ := engine.assemblePosition(positionData.ID, nil, config)
+			if include {
+				engine.Tree.Position[positionData.ID] = position
+			}
+		}
+	}
+	for _, zoneData := range engine.Patch.Zone {
+		zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
+		if include {
+			engine.Tree.Zone[zoneData.ID] = zone
+		}
+	}
+	for _, zoneItemData := range engine.Patch.ZoneItem {
+		if !zoneItemData.HasParent {
+			zoneItem, include, _ := engine.assembleZoneItem(zoneItemData.ID, nil, config)
+			if include {
+				engine.Tree.ZoneItem[zoneItemData.ID] = zoneItem
+			}
+		}
+	}
+	for _, equipmentSetData := range engine.State.EquipmentSet {
+		if _, ok := engine.Tree.EquipmentSet[equipmentSetData.ID]; !ok {
+			equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
+			if include {
+				engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+			}
+		}
+	}
+	for _, gearScoreData := range engine.State.GearScore {
+		if !gearScoreData.HasParent {
+			if _, ok := engine.Tree.GearScore[gearScoreData.ID]; !ok {
+				gearScore, include, _ := engine.assembleGearScore(gearScoreData.ID, nil, config)
+				if include {
+					engine.Tree.GearScore[gearScoreData.ID] = gearScore
+				}
+			}
+		}
+	}
+	for _, itemData := range engine.State.Item {
+		if !itemData.HasParent {
+			if _, ok := engine.Tree.Item[itemData.ID]; !ok {
+				item, include, _ := engine.assembleItem(itemData.ID, nil, config)
+				if include {
+					engine.Tree.Item[itemData.ID] = item
+				}
+			}
+		}
+	}
+	for _, playerData := range engine.State.Player {
+		if !playerData.HasParent {
+			if _, ok := engine.Tree.Player[playerData.ID]; !ok {
+				player, include, _ := engine.assemblePlayer(playerData.ID, nil, config)
+				if include {
+					engine.Tree.Player[playerData.ID] = player
+				}
+			}
+		}
+	}
+	for _, positionData := range engine.State.Position {
+		if !positionData.HasParent {
+			if _, ok := engine.Tree.Position[positionData.ID]; !ok {
+				position, include, _ := engine.assemblePosition(positionData.ID, nil, config)
+				if include {
+					engine.Tree.Position[positionData.ID] = position
+				}
+			}
+		}
+	}
+	for _, zoneData := range engine.State.Zone {
+		if _, ok := engine.Tree.Zone[zoneData.ID]; !ok {
+			zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
+			if include {
+				engine.Tree.Zone[zoneData.ID] = zone
+			}
+		}
+	}
+	for _, zoneItemData := range engine.State.ZoneItem {
+		if !zoneItemData.HasParent {
+			if _, ok := engine.Tree.ZoneItem[zoneItemData.ID]; !ok {
+				zoneItem, include, _ := engine.assembleZoneItem(zoneItemData.ID, nil, config)
+				if include {
+					engine.Tree.ZoneItem[zoneItemData.ID] = zoneItem
+				}
+			}
+		}
+	}
+	return engine.Tree
+}`
+
+const _CreateGearScore_Engine_func string = `func (engine *Engine) CreateGearScore() gearScore {
+	return engine.createGearScore(false)
+}`
+
+const createGearScore_Engine_func string = `func (engine *Engine) createGearScore(hasParent bool) gearScore {
 	var element gearScoreCore
-	element.ID = GearScoreID(se.GenerateID())
-	element.HasParent_ = hasParent
-	element.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[element.ID] = element
+	element.engine = engine
+	element.ID = GearScoreID(engine.GenerateID())
+	element.HasParent = hasParent
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.GearScore[element.ID] = element
 	return gearScore{gearScore: element}
 }`
 
-const _CreatePosition_Engine_func string = `func (se *Engine) CreatePosition() position {
-	return se.createPosition(false)
+const _CreatePosition_Engine_func string = `func (engine *Engine) CreatePosition() position {
+	return engine.createPosition(false)
 }`
 
-const createPosition_Engine_func string = `func (se *Engine) createPosition(hasParent bool) position {
+const createPosition_Engine_func string = `func (engine *Engine) createPosition(hasParent bool) position {
 	var element positionCore
-	element.ID = PositionID(se.GenerateID())
-	element.HasParent_ = hasParent
-	element.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[element.ID] = element
+	element.engine = engine
+	element.ID = PositionID(engine.GenerateID())
+	element.HasParent = hasParent
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.Position[element.ID] = element
 	return position{position: element}
 }`
 
-const _CreateItem_Engine_func string = `func (se *Engine) CreateItem() item {
-	return se.createItem(false)
+const _CreateItem_Engine_func string = `func (engine *Engine) CreateItem() item {
+	return engine.createItem(false)
 }`
 
-const createItem_Engine_func string = `func (se *Engine) createItem(hasParent bool) item {
+const createItem_Engine_func string = `func (engine *Engine) createItem(hasParent bool) item {
 	var element itemCore
-	element.ID = ItemID(se.GenerateID())
-	element.HasParent_ = hasParent
-	elementGearScore := se.createGearScore(true)
+	element.engine = engine
+	element.ID = ItemID(engine.GenerateID())
+	element.HasParent = hasParent
+	elementGearScore := engine.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
-	element.OperationKind_ = OperationKindUpdate
-	se.Patch.Item[element.ID] = element
+	elementOrigin := engine.createAnyOfPlayerPosition(true)
+	element.Origin = elementOrigin.anyOfPlayerPosition.ID
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.Item[element.ID] = element
 	return item{item: element}
 }`
 
-const _CreateZoneItem_Engine_func string = `func (se *Engine) CreateZoneItem() zoneItem {
-	return se.createZoneItem(false)
+const _CreateZoneItem_Engine_func string = `func (engine *Engine) CreateZoneItem() zoneItem {
+	return engine.createZoneItem(false)
 }`
 
-const createZoneItem_Engine_func string = `func (se *Engine) createZoneItem(hasParent bool) zoneItem {
+const createZoneItem_Engine_func string = `func (engine *Engine) createZoneItem(hasParent bool) zoneItem {
 	var element zoneItemCore
-	element.ID = ZoneItemID(se.GenerateID())
-	element.HasParent_ = hasParent
-	elementItem := se.createItem(true)
+	element.engine = engine
+	element.ID = ZoneItemID(engine.GenerateID())
+	element.HasParent = hasParent
+	elementItem := engine.createItem(true)
 	element.Item = elementItem.item.ID
-	elementPosition := se.createPosition(true)
+	elementPosition := engine.createPosition(true)
 	element.Position = elementPosition.position.ID
-	element.OperationKind_ = OperationKindUpdate
-	se.Patch.ZoneItem[element.ID] = element
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.ZoneItem[element.ID] = element
 	return zoneItem{zoneItem: element}
 }`
 
-const _CreatePlayer_Engine_func string = `func (se *Engine) CreatePlayer() player {
-	return se.createPlayer(false)
+const _CreatePlayer_Engine_func string = `func (engine *Engine) CreatePlayer() player {
+	return engine.createPlayer(false)
 }`
 
-const createPlayer_Engine_func string = `func (se *Engine) createPlayer(hasParent bool) player {
+const createPlayer_Engine_func string = `func (engine *Engine) createPlayer(hasParent bool) player {
 	var element playerCore
-	element.ID = PlayerID(se.GenerateID())
-	element.HasParent_ = hasParent
-	elementGearScore := se.createGearScore(true)
+	element.engine = engine
+	element.ID = PlayerID(engine.GenerateID())
+	element.HasParent = hasParent
+	elementGearScore := engine.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
-	elementPosition := se.createPosition(true)
+	elementPosition := engine.createPosition(true)
 	element.Position = elementPosition.position.ID
-	element.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[element.ID] = element
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.Player[element.ID] = element
 	return player{player: element}
 }`
 
-const _CreateZone_Engine_func string = `func (se *Engine) CreateZone() zone {
-	return se.createZone()
+const _CreateZone_Engine_func string = `func (engine *Engine) CreateZone() zone {
+	return engine.createZone()
 }`
 
-const createZone_Engine_func string = `func (se *Engine) createZone() zone {
+const createZone_Engine_func string = `func (engine *Engine) createZone() zone {
 	var element zoneCore
-	element.ID = ZoneID(se.GenerateID())
-	element.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[element.ID] = element
+	element.engine = engine
+	element.ID = ZoneID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.Zone[element.ID] = element
 	return zone{zone: element}
 }`
 
-const _DeletePlayer_Engine_func string = `func (se *Engine) DeletePlayer(playerID PlayerID) {
-	player := se.Player(playerID).player
-	if player.HasParent_ {
-		return
-	}
-	se.deletePlayer(playerID)
+const createItemBoundToRef_Engine_func string = `func (engine *Engine) createItemBoundToRef(referencedElementID PlayerID, parentID ItemID) itemBoundToRefCore {
+	var element itemBoundToRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = ItemBoundToRefID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.ItemBoundToRef[element.ID] = element
+	return element
 }`
 
-const deletePlayer_Engine_func string = `func (se *Engine) deletePlayer(playerID PlayerID) {
-	player := se.Player(playerID).player
-	player.OperationKind_ = OperationKindDelete
-	se.Patch.Player[player.ID] = player
-	se.deleteGearScore(player.GearScore)
+const createPlayerGuildMemberRef_Engine_func string = `func (engine *Engine) createPlayerGuildMemberRef(referencedElementID PlayerID, parentID PlayerID) playerGuildMemberRefCore {
+	var element playerGuildMemberRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = PlayerGuildMemberRefID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.PlayerGuildMemberRef[element.ID] = element
+	return element
+}`
+
+const _CreateEquipmentSet_Engine_func string = `func (engine *Engine) CreateEquipmentSet() equipmentSet {
+	return engine.createEquipmentSet()
+}`
+
+const createEquipmentSet_Engine_func string = `func (engine *Engine) createEquipmentSet() equipmentSet {
+	var element equipmentSetCore
+	element.engine = engine
+	element.ID = EquipmentSetID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.EquipmentSet[element.ID] = element
+	return equipmentSet{equipmentSet: element}
+}`
+
+const createEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) createEquipmentSetEquipmentRef(referencedElementID ItemID, parentID EquipmentSetID) equipmentSetEquipmentRefCore {
+	var element equipmentSetEquipmentRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = EquipmentSetEquipmentRefID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.EquipmentSetEquipmentRef[element.ID] = element
+	return element
+}`
+
+const createPlayerEquipmentSetRef_Engine_func string = `func (engine *Engine) createPlayerEquipmentSetRef(referencedElementID EquipmentSetID, parentID PlayerID) playerEquipmentSetRefCore {
+	var element playerEquipmentSetRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = PlayerEquipmentSetRefID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.PlayerEquipmentSetRef[element.ID] = element
+	return element
+}`
+
+const createPlayerTargetRef_Engine_func string = `func (engine *Engine) createPlayerTargetRef(referencedElementID AnyOfPlayerZoneItemID, parentID PlayerID) playerTargetRefCore {
+	var element playerTargetRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = PlayerTargetRefID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.PlayerTargetRef[element.ID] = element
+	return element
+}`
+
+const createPlayerTargetedByRef_Engine_func string = `func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayerZoneItemID, parentID PlayerID) playerTargetedByRefCore {
+	var element playerTargetedByRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = PlayerTargetedByRefID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.PlayerTargetedByRef[element.ID] = element
+	return element
+}`
+
+const createAnyOfPlayerZoneItem_Engine_func string = `func (engine *Engine) createAnyOfPlayerZoneItem(setDefaultValue bool) anyOfPlayerZoneItem {
+	var element anyOfPlayerZoneItemCore
+	element.engine = engine
+	element.ID = AnyOfPlayerZoneItemID(engine.GenerateID())
+	if setDefaultValue {
+		elementPlayer := engine.createPlayer(true)
+		element.Player = elementPlayer.player.ID
+		element.ElementKind = ElementKindPlayer
+	}
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.AnyOfPlayerZoneItem[element.ID] = element
+	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: element}
+}`
+
+const createAnyOfPlayerPosition_Engine_func string = `func (engine *Engine) createAnyOfPlayerPosition(setDefaultValue bool) anyOfPlayerPosition {
+	var element anyOfPlayerPositionCore
+	element.engine = engine
+	element.ID = AnyOfPlayerPositionID(engine.GenerateID())
+	if setDefaultValue {
+		elementPlayer := engine.createPlayer(true)
+		element.Player = elementPlayer.player.ID
+		element.ElementKind = ElementKindPlayer
+	}
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.AnyOfPlayerPosition[element.ID] = element
+	return anyOfPlayerPosition{anyOfPlayerPosition: element}
+}`
+
+const createAnyOfItemPlayerZoneItem_Engine_func string = `func (engine *Engine) createAnyOfItemPlayerZoneItem(setDefaultValue bool) anyOfItemPlayerZoneItem {
+	var element anyOfItemPlayerZoneItemCore
+	element.engine = engine
+	element.ID = AnyOfItemPlayerZoneItemID(engine.GenerateID())
+	if setDefaultValue {
+		elementItem := engine.createItem(true)
+		element.Item = elementItem.item.ID
+		element.ElementKind = ElementKindItem
+	}
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.AnyOfItemPlayerZoneItem[element.ID] = element
+	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: element}
+}`
+
+const _DeletePlayer_Engine_func string = `func (engine *Engine) DeletePlayer(playerID PlayerID) {
+	player := engine.Player(playerID).player
+	if player.HasParent {
+		return
+	}
+	engine.deletePlayer(playerID)
+}`
+
+const deletePlayer_Engine_func string = `func (engine *Engine) deletePlayer(playerID PlayerID) {
+	player := engine.Player(playerID).player
+	engine.dereferenceItemBoundToRefs(playerID)
+	engine.dereferencePlayerGuildMemberRefs(playerID)
+	engine.dereferencePlayerTargetPlayerRefs(playerID)
+	engine.dereferencePlayerTargetedByPlayerRefs(playerID)
+	engine.deleteGearScore(player.GearScore)
+	for _, guildMember := range player.GuildMembers {
+		engine.deletePlayerGuildMemberRef(guildMember)
+	}
 	for _, itemID := range player.Items {
-		se.deleteItem(itemID)
+		engine.deleteItem(itemID)
 	}
-	se.deletePosition(player.Position)
+	engine.deletePosition(player.Position)
+	engine.deletePlayerTargetRef(player.Target)
+	for _, targetedBy := range player.TargetedBy {
+		engine.deletePlayerTargetedByRef(targetedBy)
+	}
+	if _, ok := engine.State.Player[playerID]; ok {
+		player.OperationKind = OperationKindDelete
+		engine.Patch.Player[player.ID] = player
+	} else {
+		delete(engine.Patch.Player, playerID)
+	}
 }`
 
-const _DeleteGearScore_Engine_func string = `func (se *Engine) DeleteGearScore(gearScoreID GearScoreID) {
-	gearScore := se.GearScore(gearScoreID).gearScore
-	if gearScore.HasParent_ {
+const _DeleteGearScore_Engine_func string = `func (engine *Engine) DeleteGearScore(gearScoreID GearScoreID) {
+	gearScore := engine.GearScore(gearScoreID).gearScore
+	if gearScore.HasParent {
 		return
 	}
-	se.deleteGearScore(gearScoreID)
+	engine.deleteGearScore(gearScoreID)
 }`
 
-const deleteGearScore_Engine_func string = `func (se *Engine) deleteGearScore(gearScoreID GearScoreID) {
-	gearScore := se.GearScore(gearScoreID).gearScore
-	gearScore.OperationKind_ = OperationKindDelete
-	se.Patch.GearScore[gearScore.ID] = gearScore
+const deleteGearScore_Engine_func string = `func (engine *Engine) deleteGearScore(gearScoreID GearScoreID) {
+	gearScore := engine.GearScore(gearScoreID).gearScore
+	if _, ok := engine.State.GearScore[gearScoreID]; ok {
+		gearScore.OperationKind = OperationKindDelete
+		engine.Patch.GearScore[gearScore.ID] = gearScore
+	} else {
+		delete(engine.Patch.GearScore, gearScoreID)
+	}
 }`
 
-const _DeletePosition_Engine_func string = `func (se *Engine) DeletePosition(positionID PositionID) {
-	position := se.Position(positionID).position
-	if position.HasParent_ {
+const _DeletePosition_Engine_func string = `func (engine *Engine) DeletePosition(positionID PositionID) {
+	position := engine.Position(positionID).position
+	if position.HasParent {
 		return
 	}
-	se.deletePosition(positionID)
+	engine.deletePosition(positionID)
 }`
 
-const deletePosition_Engine_func string = `func (se *Engine) deletePosition(positionID PositionID) {
-	position := se.Position(positionID).position
-	position.OperationKind_ = OperationKindDelete
-	se.Patch.Position[position.ID] = position
+const deletePosition_Engine_func string = `func (engine *Engine) deletePosition(positionID PositionID) {
+	position := engine.Position(positionID).position
+	if _, ok := engine.State.Position[positionID]; ok {
+		position.OperationKind = OperationKindDelete
+		engine.Patch.Position[position.ID] = position
+	} else {
+		delete(engine.Patch.Position, positionID)
+	}
 }`
 
-const _DeleteItem_Engine_func string = `func (se *Engine) DeleteItem(itemID ItemID) {
-	item := se.Item(itemID).item
-	if item.HasParent_ {
+const _DeleteItem_Engine_func string = `func (engine *Engine) DeleteItem(itemID ItemID) {
+	item := engine.Item(itemID).item
+	if item.HasParent {
 		return
 	}
-	se.deleteItem(itemID)
+	engine.deleteItem(itemID)
 }`
 
-const deleteItem_Engine_func string = `func (se *Engine) deleteItem(itemID ItemID) {
-	item := se.Item(itemID).item
-	item.OperationKind_ = OperationKindDelete
-	se.Patch.Item[item.ID] = item
-	se.deleteGearScore(item.GearScore)
+const deleteItem_Engine_func string = `func (engine *Engine) deleteItem(itemID ItemID) {
+	item := engine.Item(itemID).item
+	engine.deleteItemBoundToRef(item.BoundTo)
+	engine.deleteGearScore(item.GearScore)
+	engine.deleteAnyOfPlayerPosition(item.Origin, true)
+	if _, ok := engine.State.Item[itemID]; ok {
+		item.OperationKind = OperationKindDelete
+		engine.Patch.Item[item.ID] = item
+	} else {
+		delete(engine.Patch.Item, itemID)
+	}
 }`
 
-const _DeleteZoneItem_Engine_func string = `func (se *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
-	zoneItem := se.ZoneItem(zoneItemID).zoneItem
-	if zoneItem.HasParent_ {
+const _DeleteZoneItem_Engine_func string = `func (engine *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
+	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
+	if zoneItem.HasParent {
 		return
 	}
-	se.deleteZoneItem(zoneItemID)
+	engine.deleteZoneItem(zoneItemID)
 }`
 
-const deleteZoneItem_Engine_func string = `func (se *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
-	zoneItem := se.ZoneItem(zoneItemID).zoneItem
-	zoneItem.OperationKind_ = OperationKindDelete
-	se.Patch.ZoneItem[zoneItem.ID] = zoneItem
-	se.deleteItem(zoneItem.Item)
-	se.deletePosition(zoneItem.Position)
+const deleteZoneItem_Engine_func string = `func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
+	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
+	engine.dereferencePlayerTargetZoneItemRefs(zoneItemID)
+	engine.dereferencePlayerTargetedByZoneItemRefs(zoneItemID)
+	engine.deleteItem(zoneItem.Item)
+	engine.deletePosition(zoneItem.Position)
+	if _, ok := engine.State.ZoneItem[zoneItemID]; ok {
+		zoneItem.OperationKind = OperationKindDelete
+		engine.Patch.ZoneItem[zoneItem.ID] = zoneItem
+	} else {
+		delete(engine.Patch.ZoneItem, zoneItemID)
+	}
 }`
 
-const _DeleteZone_Engine_func string = `func (se *Engine) DeleteZone(zoneID ZoneID) {
-	se.deleteZone(zoneID)
+const _DeleteZone_Engine_func string = `func (engine *Engine) DeleteZone(zoneID ZoneID) {
+	engine.deleteZone(zoneID)
 }`
 
-const deleteZone_Engine_func string = `func (se *Engine) deleteZone(zoneID ZoneID) {
-	zone := se.Zone(zoneID).zone
-	zone.OperationKind_ = OperationKindDelete
-	se.Patch.Zone[zone.ID] = zone
+const deleteZone_Engine_func string = `func (engine *Engine) deleteZone(zoneID ZoneID) {
+	zone := engine.Zone(zoneID).zone
 	for _, zoneItemID := range zone.Items {
-		se.deleteZoneItem(zoneItemID)
+		engine.deleteZoneItem(zoneItemID)
 	}
 	for _, playerID := range zone.Players {
-		se.deletePlayer(playerID)
+		engine.deletePlayer(playerID)
+	}
+	if _, ok := engine.State.Zone[zoneID]; ok {
+		zone.OperationKind = OperationKindDelete
+		engine.Patch.Zone[zone.ID] = zone
+	} else {
+		delete(engine.Patch.Zone, zoneID)
 	}
 }`
 
-const _Player_Engine_func string = `func (se *Engine) Player(playerID PlayerID) player {
-	patchingPlayer, ok := se.Patch.Player[playerID]
+const _DeleteEquipmentSet_Engine_func string = `func (engine *Engine) DeleteEquipmentSet(equipmentSetID EquipmentSetID) {
+	engine.deleteEquipmentSet(equipmentSetID)
+}`
+
+const deleteEquipmentSet_Engine_func string = `func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
+	equipmentSet := engine.EquipmentSet(equipmentSetID).equipmentSet
+	engine.dereferencePlayerEquipmentSetRefs(equipmentSetID)
+	for _, equipmentSet := range equipmentSet.Equipment {
+		engine.deleteEquipmentSetEquipmentRef(equipmentSet)
+	}
+	if _, ok := engine.State.EquipmentSet[equipmentSetID]; ok {
+		equipmentSet.OperationKind = OperationKindDelete
+		engine.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
+	} else {
+		delete(engine.Patch.EquipmentSet, equipmentSetID)
+	}
+}`
+
+const deletePlayerGuildMemberRef_Engine_func string = `func (engine *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) {
+	playerGuildMemberRef := engine.playerGuildMemberRef(playerGuildMemberRefID).playerGuildMemberRef
+	if _, ok := engine.State.PlayerGuildMemberRef[playerGuildMemberRefID]; ok {
+		playerGuildMemberRef.OperationKind = OperationKindDelete
+		engine.Patch.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
+	} else {
+		delete(engine.Patch.PlayerGuildMemberRef, playerGuildMemberRefID)
+	}
+}`
+
+const deletePlayerEquipmentSetRef_Engine_func string = `func (engine *Engine) deletePlayerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) {
+	playerEquipmentSetRef := engine.playerEquipmentSetRef(playerEquipmentSetRefID).playerEquipmentSetRef
+	if _, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]; ok {
+		playerEquipmentSetRef.OperationKind = OperationKindDelete
+		engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
+	} else {
+		delete(engine.Patch.PlayerEquipmentSetRef, playerEquipmentSetRefID)
+	}
+}`
+
+const deleteItemBoundToRef_Engine_func string = `func (engine *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
+	itemBoundToRef := engine.itemBoundToRef(itemBoundToRefID).itemBoundToRef
+	if _, ok := engine.State.ItemBoundToRef[itemBoundToRefID]; ok {
+		itemBoundToRef.OperationKind = OperationKindDelete
+		engine.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
+	} else {
+		delete(engine.Patch.ItemBoundToRef, itemBoundToRefID)
+	}
+}`
+
+const deleteEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) {
+	equipmentSetEquipmentRef := engine.equipmentSetEquipmentRef(equipmentSetEquipmentRefID).equipmentSetEquipmentRef
+	if _, ok := engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]; ok {
+		equipmentSetEquipmentRef.OperationKind = OperationKindDelete
+		engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
+	} else {
+		delete(engine.Patch.EquipmentSetEquipmentRef, equipmentSetEquipmentRefID)
+	}
+}`
+
+const deletePlayerTargetRef_Engine_func string = `func (engine *Engine) deletePlayerTargetRef(playerTargetRefID PlayerTargetRefID) {
+	playerTargetRef := engine.playerTargetRef(playerTargetRefID).playerTargetRef
+	engine.deleteAnyOfPlayerZoneItem(playerTargetRef.ReferencedElementID, false)
+	if _, ok := engine.State.PlayerTargetRef[playerTargetRefID]; ok {
+		playerTargetRef.OperationKind = OperationKindDelete
+		engine.Patch.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
+	} else {
+		delete(engine.Patch.PlayerTargetRef, playerTargetRefID)
+	}
+}`
+
+const deletePlayerTargetedByRef_Engine_func string = `func (engine *Engine) deletePlayerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) {
+	playerTargetedByRef := engine.playerTargetedByRef(playerTargetedByRefID).playerTargetedByRef
+	engine.deleteAnyOfPlayerZoneItem(playerTargetedByRef.ReferencedElementID, false)
+	if _, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]; ok {
+		playerTargetedByRef.OperationKind = OperationKindDelete
+		engine.Patch.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
+	} else {
+		delete(engine.Patch.PlayerTargetedByRef, playerTargetedByRefID)
+	}
+}`
+
+const deleteAnyOfPlayerZoneItem_Engine_func string = `func (engine *Engine) deleteAnyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID, deleteChild bool) {
+	anyOfPlayerZoneItem := engine.anyOfPlayerZoneItem(anyOfPlayerZoneItemID).anyOfPlayerZoneItem
+	if deleteChild {
+		anyOfPlayerZoneItem.deleteChild()
+	}
+	if _, ok := engine.State.AnyOfPlayerZoneItem[anyOfPlayerZoneItemID]; ok {
+		anyOfPlayerZoneItem.OperationKind = OperationKindDelete
+		engine.Patch.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
+	} else {
+		delete(engine.Patch.AnyOfPlayerZoneItem, anyOfPlayerZoneItemID)
+	}
+}`
+
+const deleteAnyOfPlayerPosition_Engine_func string = `func (engine *Engine) deleteAnyOfPlayerPosition(anyOfPlayerZoneID AnyOfPlayerPositionID, deleteChild bool) {
+	anyOfPlayerPosition := engine.anyOfPlayerPosition(anyOfPlayerZoneID).anyOfPlayerPosition
+	if deleteChild {
+		anyOfPlayerPosition.deleteChild()
+	}
+	if _, ok := engine.State.AnyOfPlayerPosition[anyOfPlayerZoneID]; ok {
+		anyOfPlayerPosition.OperationKind = OperationKindDelete
+		engine.Patch.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
+	} else {
+		delete(engine.Patch.AnyOfPlayerPosition, anyOfPlayerZoneID)
+	}
+}`
+
+const deleteAnyOfItemPlayerZoneItem_Engine_func string = `func (engine *Engine) deleteAnyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfItemPlayerZoneItemID, deleteChild bool) {
+	anyOfItemPlayerZoneItem := engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID).anyOfItemPlayerZoneItem
+	if deleteChild {
+		anyOfItemPlayerZoneItem.deleteChild()
+	}
+	if _, ok := engine.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItemID]; ok {
+		anyOfItemPlayerZoneItem.OperationKind = OperationKindDelete
+		engine.Patch.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
+	} else {
+		delete(engine.Patch.AnyOfItemPlayerZoneItem, anyOfItemPlayerZoneItemID)
+	}
+}`
+
+const _Player_Engine_func string = `func (engine *Engine) Player(playerID PlayerID) player {
+	patchingPlayer, ok := engine.Patch.Player[playerID]
 	if ok {
 		return player{player: patchingPlayer}
 	}
-	currentPlayer, ok := se.State.Player[playerID]
+	currentPlayer, ok := engine.State.Player[playerID]
 	if ok {
 		return player{player: currentPlayer}
 	}
-	return player{player: playerCore{OperationKind_: OperationKindDelete}}
+	return player{player: playerCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_player_func string = `func (_player player) ID(se *Engine) PlayerID {
+const _ID_player_func string = `func (_player player) ID() PlayerID {
 	return _player.player.ID
 }`
 
-const _Items_player_func string = `func (_player player) Items(se *Engine) []item {
-	player := se.Player(_player.player.ID)
+const _Target_player_func string = `func (_player player) Target() (playerTargetRef, bool) {
+	player := _player.player.engine.Player(_player.player.ID)
+	return player.player.engine.playerTargetRef(player.player.Target), player.player.Target != 0
+}`
+
+const _TargetedBy_player_func string = `func (_player player) TargetedBy() []playerTargetedByRef {
+	player := _player.player.engine.Player(_player.player.ID)
+	var guildMembers []playerTargetedByRef
+	for _, refID := range player.player.TargetedBy {
+		guildMembers = append(guildMembers, player.player.engine.playerTargetedByRef(refID))
+	}
+	return guildMembers
+}`
+
+const _Items_player_func string = `func (_player player) Items() []item {
+	player := _player.player.engine.Player(_player.player.ID)
 	var items []item
 	for _, itemID := range player.player.Items {
-		items = append(items, se.Item(itemID))
+		items = append(items, player.player.engine.Item(itemID))
 	}
 	return items
 }`
 
-const _GearScore_player_func string = `func (_player player) GearScore(se *Engine) gearScore {
-	player := se.Player(_player.player.ID)
-	return se.GearScore(player.player.GearScore)
+const _GearScore_player_func string = `func (_player player) GearScore() gearScore {
+	player := _player.player.engine.Player(_player.player.ID)
+	return player.player.engine.GearScore(player.player.GearScore)
 }`
 
-const _Position_player_func string = `func (_player player) Position(se *Engine) position {
-	player := se.Player(_player.player.ID)
-	return se.Position(player.player.Position)
+const _GuildMembers_player_func string = `func (_player player) GuildMembers() []playerGuildMemberRef {
+	player := _player.player.engine.Player(_player.player.ID)
+	var guildMembers []playerGuildMemberRef
+	for _, refID := range player.player.GuildMembers {
+		guildMembers = append(guildMembers, player.player.engine.playerGuildMemberRef(refID))
+	}
+	return guildMembers
 }`
 
-const _GearScore_Engine_func string = `func (se *Engine) GearScore(gearScoreID GearScoreID) gearScore {
-	patchingGearScore, ok := se.Patch.GearScore[gearScoreID]
+const _Position_player_func string = `func (_player player) Position() position {
+	player := _player.player.engine.Player(_player.player.ID)
+	return player.player.engine.Position(player.player.Position)
+}`
+
+const _GearScore_Engine_func string = `func (engine *Engine) GearScore(gearScoreID GearScoreID) gearScore {
+	patchingGearScore, ok := engine.Patch.GearScore[gearScoreID]
 	if ok {
 		return gearScore{gearScore: patchingGearScore}
 	}
-	currentGearScore, ok := se.State.GearScore[gearScoreID]
+	currentGearScore, ok := engine.State.GearScore[gearScoreID]
 	if ok {
 		return gearScore{gearScore: currentGearScore}
 	}
-	return gearScore{gearScore: gearScoreCore{OperationKind_: OperationKindDelete}}
+	return gearScore{gearScore: gearScoreCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_gearScore_func string = `func (_gearScore gearScore) ID(se *Engine) GearScoreID {
+const _ID_gearScore_func string = `func (_gearScore gearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }`
 
-const _Level_gearScore_func string = `func (_gearScore gearScore) Level(se *Engine) int {
-	gearScore := se.GearScore(_gearScore.gearScore.ID)
+const _Level_gearScore_func string = `func (_gearScore gearScore) Level() int {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Level
 }`
 
-const _Score_gearScore_func string = `func (_gearScore gearScore) Score(se *Engine) int {
-	gearScore := se.GearScore(_gearScore.gearScore.ID)
+const _Score_gearScore_func string = `func (_gearScore gearScore) Score() int {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Score
 }`
 
-const _Item_Engine_func string = `func (se *Engine) Item(itemID ItemID) item {
-	patchingItem, ok := se.Patch.Item[itemID]
+const _Item_Engine_func string = `func (engine *Engine) Item(itemID ItemID) item {
+	patchingItem, ok := engine.Patch.Item[itemID]
 	if ok {
 		return item{item: patchingItem}
 	}
-	currentItem, ok := se.State.Item[itemID]
+	currentItem, ok := engine.State.Item[itemID]
 	if ok {
 		return item{item: currentItem}
 	}
-	return item{item: itemCore{OperationKind_: OperationKindDelete}}
+	return item{item: itemCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_item_func string = `func (_item item) ID(se *Engine) ItemID {
+const _ID_item_func string = `func (_item item) ID() ItemID {
 	return _item.item.ID
 }`
 
-const _GearScore_item_func string = `func (_item item) GearScore(se *Engine) gearScore {
-	item := se.Item(_item.item.ID)
-	return se.GearScore(item.item.GearScore)
+const _GearScore_item_func string = `func (_item item) GearScore() gearScore {
+	item := _item.item.engine.Item(_item.item.ID)
+	return item.item.engine.GearScore(item.item.GearScore)
 }`
 
-const _Position_Engine_func string = `func (se *Engine) Position(positionID PositionID) position {
-	patchingPosition, ok := se.Patch.Position[positionID]
+const _BoundTo_item_func string = `func (_item item) BoundTo() (itemBoundToRef, bool) {
+	item := _item.item.engine.Item(_item.item.ID)
+	return item.item.engine.itemBoundToRef(item.item.BoundTo), item.item.BoundTo != 0
+}`
+
+const _Origin_item_func string = `func (_item item) Origin() anyOfPlayerPosition {
+	item := _item.item.engine.Item(_item.item.ID)
+	return item.item.engine.anyOfPlayerPosition(item.item.Origin)
+}`
+
+const _Position_Engine_func string = `func (engine *Engine) Position(positionID PositionID) position {
+	patchingPosition, ok := engine.Patch.Position[positionID]
 	if ok {
 		return position{position: patchingPosition}
 	}
-	currentPosition, ok := se.State.Position[positionID]
+	currentPosition, ok := engine.State.Position[positionID]
 	if ok {
 		return position{position: currentPosition}
 	}
-	return position{position: positionCore{OperationKind_: OperationKindDelete}}
+	return position{position: positionCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_position_func string = `func (_position position) ID(se *Engine) PositionID {
+const _ID_position_func string = `func (_position position) ID() PositionID {
 	return _position.position.ID
 }`
 
-const _X_position_func string = `func (_position position) X(se *Engine) float64 {
-	position := se.Position(_position.position.ID)
+const _X_position_func string = `func (_position position) X() float64 {
+	position := _position.position.engine.Position(_position.position.ID)
 	return position.position.X
 }`
 
-const _Y_position_func string = `func (_position position) Y(se *Engine) float64 {
-	position := se.Position(_position.position.ID)
+const _Y_position_func string = `func (_position position) Y() float64 {
+	position := _position.position.engine.Position(_position.position.ID)
 	return position.position.Y
 }`
 
-const _ZoneItem_Engine_func string = `func (se *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
-	patchingZoneItem, ok := se.Patch.ZoneItem[zoneItemID]
+const _ZoneItem_Engine_func string = `func (engine *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
+	patchingZoneItem, ok := engine.Patch.ZoneItem[zoneItemID]
 	if ok {
 		return zoneItem{zoneItem: patchingZoneItem}
 	}
-	currentZoneItem, ok := se.State.ZoneItem[zoneItemID]
+	currentZoneItem, ok := engine.State.ZoneItem[zoneItemID]
 	if ok {
 		return zoneItem{zoneItem: currentZoneItem}
 	}
-	return zoneItem{zoneItem: zoneItemCore{OperationKind_: OperationKindDelete}}
+	return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_zoneItem_func string = `func (_zoneItem zoneItem) ID(se *Engine) ZoneItemID {
+const _ID_zoneItem_func string = `func (_zoneItem zoneItem) ID() ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }`
 
-const _Position_zoneItem_func string = `func (_zoneItem zoneItem) Position(se *Engine) position {
-	zoneItem := se.ZoneItem(_zoneItem.zoneItem.ID)
-	return se.Position(zoneItem.zoneItem.Position)
+const _Position_zoneItem_func string = `func (_zoneItem zoneItem) Position() position {
+	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
+	return zoneItem.zoneItem.engine.Position(zoneItem.zoneItem.Position)
 }`
 
-const _Item_zoneItem_func string = `func (_zoneItem zoneItem) Item(se *Engine) item {
-	zoneItem := se.ZoneItem(_zoneItem.zoneItem.ID)
-	return se.Item(zoneItem.zoneItem.Item)
+const _Item_zoneItem_func string = `func (_zoneItem zoneItem) Item() item {
+	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
+	return zoneItem.zoneItem.engine.Item(zoneItem.zoneItem.Item)
 }`
 
-const _Zone_Engine_func string = `func (se *Engine) Zone(zoneID ZoneID) zone {
-	patchingZone, ok := se.Patch.Zone[zoneID]
+const _Zone_Engine_func string = `func (engine *Engine) Zone(zoneID ZoneID) zone {
+	patchingZone, ok := engine.Patch.Zone[zoneID]
 	if ok {
 		return zone{zone: patchingZone}
 	}
-	currentZone, ok := se.State.Zone[zoneID]
+	currentZone, ok := engine.State.Zone[zoneID]
 	if ok {
 		return zone{zone: currentZone}
 	}
-	return zone{zone: zoneCore{OperationKind_: OperationKindDelete}}
+	return zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_zone_func string = `func (_zone zone) ID(se *Engine) ZoneID {
+const _ID_zone_func string = `func (_zone zone) ID() ZoneID {
 	return _zone.zone.ID
 }`
 
-const _Players_zone_func string = `func (_zone zone) Players(se *Engine) []player {
-	zone := se.Zone(_zone.zone.ID)
+const _Players_zone_func string = `func (_zone zone) Players() []player {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var players []player
 	for _, playerID := range zone.zone.Players {
-		players = append(players, se.Player(playerID))
+		players = append(players, zone.zone.engine.Player(playerID))
 	}
 	return players
 }`
 
-const _Items_zone_func string = `func (_zone zone) Items(se *Engine) []zoneItem {
-	zone := se.Zone(_zone.zone.ID)
+const _Interactables_zone_func string = `func (_zone zone) Interactables() []anyOfItemPlayerZoneItem {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	var anyContainers []anyOfItemPlayerZoneItem
+	for _, anyOfItemPlayerZoneItemID := range zone.zone.Interactables {
+		anyContainers = append(anyContainers, zone.zone.engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID))
+	}
+	return anyContainers
+}`
+
+const _Items_zone_func string = `func (_zone zone) Items() []zoneItem {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var items []zoneItem
 	for _, zoneItemID := range zone.zone.Items {
-		items = append(items, se.ZoneItem(zoneItemID))
+		items = append(items, zone.zone.engine.ZoneItem(zoneItemID))
 	}
 	return items
 }`
 
-const _Tags_zone_func string = `func (_zone zone) Tags(se *Engine) []string {
-	zone := se.Zone(_zone.zone.ID)
+const _Tags_zone_func string = `func (_zone zone) Tags() []string {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var tags []string
 	for _, element := range zone.zone.Tags {
 		tags = append(tags, element)
@@ -624,9 +1866,201 @@ const _Tags_zone_func string = `func (_zone zone) Tags(se *Engine) []string {
 	return tags
 }`
 
-const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
-	check := make(map[GearScoreID]bool)
-	deduped := make([]GearScoreID, 0)
+const _ID_itemBoundToRef_func string = `func (ref itemBoundToRef) ID() PlayerID {
+	return ref.itemBoundToRef.ReferencedElementID
+}`
+
+const itemBoundToRef_Engine_func string = `func (engine *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) itemBoundToRef {
+	patchingRef, ok := engine.Patch.ItemBoundToRef[itemBoundToRefID]
+	if ok {
+		return itemBoundToRef{itemBoundToRef: patchingRef}
+	}
+	currentRef, ok := engine.State.ItemBoundToRef[itemBoundToRefID]
+	if ok {
+		return itemBoundToRef{itemBoundToRef: currentRef}
+	}
+	return itemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_playerGuildMemberRef_func string = `func (ref playerGuildMemberRef) ID() PlayerID {
+	return ref.playerGuildMemberRef.ReferencedElementID
+}`
+
+const playerGuildMemberRef_Engine_func string = `func (engine *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) playerGuildMemberRef {
+	patchingRef, ok := engine.Patch.PlayerGuildMemberRef[playerGuildMemberRefID]
+	if ok {
+		return playerGuildMemberRef{playerGuildMemberRef: patchingRef}
+	}
+	currentRef, ok := engine.State.PlayerGuildMemberRef[playerGuildMemberRefID]
+	if ok {
+		return playerGuildMemberRef{playerGuildMemberRef: currentRef}
+	}
+	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const playerEquipmentSetRef_Engine_func string = `func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
+	patchingRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: patchingRef}
+	}
+	currentRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: currentRef}
+	}
+	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _EquipmentSet_Engine_func string = `func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
+	patchingEquipmentSet, ok := engine.Patch.EquipmentSet[equipmentSetID]
+	if ok {
+		return equipmentSet{equipmentSet: patchingEquipmentSet}
+	}
+	currentEquipmentSet, ok := engine.State.EquipmentSet[equipmentSetID]
+	if ok {
+		return equipmentSet{equipmentSet: currentEquipmentSet}
+	}
+	return equipmentSet{equipmentSet: equipmentSetCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_equipmentSet_func string = `func (_equipmentSet equipmentSet) ID() EquipmentSetID {
+	return _equipmentSet.equipmentSet.ID
+}`
+
+const _Equipment_equipmentSet_func string = `func (_equipmentSet equipmentSet) Equipment() []equipmentSetEquipmentRef {
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	var equipment []equipmentSetEquipmentRef
+	for _, refID := range equipmentSet.equipmentSet.Equipment {
+		equipment = append(equipment, equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refID))
+	}
+	return equipment
+}`
+
+const equipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) equipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) equipmentSetEquipmentRef {
+	patchingRef, ok := engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
+	if ok {
+		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: patchingRef}
+	}
+	currentRef, ok := engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
+	if ok {
+		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: currentRef}
+	}
+	return equipmentSetEquipmentRef{equipmentSetEquipmentRef: equipmentSetEquipmentRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_playerTargetRef_func string = `func (ref playerTargetRef) ID() AnyOfPlayerZoneItemID {
+	return ref.playerTargetRef.ReferencedElementID
+}`
+
+const playerTargetRef_Engine_func string = `func (engine *Engine) playerTargetRef(playerTargetRefID PlayerTargetRefID) playerTargetRef {
+	patchingRef, ok := engine.Patch.PlayerTargetRef[playerTargetRefID]
+	if ok {
+		return playerTargetRef{playerTargetRef: patchingRef}
+	}
+	currentRef, ok := engine.State.PlayerTargetRef[playerTargetRefID]
+	if ok {
+		return playerTargetRef{playerTargetRef: currentRef}
+	}
+	return playerTargetRef{playerTargetRef: playerTargetRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_playerTargetedByRef_func string = `func (ref playerTargetedByRef) ID() AnyOfPlayerZoneItemID {
+	return ref.playerTargetedByRef.ReferencedElementID
+}`
+
+const playerTargetedByRef_Engine_func string = `func (engine *Engine) playerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) playerTargetedByRef {
+	patchingRef, ok := engine.Patch.PlayerTargetedByRef[playerTargetedByRefID]
+	if ok {
+		return playerTargetedByRef{playerTargetedByRef: patchingRef}
+	}
+	currentRef, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]
+	if ok {
+		return playerTargetedByRef{playerTargetedByRef: currentRef}
+	}
+	return playerTargetedByRef{playerTargetedByRef: playerTargetedByRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_anyOfPlayerPosition_func string = `func (_anyOfPlayerZone anyOfPlayerPosition) ID() AnyOfPlayerPositionID {
+	return _anyOfPlayerZone.anyOfPlayerPosition.ID
+}`
+
+const _Player_anyOfPlayerPosition_func string = `func (_anyOfPlayerZone anyOfPlayerPosition) Player() player {
+	anyOfPlayerPosition := _anyOfPlayerZone.anyOfPlayerPosition.engine.anyOfPlayerPosition(_anyOfPlayerZone.anyOfPlayerPosition.ID)
+	return anyOfPlayerPosition.anyOfPlayerPosition.engine.Player(anyOfPlayerPosition.anyOfPlayerPosition.Player)
+}`
+
+const _Position_anyOfPlayerPosition_func string = `func (_anyOfPlayerPosition anyOfPlayerPosition) Position() position {
+	anyOfPlayerPosition := _anyOfPlayerPosition.anyOfPlayerPosition.engine.anyOfPlayerPosition(_anyOfPlayerPosition.anyOfPlayerPosition.ID)
+	return anyOfPlayerPosition.anyOfPlayerPosition.engine.Position(anyOfPlayerPosition.anyOfPlayerPosition.Position)
+}`
+
+const anyOfPlayerPosition_Engine_func string = `func (engine *Engine) anyOfPlayerPosition(anyOfPlayerZoneID AnyOfPlayerPositionID) anyOfPlayerPosition {
+	patchingRef, ok := engine.Patch.AnyOfPlayerPosition[anyOfPlayerZoneID]
+	if ok {
+		return anyOfPlayerPosition{anyOfPlayerPosition: patchingRef}
+	}
+	currentRef, ok := engine.State.AnyOfPlayerPosition[anyOfPlayerZoneID]
+	if ok {
+		return anyOfPlayerPosition{anyOfPlayerPosition: currentRef}
+	}
+	return anyOfPlayerPosition{anyOfPlayerPosition: anyOfPlayerPositionCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_anyOfPlayerZoneItem_func string = `func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ID() AnyOfPlayerZoneItemID {
+	return _anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID
+}`
+
+const _Player_anyOfPlayerZoneItem_func string = `func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) Player() player {
+	anyOfPlayerZoneItem := _anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.anyOfPlayerZoneItem(_anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID)
+	return anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.Player(anyOfPlayerZoneItem.anyOfPlayerZoneItem.Player)
+}`
+
+const _ZoneItem_anyOfPlayerZoneItem_func string = `func (_anyOfPlayerZoneItem anyOfPlayerZoneItem) ZoneItem() zoneItem {
+	anyOfPlayerZoneItem := _anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.anyOfPlayerZoneItem(_anyOfPlayerZoneItem.anyOfPlayerZoneItem.ID)
+	return anyOfPlayerZoneItem.anyOfPlayerZoneItem.engine.ZoneItem(anyOfPlayerZoneItem.anyOfPlayerZoneItem.ZoneItem)
+}`
+
+const anyOfPlayerZoneItem_Engine_func string = `func (engine *Engine) anyOfPlayerZoneItem(anyOfPlayerZoneItemID AnyOfPlayerZoneItemID) anyOfPlayerZoneItem {
+	patchingRef, ok := engine.Patch.AnyOfPlayerZoneItem[anyOfPlayerZoneItemID]
+	if ok {
+		return anyOfPlayerZoneItem{anyOfPlayerZoneItem: patchingRef}
+	}
+	currentRef, ok := engine.State.AnyOfPlayerZoneItem[anyOfPlayerZoneItemID]
+	if ok {
+		return anyOfPlayerZoneItem{anyOfPlayerZoneItem: currentRef}
+	}
+	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: anyOfPlayerZoneItemCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const anyOfItemPlayerZoneItem_Engine_func string = `func (engine *Engine) anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID AnyOfItemPlayerZoneItemID) anyOfItemPlayerZoneItem {
+	patchingRef, ok := engine.Patch.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItemID]
+	if ok {
+		return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: patchingRef}
+	}
+	currentRef, ok := engine.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItemID]
+	if ok {
+		return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: currentRef}
+	}
+	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: anyOfItemPlayerZoneItemCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _Player_anyOfItemPlayerZoneItem_func string = `func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) Player() player {
+	anyOfItemPlayerZoneItem := _anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ID)
+	return anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.Player(anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.Player)
+}`
+
+const _ZoneItem_anyOfItemPlayerZoneItem_func string = `func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) ZoneItem() zoneItem {
+	anyOfItemPlayerZoneItem := _anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ID)
+	return anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.ZoneItem(anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ZoneItem)
+}`
+
+const _Item_anyOfItemPlayerZoneItem_func string = `func (_anyOfItemPlayerZoneItem anyOfItemPlayerZoneItem) Item() item {
+	anyOfItemPlayerZoneItem := _anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.ID)
+	return anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.engine.Item(anyOfItemPlayerZoneItem.anyOfItemPlayerZoneItem.Item)
+}`
+
+const deduplicatePlayerTargetedByRefIDs_func string = `func deduplicatePlayerTargetedByRefIDs(a []PlayerTargetedByRefID, b []PlayerTargetedByRefID) []PlayerTargetedByRefID {
+	check := make(map[PlayerTargetedByRefID]bool)
+	deduped := make([]PlayerTargetedByRefID, 0)
 	for _, val := range a {
 		check[val] = true
 	}
@@ -639,9 +2073,9 @@ const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []Ge
 	return deduped
 }`
 
-const deduplicateItemIDs_func string = `func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
-	check := make(map[ItemID]bool)
-	deduped := make([]ItemID, 0)
+const deduplicatePlayerTargetRefIDs_func string = `func deduplicatePlayerTargetRefIDs(a []PlayerTargetRefID, b []PlayerTargetRefID) []PlayerTargetRefID {
+	check := make(map[PlayerTargetRefID]bool)
+	deduped := make([]PlayerTargetRefID, 0)
 	for _, val := range a {
 		check[val] = true
 	}
@@ -654,9 +2088,9 @@ const deduplicateItemIDs_func string = `func deduplicateItemIDs(a []ItemID, b []
 	return deduped
 }`
 
-const deduplicatePlayerIDs_func string = `func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
-	check := make(map[PlayerID]bool)
-	deduped := make([]PlayerID, 0)
+const deduplicateItemBoundToRefIDs_func string = `func deduplicateItemBoundToRefIDs(a []ItemBoundToRefID, b []ItemBoundToRefID) []ItemBoundToRefID {
+	check := make(map[ItemBoundToRefID]bool)
+	deduped := make([]ItemBoundToRefID, 0)
 	for _, val := range a {
 		check[val] = true
 	}
@@ -669,9 +2103,9 @@ const deduplicatePlayerIDs_func string = `func deduplicatePlayerIDs(a []PlayerID
 	return deduped
 }`
 
-const deduplicatePositionIDs_func string = `func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
-	check := make(map[PositionID]bool)
-	deduped := make([]PositionID, 0)
+const deduplicatePlayerGuildMemberRefIDs_func string = `func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGuildMemberRefID) []PlayerGuildMemberRefID {
+	check := make(map[PlayerGuildMemberRefID]bool)
+	deduped := make([]PlayerGuildMemberRefID, 0)
 	for _, val := range a {
 		check[val] = true
 	}
@@ -684,9 +2118,9 @@ const deduplicatePositionIDs_func string = `func deduplicatePositionIDs(a []Posi
 	return deduped
 }`
 
-const deduplicateZoneIDs_func string = `func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
-	check := make(map[ZoneID]bool)
-	deduped := make([]ZoneID, 0)
+const deduplicatePlayerEquipmentSetRefIDs_func string = `func deduplicatePlayerEquipmentSetRefIDs(a []PlayerEquipmentSetRefID, b []PlayerEquipmentSetRefID) []PlayerEquipmentSetRefID {
+	check := make(map[PlayerEquipmentSetRefID]bool)
+	deduped := make([]PlayerEquipmentSetRefID, 0)
 	for _, val := range a {
 		check[val] = true
 	}
@@ -699,9 +2133,9 @@ const deduplicateZoneIDs_func string = `func deduplicateZoneIDs(a []ZoneID, b []
 	return deduped
 }`
 
-const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
-	check := make(map[ZoneItemID]bool)
-	deduped := make([]ZoneItemID, 0)
+const deduplicateEquipmentSetEquipmentRefIDs_func string = `func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []EquipmentSetEquipmentRefID) []EquipmentSetEquipmentRefID {
+	check := make(map[EquipmentSetEquipmentRefID]bool)
+	deduped := make([]EquipmentSetEquipmentRefID, 0)
 	for _, val := range a {
 		check[val] = true
 	}
@@ -714,9 +2148,852 @@ const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []Zone
 	return deduped
 }`
 
-const _RemovePlayers_zone_func string = `func (_zone zone) RemovePlayers(se *Engine, playersToRemove ...PlayerID) zone {
-	zone := se.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+const allPlayerTargetedByRefIDs_Engine_func string = `func (se Engine) allPlayerTargetedByRefIDs() []PlayerTargetedByRefID {
+	var statePlayerTargetedByRefIDs []PlayerTargetedByRefID
+	for itemBoundToRefID := range se.State.PlayerTargetedByRef {
+		statePlayerTargetedByRefIDs = append(statePlayerTargetedByRefIDs, itemBoundToRefID)
+	}
+	var patchPlayerTargetedByRefIDs []PlayerTargetedByRefID
+	for itemBoundToRefID := range se.Patch.PlayerTargetedByRef {
+		patchPlayerTargetedByRefIDs = append(patchPlayerTargetedByRefIDs, itemBoundToRefID)
+	}
+	return deduplicatePlayerTargetedByRefIDs(statePlayerTargetedByRefIDs, patchPlayerTargetedByRefIDs)
+}`
+
+const allPlayerTargetRefIDs_Engine_func string = `func (se Engine) allPlayerTargetRefIDs() []PlayerTargetRefID {
+	var statePlayerTargetRefIDs []PlayerTargetRefID
+	for itemBoundToRefID := range se.State.PlayerTargetRef {
+		statePlayerTargetRefIDs = append(statePlayerTargetRefIDs, itemBoundToRefID)
+	}
+	var patchPlayerTargetRefIDs []PlayerTargetRefID
+	for itemBoundToRefID := range se.Patch.PlayerTargetRef {
+		patchPlayerTargetRefIDs = append(patchPlayerTargetRefIDs, itemBoundToRefID)
+	}
+	return deduplicatePlayerTargetRefIDs(statePlayerTargetRefIDs, patchPlayerTargetRefIDs)
+}`
+
+const allItemBoundToRefIDs_Engine_func string = `func (se Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
+	var stateItemBoundToRefIDs []ItemBoundToRefID
+	for itemBoundToRefID := range se.State.ItemBoundToRef {
+		stateItemBoundToRefIDs = append(stateItemBoundToRefIDs, itemBoundToRefID)
+	}
+	var patchItemBoundToRefIDs []ItemBoundToRefID
+	for itemBoundToRefID := range se.Patch.ItemBoundToRef {
+		patchItemBoundToRefIDs = append(patchItemBoundToRefIDs, itemBoundToRefID)
+	}
+	return deduplicateItemBoundToRefIDs(stateItemBoundToRefIDs, patchItemBoundToRefIDs)
+}`
+
+const allPlayerGuildMemberRefIDs_Engine_func string = `func (se Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
+	var statePlayerGuildMemberRefIDs []PlayerGuildMemberRefID
+	for playerGuildMemberRefID := range se.State.PlayerGuildMemberRef {
+		statePlayerGuildMemberRefIDs = append(statePlayerGuildMemberRefIDs, playerGuildMemberRefID)
+	}
+	var patchPlayerGuildMemberRefIDs []PlayerGuildMemberRefID
+	for playerGuildMemberRefID := range se.Patch.PlayerGuildMemberRef {
+		patchPlayerGuildMemberRefIDs = append(patchPlayerGuildMemberRefIDs, playerGuildMemberRefID)
+	}
+	return deduplicatePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
+}`
+
+const allPlayerEquipmentSetRefIDs_Engine_func string = `func (se Engine) allPlayerEquipmentSetRefIDs() []PlayerEquipmentSetRefID {
+	var statePlayerEquipmentSetRefIDs []PlayerEquipmentSetRefID
+	for playerEquipmentSetRefID := range se.State.PlayerEquipmentSetRef {
+		statePlayerEquipmentSetRefIDs = append(statePlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
+	}
+	var patchPlayerEquipmentSetRefIDs []PlayerEquipmentSetRefID
+	for playerEquipmentSetRefID := range se.Patch.PlayerEquipmentSetRef {
+		patchPlayerEquipmentSetRefIDs = append(patchPlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
+	}
+	return deduplicatePlayerEquipmentSetRefIDs(statePlayerEquipmentSetRefIDs, patchPlayerEquipmentSetRefIDs)
+}`
+
+const allEquipmentSetEquipmentRefIDs_Engine_func string = `func (se Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
+	var stateEquipmentSetEquipmentRefIDs []EquipmentSetEquipmentRefID
+	for equipmentSetEquipmentRefID := range se.State.EquipmentSetEquipmentRef {
+		stateEquipmentSetEquipmentRefIDs = append(stateEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
+	}
+	var patchEquipmentSetEquipmentRefIDs []EquipmentSetEquipmentRefID
+	for equipmentSetEquipmentRefID := range se.Patch.EquipmentSetEquipmentRef {
+		patchEquipmentSetEquipmentRefIDs = append(patchEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
+	}
+	return deduplicateEquipmentSetEquipmentRefIDs(stateEquipmentSetEquipmentRefIDs, patchEquipmentSetEquipmentRefIDs)
+}`
+
+const mergeGearScoreIDs_func string = `func mergeGearScoreIDs(currentIDs, nextIDs []GearScoreID) []GearScoreID {
+	ids := make([]GearScoreID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeItemIDs_func string = `func mergeItemIDs(currentIDs, nextIDs []ItemID) []ItemID {
+	ids := make([]ItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergePlayerIDs_func string = `func mergePlayerIDs(currentIDs, nextIDs []PlayerID) []PlayerID {
+	ids := make([]PlayerID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergePositionIDs_func string = `func mergePositionIDs(currentIDs, nextIDs []PositionID) []PositionID {
+	ids := make([]PositionID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeZoneIDs_func string = `func mergeZoneIDs(currentIDs, nextIDs []ZoneID) []ZoneID {
+	ids := make([]ZoneID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeZoneItemIDs_func string = `func mergeZoneItemIDs(currentIDs, nextIDs []ZoneItemID) []ZoneItemID {
+	ids := make([]ZoneItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeEquipmentSetIDs_func string = `func mergeEquipmentSetIDs(currentIDs, nextIDs []EquipmentSetID) []EquipmentSetID {
+	ids := make([]EquipmentSetID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeItemBoundToRefIDs_func string = `func mergeItemBoundToRefIDs(currentIDs, nextIDs []ItemBoundToRefID) []ItemBoundToRefID {
+	ids := make([]ItemBoundToRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeEquipmentSetEquipmentRefIDs_func string = `func mergeEquipmentSetEquipmentRefIDs(currentIDs, nextIDs []EquipmentSetEquipmentRefID) []EquipmentSetEquipmentRefID {
+	ids := make([]EquipmentSetEquipmentRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergePlayerGuildMemberRefIDs_func string = `func mergePlayerGuildMemberRefIDs(currentIDs, nextIDs []PlayerGuildMemberRefID) []PlayerGuildMemberRefID {
+	ids := make([]PlayerGuildMemberRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergePlayerTargetedByRefIDs_func string = `func mergePlayerTargetedByRefIDs(currentIDs, nextIDs []PlayerTargetedByRefID) []PlayerTargetedByRefID {
+	ids := make([]PlayerTargetedByRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergePlayerEquipmentSetRefIDs_func string = `func mergePlayerEquipmentSetRefIDs(currentIDs, nextIDs []PlayerEquipmentSetRefID) []PlayerEquipmentSetRefID {
+	ids := make([]PlayerEquipmentSetRefID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeAnyOfPlayerZoneItemIDs_func string = `func mergeAnyOfPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfPlayerZoneItemID) []AnyOfPlayerZoneItemID {
+	ids := make([]AnyOfPlayerZoneItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeAnyOfPlayerPositionIDs_func string = `func mergeAnyOfPlayerPositionIDs(currentIDs, nextIDs []AnyOfPlayerPositionID) []AnyOfPlayerPositionID {
+	ids := make([]AnyOfPlayerPositionID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const mergeAnyOfItemPlayerZoneItemIDs_func string = `func mergeAnyOfItemPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfItemPlayerZoneItemID) []AnyOfItemPlayerZoneItemID {
+	ids := make([]AnyOfItemPlayerZoneItemID, len(currentIDs))
+	copy(ids, currentIDs)
+	var j int
+	for _, currentID := range currentIDs {
+		if len(nextIDs) <= j || currentID != nextIDs[j] {
+			continue
+		}
+		j += 1
+	}
+	for _, nextID := range nextIDs[j:] {
+		ids = append(ids, nextID)
+	}
+	return ids
+}`
+
+const path_go_import string = `import "strconv"`
+
+const pathTrack_type string = `type pathTrack struct {
+	_iterations	int
+	equipmentSet	map[EquipmentSetID]path
+	gearScore	map[GearScoreID]path
+	item		map[ItemID]path
+	player		map[PlayerID]path
+	position	map[PositionID]path
+	zone		map[ZoneID]path
+	zoneItem	map[ZoneItemID]path
+}`
+
+const newPathTrack_func string = `func newPathTrack() pathTrack {
+	return pathTrack{equipmentSet: make(map[EquipmentSetID]path), gearScore: make(map[GearScoreID]path), item: make(map[ItemID]path), player: make(map[PlayerID]path), position: make(map[PositionID]path), zone: make(map[ZoneID]path), zoneItem: make(map[ZoneItemID]path)}
+}`
+
+const itemsIdentifier_type string = `const (
+	itemsIdentifier		int	= -1
+	gearScoreIdentifier	int	= -2
+	positionIdentifier	int	= -3
+	targetIdentifier	int	= -4
+	playersIdentifier	int	= -5
+	interactablesIdentifier	int	= -6
+	itemIdentifier		int	= -7
+	originIdentifier	int	= -8
+	equipmentSetIdentifier	int	= -9
+	playerIdentifier	int	= -10
+	zoneIdentifier		int	= -11
+	zoneItemIdentifier	int	= -12
+)`
+
+const path_type string = `type path []int`
+
+const newPath_func string = `func newPath(elementIdentifier, id int) path {
+	return []int{elementIdentifier, id}
+}`
+
+const newEmptyPath_func string = `func newEmptyPath() path {
+	var p path
+	return p
+}`
+
+const items_path_func string = `func (p path) items() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, itemsIdentifier)
+	return newPath
+}`
+
+const gearScore_path_func string = `func (p path) gearScore() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, gearScoreIdentifier)
+	return newPath
+}`
+
+const position_path_func string = `func (p path) position() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, positionIdentifier)
+	return newPath
+}`
+
+const target_path_func string = `func (p path) target() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, targetIdentifier)
+	return newPath
+}`
+
+const players_path_func string = `func (p path) players() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, playersIdentifier)
+	return newPath
+}`
+
+const interactables_path_func string = `func (p path) interactables() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, interactablesIdentifier)
+	return newPath
+}`
+
+const item_path_func string = `func (p path) item() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, itemIdentifier)
+	return newPath
+}`
+
+const origin_path_func string = `func (p path) origin() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, originIdentifier)
+	return newPath
+}`
+
+const index_path_func string = `func (p path) index(i int) path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, i)
+	return newPath
+}`
+
+const equals_path_func string = `func (p path) equals(parentPath path) bool {
+	if len(p) != len(parentPath) {
+		return false
+	}
+	for i, segment := range parentPath {
+		if segment != p[i] {
+			return false
+		}
+	}
+	return true
+}`
+
+const walkGearScore_Engine_func string = `func (se *Engine) walkGearScore(gearScoreID GearScoreID, p path) {
+	se.PathTrack.gearScore[gearScoreID] = p
+}`
+
+const walkPosition_Engine_func string = `func (se *Engine) walkPosition(positionID PositionID, p path) {
+	se.PathTrack.position[positionID] = p
+}`
+
+const walkEquipmentSet_Engine_func string = `func (se *Engine) walkEquipmentSet(equipmentSetID EquipmentSetID, p path) {
+	se.PathTrack.equipmentSet[equipmentSetID] = p
+}`
+
+const walkItem_Engine_func string = `func (se *Engine) walkItem(itemID ItemID, p path) {
+	itemData, hasUpdated := se.Patch.Item[itemID]
+	if !hasUpdated {
+		itemData = se.State.Item[itemID]
+	}
+	var gearScorePath path
+	if existingPath, pathExists := se.PathTrack.gearScore[itemData.GearScore]; !pathExists {
+		gearScorePath = p.gearScore()
+	} else {
+		gearScorePath = existingPath
+	}
+	se.walkGearScore(itemData.GearScore, gearScorePath)
+	se.PathTrack.item[itemID] = p
+}`
+
+const walkZoneItem_Engine_func string = `func (se *Engine) walkZoneItem(zoneItemID ZoneItemID, p path) {
+	zoneItemData, hasUpdated := se.Patch.ZoneItem[zoneItemID]
+	if !hasUpdated {
+		zoneItemData = se.State.ZoneItem[zoneItemID]
+	}
+	var itemPath path
+	if existingPath, pathExists := se.PathTrack.item[zoneItemData.Item]; !pathExists {
+		itemPath = p.item()
+	} else {
+		itemPath = existingPath
+	}
+	se.walkItem(zoneItemData.Item, itemPath)
+	var positionPath path
+	if existingPath, pathExists := se.PathTrack.position[zoneItemData.Position]; !pathExists {
+		positionPath = p.position()
+	} else {
+		positionPath = existingPath
+	}
+	se.walkPosition(zoneItemData.Position, positionPath)
+	se.PathTrack.zoneItem[zoneItemID] = p
+}`
+
+const walkPlayer_Engine_func string = `func (se *Engine) walkPlayer(playerID PlayerID, p path) {
+	playerData, hasUpdated := se.Patch.Player[playerID]
+	if !hasUpdated {
+		playerData = se.State.Player[playerID]
+	}
+	var gearScorePath path
+	if existingPath, pathExists := se.PathTrack.gearScore[playerData.GearScore]; !pathExists {
+		gearScorePath = p.gearScore()
+	} else {
+		gearScorePath = existingPath
+	}
+	se.walkGearScore(playerData.GearScore, gearScorePath)
+	for i, itemID := range mergeItemIDs(se.State.Player[playerData.ID].Items, se.Patch.Player[playerData.ID].Items) {
+		var itemsPath path
+		if existingPath, pathExists := se.PathTrack.item[itemID]; !pathExists || !existingPath.equals(p) {
+			itemsPath = p.items().index(i)
+		} else {
+			itemsPath = existingPath
+		}
+		se.walkItem(itemID, itemsPath)
+	}
+	var positionPath path
+	if existingPath, pathExists := se.PathTrack.position[playerData.Position]; !pathExists {
+		positionPath = p.position()
+	} else {
+		positionPath = existingPath
+	}
+	se.walkPosition(playerData.Position, positionPath)
+	se.PathTrack.player[playerID] = p
+}`
+
+const walkZone_Engine_func string = `func (se *Engine) walkZone(zoneID ZoneID, p path) {
+	zoneData, hasUpdated := se.Patch.Zone[zoneID]
+	if !hasUpdated {
+		zoneData = se.State.Zone[zoneID]
+	}
+	for i, zoneItemID := range mergeZoneItemIDs(se.State.Zone[zoneData.ID].Items, se.Patch.Zone[zoneData.ID].Items) {
+		var itemsPath path
+		if existingPath, pathExists := se.PathTrack.zoneItem[zoneItemID]; !pathExists || !existingPath.equals(p) {
+			itemsPath = p.items().index(i)
+		} else {
+			itemsPath = existingPath
+		}
+		se.walkZoneItem(zoneItemID, itemsPath)
+	}
+	for i, playerID := range mergePlayerIDs(se.State.Zone[zoneData.ID].Players, se.Patch.Zone[zoneData.ID].Players) {
+		var playersPath path
+		if existingPath, pathExists := se.PathTrack.player[playerID]; !pathExists || !existingPath.equals(p) {
+			playersPath = p.players().index(i)
+		} else {
+			playersPath = existingPath
+		}
+		se.walkPlayer(playerID, playersPath)
+	}
+	se.PathTrack.zone[zoneID] = p
+}`
+
+const walkTree_Engine_func string = `func (se *Engine) walkTree() {
+	walkedCheck := newRecursionCheck()
+	for id, equipmentSetData := range se.Patch.EquipmentSet {
+		se.walkEquipmentSet(equipmentSetData.ID, newPath(equipmentSetIdentifier, int(id)))
+		walkedCheck.equipmentSet[equipmentSetData.ID] = true
+	}
+	for id, gearScoreData := range se.Patch.GearScore {
+		if !gearScoreData.HasParent {
+			se.walkGearScore(gearScoreData.ID, newPath(gearScoreIdentifier, int(id)))
+			walkedCheck.gearScore[gearScoreData.ID] = true
+		}
+	}
+	for id, itemData := range se.Patch.Item {
+		if !itemData.HasParent {
+			se.walkItem(itemData.ID, newPath(itemIdentifier, int(id)))
+			walkedCheck.item[itemData.ID] = true
+		}
+	}
+	for id, playerData := range se.Patch.Player {
+		if !playerData.HasParent {
+			se.walkPlayer(playerData.ID, newPath(playerIdentifier, int(id)))
+			walkedCheck.player[playerData.ID] = true
+		}
+	}
+	for id, positionData := range se.Patch.Position {
+		if !positionData.HasParent {
+			se.walkPosition(positionData.ID, newPath(positionIdentifier, int(id)))
+			walkedCheck.position[positionData.ID] = true
+		}
+	}
+	for id, zoneData := range se.Patch.Zone {
+		se.walkZone(zoneData.ID, newPath(zoneIdentifier, int(id)))
+		walkedCheck.zone[zoneData.ID] = true
+	}
+	for id, zoneItemData := range se.Patch.ZoneItem {
+		if !zoneItemData.HasParent {
+			se.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
+			walkedCheck.zoneItem[zoneItemData.ID] = true
+		}
+	}
+	for id, equipmentSetData := range se.State.EquipmentSet {
+		if _, ok := walkedCheck.equipmentSet[equipmentSetData.ID]; !ok {
+			se.walkEquipmentSet(equipmentSetData.ID, newPath(equipmentSetIdentifier, int(id)))
+		}
+	}
+	for id, gearScoreData := range se.State.GearScore {
+		if !gearScoreData.HasParent {
+			if _, ok := walkedCheck.gearScore[gearScoreData.ID]; !ok {
+				se.walkGearScore(gearScoreData.ID, newPath(gearScoreIdentifier, int(id)))
+			}
+		}
+	}
+	for id, itemData := range se.State.Item {
+		if !itemData.HasParent {
+			if _, ok := walkedCheck.item[itemData.ID]; !ok {
+				se.walkItem(itemData.ID, newPath(itemIdentifier, int(id)))
+			}
+		}
+	}
+	for id, playerData := range se.State.Player {
+		if !playerData.HasParent {
+			if _, ok := walkedCheck.player[playerData.ID]; !ok {
+				se.walkPlayer(playerData.ID, newPath(playerIdentifier, int(id)))
+			}
+		}
+	}
+	for id, positionData := range se.State.Position {
+		if !positionData.HasParent {
+			if _, ok := walkedCheck.position[positionData.ID]; !ok {
+				se.walkPosition(positionData.ID, newPath(positionIdentifier, int(id)))
+			}
+		}
+	}
+	for id, zoneData := range se.State.Zone {
+		if _, ok := walkedCheck.zone[zoneData.ID]; !ok {
+			se.walkZone(zoneData.ID, newPath(zoneIdentifier, int(id)))
+		}
+	}
+	for id, zoneItemData := range se.State.ZoneItem {
+		if !zoneItemData.HasParent {
+			if _, ok := walkedCheck.zoneItem[zoneItemData.ID]; !ok {
+				se.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
+			}
+		}
+	}
+	se.PathTrack._iterations += 1
+	if se.PathTrack._iterations == 100 {
+		for key := range se.PathTrack.equipmentSet {
+			delete(se.PathTrack.equipmentSet, key)
+		}
+		for key := range se.PathTrack.gearScore {
+			delete(se.PathTrack.gearScore, key)
+		}
+		for key := range se.PathTrack.item {
+			delete(se.PathTrack.item, key)
+		}
+		for key := range se.PathTrack.player {
+			delete(se.PathTrack.player, key)
+		}
+		for key := range se.PathTrack.position {
+			delete(se.PathTrack.position, key)
+		}
+		for key := range se.PathTrack.zone {
+			delete(se.PathTrack.zone, key)
+		}
+		for key := range se.PathTrack.zoneItem {
+			delete(se.PathTrack.zoneItem, key)
+		}
+	}
+}`
+
+const toJSONPath_path_func string = `func (p path) toJSONPath() string {
+	jsonPath := "$"
+	for i, seg := range p {
+		if seg < 0 {
+			jsonPath += "." + pathIdentifierToString(seg)
+		} else if i == 1 {
+			jsonPath += "." + strconv.Itoa(seg)
+		} else {
+			jsonPath += "[" + strconv.Itoa(seg) + "]"
+		}
+	}
+	return jsonPath
+}`
+
+const pathIdentifierToString_func string = `func pathIdentifierToString(identifier int) string {
+	switch identifier {
+	case itemsIdentifier:
+		return "items"
+	case gearScoreIdentifier:
+		return "gearScore"
+	case positionIdentifier:
+		return "position"
+	case targetIdentifier:
+		return "target"
+	case playersIdentifier:
+		return "players"
+	case interactablesIdentifier:
+		return "interactables"
+	case itemIdentifier:
+		return "item"
+	case originIdentifier:
+		return "origin"
+	case equipmentSetIdentifier:
+		return "equipmentSet"
+	case playerIdentifier:
+		return "player"
+	case zoneIdentifier:
+		return "zone"
+	case zoneItemIdentifier:
+		return "zoneItem"
+	}
+	return ""
+}`
+
+const _IsSet_itemBoundToRef_func string = `func (_ref itemBoundToRef) IsSet() bool {
+	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
+	return ref.itemBoundToRef.ID != 0
+}`
+
+const _Unset_itemBoundToRef_func string = `func (_ref itemBoundToRef) Unset() {
+	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
+	_ref.itemBoundToRef.engine.deleteItemBoundToRef(ref.itemBoundToRef.ID)
+	item := _ref.itemBoundToRef.engine.Item(ref.itemBoundToRef.ParentID).item
+	if item.OperationKind == OperationKindDelete {
+		return
+	}
+	item.BoundTo = 0
+	item.OperationKind = OperationKindUpdate
+	_ref.itemBoundToRef.engine.Patch.Item[item.ID] = item
+}`
+
+const _Get_itemBoundToRef_func string = `func (_ref itemBoundToRef) Get() player {
+	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
+	return _ref.itemBoundToRef.engine.Player(ref.itemBoundToRef.ReferencedElementID)
+}`
+
+const _Get_playerGuildMemberRef_func string = `func (_ref playerGuildMemberRef) Get() player {
+	ref := _ref.playerGuildMemberRef.engine.playerGuildMemberRef(_ref.playerGuildMemberRef.ID)
+	return _ref.playerGuildMemberRef.engine.Player(ref.playerGuildMemberRef.ReferencedElementID)
+}`
+
+const _Get_equipmentSetEquipmentRef_func string = `func (_ref equipmentSetEquipmentRef) Get() item {
+	ref := _ref.equipmentSetEquipmentRef.engine.equipmentSetEquipmentRef(_ref.equipmentSetEquipmentRef.ID)
+	return _ref.equipmentSetEquipmentRef.engine.Item(ref.equipmentSetEquipmentRef.ReferencedElementID)
+}`
+
+const _IsSet_playerTargetRef_func string = `func (_ref playerTargetRef) IsSet() bool {
+	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
+	return ref.playerTargetRef.ID != 0
+}`
+
+const _Unset_playerTargetRef_func string = `func (_ref playerTargetRef) Unset() {
+	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
+	_ref.playerTargetRef.engine.deletePlayerTargetRef(ref.playerTargetRef.ID)
+	player := _ref.playerTargetRef.engine.Player(ref.playerTargetRef.ParentID).player
+	if player.OperationKind == OperationKindDelete {
+		return
+	}
+	player.Target = 0
+	player.OperationKind = OperationKindUpdate
+	_ref.playerTargetRef.engine.Patch.Player[player.ID] = player
+}`
+
+const _Get_playerTargetRef_func string = `func (_ref playerTargetRef) Get() anyOfPlayerZoneItem {
+	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
+	return _ref.playerTargetRef.engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+}`
+
+const _Get_playerTargetedByRef_func string = `func (_ref playerTargetedByRef) Get() anyOfPlayerZoneItem {
+	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
+	return _ref.playerTargetedByRef.engine.anyOfPlayerZoneItem(ref.playerTargetedByRef.ReferencedElementID)
+}`
+
+const dereferenceItemBoundToRefs_Engine_func string = `func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
+	for _, refID := range engine.allItemBoundToRefIDs() {
+		ref := engine.itemBoundToRef(refID)
+		if ref.itemBoundToRef.ReferencedElementID == playerID {
+			ref.Unset()
+		}
+	}
+}`
+
+const dereferencePlayerGuildMemberRefs_Engine_func string = `func (engine *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
+	for _, refID := range engine.allPlayerGuildMemberRefIDs() {
+		ref := engine.playerGuildMemberRef(refID)
+		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
+			parent := engine.Player(ref.playerGuildMemberRef.ParentID)
+			parent.RemoveGuildMembers(playerID)
+		}
+	}
+}`
+
+const dereferencePlayerEquipmentSetRefs_Engine_func string = `func (engine *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID EquipmentSetID) {
+	for _, refID := range engine.allPlayerEquipmentSetRefIDs() {
+		ref := engine.playerEquipmentSetRef(refID)
+		if ref.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
+			parent := engine.Player(ref.playerEquipmentSetRef.ParentID)
+			parent.RemoveEquipmentSets(equipmentSetID)
+		}
+	}
+}`
+
+const dereferenceEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
+	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
+		ref := engine.equipmentSetEquipmentRef(refID)
+		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
+			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
+			parent.RemoveEquipment(itemID)
+		}
+	}
+}`
+
+const dereferencePlayerTargetPlayerRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetPlayerRefs(playerID PlayerID) {
+	for _, refID := range engine.allPlayerTargetRefIDs() {
+		ref := engine.playerTargetRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
+			return
+		}
+		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
+			ref.Unset()
+		}
+	}
+}`
+
+const dereferencePlayerTargetZoneItemRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetZoneItemRefs(zoneItemID ZoneItemID) {
+	for _, refID := range engine.allPlayerTargetRefIDs() {
+		ref := engine.playerTargetRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
+			return
+		}
+		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
+			ref.Unset()
+		}
+	}
+}`
+
+const dereferencePlayerTargetedByPlayerRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetedByPlayerRefs(playerID PlayerID) {
+	for _, refID := range engine.allPlayerTargetedByRefIDs() {
+		ref := engine.playerTargetedByRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
+			continue
+		}
+		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
+			parent := engine.Player(ref.playerTargetedByRef.ParentID)
+			parent.RemoveTargetedByPlayer(playerID)
+		}
+	}
+}`
+
+const dereferencePlayerTargetedByZoneItemRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetedByZoneItemRefs(zoneItemID ZoneItemID) {
+	for _, refID := range engine.allPlayerTargetedByRefIDs() {
+		ref := engine.playerTargetedByRef(refID)
+		anyContainer := ref.Get()
+		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
+			continue
+		}
+		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
+			parent := engine.Player(ref.playerTargetedByRef.ParentID)
+			parent.RemoveTargetedByZoneItem(zoneItemID)
+		}
+	}
+}`
+
+const _RemovePlayers_zone_func string = `func (_zone zone) RemovePlayers(playersToRemove ...PlayerID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -727,7 +3004,7 @@ const _RemovePlayers_zone_func string = `func (_zone zone) RemovePlayers(se *Eng
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deletePlayer(element)
+				zone.zone.engine.deletePlayer(element)
 				break
 			}
 		}
@@ -739,14 +3016,14 @@ const _RemovePlayers_zone_func string = `func (_zone zone) RemovePlayers(se *Eng
 		return zone
 	}
 	zone.zone.Players = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }`
 
-const _RemoveItems_zone_func string = `func (_zone zone) RemoveItems(se *Engine, itemsToRemove ...ZoneItemID) zone {
-	zone := se.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+const _RemoveItems_zone_func string = `func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -757,7 +3034,7 @@ const _RemoveItems_zone_func string = `func (_zone zone) RemoveItems(se *Engine,
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deleteZoneItem(element)
+				zone.zone.engine.deleteZoneItem(element)
 				break
 			}
 		}
@@ -769,14 +3046,119 @@ const _RemoveItems_zone_func string = `func (_zone zone) RemoveItems(se *Engine,
 		return zone
 	}
 	zone.zone.Items = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }`
 
-const _RemoveItems_player_func string = `func (_player player) RemoveItems(se *Engine, itemsToRemove ...ItemID) player {
-	player := se.Player(_player.player.ID)
-	if player.player.OperationKind_ == OperationKindDelete {
+const _RemoveInteracableItem_zone_func string = `func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
+	var newElements []AnyOfItemPlayerZoneItemID
+	for _, anyContainerID := range zone.zone.Interactables {
+		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		element := anyContainer.Item().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				zone.zone.engine.deleteItem(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+		}
+	}
+	if !wereElementsAltered {
+		return zone
+	}
+	zone.zone.Interactables = newElements
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
+}`
+
+const _RemoveInteracablePlayer_zone_func string = `func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
+	var newElements []AnyOfItemPlayerZoneItemID
+	for _, anyContainerID := range zone.zone.Interactables {
+		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		element := anyContainer.Player().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range playersToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				zone.zone.engine.deletePlayer(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+		}
+	}
+	if !wereElementsAltered {
+		return zone
+	}
+	zone.zone.Interactables = newElements
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
+}`
+
+const _RemoveInteracableZoneItem_zone_func string = `func (_zone zone) RemoveInteracableZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
+		return zone
+	}
+	var wereElementsAltered bool
+	var newElements []AnyOfItemPlayerZoneItemID
+	for _, anyContainerID := range zone.zone.Interactables {
+		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		element := anyContainer.ZoneItem().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range zoneItemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				zone.zone.engine.deleteZoneItem(element)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+		}
+	}
+	if !wereElementsAltered {
+		return zone
+	}
+	zone.zone.Interactables = newElements
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+	return zone
+}`
+
+const _RemoveItems_player_func string = `func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
 	var wereElementsAltered bool
@@ -787,7 +3169,7 @@ const _RemoveItems_player_func string = `func (_player player) RemoveItems(se *E
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
-				se.deleteItem(element)
+				player.player.engine.deleteItem(element)
 				break
 			}
 		}
@@ -799,14 +3181,146 @@ const _RemoveItems_player_func string = `func (_player player) RemoveItems(se *E
 		return player
 	}
 	player.player.Items = newElements
-	player.player.OperationKind_ = OperationKindUpdate
-	se.Patch.Player[player.player.ID] = player.player
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }`
 
-const _RemoveTags_zone_func string = `func (_zone zone) RemoveTags(se *Engine, tagsToRemove ...string) zone {
-	zone := se.Zone(_zone.zone.ID)
-	if zone.zone.OperationKind_ == OperationKindDelete {
+const _RemoveEquipmentSets_player_func string = `func (_player player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	var wereElementsAltered bool
+	var newElements []PlayerEquipmentSetRefID
+	for _, refElement := range player.player.EquipmentSets {
+		element := player.player.engine.playerEquipmentSetRef(refElement).playerEquipmentSetRef.ReferencedElementID
+		var toBeRemoved bool
+		for _, elementToRemove := range equipmentSetsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				player.player.engine.deletePlayerEquipmentSetRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return player
+	}
+	player.player.EquipmentSets = newElements
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}`
+
+const _RemoveGuildMembers_player_func string = `func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	var wereElementsAltered bool
+	var newElements []PlayerGuildMemberRefID
+	for _, refElement := range player.player.GuildMembers {
+		element := player.player.engine.playerGuildMemberRef(refElement).playerGuildMemberRef.ReferencedElementID
+		var toBeRemoved bool
+		for _, elementToRemove := range guildMembersToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				player.player.engine.deletePlayerGuildMemberRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return player
+	}
+	player.player.GuildMembers = newElements
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}`
+
+const _RemoveTargetedByZoneItem_player_func string = `func (_player player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	var wereElementsAltered bool
+	var newElements []PlayerTargetedByRefID
+	for _, refElement := range player.player.TargetedBy {
+		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
+		element := anyContainer.ZoneItem().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range zoneItemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				player.player.engine.deletePlayerTargetedByRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return player
+	}
+	player.player.TargetedBy = newElements
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}`
+
+const _RemoveTargetedByPlayer_player_func string = `func (_player player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	var wereElementsAltered bool
+	var newElements []PlayerTargetedByRefID
+	for _, refElement := range player.player.TargetedBy {
+		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
+		element := anyContainer.Player().ID()
+		if element == 0 {
+			continue
+		}
+		var toBeRemoved bool
+		for _, elementToRemove := range playersToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				player.player.engine.deletePlayerTargetedByRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return player
+	}
+	player.player.TargetedBy = newElements
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}`
+
+const _RemoveTags_zone_func string = `func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
 	var wereElementsAltered bool
@@ -828,54 +3342,167 @@ const _RemoveTags_zone_func string = `func (_zone zone) RemoveTags(se *Engine, t
 		return zone
 	}
 	zone.zone.Tags = newElements
-	zone.zone.OperationKind_ = OperationKindUpdate
-	se.Patch.Zone[zone.zone.ID] = zone.zone
+	zone.zone.OperationKind = OperationKindUpdate
+	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zone
 }`
 
-const _SetLevel_gearScore_func string = `func (_gearScore gearScore) SetLevel(se *Engine, newLevel int) gearScore {
-	gearScore := se.GearScore(_gearScore.gearScore.ID)
-	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
+const _RemoveEquipment_equipmentSet_func string = `func (_equipmentSet equipmentSet) RemoveEquipment(itemsToRemove ...ItemID) equipmentSet {
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
+		return equipmentSet
+	}
+	var wereElementsAltered bool
+	var newElements []EquipmentSetEquipmentRefID
+	for _, refElement := range equipmentSet.equipmentSet.Equipment {
+		element := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refElement).equipmentSetEquipmentRef.ReferencedElementID
+		var toBeRemoved bool
+		for _, elementToRemove := range itemsToRemove {
+			if element == elementToRemove {
+				toBeRemoved = true
+				wereElementsAltered = true
+				equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(refElement)
+				break
+			}
+		}
+		if !toBeRemoved {
+			newElements = append(newElements, refElement)
+		}
+	}
+	if !wereElementsAltered {
+		return equipmentSet
+	}
+	equipmentSet.equipmentSet.Equipment = newElements
+	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
+	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+	return equipmentSet
+}`
+
+const _SetLevel_gearScore_func string = `func (_gearScore gearScore) SetLevel(newLevel int) gearScore {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	if gearScore.gearScore.OperationKind == OperationKindDelete {
 		return gearScore
 	}
 	gearScore.gearScore.Level = newLevel
-	gearScore.gearScore.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
+	gearScore.gearScore.OperationKind = OperationKindUpdate
+	gearScore.gearScore.engine.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
 	return gearScore
 }`
 
-const _SetScore_gearScore_func string = `func (_gearScore gearScore) SetScore(se *Engine, newScore int) gearScore {
-	gearScore := se.GearScore(_gearScore.gearScore.ID)
-	if gearScore.gearScore.OperationKind_ == OperationKindDelete {
+const _SetScore_gearScore_func string = `func (_gearScore gearScore) SetScore(newScore int) gearScore {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	if gearScore.gearScore.OperationKind == OperationKindDelete {
 		return gearScore
 	}
 	gearScore.gearScore.Score = newScore
-	gearScore.gearScore.OperationKind_ = OperationKindUpdate
-	se.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
+	gearScore.gearScore.OperationKind = OperationKindUpdate
+	gearScore.gearScore.engine.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
 	return gearScore
 }`
 
-const _SetX_position_func string = `func (_position position) SetX(se *Engine, newX float64) position {
-	position := se.Position(_position.position.ID)
-	if position.position.OperationKind_ == OperationKindDelete {
+const _SetX_position_func string = `func (_position position) SetX(newX float64) position {
+	position := _position.position.engine.Position(_position.position.ID)
+	if position.position.OperationKind == OperationKindDelete {
 		return position
 	}
 	position.position.X = newX
-	position.position.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[position.position.ID] = position.position
+	position.position.OperationKind = OperationKindUpdate
+	position.position.engine.Patch.Position[position.position.ID] = position.position
 	return position
 }`
 
-const _SetY_position_func string = `func (_position position) SetY(se *Engine, newY float64) position {
-	position := se.Position(_position.position.ID)
-	if position.position.OperationKind_ == OperationKindDelete {
+const _SetY_position_func string = `func (_position position) SetY(newY float64) position {
+	position := _position.position.engine.Position(_position.position.ID)
+	if position.position.OperationKind == OperationKindDelete {
 		return position
 	}
 	position.position.Y = newY
-	position.position.OperationKind_ = OperationKindUpdate
-	se.Patch.Position[position.position.ID] = position.position
+	position.position.OperationKind = OperationKindUpdate
+	position.position.engine.Patch.Position[position.position.ID] = position.position
 	return position
 }`
+
+const _SetName_item_func string = `func (_item item) SetName(nameName string) item {
+	item := _item.item.engine.Item(_item.item.ID)
+	if item.item.OperationKind == OperationKindDelete {
+		return item
+	}
+	item.item.Name = nameName
+	item.item.OperationKind = OperationKindUpdate
+	item.item.engine.Patch.Item[item.item.ID] = item.item
+	return item
+}`
+
+const _SetBoundTo_item_func string = `func (_item item) SetBoundTo(playerID PlayerID) item {
+	item := _item.item.engine.Item(_item.item.ID)
+	if item.item.OperationKind == OperationKindDelete {
+		return item
+	}
+	if item.item.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return item
+	}
+	if item.item.BoundTo != 0 {
+		item.item.engine.deleteItemBoundToRef(item.item.BoundTo)
+	}
+	ref := item.item.engine.createItemBoundToRef(playerID, item.item.ID)
+	item.item.BoundTo = ref.ID
+	item.item.OperationKind = OperationKindUpdate
+	item.item.engine.Patch.Item[item.item.ID] = item.item
+	return item
+}`
+
+const _SetName_equipmentSet_func string = `func (_equipmentSet equipmentSet) SetName(nameName string) equipmentSet {
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
+		return equipmentSet
+	}
+	equipmentSet.equipmentSet.Name = nameName
+	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
+	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+	return equipmentSet
+}`
+
+const _SetTargetPlayer_player_func string = `func (_player player) SetTargetPlayer(playerID PlayerID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.Target != 0 {
+		player.player.engine.deletePlayerTargetRef(player.player.Target)
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false)
+	anyContainer.anyOfPlayerZoneItem.setPlayer(playerID)
+	ref := player.player.engine.createPlayerTargetRef(anyContainer.anyOfPlayerZoneItem.ID, player.player.ID)
+	player.player.Target = ref.ID
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}`
+
+const _SetTargetZoneItem_player_func string = `func (_player player) SetTargetZoneItem(zoneItemID ZoneItemID) player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.Target != 0 {
+		player.player.engine.deletePlayerTargetRef(player.player.Target)
+	}
+	anyContainer := player.player.engine.createAnyOfPlayerZoneItem(false)
+	anyContainer.anyOfPlayerZoneItem.setZoneItem(zoneItemID)
+	ref := player.player.engine.createPlayerTargetRef(anyContainer.anyOfPlayerZoneItem.ID, player.player.ID)
+	player.player.Target = ref.ID
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return player
+}`
+
+const _EquipmentSetID_type string = `type EquipmentSetID int`
 
 const _GearScoreID_type string = `type GearScoreID int`
 
@@ -889,25 +3516,55 @@ const _ZoneID_type string = `type ZoneID int`
 
 const _ZoneItemID_type string = `type ZoneItemID int`
 
+const _PlayerGuildMemberRefID_type string = `type PlayerGuildMemberRefID int`
+
+const _ItemBoundToRefID_type string = `type ItemBoundToRefID int`
+
+const _EquipmentSetEquipmentRefID_type string = `type EquipmentSetEquipmentRefID int`
+
+const _PlayerEquipmentSetRefID_type string = `type PlayerEquipmentSetRefID int`
+
+const _AnyOfItemPlayerZoneItemID_type string = `type AnyOfItemPlayerZoneItemID int`
+
+const _AnyOfPlayerZoneItemID_type string = `type AnyOfPlayerZoneItemID int`
+
+const _AnyOfPlayerPositionID_type string = `type AnyOfPlayerPositionID int`
+
+const _PlayerTargetRefID_type string = `type PlayerTargetRefID int`
+
+const _PlayerTargetedByRefID_type string = `type PlayerTargetedByRefID int`
+
 const _State_type string = `type State struct {
-	GearScore	map[GearScoreID]gearScoreCore	` + "`" + `json:"gearScore"` + "`" + `
-	Item		map[ItemID]itemCore		` + "`" + `json:"item"` + "`" + `
-	Player		map[PlayerID]playerCore		` + "`" + `json:"player"` + "`" + `
-	Position	map[PositionID]positionCore	` + "`" + `json:"position"` + "`" + `
-	Zone		map[ZoneID]zoneCore		` + "`" + `json:"zone"` + "`" + `
-	ZoneItem	map[ZoneItemID]zoneItemCore	` + "`" + `json:"zoneItem"` + "`" + `
+	AnyOfItemPlayerZoneItem		map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore	` + "`" + `json:"anyOfItemPlayerZoneItem"` + "`" + `
+	AnyOfPlayerPosition		map[AnyOfPlayerPositionID]anyOfPlayerPositionCore		` + "`" + `json:"anyOfPlayerPosition"` + "`" + `
+	AnyOfPlayerZoneItem		map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore		` + "`" + `json:"anyOfPlayerZoneItem"` + "`" + `
+	EquipmentSet			map[EquipmentSetID]equipmentSetCore				` + "`" + `json:"equipmentSet"` + "`" + `
+	EquipmentSetEquipmentRef	map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore	` + "`" + `json:"equipmentSetEquipmentRef"` + "`" + `
+	GearScore			map[GearScoreID]gearScoreCore					` + "`" + `json:"gearScore"` + "`" + `
+	Item				map[ItemID]itemCore						` + "`" + `json:"item"` + "`" + `
+	ItemBoundToRef			map[ItemBoundToRefID]itemBoundToRefCore				` + "`" + `json:"itemBoundToRef"` + "`" + `
+	Player				map[PlayerID]playerCore						` + "`" + `json:"player"` + "`" + `
+	PlayerEquipmentSetRef		map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore		` + "`" + `json:"PlayerEquipmentSerRef"` + "`" + `
+	PlayerGuildMemberRef		map[PlayerGuildMemberRefID]playerGuildMemberRefCore		` + "`" + `json:"playerGuildMemberRef"` + "`" + `
+	PlayerTargetRef			map[PlayerTargetRefID]playerTargetRefCore			` + "`" + `json:"playerTargetRef"` + "`" + `
+	PlayerTargetedByRef		map[PlayerTargetedByRefID]playerTargetedByRefCore		` + "`" + `json:"playerTargetedByRef"` + "`" + `
+	Position			map[PositionID]positionCore					` + "`" + `json:"position"` + "`" + `
+	Zone				map[ZoneID]zoneCore						` + "`" + `json:"zone"` + "`" + `
+	ZoneItem			map[ZoneItemID]zoneItemCore					` + "`" + `json:"zoneItem"` + "`" + `
 }`
 
 const newState_func string = `func newState() State {
-	return State{GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), Player: make(map[PlayerID]playerCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore)}
+	return State{AnyOfItemPlayerZoneItem: make(map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore), AnyOfPlayerPosition: make(map[AnyOfPlayerPositionID]anyOfPlayerPositionCore), AnyOfPlayerZoneItem: make(map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore), EquipmentSet: make(map[EquipmentSetID]equipmentSetCore), EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore), GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), ItemBoundToRef: make(map[ItemBoundToRefID]itemBoundToRefCore), Player: make(map[PlayerID]playerCore), PlayerEquipmentSetRef: make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore), PlayerGuildMemberRef: make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore), PlayerTargetRef: make(map[PlayerTargetRefID]playerTargetRefCore), PlayerTargetedByRef: make(map[PlayerTargetedByRefID]playerTargetedByRefCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore)}
 }`
 
 const zoneCore_type string = `type zoneCore struct {
-	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
-	Items		[]ZoneItemID	` + "`" + `json:"items"` + "`" + `
-	Players		[]PlayerID	` + "`" + `json:"players"` + "`" + `
-	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	ID		ZoneID				` + "`" + `json:"id"` + "`" + `
+	Interactables	[]AnyOfItemPlayerZoneItemID	` + "`" + `json:"interactables"` + "`" + `
+	Items		[]ZoneItemID			` + "`" + `json:"items"` + "`" + `
+	Players		[]PlayerID			` + "`" + `json:"players"` + "`" + `
+	Tags		[]string			` + "`" + `json:"tags"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	engine		*Engine
 }`
 
 const zone_type string = `type zone struct{ zone zoneCore }`
@@ -916,28 +3573,38 @@ const zoneItemCore_type string = `type zoneItemCore struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Item		ItemID		` + "`" + `json:"item"` + "`" + `
 	Position	PositionID	` + "`" + `json:"position"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
-	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	engine		*Engine
 }`
 
 const zoneItem_type string = `type zoneItem struct{ zoneItem zoneItemCore }`
 
 const itemCore_type string = `type itemCore struct {
-	ID		ItemID		` + "`" + `json:"id"` + "`" + `
-	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
-	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
+	ID		ItemID			` + "`" + `json:"id"` + "`" + `
+	BoundTo		ItemBoundToRefID	` + "`" + `json:"boundTo"` + "`" + `
+	GearScore	GearScoreID		` + "`" + `json:"gearScore"` + "`" + `
+	Name		string			` + "`" + `json:"name"` + "`" + `
+	Origin		AnyOfPlayerPositionID	` + "`" + `json:"origin"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	HasParent	bool			` + "`" + `json:"hasParent"` + "`" + `
+	engine		*Engine
 }`
 
 const item_type string = `type item struct{ item itemCore }`
 
 const playerCore_type string = `type playerCore struct {
-	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
-	GearScore	GearScoreID	` + "`" + `json:"gearScore"` + "`" + `
-	Items		[]ItemID	` + "`" + `json:"items"` + "`" + `
-	Position	PositionID	` + "`" + `json:"position"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
-	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
+	ID		PlayerID			` + "`" + `json:"id"` + "`" + `
+	GearScore	GearScoreID			` + "`" + `json:"gearScore"` + "`" + `
+	EquipmentSets	[]PlayerEquipmentSetRefID	` + "`" + `json:"equipmentSets"` + "`" + `
+	GuildMembers	[]PlayerGuildMemberRefID	` + "`" + `json:"guildMembers"` + "`" + `
+	Items		[]ItemID			` + "`" + `json:"items"` + "`" + `
+	Position	PositionID			` + "`" + `json:"position"` + "`" + `
+	Target		PlayerTargetRefID		` + "`" + `json:"target"` + "`" + `
+	TargetedBy	[]PlayerTargetedByRefID		` + "`" + `json:"targetedBy"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	HasParent	bool				` + "`" + `json:"hasParent"` + "`" + `
+	engine		*Engine
 }`
 
 const player_type string = `type player struct{ player playerCore }`
@@ -946,8 +3613,9 @@ const gearScoreCore_type string = `type gearScoreCore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
-	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	engine		*Engine
 }`
 
 const gearScore_type string = `type gearScore struct{ gearScore gearScoreCore }`
@@ -956,27 +3624,135 @@ const positionCore_type string = `type positionCore struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
-	HasParent_	bool		` + "`" + `json:"hasParent_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	HasParent	bool		` + "`" + `json:"hasParent"` + "`" + `
+	engine		*Engine
 }`
 
 const position_type string = `type position struct{ position positionCore }`
+
+const equipmentSetCore_type string = `type equipmentSetCore struct {
+	ID		EquipmentSetID			` + "`" + `json:"id"` + "`" + `
+	Name		string				` + "`" + `json:"name"` + "`" + `
+	Equipment	[]EquipmentSetEquipmentRefID	` + "`" + `json:"equipment"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	engine		*Engine
+}`
+
+const equipmentSet_type string = `type equipmentSet struct{ equipmentSet equipmentSetCore }`
+
+const itemBoundToRefCore_type string = `type itemBoundToRefCore struct {
+	ID			ItemBoundToRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		ItemID			` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	PlayerID		` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine			*Engine
+}`
+
+const itemBoundToRef_type string = `type itemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }`
+
+const playerGuildMemberRefCore_type string = `type playerGuildMemberRefCore struct {
+	ID			PlayerGuildMemberRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		PlayerID		` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	PlayerID		` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine			*Engine
+}`
+
+const playerGuildMemberRef_type string = `type playerGuildMemberRef struct{ playerGuildMemberRef playerGuildMemberRefCore }`
+
+const equipmentSetEquipmentRefCore_type string = `type equipmentSetEquipmentRefCore struct {
+	ID			EquipmentSetEquipmentRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		EquipmentSetID			` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	ItemID				` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	engine			*Engine
+}`
+
+const equipmentSetEquipmentRef_type string = `type equipmentSetEquipmentRef struct{ equipmentSetEquipmentRef equipmentSetEquipmentRefCore }`
+
+const playerEquipmentSetRefCore_type string = `type playerEquipmentSetRefCore struct {
+	ID			PlayerEquipmentSetRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		PlayerID		` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	EquipmentSetID		` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine			*Engine
+}`
+
+const playerEquipmentSetRef_type string = `type playerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }`
+
+const anyOfPlayerPositionCore_type string = `type anyOfPlayerPositionCore struct {
+	ID		AnyOfPlayerPositionID	` + "`" + `json:"id"` + "`" + `
+	ElementKind	ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	Player		PlayerID		` + "`" + `json:"player"` + "`" + `
+	Position	PositionID		` + "`" + `json:"position"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine		*Engine
+}`
+
+const anyOfPlayerPosition_type string = `type anyOfPlayerPosition struct{ anyOfPlayerPosition anyOfPlayerPositionCore }`
+
+const anyOfPlayerZoneItemCore_type string = `type anyOfPlayerZoneItemCore struct {
+	ID		AnyOfPlayerZoneItemID	` + "`" + `json:"id"` + "`" + `
+	ElementKind	ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	Player		PlayerID		` + "`" + `json:"player"` + "`" + `
+	ZoneItem	ZoneItemID		` + "`" + `json:"zoneItem"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine		*Engine
+}`
+
+const anyOfPlayerZoneItem_type string = `type anyOfPlayerZoneItem struct{ anyOfPlayerZoneItem anyOfPlayerZoneItemCore }`
+
+const anyOfItemPlayerZoneItemCore_type string = `type anyOfItemPlayerZoneItemCore struct {
+	ID		AnyOfItemPlayerZoneItemID	` + "`" + `json:"id"` + "`" + `
+	ElementKind	ElementKind			` + "`" + `json:"elementKind"` + "`" + `
+	Item		ItemID				` + "`" + `json:"item"` + "`" + `
+	Player		PlayerID			` + "`" + `json:"player"` + "`" + `
+	ZoneItem	ZoneItemID			` + "`" + `json:"zoneItem"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	engine		*Engine
+}`
+
+const anyOfItemPlayerZoneItem_type string = `type anyOfItemPlayerZoneItem struct{ anyOfItemPlayerZoneItem anyOfItemPlayerZoneItemCore }`
+
+const playerTargetRefCore_type string = `type playerTargetRefCore struct {
+	ID			PlayerTargetRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		PlayerID		` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	AnyOfPlayerZoneItemID	` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine			*Engine
+}`
+
+const playerTargetRef_type string = `type playerTargetRef struct{ playerTargetRef playerTargetRefCore }`
+
+const playerTargetedByRefCore_type string = `type playerTargetedByRefCore struct {
+	ID			PlayerTargetedByRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		PlayerID		` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	AnyOfPlayerZoneItemID	` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	engine			*Engine
+}`
+
+const playerTargetedByRef_type string = `type playerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }`
 
 const _OperationKind_type string = `type OperationKind string`
 
 const _OperationKindDelete_type string = `const (
 	OperationKindDelete	OperationKind	= "DELETE"
-	OperationKindUpdate			= "UPDATE"
+	OperationKindUpdate	OperationKind	= "UPDATE"
+	OperationKindUnchanged	OperationKind	= "UNCHANGED"
 )`
 
 const _Engine_type string = `type Engine struct {
-	State	State
-	Patch	State
-	IDgen	int
+	State		State
+	Patch		State
+	Tree		Tree
+	PathTrack	pathTrack
+	IDgen		int
 }`
 
 const newEngine_func string = `func newEngine() *Engine {
-	return &Engine{IDgen: 1, Patch: newState(), State: newState()}
+	return &Engine{IDgen: 1, Patch: newState(), State: newState(), PathTrack: newPathTrack(), Tree: newTree()}
 }`
 
 const _GenerateID_Engine_func string = `func (se *Engine) GenerateID() int {
@@ -986,47 +3762,136 @@ const _GenerateID_Engine_func string = `func (se *Engine) GenerateID() int {
 }`
 
 const _UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
+	for _, equipmentSet := range se.Patch.EquipmentSet {
+		if equipmentSet.OperationKind == OperationKindDelete {
+			delete(se.State.EquipmentSet, equipmentSet.ID)
+		} else {
+			equipmentSet.OperationKind = OperationKindUnchanged
+			se.State.EquipmentSet[equipmentSet.ID] = equipmentSet
+		}
+	}
 	for _, gearScore := range se.Patch.GearScore {
-		if gearScore.OperationKind_ == OperationKindDelete {
+		if gearScore.OperationKind == OperationKindDelete {
 			delete(se.State.GearScore, gearScore.ID)
 		} else {
+			gearScore.OperationKind = OperationKindUnchanged
 			se.State.GearScore[gearScore.ID] = gearScore
 		}
 	}
 	for _, item := range se.Patch.Item {
-		if item.OperationKind_ == OperationKindDelete {
+		if item.OperationKind == OperationKindDelete {
 			delete(se.State.Item, item.ID)
 		} else {
+			item.OperationKind = OperationKindUnchanged
 			se.State.Item[item.ID] = item
 		}
 	}
 	for _, player := range se.Patch.Player {
-		if player.OperationKind_ == OperationKindDelete {
+		if player.OperationKind == OperationKindDelete {
 			delete(se.State.Player, player.ID)
 		} else {
+			player.OperationKind = OperationKindUnchanged
 			se.State.Player[player.ID] = player
 		}
 	}
 	for _, position := range se.Patch.Position {
-		if position.OperationKind_ == OperationKindDelete {
+		if position.OperationKind == OperationKindDelete {
 			delete(se.State.Position, position.ID)
 		} else {
+			position.OperationKind = OperationKindUnchanged
 			se.State.Position[position.ID] = position
 		}
 	}
 	for _, zone := range se.Patch.Zone {
-		if zone.OperationKind_ == OperationKindDelete {
+		if zone.OperationKind == OperationKindDelete {
 			delete(se.State.Zone, zone.ID)
 		} else {
+			zone.OperationKind = OperationKindUnchanged
 			se.State.Zone[zone.ID] = zone
 		}
 	}
 	for _, zoneItem := range se.Patch.ZoneItem {
-		if zoneItem.OperationKind_ == OperationKindDelete {
+		if zoneItem.OperationKind == OperationKindDelete {
 			delete(se.State.ZoneItem, zoneItem.ID)
 		} else {
+			zoneItem.OperationKind = OperationKindUnchanged
 			se.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
+	}
+	for _, equipmentSetEquipmentRef := range se.Patch.EquipmentSetEquipmentRef {
+		if equipmentSetEquipmentRef.OperationKind == OperationKindDelete {
+			delete(se.State.EquipmentSetEquipmentRef, equipmentSetEquipmentRef.ID)
+		} else {
+			equipmentSetEquipmentRef.OperationKind = OperationKindUnchanged
+			se.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
+		}
+	}
+	for _, itemBoundToRef := range se.Patch.ItemBoundToRef {
+		if itemBoundToRef.OperationKind == OperationKindDelete {
+			delete(se.State.ItemBoundToRef, itemBoundToRef.ID)
+		} else {
+			itemBoundToRef.OperationKind = OperationKindUnchanged
+			se.State.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
+		}
+	}
+	for _, playerEquipmentSetRef := range se.Patch.PlayerEquipmentSetRef {
+		if playerEquipmentSetRef.OperationKind == OperationKindDelete {
+			delete(se.State.PlayerEquipmentSetRef, playerEquipmentSetRef.ID)
+		} else {
+			playerEquipmentSetRef.OperationKind = OperationKindUnchanged
+			se.State.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
+		}
+	}
+	for _, playerGuildMemberRef := range se.Patch.PlayerGuildMemberRef {
+		if playerGuildMemberRef.OperationKind == OperationKindDelete {
+			delete(se.State.PlayerGuildMemberRef, playerGuildMemberRef.ID)
+		} else {
+			playerGuildMemberRef.OperationKind = OperationKindUnchanged
+			se.State.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
+		}
+	}
+	for _, playerTargetRef := range se.Patch.PlayerTargetRef {
+		if playerTargetRef.OperationKind == OperationKindDelete {
+			delete(se.State.PlayerTargetRef, playerTargetRef.ID)
+		} else {
+			playerTargetRef.OperationKind = OperationKindUnchanged
+			se.State.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
+		}
+	}
+	for _, playerTargetedByRef := range se.Patch.PlayerTargetedByRef {
+		if playerTargetedByRef.OperationKind == OperationKindDelete {
+			delete(se.State.PlayerTargetedByRef, playerTargetedByRef.ID)
+		} else {
+			playerTargetedByRef.OperationKind = OperationKindUnchanged
+			se.State.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
+		}
+	}
+	for _, anyOfItemPlayerZoneItem := range se.Patch.AnyOfItemPlayerZoneItem {
+		if anyOfItemPlayerZoneItem.OperationKind == OperationKindDelete {
+			delete(se.State.AnyOfItemPlayerZoneItem, anyOfItemPlayerZoneItem.ID)
+		} else {
+			anyOfItemPlayerZoneItem.OperationKind = OperationKindUnchanged
+			se.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
+		}
+	}
+	for _, anyOfPlayerPosition := range se.Patch.AnyOfPlayerPosition {
+		if anyOfPlayerPosition.OperationKind == OperationKindDelete {
+			delete(se.State.AnyOfPlayerPosition, anyOfPlayerPosition.ID)
+		} else {
+			anyOfPlayerPosition.OperationKind = OperationKindUnchanged
+			se.State.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
+		}
+	}
+	for _, anyOfPlayerZoneItem := range se.Patch.AnyOfPlayerZoneItem {
+		if anyOfPlayerZoneItem.OperationKind == OperationKindDelete {
+			delete(se.State.AnyOfPlayerZoneItem, anyOfPlayerZoneItem.ID)
+		} else {
+			anyOfPlayerZoneItem.OperationKind = OperationKindUnchanged
+			se.State.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
+		}
+	}
+	for key := range se.Patch.EquipmentSet {
+		delete(se.Patch.EquipmentSet, key)
 	}
 	for key := range se.Patch.GearScore {
 		delete(se.Patch.GearScore, key)
@@ -1046,9 +3911,56 @@ const _UpdateState_Engine_func string = `func (se *Engine) UpdateState() {
 	for key := range se.Patch.ZoneItem {
 		delete(se.Patch.ZoneItem, key)
 	}
+	for key := range se.Patch.EquipmentSetEquipmentRef {
+		delete(se.Patch.EquipmentSetEquipmentRef, key)
+	}
+	for key := range se.Patch.ItemBoundToRef {
+		delete(se.Patch.ItemBoundToRef, key)
+	}
+	for key := range se.Patch.PlayerEquipmentSetRef {
+		delete(se.Patch.PlayerEquipmentSetRef, key)
+	}
+	for key := range se.Patch.PlayerGuildMemberRef {
+		delete(se.Patch.PlayerGuildMemberRef, key)
+	}
+	for key := range se.Patch.PlayerTargetRef {
+		delete(se.Patch.PlayerTargetRef, key)
+	}
+	for key := range se.Patch.PlayerTargetedByRef {
+		delete(se.Patch.PlayerTargetedByRef, key)
+	}
+	for key := range se.Patch.AnyOfItemPlayerZoneItem {
+		delete(se.Patch.AnyOfItemPlayerZoneItem, key)
+	}
+	for key := range se.Patch.AnyOfPlayerPosition {
+		delete(se.Patch.AnyOfPlayerPosition, key)
+	}
+	for key := range se.Patch.AnyOfPlayerZoneItem {
+		delete(se.Patch.AnyOfPlayerZoneItem, key)
+	}
 }`
 
+const _ReferencedDataStatus_type string = `type ReferencedDataStatus string`
+
+const _ReferencedDataModified_type string = `const (
+	ReferencedDataModified	ReferencedDataStatus	= "MODIFIED"
+	ReferencedDataUnchanged	ReferencedDataStatus	= "UNCHANGED"
+)`
+
+const _ElementKind_type string = `type ElementKind string`
+
+const _ElementKindEquipmentSet_type string = `const (
+	ElementKindEquipmentSet	ElementKind	= "EquipmentSet"
+	ElementKindGearScore	ElementKind	= "GearScore"
+	ElementKindItem		ElementKind	= "Item"
+	ElementKindPlayer	ElementKind	= "Player"
+	ElementKindPosition	ElementKind	= "Position"
+	ElementKindZone		ElementKind	= "Zone"
+	ElementKindZoneItem	ElementKind	= "ZoneItem"
+)`
+
 const _Tree_type string = `type Tree struct {
+	EquipmentSet	map[EquipmentSetID]EquipmentSet	` + "`" + `json:"equipmentSet"` + "`" + `
 	GearScore	map[GearScoreID]GearScore	` + "`" + `json:"gearScore"` + "`" + `
 	Item		map[ItemID]Item			` + "`" + `json:"item"` + "`" + `
 	Player		map[PlayerID]Player		` + "`" + `json:"player"` + "`" + `
@@ -1058,48 +3970,149 @@ const _Tree_type string = `type Tree struct {
 }`
 
 const newTree_func string = `func newTree() Tree {
-	return Tree{GearScore: make(map[GearScoreID]GearScore), Item: make(map[ItemID]Item), Player: make(map[PlayerID]Player), Position: make(map[PositionID]Position), Zone: make(map[ZoneID]Zone), ZoneItem: make(map[ZoneItemID]ZoneItem)}
+	return Tree{EquipmentSet: make(map[EquipmentSetID]EquipmentSet), GearScore: make(map[GearScoreID]GearScore), Item: make(map[ItemID]Item), Player: make(map[PlayerID]Player), Position: make(map[PositionID]Position), Zone: make(map[ZoneID]Zone), ZoneItem: make(map[ZoneItemID]ZoneItem)}
 }`
 
 const _ZoneItem_type string = `type ZoneItem struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Item		*Item		` + "`" + `json:"item"` + "`" + `
 	Position	*Position	` + "`" + `json:"position"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+}`
+
+const _ZoneItemReference_type string = `type ZoneItemReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind_"` + "`" + `
+	ElementID		ZoneItemID		` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	ZoneItem		*ZoneItem		` + "`" + `json:"zoneItem"` + "`" + `
 }`
 
 const _Item_type string = `type Item struct {
-	ID		ItemID		` + "`" + `json:"id"` + "`" + `
-	GearScore	*GearScore	` + "`" + `json:"gearScore"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	ID		ItemID			` + "`" + `json:"id"` + "`" + `
+	BoundTo		*PlayerReference	` + "`" + `json:"boundTo"` + "`" + `
+	GearScore	*GearScore		` + "`" + `json:"gearScore"` + "`" + `
+	Name		string			` + "`" + `json:"name"` + "`" + `
+	Origin		interface{}		` + "`" + `json:"origin"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const _ItemReference_type string = `type ItemReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		ItemID			` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	Item			*Item			` + "`" + `json:"item"` + "`" + `
+}`
+
+const _EquipmentSet_type string = `type EquipmentSet struct {
+	ID		EquipmentSetID	` + "`" + `json:"id"` + "`" + `
+	Name		string		` + "`" + `json:"name"` + "`" + `
+	Equipment	[]ItemReference	` + "`" + `json:"equipment"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const _EquipmentSetReference_type string = `type EquipmentSetReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		EquipmentSetID		` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	EquipmentSet		*EquipmentSet		` + "`" + `json:"equipmentSet"` + "`" + `
 }`
 
 const _Position_type string = `type Position struct {
 	ID		PositionID	` + "`" + `json:"id"` + "`" + `
 	X		float64		` + "`" + `json:"x"` + "`" + `
 	Y		float64		` + "`" + `json:"y"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const _PositionReference_type string = `type PositionReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		PositionID		` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	Position		*Position		` + "`" + `json:"position"` + "`" + `
 }`
 
 const _GearScore_type string = `type GearScore struct {
 	ID		GearScoreID	` + "`" + `json:"id"` + "`" + `
 	Level		int		` + "`" + `json:"level"` + "`" + `
 	Score		int		` + "`" + `json:"score"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const _GearScoreReference_type string = `type GearScoreReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		GearScoreID		` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	GearScore		*GearScore		` + "`" + `json:"gearScore"` + "`" + `
 }`
 
 const _Player_type string = `type Player struct {
-	ID		PlayerID	` + "`" + `json:"id"` + "`" + `
-	GearScore	*GearScore	` + "`" + `json:"gearScore"` + "`" + `
-	Items		[]Item		` + "`" + `json:"items"` + "`" + `
-	Position	*Position	` + "`" + `json:"position"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	ID		PlayerID			` + "`" + `json:"id"` + "`" + `
+	EquipmentSets	[]EquipmentSetReference		` + "`" + `json:"equipmentSets"` + "`" + `
+	GearScore	*GearScore			` + "`" + `json:"gearScore"` + "`" + `
+	GuildMembers	[]PlayerReference		` + "`" + `json:"guildMembers"` + "`" + `
+	Items		[]Item				` + "`" + `json:"items"` + "`" + `
+	Position	*Position			` + "`" + `json:"position"` + "`" + `
+	Target		*AnyOfPlayerZoneItemReference	` + "`" + `json:"target"` + "`" + `
+	TargetedBy	[]AnyOfPlayerZoneItemReference	` + "`" + `json:"targetedBy"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const _PlayerReference_type string = `type PlayerReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		PlayerID		` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	Player			*Player			` + "`" + `json:"player"` + "`" + `
 }`
 
 const _Zone_type string = `type Zone struct {
 	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
+	Interactables	[]interface{}	` + "`" + `json:"interactables"` + "`" + `
 	Items		[]ZoneItem	` + "`" + `json:"items"` + "`" + `
 	Players		[]Player	` + "`" + `json:"players"` + "`" + `
 	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
-	OperationKind_	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const _ZoneReference_type string = `type ZoneReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		ZoneID			` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	Zone			*Zone			` + "`" + `json:"zone"` + "`" + `
+}`
+
+const _AnyOfPlayerZoneItemReference_type string = `type AnyOfPlayerZoneItemReference struct {
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	ElementID		int			` + "`" + `json:"id"` + "`" + `
+	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
+	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
+	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `
+	Element			interface{}		` + "`" + `json:"element"` + "`" + `
+}`
+
+const recursionCheck_type string = `type recursionCheck struct {
+	equipmentSet	map[EquipmentSetID]bool
+	gearScore	map[GearScoreID]bool
+	item		map[ItemID]bool
+	player		map[PlayerID]bool
+	position	map[PositionID]bool
+	zone		map[ZoneID]bool
+	zoneItem	map[ZoneItemID]bool
+}`
+
+const newRecursionCheck_func string = `func newRecursionCheck() *recursionCheck {
+	return &recursionCheck{equipmentSet: make(map[EquipmentSetID]bool), gearScore: make(map[GearScoreID]bool), item: make(map[ItemID]bool), player: make(map[PlayerID]bool), position: make(map[PositionID]bool), zone: make(map[ZoneID]bool), zoneItem: make(map[ZoneItemID]bool)}
 }`
