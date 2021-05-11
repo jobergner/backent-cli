@@ -1880,48 +1880,52 @@ const _Tags_zone_func string = `func (_zone zone) Tags() []string {
 	return tags
 }`
 
-const _ID_itemBoundToRef_func string = `func (ref itemBoundToRef) ID() PlayerID {
-	return ref.itemBoundToRef.ReferencedElementID
+const _ID_itemBoundToRef_func string = `func (_itemBoundToRef itemBoundToRef) ID() PlayerID {
+	return _itemBoundToRef.itemBoundToRef.ReferencedElementID
 }`
 
 const itemBoundToRef_Engine_func string = `func (engine *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) itemBoundToRef {
-	patchingRef, ok := engine.Patch.ItemBoundToRef[itemBoundToRefID]
+	patchingItemBoundToRef, ok := engine.Patch.ItemBoundToRef[itemBoundToRefID]
 	if ok {
-		return itemBoundToRef{itemBoundToRef: patchingRef}
+		return itemBoundToRef{itemBoundToRef: patchingItemBoundToRef}
 	}
-	currentRef, ok := engine.State.ItemBoundToRef[itemBoundToRefID]
+	currentItemBoundToRef, ok := engine.State.ItemBoundToRef[itemBoundToRefID]
 	if ok {
-		return itemBoundToRef{itemBoundToRef: currentRef}
+		return itemBoundToRef{itemBoundToRef: currentItemBoundToRef}
 	}
 	return itemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_playerGuildMemberRef_func string = `func (ref playerGuildMemberRef) ID() PlayerID {
-	return ref.playerGuildMemberRef.ReferencedElementID
+const _ID_playerGuildMemberRef_func string = `func (_playerGuildMemberRef playerGuildMemberRef) ID() PlayerID {
+	return _playerGuildMemberRef.playerGuildMemberRef.ReferencedElementID
 }`
 
 const playerGuildMemberRef_Engine_func string = `func (engine *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) playerGuildMemberRef {
-	patchingRef, ok := engine.Patch.PlayerGuildMemberRef[playerGuildMemberRefID]
+	patchingPlayerGuildMemberRef, ok := engine.Patch.PlayerGuildMemberRef[playerGuildMemberRefID]
 	if ok {
-		return playerGuildMemberRef{playerGuildMemberRef: patchingRef}
+		return playerGuildMemberRef{playerGuildMemberRef: patchingPlayerGuildMemberRef}
 	}
-	currentRef, ok := engine.State.PlayerGuildMemberRef[playerGuildMemberRefID]
+	currentPlayerGuildMemberRef, ok := engine.State.PlayerGuildMemberRef[playerGuildMemberRefID]
 	if ok {
-		return playerGuildMemberRef{playerGuildMemberRef: currentRef}
+		return playerGuildMemberRef{playerGuildMemberRef: currentPlayerGuildMemberRef}
 	}
 	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
 const playerEquipmentSetRef_Engine_func string = `func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
-	patchingRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
 	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: patchingRef}
+		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
 	}
-	currentRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
 	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: currentRef}
+		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
 	}
 	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_playerEquipmentSetRef_func string = `func (_playerEquipmentSetRef playerEquipmentSetRef) ID() EquipmentSetID {
+	return _playerEquipmentSetRef.playerEquipmentSetRef.ReferencedElementID
 }`
 
 const _EquipmentSet_Engine_func string = `func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
@@ -1954,46 +1958,50 @@ const _Equipment_equipmentSet_func string = `func (_equipmentSet equipmentSet) E
 	return equipment
 }`
 
+const _ID_equipmentSetEquipmentRef_func string = `func (_equipmentSetEquipmentRef equipmentSetEquipmentRef) ID() ItemID {
+	return _equipmentSetEquipmentRef.equipmentSetEquipmentRef.ReferencedElementID
+}`
+
 const equipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) equipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) equipmentSetEquipmentRef {
-	patchingRef, ok := engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
+	patchingEquipmentSetEquipmentRef, ok := engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
 	if ok {
-		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: patchingRef}
+		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: patchingEquipmentSetEquipmentRef}
 	}
-	currentRef, ok := engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
+	currentEquipmentSetEquipmentRef, ok := engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]
 	if ok {
-		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: currentRef}
+		return equipmentSetEquipmentRef{equipmentSetEquipmentRef: currentEquipmentSetEquipmentRef}
 	}
 	return equipmentSetEquipmentRef{equipmentSetEquipmentRef: equipmentSetEquipmentRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_playerTargetRef_func string = `func (ref playerTargetRef) ID() AnyOfPlayerZoneItemID {
-	return ref.playerTargetRef.ReferencedElementID
+const _ID_playerTargetRef_func string = `func (_playerTargetRef playerTargetRef) ID() AnyOfPlayerZoneItemID {
+	return _playerTargetRef.playerTargetRef.ReferencedElementID
 }`
 
 const playerTargetRef_Engine_func string = `func (engine *Engine) playerTargetRef(playerTargetRefID PlayerTargetRefID) playerTargetRef {
-	patchingRef, ok := engine.Patch.PlayerTargetRef[playerTargetRefID]
+	patchingPlayerTargetRef, ok := engine.Patch.PlayerTargetRef[playerTargetRefID]
 	if ok {
-		return playerTargetRef{playerTargetRef: patchingRef}
+		return playerTargetRef{playerTargetRef: patchingPlayerTargetRef}
 	}
-	currentRef, ok := engine.State.PlayerTargetRef[playerTargetRefID]
+	currentPlayerTargetRef, ok := engine.State.PlayerTargetRef[playerTargetRefID]
 	if ok {
-		return playerTargetRef{playerTargetRef: currentRef}
+		return playerTargetRef{playerTargetRef: currentPlayerTargetRef}
 	}
 	return playerTargetRef{playerTargetRef: playerTargetRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_playerTargetedByRef_func string = `func (ref playerTargetedByRef) ID() AnyOfPlayerZoneItemID {
-	return ref.playerTargetedByRef.ReferencedElementID
+const _ID_playerTargetedByRef_func string = `func (_playerTargetedByRef playerTargetedByRef) ID() AnyOfPlayerZoneItemID {
+	return _playerTargetedByRef.playerTargetedByRef.ReferencedElementID
 }`
 
 const playerTargetedByRef_Engine_func string = `func (engine *Engine) playerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) playerTargetedByRef {
-	patchingRef, ok := engine.Patch.PlayerTargetedByRef[playerTargetedByRefID]
+	patchingPlayerTargetedByRef, ok := engine.Patch.PlayerTargetedByRef[playerTargetedByRefID]
 	if ok {
-		return playerTargetedByRef{playerTargetedByRef: patchingRef}
+		return playerTargetedByRef{playerTargetedByRef: patchingPlayerTargetedByRef}
 	}
-	currentRef, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]
+	currentPlayerTargetedByRef, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]
 	if ok {
-		return playerTargetedByRef{playerTargetedByRef: currentRef}
+		return playerTargetedByRef{playerTargetedByRef: currentPlayerTargetedByRef}
 	}
 	return playerTargetedByRef{playerTargetedByRef: playerTargetedByRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
