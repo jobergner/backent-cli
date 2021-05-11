@@ -6,6 +6,7 @@ type Field struct {
 	Name            string
 	ValueTypes      map[string]*ConfigType // references the field's value's Type
 	Parent          *ConfigType            // references the field's parent (not use when field is action param)
+	ValueTypeName   string                 // the name of the to-be-generated type
 	ValueString     string                 // the original value represented as string (eg. "[]Person")
 	HasSliceValue   bool                   // if the value is a slice value (eg. []string)
 	HasPointerValue bool                   // if the value is a pointer value (eg. *foo, []*foo)
