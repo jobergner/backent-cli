@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/gertd/go-pluralize"
 )
+
+var pluralizeClient *pluralize.Client = pluralize.NewClient()
 
 func caseInsensitiveSort(keys []string) func(i, j int) bool {
 	return func(i, j int) bool {
@@ -48,4 +52,22 @@ func extractValueType(valueString string) string {
 
 func getSring(value interface{}) string {
 	return fmt.Sprintf("%v", value)
+}
+
+func fieldValueTypeName(field Field) string {
+	if field.HasPointerValue {
+		return field.Parent.Name + title(pluralizeClient.Singular(field.Name)) + "Ref"
+	}
+	if field.HasAnyValue {
+		name := "anyOf"
+		field.RangeValueTypes(func(configType *ConfigType) {
+			name += title(configType.Name)
+		})
+		return name
+	}
+	return field.ValueType().Name
+}
+
+func title(name string) string {
+	return strings.Title(name)
 }

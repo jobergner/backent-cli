@@ -28,3 +28,9 @@ func (t *ConfigType) RangeFields(fn func(field Field)) {
 		fn(t.Fields[key])
 	}
 }
+
+func (t *ConfigType) RangeReferencedBy(fn func(field *Field)) {
+	for _, field := range t.ReferencedBy {
+		fn(field)
+	}
+}
