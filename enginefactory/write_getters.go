@@ -35,6 +35,12 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			typeName: func() string {
 				return configType.Name
 			},
+			returns: func() string {
+				return title(configType.Name) + "ID"
+			},
+			idFieldToReturn: func() string {
+				return "ID"
+			},
 		}
 
 		decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
@@ -65,22 +71,47 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 	alreadyWrittenCheck := make(map[string]bool)
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
-
 		configType.RangeFields(func(field ast.Field) {
-			if !field.HasAnyValue || alreadyWrittenCheck[anyNameByField(field)] {
+			if alreadyWrittenCheck[anyNameByField(field)] {
 				return
 			}
 
-			alreadyWrittenCheck[anyNameByField(field)] = true
-
-			t := typeGetter{
-				name: func() string {
+			t := typeGetter{}
+			i := idGetter{}
+			if field.HasPointerValue {
+				t.name = func() string {
+					return field.Parent.Name + title(pluralizeClient.Singular(field.Name)) + "Ref"
+				}
+				i.idFieldToReturn = func() string {
+					return "ReferencedElementID"
+				}
+				if field.HasAnyValue {
+					i.returns = func() string {
+						return title(anyNameByField(field)) + "ID"
+					}
+				} else {
+					i.returns = func() string {
+						return title(field.ValueType().Name) + "ID"
+					}
+				}
+				alreadyWrittenCheck[field.Name] = true
+			} else if field.HasAnyValue {
+				t.name = func() string {
 					return anyNameByField(field)
-				},
-				typeName: func() string {
-					return anyNameByField(field)
-				},
+				}
+				i.idFieldToReturn = func() string {
+					return "ID"
+				}
+				i.returns = func() string {
+					return title(t.name()) + "ID"
+				}
+				alreadyWrittenCheck[anyNameByField(field)] = true
+			} else {
+				return
 			}
+
+			t.typeName = t.name
+			i.typeName = t.name
 
 			decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
 				t.definePatchingElement(),
@@ -94,17 +125,10 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				Return(t.finalReturn()),
 			)
 
-			i := idGetter{
-				typeName: func() string {
-					return anyNameByField(field)
-				},
-			}
-
 			decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
 				Return(i.returnID()),
 			)
 		})
-
 	})
 
 	decls.Render(s.buf)
@@ -153,7 +177,9 @@ func (t typeGetter) finalReturn() *Statement {
 }
 
 type idGetter struct {
-	typeName func() string
+	typeName        func() string
+	returns         func() string
+	idFieldToReturn func() string
 }
 
 func (i idGetter) receiverName() string {
@@ -168,12 +194,8 @@ func (i idGetter) name() string {
 	return "ID"
 }
 
-func (i idGetter) returns() string {
-	return title(i.typeName()) + "ID"
-}
-
 func (i idGetter) returnID() *Statement {
-	return Id(i.receiverName()).Dot(i.typeName()).Dot("ID")
+	return Id(i.receiverName()).Dot(i.typeName()).Dot(i.idFieldToReturn())
 }
 
 type fieldGetter struct {
