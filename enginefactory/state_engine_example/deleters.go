@@ -11,8 +11,8 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	player := engine.Player(playerID).player
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
-	engine.dereferencePlayerTargetPlayerRefs(playerID)
-	engine.dereferencePlayerTargetedByPlayerRefs(playerID)
+	engine.dereferencePlayerTargetRefsPlayer(playerID)
+	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
 	engine.deleteGearScore(player.GearScore)
 	for _, guildMember := range player.GuildMembers {
 		engine.deletePlayerGuildMemberRef(guildMember)
@@ -96,8 +96,8 @@ func (engine *Engine) DeleteZoneItem(zoneItemID ZoneItemID) {
 }
 func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
-	engine.dereferencePlayerTargetZoneItemRefs(zoneItemID)
-	engine.dereferencePlayerTargetedByZoneItemRefs(zoneItemID)
+	engine.dereferencePlayerTargetRefsZoneItem(zoneItemID)
+	engine.dereferencePlayerTargetedByRefsZoneItem(zoneItemID)
 	engine.deleteItem(zoneItem.Item)
 	engine.deletePosition(zoneItem.Position)
 	if _, ok := engine.State.ZoneItem[zoneItemID]; ok {

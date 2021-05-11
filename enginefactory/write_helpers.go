@@ -204,7 +204,7 @@ func (s *EngineFactory) writeMergeIDs() *EngineFactory {
 
 			m := mergeIDsWriter{
 				idType: func() string {
-					return title(field.Parent.Name) + title(pluralizeClient.Singular(field.Name)) + "RefID"
+					return title(field.ValueTypeName) + "ID"
 				},
 			}
 
