@@ -24,6 +24,14 @@ func lower(name string) string {
 	return strings.ToLower(name[:1]) + name[1:]
 }
 
+func anyNameByField(f ast.Field) string {
+	name := "anyOf"
+	f.RangeValueTypes(func(configType *ast.ConfigType) {
+		name += title(configType.Name)
+	})
+	return name
+}
+
 // pluralizeClient is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
 // with getting the singular form of a plural, this field:
