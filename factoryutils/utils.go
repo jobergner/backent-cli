@@ -26,6 +26,15 @@ func ForEachFieldInType(configType ast.ConfigType, fn func(field ast.Field) *jen
 	return &statements
 }
 
+func ForEachReferenceOfType(configType ast.ConfigType, fn func(field *ast.Field) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	configType.RangeReferencedBy(func(field *ast.Field) {
+		statements = append(statements, fn(field))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 func ForEachTypeInAST(config *ast.AST, fn func(configType ast.ConfigType) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
 	config.RangeTypes(func(configType ast.ConfigType) {

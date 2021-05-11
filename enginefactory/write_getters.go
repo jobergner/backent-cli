@@ -80,7 +80,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			i := idGetter{}
 			if field.HasPointerValue {
 				t.name = func() string {
-					return field.Parent.Name + title(pluralizeClient.Singular(field.Name)) + "Ref"
+					return field.ValueTypeName
 				}
 				i.idFieldToReturn = func() string {
 					return "ReferencedElementID"

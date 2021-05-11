@@ -98,7 +98,7 @@ func (engine *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
 	}
 }
 
-func (engine *Engine) dereferencePlayerTargetPlayerRefs(playerID PlayerID) {
+func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
@@ -111,7 +111,7 @@ func (engine *Engine) dereferencePlayerTargetPlayerRefs(playerID PlayerID) {
 	}
 }
 
-func (engine *Engine) dereferencePlayerTargetZoneItemRefs(zoneItemID ZoneItemID) {
+func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
@@ -124,7 +124,7 @@ func (engine *Engine) dereferencePlayerTargetZoneItemRefs(zoneItemID ZoneItemID)
 	}
 }
 
-func (engine *Engine) dereferencePlayerTargetedByPlayerRefs(playerID PlayerID) {
+func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetedByRefIDs() {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
@@ -138,7 +138,7 @@ func (engine *Engine) dereferencePlayerTargetedByPlayerRefs(playerID PlayerID) {
 	}
 }
 
-func (engine *Engine) dereferencePlayerTargetedByZoneItemRefs(zoneItemID ZoneItemID) {
+func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneItemID) {
 	for _, refID := range engine.allPlayerTargetedByRefIDs() {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
