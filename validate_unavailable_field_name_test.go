@@ -10,15 +10,15 @@ func TestValidateDataUnavailableFieldName(t *testing.T) {
 	t.Run("should not fail on usage of available field names", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
-				"bar":            "[]int32",
-				"ban":            "int",
-				"operationKind_": "string",
+				"bar":           "[]int32",
+				"ban":           "int",
+				"operationKind": "string",
 			},
 		}
 
 		actualErrors := validateUnavailableFieldName(data)
 		expectedErrors := []error{
-			newValidationErrorUnavailableFieldName("operationKind_"),
+			newValidationErrorUnavailableFieldName("operationKind"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
