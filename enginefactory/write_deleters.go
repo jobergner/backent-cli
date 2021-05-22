@@ -63,7 +63,7 @@ type deleteTypeWrapperWriter struct {
 }
 
 func (d deleteTypeWrapperWriter) receiverParams() *Statement {
-	return Id("se").Id("*Engine")
+	return Id("engine").Id("*Engine")
 }
 
 func (d deleteTypeWrapperWriter) name() string {
@@ -79,15 +79,15 @@ func (d deleteTypeWrapperWriter) params() *Statement {
 }
 
 func (d deleteTypeWrapperWriter) getElement() *Statement {
-	return Id(d.t.Name).Op(":=").Id("se").Dot(title(d.t.Name)).Call(Id(d.idParam())).Dot(d.t.Name)
+	return Id(d.t.Name).Op(":=").Id("engine").Dot(title(d.t.Name)).Call(Id(d.idParam())).Dot(d.t.Name)
 }
 
 func (d deleteTypeWrapperWriter) hasParent() *Statement {
-	return Id(d.t.Name).Dot("HasParent_")
+	return Id(d.t.Name).Dot("HasParent")
 }
 
 func (d deleteTypeWrapperWriter) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(d.t.Name)).Call(Id(d.idParam()))
+	return Id("engine").Dot("delete" + title(d.t.Name)).Call(Id(d.idParam()))
 }
 
 type deleteTypeWriter struct {
@@ -96,7 +96,7 @@ type deleteTypeWriter struct {
 }
 
 func (d deleteTypeWriter) receiverParams() *Statement {
-	return Id("se").Id("*Engine")
+	return Id("engine").Id("*Engine")
 }
 
 func (d deleteTypeWriter) name() string {
@@ -112,27 +112,39 @@ func (d deleteTypeWriter) params() *Statement {
 }
 
 func (d deleteTypeWriter) getElement() *Statement {
-	return Id(d.t.Name).Op(":=").Id("se").Dot(title(d.t.Name)).Call(Id(d.idParam())).Dot(d.t.Name)
+	return Id(d.t.Name).Op(":=").Id("engine").Dot(title(d.t.Name)).Call(Id(d.idParam())).Dot(d.t.Name)
 }
 
 func (d deleteTypeWriter) setOperationKind() *Statement {
-	return Id(d.t.Name).Dot("OperationKind_").Op("=").Id("OperationKindDelete")
+	return Id(d.t.Name).Dot("OperationKind").Op("=").Id("OperationKindDelete")
 }
 
 func (d deleteTypeWriter) updateElementInPatch() *Statement {
-	return Id("se").Dot("Patch").Dot(title(d.t.Name)).Index(Id(d.t.Name).Dot("ID")).Op("=").Id(d.t.Name)
+	return Id("engine").Dot("Patch").Dot(title(d.t.Name)).Index(Id(d.t.Name).Dot("ID")).Op("=").Id(d.t.Name)
+}
+
+func (d deleteTypeWriter) loopedElementIdentifier() string {
+	return pluralizeClient.Singular(d.f.Name) + "ID"
 }
 
 func (d deleteTypeWriter) loopConditions() *Statement {
-	return List(Id("_"), Id(d.f.ValueType().Name+"ID")).Op(":=").Range().Id(d.t.Name).Dot(title(d.f.Name))
+	return List(Id("_"), Id(d.loopedElementIdentifier())).Op(":=").Range().Id(d.t.Name).Dot(title(d.f.Name))
 }
 
 func (d deleteTypeWriter) deleteElementInLoop() *Statement {
-	return Id("se").Dot("delete" + title(d.f.ValueType().Name)).Call(Id(d.f.ValueType().Name + "ID"))
+	deleteFunc := Id("engine").Dot("delete" + title(d.f.ValueTypeName))
+	if !d.f.HasPointerValue && d.f.HasAnyValue {
+		return deleteFunc.Call(Id(d.loopedElementIdentifier()), True())
+	}
+	return deleteFunc.Call(Id(d.loopedElementIdentifier()))
 }
 
 func (d deleteTypeWriter) deleteElement() *Statement {
-	return Id("se").Dot("delete" + title(d.f.ValueType().Name)).Call(Id(d.t.Name).Dot(title(d.f.ValueType().Name)))
+	deleteFunc := Id("engine").Dot("delete" + title(d.f.ValueTypeName))
+	if !d.f.HasPointerValue && d.f.HasAnyValue {
+		return deleteFunc.Call(Id(d.t.Name).Dot(title(d.f.Name)), True())
+	}
+	return deleteFunc.Call(Id(d.t.Name).Dot(title(d.f.Name)))
 }
 
 func (d deleteTypeWriter) existsInState() *Statement {
@@ -148,5 +160,5 @@ func (d deleteTypeWriter) dereferenceField(field *ast.Field) *Statement {
 	if field.HasAnyValue {
 		suffix = title(d.t.Name)
 	}
-	return Id("engine").Id("dereference" + title(field.Parent.Name) + title(field.Name) + suffix + "Refs")
+	return Id("engine").Dot("dereference" + title(field.Parent.Name) + title(pluralizeClient.Singular(field.Name)) + "Refs" + suffix).Call(Id(d.idParam()))
 }
