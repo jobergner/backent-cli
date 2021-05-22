@@ -27,6 +27,14 @@ func TestWriteDeleters(t *testing.T) {
 			deleteZone_Engine_func,
 			_DeleteZoneItem_Engine_func,
 			deleteZoneItem_Engine_func,
+			deleteEquipmentSetEquipmentRef_Engine_func,
+			deleteItemBoundToRef_Engine_func,
+			deletePlayerEquipmentSetRef_Engine_func,
+			deletePlayerGuildMemberRef_Engine_func,
+			deletePlayerTargetRef_Engine_func,
+			deletePlayerTargetedByRef_Engine_func,
+			deleteAnyOfPlayerPosition_Engine_func,
+			deleteAnyOfItemPlayerZoneItem_Engine_func,
 		}, "\n"))
 
 		if expected != actual {

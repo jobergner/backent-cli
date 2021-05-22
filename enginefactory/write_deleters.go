@@ -54,8 +54,75 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 		)
 	})
 
+	alreadyWrittenCheck := make(map[string]bool)
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[field.ValueTypeName] {
+				return
+			}
+
+			if !field.HasPointerValue {
+				return
+			}
+
+			alreadyWrittenCheck[field.ValueTypeName] = true
+
+			d := deleteGeneratedTypeWriter{
+				f: field,
+			}
+
+			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+				d.getElement(),
+				onlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
+				If(d.existsInState()).Block(
+					d.setOperationKind(),
+					d.updateElementInPatch(),
+				).Else().Block(
+					d.deleteFromPatch(),
+				),
+			)
+
+		})
+	})
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[field.ValueTypeName] {
+				return
+			}
+
+			if !field.HasAnyValue {
+				return
+			}
+
+			alreadyWrittenCheck[anyNameByField(field)] = true
+
+			d := deleteGeneratedTypeWriter{
+				f: field,
+			}
+
+			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
+				d.getElement(),
+				If(Id("deleteChild")).Block(
+					d.deleteChild(),
+				),
+				If(d.existsInState()).Block(
+					d.setOperationKind(),
+					d.updateElementInPatch(),
+				).Else().Block(
+					d.deleteFromPatch(),
+				),
+			)
+
+		})
+	})
+
 	decls.Render(s.buf)
 	return s
+}
+
+func writeDeleteGeneratedType(decls *DeclSet, d deleteGeneratedTypeWriter, writeDeleteReference bool) {
 }
 
 type deleteTypeWrapperWriter struct {
@@ -161,4 +228,52 @@ func (d deleteTypeWriter) dereferenceField(field *ast.Field) *Statement {
 		suffix = title(d.t.Name)
 	}
 	return Id("engine").Dot("dereference" + title(field.Parent.Name) + title(pluralizeClient.Singular(field.Name)) + "Refs" + suffix).Call(Id(d.idParam()))
+}
+
+type deleteGeneratedTypeWriter struct {
+	f ast.Field
+}
+
+func (d deleteGeneratedTypeWriter) receiverParams() *Statement {
+	return Id("engine").Id("*Engine")
+}
+
+func (d deleteGeneratedTypeWriter) name() string {
+	return "delete" + title(d.f.ValueTypeName)
+}
+
+func (d deleteGeneratedTypeWriter) idParam() string {
+	return d.f.ValueTypeName + "ID"
+}
+
+func (d deleteGeneratedTypeWriter) params() *Statement {
+	return Id(d.idParam()).Id(title(d.f.ValueTypeName) + "ID")
+}
+
+func (d deleteGeneratedTypeWriter) getElement() *Statement {
+	return Id(d.f.ValueTypeName).Op(":=").Id("engine").Dot(d.f.ValueTypeName).Call(Id(d.idParam())).Dot(d.f.ValueTypeName)
+}
+
+func (d deleteGeneratedTypeWriter) deleteChild() *Statement {
+	return Id(d.f.ValueTypeName).Dot("deleteChild").Call()
+}
+
+func (d deleteGeneratedTypeWriter) deleteAnyContainer() *Statement {
+	return Id("engine").Dot("delete"+title(anyNameByField(d.f))).Call(Id(d.f.ValueTypeName).Dot("ReferencedElementID"), False())
+}
+
+func (d deleteGeneratedTypeWriter) setOperationKind() *Statement {
+	return Id(d.f.ValueTypeName).Dot("OperationKind").Op("=").Id("OperationKindDelete")
+}
+
+func (d deleteGeneratedTypeWriter) updateElementInPatch() *Statement {
+	return Id("engine").Dot("Patch").Dot(title(d.f.ValueTypeName)).Index(Id(d.f.ValueTypeName).Dot("ID")).Op("=").Id(d.f.ValueTypeName)
+}
+
+func (d deleteGeneratedTypeWriter) existsInState() *Statement {
+	return List(Id("_"), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(title(d.f.ValueTypeName)).Index(Id(d.idParam())).Id(";").Id("ok")
+}
+
+func (d deleteGeneratedTypeWriter) deleteFromPatch() *Statement {
+	return Delete(Id("engine").Dot("Patch").Dot(title(d.f.ValueTypeName)), Id(d.idParam()))
 }

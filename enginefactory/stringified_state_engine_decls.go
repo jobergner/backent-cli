@@ -1628,16 +1628,16 @@ const deleteAnyOfPlayerZoneItem_Engine_func string = `func (engine *Engine) dele
 	}
 }`
 
-const deleteAnyOfPlayerPosition_Engine_func string = `func (engine *Engine) deleteAnyOfPlayerPosition(anyOfPlayerZoneID AnyOfPlayerPositionID, deleteChild bool) {
-	anyOfPlayerPosition := engine.anyOfPlayerPosition(anyOfPlayerZoneID).anyOfPlayerPosition
+const deleteAnyOfPlayerPosition_Engine_func string = `func (engine *Engine) deleteAnyOfPlayerPosition(anyOfPlayerPositionID AnyOfPlayerPositionID, deleteChild bool) {
+	anyOfPlayerPosition := engine.anyOfPlayerPosition(anyOfPlayerPositionID).anyOfPlayerPosition
 	if deleteChild {
 		anyOfPlayerPosition.deleteChild()
 	}
-	if _, ok := engine.State.AnyOfPlayerPosition[anyOfPlayerZoneID]; ok {
+	if _, ok := engine.State.AnyOfPlayerPosition[anyOfPlayerPositionID]; ok {
 		anyOfPlayerPosition.OperationKind = OperationKindDelete
 		engine.Patch.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
 	} else {
-		delete(engine.Patch.AnyOfPlayerPosition, anyOfPlayerZoneID)
+		delete(engine.Patch.AnyOfPlayerPosition, anyOfPlayerPositionID)
 	}
 }`
 
