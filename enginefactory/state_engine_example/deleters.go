@@ -13,17 +13,20 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferencePlayerTargetRefsPlayer(playerID)
 	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
+	for _, equipmentSetID := range player.EquipmentSets {
+		engine.deletePlayerEquipmentSetRef(equipmentSetID)
+	}
 	engine.deleteGearScore(player.GearScore)
-	for _, guildMember := range player.GuildMembers {
-		engine.deletePlayerGuildMemberRef(guildMember)
+	for _, guildMemberID := range player.GuildMembers {
+		engine.deletePlayerGuildMemberRef(guildMemberID)
 	}
 	for _, itemID := range player.Items {
 		engine.deleteItem(itemID)
 	}
 	engine.deletePosition(player.Position)
 	engine.deletePlayerTargetRef(player.Target)
-	for _, targetedBy := range player.TargetedBy {
-		engine.deletePlayerTargetedByRef(targetedBy)
+	for _, targetedByID := range player.TargetedBy {
+		engine.deletePlayerTargetedByRef(targetedByID)
 	}
 	if _, ok := engine.State.Player[playerID]; ok {
 		player.OperationKind = OperationKindDelete
@@ -76,6 +79,7 @@ func (engine *Engine) DeleteItem(itemID ItemID) {
 }
 func (engine *Engine) deleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
+	engine.dereferenceEquipmentSetEquipmentRefs(itemID)
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
 	engine.deleteAnyOfPlayerPosition(item.Origin, true)
@@ -113,8 +117,11 @@ func (engine *Engine) DeleteZone(zoneID ZoneID) {
 }
 func (engine *Engine) deleteZone(zoneID ZoneID) {
 	zone := engine.Zone(zoneID).zone
-	for _, zoneItemID := range zone.Items {
-		engine.deleteZoneItem(zoneItemID)
+	for _, interactableID := range zone.Interactables {
+		engine.deleteAnyOfItemPlayerZoneItem(interactableID, true)
+	}
+	for _, itemID := range zone.Items {
+		engine.deleteZoneItem(itemID)
 	}
 	for _, playerID := range zone.Players {
 		engine.deletePlayer(playerID)
@@ -133,8 +140,8 @@ func (engine *Engine) DeleteEquipmentSet(equipmentSetID EquipmentSetID) {
 func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	equipmentSet := engine.EquipmentSet(equipmentSetID).equipmentSet
 	engine.dereferencePlayerEquipmentSetRefs(equipmentSetID)
-	for _, equipmentSet := range equipmentSet.Equipment {
-		engine.deleteEquipmentSetEquipmentRef(equipmentSet)
+	for _, equipmentID := range equipmentSet.Equipment {
+		engine.deleteEquipmentSetEquipmentRef(equipmentID)
 	}
 	if _, ok := engine.State.EquipmentSet[equipmentSetID]; ok {
 		equipmentSet.OperationKind = OperationKindDelete

@@ -13,6 +13,8 @@ func TestWriteDeleters(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
+			_DeleteEquipmentSet_Engine_func,
+			deleteEquipmentSet_Engine_func,
 			_DeleteGearScore_Engine_func,
 			deleteGearScore_Engine_func,
 			_DeleteItem_Engine_func,

@@ -68,6 +68,16 @@ func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
 	}
 }
 
+func (engine *Engine) dereferenceEquipmentSetEquipmentRefs(itemID ItemID) {
+	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
+		ref := engine.equipmentSetEquipmentRef(refID)
+		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
+			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
+			parent.RemoveEquipment(itemID)
+		}
+	}
+}
+
 func (engine *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
 	for _, refID := range engine.allPlayerGuildMemberRefIDs() {
 		ref := engine.playerGuildMemberRef(refID)

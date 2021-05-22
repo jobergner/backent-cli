@@ -30,7 +30,10 @@ func (t *ConfigType) RangeFields(fn func(field Field)) {
 }
 
 func (t *ConfigType) RangeReferencedBy(fn func(field *Field)) {
-	for _, field := range t.ReferencedBy {
+	referencedBy := make([]*Field, len(t.ReferencedBy))
+	copy(referencedBy, t.ReferencedBy)
+	sort.Slice(referencedBy, valueTypeNameSort(referencedBy))
+	for _, field := range referencedBy {
 		fn(field)
 	}
 }

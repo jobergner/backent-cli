@@ -1407,19 +1407,22 @@ const deletePlayer_Engine_func string = `func (engine *Engine) deletePlayer(play
 	player := engine.Player(playerID).player
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
-	engine.dereferencePlayerTargetPlayerRefs(playerID)
-	engine.dereferencePlayerTargetedByPlayerRefs(playerID)
+	engine.dereferencePlayerTargetRefsPlayer(playerID)
+	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
+	for _, equipmentSetID := range player.EquipmentSets {
+		engine.deletePlayerEquipmentSetRef(equipmentSetID)
+	}
 	engine.deleteGearScore(player.GearScore)
-	for _, guildMember := range player.GuildMembers {
-		engine.deletePlayerGuildMemberRef(guildMember)
+	for _, guildMemberID := range player.GuildMembers {
+		engine.deletePlayerGuildMemberRef(guildMemberID)
 	}
 	for _, itemID := range player.Items {
 		engine.deleteItem(itemID)
 	}
 	engine.deletePosition(player.Position)
 	engine.deletePlayerTargetRef(player.Target)
-	for _, targetedBy := range player.TargetedBy {
-		engine.deletePlayerTargetedByRef(targetedBy)
+	for _, targetedByID := range player.TargetedBy {
+		engine.deletePlayerTargetedByRef(targetedByID)
 	}
 	if _, ok := engine.State.Player[playerID]; ok {
 		player.OperationKind = OperationKindDelete
@@ -1475,6 +1478,7 @@ const _DeleteItem_Engine_func string = `func (engine *Engine) DeleteItem(itemID 
 
 const deleteItem_Engine_func string = `func (engine *Engine) deleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
+	engine.dereferenceEquipmentSetEquipmentRefs(itemID)
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
 	engine.deleteAnyOfPlayerPosition(item.Origin, true)
@@ -1496,8 +1500,8 @@ const _DeleteZoneItem_Engine_func string = `func (engine *Engine) DeleteZoneItem
 
 const deleteZoneItem_Engine_func string = `func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
-	engine.dereferencePlayerTargetZoneItemRefs(zoneItemID)
-	engine.dereferencePlayerTargetedByZoneItemRefs(zoneItemID)
+	engine.dereferencePlayerTargetRefsZoneItem(zoneItemID)
+	engine.dereferencePlayerTargetedByRefsZoneItem(zoneItemID)
 	engine.deleteItem(zoneItem.Item)
 	engine.deletePosition(zoneItem.Position)
 	if _, ok := engine.State.ZoneItem[zoneItemID]; ok {
@@ -1514,8 +1518,11 @@ const _DeleteZone_Engine_func string = `func (engine *Engine) DeleteZone(zoneID 
 
 const deleteZone_Engine_func string = `func (engine *Engine) deleteZone(zoneID ZoneID) {
 	zone := engine.Zone(zoneID).zone
-	for _, zoneItemID := range zone.Items {
-		engine.deleteZoneItem(zoneItemID)
+	for _, interactableID := range zone.Interactables {
+		engine.deleteAnyOfItemPlayerZoneItem(interactableID, true)
+	}
+	for _, itemID := range zone.Items {
+		engine.deleteZoneItem(itemID)
 	}
 	for _, playerID := range zone.Players {
 		engine.deletePlayer(playerID)
@@ -1535,8 +1542,8 @@ const _DeleteEquipmentSet_Engine_func string = `func (engine *Engine) DeleteEqui
 const deleteEquipmentSet_Engine_func string = `func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	equipmentSet := engine.EquipmentSet(equipmentSetID).equipmentSet
 	engine.dereferencePlayerEquipmentSetRefs(equipmentSetID)
-	for _, equipmentSet := range equipmentSet.Equipment {
-		engine.deleteEquipmentSetEquipmentRef(equipmentSet)
+	for _, equipmentID := range equipmentSet.Equipment {
+		engine.deleteEquipmentSetEquipmentRef(equipmentID)
 	}
 	if _, ok := engine.State.EquipmentSet[equipmentSetID]; ok {
 		equipmentSet.OperationKind = OperationKindDelete
@@ -2954,6 +2961,16 @@ const dereferenceItemBoundToRefs_Engine_func string = `func (engine *Engine) der
 	}
 }`
 
+const dereferenceEquipmentSetEquipmentRefs_Engine_func string = `func (engine *Engine) dereferenceEquipmentSetEquipmentRefs(itemID ItemID) {
+	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
+		ref := engine.equipmentSetEquipmentRef(refID)
+		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
+			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
+			parent.RemoveEquipment(itemID)
+		}
+	}
+}`
+
 const dereferencePlayerGuildMemberRefs_Engine_func string = `func (engine *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
 	for _, refID := range engine.allPlayerGuildMemberRefIDs() {
 		ref := engine.playerGuildMemberRef(refID)
@@ -2984,7 +3001,7 @@ const dereferenceEquipmentSetEquipmentRef_Engine_func string = `func (engine *En
 	}
 }`
 
-const dereferencePlayerTargetPlayerRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetPlayerRefs(playerID PlayerID) {
+const dereferencePlayerTargetRefsPlayer_Engine_func string = `func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
@@ -2997,7 +3014,7 @@ const dereferencePlayerTargetPlayerRefs_Engine_func string = `func (engine *Engi
 	}
 }`
 
-const dereferencePlayerTargetZoneItemRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetZoneItemRefs(zoneItemID ZoneItemID) {
+const dereferencePlayerTargetRefsZoneItem_Engine_func string = `func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
@@ -3010,7 +3027,7 @@ const dereferencePlayerTargetZoneItemRefs_Engine_func string = `func (engine *En
 	}
 }`
 
-const dereferencePlayerTargetedByPlayerRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetedByPlayerRefs(playerID PlayerID) {
+const dereferencePlayerTargetedByRefsPlayer_Engine_func string = `func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetedByRefIDs() {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
@@ -3024,7 +3041,7 @@ const dereferencePlayerTargetedByPlayerRefs_Engine_func string = `func (engine *
 	}
 }`
 
-const dereferencePlayerTargetedByZoneItemRefs_Engine_func string = `func (engine *Engine) dereferencePlayerTargetedByZoneItemRefs(zoneItemID ZoneItemID) {
+const dereferencePlayerTargetedByRefsZoneItem_Engine_func string = `func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneItemID) {
 	for _, refID := range engine.allPlayerTargetedByRefIDs() {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
