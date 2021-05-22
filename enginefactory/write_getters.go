@@ -19,18 +19,6 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			},
 		}
 
-		decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
-			t.definePatchingElement(),
-			If(Id("ok")).Block(
-				Return(t.earlyReturnPatching()),
-			),
-			t.defineCurrentElement(),
-			If(Id("ok")).Block(
-				Return(t.earlyReturnCurrent()),
-			),
-			Return(t.finalReturn()),
-		)
-
 		i := idGetter{
 			typeName: func() string {
 				return configType.Name
@@ -43,9 +31,8 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			},
 		}
 
-		decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
-			Return(i.returnID()),
-		)
+		writeTypeDeleter(&decls, t)
+		writeIdDeleter(&decls, i)
 
 		configType.RangeFields(func(field ast.Field) {
 			f := fieldGetter{
@@ -72,67 +59,99 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[anyNameByField(field)] {
+			if alreadyWrittenCheck[field.ValueTypeName] {
+				return
+			}
+			if !field.HasPointerValue {
 				return
 			}
 
 			t := typeGetter{}
 			i := idGetter{}
-			if field.HasPointerValue {
-				t.name = func() string {
-					return field.ValueTypeName
-				}
-				i.idFieldToReturn = func() string {
-					return "ReferencedElementID"
-				}
-				if field.HasAnyValue {
-					i.returns = func() string {
-						return title(anyNameByField(field)) + "ID"
-					}
-				} else {
-					i.returns = func() string {
-						return title(field.ValueType().Name) + "ID"
-					}
-				}
-				alreadyWrittenCheck[field.Name] = true
-			} else if field.HasAnyValue {
-				t.name = func() string {
-					return anyNameByField(field)
-				}
-				i.idFieldToReturn = func() string {
-					return "ID"
-				}
-				i.returns = func() string {
-					return title(t.name()) + "ID"
-				}
-				alreadyWrittenCheck[anyNameByField(field)] = true
-			} else {
-				return
+
+			t.name = func() string {
+				return field.ValueTypeName
 			}
+			i.idFieldToReturn = func() string {
+				return "ReferencedElementID"
+			}
+			if field.HasAnyValue {
+				i.returns = func() string {
+					return title(anyNameByField(field)) + "ID"
+				}
+			} else {
+				i.returns = func() string {
+					return title(field.ValueType().Name) + "ID"
+				}
+			}
+
+			alreadyWrittenCheck[field.ValueTypeName] = true
 
 			t.typeName = t.name
 			i.typeName = t.name
 
-			decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
-				t.definePatchingElement(),
-				If(Id("ok")).Block(
-					Return(t.earlyReturnPatching()),
-				),
-				t.defineCurrentElement(),
-				If(Id("ok")).Block(
-					Return(t.earlyReturnCurrent()),
-				),
-				Return(t.finalReturn()),
-			)
+			writeTypeDeleter(&decls, t)
+			writeIdDeleter(&decls, i)
 
-			decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
-				Return(i.returnID()),
-			)
+		})
+	})
+
+	alreadyWrittenCheck = make(map[string]bool)
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[anyNameByField(field)] {
+				return
+			}
+			if !field.HasAnyValue {
+				return
+			}
+
+			t := typeGetter{}
+			i := idGetter{}
+
+			t.name = func() string {
+				return anyNameByField(field)
+			}
+			i.idFieldToReturn = func() string {
+				return "ID"
+			}
+			i.returns = func() string {
+				return title(t.name()) + "ID"
+			}
+
+			alreadyWrittenCheck[anyNameByField(field)] = true
+
+			t.typeName = t.name
+			i.typeName = t.name
+
+			writeTypeDeleter(&decls, t)
+			writeIdDeleter(&decls, i)
 		})
 	})
 
 	decls.Render(s.buf)
 	return s
+}
+
+func writeTypeDeleter(decls *DeclSet, t typeGetter) {
+	decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
+		t.definePatchingElement(),
+		If(Id("ok")).Block(
+			Return(t.earlyReturnPatching()),
+		),
+		t.defineCurrentElement(),
+		If(Id("ok")).Block(
+			Return(t.earlyReturnCurrent()),
+		),
+		Return(t.finalReturn()),
+	)
+}
+
+func writeIdDeleter(decls *DeclSet, i idGetter) {
+	decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
+		Return(i.returnID()),
+	)
 }
 
 type typeGetter struct {
