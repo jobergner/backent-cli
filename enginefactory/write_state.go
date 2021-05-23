@@ -13,6 +13,40 @@ func (s *EngineFactory) writeIDs() *EngineFactory {
 		decls.File.Type().Id(title(configType.Name) + "ID").Int()
 	})
 
+	alreadyWrittenCheck := make(map[string]bool)
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[field.ValueTypeName] {
+				return
+			}
+
+			if !field.HasPointerValue {
+				return
+			}
+
+			alreadyWrittenCheck[field.ValueTypeName] = true
+
+			decls.File.Type().Id(title(field.ValueTypeName) + "ID").Int()
+		})
+	})
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[anyNameByField(field)] {
+				return
+			}
+
+			if !field.HasAnyValue {
+				return
+			}
+
+			alreadyWrittenCheck[anyNameByField(field)] = true
+
+			decls.File.Type().Id(title(anyNameByField(field)) + "ID").Int()
+		})
+	})
+
 	decls.Render(s.buf)
 	return s
 }
