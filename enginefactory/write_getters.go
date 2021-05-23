@@ -103,24 +103,26 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			if alreadyWrittenCheck[anyNameByField(field)] {
 				return
 			}
+
 			if !field.HasAnyValue {
 				return
 			}
 
-			t := typeGetter{}
-			i := idGetter{}
-
-			t.name = func() string {
-				return anyNameByField(field)
-			}
-			i.idFieldToReturn = func() string {
-				return "ID"
-			}
-			i.returns = func() string {
-				return title(t.name()) + "ID"
-			}
-
 			alreadyWrittenCheck[anyNameByField(field)] = true
+
+			t := typeGetter{
+				name: func() string {
+					return anyNameByField(field)
+				},
+			}
+			i := idGetter{
+				idFieldToReturn: func() string {
+					return "ID"
+				},
+				returns: func() string {
+					return title(t.name()) + "ID"
+				},
+			}
 
 			t.typeName = t.name
 			i.typeName = t.name
