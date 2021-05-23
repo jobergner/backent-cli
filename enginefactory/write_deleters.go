@@ -69,7 +69,8 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			alreadyWrittenCheck[field.ValueTypeName] = true
 
 			d := deleteGeneratedTypeWriter{
-				f: field,
+				f:             field,
+				valueTypeName: func() string { return field.ValueTypeName },
 			}
 
 			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
@@ -88,7 +89,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[field.ValueTypeName] {
+			if alreadyWrittenCheck[anyNameByField(field)] {
 				return
 			}
 
@@ -99,7 +100,8 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			alreadyWrittenCheck[anyNameByField(field)] = true
 
 			d := deleteGeneratedTypeWriter{
-				f: field,
+				f:             field,
+				valueTypeName: func() string { return anyNameByField(field) },
 			}
 
 			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
@@ -231,7 +233,8 @@ func (d deleteTypeWriter) dereferenceField(field *ast.Field) *Statement {
 }
 
 type deleteGeneratedTypeWriter struct {
-	f ast.Field
+	f             ast.Field
+	valueTypeName func() string
 }
 
 func (d deleteGeneratedTypeWriter) receiverParams() *Statement {
@@ -239,41 +242,41 @@ func (d deleteGeneratedTypeWriter) receiverParams() *Statement {
 }
 
 func (d deleteGeneratedTypeWriter) name() string {
-	return "delete" + title(d.f.ValueTypeName)
+	return "delete" + title(d.valueTypeName())
 }
 
 func (d deleteGeneratedTypeWriter) idParam() string {
-	return d.f.ValueTypeName + "ID"
+	return d.valueTypeName() + "ID"
 }
 
 func (d deleteGeneratedTypeWriter) params() *Statement {
-	return Id(d.idParam()).Id(title(d.f.ValueTypeName) + "ID")
+	return Id(d.idParam()).Id(title(d.valueTypeName()) + "ID")
 }
 
 func (d deleteGeneratedTypeWriter) getElement() *Statement {
-	return Id(d.f.ValueTypeName).Op(":=").Id("engine").Dot(d.f.ValueTypeName).Call(Id(d.idParam())).Dot(d.f.ValueTypeName)
+	return Id(d.valueTypeName()).Op(":=").Id("engine").Dot(d.valueTypeName()).Call(Id(d.idParam())).Dot(d.valueTypeName())
 }
 
 func (d deleteGeneratedTypeWriter) deleteChild() *Statement {
-	return Id(d.f.ValueTypeName).Dot("deleteChild").Call()
+	return Id(d.valueTypeName()).Dot("deleteChild").Call()
 }
 
 func (d deleteGeneratedTypeWriter) deleteAnyContainer() *Statement {
-	return Id("engine").Dot("delete"+title(anyNameByField(d.f))).Call(Id(d.f.ValueTypeName).Dot("ReferencedElementID"), False())
+	return Id("engine").Dot("delete"+title(anyNameByField(d.f))).Call(Id(d.valueTypeName()).Dot("ReferencedElementID"), False())
 }
 
 func (d deleteGeneratedTypeWriter) setOperationKind() *Statement {
-	return Id(d.f.ValueTypeName).Dot("OperationKind").Op("=").Id("OperationKindDelete")
+	return Id(d.valueTypeName()).Dot("OperationKind").Op("=").Id("OperationKindDelete")
 }
 
 func (d deleteGeneratedTypeWriter) updateElementInPatch() *Statement {
-	return Id("engine").Dot("Patch").Dot(title(d.f.ValueTypeName)).Index(Id(d.f.ValueTypeName).Dot("ID")).Op("=").Id(d.f.ValueTypeName)
+	return Id("engine").Dot("Patch").Dot(title(d.valueTypeName())).Index(Id(d.valueTypeName()).Dot("ID")).Op("=").Id(d.valueTypeName())
 }
 
 func (d deleteGeneratedTypeWriter) existsInState() *Statement {
-	return List(Id("_"), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(title(d.f.ValueTypeName)).Index(Id(d.idParam())).Id(";").Id("ok")
+	return List(Id("_"), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(title(d.valueTypeName())).Index(Id(d.idParam())).Id(";").Id("ok")
 }
 
 func (d deleteGeneratedTypeWriter) deleteFromPatch() *Statement {
-	return Delete(Id("engine").Dot("Patch").Dot(title(d.f.ValueTypeName)), Id(d.idParam()))
+	return Delete(Id("engine").Dot("Patch").Dot(title(d.valueTypeName())), Id(d.idParam()))
 }
