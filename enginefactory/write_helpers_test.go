@@ -62,6 +62,9 @@ func TestWriteHelpers(t *testing.T) {
 			mergePlayerGuildMemberRefIDs_func,
 			mergePlayerTargetRefIDs_func,
 			mergePlayerTargetedByRefIDs_func,
+			mergeAnyOfPlayerPositionIDs_func,
+			mergeAnyOfPlayerZoneItemIDs_func,
+			mergeAnyOfItemPlayerZoneItemIDs_func,
 		}, "\n"))
 
 		if expected != actual {
