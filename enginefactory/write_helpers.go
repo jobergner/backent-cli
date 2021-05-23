@@ -196,11 +196,20 @@ func (s *EngineFactory) writeMergeIDs() *EngineFactory {
 		)
 
 	})
+
+	alreadyWrittenCheck := make(map[string]bool)
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[field.ValueTypeName] {
+				return
+			}
+
 			if !field.HasPointerValue {
 				return
 			}
+
+			alreadyWrittenCheck[field.ValueTypeName] = true
 
 			m := mergeIDsWriter{
 				idType: func() string {
@@ -208,27 +217,53 @@ func (s *EngineFactory) writeMergeIDs() *EngineFactory {
 				},
 			}
 
-			decls.File.Func().Id(m.name()).Params(m.params()).Id(m.returns()).Block(
-				m.declareIDs(),
-				m.copyIDs(),
-				m.declareCounter(),
-				For(m.currentIDsLoopConditions()).Block(
-					If(m.idDoesNotMatch()).Block(
-						Continue(),
-					),
-					m.incrementCounter(),
-				),
-				For(m.nextIDsLoopConditions()).Block(
-					m.appendID(),
-				),
-				Return(Id("ids")),
-			)
+			writeMergeIDs(&decls, m)
+		})
+	})
 
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[anyNameByField(field)] {
+				return
+			}
+
+			if !field.HasAnyValue {
+				return
+			}
+
+			alreadyWrittenCheck[anyNameByField(field)] = true
+
+			m := mergeIDsWriter{
+				idType: func() string {
+					return title(anyNameByField(field)) + "ID"
+				},
+			}
+
+			writeMergeIDs(&decls, m)
 		})
 	})
 
 	decls.Render(s.buf)
 	return s
+}
+
+func writeMergeIDs(decls *DeclSet, m mergeIDsWriter) {
+
+	decls.File.Func().Id(m.name()).Params(m.params()).Id(m.returns()).Block(
+		m.declareIDs(),
+		m.copyIDs(),
+		m.declareCounter(),
+		For(m.currentIDsLoopConditions()).Block(
+			If(m.idDoesNotMatch()).Block(
+				Continue(),
+			),
+			m.incrementCounter(),
+		),
+		For(m.nextIDsLoopConditions()).Block(
+			m.appendID(),
+		),
+		Return(Id("ids")),
+	)
 }
 
 type mergeIDsWriter struct {
