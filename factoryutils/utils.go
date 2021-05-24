@@ -44,6 +44,24 @@ func ForEachTypeInAST(config *ast.AST, fn func(configType ast.ConfigType) *jen.S
 	return &statements
 }
 
+func ForEachRefFieldInAST(config *ast.AST, fn func(field ast.Field) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	config.RangeRefFields(func(field ast.Field) {
+		statements = append(statements, fn(field))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
+func ForEachAnyFieldInAST(config *ast.AST, fn func(field ast.Field) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	config.RangeAnyFields(func(field ast.Field) {
+		statements = append(statements, fn(field))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 func ForEachActionInAST(config *ast.AST, fn func(action ast.Action) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
 	config.RangeActions(func(action ast.Action) {
