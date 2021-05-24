@@ -3599,26 +3599,26 @@ const _PlayerTargetRefID_type string = `type PlayerTargetRefID int`
 const _PlayerTargetedByRefID_type string = `type PlayerTargetedByRefID int`
 
 const _State_type string = `type State struct {
-	AnyOfItemPlayerZoneItem		map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore	` + "`" + `json:"anyOfItemPlayerZoneItem"` + "`" + `
-	AnyOfPlayerPosition		map[AnyOfPlayerPositionID]anyOfPlayerPositionCore		` + "`" + `json:"anyOfPlayerPosition"` + "`" + `
-	AnyOfPlayerZoneItem		map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore		` + "`" + `json:"anyOfPlayerZoneItem"` + "`" + `
-	EquipmentSet			map[EquipmentSetID]equipmentSetCore				` + "`" + `json:"equipmentSet"` + "`" + `
-	EquipmentSetEquipmentRef	map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore	` + "`" + `json:"equipmentSetEquipmentRef"` + "`" + `
-	GearScore			map[GearScoreID]gearScoreCore					` + "`" + `json:"gearScore"` + "`" + `
-	Item				map[ItemID]itemCore						` + "`" + `json:"item"` + "`" + `
-	ItemBoundToRef			map[ItemBoundToRefID]itemBoundToRefCore				` + "`" + `json:"itemBoundToRef"` + "`" + `
-	Player				map[PlayerID]playerCore						` + "`" + `json:"player"` + "`" + `
 	PlayerEquipmentSetRef		map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore		` + "`" + `json:"PlayerEquipmentSerRef"` + "`" + `
 	PlayerGuildMemberRef		map[PlayerGuildMemberRefID]playerGuildMemberRefCore		` + "`" + `json:"playerGuildMemberRef"` + "`" + `
 	PlayerTargetRef			map[PlayerTargetRefID]playerTargetRefCore			` + "`" + `json:"playerTargetRef"` + "`" + `
 	PlayerTargetedByRef		map[PlayerTargetedByRefID]playerTargetedByRefCore		` + "`" + `json:"playerTargetedByRef"` + "`" + `
+	EquipmentSetEquipmentRef	map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore	` + "`" + `json:"equipmentSetEquipmentRef"` + "`" + `
+	ItemBoundToRef			map[ItemBoundToRefID]itemBoundToRefCore				` + "`" + `json:"itemBoundToRef"` + "`" + `
+	EquipmentSet			map[EquipmentSetID]equipmentSetCore				` + "`" + `json:"equipmentSet"` + "`" + `
+	GearScore			map[GearScoreID]gearScoreCore					` + "`" + `json:"gearScore"` + "`" + `
+	Item				map[ItemID]itemCore						` + "`" + `json:"item"` + "`" + `
+	Player				map[PlayerID]playerCore						` + "`" + `json:"player"` + "`" + `
 	Position			map[PositionID]positionCore					` + "`" + `json:"position"` + "`" + `
 	Zone				map[ZoneID]zoneCore						` + "`" + `json:"zone"` + "`" + `
 	ZoneItem			map[ZoneItemID]zoneItemCore					` + "`" + `json:"zoneItem"` + "`" + `
+	AnyOfItemPlayerZoneItem		map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore	` + "`" + `json:"anyOfItemPlayerZoneItem"` + "`" + `
+	AnyOfPlayerPosition		map[AnyOfPlayerPositionID]anyOfPlayerPositionCore		` + "`" + `json:"anyOfPlayerPosition"` + "`" + `
+	AnyOfPlayerZoneItem		map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore		` + "`" + `json:"anyOfPlayerZoneItem"` + "`" + `
 }`
 
 const newState_func string = `func newState() State {
-	return State{AnyOfItemPlayerZoneItem: make(map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore), AnyOfPlayerPosition: make(map[AnyOfPlayerPositionID]anyOfPlayerPositionCore), AnyOfPlayerZoneItem: make(map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore), EquipmentSet: make(map[EquipmentSetID]equipmentSetCore), EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore), GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), ItemBoundToRef: make(map[ItemBoundToRefID]itemBoundToRefCore), Player: make(map[PlayerID]playerCore), PlayerEquipmentSetRef: make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore), PlayerGuildMemberRef: make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore), PlayerTargetRef: make(map[PlayerTargetRefID]playerTargetRefCore), PlayerTargetedByRef: make(map[PlayerTargetedByRefID]playerTargetedByRefCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore)}
+	return State{ItemBoundToRef: make(map[ItemBoundToRefID]itemBoundToRefCore), EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore), PlayerEquipmentSetRef: make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore), PlayerGuildMemberRef: make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore), PlayerTargetRef: make(map[PlayerTargetRefID]playerTargetRefCore), PlayerTargetedByRef: make(map[PlayerTargetedByRefID]playerTargetedByRefCore), EquipmentSet: make(map[EquipmentSetID]equipmentSetCore), GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), Player: make(map[PlayerID]playerCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore), AnyOfItemPlayerZoneItem: make(map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore), AnyOfPlayerPosition: make(map[AnyOfPlayerPositionID]anyOfPlayerPositionCore), AnyOfPlayerZoneItem: make(map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore)}
 }`
 
 const zoneCore_type string = `type zoneCore struct {

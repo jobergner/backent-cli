@@ -53,18 +53,11 @@ func (a *AST) RangeAnyFields(fn func(field Field)) {
 }
 
 func (a *AST) RangeRefFields(fn func(field Field)) {
-	alreadyWrittenCheck := make(map[string]bool)
 	a.RangeTypes(func(configType ConfigType) {
 		configType.RangeFields(func(field Field) {
-			if alreadyWrittenCheck[field.ValueTypeName] {
-				return
-			}
-
 			if !field.HasPointerValue {
 				return
 			}
-
-			alreadyWrittenCheck[field.ValueTypeName] = true
 
 			fn(field)
 		})
