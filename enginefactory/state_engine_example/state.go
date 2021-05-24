@@ -95,8 +95,8 @@ type item struct{ item itemCore }
 
 type playerCore struct {
 	ID            PlayerID                  `json:"id"`
-	GearScore     GearScoreID               `json:"gearScore"`
 	EquipmentSets []PlayerEquipmentSetRefID `json:"equipmentSets"`
+	GearScore     GearScoreID               `json:"gearScore"`
 	GuildMembers  []PlayerGuildMemberRefID  `json:"guildMembers"`
 	Items         []ItemID                  `json:"items"`
 	Position      PositionID                `json:"position"`
@@ -133,8 +133,8 @@ type position struct{ position positionCore }
 
 type equipmentSetCore struct {
 	ID            EquipmentSetID               `json:"id"`
-	Name          string                       `json:"name"`
 	Equipment     []EquipmentSetEquipmentRefID `json:"equipment"`
+	Name          string                       `json:"name"`
 	OperationKind OperationKind                `json:"operationKind"`
 	engine        *Engine
 }
