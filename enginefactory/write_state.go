@@ -13,38 +13,13 @@ func (s *EngineFactory) writeIDs() *EngineFactory {
 		decls.File.Type().Id(title(configType.Name) + "ID").Int()
 	})
 
-	alreadyWrittenCheck := make(map[string]bool)
-
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[field.ValueTypeName] {
-				return
-			}
-
-			if !field.HasPointerValue {
-				return
-			}
-
-			alreadyWrittenCheck[field.ValueTypeName] = true
-
-			decls.File.Type().Id(title(field.ValueTypeName) + "ID").Int()
-		})
+	s.config.RangeRefFields(func(field ast.Field) {
+		decls.File.Type().Id(title(field.ValueTypeName) + "ID").Int()
 	})
 
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[anyNameByField(field)] {
-				return
-			}
+	s.config.RangeAnyFields(func(field ast.Field) {
 
-			if !field.HasAnyValue {
-				return
-			}
-
-			alreadyWrittenCheck[anyNameByField(field)] = true
-
-			decls.File.Type().Id(title(anyNameByField(field)) + "ID").Int()
-		})
+		decls.File.Type().Id(title(anyNameByField(field)) + "ID").Int()
 	})
 
 	decls.Render(s.buf)
@@ -54,11 +29,8 @@ func (s *EngineFactory) writeIDs() *EngineFactory {
 func (s *EngineFactory) writeState() *EngineFactory {
 	decls := NewDeclSet()
 
-	alreadyWrittenCheck := make(map[string]bool)
-
 	decls.File.Type().Id("State").Struct(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-
 			s := stateWriter{
 				typeName: func() string {
 					return configType.Name
@@ -67,54 +39,28 @@ func (s *EngineFactory) writeState() *EngineFactory {
 
 			return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 		}),
-		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			return ForEachFieldInType(configType, func(field ast.Field) *Statement {
-				if alreadyWrittenCheck[field.ValueTypeName] {
-					return Empty()
-				}
+		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
+			s := stateWriter{
+				typeName: func() string {
+					return field.ValueTypeName
+				},
+			}
 
-				if !field.HasPointerValue {
-					return Empty()
-				}
-
-				alreadyWrittenCheck[field.ValueTypeName] = true
-
-				s := stateWriter{
-					typeName: func() string {
-						return field.ValueTypeName
-					},
-				}
-
-				return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
-			})
+			return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 		}),
-		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			return ForEachFieldInType(configType, func(field ast.Field) *Statement {
-				if alreadyWrittenCheck[anyNameByField(field)] {
-					return Empty()
-				}
+		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
+			s := stateWriter{
+				typeName: func() string {
+					return anyNameByField(field)
+				},
+			}
 
-				if !field.HasAnyValue {
-					return Empty()
-				}
-
-				alreadyWrittenCheck[anyNameByField(field)] = true
-
-				s := stateWriter{
-					typeName: func() string {
-						return anyNameByField(field)
-					},
-				}
-
-				return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
-			})
+			return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
 		}),
 	)
 
-	alreadyWrittenCheck = make(map[string]bool)
-
 	decls.File.Func().Id("newState").Params().Id("State").Block(
-		Return(Id("State").Values(
+		Return(Id("State").Block(
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 
 				s := stateWriter{
@@ -125,47 +71,23 @@ func (s *EngineFactory) writeState() *EngineFactory {
 
 				return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 			}),
-			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				return ForEachFieldInType(configType, func(field ast.Field) *Statement {
-					if alreadyWrittenCheck[field.ValueTypeName] {
-						return Empty()
-					}
+			ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
+				s := stateWriter{
+					typeName: func() string {
+						return field.ValueTypeName
+					},
+				}
 
-					if !field.HasPointerValue {
-						return Empty()
-					}
-
-					alreadyWrittenCheck[field.ValueTypeName] = true
-
-					s := stateWriter{
-						typeName: func() string {
-							return field.ValueTypeName
-						},
-					}
-
-					return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
-				})
+				return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 			}),
-			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				return ForEachFieldInType(configType, func(field ast.Field) *Statement {
-					if alreadyWrittenCheck[anyNameByField(field)] {
-						return Empty()
-					}
+			ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
+				s := stateWriter{
+					typeName: func() string {
+						return anyNameByField(field)
+					},
+				}
 
-					if !field.HasAnyValue {
-						return Empty()
-					}
-
-					alreadyWrittenCheck[anyNameByField(field)] = true
-
-					s := stateWriter{
-						typeName: func() string {
-							return anyNameByField(field)
-						},
-					}
-
-					return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
-				})
+				return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
 			}),
 		)),
 	)
