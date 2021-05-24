@@ -77,3 +77,11 @@ func fieldValueTypeName(field Field) string {
 func title(name string) string {
 	return strings.Title(name)
 }
+
+func anyNameByField(f Field) string {
+	name := "anyOf"
+	f.RangeValueTypes(func(configType *ConfigType) {
+		name += title(configType.Name)
+	})
+	return name
+}
