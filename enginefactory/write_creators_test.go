@@ -13,6 +13,8 @@ func TestWriteCreators(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
+			_CreateEquipmentSet_Engine_func,
+			createEquipmentSet_Engine_func,
 			_CreateGearScore_Engine_func,
 			createGearScore_Engine_func,
 			_CreateItem_Engine_func,
@@ -25,6 +27,15 @@ func TestWriteCreators(t *testing.T) {
 			createZone_Engine_func,
 			_CreateZoneItem_Engine_func,
 			createZoneItem_Engine_func,
+			createEquipmentSetEquipmentRef_Engine_func,
+			createItemBoundToRef_Engine_func,
+			createPlayerEquipmentSetRef_Engine_func,
+			createPlayerGuildMemberRef_Engine_func,
+			createPlayerTargetRef_Engine_func,
+			createPlayerTargetedByRef_Engine_func,
+			createAnyOfPlayerPosition_Engine_func,
+			createAnyOfPlayerZoneItem_Engine_func,
+			createAnyOfItemPlayerZoneItem_Engine_func,
 		}, "\n"))
 
 		if expected != actual {
