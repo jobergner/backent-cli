@@ -88,25 +88,19 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 			u.typeName = func() string {
 				return configType.Name
 			}
-			return For(u.loopPatchKeysConditions()).Block(
-				u.clearElementFromPatch(),
-			)
+			return writeClearPatch(u)
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 			u.typeName = func() string {
 				return field.ValueTypeName
 			}
-			return For(u.loopPatchKeysConditions()).Block(
-				u.clearElementFromPatch(),
-			)
+			return writeClearPatch(u)
 		}),
 		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
 			u.typeName = func() string {
 				return anyNameByField(field)
 			}
-			return For(u.loopPatchKeysConditions()).Block(
-				u.clearElementFromPatch(),
-			)
+			return writeClearPatch(u)
 		}),
 	)
 
@@ -122,6 +116,12 @@ func writeUpdateElement(u updateStateWriter) *Statement {
 			u.setOperationKindUnchanged(),
 			u.updateElement(),
 		),
+	)
+}
+
+func writeClearPatch(u updateStateWriter) *Statement {
+	return For(u.loopPatchKeysConditions()).Block(
+		u.clearElementFromPatch(),
 	)
 }
 
