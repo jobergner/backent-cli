@@ -131,15 +131,50 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 				e.f = &field
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
-			Id("OperationKind_").Id("OperationKind").Id(e.metaFieldTag("operationKind_")).Line(),
-			onlyIf(!configType.IsRootType, Id("HasParent_").Bool().Id(e.metaFieldTag("hasParent_")).Line()),
+			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
+			onlyIf(!configType.IsRootType, Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line()),
+			Id("engine").Id("*Engine").Line(),
 		)
 
 		decls.File.Type().Id(configType.Name).Struct(Id(configType.Name).Id(e.name()))
 	})
 
+	s.config.RangeRefFields(func(field ast.Field) {
+
+		referencedElementName := field.ValueType().Name
+		if field.HasAnyValue {
+			referencedElementName = anyNameByField(field)
+		}
+
+		decls.File.Type().Id(field.ValueTypeName+"Core").Struct(
+			Id("ID").Id(title(field.ValueTypeName)+"ID").Id(fieldTag("id")).Line(),
+			Id("ParentID").Id(title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
+			Id("ReferencedElementID").Id(title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
+			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
+			Id("engine").Id("*Engine").Line(),
+		)
+		decls.File.Type().Id(field.ValueTypeName).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
+	})
+
+	s.config.RangeAnyFields(func(field ast.Field) {
+		decls.File.Type().Id(anyNameByField(field)+"Core").Struct(
+			Id("ID").Id(title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
+			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
+			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
+				return Id(title(configType.Name)).Id(title(configType.Name) + "ID").Id(fieldTag(configType.Name)).Line()
+			}),
+			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
+			Id("engine").Id("*Engine").Line(),
+		)
+		decls.File.Type().Id(anyNameByField(field)).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
+	})
+
 	decls.Render(s.buf)
 	return s
+}
+
+func fieldTag(name string) string {
+	return "`json:\"" + name + "\"`"
 }
 
 type elementWriter struct {
@@ -155,9 +190,9 @@ func (e elementWriter) fieldValue() string {
 	}
 
 	if e.f.ValueType().IsBasicType {
-		value += e.f.ValueType().Name
+		value += e.f.ValueTypeName
 	} else {
-		value += title(e.f.ValueType().Name) + "ID"
+		value += title(e.f.ValueTypeName) + "ID"
 	}
 
 	return value
