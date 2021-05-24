@@ -10,7 +10,7 @@ import (
 func (s *EngineFactory) writeGetters() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
-		t := typeGetter{
+		t := typeGetterWriter{
 			name: func() string {
 				return title(configType.Name)
 			},
@@ -19,7 +19,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			},
 		}
 
-		i := idGetter{
+		i := idGetterWriter{
 			typeName: func() string {
 				return configType.Name
 			},
@@ -31,8 +31,8 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			},
 		}
 
-		writeTypeDeleter(&decls, t)
-		writeIdDeleter(&decls, i)
+		writeTypeGetter(&decls, t)
+		writeIDGetter(&decls, i)
 
 		configType.RangeFields(func(field ast.Field) {
 			f := fieldGetter{
@@ -55,88 +55,63 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 
 	})
 
-	alreadyWrittenCheck := make(map[string]bool)
+	s.config.RangeRefFields(func(field ast.Field) {
 
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[field.ValueTypeName] {
-				return
-			}
-			if !field.HasPointerValue {
-				return
-			}
-
-			t := typeGetter{}
-			i := idGetter{}
-
-			t.name = func() string {
+		t := typeGetterWriter{
+			name: func() string {
 				return field.ValueTypeName
-			}
-			i.idFieldToReturn = func() string {
+			},
+		}
+		i := idGetterWriter{
+			idFieldToReturn: func() string {
 				return "ReferencedElementID"
+			},
+		}
+
+		if field.HasAnyValue {
+			i.returns = func() string {
+				return title(anyNameByField(field)) + "ID"
 			}
-			if field.HasAnyValue {
-				i.returns = func() string {
-					return title(anyNameByField(field)) + "ID"
-				}
-			} else {
-				i.returns = func() string {
-					return title(field.ValueType().Name) + "ID"
-				}
+		} else {
+			i.returns = func() string {
+				return title(field.ValueType().Name) + "ID"
 			}
+		}
 
-			alreadyWrittenCheck[field.ValueTypeName] = true
+		t.typeName = t.name
+		i.typeName = t.name
 
-			t.typeName = t.name
-			i.typeName = t.name
-
-			writeTypeDeleter(&decls, t)
-			writeIdDeleter(&decls, i)
-
-		})
+		writeTypeGetter(&decls, t)
+		writeIDGetter(&decls, i)
 	})
 
-	alreadyWrittenCheck = make(map[string]bool)
+	s.config.RangeAnyFields(func(field ast.Field) {
+		t := typeGetterWriter{
+			name: func() string {
+				return anyNameByField(field)
+			},
+		}
+		i := idGetterWriter{
+			idFieldToReturn: func() string {
+				return "ID"
+			},
+			returns: func() string {
+				return title(t.name()) + "ID"
+			},
+		}
 
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[anyNameByField(field)] {
-				return
-			}
+		t.typeName = t.name
+		i.typeName = t.name
 
-			if !field.HasAnyValue {
-				return
-			}
-
-			alreadyWrittenCheck[anyNameByField(field)] = true
-
-			t := typeGetter{
-				name: func() string {
-					return anyNameByField(field)
-				},
-			}
-			i := idGetter{
-				idFieldToReturn: func() string {
-					return "ID"
-				},
-				returns: func() string {
-					return title(t.name()) + "ID"
-				},
-			}
-
-			t.typeName = t.name
-			i.typeName = t.name
-
-			writeTypeDeleter(&decls, t)
-			writeIdDeleter(&decls, i)
-		})
+		writeTypeGetter(&decls, t)
+		writeIDGetter(&decls, i)
 	})
 
 	decls.Render(s.buf)
 	return s
 }
 
-func writeTypeDeleter(decls *DeclSet, t typeGetter) {
+func writeTypeGetter(decls *DeclSet, t typeGetterWriter) {
 	decls.File.Func().Params(t.receiverParams()).Id(t.name()).Params(t.params()).Id(t.returns()).Block(
 		t.definePatchingElement(),
 		If(Id("ok")).Block(
@@ -150,72 +125,72 @@ func writeTypeDeleter(decls *DeclSet, t typeGetter) {
 	)
 }
 
-func writeIdDeleter(decls *DeclSet, i idGetter) {
+func writeIDGetter(decls *DeclSet, i idGetterWriter) {
 	decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
 		Return(i.returnID()),
 	)
 }
 
-type typeGetter struct {
+type typeGetterWriter struct {
 	name     func() string
 	typeName func() string
 }
 
-func (t typeGetter) receiverParams() *Statement {
+func (t typeGetterWriter) receiverParams() *Statement {
 	return Id("engine").Id("*Engine")
 }
 
-func (t typeGetter) idParam() string {
+func (t typeGetterWriter) idParam() string {
 	return t.typeName() + "ID"
 }
 
-func (t typeGetter) params() *Statement {
+func (t typeGetterWriter) params() *Statement {
 	return Id(t.idParam()).Id(title(t.typeName()) + "ID")
 }
 
-func (t typeGetter) returns() string {
+func (t typeGetterWriter) returns() string {
 	return t.typeName()
 }
 
-func (t typeGetter) definePatchingElement() *Statement {
+func (t typeGetterWriter) definePatchingElement() *Statement {
 	return List(Id("patching"+title(t.typeName())), Id("ok")).Op(":=").Id("engine").Dot("Patch").Dot(title(t.typeName())).Index(Id(t.idParam()))
 }
 
-func (t typeGetter) earlyReturnPatching() *Statement {
+func (t typeGetterWriter) earlyReturnPatching() *Statement {
 	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("patching" + title(t.typeName()))})
 }
 
-func (t typeGetter) defineCurrentElement() *Statement {
+func (t typeGetterWriter) defineCurrentElement() *Statement {
 	return List(Id("current"+title(t.typeName())), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(title(t.typeName())).Index(Id(t.idParam()))
 }
 
-func (t typeGetter) earlyReturnCurrent() *Statement {
+func (t typeGetterWriter) earlyReturnCurrent() *Statement {
 	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("current" + title(t.typeName()))})
 }
 
-func (t typeGetter) finalReturn() *Statement {
+func (t typeGetterWriter) finalReturn() *Statement {
 	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id(t.typeName() + "Core").Values(Dict{Id("OperationKind"): Id("OperationKindDelete"), Id("engine"): Id("engine")})})
 }
 
-type idGetter struct {
+type idGetterWriter struct {
 	typeName        func() string
 	returns         func() string
 	idFieldToReturn func() string
 }
 
-func (i idGetter) receiverName() string {
+func (i idGetterWriter) receiverName() string {
 	return "_" + i.typeName()
 }
 
-func (i idGetter) receiverParams() *Statement {
+func (i idGetterWriter) receiverParams() *Statement {
 	return Id(i.receiverName()).Id(i.typeName())
 }
 
-func (i idGetter) name() string {
+func (i idGetterWriter) name() string {
 	return "ID"
 }
 
-func (i idGetter) returnID() *Statement {
+func (i idGetterWriter) returnID() *Statement {
 	return Id(i.receiverName()).Dot(i.typeName()).Dot(i.idFieldToReturn())
 }
 

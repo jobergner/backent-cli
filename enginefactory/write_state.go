@@ -53,16 +53,121 @@ func (s *EngineFactory) writeIDs() *EngineFactory {
 
 func (s *EngineFactory) writeState() *EngineFactory {
 	decls := NewDeclSet()
-	decls.File.Type().Id("State").Struct(ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-		s := stateWriter{configType}
-		return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
-	}))
+
+	alreadyWrittenCheck := make(map[string]bool)
+
+	decls.File.Type().Id("State").Struct(
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+
+			s := stateWriter{
+				typeName: func() string {
+					return configType.Name
+				},
+			}
+
+			return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			return ForEachFieldInType(configType, func(field ast.Field) *Statement {
+				if alreadyWrittenCheck[field.ValueTypeName] {
+					return Empty()
+				}
+
+				if !field.HasPointerValue {
+					return Empty()
+				}
+
+				alreadyWrittenCheck[field.ValueTypeName] = true
+
+				s := stateWriter{
+					typeName: func() string {
+						return field.ValueTypeName
+					},
+				}
+
+				return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
+			})
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			return ForEachFieldInType(configType, func(field ast.Field) *Statement {
+				if alreadyWrittenCheck[anyNameByField(field)] {
+					return Empty()
+				}
+
+				if !field.HasAnyValue {
+					return Empty()
+				}
+
+				alreadyWrittenCheck[anyNameByField(field)] = true
+
+				s := stateWriter{
+					typeName: func() string {
+						return anyNameByField(field)
+					},
+				}
+
+				return Id(s.fieldName()).Map(s.mapKey()).Id(s.mapValue()).Id(s.fieldTag()).Line()
+			})
+		}),
+	)
+
+	alreadyWrittenCheck = make(map[string]bool)
 
 	decls.File.Func().Id("newState").Params().Id("State").Block(
-		Return(Id("State").Values(ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			s := stateWriter{configType}
-			return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
-		}))),
+		Return(Id("State").Values(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+
+				s := stateWriter{
+					typeName: func() string {
+						return configType.Name
+					},
+				}
+
+				return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
+			}),
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				return ForEachFieldInType(configType, func(field ast.Field) *Statement {
+					if alreadyWrittenCheck[field.ValueTypeName] {
+						return Empty()
+					}
+
+					if !field.HasPointerValue {
+						return Empty()
+					}
+
+					alreadyWrittenCheck[field.ValueTypeName] = true
+
+					s := stateWriter{
+						typeName: func() string {
+							return field.ValueTypeName
+						},
+					}
+
+					return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
+				})
+			}),
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				return ForEachFieldInType(configType, func(field ast.Field) *Statement {
+					if alreadyWrittenCheck[anyNameByField(field)] {
+						return Empty()
+					}
+
+					if !field.HasAnyValue {
+						return Empty()
+					}
+
+					alreadyWrittenCheck[anyNameByField(field)] = true
+
+					s := stateWriter{
+						typeName: func() string {
+							return anyNameByField(field)
+						},
+					}
+
+					return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
+				})
+			}),
+		)),
 	)
 
 	decls.Render(s.buf)
@@ -70,23 +175,23 @@ func (s *EngineFactory) writeState() *EngineFactory {
 }
 
 type stateWriter struct {
-	t ast.ConfigType
+	typeName func() string
 }
 
 func (s stateWriter) fieldName() string {
-	return title(s.t.Name)
+	return title(s.typeName())
 }
 
 func (s stateWriter) mapKey() *Statement {
-	return Id(title(s.t.Name) + "ID")
+	return Id(title(s.typeName()) + "ID")
 }
 
 func (s stateWriter) mapValue() string {
-	return s.t.Name + "Core"
+	return s.typeName() + "Core"
 }
 
 func (s stateWriter) fieldTag() string {
-	return "`json:\"" + s.t.Name + "\"`"
+	return "`json:\"" + s.typeName() + "\"`"
 }
 
 func (s *EngineFactory) writeElements() *EngineFactory {

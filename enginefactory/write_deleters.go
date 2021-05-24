@@ -54,70 +54,42 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 		)
 	})
 
-	alreadyWrittenCheck := make(map[string]bool)
+	s.config.RangeRefFields(func(field ast.Field) {
+		d := deleteGeneratedTypeWriter{
+			f:             field,
+			valueTypeName: func() string { return field.ValueTypeName },
+		}
 
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[field.ValueTypeName] {
-				return
-			}
-
-			if !field.HasPointerValue {
-				return
-			}
-
-			alreadyWrittenCheck[field.ValueTypeName] = true
-
-			d := deleteGeneratedTypeWriter{
-				f:             field,
-				valueTypeName: func() string { return field.ValueTypeName },
-			}
-
-			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
-				d.getElement(),
-				onlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
-				If(d.existsInState()).Block(
-					d.setOperationKind(),
-					d.updateElementInPatch(),
-				).Else().Block(
-					d.deleteFromPatch(),
-				),
-			)
-
-		})
+		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+			d.getElement(),
+			onlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
+			If(d.existsInState()).Block(
+				d.setOperationKind(),
+				d.updateElementInPatch(),
+			).Else().Block(
+				d.deleteFromPatch(),
+			),
+		)
 	})
 
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[anyNameByField(field)] {
-				return
-			}
+	s.config.RangeAnyFields(func(field ast.Field) {
+		d := deleteGeneratedTypeWriter{
+			f:             field,
+			valueTypeName: func() string { return anyNameByField(field) },
+		}
 
-			if !field.HasAnyValue {
-				return
-			}
-
-			alreadyWrittenCheck[anyNameByField(field)] = true
-
-			d := deleteGeneratedTypeWriter{
-				f:             field,
-				valueTypeName: func() string { return anyNameByField(field) },
-			}
-
-			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
-				d.getElement(),
-				If(Id("deleteChild")).Block(
-					d.deleteChild(),
-				),
-				If(d.existsInState()).Block(
-					d.setOperationKind(),
-					d.updateElementInPatch(),
-				).Else().Block(
-					d.deleteFromPatch(),
-				),
-			)
-
-		})
+		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
+			d.getElement(),
+			If(Id("deleteChild")).Block(
+				d.deleteChild(),
+			),
+			If(d.existsInState()).Block(
+				d.setOperationKind(),
+				d.updateElementInPatch(),
+			).Else().Block(
+				d.deleteFromPatch(),
+			),
+		)
 	})
 
 	decls.Render(s.buf)
