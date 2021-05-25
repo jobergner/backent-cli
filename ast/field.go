@@ -25,8 +25,11 @@ func (f *Field) RangeValueTypes(fn func(configType *ConfigType)) {
 }
 
 func (f Field) ValueType() *ConfigType {
-	for _, valueType := range f.ValueTypes {
-		return valueType
-	}
-	return nil
+	var valueType *ConfigType
+	f.RangeValueTypes(func(configType *ConfigType) {
+		if valueType == nil {
+			valueType = configType
+		}
+	})
+	return valueType
 }
