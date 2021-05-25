@@ -46,8 +46,9 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		c := anyCreatorWriter{
-			f: field,
+		c := generatedTypeCreatorWriter{
+			f:        field,
+			typeName: field.ValueTypeName,
 		}
 
 		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
@@ -59,6 +60,27 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.setOperationKind(),
 			c.assignElementToPatch(),
 			Return(Id("element")),
+		)
+	})
+
+	s.config.RangeAnyFields(func(field ast.Field) {
+		c := generatedTypeCreatorWriter{
+			f:        field,
+			typeName: anyNameByField(field),
+		}
+
+		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool()).Id(anyNameByField(field)).Block(
+			c.declareElement(),
+			c.assignEngine(),
+			c.setID(),
+			If(Id("setDefaultValue")).Block(
+				c.createChildElement(),
+				c.assignChildElement(),
+				c.assignElementKind(),
+			),
+			c.setOperationKind(),
+			c.assignElementToPatch(),
+			Return(c.returnElement()),
 		)
 	})
 
@@ -161,19 +183,20 @@ func (c creatorWriter) returnElement() *Statement {
 	})
 }
 
-type anyCreatorWriter struct {
-	f ast.Field
+type generatedTypeCreatorWriter struct {
+	f        ast.Field
+	typeName string
 }
 
-func (c anyCreatorWriter) receiverParams() *Statement {
+func (c generatedTypeCreatorWriter) receiverParams() *Statement {
 	return Id("engine").Id("*Engine")
 }
 
-func (c anyCreatorWriter) name() string {
-	return "create" + title(c.f.ValueTypeName)
+func (c generatedTypeCreatorWriter) name() string {
+	return "create" + title(c.typeName)
 }
 
-func (c anyCreatorWriter) params() *Statement {
+func (c generatedTypeCreatorWriter) params() *Statement {
 	referencedElementType := c.f.ValueType().Name
 	if c.f.HasAnyValue {
 		referencedElementType = anyNameByField(c.f)
@@ -181,34 +204,52 @@ func (c anyCreatorWriter) params() *Statement {
 	return List(Id("referencedElementID").Id(title(referencedElementType)+"ID"), Id("parentID").Id(title(c.f.Parent.Name)+"ID"))
 }
 
-func (c anyCreatorWriter) returns() string {
-	return c.f.ValueTypeName + "Core"
+func (c generatedTypeCreatorWriter) returns() string {
+	return c.typeName + "Core"
 }
 
-func (c anyCreatorWriter) declareElement() *Statement {
-	return Var().Id("element").Id(c.f.ValueTypeName + "Core")
+func (c generatedTypeCreatorWriter) declareElement() *Statement {
+	return Var().Id("element").Id(c.typeName + "Core")
 }
 
-func (c anyCreatorWriter) assignEngine() *Statement {
+func (c generatedTypeCreatorWriter) assignEngine() *Statement {
 	return Id("element").Dot("engine").Op("=").Id("engine")
 }
 
-func (c anyCreatorWriter) setReferencedElementID() *Statement {
+func (c generatedTypeCreatorWriter) setReferencedElementID() *Statement {
 	return Id("element").Dot("ReferencedElementID").Op("=").Id("referencedElementID")
 }
 
-func (c anyCreatorWriter) setParentID() *Statement {
+func (c generatedTypeCreatorWriter) setParentID() *Statement {
 	return Id("element").Dot("ParentID").Op("=").Id("parentID")
 }
 
-func (c anyCreatorWriter) setID() *Statement {
-	return Id("element").Dot("ID").Op("=").Id(title(c.f.ValueTypeName) + "ID").Call(Id("engine").Dot("GenerateID").Call())
+func (c generatedTypeCreatorWriter) setID() *Statement {
+	return Id("element").Dot("ID").Op("=").Id(title(c.typeName) + "ID").Call(Id("engine").Dot("GenerateID").Call())
 }
 
-func (c anyCreatorWriter) setOperationKind() *Statement {
+func (c generatedTypeCreatorWriter) setOperationKind() *Statement {
 	return Id("element").Dot("OperationKind").Op("=").Id("OperationKindUpdate")
 }
 
-func (c anyCreatorWriter) assignElementToPatch() *Statement {
-	return Id("engine").Dot("Patch").Dot(title(c.f.ValueTypeName)).Index(Id("element").Dot("ID")).Op("=").Id("element")
+func (c generatedTypeCreatorWriter) assignElementToPatch() *Statement {
+	return Id("engine").Dot("Patch").Dot(title(c.typeName)).Index(Id("element").Dot("ID")).Op("=").Id("element")
+}
+
+func (c generatedTypeCreatorWriter) createChildElement() *Statement {
+	return Id("element" + title(c.f.ValueType().Name)).Op(":=").Id("engine").Dot("create" + title(c.f.ValueType().Name)).Call(True())
+}
+
+func (c generatedTypeCreatorWriter) assignChildElement() *Statement {
+	return Id("element").Dot(title(c.f.ValueType().Name)).Op("=").Id("element" + title(c.f.ValueType().Name)).Dot(c.f.ValueType().Name).Dot("ID")
+}
+
+func (c generatedTypeCreatorWriter) assignElementKind() *Statement {
+	return Id("element").Dot("ElementKind").Op("=").Id("ElementKind" + title(c.f.ValueType().Name))
+}
+
+func (c generatedTypeCreatorWriter) returnElement() *Statement {
+	return Id(anyNameByField(c.f)).Values(Dict{
+		Id(anyNameByField(c.f)): Id("element"),
+	})
 }
