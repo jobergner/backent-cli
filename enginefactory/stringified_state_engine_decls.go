@@ -4041,11 +4041,11 @@ const _ZoneItem_type string = `type ZoneItem struct {
 	ID		ZoneItemID	` + "`" + `json:"id"` + "`" + `
 	Item		*Item		` + "`" + `json:"item"` + "`" + `
 	Position	*Position	` + "`" + `json:"position"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind_"` + "`" + `
+	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _ZoneItemReference_type string = `type ZoneItemReference struct {
-	OperationKind		OperationKind		` + "`" + `json:"operationKind_"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
 	ElementID		ZoneItemID		` + "`" + `json:"id"` + "`" + `
 	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
 	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
@@ -4073,8 +4073,8 @@ const _ItemReference_type string = `type ItemReference struct {
 
 const _EquipmentSet_type string = `type EquipmentSet struct {
 	ID		EquipmentSetID	` + "`" + `json:"id"` + "`" + `
-	Name		string		` + "`" + `json:"name"` + "`" + `
 	Equipment	[]ItemReference	` + "`" + `json:"equipment"` + "`" + `
+	Name		string		` + "`" + `json:"name"` + "`" + `
 	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
 }`
 
