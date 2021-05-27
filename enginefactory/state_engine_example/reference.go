@@ -103,22 +103,12 @@ func (engine *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID Equipment
 	}
 }
 
-func (engine *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
-	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
-		ref := engine.equipmentSetEquipmentRef(refID)
-		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
-			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
-			parent.RemoveEquipment(itemID)
-		}
-	}
-}
-
 func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
-			return
+			continue
 		}
 		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
 			ref.Unset()
@@ -131,7 +121,7 @@ func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID)
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
-			return
+			continue
 		}
 		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
 			ref.Unset()

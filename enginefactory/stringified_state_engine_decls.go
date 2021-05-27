@@ -2996,22 +2996,12 @@ const dereferencePlayerEquipmentSetRefs_Engine_func string = `func (engine *Engi
 	}
 }`
 
-const dereferenceEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) dereferenceEquipmentSetEquipmentRef(itemID ItemID) {
-	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
-		ref := engine.equipmentSetEquipmentRef(refID)
-		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
-			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
-			parent.RemoveEquipment(itemID)
-		}
-	}
-}`
-
 const dereferencePlayerTargetRefsPlayer_Engine_func string = `func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
-			return
+			continue
 		}
 		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
 			ref.Unset()
@@ -3024,7 +3014,7 @@ const dereferencePlayerTargetRefsZoneItem_Engine_func string = `func (engine *En
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
-			return
+			continue
 		}
 		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
 			ref.Unset()
