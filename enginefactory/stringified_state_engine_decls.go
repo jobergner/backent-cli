@@ -2901,13 +2901,13 @@ const _IsSet_itemBoundToRef_func string = `func (_ref itemBoundToRef) IsSet() bo
 const _Unset_itemBoundToRef_func string = `func (_ref itemBoundToRef) Unset() {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
 	ref.itemBoundToRef.engine.deleteItemBoundToRef(ref.itemBoundToRef.ID)
-	item := ref.itemBoundToRef.engine.Item(ref.itemBoundToRef.ParentID).item
-	if item.OperationKind == OperationKindDelete {
+	parent := ref.itemBoundToRef.engine.Item(ref.itemBoundToRef.ParentID).item
+	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	item.BoundTo = 0
-	item.OperationKind = OperationKindUpdate
-	ref.itemBoundToRef.engine.Patch.Item[item.ID] = item
+	parent.BoundTo = 0
+	parent.OperationKind = OperationKindUpdate
+	ref.itemBoundToRef.engine.Patch.Item[parent.ID] = parent
 }`
 
 const _Get_itemBoundToRef_func string = `func (_ref itemBoundToRef) Get() player {
@@ -2938,13 +2938,13 @@ const _IsSet_playerTargetRef_func string = `func (_ref playerTargetRef) IsSet() 
 const _Unset_playerTargetRef_func string = `func (_ref playerTargetRef) Unset() {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	ref.playerTargetRef.engine.deletePlayerTargetRef(ref.playerTargetRef.ID)
-	player := ref.playerTargetRef.engine.Player(ref.playerTargetRef.ParentID).player
-	if player.OperationKind == OperationKindDelete {
+	parent := ref.playerTargetRef.engine.Player(ref.playerTargetRef.ParentID).player
+	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	player.Target = 0
-	player.OperationKind = OperationKindUpdate
-	ref.playerTargetRef.engine.Patch.Player[player.ID] = player
+	parent.Target = 0
+	parent.OperationKind = OperationKindUpdate
+	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }`
 
 const _Get_playerTargetRef_func string = `func (_ref playerTargetRef) Get() anyOfPlayerZoneItem {

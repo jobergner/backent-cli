@@ -20,13 +20,13 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 			decls.File.Func().Params(Id("_ref").Id(field.ValueTypeName)).Id("Unset").Params().Block(
 				Id("ref").Op(":=").Id("_ref").Dot(field.ValueTypeName).Dot("engine").Dot(field.ValueTypeName).Call(Id("_ref").Dot(field.ValueTypeName).Dot("ID")),
 				Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot("delete"+title(field.ValueTypeName)).Call(Id("ref").Dot(field.ValueTypeName).Dot("ID")),
-				Id(field.Parent.Name).Op(":=").Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot(title(field.Parent.Name)).Call(Id("ref").Dot(field.ValueTypeName).Dot("ParentID")).Dot(field.Parent.Name),
-				If(Id(field.Parent.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
+				Id("parent").Op(":=").Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot(title(field.Parent.Name)).Call(Id("ref").Dot(field.ValueTypeName).Dot("ParentID")).Dot(field.Parent.Name),
+				If(Id("parent").Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
 					Return(),
 				),
-				Id(field.Parent.Name).Dot(title(field.Name)).Op("=").Lit(0),
-				Id(field.Parent.Name).Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
-				Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot("Patch").Dot(title(field.Parent.Name)).Index(Id(field.Parent.Name).Dot("ID")).Op("=").Id(field.Parent.Name),
+				Id("parent").Dot(title(field.Name)).Op("=").Lit(0),
+				Id("parent").Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
+				Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot("Patch").Dot(title(field.Parent.Name)).Index(Id("parent").Dot("ID")).Op("=").Id("parent"),
 			)
 		}
 
@@ -39,6 +39,20 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 			Id("ref").Op(":=").Id("_ref").Dot(field.ValueTypeName).Dot("engine").Dot(field.ValueTypeName).Call(Id("_ref").Dot(field.ValueTypeName).Dot("ID")),
 			Return(Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot(getReturnType).Call(Id("ref").Dot(field.ValueTypeName).Dot("ReferencedElementID"))),
 		)
+
+		field.RangeValueTypes(func(valueType *ast.ConfigType) {
+
+			decls.File.Func().Params(Id("engine").Id("*Engine")).Id("dereference"+title(field.ValueTypeName)+title(valueType.Name)+"Refs").Params(Id(valueType.Name+"ID").Id(title(valueType.Name)+"ID")).Block(
+				Id("ref").Op(":=").Id("_ref").Dot(field.ValueTypeName).Dot("engine").Dot(field.ValueTypeName).Call(Id("_ref").Dot(field.ValueTypeName).Dot("ID")),
+				Return(Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot(getReturnType).Call(Id("ref").Dot(field.ValueTypeName).Dot("ReferencedElementID"))),
+				For(List(Id("_"), Id("refID")).Op(":=").Range().Id("engine").Dot("all"+title(field.ValueTypeName)+"IDs")).Block(
+					Id("ref").Op(":=").Id("engine").Dot(field.ValueTypeName).Call(Id("refID")),
+					onlyIf(field.HasSliceValue, &Statement{}),
+					onlyIf(!field.HasSliceValue, &Statement{}),
+				),
+			)
+		})
+
 	})
 
 	decls.Render(s.buf)
