@@ -1,0 +1,32 @@
+package enginefactory
+
+import (
+	"bar-cli/testutils"
+	"strings"
+	"testing"
+)
+
+func TestWriteReference(t *testing.T) {
+	t.Run("writes reference", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeReference()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			_Get_equipmentSetEquipmentRef_func,
+			_IsSet_itemBoundToRef_func,
+			_Unset_itemBoundToRef_func,
+			_Get_itemBoundToRef_func,
+			_Get_playerEquipmentSetRef_func,
+			_Get_playerGuildMemberRef_func,
+			_IsSet_playerTargetRef_func,
+			_Unset_playerTargetRef_func,
+			_Get_playerTargetRef_func,
+			_Get_playerTargetedByRef_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
+}
