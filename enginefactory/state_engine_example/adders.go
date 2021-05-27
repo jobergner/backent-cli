@@ -30,9 +30,9 @@ func (_zone zone) AddInteractablePlayer() player {
 		return player{player: playerCore{OperationKind: OperationKindDelete}}
 	}
 	player := zone.zone.engine.createPlayer(true)
-	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
-	anyContainer.anyOfItemPlayerZoneItem.setPlayer(player.player.ID)
-	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false).anyOfItemPlayerZoneItem
+	anyContainer.setPlayer(player.player.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return player
@@ -44,9 +44,9 @@ func (_zone zone) AddInteractableZoneItem() zoneItem {
 		return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete}}
 	}
 	zoneItem := zone.zone.engine.createZoneItem(true)
-	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
-	anyContainer.anyOfItemPlayerZoneItem.setZoneItem(zoneItem.zoneItem.ID)
-	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false).anyOfItemPlayerZoneItem
+	anyContainer.setZoneItem(zoneItem.zoneItem.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zoneItem
@@ -58,9 +58,9 @@ func (_zone zone) AddInteractableItem() item {
 		return item{item: itemCore{OperationKind: OperationKindDelete}}
 	}
 	item := zone.zone.engine.createItem(true)
-	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false)
-	anyContainer.anyOfItemPlayerZoneItem.setItem(item.item.ID)
-	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.anyOfItemPlayerZoneItem.ID)
+	anyContainer := zone.zone.engine.createAnyOfItemPlayerZoneItem(false).anyOfItemPlayerZoneItem
+	anyContainer.setItem(item.item.ID)
+	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return item
