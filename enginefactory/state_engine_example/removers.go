@@ -356,7 +356,7 @@ func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
 	return zone
 }
 
-func (_equipmentSet equipmentSet) RemoveEquipment(itemsToRemove ...ItemID) equipmentSet {
+func (_equipmentSet equipmentSet) RemoveEquipment(equipmentToRemove ...ItemID) equipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
@@ -366,7 +366,7 @@ func (_equipmentSet equipmentSet) RemoveEquipment(itemsToRemove ...ItemID) equip
 	for _, refElement := range equipmentSet.equipmentSet.Equipment {
 		element := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refElement).equipmentSetEquipmentRef.ReferencedElementID
 		var toBeRemoved bool
-		for _, elementToRemove := range itemsToRemove {
+		for _, elementToRemove := range equipmentToRemove {
 			if element == elementToRemove {
 				toBeRemoved = true
 				wereElementsAltered = true
