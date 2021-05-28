@@ -34,7 +34,10 @@ func (s *EngineFactory) writeRemovers() *EngineFactory {
 					r.declareNewElements(),
 					For(r.existingElementsLoopConditions()).Block(
 						onlyIf(field.HasAnyValue, r.declareAnyContainer()),
-						onlyIf(field.HasPointerValue, r.declareElementFromRef()),
+						onlyIf(field.HasPointerValue || field.HasAnyValue, r.declareElementFromRef()),
+						onlyIf(field.HasAnyValue, If(r.elementIsNil()).Block(
+							Continue(),
+						)),
 						r.declareToBeRemovedBool(),
 						For(r.elementsToDeteleLoopConditions()).Block(
 							If(r.isElementMatching()).Block(

@@ -60,7 +60,7 @@ func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
+func (_zone zone) RemoveInteractablesItem(itemsToRemove ...ItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -95,7 +95,7 @@ func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
+func (_zone zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -130,7 +130,7 @@ func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveInteracableZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
+func (_zone zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
