@@ -3110,7 +3110,7 @@ const _RemoveItems_zone_func string = `func (_zone zone) RemoveItems(itemsToRemo
 	return zone
 }`
 
-const _RemoveInteracableItem_zone_func string = `func (_zone zone) RemoveInteracableItem(itemsToRemove ...ItemID) zone {
+const _RemoveInteractablesItem_zone_func string = `func (_zone zone) RemoveInteractablesItem(itemsToRemove ...ItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -3145,7 +3145,7 @@ const _RemoveInteracableItem_zone_func string = `func (_zone zone) RemoveInterac
 	return zone
 }`
 
-const _RemoveInteracablePlayer_zone_func string = `func (_zone zone) RemoveInteracablePlayer(playersToRemove ...PlayerID) zone {
+const _RemoveInteractablesPlayer_zone_func string = `func (_zone zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -3180,7 +3180,7 @@ const _RemoveInteracablePlayer_zone_func string = `func (_zone zone) RemoveInter
 	return zone
 }`
 
-const _RemoveInteracableZoneItem_zone_func string = `func (_zone zone) RemoveInteracableZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
+const _RemoveInteractablesZoneItem_zone_func string = `func (_zone zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone

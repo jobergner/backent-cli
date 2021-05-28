@@ -69,6 +69,8 @@ func (r remover) existingElementsLoopConditions() *Statement {
 	assignedVariableId := "element"
 	if r.f.HasPointerValue {
 		assignedVariableId = "refElement"
+	} else if r.f.HasAnyValue {
+		assignedVariableId = "anyContainerID"
 	}
 	return List(Id("_"), Id(assignedVariableId)).Op(":=").Range().Id(r.t.Name).Dot(r.t.Name).Dot(title(r.f.Name))
 }
@@ -98,7 +100,11 @@ func (r remover) deleteElement() *Statement {
 	if r.f.HasPointerValue {
 		assignedVariableId = "refElement"
 	}
-	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot("delete" + title(r.f.ValueTypeName)).Call(Id(assignedVariableId))
+	deleteCall := "delete" + title(r.f.ValueTypeName)
+	if r.f.HasAnyValue && !r.f.HasPointerValue {
+		deleteCall = "delete" + title(r.v.Name)
+	}
+	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(deleteCall).Call(Id(assignedVariableId))
 }
 
 func (r remover) isElementRemoved() *Statement {
@@ -106,11 +112,13 @@ func (r remover) isElementRemoved() *Statement {
 }
 
 func (r remover) appendRemainingElement() *Statement {
-	assignedVariableId := "element"
+	assignedVariableId := Id("element")
 	if r.f.HasPointerValue {
-		assignedVariableId = "refElement"
+		assignedVariableId = Id("refElement")
+	} else if r.f.HasAnyValue {
+		assignedVariableId = Id("anyContainer").Dot(r.f.ValueTypeName).Dot("ID")
 	}
-	return Id("newElements").Op("=").Append(Id("newElements"), Id(assignedVariableId))
+	return Id("newElements").Op("=").Append(Id("newElements"), assignedVariableId)
 }
 
 func (r remover) isWereElementsAltered() *Statement {
@@ -141,5 +149,13 @@ func (r remover) declareElementFromRef() *Statement {
 }
 
 func (r remover) declareAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(r.f.ValueTypeName).Call(Id("refElement")).Dot("Get").Call()
+	statement := Id("anyContainer").Op(":=").Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(r.f.ValueTypeName)
+	if r.f.HasAnyValue && !r.f.HasPointerValue {
+		return statement.Call(Id("anyContainerID"))
+	}
+	return statement.Call(Id("refElement")).Dot("Get").Call()
+}
+
+func (r remover) elementIsNil() *Statement {
+	return Id("element").Op("==").Lit(0)
 }
