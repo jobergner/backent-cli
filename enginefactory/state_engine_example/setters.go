@@ -44,12 +44,12 @@ func (_position position) SetY(newY float64) position {
 	return position
 }
 
-func (_item item) SetName(nameName string) item {
+func (_item item) SetName(newName string) item {
 	item := _item.item.engine.Item(_item.item.ID)
 	if item.item.OperationKind == OperationKindDelete {
 		return item
 	}
-	item.item.Name = nameName
+	item.item.Name = newName
 	item.item.OperationKind = OperationKindUpdate
 	item.item.engine.Patch.Item[item.item.ID] = item.item
 	return item
@@ -73,12 +73,12 @@ func (_item item) SetBoundTo(playerID PlayerID) item {
 	return item
 }
 
-func (_equipmentSet equipmentSet) SetName(nameName string) equipmentSet {
+func (_equipmentSet equipmentSet) SetName(newName string) equipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
 	}
-	equipmentSet.equipmentSet.Name = nameName
+	equipmentSet.equipmentSet.Name = newName
 	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 	return equipmentSet

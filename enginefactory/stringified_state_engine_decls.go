@@ -3481,12 +3481,12 @@ const _SetY_position_func string = `func (_position position) SetY(newY float64)
 	return position
 }`
 
-const _SetName_item_func string = `func (_item item) SetName(nameName string) item {
+const _SetName_item_func string = `func (_item item) SetName(newName string) item {
 	item := _item.item.engine.Item(_item.item.ID)
 	if item.item.OperationKind == OperationKindDelete {
 		return item
 	}
-	item.item.Name = nameName
+	item.item.Name = newName
 	item.item.OperationKind = OperationKindUpdate
 	item.item.engine.Patch.Item[item.item.ID] = item.item
 	return item
@@ -3510,12 +3510,12 @@ const _SetBoundTo_item_func string = `func (_item item) SetBoundTo(playerID Play
 	return item
 }`
 
-const _SetName_equipmentSet_func string = `func (_equipmentSet equipmentSet) SetName(nameName string) equipmentSet {
+const _SetName_equipmentSet_func string = `func (_equipmentSet equipmentSet) SetName(newName string) equipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
 	}
-	equipmentSet.equipmentSet.Name = nameName
+	equipmentSet.equipmentSet.Name = newName
 	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 	return equipmentSet
