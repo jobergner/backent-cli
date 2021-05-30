@@ -451,7 +451,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 
 	// OperationKindUpdate element got updated
 	if statePlayer.Target != 0 {
-		ref := engine.playerTargetRef(patchPlayer.Target)
+		ref := engine.playerTargetRef(statePlayer.Target)
 		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			if check == nil {
 				check = newRecursionCheck()
