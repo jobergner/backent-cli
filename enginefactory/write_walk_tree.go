@@ -11,42 +11,82 @@ func (s *EngineFactory) writeWalkElement() *EngineFactory {
 	decls := NewDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
-		decls.File.Func().Params(Id("engine").Id("*Engine")).Id("walk"+title(configType.Name)).Params(Id(configType.Name+"ID").Id(title(configType.Name)+"ID"), Id("p").Id("path")).Block(
-			List(Id(configType.Name+"Data"), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(title(configType.Name)).Index(Id(configType.Name+"ID")),
+
+		w := walkElementWriter{
+			t: configType,
+		}
+
+		if configType.IsLeafType {
+			decls.File.Func().Params(w.receiverParams()).Id(w.name()).Params(w.params()).Block(
+				w.updatePath(),
+			)
+			return
+		}
+
+		decls.File.Func().Params(w.receiverParams()).Id(w.name()).Params(w.params()).Block(
+			w.getElementFromPatch(),
 			If(Id("!hasUpdated")).Block(
-				Id(configType.Name+"Data").Op("=").Id("engine").Dot("State").Dot(title(configType.Name)).Index(Id(configType.Name+"ID")),
+				w.getElementFromState(),
 			),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
-				if !field.HasSliceValue {
-					return &Statement{
-						Var().Id(field.Name + "Path").Id("path").Line(),
-						If(List(Id("existingPath"), Id("pathExists")).Op(":=").Id("engine").Dot("PathTrack").Dot(field.ValueTypeName).Index(Id(configType.Name+"Data").Dot(title(field.Name))), Id("!pathExists")).Block(
-							Id(field.Name + "Path").Op("=").Id("p").Dot(field.ValueTypeName).Call(),
-						).Else().Block(
-							Id(field.Name + "Path").Op("=").Id("existingPath"),
-						).Line(),
-						Id("engine").Dot("walk"+title(field.ValueTypeName)).Call(Id(configType.Name+"Data").Dot(title(field.Name)), Id(field.Name+"Path")),
+				if field.ValueType().IsBasicType || field.HasPointerValue {
+					return Empty()
+				}
+
+				w.f = &field
+				w.v = field.ValueType()
+
+				if !field.HasAnyValue {
+					if !field.HasSliceValue {
+						return writeEvaluateChildPath(w)
 					}
+					return For(w.childrenLoopConditions()).Block(
+						writeEvaluateChildPath(w),
+					)
 				}
-				return &Statement{
-					For(List(Id("i"), Id(field.ValueTypeName)).Op(":=").Range().Id("merge"+title(field.ValueTypeName)+"IDs").Call(
-						Id("engine").Dot("State").Dot(title(configType.Name)).Index(Id(configType.Name+"Data").Dot("ID")).Dot(title(field.Name)),
-						Id("engine").Dot("Patch").Dot(title(configType.Name)).Index(Id(configType.Name+"Data").Dot("ID")).Dot(title(field.Name)),
-					)).Block(
-						Var().Id(field.Name+"Path").Id("path").Line(),
-						If(List(Id("existingPath"), Id("pathExists")).Op(":=").Id("engine").Dot("PathTrack").Dot(field.ValueTypeName).Index(Id(field.ValueTypeName+"ID")), Id("!pathExists").Op("||").Id("!existingPath").Dot("equals").Call(Id("p"))).Block(
-							Id(field.Name+"Path").Op("=").Id("p").Dot(field.ValueTypeName).Dot("index").Call(Id("i")),
-						).Else().Block(
-							Id(field.Name+"Path").Op("=").Id("existingPath"),
-						).Line(),
-						Id("engine").Dot("walk"+title(field.ValueTypeName)).Call(Id(configType.Name+"Data").Dot(title(field.Name)), Id(field.Name+"Path")),
-						Id("engine").Dot("walk"+title(field.ValueTypeName)).Call(Id(field.ValueTypeName+"ID"), Id(field.Name+"Path")),
-					),
+
+				if !field.HasSliceValue {
+					return writeEvaluateAnyChildPath(w, field)
 				}
+				return For(w.anyChildLoopConditions()).Block(
+					writeEvaluateAnyChildPath(w, field),
+				)
 			}),
+			w.updatePath(),
 		)
 	})
 
 	decls.Render(s.buf)
 	return s
+}
+
+func writeEvaluateChildPath(w walkElementWriter) *Statement {
+	return &Statement{
+		w.declarePathVar().Line(),
+		If(w.getChildPath(), w.pathNeedsUpdate()).Block(
+			w.setChildPathNew(),
+		).Else().Block(
+			w.setChildPathExisting(),
+		).Line(),
+		w.walkChild(),
+	}
+}
+
+func writeEvaluateAnyChildPath(w walkElementWriter, field ast.Field) *Statement {
+	firstValueTypeIteration := true
+	statement := w.declareAnyContainer().Line()
+	field.RangeValueTypes(func(valueType *ast.ConfigType) {
+		w.v = valueType
+		if !firstValueTypeIteration {
+			statement = statement.Else()
+		}
+		firstValueTypeIteration = false
+
+		statement.If(Id(field.Name + "Container").Dot("ElementKind").Op("==").Id("ElementKind" + title(valueType.Name))).Block(
+			writeEvaluateChildPath(w),
+		)
+
+	})
+
+	return statement
 }

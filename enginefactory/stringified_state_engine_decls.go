@@ -741,7 +741,7 @@ const assemblePlayerTargetRef_Engine_func string = `func (engine *Engine) assemb
 		}
 	}
 	if statePlayer.Target != 0 {
-		ref := engine.playerTargetRef(patchPlayer.Target)
+		ref := engine.playerTargetRef(statePlayer.Target)
 		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			if check == nil {
 				check = newRecursionCheck()
@@ -3983,6 +3983,24 @@ const walkItem_Engine_func string = `func (engine *Engine) walkItem(itemID ItemI
 		gearScorePath = existingPath
 	}
 	engine.walkGearScore(itemData.GearScore, gearScorePath)
+	originContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition
+	if originContainer.ElementKind == ElementKindPlayer {
+		var originPath path
+		if existingPath, pathExists := engine.PathTrack.player[originContainer.Player]; !pathExists {
+			originPath = p.origin()
+		} else {
+			originPath = existingPath
+		}
+		engine.walkPlayer(originContainer.Player, originPath)
+	} else if originContainer.ElementKind == ElementKindPosition {
+		var originPath path
+		if existingPath, pathExists := engine.PathTrack.position[originContainer.Position]; !pathExists {
+			originPath = p.origin()
+		} else {
+			originPath = existingPath
+		}
+		engine.walkPosition(originContainer.Position, originPath)
+	}
 	engine.PathTrack.item[itemID] = p
 }`
 
@@ -4043,6 +4061,34 @@ const walkZone_Engine_func string = `func (engine *Engine) walkZone(zoneID ZoneI
 	zoneData, hasUpdated := engine.Patch.Zone[zoneID]
 	if !hasUpdated {
 		zoneData = engine.State.Zone[zoneID]
+	}
+	for i, anyID := range zoneData.Interactables {
+		interactablesContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem
+		if interactablesContainer.ElementKind == ElementKindItem {
+			var interactablesPath path
+			if existingPath, pathExists := engine.PathTrack.item[interactablesContainer.Item]; !pathExists || !existingPath.equals(p) {
+				interactablesPath = p.interactables().index(i)
+			} else {
+				interactablesPath = existingPath
+			}
+			engine.walkItem(interactablesContainer.Item, interactablesPath)
+		} else if interactablesContainer.ElementKind == ElementKindPlayer {
+			var interactablesPath path
+			if existingPath, pathExists := engine.PathTrack.player[interactablesContainer.Player]; !pathExists || !existingPath.equals(p) {
+				interactablesPath = p.interactables().index(i)
+			} else {
+				interactablesPath = existingPath
+			}
+			engine.walkPlayer(interactablesContainer.Player, interactablesPath)
+		} else if interactablesContainer.ElementKind == ElementKindZoneItem {
+			var interactablesPath path
+			if existingPath, pathExists := engine.PathTrack.zoneItem[interactablesContainer.ZoneItem]; !pathExists || !existingPath.equals(p) {
+				interactablesPath = p.interactables().index(i)
+			} else {
+				interactablesPath = existingPath
+			}
+			engine.walkZoneItem(interactablesContainer.ZoneItem, interactablesPath)
+		}
 	}
 	for i, zoneItemID := range mergeZoneItemIDs(engine.State.Zone[zoneData.ID].Items, engine.Patch.Zone[zoneData.ID].Items) {
 		var itemsPath path
