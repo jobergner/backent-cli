@@ -26,22 +26,23 @@ func (engine *Engine) walkItem(itemID ItemID, p path) {
 	}
 	engine.walkGearScore(itemData.GearScore, gearScorePath)
 
-	if anyContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition; anyContainer.ElementKind == ElementKindPlayer {
+	originContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition
+	if originContainer.ElementKind == ElementKindPlayer {
 		var originPath path
-		if existingPath, pathExists := engine.PathTrack.player[anyContainer.Player]; !pathExists {
+		if existingPath, pathExists := engine.PathTrack.player[originContainer.Player]; !pathExists {
 			originPath = p.origin()
 		} else {
 			originPath = existingPath
 		}
-		engine.walkPlayer(anyContainer.Player, originPath)
-	} else if anyContainer.ElementKind == ElementKindPosition {
+		engine.walkPlayer(originContainer.Player, originPath)
+	} else if originContainer.ElementKind == ElementKindPosition {
 		var originPath path
-		if existingPath, pathExists := engine.PathTrack.position[anyContainer.Position]; !pathExists {
+		if existingPath, pathExists := engine.PathTrack.position[originContainer.Position]; !pathExists {
 			originPath = p.origin()
 		} else {
 			originPath = existingPath
 		}
-		engine.walkPosition(anyContainer.Position, originPath)
+		engine.walkPosition(originContainer.Position, originPath)
 	}
 
 	engine.PathTrack.item[itemID] = p
@@ -114,30 +115,31 @@ func (engine *Engine) walkZone(zoneID ZoneID, p path) {
 	}
 
 	for i, anyID := range zoneData.Interactables {
-		if anyContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem; anyContainer.ElementKind == ElementKindItem {
+		interactablesContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem
+		if interactablesContainer.ElementKind == ElementKindItem {
 			var interactablesPath path
-			if existingPath, pathExists := engine.PathTrack.item[anyContainer.Item]; !pathExists || !existingPath.equals(p) {
+			if existingPath, pathExists := engine.PathTrack.item[interactablesContainer.Item]; !pathExists || !existingPath.equals(p) {
 				interactablesPath = p.interactables().index(i)
 			} else {
 				interactablesPath = existingPath
 			}
-			engine.walkItem(anyContainer.Item, interactablesPath)
-		} else if anyContainer.ElementKind == ElementKindPlayer {
+			engine.walkItem(interactablesContainer.Item, interactablesPath)
+		} else if interactablesContainer.ElementKind == ElementKindPlayer {
 			var interactablesPath path
-			if existingPath, pathExists := engine.PathTrack.player[anyContainer.Player]; !pathExists || !existingPath.equals(p) {
+			if existingPath, pathExists := engine.PathTrack.player[interactablesContainer.Player]; !pathExists || !existingPath.equals(p) {
 				interactablesPath = p.interactables().index(i)
 			} else {
 				interactablesPath = existingPath
 			}
-			engine.walkPlayer(anyContainer.Player, interactablesPath)
-		} else if anyContainer.ElementKind == ElementKindZoneItem {
+			engine.walkPlayer(interactablesContainer.Player, interactablesPath)
+		} else if interactablesContainer.ElementKind == ElementKindZoneItem {
 			var interactablesPath path
-			if existingPath, pathExists := engine.PathTrack.zoneItem[anyContainer.ZoneItem]; !pathExists || !existingPath.equals(p) {
+			if existingPath, pathExists := engine.PathTrack.zoneItem[interactablesContainer.ZoneItem]; !pathExists || !existingPath.equals(p) {
 				interactablesPath = p.interactables().index(i)
 			} else {
 				interactablesPath = existingPath
 			}
-			engine.walkZoneItem(anyContainer.ZoneItem, interactablesPath)
+			engine.walkZoneItem(interactablesContainer.ZoneItem, interactablesPath)
 		}
 	}
 
