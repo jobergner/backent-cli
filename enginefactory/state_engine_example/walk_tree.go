@@ -26,6 +26,24 @@ func (engine *Engine) walkItem(itemID ItemID, p path) {
 	}
 	engine.walkGearScore(itemData.GearScore, gearScorePath)
 
+	if anyContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition; anyContainer.ElementKind == ElementKindPlayer {
+		var originPath path
+		if existingPath, pathExists := engine.PathTrack.player[anyContainer.Player]; !pathExists {
+			originPath = p.origin()
+		} else {
+			originPath = existingPath
+		}
+		engine.walkPlayer(anyContainer.Player, originPath)
+	} else if anyContainer.ElementKind == ElementKindPosition {
+		var originPath path
+		if existingPath, pathExists := engine.PathTrack.position[anyContainer.Position]; !pathExists {
+			originPath = p.origin()
+		} else {
+			originPath = existingPath
+		}
+		engine.walkPosition(anyContainer.Position, originPath)
+	}
+
 	engine.PathTrack.item[itemID] = p
 }
 
@@ -93,6 +111,34 @@ func (engine *Engine) walkZone(zoneID ZoneID, p path) {
 	zoneData, hasUpdated := engine.Patch.Zone[zoneID]
 	if !hasUpdated {
 		zoneData = engine.State.Zone[zoneID]
+	}
+
+	for i, anyID := range zoneData.Interactables {
+		if anyContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem; anyContainer.ElementKind == ElementKindItem {
+			var interactablesPath path
+			if existingPath, pathExists := engine.PathTrack.item[anyContainer.Item]; !pathExists || !existingPath.equals(p) {
+				interactablesPath = p.interactables().index(i)
+			} else {
+				interactablesPath = existingPath
+			}
+			engine.walkItem(anyContainer.Item, interactablesPath)
+		} else if anyContainer.ElementKind == ElementKindPlayer {
+			var interactablesPath path
+			if existingPath, pathExists := engine.PathTrack.player[anyContainer.Player]; !pathExists || !existingPath.equals(p) {
+				interactablesPath = p.interactables().index(i)
+			} else {
+				interactablesPath = existingPath
+			}
+			engine.walkPlayer(anyContainer.Player, interactablesPath)
+		} else if anyContainer.ElementKind == ElementKindZoneItem {
+			var interactablesPath path
+			if existingPath, pathExists := engine.PathTrack.zoneItem[anyContainer.ZoneItem]; !pathExists || !existingPath.equals(p) {
+				interactablesPath = p.interactables().index(i)
+			} else {
+				interactablesPath = existingPath
+			}
+			engine.walkZoneItem(anyContainer.ZoneItem, interactablesPath)
+		}
 	}
 
 	for i, zoneItemID := range mergeZoneItemIDs(engine.State.Zone[zoneData.ID].Items, engine.Patch.Zone[zoneData.ID].Items) {
