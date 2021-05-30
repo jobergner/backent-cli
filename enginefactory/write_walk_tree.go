@@ -34,12 +34,13 @@ func (s *EngineFactory) writeWalkElement() *EngineFactory {
 						Id("engine").Dot("Patch").Dot(title(configType.Name)).Index(Id(configType.Name+"Data").Dot("ID")).Dot(title(field.Name)),
 					)).Block(
 						Var().Id(field.Name+"Path").Id("path").Line(),
-						If(List(Id("existingPath"), Id("pathExists")).Op(":=").Id("engine").Dot("PathTrack").Dot(field.ValueTypeName).Index(Id(configType.Name+"Data").Dot(title(field.Name))), Id("!pathExists")).Block(
-							Id(field.Name+"Path").Op("=").Id("p").Dot(field.ValueTypeName).Call(),
+						If(List(Id("existingPath"), Id("pathExists")).Op(":=").Id("engine").Dot("PathTrack").Dot(field.ValueTypeName).Index(Id(field.ValueTypeName+"ID")), Id("!pathExists").Op("||").Id("!existingPath").Dot("equals").Call(Id("p"))).Block(
+							Id(field.Name+"Path").Op("=").Id("p").Dot(field.ValueTypeName).Dot("index").Call(Id("i")),
 						).Else().Block(
 							Id(field.Name+"Path").Op("=").Id("existingPath"),
 						).Line(),
 						Id("engine").Dot("walk"+title(field.ValueTypeName)).Call(Id(configType.Name+"Data").Dot(title(field.Name)), Id(field.Name+"Path")),
+						Id("engine").Dot("walk"+title(field.ValueTypeName)).Call(Id(field.ValueTypeName+"ID"), Id(field.Name+"Path")),
 					),
 				}
 			}),
