@@ -1262,6 +1262,53 @@ func TestTree(t *testing.T) {
 			},
 		)
 	})
+	t.Run("build tree with path to element of any type", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zone := se.createZone()
+				player1 := zone.AddPlayer()
+				player2 := se.createPlayer(false)
+				player2.SetTargetPlayer(player1.ID())
+
+				se.UpdateState()
+				player1.GearScore().SetLevel(1)
+
+				expectedTree.Player = map[PlayerID]Player{
+					player2.ID(): {
+						ID:            player2.ID(),
+						OperationKind: OperationKindUnchanged,
+						Target: &AnyOfPlayerZoneItemReference{
+							OperationKind:        OperationKindUnchanged,
+							ElementID:            int(player1.ID()),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataModified,
+							ElementPath:          newPath(zoneIdentifier, int(zone.ID())).players().index(0).toJSONPath(),
+						},
+					},
+				}
+				expectedTree.Zone = map[ZoneID]Zone{
+					zone.ID(): {
+						ID:            zone.ID(),
+						OperationKind: OperationKindUnchanged,
+						Players: []Player{
+							{
+								ID:            player1.ID(),
+								OperationKind: OperationKindUnchanged,
+								GearScore: &GearScore{
+									ID:            player1.GearScore().ID(),
+									OperationKind: OperationKindUpdate,
+									Level:         1,
+								},
+							},
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+		)
+	})
 }
 
 func TestMergePlayerIDs(t *testing.T) {
