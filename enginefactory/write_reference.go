@@ -11,61 +11,64 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeRefFields(func(field ast.Field) {
 
+		r := referenceWriter{
+			f: field,
+		}
+
 		if !field.HasSliceValue {
-			decls.File.Func().Params(Id("_ref").Id(field.ValueTypeName)).Id("IsSet").Params().Bool().Block(
-				Id("ref").Op(":=").Id("_ref").Dot(field.ValueTypeName).Dot("engine").Dot(field.ValueTypeName).Call(Id("_ref").Dot(field.ValueTypeName).Dot("ID")),
-				Return(Id("ref").Dot(field.ValueTypeName).Dot("ID")).Op("!=").Lit(0),
+			decls.File.Func().Params(r.receiverParams()).Id("IsSet").Params().Bool().Block(
+				r.reassignRef(),
+				r.returnIsSet(),
 			)
 
-			decls.File.Func().Params(Id("_ref").Id(field.ValueTypeName)).Id("Unset").Params().Block(
-				Id("ref").Op(":=").Id("_ref").Dot(field.ValueTypeName).Dot("engine").Dot(field.ValueTypeName).Call(Id("_ref").Dot(field.ValueTypeName).Dot("ID")),
-				Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot("delete"+title(field.ValueTypeName)).Call(Id("ref").Dot(field.ValueTypeName).Dot("ID")),
-				Id("parent").Op(":=").Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot(title(field.Parent.Name)).Call(Id("ref").Dot(field.ValueTypeName).Dot("ParentID")).Dot(field.Parent.Name),
-				If(Id("parent").Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
+			decls.File.Func().Params(r.receiverParams()).Id("Unset").Params().Block(
+				r.reassignRef(),
+				r.deleteSelf(),
+				r.declareParent(),
+				If(r.parentIsDeleted()).Block(
 					Return(),
 				),
-				Id("parent").Dot(title(field.Name)).Op("=").Lit(0),
-				Id("parent").Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
-				Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot("Patch").Dot(title(field.Parent.Name)).Index(Id("parent").Dot("ID")).Op("=").Id("parent"),
+				r.setRefIDInParent(),
+				r.setParentOperationKind(),
+				r.updateParentInPatch(),
 			)
 		}
 
-		getReturnType := title(field.ValueType().Name)
-		if field.HasAnyValue {
-			getReturnType = anyNameByField(field)
-		}
-
-		decls.File.Func().Params(Id("_ref").Id(field.ValueTypeName)).Id("Get").Params().Id(lower(getReturnType)).Block(
-			Id("ref").Op(":=").Id("_ref").Dot(field.ValueTypeName).Dot("engine").Dot(field.ValueTypeName).Call(Id("_ref").Dot(field.ValueTypeName).Dot("ID")),
-			Return(Id("ref").Dot(field.ValueTypeName).Dot("engine").Dot(getReturnType).Call(Id("ref").Dot(field.ValueTypeName).Dot("ReferencedElementID"))),
+		decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(lower(r.returnTypeOfGet())).Block(
+			r.reassignRef(),
+			r.returnReferencedElement(),
 		)
 
+	})
+
+	decls.Render(s.buf)
+	return s
+}
+
+func (s *EngineFactory) writeDereference() *EngineFactory {
+	decls := NewDeclSet()
+	s.config.RangeRefFields(func(field ast.Field) {
 		field.RangeValueTypes(func(valueType *ast.ConfigType) {
 
-			dereferenceCondition := Id("ref").Dot(field.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(valueType.Name + "ID")
-			if field.HasAnyValue {
-				dereferenceCondition = Id("anyContainer").Dot(anyNameByField(field)).Dot(title(valueType.Name)).Op("==").Id(valueType.Name + "ID")
+			d := dereferenceWriter{
+				f: field,
+				v: *valueType,
 			}
 
-			var optionalSuffix string
-			if len(field.ValueTypes) > 1 {
-				optionalSuffix = title(valueType.Name)
-			}
-
-			decls.File.Func().Params(Id("engine").Id("*Engine")).Id("dereference" + title(field.ValueTypeName) + "s" + optionalSuffix).Params(Id(valueType.Name + "ID").Id(title(valueType.Name) + "ID")).Block(
-				For(List(Id("_"), Id("refID")).Op(":=").Range().Id("engine").Dot("all"+title(field.ValueTypeName)+"IDs").Call()).Block(
-					Id("ref").Op(":=").Id("engine").Dot(field.ValueTypeName).Call(Id("refID")),
-					onlyIf(field.HasAnyValue, Id("anyContainer").Op(":=").Id("ref").Dot("Get").Call()),
-					onlyIf(field.HasAnyValue, If(Id("anyContainer").Dot(anyNameByField(field)).Dot("ElementKind").Op("!=").Id("ElementKind"+title(valueType.Name))).Block(
+			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+				For(d.allIDsLoopConditions()).Block(
+					d.declareRef(),
+					onlyIf(field.HasAnyValue, d.declareAnyContainer()),
+					onlyIf(field.HasAnyValue, If(d.anyContainerContainsElemenKind()).Block(
 						Continue(),
 					)),
-					If(dereferenceCondition).Block(
+					If(d.dereferenceCondition()).Block(
 						onlyIf(field.HasSliceValue, &Statement{
-							Id("parent").Op(":=").Id("engine").Dot(title(field.Parent.Name)).Call(Id("ref").Dot(field.ValueTypeName).Dot("ParentID")).Line(),
-							Id("parent").Dot("Remove" + title(field.Name) + optionalSuffix).Call(Id(valueType.Name + "ID")),
+							d.declareParent().Line(),
+							d.removeChildReferenceFromParent(),
 						}),
 						onlyIf(!field.HasSliceValue, &Statement{
-							Id("ref").Dot("Unset").Call(),
+							d.unsetRef(),
 						}),
 					),
 				),
