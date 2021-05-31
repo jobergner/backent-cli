@@ -2531,19 +2531,18 @@ const newPathTrack_func string = `func newPathTrack() pathTrack {
 	return pathTrack{equipmentSet: make(map[EquipmentSetID]path), gearScore: make(map[GearScoreID]path), item: make(map[ItemID]path), player: make(map[PlayerID]path), position: make(map[PositionID]path), zone: make(map[ZoneID]path), zoneItem: make(map[ZoneItemID]path)}
 }`
 
-const itemsIdentifier_type string = `const (
-	itemsIdentifier		int	= -1
+const equipmentSetIdentifier_type string = `const (
+	equipmentSetIdentifier	int	= -1
 	gearScoreIdentifier	int	= -2
-	positionIdentifier	int	= -3
-	targetIdentifier	int	= -4
-	playersIdentifier	int	= -5
-	interactablesIdentifier	int	= -6
-	itemIdentifier		int	= -7
-	originIdentifier	int	= -8
-	equipmentSetIdentifier	int	= -9
-	playerIdentifier	int	= -10
-	zoneIdentifier		int	= -11
-	zoneItemIdentifier	int	= -12
+	itemIdentifier		int	= -3
+	originIdentifier	int	= -4
+	playerIdentifier	int	= -5
+	itemsIdentifier		int	= -6
+	positionIdentifier	int	= -7
+	zoneIdentifier		int	= -8
+	interactablesIdentifier	int	= -9
+	playersIdentifier	int	= -10
+	zoneItemIdentifier	int	= -11
 )`
 
 const path_type string = `type path []int`
@@ -2575,13 +2574,6 @@ const position_path_func string = `func (p path) position() path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, positionIdentifier)
-	return newPath
-}`
-
-const target_path_func string = `func (p path) target() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, targetIdentifier)
 	return newPath
 }`
 
@@ -2654,8 +2646,6 @@ const pathIdentifierToString_func string = `func pathIdentifierToString(identifi
 		return "gearScore"
 	case positionIdentifier:
 		return "position"
-	case targetIdentifier:
-		return "target"
 	case playersIdentifier:
 		return "players"
 	case interactablesIdentifier:
