@@ -45,15 +45,24 @@ func newPath(elementIdentifier, id int) path {
 	return []int{elementIdentifier, id}
 }
 
-func newEmptyPath() path {
-	var p path
-	return p
+func (p path) equipmentSet() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, equipmentSetIdentifier)
+	return newPath
 }
 
 func (p path) items() path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, itemsIdentifier)
+	return newPath
+}
+
+func (p path) player() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, playerIdentifier)
 	return newPath
 }
 
@@ -89,6 +98,20 @@ func (p path) item() path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, itemIdentifier)
+	return newPath
+}
+
+func (p path) zone() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, zoneIdentifier)
+	return newPath
+}
+
+func (p path) zoneItem() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, zoneItemIdentifier)
 	return newPath
 }
 
