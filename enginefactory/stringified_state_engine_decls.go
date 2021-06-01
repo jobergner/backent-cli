@@ -2556,10 +2556,24 @@ const newEmptyPath_func string = `func newEmptyPath() path {
 	return p
 }`
 
+const equipmentSet_path_func string = `func (p path) equipmentSet() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, equipmentSetIdentifier)
+	return newPath
+}`
+
 const items_path_func string = `func (p path) items() path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, itemsIdentifier)
+	return newPath
+}`
+
+const player_path_func string = `func (p path) player() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, playerIdentifier)
 	return newPath
 }`
 
@@ -2595,6 +2609,20 @@ const item_path_func string = `func (p path) item() path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, itemIdentifier)
+	return newPath
+}`
+
+const zone_path_func string = `func (p path) zone() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, zoneIdentifier)
+	return newPath
+}`
+
+const zoneItem_path_func string = `func (p path) zoneItem() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, zoneItemIdentifier)
 	return newPath
 }`
 

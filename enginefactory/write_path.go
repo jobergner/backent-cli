@@ -61,3 +61,72 @@ func (s *EngineFactory) writeIdentifiers() *EngineFactory {
 	decls.Render(s.buf)
 	return s
 }
+
+func writePathSegmentMethod(decls DeclSet, name string) {
+	decls.File.Func().Params(Id("p").Id("path")).Id(name).Params().Id("path").Block(
+		Id("newPath").Op(":=").Make(Id("[]int"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
+		Copy(Id("newPath"), Id("p")),
+		Id("newPath").Op("=").Append(Id("newPath"), Id(name+"Identifier")),
+		Return(Id("newPath")),
+	)
+}
+
+func (s *EngineFactory) writePathSegments() *EngineFactory {
+	decls := NewDeclSet()
+
+	alreadyWrittenCheck := make(map[string]bool)
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+
+		if !alreadyWrittenCheck[configType.Name] {
+			writePathSegmentMethod(decls, configType.Name)
+			alreadyWrittenCheck[configType.Name] = true
+		}
+
+		configType.RangeFields(func(field ast.Field) {
+			if alreadyWrittenCheck[field.Name] {
+				return
+			}
+			if field.ValueType().IsBasicType || field.HasPointerValue {
+				return
+			}
+			alreadyWrittenCheck[field.Name] = true
+			writePathSegmentMethod(decls, field.Name)
+		})
+
+	})
+
+	decls.Render(s.buf)
+	return s
+}
+
+func (s *EngineFactory) writePath() *EngineFactory {
+	decls := NewDeclSet()
+
+	decls.File.Type().Id("path").Id("[]int")
+
+	decls.File.Func().Id("newPath").Params(Id("elementIdentifier"), Id("id").Int()).Id("path").Block(
+		Return(Id("[]int").Values(Id("elementIdentifier"), Id("id"))),
+	)
+
+	decls.File.Func().Params(Id("p").Id("path")).Id("index").Params(Id("i").Id("int")).Id("path").Block(
+		Id("newPath").Op(":=").Make(Id("[]int"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
+		Copy(Id("newPath"), Id("p")),
+		Id("newPath").Op("=").Append(Id("newPath"), Id("i")),
+		Return(Id("newPath")),
+	)
+
+	decls.File.Func().Params(Id("p").Id("path")).Id("equals").Params(Id("parentPath").Id("path")).Bool().Block(
+		If(Len(Id("p")).Op("!=").Len(Id("parentPath"))).Block(
+			Return(False()),
+		),
+		For(Id("i"), Id("segment").Op(":=").Range().Id("parentPath")).Block(
+			If(Id("segment").Op("!=").Id("p").Index(Id("i"))).Block(
+				Return(False()),
+			),
+		),
+		Return(True()),
+	)
+
+	decls.Render(s.buf)
+	return s
+}
