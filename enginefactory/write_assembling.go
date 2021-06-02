@@ -108,14 +108,25 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 				}
 
 				if field.HasSliceValue {
-					return For(a.sliceFieldLoopConditions()).Block(
-						If(a.elementHasUpdated()).Block(
-							If(Id("childHasUpdated")).Block(
-								a.setHasUpdatedTrue(),
+					if field.HasAnyValue {
+						return For(a.sliceFieldLoopConditions()).Block(
+							If(a.elementHasUpdated()).Block(
+								If(Id("childHasUpdated")).Block(
+									a.setHasUpdatedTrue(),
+								),
+								a.appendToElementsInField(),
 							),
-							a.appendToElementsInField(),
-						),
-					)
+						)
+					} else {
+						return For(a.sliceFieldLoopConditions()).Block(
+							If(a.elementHasUpdated()).Block(
+								If(Id("childHasUpdated")).Block(
+									a.setHasUpdatedTrue(),
+								),
+								a.appendToElementsInField(),
+							),
+						)
+					}
 				}
 				return If(a.elementHasUpdated()).Block(
 					If(Id("childHasUpdated")).Block(
