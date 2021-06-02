@@ -166,3 +166,7 @@ func (a assembleElement) setOperationKind() *Statement {
 func (a assembleElement) finalReturn() (*Statement, *Statement, *Statement) {
 	return Id(a.t.Name), Id("hasUpdated").Op("||").Id("config").Dot("forceInclude"), Id("hasUpdated")
 }
+
+func (a assembleElement) createAnyContainer() *Statement {
+	return Id("engine").Dot(anyNameByField(*a.f)).Call(Id(anyNameByField(*a.f) + "ID")).Dot(anyNameByField(*a.f))
+}

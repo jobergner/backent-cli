@@ -32,6 +32,24 @@ func anyNameByField(f ast.Field) string {
 	return name
 }
 
+func forEachFieldValueComparison(field ast.Field, comparator jen.Statement, fn func(configType *ast.ConfigType) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	first := true
+	field.RangeValueTypes(func(valueType *ast.ConfigType) {
+		statement := jen.Empty()
+		if !first {
+			statement.Else()
+		}
+		_comparator := comparator
+		statement.If(_comparator.Op("==").Id("ElementKind" + title(valueType.Name))).Block(
+			fn(valueType),
+		)
+		statements = append(statements, statement)
+		first = false
+	})
+	return &statements
+}
+
 // pluralizeClient is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
 // with getting the singular form of a plural, this field:

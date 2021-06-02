@@ -111,16 +111,17 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		item.GearScore = &treeGearScore
 	}
 
-	if anyContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition; anyContainer.ElementKind == ElementKindPlayer {
-		playerID := anyContainer.Player
+	anyOfPlayerPositionContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition
+	if anyOfPlayerPositionContainer.ElementKind == ElementKindPlayer {
+		playerID := anyOfPlayerPositionContainer.Player
 		if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
 			if childHasUpdated {
 				hasUpdated = true
 			}
 			item.Origin = &treePlayer
 		}
-	} else if anyContainer.ElementKind == ElementKindPosition {
-		positionID := anyContainer.Position
+	} else if anyOfPlayerPositionContainer.ElementKind == ElementKindPosition {
+		positionID := anyOfPlayerPositionContainer.Position
 		if treePosition, include, childHasUpdated := engine.assemblePosition(positionID, check, config); include {
 			if childHasUpdated {
 				hasUpdated = true
@@ -272,24 +273,25 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 	var zone Zone
 
 	for _, anyOfItemPlayerZoneItemID := range mergeAnyOfItemPlayerZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
-		if anyContainer := engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID).anyOfItemPlayerZoneItem; anyContainer.ElementKind == ElementKindItem {
-			itemID := anyContainer.Item
+		anyOfItemPlayerZoneItemContainer := engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID).anyOfItemPlayerZoneItem
+		if anyOfItemPlayerZoneItemContainer.ElementKind == ElementKindItem {
+			itemID := anyOfItemPlayerZoneItemContainer.Item
 			if treeItem, include, childHasUpdated := engine.assembleItem(itemID, check, config); include {
 				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treeItem)
 			}
-		} else if anyContainer.ElementKind == ElementKindPlayer {
-			playerID := anyContainer.Player
+		} else if anyOfItemPlayerZoneItemContainer.ElementKind == ElementKindPlayer {
+			playerID := anyOfItemPlayerZoneItemContainer.Player
 			if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
 				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treePlayer)
 			}
-		} else if anyContainer.ElementKind == ElementKindZoneItem {
-			zoneItemID := anyContainer.ZoneItem
+		} else if anyOfItemPlayerZoneItemContainer.ElementKind == ElementKindZoneItem {
+			zoneItemID := anyOfItemPlayerZoneItemContainer.ZoneItem
 			if treeZoneItem, include, childHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
 				if childHasUpdated {
 					hasUpdated = true
@@ -335,7 +337,8 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	// force include
 	if config.forceInclude {
 		ref := engine.playerTargetRef(patchPlayer.Target)
-		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
@@ -364,7 +367,8 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	if statePlayer.Target == 0 && (playerIsInPatch && patchPlayer.Target != 0) {
 		config.forceInclude = true
 		ref := engine.playerTargetRef(patchPlayer.Target)
-		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
@@ -394,7 +398,8 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	// ref was definitely removed
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target == 0) {
 		ref := engine.playerTargetRef(patchPlayer.Target)
-		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
@@ -423,7 +428,8 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target != 0) {
 		if statePlayer.Target != patchPlayer.Target {
 			ref := engine.playerTargetRef(patchPlayer.Target)
-			if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+			anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+			if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 				referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 				if check == nil {
 					check = newRecursionCheck()
@@ -452,7 +458,8 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	// OperationKindUpdate element got updated
 	if statePlayer.Target != 0 {
 		ref := engine.playerTargetRef(statePlayer.Target)
-		if anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -565,7 +572,8 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (AnyOfPlayerZoneItemReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
-		if anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
+		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
@@ -594,7 +602,8 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 		if patchRef.OperationKind == OperationKindUpdate {
 			config.forceInclude = true
 		}
-		if anyContainer := engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID)
+		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
@@ -633,7 +642,8 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 	if check == nil {
 		check = newRecursionCheck()
 	}
-	if anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID); anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+	anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
+	if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayerZoneItem.Player, check, config); hasUpdatedDownstream {
 			path, _ := engine.PathTrack.player[anyContainer.anyOfPlayerZoneItem.Player]
 			return AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
