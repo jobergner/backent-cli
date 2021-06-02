@@ -347,14 +347,14 @@ const assembleConfig_type string = `type assembleConfig struct{ forceInclude boo
 const assembleGearScore_Engine_func string = `func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
-			return GearScore{}, false, true
+			return GearScore{}, false, false
 		} else {
 			check.gearScore[gearScoreID] = true
 		}
 	}
 	gearScoreData, hasUpdated := engine.Patch.GearScore[gearScoreID]
 	if !hasUpdated {
-		gearScoreData, _ = engine.State.GearScore[gearScoreID]
+		gearScoreData = engine.State.GearScore[gearScoreID]
 	}
 	var gearScore GearScore
 	gearScore.ID = gearScoreData.ID
@@ -367,14 +367,14 @@ const assembleGearScore_Engine_func string = `func (engine *Engine) assembleGear
 const assemblePosition_Engine_func string = `func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.position[positionID]; alreadyExists {
-			return Position{}, false, true
+			return Position{}, false, false
 		} else {
 			check.position[positionID] = true
 		}
 	}
 	positionData, hasUpdated := engine.Patch.Position[positionID]
 	if !hasUpdated {
-		positionData, _ = engine.State.Position[positionID]
+		positionData = engine.State.Position[positionID]
 	}
 	var position Position
 	position.ID = positionData.ID
@@ -387,7 +387,7 @@ const assemblePosition_Engine_func string = `func (engine *Engine) assemblePosit
 const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
-			return EquipmentSet{}, false, true
+			return EquipmentSet{}, false, false
 		} else {
 			check.equipmentSet[equipmentSetID] = true
 		}
@@ -397,12 +397,12 @@ const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleE
 		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
 	}
 	var equipmentSet EquipmentSet
-	for _, refID := range mergeEquipmentSetEquipmentRefIDs(engine.State.EquipmentSet[equipmentSetID].Equipment, engine.Patch.EquipmentSet[equipmentSetID].Equipment) {
-		if ref, include, refHasUpdated := engine.assembleEquipmentSetEquipmentRef(refID, check, config); include {
-			if refHasUpdated {
+	for _, equipmentSetEquipmentRefID := range mergeEquipmentSetEquipmentRefIDs(engine.State.EquipmentSet[equipmentSetData.ID].Equipment, engine.Patch.EquipmentSet[equipmentSetData.ID].Equipment) {
+		if treeEquipmentSetEquipmentRef, include, childHasUpdated := engine.assembleEquipmentSetEquipmentRef(equipmentSetEquipmentRefID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
-			equipmentSet.Equipment = append(equipmentSet.Equipment, ref)
+			equipmentSet.Equipment = append(equipmentSet.Equipment, treeEquipmentSetEquipmentRef)
 		}
 	}
 	equipmentSet.ID = equipmentSetData.ID
@@ -414,7 +414,7 @@ const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleE
 const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.item[itemID]; alreadyExists {
-			return Item{}, false, true
+			return Item{}, false, false
 		} else {
 			check.item[itemID] = true
 		}
@@ -424,37 +424,37 @@ const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(item
 		itemData = engine.State.Item[itemID]
 	}
 	var item Item
-	if ref, include, refHasUpdated := engine.assembleItemBoundToRef(itemID, check, config); include {
-		if refHasUpdated {
+	if treeItemBoundToRef, include, childHasUpdated := engine.assembleItemBoundToRef(itemID, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
-		item.BoundTo = ref
+		item.BoundTo = treeItemBoundToRef
 	}
-	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
-		if gearScoreHasUpdated {
+	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
 		item.GearScore = &treeGearScore
 	}
 	if anyContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition; anyContainer.ElementKind == ElementKindPlayer {
 		playerID := anyContainer.Player
-		if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
-			if playerHasUpdated {
+		if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
 			item.Origin = &treePlayer
 		}
 	} else if anyContainer.ElementKind == ElementKindPosition {
 		positionID := anyContainer.Position
-		if treePosition, include, positionHasUpdated := engine.assemblePosition(positionID, check, config); include {
-			if positionHasUpdated {
+		if treePosition, include, childHasUpdated := engine.assemblePosition(positionID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
 			item.Origin = &treePosition
 		}
 	}
-	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
-		if gearScoreHasUpdated {
+	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
 		item.GearScore = &treeGearScore
@@ -468,7 +468,7 @@ const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(item
 const assembleZoneItem_Engine_func string = `func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
-			return ZoneItem{}, false, true
+			return ZoneItem{}, false, false
 		} else {
 			check.zoneItem[zoneItemID] = true
 		}
@@ -478,14 +478,14 @@ const assembleZoneItem_Engine_func string = `func (engine *Engine) assembleZoneI
 		zoneItemData = engine.State.ZoneItem[zoneItemID]
 	}
 	var zoneItem ZoneItem
-	if treeItem, include, itemHasUpdated := engine.assembleItem(zoneItemData.Item, check, config); include {
-		if itemHasUpdated {
+	if treeItem, include, childHasUpdated := engine.assembleItem(zoneItemData.Item, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
 		zoneItem.Item = &treeItem
 	}
-	if treePosition, include, positionHasUpdated := engine.assemblePosition(zoneItemData.Position, check, config); include {
-		if positionHasUpdated {
+	if treePosition, include, childHasUpdated := engine.assemblePosition(zoneItemData.Position, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
 		zoneItem.Position = &treePosition
@@ -498,7 +498,7 @@ const assembleZoneItem_Engine_func string = `func (engine *Engine) assembleZoneI
 const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.player[playerID]; alreadyExists {
-			return Player{}, false, true
+			return Player{}, false, false
 		} else {
 			check.player[playerID] = true
 		}
@@ -508,54 +508,54 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 		playerData = engine.State.Player[playerID]
 	}
 	var player Player
-	for _, refID := range mergePlayerEquipmentSetRefIDs(engine.State.Player[playerID].EquipmentSets, engine.Patch.Player[playerID].EquipmentSets) {
-		if ref, include, refHasUpdated := engine.assemblePlayerEquipmentSetRef(refID, check, config); include {
-			if refHasUpdated {
+	for _, playerEquipmentSetRefID := range mergePlayerEquipmentSetRefIDs(engine.State.Player[playerData.ID].EquipmentSets, engine.Patch.Player[playerData.ID].EquipmentSets) {
+		if treePlayerEquipmentSetRef, include, childHasUpdated := engine.assemblePlayerEquipmentSetRef(playerEquipmentSetRefID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.EquipmentSets = append(player.EquipmentSets, ref)
+			player.EquipmentSets = append(player.EquipmentSets, treePlayerEquipmentSetRef)
 		}
 	}
-	if treeGearScore, include, gearScoreHasUpdated := engine.assembleGearScore(playerData.GearScore, check, config); include {
-		if gearScoreHasUpdated {
+	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(playerData.GearScore, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
 		player.GearScore = &treeGearScore
 	}
-	for _, refID := range mergePlayerGuildMemberRefIDs(engine.State.Player[playerID].GuildMembers, engine.Patch.Player[playerID].GuildMembers) {
-		if ref, include, refHasUpdated := engine.assemblePlayerGuildMemberRef(refID, check, config); include {
-			if refHasUpdated {
+	for _, playerGuildMemberRefID := range mergePlayerGuildMemberRefIDs(engine.State.Player[playerData.ID].GuildMembers, engine.Patch.Player[playerData.ID].GuildMembers) {
+		if treePlayerGuildMemberRef, include, childHasUpdated := engine.assemblePlayerGuildMemberRef(playerGuildMemberRefID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.GuildMembers = append(player.GuildMembers, ref)
+			player.GuildMembers = append(player.GuildMembers, treePlayerGuildMemberRef)
 		}
 	}
 	for _, itemID := range mergeItemIDs(engine.State.Player[playerData.ID].Items, engine.Patch.Player[playerData.ID].Items) {
-		if treeItem, include, itemHasUpdated := engine.assembleItem(itemID, check, config); include {
-			if itemHasUpdated {
+		if treeItem, include, childHasUpdated := engine.assembleItem(itemID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
 			player.Items = append(player.Items, treeItem)
 		}
 	}
-	if treePosition, include, positionHasUpdated := engine.assemblePosition(playerData.Position, check, config); include {
-		if positionHasUpdated {
+	if treePosition, include, childHasUpdated := engine.assemblePosition(playerData.Position, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
 		player.Position = &treePosition
 	}
-	if ref, include, refHasUpdated := engine.assemblePlayerTargetRef(playerID, check, config); include {
-		if refHasUpdated {
+	if treePlayerTargetRef, include, childHasUpdated := engine.assemblePlayerTargetRef(playerID, check, config); include {
+		if childHasUpdated {
 			hasUpdated = true
 		}
-		player.Target = ref
+		player.Target = treePlayerTargetRef
 	}
-	for _, refID := range mergePlayerTargetedByRefIDs(engine.State.Player[playerID].TargetedBy, engine.Patch.Player[playerID].TargetedBy) {
-		if ref, include, refHasUpdated := engine.assemblePlayerTargetedByRef(refID, check, config); include {
-			if refHasUpdated {
+	for _, playerTargetedByRefID := range mergePlayerTargetedByRefIDs(engine.State.Player[playerData.ID].TargetedBy, engine.Patch.Player[playerData.ID].TargetedBy) {
+		if treePlayerTargetedByRef, include, childHasUpdated := engine.assemblePlayerTargetedByRef(playerTargetedByRefID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.TargetedBy = append(player.TargetedBy, ref)
+			player.TargetedBy = append(player.TargetedBy, treePlayerTargetedByRef)
 		}
 	}
 	player.ID = playerData.ID
@@ -566,7 +566,7 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zone[zoneID]; alreadyExists {
-			return Zone{}, false, true
+			return Zone{}, false, false
 		} else {
 			check.zone[zoneID] = true
 		}
@@ -576,27 +576,27 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 		zoneData = engine.State.Zone[zoneID]
 	}
 	var zone Zone
-	for _, anyID := range mergeAnyOfItemPlayerZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
-		if anyContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem; anyContainer.ElementKind == ElementKindItem {
+	for _, anyOfItemPlayerZoneItemID := range mergeAnyOfItemPlayerZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
+		if anyContainer := engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID).anyOfItemPlayerZoneItem; anyContainer.ElementKind == ElementKindItem {
 			itemID := anyContainer.Item
-			if treeItem, include, itemHasUpdated := engine.assembleItem(itemID, check, config); include {
-				if itemHasUpdated {
+			if treeItem, include, childHasUpdated := engine.assembleItem(itemID, check, config); include {
+				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treeItem)
 			}
 		} else if anyContainer.ElementKind == ElementKindPlayer {
 			playerID := anyContainer.Player
-			if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
-				if playerHasUpdated {
+			if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treePlayer)
 			}
 		} else if anyContainer.ElementKind == ElementKindZoneItem {
 			zoneItemID := anyContainer.ZoneItem
-			if treeZoneItem, include, zoneItemHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
-				if zoneItemHasUpdated {
+			if treeZoneItem, include, childHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
+				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treeZoneItem)
@@ -604,16 +604,16 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 		}
 	}
 	for _, zoneItemID := range mergeZoneItemIDs(engine.State.Zone[zoneData.ID].Items, engine.Patch.Zone[zoneData.ID].Items) {
-		if treeZoneItem, include, zoneItemHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
-			if zoneItemHasUpdated {
+		if treeZoneItem, include, childHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
 			zone.Items = append(zone.Items, treeZoneItem)
 		}
 	}
 	for _, playerID := range mergePlayerIDs(engine.State.Zone[zoneData.ID].Players, engine.Patch.Zone[zoneData.ID].Players) {
-		if treePlayer, include, playerHasUpdated := engine.assemblePlayer(playerID, check, config); include {
-			if playerHasUpdated {
+		if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
+			if childHasUpdated {
 				hasUpdated = true
 			}
 			zone.Players = append(zone.Players, treePlayer)
@@ -2549,11 +2549,6 @@ const path_type string = `type path []int`
 
 const newPath_func string = `func newPath(elementIdentifier, id int) path {
 	return []int{elementIdentifier, id}
-}`
-
-const newEmptyPath_func string = `func newEmptyPath() path {
-	var p path
-	return p
 }`
 
 const equipmentSet_path_func string = `func (p path) equipmentSet() path {
