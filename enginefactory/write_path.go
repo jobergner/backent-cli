@@ -119,7 +119,7 @@ func (s *EngineFactory) writePath() *EngineFactory {
 		If(Len(Id("p")).Op("!=").Len(Id("parentPath"))).Block(
 			Return(False()),
 		),
-		For(Id("i"), Id("segment").Op(":=").Range().Id("parentPath")).Block(
+		For(List(Id("i"), Id("segment")).Op(":=").Range().Id("parentPath")).Block(
 			If(Id("segment").Op("!=").Id("p").Index(Id("i"))).Block(
 				Return(False()),
 			),
