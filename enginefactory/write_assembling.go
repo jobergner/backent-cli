@@ -108,31 +108,55 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 				}
 
 				if field.HasSliceValue {
-					if field.HasAnyValue {
+					if field.HasAnyValue && !field.HasPointerValue {
 						return For(a.sliceFieldLoopConditions()).Block(
-							If(a.elementHasUpdated()).Block(
-								If(Id("childHasUpdated")).Block(
-									a.setHasUpdatedTrue(),
-								),
-								a.appendToElementsInField(),
-							),
+							onlyIf(!field.HasPointerValue, a.createAnyContainer().Line()),
+							forEachFieldValueComparison(field, *Id(a.anyContainerName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+								return &Statement{
+									Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name)).Line(),
+									If(a.elementHasUpdated(valueType, a.usedAssembleID(configType, field, valueType))).Block(
+										If(Id("childHasUpdated")).Block(
+											a.setHasUpdatedTrue(),
+										),
+										a.appendToElementsInField(valueType),
+									),
+								}
+							}),
 						)
 					} else {
 						return For(a.sliceFieldLoopConditions()).Block(
-							If(a.elementHasUpdated()).Block(
+							If(a.elementHasUpdated(field.ValueType(), a.usedAssembleID(configType, field, field.ValueType()))).Block(
 								If(Id("childHasUpdated")).Block(
 									a.setHasUpdatedTrue(),
 								),
-								a.appendToElementsInField(),
+								a.appendToElementsInField(field.ValueType()),
 							),
 						)
 					}
 				}
-				return If(a.elementHasUpdated()).Block(
+
+				if field.HasAnyValue && !field.HasPointerValue {
+					return &Statement{
+						onlyIf(!field.HasPointerValue, a.createAnyContainer().Line()),
+						forEachFieldValueComparison(field, *Id(a.anyContainerName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+							return &Statement{
+								Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name)).Line(),
+								If(a.elementHasUpdated(valueType, a.usedAssembleID(configType, field, valueType))).Block(
+									If(Id("childHasUpdated")).Block(
+										a.setHasUpdatedTrue(),
+									),
+									a.setFieldElement(valueType),
+								),
+							}
+
+						}),
+					}
+				}
+				return If(a.elementHasUpdated(field.ValueType(), a.usedAssembleID(configType, field, field.ValueType()))).Block(
 					If(Id("childHasUpdated")).Block(
 						a.setHasUpdatedTrue(),
 					),
-					a.setFieldElement(),
+					a.setFieldElement(field.ValueType()),
 				)
 			}),
 			a.setID(),

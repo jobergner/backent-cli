@@ -130,13 +130,6 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		}
 	}
 
-	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		item.GearScore = &treeGearScore
-	}
-
 	item.ID = itemData.ID
 	item.OperationKind = itemData.OperationKind
 	item.Name = itemData.Name

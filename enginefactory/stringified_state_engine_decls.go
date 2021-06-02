@@ -454,12 +454,6 @@ const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(item
 			item.Origin = &treePosition
 		}
 	}
-	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		item.GearScore = &treeGearScore
-	}
 	item.ID = itemData.ID
 	item.OperationKind = itemData.OperationKind
 	item.Name = itemData.Name

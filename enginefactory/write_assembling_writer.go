@@ -123,15 +123,24 @@ func (a assembleElement) sliceFieldLoopConditions() *Statement {
 	return loopVars.Op(":=").Range().Id(mergeFuncName).Call(a.typeFieldOn("State"), a.typeFieldOn("Patch"))
 }
 
-func (a assembleElement) elementHasUpdated() (*Statement, *Statement) {
-	fieldIdentifier := Id(a.f.ValueTypeName + "ID")
-	if !a.f.HasPointerValue && !a.f.HasSliceValue {
-		fieldIdentifier = Id(a.dataElementName()).Dot(title(a.f.Name))
-	} else if a.f.HasPointerValue && !a.f.HasSliceValue {
-		fieldIdentifier = Id(a.t.Name + "ID")
+func (a assembleElement) usedAssembleID(configType ast.ConfigType, field ast.Field, valueType *ast.ConfigType) *Statement {
+	if !field.HasPointerValue && !field.HasAnyValue && !field.HasSliceValue {
+		return Id(a.dataElementName()).Dot(title(field.Name))
+	} else if field.HasPointerValue && !field.HasAnyValue && !field.HasSliceValue {
+		return Id(configType.Name + "ID")
+	} else if field.HasPointerValue && field.HasSliceValue {
+		return Id(field.ValueTypeName + "ID")
 	}
-	conditionVars := List(Id("tree"+title(a.f.ValueTypeName)), Id("include"), Id("childHasUpdated"))
-	condition := conditionVars.Op(":=").Id("engine").Dot("assemble"+title(a.f.ValueTypeName)).Call(fieldIdentifier, Id("check"), Id("config"))
+	return Id(valueType.Name + "ID")
+}
+
+func (a assembleElement) elementHasUpdated(valueType *ast.ConfigType, assembleID *Statement) (*Statement, *Statement) {
+	handledElementTypeName := a.f.ValueTypeName
+	if a.f.HasAnyValue && !a.f.HasPointerValue {
+		handledElementTypeName = valueType.Name
+	}
+	conditionVars := List(Id("tree"+title(handledElementTypeName)), Id("include"), Id("childHasUpdated"))
+	condition := conditionVars.Op(":=").Id("engine").Dot("assemble"+title(handledElementTypeName)).Call(assembleID, Id("check"), Id("config"))
 	return condition, Id("include")
 }
 
@@ -139,16 +148,24 @@ func (a assembleElement) setHasUpdatedTrue() *Statement {
 	return Id("hasUpdated").Op("=").True()
 }
 
-func (a assembleElement) appendToElementsInField() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(a.f.ValueTypeName)))
+func (a assembleElement) appendToElementsInField(valueType *ast.ConfigType) *Statement {
+	appendedType := valueType.Name
+	if !a.f.HasAnyValue && a.f.HasPointerValue || (a.f.HasPointerValue && a.f.HasSliceValue && a.f.HasAnyValue) {
+		appendedType = a.f.ValueTypeName
+	}
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(appendedType)))
 }
 
-func (a assembleElement) setFieldElement() *Statement {
+func (a assembleElement) setFieldElement(valueType *ast.ConfigType) *Statement {
 	var optionalShare string
 	if !a.f.HasPointerValue {
 		optionalShare = "&"
 	}
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(optionalShare + "tree" + title(a.f.ValueTypeName))
+	usedType := a.f.ValueTypeName
+	if a.f.HasAnyValue && !a.f.HasPointerValue {
+		usedType = valueType.Name
+	}
+	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(optionalShare + "tree" + title(usedType))
 }
 
 func (a assembleElement) setField() *Statement {
@@ -172,5 +189,9 @@ func (a assembleElement) anyContainerName() string {
 }
 
 func (a assembleElement) createAnyContainer() *Statement {
-	return Id(a.anyContainerName()).Op(":=").Id("engine").Dot(anyNameByField(*a.f)).Call(Id(anyNameByField(*a.f) + "ID")).Dot(anyNameByField(*a.f))
+	usedID := Id(anyNameByField(*a.f) + "ID")
+	if !a.f.HasSliceValue {
+		usedID = Id(a.dataElementName()).Dot(title(a.f.Name))
+	}
+	return Id(a.anyContainerName()).Op(":=").Id("engine").Dot(anyNameByField(*a.f)).Call(usedID).Dot(anyNameByField(*a.f))
 }
