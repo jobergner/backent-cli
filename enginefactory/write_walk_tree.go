@@ -46,10 +46,22 @@ func (s *EngineFactory) writeWalkElement() *EngineFactory {
 				}
 
 				if !field.HasSliceValue {
-					return writeEvaluateAnyChildPath(w, field)
+					return &Statement{
+						w.declareAnyContainer().Line(),
+						forEachFieldValueComparison(field, *Id(field.Name + "Container").Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+							w.v = valueType
+							return writeEvaluateChildPath(w)
+
+						}),
+					}
 				}
 				return For(w.anyChildLoopConditions()).Block(
-					writeEvaluateAnyChildPath(w, field),
+					w.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id(field.Name + "Container").Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						w.v = valueType
+						return writeEvaluateChildPath(w)
+
+					}),
 				)
 			}),
 			w.updatePath(),
@@ -70,23 +82,4 @@ func writeEvaluateChildPath(w walkElementWriter) *Statement {
 		).Line(),
 		w.walkChild(),
 	}
-}
-
-func writeEvaluateAnyChildPath(w walkElementWriter, field ast.Field) *Statement {
-	firstValueTypeIteration := true
-	statement := w.declareAnyContainer().Line()
-	field.RangeValueTypes(func(valueType *ast.ConfigType) {
-		w.v = valueType
-		if !firstValueTypeIteration {
-			statement = statement.Else()
-		}
-		firstValueTypeIteration = false
-
-		statement.If(Id(field.Name + "Container").Dot("ElementKind").Op("==").Id("ElementKind" + title(valueType.Name))).Block(
-			writeEvaluateChildPath(w),
-		)
-
-	})
-
-	return statement
 }
