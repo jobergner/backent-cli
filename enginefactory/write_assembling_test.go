@@ -26,6 +26,7 @@ func TestWriteAssembling(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
+			assembleEquipmentSet_Engine_func,
 			assembleGearScore_Engine_func,
 			assembleItem_Engine_func,
 			assemblePlayer_Engine_func,

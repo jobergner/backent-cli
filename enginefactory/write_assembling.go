@@ -14,15 +14,15 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 	a := assembleTreeWriter{}
 
 	decls.File.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
-		Id("tree").Op(":=").Id("newTree").Call(),
+		a.createConfig(),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
 
 			if a.t.IsRootType {
 				return &Statement{
 					For(a.patchLoopConditions()).Block(
-						a.assembleItem(),
-						If(Id("hasUpdated")).Block(
+						a.assembleElement(),
+						If(Id("include")).Block(
 							a.setElementInTree(),
 						),
 					),
@@ -32,8 +32,8 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 			return &Statement{
 				For(a.patchLoopConditions()).Block(
 					If(a.elementHasNoParent()).Block(
-						a.assembleItem(),
-						If(Id("hasUpdated")).Block(
+						a.assembleElement(),
+						If(Id("include")).Block(
 							a.setElementInTree(),
 						),
 					),
@@ -48,8 +48,8 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 				return &Statement{
 					For(a.stateLoopConditions()).Block(
 						If(a.elementNonExistentInTree()).Block(
-							a.assembleItem(),
-							If(Id("hasUpdated")).Block(
+							a.assembleElement(),
+							If(Id("include")).Block(
 								a.setElementInTree(),
 							),
 						),
@@ -61,8 +61,8 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 				For(a.stateLoopConditions()).Block(
 					If(a.elementHasNoParent()).Block(
 						If(a.elementNonExistentInTree()).Block(
-							a.assembleItem(),
-							If(Id("hasUpdated")).Block(
+							a.assembleElement(),
+							If(Id("include")).Block(
 								a.setElementInTree(),
 							),
 						),
@@ -71,49 +71,11 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 			}
 
 		}),
-		Return(Id("tree")),
+		Return(Id("engine").Dot("Tree")),
 	)
 
 	decls.Render(s.buf)
 	return s
-}
-
-type assembleTreeWriter struct {
-	t *ast.ConfigType
-}
-
-func (a assembleTreeWriter) dataElementName() string {
-	return a.t.Name + "Data"
-}
-
-func (a assembleTreeWriter) receiverParams() *Statement {
-	return Id("se").Id("*Engine")
-}
-
-func (a assembleTreeWriter) patchLoopConditions() *Statement {
-	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("se").Dot("Patch").Dot(title(a.t.Name))
-}
-
-func (a assembleTreeWriter) elementHasNoParent() *Statement {
-	return Id("!" + a.dataElementName()).Dot("HasParent_")
-}
-
-func (a assembleTreeWriter) elementNonExistentInTree() (*Statement, *Statement) {
-	condition := List(Id("_"), Id("ok")).Op(":=").Id("tree").Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID"))
-	return condition, Id("!ok")
-}
-
-func (a assembleTreeWriter) assembleItem() *Statement {
-	variableNames := List(Id(a.t.Name), Id("hasUpdated"))
-	return variableNames.Op(":=").Id("se").Dot("assemble" + title(a.t.Name)).Call(Id(a.dataElementName()).Dot("ID"))
-}
-
-func (a assembleTreeWriter) setElementInTree() *Statement {
-	return Id("tree").Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Op("=").Id(a.t.Name)
-}
-
-func (a assembleTreeWriter) stateLoopConditions() *Statement {
-	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("se").Dot("State").Dot(title(a.t.Name))
 }
 
 func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
@@ -126,9 +88,16 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 		}
 
 		decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Params(a.returns()).Block(
+			If(a.checkIsDefined()).Block(
+				If(a.elementExistsInCheck()).Block(
+					Return(a.returnEmpty()),
+				).Else().Block(
+					a.checkElement(),
+				),
+			),
 			a.getElementFromPatch(),
 			If(Id("!hasUpdated")).Block(
-				a.earlyReturn(),
+				a.getElementFromState(),
 			),
 			a.declareTreeElement(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
@@ -140,14 +109,18 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 
 				if field.HasSliceValue {
 					return For(a.sliceFieldLoopConditions()).Block(
-						If(a.elementHasUpdated(Id(field.ValueType().Name+"ID"))).Block(
-							a.setHasUpdatedTrue(),
+						If(a.elementHasUpdated()).Block(
+							If(Id("childHasUpdated")).Block(
+								a.setHasUpdatedTrue(),
+							),
 							a.appendToElementsInField(),
 						),
 					)
 				}
-				return If(a.elementHasUpdated(Id(a.dataElementName()).Dot(title(field.Name)))).Block(
-					a.setHasUpdatedTrue(),
+				return If(a.elementHasUpdated()).Block(
+					If(Id("childHasUpdated")).Block(
+						a.setHasUpdatedTrue(),
+					),
 					a.setFieldElement(),
 				)
 			}),
@@ -169,105 +142,4 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 	decls.Render(s.buf)
 	return s
 
-}
-
-type assembleElement struct {
-	t ast.ConfigType
-	f *ast.Field
-}
-
-func (a assembleElement) treeElementName() string {
-	return a.t.Name
-}
-
-func (a assembleElement) dataElementName() string {
-	return a.t.Name + "Data"
-}
-
-func (a assembleElement) treeTypeName() string {
-	return title(a.t.Name)
-}
-
-func (a assembleElement) receiverParams() *Statement {
-	return Id("se").Id("*Engine")
-}
-
-func (a assembleElement) name() string {
-	return "assemble" + title(a.t.Name)
-}
-
-func (a assembleElement) idParam() string {
-	return a.t.Name + "ID"
-}
-
-func (a assembleElement) params() *Statement {
-	return Id(a.idParam()).Id(title(a.t.Name) + "ID")
-}
-
-func (a assembleElement) returns() (*Statement, *Statement) {
-	return Id(a.treeTypeName()), Bool()
-}
-
-func (a assembleElement) getElementFromPatch() *Statement {
-	return List(Id(a.dataElementName()), Id("hasUpdated")).Op(":=").Id("se").Dot("Patch").Dot(title(a.t.Name)).Index(Id(a.idParam()))
-}
-
-func (a assembleElement) earlyReturn() *Statement {
-	if a.t.IsLeafType {
-		return Return(List(Id(a.treeTypeName()).Values(), Lit(false)))
-	}
-	return Id(a.dataElementName()).Op("=").Id("se").Dot("State").Dot(title(a.t.Name)).Index(Id(a.idParam()))
-}
-
-func (a assembleElement) declareTreeElement() *Statement {
-	return Var().Id(a.treeElementName()).Id(a.treeTypeName())
-}
-
-func (a assembleElement) typeFieldOn(from string) *Statement {
-	return Id("se").Dot(from).Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Dot(title(a.f.Name))
-}
-
-func (a assembleElement) sliceFieldLoopConditions() *Statement {
-	loopVars := List(Id("_"), Id(a.f.ValueType().Name+"ID"))
-	deduplicateFuncName := "deduplicate" + title(a.f.ValueType().Name) + "IDs"
-	return loopVars.Op(":=").Range().Id(deduplicateFuncName).Call(a.typeFieldOn("State"), a.typeFieldOn("Patch"))
-}
-
-func (a assembleElement) elementHasUpdated(fieldIdentifier *Statement) (*Statement, *Statement) {
-	elementHasUpdatedId := Id(a.f.ValueType().Name + "HasUpdated")
-	conditionVars := List(Id("tree"+title(a.f.ValueType().Name)), elementHasUpdatedId)
-	condition := conditionVars.Op(":=").Id("se").Dot("assemble" + title(a.f.ValueType().Name)).Call(fieldIdentifier)
-	return condition, elementHasUpdatedId
-}
-
-func (a assembleElement) setHasUpdatedTrue() *Statement {
-	return Id("hasUpdated").Op("=").True()
-}
-
-func (a assembleElement) appendToElementsInField() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(a.f.ValueType().Name)))
-}
-
-func (a assembleElement) setFieldElement() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id("&" + "tree" + title(a.f.ValueType().Name))
-}
-
-func (a assembleElement) setField() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(a.dataElementName()).Dot(title(a.f.Name))
-}
-
-func (a assembleElement) setID() *Statement {
-	return Id(a.treeElementName()).Dot("ID").Op("=").Id(a.dataElementName()).Dot("ID")
-}
-
-func (a assembleElement) setOperationKind() *Statement {
-	return Id(a.treeElementName()).Dot("OperationKind_").Op("=").Id(a.dataElementName()).Dot("OperationKind_")
-}
-
-func (a assembleElement) finalReturn() (*Statement, *Statement) {
-	elementName := Id(a.treeElementName())
-	if a.t.IsLeafType {
-		return elementName, True()
-	}
-	return elementName, Id("hasUpdated")
 }
