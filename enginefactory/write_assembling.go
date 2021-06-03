@@ -110,10 +110,10 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 				if field.HasSliceValue {
 					if field.HasAnyValue && !field.HasPointerValue {
 						return For(a.sliceFieldLoopConditions()).Block(
-							onlyIf(!field.HasPointerValue, a.createAnyContainer().Line()),
+							onlyIf(!field.HasPointerValue, a.createAnyContainer()),
 							forEachFieldValueComparison(field, *Id(a.anyContainerName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 								return &Statement{
-									Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name)).Line(),
+									a.assignIDFromAnyContainer(valueType).Line(),
 									If(a.elementHasUpdated(valueType, a.usedAssembleID(configType, field, valueType))).Block(
 										If(Id("childHasUpdated")).Block(
 											a.setHasUpdatedTrue(),
@@ -140,7 +140,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 						onlyIf(!field.HasPointerValue, a.createAnyContainer().Line()),
 						forEachFieldValueComparison(field, *Id(a.anyContainerName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 							return &Statement{
-								Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name)).Line(),
+								a.assignIDFromAnyContainer(valueType).Line(),
 								If(a.elementHasUpdated(valueType, a.usedAssembleID(configType, field, valueType))).Block(
 									If(Id("childHasUpdated")).Block(
 										a.setHasUpdatedTrue(),

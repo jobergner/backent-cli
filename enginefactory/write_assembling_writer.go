@@ -195,3 +195,7 @@ func (a assembleElement) createAnyContainer() *Statement {
 	}
 	return Id(a.anyContainerName()).Op(":=").Id("engine").Dot(anyNameByField(*a.f)).Call(usedID).Dot(anyNameByField(*a.f))
 }
+
+func (a assembleElement) assignIDFromAnyContainer(valueType *ast.ConfigType) *Statement {
+	return Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name))
+}
