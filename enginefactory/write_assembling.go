@@ -178,3 +178,83 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 	return s
 
 }
+
+func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
+	decls := NewDeclSet()
+
+	s.config.RangeRefFields(func(field ast.Field) {
+		a := assembleReferenceWriter{
+			f: field,
+		}
+		decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
+			a.declareStateElement(),
+			a.declarepatchElement(),
+			If(a.refIsNotSet()).Block(
+				Return(Nil(), False(), False()),
+			),
+			If(Id("config").Dot("forceInclude")).Block(
+				a.declareRef(),
+				a.declareAnyContainer(),
+				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+					a.v = valueType
+					return &Statement{
+						a.declareReferencedElement(),
+						If(Id("check").Op("==").Nil()).Block(
+							Id("check").Op("=").Id("newRecursionCheck").Call(),
+						),
+						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+						If(a.assembleReferencedElement(false), Id("hasUpdatedDownstream")).Block(
+							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+						),
+						a.retrievePath(),
+						Return(a.defineReference(false, false), True(), a.dataHasUpdated()),
+					}
+				}),
+			),
+			If(a.refWasCreated()).Block(
+				Id("config").Dot("forceInclude").Op("=").True(),
+				a.declareRef(),
+				a.declareAnyContainer(),
+				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+					a.v = valueType
+					return &Statement{
+						a.declareReferencedElement(),
+						If(Id("check").Op("==").Nil()).Block(
+							Id("check").Op("=").Id("newRecursionCheck").Call(),
+						),
+						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+						a.assembleReferencedElement(true),
+						If(Id("hasUpdatedDownstream")).Block(
+							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+						),
+						a.retrievePath(),
+						Return(a.defineReference(true, false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+					}
+				}),
+			),
+			If(Id("state"+title(field.Parent.Name)).Op("!=").Lit(0).Op("&&").Params(Id(field.Parent.Name+"IsInPatch").Op("&&").Id("patch"+title(field.Parent.Name)).Dot(title(field.Name)))).Block(
+				a.declareRef(),
+				a.declareAnyContainer(),
+				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+					a.v = valueType
+					return &Statement{
+						a.declareReferencedElement(),
+						If(Id("check").Op("==").Nil()).Block(
+							Id("check").Op("=").Id("newRecursionCheck").Call(),
+						),
+						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+						If(a.assembleReferencedElement(false), Id("hasUpdatedDownstream")).Block(
+							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+						),
+						a.retrievePath(),
+						Return(a.defineReference(false, true), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+					}
+				}),
+			),
+			Return(Nil(), False(), False()),
+		)
+	})
+
+	decls.Render(s.buf)
+	return s
+}
