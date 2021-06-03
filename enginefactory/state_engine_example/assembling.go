@@ -448,7 +448,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 		}
 	}
 
-	// OperationKindUpdate element got updated
+	// element got updated - OperationKindUpdate
 	if statePlayer.Target != 0 {
 		ref := engine.playerTargetRef(statePlayer.Target)
 		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)

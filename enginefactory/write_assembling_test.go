@@ -39,4 +39,22 @@ func TestWriteAssembling(t *testing.T) {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
+	t.Run("writes assemble tree reference", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeAssembleTreeReference()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			assembleEquipmentSetEquipmentRef_Engine_func,
+			assembleItemBoundToRef_Engine_func,
+			assemblePlayerEquipmentSetRef_Engine_func,
+			assemblePlayerGuildMemberRef_Engine_func,
+			assemblePlayerTargetRef_Engine_func,
+			assemblePlayerTargetedByRef_Engine_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 }
