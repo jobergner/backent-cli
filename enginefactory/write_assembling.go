@@ -197,18 +197,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 					a.v = valueType
-					return &Statement{
-						a.declareReferencedElement(),
-						If(Id("check").Op("==").Nil()).Block(
-							Id("check").Op("=").Id("newRecursionCheck").Call(),
-						),
-						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
-							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
-						),
-						a.retrievePath(false),
-						Return(a.defineReference(false, "", false), True(), a.dataHasUpdated()),
-					}
+					return a.writeNonSliceTreeReferenceForceInclude()
 				}),
 			),
 			If(a.refWasCreated()).Block(
@@ -217,19 +206,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 					a.v = valueType
-					return &Statement{
-						a.declareReferencedElement(),
-						If(Id("check").Op("==").Nil()).Block(
-							Id("check").Op("=").Id("newRecursionCheck").Call(),
-						),
-						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						a.assembleReferencedElement(true, false),
-						If(Id("hasUpdatedDownstream")).Block(
-							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
-						),
-						a.retrievePath(false),
-						Return(a.defineReference(true, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
-					}
+					return a.writeNonSliceTreeReferenceRefCreated()
 				}),
 			),
 			If(a.refWasRemoved()).Block(
@@ -237,18 +214,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 					a.v = valueType
-					return &Statement{
-						a.declareReferencedElement(),
-						If(Id("check").Op("==").Nil()).Block(
-							Id("check").Op("=").Id("newRecursionCheck").Call(),
-						),
-						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
-							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
-						),
-						a.retrievePath(false),
-						Return(a.defineReference(false, "delete", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
-					}
+					return a.writeNonSliceTreeReferenceRefRemoved()
 				}),
 			),
 			If(a.refHasBeenDefined()).Block(
@@ -257,36 +223,16 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
-						return &Statement{
-							a.declareReferencedElement(),
-							If(Id("check").Op("==").Nil()).Block(
-								Id("check").Op("=").Id("newRecursionCheck").Call(),
-							),
-							Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-							If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
-								Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
-							),
-							a.retrievePath(false),
-							Return(a.defineReference(false, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
-						}
+						return a.writeNonSliceTreeReferenceRefReplaced()
 					}),
 				),
 			),
-			If(Id("state"+title(field.Parent.Name)).Dot(title(field.Name)).Op("!=").Lit(0)).Block(
+			If(a.referencedElementGotUpdated()).Block(
 				a.declareRef(),
 				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 					a.v = valueType
-					return &Statement{
-						If(Id("check").Op("==").Nil()).Block(
-							Id("check").Op("=").Id("newRecursionCheck").Call(),
-						),
-						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						If(a.assembleReferencedElement(false, true), Id("hasUpdatedDownstream")).Block(
-							a.retrievePath(true),
-							Return(a.defineReference(false, "update", true), True(), a.dataHasUpdated()),
-						),
-					}
+					return a.writeNonSliceTreeReferenceRefElementUpdated()
 				}),
 			),
 			Return(Nil(), False(), False()),
