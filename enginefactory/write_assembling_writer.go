@@ -252,31 +252,44 @@ func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 	return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))).Dot(a.v.Name)
 }
 
-func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool) *Statement {
+func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool, useContainer bool) *Statement {
 	firstReturn := "_"
 	if declareElement {
 		firstReturn = "element"
 	}
-	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+title(a.v.Name)).Call(Id("referencedElement").Dot("ID"), Id("check"), Id("config"))
+	usedID := Id("referencedElement").Dot("ID")
+	if useContainer {
+		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+	}
+	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
-func (a assembleReferenceWriter) retrievePath() *Statement {
-	return List(Id("path"), Id("_")).Op(":=").Id("engine").Dot("PathTrack").Dot(a.v.Name).Index(Id("referencedElement").Dot("ID"))
+func (a assembleReferenceWriter) retrievePath(useContainer bool) *Statement {
+	usedID := Id("referencedElement").Dot("ID")
+	if useContainer {
+		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+	}
+	return List(Id("path"), Id("_")).Op(":=").Id("engine").Dot("PathTrack").Dot(a.v.Name).Index(usedID)
 }
 
-func (a assembleReferenceWriter) defineReference(useElement bool, isOperationKindDelete bool) *Statement {
-	operationKind := Id("ref").Dot(a.f.Name).Dot("OperationKind")
+func (a assembleReferenceWriter) defineReference(useElement bool, operationKind string, useContainer bool) *Statement {
 	element := Nil()
 	if useElement {
-		operationKind = Id("OperationKindUpdate")
 		element = Id("&Element")
 	}
-	if isOperationKindDelete {
-		operationKind = Id("OperationKindDelete")
+	operationKindStatement := Id("ref").Dot(a.f.Name).Dot("OperationKind")
+	if operationKind == "delete" {
+		operationKindStatement = Id("OperationKindDelete")
+	} else if operationKind == "update" {
+		operationKindStatement = Id("OperationKindUpdate")
+	}
+	usedID := Id("referencedElement").Dot("ID")
+	if useContainer {
+		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
 	}
 	return Id("&"+title(a.nextValueName())).Values(
-		operationKind,
-		Int().Call(Id("referencedElement").Dot("ID")),
+		operationKindStatement,
+		Int().Call(usedID),
 		Id("ElementKind"+title(a.v.Name)),
 		Id("referencedDataStatus"),
 		Id("path").Dot("toJSONPath").Call(),
@@ -290,4 +303,16 @@ func (a assembleReferenceWriter) dataHasUpdated() *Statement {
 
 func (a assembleReferenceWriter) refWasCreated() *Statement {
 	return Id("state" + title(a.f.Parent.Name)).Op("==").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)))
+}
+
+func (a assembleReferenceWriter) refWasRemoved() *Statement {
+	return Id("state" + title(a.f.Parent.Name)).Op("!=").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0))
+}
+
+func (a assembleReferenceWriter) refHasBeenDefined() *Statement {
+	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("=!").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0))
+}
+
+func (a assembleReferenceWriter) refWasReplaced() *Statement {
+	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name))
 }

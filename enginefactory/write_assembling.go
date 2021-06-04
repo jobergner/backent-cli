@@ -203,11 +203,11 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 							Id("check").Op("=").Id("newRecursionCheck").Call(),
 						),
 						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						If(a.assembleReferencedElement(false), Id("hasUpdatedDownstream")).Block(
+						If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
 							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 						),
-						a.retrievePath(),
-						Return(a.defineReference(false, false), True(), a.dataHasUpdated()),
+						a.retrievePath(false),
+						Return(a.defineReference(false, "", false), True(), a.dataHasUpdated()),
 					}
 				}),
 			),
@@ -223,16 +223,16 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 							Id("check").Op("=").Id("newRecursionCheck").Call(),
 						),
 						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						a.assembleReferencedElement(true),
+						a.assembleReferencedElement(true, false),
 						If(Id("hasUpdatedDownstream")).Block(
 							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 						),
-						a.retrievePath(),
-						Return(a.defineReference(true, false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+						a.retrievePath(false),
+						Return(a.defineReference(true, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
 					}
 				}),
 			),
-			If(Id("state"+title(field.Parent.Name)).Op("!=").Lit(0).Op("&&").Params(Id(field.Parent.Name+"IsInPatch").Op("&&").Id("patch"+title(field.Parent.Name)).Dot(title(field.Name)))).Block(
+			If(a.refWasRemoved()).Block(
 				a.declareRef(),
 				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
@@ -243,11 +243,49 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 							Id("check").Op("=").Id("newRecursionCheck").Call(),
 						),
 						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-						If(a.assembleReferencedElement(false), Id("hasUpdatedDownstream")).Block(
+						If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
 							Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 						),
-						a.retrievePath(),
-						Return(a.defineReference(false, true), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+						a.retrievePath(false),
+						Return(a.defineReference(false, "delete", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+					}
+				}),
+			),
+			If(a.refHasBeenDefined()).Block(
+				If(a.refWasReplaced()).Block(
+					a.declareRef(),
+					a.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						a.v = valueType
+						return &Statement{
+							a.declareReferencedElement(),
+							If(Id("check").Op("==").Nil()).Block(
+								Id("check").Op("=").Id("newRecursionCheck").Call(),
+							),
+							Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+							If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+								Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+							),
+							a.retrievePath(false),
+							Return(a.defineReference(false, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+						}
+					}),
+				),
+			),
+			If(Id("state"+title(field.Parent.Name)).Dot(title(field.Name)).Op("!=").Lit(0)).Block(
+				a.declareRef(),
+				a.declareAnyContainer(),
+				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+					a.v = valueType
+					return &Statement{
+						If(Id("check").Op("==").Nil()).Block(
+							Id("check").Op("=").Id("newRecursionCheck").Call(),
+						),
+						Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+						If(a.assembleReferencedElement(false, true), Id("hasUpdatedDownstream")).Block(
+							a.retrievePath(true),
+							Return(a.defineReference(false, "update", true), True(), a.dataHasUpdated()),
+						),
 					}
 				}),
 			),
