@@ -316,3 +316,81 @@ func (a assembleReferenceWriter) refHasBeenDefined() *Statement {
 func (a assembleReferenceWriter) refWasReplaced() *Statement {
 	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name))
 }
+
+func (a assembleReferenceWriter) referencedElementGotUpdated() *Statement {
+	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0)
+}
+
+func (a assembleReferenceWriter) writeNonSliceTreeReferenceForceInclude() *Statement {
+	return &Statement{
+		a.declareReferencedElement(),
+		If(Id("check").Op("==").Nil()).Block(
+			Id("check").Op("=").Id("newRecursionCheck").Call(),
+		),
+		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+		If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+		),
+		a.retrievePath(false),
+		Return(a.defineReference(false, "", false), True(), a.dataHasUpdated()),
+	}
+}
+
+func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefCreated() *Statement {
+	return &Statement{
+		a.declareReferencedElement(),
+		If(Id("check").Op("==").Nil()).Block(
+			Id("check").Op("=").Id("newRecursionCheck").Call(),
+		),
+		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+		a.assembleReferencedElement(true, false),
+		If(Id("hasUpdatedDownstream")).Block(
+			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+		),
+		a.retrievePath(false),
+		Return(a.defineReference(true, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+	}
+}
+
+func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefRemoved() *Statement {
+	return &Statement{
+		a.declareReferencedElement(),
+		If(Id("check").Op("==").Nil()).Block(
+			Id("check").Op("=").Id("newRecursionCheck").Call(),
+		),
+		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+		If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+		),
+		a.retrievePath(false),
+		Return(a.defineReference(false, "delete", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+	}
+}
+
+func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefReplaced() *Statement {
+	return &Statement{
+		a.declareReferencedElement(),
+		If(Id("check").Op("==").Nil()).Block(
+			Id("check").Op("=").Id("newRecursionCheck").Call(),
+		),
+		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+		If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
+		),
+		a.retrievePath(false),
+		Return(a.defineReference(false, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+	}
+}
+
+func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefElementUpdated() *Statement {
+	return &Statement{
+		If(Id("check").Op("==").Nil()).Block(
+			Id("check").Op("=").Id("newRecursionCheck").Call(),
+		),
+		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
+		If(a.assembleReferencedElement(false, true), Id("hasUpdatedDownstream")).Block(
+			a.retrievePath(true),
+			Return(a.defineReference(false, "update", true), True(), a.dataHasUpdated()),
+		),
+	}
+}
