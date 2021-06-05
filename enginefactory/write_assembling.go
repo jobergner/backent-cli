@@ -183,60 +183,172 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 	decls := NewDeclSet()
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		a := assembleReferenceWriter{
-			f: field,
-		}
-		decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
-			a.declareStateElement(),
-			a.declarepatchElement(),
-			If(a.refIsNotSet()).Block(
-				Return(Nil(), False(), False()),
-			),
-			If(Id("config").Dot("forceInclude")).Block(
-				a.declareRef(),
-				a.declareAnyContainer(),
-				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
-					a.v = valueType
-					return a.writeNonSliceTreeReferenceForceInclude()
-				}),
-			),
-			If(a.refWasCreated()).Block(
-				Id("config").Dot("forceInclude").Op("=").True(),
-				a.declareRef(),
-				a.declareAnyContainer(),
-				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
-					a.v = valueType
-					return a.writeNonSliceTreeReferenceRefCreated()
-				}),
-			),
-			If(a.refWasRemoved()).Block(
-				a.declareRef(),
-				a.declareAnyContainer(),
-				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
-					a.v = valueType
-					return a.writeNonSliceTreeReferenceRefRemoved()
-				}),
-			),
-			If(a.refHasBeenDefined()).Block(
-				If(a.refWasReplaced()).Block(
+		if field.HasAnyValue && !field.HasSliceValue {
+			a := assembleReferenceWriter{
+				f: field,
+			}
+			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
+				a.declareStateElement(),
+				a.declarepatchElement(),
+				If(a.refIsNotSet()).Block(
+					Return(Nil(), False(), False()),
+				),
+				If(Id("config").Dot("forceInclude")).Block(
 					a.declareRef(),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
-						return a.writeNonSliceTreeReferenceRefReplaced()
+						return a.writeTreeReferenceForceInclude()
 					}),
 				),
-			),
-			If(a.referencedElementGotUpdated()).Block(
+				If(a.refWasCreated()).Block(
+					Id("config").Dot("forceInclude").Op("=").True(),
+					a.declareRef(),
+					a.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						a.v = valueType
+						return a.writeNonSliceTreeReferenceRefCreated()
+					}),
+				),
+				If(a.refWasRemoved()).Block(
+					a.declareRef(),
+					a.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						a.v = valueType
+						return a.writeNonSliceTreeReferenceRefRemoved()
+					}),
+				),
+				If(a.refHasBeenReplaced()).Block(
+					If(a.refWasReplaced()).Block(
+						a.declareRef(),
+						a.declareAnyContainer(),
+						forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+							a.v = valueType
+							return a.writeNonSliceTreeReferenceRefReplaced()
+						}),
+					),
+				),
+				If(a.referencedElementGotUpdated()).Block(
+					a.declareRef(),
+					a.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						a.v = valueType
+						return a.writeNonSliceTreeReferenceRefElementUpdated()
+					}),
+				),
+				Return(Nil(), False(), False()),
+			)
+		}
+		if !field.HasAnyValue && !field.HasSliceValue {
+			a := assembleReferenceWriter{
+				f: field,
+				v: field.ValueType(),
+			}
+			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
+				a.declareStateElement(),
+				a.declarepatchElement(),
+				If(a.refIsNotSet()).Block(
+					Return(Nil(), False(), False()),
+				),
+				If(Id("config").Dot("forceInclude")).Block(
+					a.declareRef(),
+					a.writeTreeReferenceForceInclude(),
+				),
+				If(a.refWasCreated()).Block(
+					Id("config").Dot("forceInclude").Op("=").True(),
+					a.declareRef(),
+					a.writeNonSliceTreeReferenceRefCreated(),
+				),
+				If(a.refWasRemoved()).Block(
+					a.declareRef(),
+					a.writeNonSliceTreeReferenceRefRemoved(),
+				),
+				If(a.refHasBeenReplaced()).Block(
+					If(a.refWasReplaced()).Block(
+						a.declareRef(),
+						a.writeNonSliceTreeReferenceRefReplaced(),
+					),
+				),
+				If(a.referencedElementGotUpdated()).Block(
+					a.declareRef(),
+					a.writeNonSliceTreeReferenceRefElementUpdated(),
+				),
+				Return(Nil(), False(), False()),
+			)
+		}
+		if field.HasAnyValue && field.HasSliceValue {
+			a := assembleReferenceWriter{
+				f: field,
+			}
+			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
+				a.declareStateElement(),
+				a.declarepatchElement(),
+				If(a.refIsNotSet()).Block(
+					Return(Nil(), False(), False()),
+				),
+				If(Id("config").Dot("forceInclude")).Block(
+					a.declareRef(),
+					a.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						a.v = valueType
+						return a.writeTreeReferenceForceInclude()
+					}),
+				),
+				If(a.sliceRefHasUpdated()).Block(
+					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
+						Id("config").Dot("forceInclude").Op("=").True(),
+					),
+					a.declareRef(),
+					a.declareAnyContainer(),
+					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						a.v = valueType
+						return a.writeSliceTreeReferenceRefUpdated()
+					}),
+				),
 				a.declareRef(),
+				a.declareAnyContainer(),
+				If(Id("check").Op("==").Nil()).Block(
+					Id("check").Op("=").Id("newRecursionCheck").Call(),
+				),
 				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 					a.v = valueType
-					return a.writeNonSliceTreeReferenceRefElementUpdated()
+					return a.writeSliceTreeReferenceRefElementUpdated()
 				}),
-			),
-			Return(Nil(), False(), False()),
-		)
+				Return(Nil(), False(), False()),
+			)
+		}
+		if !field.HasAnyValue && field.HasSliceValue {
+			a := assembleReferenceWriter{
+				f: field,
+				v: field.ValueType(),
+			}
+			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
+				a.declareStateElement(),
+				a.declarepatchElement(),
+				If(a.refIsNotSet()).Block(
+					Return(Nil(), False(), False()),
+				),
+				If(Id("config").Dot("forceInclude")).Block(
+					a.declareRef(),
+					a.writeTreeReferenceForceInclude(),
+				),
+				If(a.sliceRefHasUpdated()).Block(
+					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
+						Id("config").Dot("forceInclude").Op("=").True(),
+					),
+					a.declareRef(),
+					a.writeNonSliceTreeReferenceRefCreated(),
+				),
+				a.declareRef(),
+				If(Id("check").Op("==").Nil()).Block(
+					Id("check").Op("=").Id("newRecursionCheck").Call(),
+				),
+				a.declareAnyContainer(),
+				a.writeSliceTreeReferenceRefElementUpdated(),
+				Return(Nil(), False(), False()),
+			)
+		}
 	})
 
 	decls.Render(s.buf)
