@@ -281,11 +281,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				f: field,
 			}
 			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
-				a.declareStateElement(),
-				a.declarepatchElement(),
-				If(a.refIsNotSet()).Block(
-					Return(Nil(), False(), False()),
-				),
 				If(Id("config").Dot("forceInclude")).Block(
 					a.declareRef(),
 					a.declareAnyContainer(),
@@ -298,7 +293,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 						Id("config").Dot("forceInclude").Op("=").True(),
 					),
-					a.declareRef(),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -324,11 +318,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				v: field.ValueType(),
 			}
 			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
-				a.declareStateElement(),
-				a.declarepatchElement(),
-				If(a.refIsNotSet()).Block(
-					Return(Nil(), False(), False()),
-				),
 				If(Id("config").Dot("forceInclude")).Block(
 					a.declareRef(),
 					a.writeTreeReferenceForceInclude(),
@@ -337,14 +326,12 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 						Id("config").Dot("forceInclude").Op("=").True(),
 					),
-					a.declareRef(),
-					a.writeNonSliceTreeReferenceRefCreated(),
+					a.writeSliceTreeReferenceRefUpdated(),
 				),
 				a.declareRef(),
 				If(Id("check").Op("==").Nil()).Block(
 					Id("check").Op("=").Id("newRecursionCheck").Call(),
 				),
-				a.declareAnyContainer(),
 				a.writeSliceTreeReferenceRefElementUpdated(),
 				Return(Nil(), False(), False()),
 			)
