@@ -68,6 +68,7 @@ func TestWritePath(t *testing.T) {
 			index_path_func,
 			equals_path_func,
 			toJSONPath_path_func,
+			pathIdentifierToString_func,
 		}, "\n"))
 
 		if expected != actual {

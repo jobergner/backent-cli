@@ -141,6 +141,35 @@ func (s *EngineFactory) writePath() *EngineFactory {
 		Return(Id("jsonPath")),
 	)
 
+	alreadyWrittenCheck := make(map[string]bool)
+
+	decls.File.Func().Id("pathIdentifierToString").Params(Id("identifier").Int()).String().Block(
+		Switch(Id("identifier")).Block(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				alreadyWritten := alreadyWrittenCheck[configType.Name]
+				alreadyWrittenCheck[configType.Name] = true
+				return &Statement{
+					onlyIf(!alreadyWritten, Case(Id(configType.Name+"Identifier")).Block(
+						Return(Lit(configType.Name)),
+					).Line()),
+					ForEachFieldInType(configType, func(field ast.Field) *Statement {
+						if alreadyWrittenCheck[field.Name] {
+							return Empty()
+						}
+						if field.ValueType().IsBasicType || field.HasPointerValue {
+							return Empty()
+						}
+						alreadyWrittenCheck[field.Name] = true
+						return Case(Id(field.Name + "Identifier")).Block(
+							Return(Lit(field.Name)),
+						)
+					}),
+				}
+			}),
+		),
+		Return(Lit("")),
+	)
+
 	decls.Render(s.buf)
 	return s
 }
