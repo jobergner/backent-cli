@@ -248,42 +248,60 @@ func (a assembleReferenceWriter) refIsNotSet() *Statement {
 	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0).Op("&&").Params(Id("!" + a.f.Parent.Name + "IsInPatch").Op("||").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0))
 }
 
-func (a assembleReferenceWriter) declareRef() *Statement {
-	if a.f.HasAnyValue {
-		return Id("ref").Op(":=").Id("engine").Dot(a.nextValueName()).Call(Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)))
+// non-slice gen force: ref := engine.playerTargetRef(patchPlayer.Target)
+// non-slice gen el upd:ref := engine.playerTargetRef(statePlayer.Target)
+// slice * : ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
+func (a assembleReferenceWriter) declareRef(useStateElement bool) *Statement {
+	if a.f.HasSliceValue {
+		return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id("refID")).Dot(a.f.ValueTypeName)
 	}
-	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id("refID")).Dot(a.f.ValueTypeName)
+	usedElement := "patch"
+	if useStateElement {
+		usedElement = "state"
+	}
+	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(usedElement + title(a.f.Parent.Name)).Dot(title(a.f.Name)))
 }
 
 func (a assembleReferenceWriter) declareAnyContainer() *Statement {
-	return Id("anyContainer").Dot(a.nextValueName()).Call(Id("ref").Dot(a.f.Name).Dot("ReferencedElementID"))
+	return Id("anyContainer").Op(":=").Id("engine").Dot(a.nextValueName()).Call(Id("ref").Dot(a.f.Name).Dot("ReferencedElementID"))
 }
 
-func (a assembleReferenceWriter) declareReferencedElement() *Statement {
+// slice non gen: referencedElement := engine.Player(ref.ReferencedElementID).player
+// slice gen: referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+// non-slice gen:referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+// non-slice non-gen: referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
+func (a assembleReferenceWriter) declareReferencedElement(usedInRefUpdated bool) *Statement {
 	if a.f.HasAnyValue {
 		return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))).Dot(a.v.Name)
 	}
-	return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("ref").Dot("ReferencedElementID")).Dot(a.v.Name)
+	if a.f.HasSliceValue {
+		usedRef := "ref"
+		if usedInRefUpdated {
+			usedRef = "patchRef"
+		}
+		return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id(usedRef).Dot("ReferencedElementID")).Dot(a.v.Name)
+	}
+	return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")).Dot(a.v.Name)
 }
 
-func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool, useContainer bool) *Statement {
+func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool, usedInReferencedElementUpdated bool) *Statement {
 	firstReturn := "_"
 	if declareElement {
 		firstReturn = "element"
 	}
 	usedID := Id("referencedElement").Dot("ID")
-	if a.f.HasSliceValue {
-		usedID = Id("ref").Dot("ReferencedElementID")
+	if usedInReferencedElementUpdated && !a.f.HasAnyValue {
+		usedID = Id("ref").Call(Id("ID"))
 	}
-	if useContainer {
+	if a.f.HasAnyValue {
 		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
 	}
 	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
-func (a assembleReferenceWriter) retrievePath(useContainer bool) *Statement {
+func (a assembleReferenceWriter) retrievePath(useRefID bool) *Statement {
 	usedID := Id("referencedElement").Dot("ID")
-	if useContainer {
+	if a.f.HasAnyValue && !useRefID {
 		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
 	}
 	return List(Id("path"), Id("_")).Op(":=").Id("engine").Dot("PathTrack").Dot(a.v.Name).Index(usedID)
@@ -344,7 +362,7 @@ func (a assembleReferenceWriter) referencedElementGotUpdated() *Statement {
 
 func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
+		a.declareReferencedElement(false).Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
@@ -359,7 +377,7 @@ func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefCreated() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
+		a.declareReferencedElement(false).Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
@@ -375,7 +393,7 @@ func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefCreated() *Stateme
 
 func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
+		a.declareReferencedElement(true).Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
@@ -395,7 +413,7 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement 
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefRemoved() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
+		a.declareReferencedElement(false).Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
@@ -410,7 +428,7 @@ func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefRemoved() *Stateme
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefReplaced() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
+		a.declareReferencedElement(false).Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),

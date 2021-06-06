@@ -194,7 +194,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					Return(Nil(), False(), False()),
 				),
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(),
+					a.declareRef(false),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -203,7 +203,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				),
 				If(a.refWasCreated()).Block(
 					Id("config").Dot("forceInclude").Op("=").True(),
-					a.declareRef(),
+					a.declareRef(false),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -211,7 +211,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					}),
 				),
 				If(a.refWasRemoved()).Block(
-					a.declareRef(),
+					a.declareRef(true),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -220,7 +220,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				),
 				If(a.refHasBeenReplaced()).Block(
 					If(a.refWasReplaced()).Block(
-						a.declareRef(),
+						a.declareRef(false),
 						a.declareAnyContainer(),
 						forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 							a.v = valueType
@@ -229,7 +229,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					),
 				),
 				If(a.referencedElementGotUpdated()).Block(
-					a.declareRef(),
+					a.declareRef(true),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -251,26 +251,26 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					Return(Nil(), False(), False()),
 				),
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(),
+					a.declareRef(false),
 					a.writeTreeReferenceForceInclude(),
 				),
 				If(a.refWasCreated()).Block(
 					Id("config").Dot("forceInclude").Op("=").True(),
-					a.declareRef(),
+					a.declareRef(false),
 					a.writeNonSliceTreeReferenceRefCreated(),
 				),
 				If(a.refWasRemoved()).Block(
-					a.declareRef(),
+					a.declareRef(true),
 					a.writeNonSliceTreeReferenceRefRemoved(),
 				),
 				If(a.refHasBeenReplaced()).Block(
 					If(a.refWasReplaced()).Block(
-						a.declareRef(),
+						a.declareRef(false),
 						a.writeNonSliceTreeReferenceRefReplaced(),
 					),
 				),
 				If(a.referencedElementGotUpdated()).Block(
-					a.declareRef(),
+					a.declareRef(true),
 					a.writeNonSliceTreeReferenceRefElementUpdated(),
 				),
 				Return(Nil(), False(), False()),
@@ -282,7 +282,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 			}
 			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(),
+					a.declareRef(false),
 					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -299,7 +299,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 						return a.writeSliceTreeReferenceRefUpdated()
 					}),
 				),
-				a.declareRef(),
+				a.declareRef(false),
 				a.declareAnyContainer(),
 				If(Id("check").Op("==").Nil()).Block(
 					Id("check").Op("=").Id("newRecursionCheck").Call(),
@@ -319,7 +319,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 			}
 			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(),
+					a.declareRef(false),
 					a.writeTreeReferenceForceInclude(),
 				),
 				If(a.sliceRefHasUpdated()).Block(
@@ -328,7 +328,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					),
 					a.writeSliceTreeReferenceRefUpdated(),
 				),
-				a.declareRef(),
+				a.declareRef(false),
 				If(Id("check").Op("==").Nil()).Block(
 					Id("check").Op("=").Id("newRecursionCheck").Call(),
 				),
