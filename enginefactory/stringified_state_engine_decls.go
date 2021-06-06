@@ -685,7 +685,7 @@ const assemblePlayerTargetRef_Engine_func string = `func (engine *Engine) assemb
 		}
 	}
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target == 0) {
-		ref := engine.playerTargetRef(patchPlayer.Target)
+		ref := engine.playerTargetRef(statePlayer.Target)
 		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
@@ -832,7 +832,7 @@ const assembleItemBoundToRef_Engine_func string = `func (engine *Engine) assembl
 			check = newRecursionCheck()
 		}
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
-			path, _ := engine.PathTrack.player[ref.itemBoundToRef.ReferencedElementID]
+			path, _ := engine.PathTrack.player[ref.ID()]
 			return &PlayerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 		}
 	}

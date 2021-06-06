@@ -554,7 +554,7 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 			check = newRecursionCheck()
 		}
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
-			path, _ := engine.PathTrack.player[ref.itemBoundToRef.ReferencedElementID]
+			path, _ := engine.PathTrack.player[ref.ID()]
 			return &PlayerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 		}
 	}
