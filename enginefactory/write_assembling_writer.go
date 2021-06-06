@@ -201,9 +201,26 @@ func (a assembleElement) assignIDFromAnyContainer(valueType *ast.ConfigType) *St
 	return Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name))
 }
 
+type referenceWriterMode int
+
+const (
+	referenceWriterModeForceInclude referenceWriterMode = iota
+	referenceWriterModeRefCreate
+	referenceWriterModeRefDelete
+	referenceWriterModeRefReplace
+	referenceWriterModeRefUpdate
+	referenceWriterModeElementModified
+)
+
 type assembleReferenceWriter struct {
-	f ast.Field
-	v *ast.ConfigType
+	f    ast.Field
+	v    *ast.ConfigType
+	mode referenceWriterMode
+}
+
+func (a *assembleReferenceWriter) setMode(mode referenceWriterMode) *Statement {
+	a.mode = mode
+	return Empty()
 }
 
 func (a assembleReferenceWriter) receiverParams() *Statement {
@@ -233,7 +250,11 @@ func (a assembleReferenceWriter) params() (*Statement, *Statement, *Statement) {
 }
 
 func (a assembleReferenceWriter) returns() (*Statement, *Statement, *Statement) {
-	return Id(title(a.nextValueName()) + "Reference"), Bool(), Bool()
+	optionalPointer := ""
+	if !a.f.HasSliceValue {
+		optionalPointer = "*"
+	}
+	return Id(optionalPointer + title(a.nextValueName()) + "Reference"), Bool(), Bool()
 }
 
 func (a assembleReferenceWriter) declareStateElement() *Statement {
@@ -251,12 +272,12 @@ func (a assembleReferenceWriter) refIsNotSet() *Statement {
 // non-slice gen force: ref := engine.playerTargetRef(patchPlayer.Target)
 // non-slice gen el upd:ref := engine.playerTargetRef(statePlayer.Target)
 // slice * : ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
-func (a assembleReferenceWriter) declareRef(useStateElement bool) *Statement {
+func (a assembleReferenceWriter) declareRef() *Statement {
 	if a.f.HasSliceValue {
 		return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id("refID")).Dot(a.f.ValueTypeName)
 	}
 	usedElement := "patch"
-	if useStateElement {
+	if !a.f.HasSliceValue && (a.mode == referenceWriterModeRefDelete || a.mode == referenceWriterModeElementModified) {
 		usedElement = "state"
 	}
 	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(usedElement + title(a.f.Parent.Name)).Dot(title(a.f.Name)))
@@ -265,11 +286,11 @@ func (a assembleReferenceWriter) declareRef(useStateElement bool) *Statement {
 // non-slice gen: engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
 // slice gen: 		engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
 // __ ref updated:engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID)
-func (a assembleReferenceWriter) declareAnyContainer(usedInSliceReferenceUpdated bool) *Statement {
+func (a assembleReferenceWriter) declareAnyContainer() *Statement {
 	usedID := Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")
 	if a.f.HasSliceValue {
 		usedID = Id("ref").Dot("ReferencedElementID")
-		if usedInSliceReferenceUpdated {
+		if a.mode == referenceWriterModeRefUpdate {
 			usedID = Id("patchRef").Dot("ReferencedElementID")
 		}
 	}
@@ -280,13 +301,13 @@ func (a assembleReferenceWriter) declareAnyContainer(usedInSliceReferenceUpdated
 // slice gen: referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 // non-slice gen:referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
 // non-slice non-gen: referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
-func (a assembleReferenceWriter) declareReferencedElement(usedInRefUpdated bool) *Statement {
+func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 	if a.f.HasAnyValue {
 		return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))).Dot(a.v.Name)
 	}
 	if a.f.HasSliceValue {
 		usedRef := "ref"
-		if usedInRefUpdated {
+		if a.mode == referenceWriterModeRefUpdate {
 			usedRef = "patchRef"
 		}
 		return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id(usedRef).Dot("ReferencedElementID")).Dot(a.v.Name)
@@ -301,13 +322,13 @@ func (a assembleReferenceWriter) declareReferencedElement(usedInRefUpdated bool)
 // slice non-gen:		  							 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 // __ on referenced element update:  engine.assembleItem(ref.ReferencedElementID, check
 
-func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool, usedInReferencedElementUpdated bool) *Statement {
+func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
 	firstReturn := "_"
-	if declareElement {
+	if a.mode == referenceWriterModeRefCreate || a.mode == referenceWriterModeRefUpdate {
 		firstReturn = "element"
 	}
 	usedID := Id("referencedElement").Dot("ID")
-	if usedInReferencedElementUpdated {
+	if a.mode == referenceWriterModeElementModified {
 		if a.f.HasAnyValue {
 			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
 		} else if !a.f.HasSliceValue {
@@ -319,9 +340,9 @@ func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool, 
 	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
-func (a assembleReferenceWriter) retrievePath(usedInReferencedElementUpdated bool) *Statement {
+func (a assembleReferenceWriter) retrievePath() *Statement {
 	usedID := Id("referencedElement").Dot("ID")
-	if usedInReferencedElementUpdated {
+	if a.mode == referenceWriterModeElementModified {
 		if a.f.HasAnyValue {
 			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
 		} else if !a.f.HasSliceValue {
@@ -333,37 +354,108 @@ func (a assembleReferenceWriter) retrievePath(usedInReferencedElementUpdated boo
 	return List(Id("path"), Id("_")).Op(":=").Id("engine").Dot("PathTrack").Dot(a.v.Name).Index(usedID)
 }
 
-func (a assembleReferenceWriter) defineReference(useElement bool, operationKind string, useContainer bool) *Statement {
+// non-slice gen force: ref.playerTargetRef.OperationKind
+//   "          create: OperationKindUpdate
+//							remove: OperationKindDelete
+//							replac: OperationKindUpdate
+//							   mod: OperationKindUnchanged
+// non-slice non-gen force: SAME
+// slice gen     force: ref.OperationKind
+//   "          update: patchRef.OperationKind
+//							   mod: OperationKindUnchanged
+// slice non-gen force: SAME
+
+func (a assembleReferenceWriter) defineReference() *Statement {
 	element := Nil()
-	if useElement {
-		element = Id("&Element")
+	if a.mode == referenceWriterModeRefCreate {
+		element = Id("&element")
 	}
-	operationKindStatement := Id("ref").Dot(a.f.Name).Dot("OperationKind")
-	if operationKind == "delete" {
+	if a.mode == referenceWriterModeRefUpdate {
+		element = Id("el")
+	}
+
+	operationKindStatement := Id("OperationKindUpdate")
+	if a.mode == referenceWriterModeForceInclude {
+		if a.f.HasSliceValue {
+			operationKindStatement = Id("ref").Dot("OperationKind")
+		} else {
+			operationKindStatement = Id("ref").Dot(a.f.ValueTypeName).Dot("OperationKind")
+		}
+	}
+	if a.mode == referenceWriterModeRefDelete {
 		operationKindStatement = Id("OperationKindDelete")
-	} else if operationKind == "update" {
-		operationKindStatement = Id("OperationKindUpdate")
 	}
+	if a.mode == referenceWriterModeElementModified {
+		operationKindStatement = Id("OperationKindUnchanged")
+	}
+	if a.mode == referenceWriterModeRefUpdate {
+		operationKindStatement = Id("patchRef").Dot("OperationKind")
+	}
+
 	usedID := Id("referencedElement").Dot("ID")
-	if useContainer {
-		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+	if a.mode == referenceWriterModeElementModified {
+		if a.f.HasAnyValue {
+			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+		} else if !a.f.HasSliceValue {
+			usedID = Id("ref").Dot("ID").Call()
+		}
+	}
+	if !a.f.HasAnyValue && a.f.HasSliceValue {
+		usedID = Id("ref").Dot("ReferencedElementID")
+	}
+	if a.mode == referenceWriterModeRefUpdate && !a.f.HasAnyValue {
+		usedID = Id("patchRef").Dot("ReferencedElementID")
+	}
+
+	if a.f.HasAnyValue {
+		usedID = Int().Call(usedID)
 	}
 	optionalShare := "&"
 	if a.f.HasSliceValue {
 		optionalShare = ""
 	}
+
+	dataStatus := Id("referencedDataStatus")
+	if a.mode == referenceWriterModeElementModified {
+		dataStatus = Id("ReferencedDataModified")
+	}
+
 	return Id(optionalShare+title(a.nextValueName())+"Reference").Values(
 		operationKindStatement,
-		Int().Call(usedID),
+		usedID,
 		Id("ElementKind"+title(a.v.Name)),
-		Id("referencedDataStatus"),
+		dataStatus,
 		Id("path").Dot("toJSONPath").Call(),
 		element,
 	)
 }
 
-func (a assembleReferenceWriter) dataHasUpdated() *Statement {
-	return Id("ref").Dot(a.f.ValueTypeName).Dot("OperationKind").Op("==").Id("OperationKindUpdate").Op("||").Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")
+// non-slice gen force: ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+//							 create: referencedDataStatus == ReferencedDataModified
+// 							 remove: -
+//							replace: -
+//									mod: true
+// non-slice non-gen: SAME
+// slice jen  force: ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+// 						update: patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+// slice non-jen: SAME
+func (a assembleReferenceWriter) hasUpdated() *Statement {
+	dataStatusIsModified := Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")
+	if a.mode == referenceWriterModeForceInclude {
+		if a.f.HasSliceValue {
+			return Id("ref").Dot("OperationKind").Op("==").Id("OperationKindUpdate").Op("||").Add(dataStatusIsModified)
+		} else {
+			return Id("ref").Dot(a.f.ValueTypeName).Dot("OperationKind").Op("==").Id("OperationKindUpdate").Op("||").Add(dataStatusIsModified)
+		}
+	}
+	if a.mode == referenceWriterModeRefUpdate {
+		return Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate").Op("||").Add(dataStatusIsModified)
+	}
+	if a.mode == referenceWriterModeElementModified {
+		return True()
+	}
+
+	return dataStatusIsModified
 }
 
 func (a assembleReferenceWriter) refWasCreated() *Statement {
@@ -386,44 +478,51 @@ func (a assembleReferenceWriter) referencedElementGotUpdated() *Statement {
 	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0)
 }
 
+func (a assembleReferenceWriter) finalReturn() *Statement {
+	if !a.f.HasSliceValue {
+		return Nil()
+	}
+	return Id(title(a.nextValueName()) + "Reference").Values()
+}
+
 func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
 	return &Statement{
-		a.declareReferencedElement(false).Line(),
+		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
-		If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath(false).Line(),
-		Return(a.defineReference(false, "", false), True(), a.dataHasUpdated()).Line(),
+		a.retrievePath().Line(),
+		Return(a.defineReference(), True(), a.hasUpdated()).Line(),
 	}
 }
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefCreated() *Statement {
 	return &Statement{
-		a.declareReferencedElement(false).Line(),
+		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
-		a.assembleReferencedElement(true, false).Line(),
+		a.assembleReferencedElement().Line(),
 		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath(false).Line(),
-		Return(a.defineReference(true, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+		a.retrievePath().Line(),
+		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
 func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement {
 	return &Statement{
-		a.declareReferencedElement(true).Line(),
+		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
-		a.assembleReferencedElement(true, false).Line(),
+		a.assembleReferencedElement().Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
 		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
@@ -432,38 +531,38 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement 
 		If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 			Id("el").Op("=").Id("&element"),
 		).Line(),
-		a.retrievePath(false).Line(),
-		Return(a.defineReference(true, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+		a.retrievePath().Line(),
+		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefRemoved() *Statement {
 	return &Statement{
-		a.declareReferencedElement(false).Line(),
+		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
-		If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath(false).Line(),
-		Return(a.defineReference(false, "delete", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+		a.retrievePath().Line(),
+		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefReplaced() *Statement {
 	return &Statement{
-		a.declareReferencedElement(false).Line(),
+		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
-		If(a.assembleReferencedElement(false, false), Id("hasUpdatedDownstream")).Block(
+		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath(false).Line(),
-		Return(a.defineReference(false, "update", false), True(), Id("referencedDataStatus").Op("==").Id("ReferencedDataModified")),
+		a.retrievePath().Line(),
+		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
@@ -472,18 +571,18 @@ func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefElementUpdated() *
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
-		If(a.assembleReferencedElement(false, true), Id("hasUpdatedDownstream")).Block(
-			a.retrievePath(true),
-			Return(a.defineReference(false, "update", true), True(), True()),
+		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
+			a.retrievePath(),
+			Return(a.defineReference(), True(), a.hasUpdated()),
 		),
 	}
 }
 
 func (a assembleReferenceWriter) writeSliceTreeReferenceRefElementUpdated() *Statement {
 	return &Statement{
-		If(a.assembleReferencedElement(false, true), Id("hasUpdatedDownstream")).Block(
-			a.retrievePath(true),
-			Return(a.defineReference(false, "update", true), True(), True()),
+		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
+			a.retrievePath(),
+			Return(a.defineReference(), True(), a.hasUpdated()),
 		),
 	}
 }

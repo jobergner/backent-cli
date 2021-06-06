@@ -194,49 +194,57 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					Return(Nil(), False(), False()),
 				),
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(false),
-					a.declareAnyContainer(false),
+					a.setMode(referenceWriterModeForceInclude),
+					a.declareRef(),
+					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
 						return a.writeTreeReferenceForceInclude()
 					}),
 				),
 				If(a.refWasCreated()).Block(
+					a.setMode(referenceWriterModeRefCreate),
 					Id("config").Dot("forceInclude").Op("=").True(),
-					a.declareRef(false),
-					a.declareAnyContainer(false),
+					a.declareRef(),
+					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
 						return a.writeNonSliceTreeReferenceRefCreated()
 					}),
 				),
 				If(a.refWasRemoved()).Block(
-					a.declareRef(true),
-					a.declareAnyContainer(false),
+					a.setMode(referenceWriterModeRefDelete),
+					a.declareRef(),
+					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
+						a.mode = referenceWriterModeRefDelete
 						return a.writeNonSliceTreeReferenceRefRemoved()
 					}),
 				),
 				If(a.refHasBeenReplaced()).Block(
+					a.setMode(referenceWriterModeRefReplace),
 					If(a.refWasReplaced()).Block(
-						a.declareRef(false),
-						a.declareAnyContainer(false),
+						a.declareRef(),
+						a.declareAnyContainer(),
 						forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 							a.v = valueType
+							a.mode = referenceWriterModeRefReplace
 							return a.writeNonSliceTreeReferenceRefReplaced()
 						}),
 					),
 				),
 				If(a.referencedElementGotUpdated()).Block(
-					a.declareRef(true),
-					a.declareAnyContainer(false),
+					a.setMode(referenceWriterModeElementModified),
+					a.declareRef(),
+					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
+						a.mode = referenceWriterModeElementModified
 						return a.writeNonSliceTreeReferenceRefElementUpdated()
 					}),
 				),
-				Return(Nil(), False(), False()),
+				Return(a.finalReturn(), False(), False()),
 			)
 		}
 		if !field.HasAnyValue && !field.HasSliceValue {
@@ -251,29 +259,34 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 					Return(Nil(), False(), False()),
 				),
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(false),
+					a.setMode(referenceWriterModeForceInclude),
+					a.declareRef(),
 					a.writeTreeReferenceForceInclude(),
 				),
 				If(a.refWasCreated()).Block(
+					a.setMode(referenceWriterModeRefCreate),
 					Id("config").Dot("forceInclude").Op("=").True(),
-					a.declareRef(false),
+					a.declareRef(),
 					a.writeNonSliceTreeReferenceRefCreated(),
 				),
 				If(a.refWasRemoved()).Block(
-					a.declareRef(true),
+					a.setMode(referenceWriterModeRefDelete),
+					a.declareRef(),
 					a.writeNonSliceTreeReferenceRefRemoved(),
 				),
 				If(a.refHasBeenReplaced()).Block(
+					a.setMode(referenceWriterModeRefReplace),
 					If(a.refWasReplaced()).Block(
-						a.declareRef(false),
+						a.declareRef(),
 						a.writeNonSliceTreeReferenceRefReplaced(),
 					),
 				),
 				If(a.referencedElementGotUpdated()).Block(
-					a.declareRef(true),
+					a.setMode(referenceWriterModeElementModified),
+					a.declareRef(),
 					a.writeNonSliceTreeReferenceRefElementUpdated(),
 				),
-				Return(Nil(), False(), False()),
+				Return(a.finalReturn(), False(), False()),
 			)
 		}
 		if field.HasAnyValue && field.HasSliceValue {
@@ -282,34 +295,36 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 			}
 			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(false),
-					a.declareAnyContainer(false),
+					a.setMode(referenceWriterModeForceInclude),
+					a.declareRef(),
+					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
 						return a.writeTreeReferenceForceInclude()
 					}),
 				),
 				If(a.sliceRefHasUpdated()).Block(
+					a.setMode(referenceWriterModeRefUpdate),
 					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 						Id("config").Dot("forceInclude").Op("=").True(),
 					),
-					a.declareAnyContainer(true),
+					a.declareAnyContainer(),
 					forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
 						return a.writeSliceTreeReferenceRefUpdated()
 					}),
 				),
-				a.declareRef(false),
-				a.declareAnyContainer(false),
+				a.setMode(referenceWriterModeElementModified),
+				a.declareRef(),
 				If(Id("check").Op("==").Nil()).Block(
 					Id("check").Op("=").Id("newRecursionCheck").Call(),
 				),
-				a.declareAnyContainer(false),
+				a.declareAnyContainer(),
 				forEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 					a.v = valueType
 					return a.writeSliceTreeReferenceRefElementUpdated()
 				}),
-				Return(Nil(), False(), False()),
+				Return(a.finalReturn(), False(), False()),
 			)
 		}
 		if !field.HasAnyValue && field.HasSliceValue {
@@ -319,21 +334,24 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 			}
 			decls.File.Func().Params(a.receiverParams()).Id("assemble"+title(field.ValueTypeName)).Params(a.params()).Params(a.returns()).Block(
 				If(Id("config").Dot("forceInclude")).Block(
-					a.declareRef(false),
+					a.setMode(referenceWriterModeForceInclude),
+					a.declareRef(),
 					a.writeTreeReferenceForceInclude(),
 				),
 				If(a.sliceRefHasUpdated()).Block(
+					a.setMode(referenceWriterModeRefUpdate),
 					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 						Id("config").Dot("forceInclude").Op("=").True(),
 					),
 					a.writeSliceTreeReferenceRefUpdated(),
 				),
-				a.declareRef(false),
+				a.setMode(referenceWriterModeElementModified),
+				a.declareRef(),
 				If(Id("check").Op("==").Nil()).Block(
 					Id("check").Op("=").Id("newRecursionCheck").Call(),
 				),
 				a.writeSliceTreeReferenceRefElementUpdated(),
-				Return(Nil(), False(), False()),
+				Return(a.finalReturn(), False(), False()),
 			)
 		}
 	})
