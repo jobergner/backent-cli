@@ -87,6 +87,20 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 
 	})
 
+	s.config.RangeAnyFields(func(field ast.Field) {
+		if !field.HasPointerValue {
+			return
+		}
+		decls.File.Type().Id(title(anyNameByField(field))+"Reference").Struct(
+			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
+			Id("ElementID").Int().Id(fieldTag("id")).Line(),
+			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
+			Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(fieldTag("referencedDataStatus")).Line(),
+			Id("ElementPath").Id("string").Id(fieldTag("elementPath")).Line(),
+			Id("Element").Interface().Id(fieldTag("element")).Line(),
+		)
+	})
+
 	decls.Render(s.buf)
 	return s
 }
