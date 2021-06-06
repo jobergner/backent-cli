@@ -55,6 +55,7 @@ func TestWriteTree(t *testing.T) {
 			_ZoneReference_type,
 			_ZoneItem_type,
 			_ZoneItemReference_type,
+			_AnyOfPlayerZoneItemReference_type,
 		}, "\n"))
 
 		if expected != actual {
