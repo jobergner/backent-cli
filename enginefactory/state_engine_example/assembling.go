@@ -390,7 +390,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 
 	// ref was definitely removed
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target == 0) {
-		ref := engine.playerTargetRef(patchPlayer.Target)
+		ref := engine.playerTargetRef(statePlayer.Target)
 		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
