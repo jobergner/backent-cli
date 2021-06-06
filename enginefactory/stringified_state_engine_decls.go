@@ -2667,26 +2667,26 @@ const toJSONPath_path_func string = `func (p path) toJSONPath() string {
 
 const pathIdentifierToString_func string = `func pathIdentifierToString(identifier int) string {
 	switch identifier {
-	case itemsIdentifier:
-		return "items"
+	case equipmentSetIdentifier:
+		return "equipmentSet"
 	case gearScoreIdentifier:
 		return "gearScore"
-	case positionIdentifier:
-		return "position"
-	case playersIdentifier:
-		return "players"
-	case interactablesIdentifier:
-		return "interactables"
 	case itemIdentifier:
 		return "item"
 	case originIdentifier:
 		return "origin"
-	case equipmentSetIdentifier:
-		return "equipmentSet"
 	case playerIdentifier:
 		return "player"
+	case itemsIdentifier:
+		return "items"
+	case positionIdentifier:
+		return "position"
 	case zoneIdentifier:
 		return "zone"
+	case interactablesIdentifier:
+		return "interactables"
+	case playersIdentifier:
+		return "players"
 	case zoneItemIdentifier:
 		return "zoneItem"
 	}
