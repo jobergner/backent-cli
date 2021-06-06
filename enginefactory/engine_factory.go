@@ -74,24 +74,37 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
 	s := newStateFactory(config).
 		writePackageName().
-		writeOperationKind().
-		writeIDs().
-		writeState().
-		writeEngine().
-		writeGenerateID().
-		writeUpdateState().
-		writeElements().
 		writeAdders().
+		writeAny().
+		writeAssembleTree().
+		writeAssembleTreeElement().
+		writeAssembleTreeReference().
 		writeCreators().
 		writeDeleters().
 		writeGetters().
+		writeDeduplicate().
+		writeAllIDsMethod().
+		writeMergeIDs().
+		writePathTrack().
+		writeIdentifiers().
+		writePathSegments().
+		writePath().
+		writeReference().
+		writeDereference().
 		writeRemovers().
 		writeSetters().
+		writeIDs().
+		writeState().
+		writeElements().
+		writeOperationKind().
+		writeEngine().
+		writeGenerateID().
+		writeUpdateState().
+		writeReferencedDataStatus().
+		writeElementKinds().
 		writeTree().
 		writeTreeElements().
-		writeAssembleTree().
-		writeAssembleTreeElement().
-		writeDeduplicate()
+		writeWalkElement()
 
 	err := s.format()
 	if err != nil {
