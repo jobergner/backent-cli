@@ -83,3 +83,23 @@ func (e treeElementWriter) name() string {
 func (e treeElementWriter) idType() string {
 	return title(e.t.Name) + "ID"
 }
+
+type recursionCheckWriter struct {
+	typeName func() string
+}
+
+func (r recursionCheckWriter) fieldName() string {
+	return r.typeName()
+}
+
+func (r recursionCheckWriter) mapKey() *Statement {
+	return Id(title(r.typeName()) + "ID")
+}
+
+func (r recursionCheckWriter) mapValue() string {
+	return r.typeName() + "Core"
+}
+
+func (r recursionCheckWriter) fieldTag() string {
+	return "`json:\"" + r.typeName() + "\"`"
+}

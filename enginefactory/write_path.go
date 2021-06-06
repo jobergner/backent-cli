@@ -127,6 +127,20 @@ func (s *EngineFactory) writePath() *EngineFactory {
 		Return(True()),
 	)
 
+	decls.File.Func().Params(Id("p").Id("path")).Id("toJSONPath").Params().String().Block(
+		Id("jsonPath").Op(":=").Lit("$"),
+		For(List(Id("i"), Id("seg")).Op(":=").Range().Id("p")).Block(
+			If(Id("seg").Op("<").Lit(0)).Block(
+				Id("jsonPath").Op("+=").Lit(".").Op("+").Id("pathIdentifierToString").Call(Id("seg")),
+			).Else().If(Id("i").Op("==").Lit(1)).Block(
+				Id("jsonPath").Op("+=").Lit(".").Op("+").Id("strconv").Dot("Itoa").Call(Id("seg")),
+			).Else().Block(
+				Id("jsonPath").Op("+=").Lit("[").Op("+").Id("strconv").Dot("Itoa").Call(Id("seg")).Op("+").Lit("]"),
+			),
+		),
+		Return(Id("jsonPath")),
+	)
+
 	decls.Render(s.buf)
 	return s
 }

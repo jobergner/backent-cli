@@ -90,3 +90,37 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 	decls.Render(s.buf)
 	return s
 }
+
+func (s *EngineFactory) writeRecursionCheck() *EngineFactory {
+	decls := NewDeclSet()
+
+	decls.File.Type().Id("recursionCheck").Struct(
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			r := recursionCheckWriter{
+				typeName: func() string {
+					return configType.Name
+				},
+			}
+
+			return Id(r.fieldName()).Map(r.mapKey()).Bool().Line()
+		}),
+	)
+
+	decls.File.Func().Id("newRecursionCheck").Params().Id("*recursionCheck").Block(
+		Return(Id("&recursionCheck").Block(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+
+				r := recursionCheckWriter{
+					typeName: func() string {
+						return configType.Name
+					},
+				}
+
+				return Id(r.fieldName()).Id(":").Make(Map(r.mapKey()).Bool()).Id(",")
+			}),
+		)),
+	)
+
+	decls.Render(s.buf)
+	return s
+}

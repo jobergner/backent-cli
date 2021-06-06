@@ -104,6 +104,7 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 		writeElementKinds().
 		writeTree().
 		writeTreeElements().
+		writeRecursionCheck().
 		writeWalkElement()
 
 	err := s.format()
