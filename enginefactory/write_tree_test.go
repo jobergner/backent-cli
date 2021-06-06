@@ -75,4 +75,18 @@ func TestWriteTree(t *testing.T) {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
+	t.Run("writes recursionCheck", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeRecursionCheck()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			recursionCheck_type,
+			newRecursionCheck_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 }
