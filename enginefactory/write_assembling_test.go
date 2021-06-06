@@ -13,6 +13,7 @@ func TestWriteAssembling(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
+			assembleConfig_type,
 			assembleTree_Engine_func,
 		}, "\n"))
 

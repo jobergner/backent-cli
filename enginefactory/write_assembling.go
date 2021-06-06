@@ -11,6 +11,10 @@ import (
 func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 	decls := NewDeclSet()
 
+	decls.File.Type().Id("assembleConfig").Struct(
+		Id("forceInclude").Bool(),
+	)
+
 	a := assembleTreeWriter{}
 
 	decls.File.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
