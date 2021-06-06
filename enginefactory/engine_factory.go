@@ -74,6 +74,7 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
 	s := newStateFactory(config).
 		writePackageName().
+		writeImports().
 		writeAdders().
 		writeAny().
 		writeAssembleTree().
@@ -118,6 +119,11 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 
 func (s *EngineFactory) writePackageName() *EngineFactory {
 	s.buf.WriteString("package state\n")
+	return s
+}
+
+func (s *EngineFactory) writeImports() *EngineFactory {
+	s.buf.WriteString("import \"strconv\"\n")
 	return s
 }
 
