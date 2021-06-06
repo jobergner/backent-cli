@@ -262,8 +262,18 @@ func (a assembleReferenceWriter) declareRef(useStateElement bool) *Statement {
 	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(usedElement + title(a.f.Parent.Name)).Dot(title(a.f.Name)))
 }
 
-func (a assembleReferenceWriter) declareAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id("engine").Dot(a.nextValueName()).Call(Id("ref").Dot(a.f.Name).Dot("ReferencedElementID"))
+// non-slice gen: engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+// slice gen: 		engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
+// __ ref updated:engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID)
+func (a assembleReferenceWriter) declareAnyContainer(usedInSliceReferenceUpdated bool) *Statement {
+	usedID := Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")
+	if a.f.HasSliceValue {
+		usedID = Id("ref").Dot("ReferencedElementID")
+		if usedInSliceReferenceUpdated {
+			usedID = Id("patchRef").Dot("ReferencedElementID")
+		}
+	}
+	return Id("anyContainer").Op(":=").Id("engine").Dot(a.nextValueName()).Call(usedID)
 }
 
 // slice non gen: referencedElement := engine.Player(ref.ReferencedElementID).player
@@ -284,25 +294,41 @@ func (a assembleReferenceWriter) declareReferencedElement(usedInRefUpdated bool)
 	return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")).Dot(a.v.Name)
 }
 
+// non-slice gen: 									 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+// __ on referenced element update:  engine.assembleZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem, check,
+// non-slice non-gen:  							 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+// __ on referenced element update:  engine.assembleZoneItem(ref.ID(), check,
+// slice non-gen:		  							 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+// __ on referenced element update:  engine.assembleItem(ref.ReferencedElementID, check
+
 func (a assembleReferenceWriter) assembleReferencedElement(declareElement bool, usedInReferencedElementUpdated bool) *Statement {
 	firstReturn := "_"
 	if declareElement {
 		firstReturn = "element"
 	}
 	usedID := Id("referencedElement").Dot("ID")
-	if usedInReferencedElementUpdated && !a.f.HasAnyValue {
-		usedID = Id("ref").Call(Id("ID"))
-	}
-	if a.f.HasAnyValue {
-		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+	if usedInReferencedElementUpdated {
+		if a.f.HasAnyValue {
+			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+		} else if !a.f.HasSliceValue {
+			usedID = Id("ref").Dot("ID").Call()
+		} else {
+			usedID = Id("ref").Dot("ReferencedElementID")
+		}
 	}
 	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
-func (a assembleReferenceWriter) retrievePath(useRefID bool) *Statement {
+func (a assembleReferenceWriter) retrievePath(usedInReferencedElementUpdated bool) *Statement {
 	usedID := Id("referencedElement").Dot("ID")
-	if a.f.HasAnyValue && !useRefID {
-		usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+	if usedInReferencedElementUpdated {
+		if a.f.HasAnyValue {
+			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+		} else if !a.f.HasSliceValue {
+			usedID = Id("ref").Dot("ID").Call()
+		} else {
+			usedID = Id("ref").Dot("ReferencedElementID")
+		}
 	}
 	return List(Id("path"), Id("_")).Op(":=").Id("engine").Dot("PathTrack").Dot(a.v.Name).Index(usedID)
 }
