@@ -16,8 +16,8 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 		}
 
 		decls.File.Func().Params(w.receiverParams()).Id(w.name()).Params(w.params()).Block(
-			onlyIf(!configType.IsRootType, w.getElement()),
-			onlyIf(!configType.IsRootType, If(w.hasParent()).Block(
+			OnlyIf(!configType.IsRootType, w.getElement()),
+			OnlyIf(!configType.IsRootType, If(w.hasParent()).Block(
 				Return(),
 			)),
 			w.deleteElement(),
@@ -62,7 +62,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 
 		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 			d.getElement(),
-			onlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
+			OnlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
 				d.updateElementInPatch(),

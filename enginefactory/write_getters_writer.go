@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -20,7 +21,7 @@ func (t typeGetterWriter) idParam() string {
 }
 
 func (t typeGetterWriter) params() *Statement {
-	return Id(t.idParam()).Id(title(t.typeName()) + "ID")
+	return Id(t.idParam()).Id(Title(t.typeName()) + "ID")
 }
 
 func (t typeGetterWriter) returns() string {
@@ -28,19 +29,19 @@ func (t typeGetterWriter) returns() string {
 }
 
 func (t typeGetterWriter) definePatchingElement() *Statement {
-	return List(Id("patching"+title(t.typeName())), Id("ok")).Op(":=").Id("engine").Dot("Patch").Dot(title(t.typeName())).Index(Id(t.idParam()))
+	return List(Id("patching"+Title(t.typeName())), Id("ok")).Op(":=").Id("engine").Dot("Patch").Dot(Title(t.typeName())).Index(Id(t.idParam()))
 }
 
 func (t typeGetterWriter) earlyReturnPatching() *Statement {
-	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("patching" + title(t.typeName()))})
+	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("patching" + Title(t.typeName()))})
 }
 
 func (t typeGetterWriter) defineCurrentElement() *Statement {
-	return List(Id("current"+title(t.typeName())), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(title(t.typeName())).Index(Id(t.idParam()))
+	return List(Id("current"+Title(t.typeName())), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(Title(t.typeName())).Index(Id(t.idParam()))
 }
 
 func (t typeGetterWriter) earlyReturnCurrent() *Statement {
-	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("current" + title(t.typeName()))})
+	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("current" + Title(t.typeName()))})
 }
 
 func (t typeGetterWriter) finalReturn() *Statement {
@@ -83,7 +84,7 @@ func (f fieldGetter) receiverParams() *Statement {
 }
 
 func (f fieldGetter) name() string {
-	return title(f.f.Name)
+	return Title(f.f.Name)
 }
 
 func (f fieldGetter) returnedType() string {
@@ -92,7 +93,7 @@ func (f fieldGetter) returnedType() string {
 		return f.f.ValueType().Name
 	}
 	if f.f.HasPointerValue {
-		return f.f.Parent.Name + title(pluralizeClient.Singular(f.f.Name)) + "Ref"
+		return f.f.Parent.Name + Title(Singular(f.f.Name)) + "Ref"
 	}
 	if f.f.HasAnyValue {
 		return anyNameByField(f.f)
@@ -111,7 +112,7 @@ func (f fieldGetter) returns() string {
 }
 
 func (f fieldGetter) reassignElement() *Statement {
-	return Id(f.t.Name).Op(":=").Id(f.receiverName()).Dot(f.t.Name).Dot("engine").Dot(title(f.t.Name)).Call(Id(f.receiverName()).Dot(f.t.Name).Dot("ID"))
+	return Id(f.t.Name).Op(":=").Id(f.receiverName()).Dot(f.t.Name).Dot("engine").Dot(Title(f.t.Name)).Call(Id(f.receiverName()).Dot(f.t.Name).Dot("ID"))
 }
 
 func (f fieldGetter) declareSliceOfElements() *Statement {
@@ -137,7 +138,7 @@ func (f fieldGetter) loopedElementIdentifier() string {
 
 func (f fieldGetter) loopConditions() *Statement {
 	identifier := f.loopedElementIdentifier()
-	return List(Id("_"), Id(identifier)).Op(":=").Range().Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name))
+	return List(Id("_"), Id(identifier)).Op(":=").Range().Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))
 }
 
 func (f fieldGetter) appendedItem() *Statement {
@@ -146,7 +147,7 @@ func (f fieldGetter) appendedItem() *Statement {
 	}
 	returnedType := f.returnedType()
 	if !f.f.HasPointerValue && !f.f.HasAnyValue {
-		returnedType = title(returnedType)
+		returnedType = Title(returnedType)
 	}
 	return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(returnedType).Call(Id(f.loopedElementIdentifier()))
 }
@@ -160,19 +161,19 @@ func (f fieldGetter) returnSliceOfType() *Statement {
 }
 
 func (f fieldGetter) returnBasicType() *Statement {
-	return Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name))
+	return Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))
 }
 
 func (f fieldGetter) returnNamedType() *Statement {
 	engine := Id(f.t.Name).Dot(f.t.Name).Dot("engine")
 	if f.f.HasPointerValue {
-		return engine.Dot(f.returnedType()).Call(Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name))).Id(",").Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name)).Op("!=").Lit(0)
+		return engine.Dot(f.returnedType()).Call(Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))).Id(",").Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name)).Op("!=").Lit(0)
 	}
 	returnedType := f.returnedType()
 	if !f.f.HasAnyValue {
-		returnedType = title(returnedType)
+		returnedType = Title(returnedType)
 	}
-	return engine.Dot(returnedType).Call(Id(f.t.Name).Dot(f.t.Name).Dot(title(f.f.Name)))
+	return engine.Dot(returnedType).Call(Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name)))
 }
 
 func (f fieldGetter) returnSingleType() *Statement {

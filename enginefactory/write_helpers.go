@@ -62,7 +62,7 @@ func (s *EngineFactory) writeMergeIDs() *EngineFactory {
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		m := mergeIDsWriter{
 			idType: func() string {
-				return title(configType.Name) + "ID"
+				return Title(configType.Name) + "ID"
 			},
 		}
 
@@ -72,7 +72,7 @@ func (s *EngineFactory) writeMergeIDs() *EngineFactory {
 	s.config.RangeRefFields(func(field ast.Field) {
 		m := mergeIDsWriter{
 			idType: func() string {
-				return title(field.ValueTypeName) + "ID"
+				return Title(field.ValueTypeName) + "ID"
 			},
 		}
 
@@ -82,7 +82,7 @@ func (s *EngineFactory) writeMergeIDs() *EngineFactory {
 	s.config.RangeAnyFields(func(field ast.Field) {
 		m := mergeIDsWriter{
 			idType: func() string {
-				return title(anyNameByField(field)) + "ID"
+				return Title(anyNameByField(field)) + "ID"
 			},
 		}
 

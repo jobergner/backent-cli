@@ -10,16 +10,16 @@ import (
 func (s *EngineFactory) writeIDs() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
-		decls.File.Type().Id(title(configType.Name) + "ID").Int()
+		decls.File.Type().Id(Title(configType.Name) + "ID").Int()
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		decls.File.Type().Id(title(field.ValueTypeName) + "ID").Int()
+		decls.File.Type().Id(Title(field.ValueTypeName) + "ID").Int()
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
 
-		decls.File.Type().Id(title(anyNameByField(field)) + "ID").Int()
+		decls.File.Type().Id(Title(anyNameByField(field)) + "ID").Int()
 	})
 
 	decls.Render(s.buf)
@@ -112,7 +112,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
 			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
-			onlyIf(!configType.IsRootType, Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line()),
+			OnlyIf(!configType.IsRootType, Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line()),
 			Id("engine").Id("*Engine").Line(),
 		)
 
@@ -127,9 +127,9 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 		}
 
 		decls.File.Type().Id(field.ValueTypeName+"Core").Struct(
-			Id("ID").Id(title(field.ValueTypeName)+"ID").Id(fieldTag("id")).Line(),
-			Id("ParentID").Id(title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
-			Id("ReferencedElementID").Id(title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
+			Id("ID").Id(Title(field.ValueTypeName)+"ID").Id(fieldTag("id")).Line(),
+			Id("ParentID").Id(Title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
+			Id("ReferencedElementID").Id(Title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("engine").Id("*Engine").Line(),
 		)
@@ -138,10 +138,10 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 
 	s.config.RangeAnyFields(func(field ast.Field) {
 		decls.File.Type().Id(anyNameByField(field)+"Core").Struct(
-			Id("ID").Id(title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
+			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
 			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
-				return Id(title(configType.Name)).Id(title(configType.Name) + "ID").Id(fieldTag(configType.Name)).Line()
+				return Id(Title(configType.Name)).Id(Title(configType.Name) + "ID").Id(fieldTag(configType.Name)).Line()
 			}),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("engine").Id("*Engine").Line(),

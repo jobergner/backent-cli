@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -11,15 +12,15 @@ type treeWriter struct {
 }
 
 func (s treeWriter) fieldName() string {
-	return title(s.t.Name)
+	return Title(s.t.Name)
 }
 
 func (s treeWriter) mapKey() *Statement {
-	return Id(title(s.t.Name) + "ID")
+	return Id(Title(s.t.Name) + "ID")
 }
 
 func (s treeWriter) mapValue() string {
-	return title(s.t.Name)
+	return Title(s.t.Name)
 }
 
 func (s treeWriter) fieldTag() string {
@@ -46,13 +47,13 @@ func (e treeElementWriter) fieldValue() string {
 		typeName = e.f.ValueTypeName
 	} else if e.f.HasPointerValue {
 		if e.f.HasAnyValue {
-			typeName = title(anyNameByField(*e.f))
+			typeName = Title(anyNameByField(*e.f))
 		} else {
-			typeName = title(e.f.ValueType().Name)
+			typeName = Title(e.f.ValueType().Name)
 		}
 		typeName = typeName + "Reference"
 	} else {
-		typeName = title(e.f.ValueTypeName)
+		typeName = Title(e.f.ValueTypeName)
 	}
 
 	if e.f.HasSliceValue {
@@ -73,15 +74,15 @@ func (e treeElementWriter) metaFieldTag(name string) string {
 }
 
 func (e treeElementWriter) fieldName() string {
-	return title(e.f.Name)
+	return Title(e.f.Name)
 }
 
 func (e treeElementWriter) name() string {
-	return title(e.t.Name)
+	return Title(e.t.Name)
 }
 
 func (e treeElementWriter) idType() string {
-	return title(e.t.Name) + "ID"
+	return Title(e.t.Name) + "ID"
 }
 
 type recursionCheckWriter struct {
@@ -93,7 +94,7 @@ func (r recursionCheckWriter) fieldName() string {
 }
 
 func (r recursionCheckWriter) mapKey() *Statement {
-	return Id(title(r.typeName()) + "ID")
+	return Id(Title(r.typeName()) + "ID")
 }
 
 func (r recursionCheckWriter) mapValue() string {

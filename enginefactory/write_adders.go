@@ -29,19 +29,19 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 					If(a.isOperationKindDelete()).Block(
 						Return(a.returnDeletedElement()),
 					),
-					onlyIf(field.HasPointerValue, If(a.referencedElementDoesntExist()).Block(
+					OnlyIf(field.HasPointerValue, If(a.referencedElementDoesntExist()).Block(
 						Return(),
 					)),
-					onlyIf(!valueType.IsBasicType && !field.HasPointerValue, a.createNewElement()),
-					onlyIf(field.HasAnyValue, &Statement{
+					OnlyIf(!valueType.IsBasicType && !field.HasPointerValue, a.createNewElement()),
+					OnlyIf(field.HasAnyValue, &Statement{
 						a.createAnyContainer().Line(),
 						a.setAnyContainer(),
 					}),
-					onlyIf(field.HasPointerValue, a.createRef()),
+					OnlyIf(field.HasPointerValue, a.createRef()),
 					a.appendElement(),
 					a.setOperationKindUpdate(),
 					a.updateElementInPatch(),
-					onlyIf(!valueType.IsBasicType && !field.HasPointerValue, Return(Id(valueType.Name))),
+					OnlyIf(!valueType.IsBasicType && !field.HasPointerValue, Return(Id(valueType.Name))),
 				)
 			})
 

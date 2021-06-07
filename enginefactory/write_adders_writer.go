@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -19,12 +20,12 @@ func (a adderWriter) receiverParams() *Statement {
 func (a adderWriter) name() string {
 	var optionalSuffix string
 	if len(a.f.ValueTypes) > 1 {
-		optionalSuffix = title(a.v.Name)
+		optionalSuffix = Title(a.v.Name)
 	}
 	if a.f.ValueType().IsBasicType {
-		return "Add" + title(a.f.Name)
+		return "Add" + Title(a.f.Name)
 	}
-	return "Add" + title(pluralizeClient.Singular(a.f.Name)) + optionalSuffix
+	return "Add" + Title(Singular(a.f.Name)) + optionalSuffix
 }
 
 func (a adderWriter) idParam() string {
@@ -36,7 +37,7 @@ func (a adderWriter) params() *Statement {
 		return Id(a.f.Name).Id("..." + a.f.ValueType().Name)
 	}
 	if a.f.HasPointerValue {
-		return Id(a.idParam()).Id(title(a.v.Name) + "ID")
+		return Id(a.idParam()).Id(Title(a.v.Name) + "ID")
 	}
 	return Empty()
 }
@@ -49,7 +50,7 @@ func (a adderWriter) returns() string {
 }
 
 func (a adderWriter) reassignElement() *Statement {
-	return Id(a.t.Name).Op(":=").Id(a.receiverName()).Dot(a.t.Name).Dot("engine").Dot(title(a.t.Name)).Call(Id(a.receiverName()).Dot(a.t.Name).Dot("ID"))
+	return Id(a.t.Name).Op(":=").Id(a.receiverName()).Dot(a.t.Name).Dot("engine").Dot(Title(a.t.Name)).Call(Id(a.receiverName()).Dot(a.t.Name).Dot("ID"))
 }
 
 func (a adderWriter) isOperationKindDelete() *Statement {
@@ -57,7 +58,7 @@ func (a adderWriter) isOperationKindDelete() *Statement {
 }
 
 func (a adderWriter) referencedElementDoesntExist() *Statement {
-	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(title(a.v.Name)).Call(Id(a.idParam())).Dot(a.v.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
+	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(Title(a.v.Name)).Call(Id(a.idParam())).Dot(a.v.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
 func (a adderWriter) returnDeletedElement() *Statement {
@@ -71,15 +72,15 @@ func (a adderWriter) returnDeletedElement() *Statement {
 }
 
 func (a adderWriter) createNewElement() *Statement {
-	return Id(a.v.Name).Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + title(a.v.Name)).Call(True())
+	return Id(a.v.Name).Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + Title(a.v.Name)).Call(True())
 }
 
 func (a adderWriter) createAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + title(anyNameByField(a.f))).Call(False()).Dot(anyNameByField(a.f))
+	return Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + Title(anyNameByField(a.f))).Call(False()).Dot(anyNameByField(a.f))
 }
 
 func (a adderWriter) setAnyContainer() *Statement {
-	statement := Id("anyContainer").Dot("set" + title(a.v.Name))
+	statement := Id("anyContainer").Dot("set" + Title(a.v.Name))
 	if a.f.HasPointerValue {
 		return statement.Call(Id(a.idParam()))
 	}
@@ -87,7 +88,7 @@ func (a adderWriter) setAnyContainer() *Statement {
 }
 
 func (a adderWriter) createRef() *Statement {
-	statement := Id("ref").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + title(a.f.ValueTypeName))
+	statement := Id("ref").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + Title(a.f.ValueTypeName))
 
 	if a.f.HasAnyValue {
 		return statement.Call(Id("anyContainer").Dot("ID"), Id(a.t.Name).Dot(a.t.Name).Dot("ID"))
@@ -111,8 +112,8 @@ func (a adderWriter) appendElement() *Statement {
 		}
 	}
 
-	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)).Op("=").Append(
-		Id(a.t.Name).Dot(a.t.Name).Dot(title(a.f.Name)),
+	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(Title(a.f.Name)).Op("=").Append(
+		Id(a.t.Name).Dot(a.t.Name).Dot(Title(a.f.Name)),
 		toAppend,
 	)
 
@@ -124,7 +125,7 @@ func (a adderWriter) setOperationKindUpdate() *Statement {
 }
 
 func (a adderWriter) updateElementInPatch() *Statement {
-	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("Patch").Dot(title(a.t.Name)).Index(a.elementID()).Op("=").Id(a.t.Name).Dot(a.t.Name)
+	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("Patch").Dot(Title(a.t.Name)).Index(a.elementID()).Op("=").Id(a.t.Name).Dot(a.t.Name)
 }
 
 func (a adderWriter) elementID() *Statement {
