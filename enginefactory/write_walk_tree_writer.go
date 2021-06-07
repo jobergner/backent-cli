@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -17,7 +18,7 @@ func (w walkElementWriter) receiverParams() *Statement {
 }
 
 func (w walkElementWriter) name() string {
-	return "walk" + title(w.t.Name)
+	return "walk" + Title(w.t.Name)
 }
 
 func (w walkElementWriter) idParam() string {
@@ -25,7 +26,7 @@ func (w walkElementWriter) idParam() string {
 }
 
 func (w walkElementWriter) params() *Statement {
-	return List(Id(w.t.Name+"ID").Id(title(w.t.Name)+"ID"), Id("p").Id("path"))
+	return List(Id(w.t.Name+"ID").Id(Title(w.t.Name)+"ID"), Id("p").Id("path"))
 }
 
 func (w walkElementWriter) dataElementName() string {
@@ -33,11 +34,11 @@ func (w walkElementWriter) dataElementName() string {
 }
 
 func (w walkElementWriter) getElementFromPatch() *Statement {
-	return List(Id(w.dataElementName()), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(title(w.t.Name)).Index(Id(w.idParam()))
+	return List(Id(w.dataElementName()), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(Title(w.t.Name)).Index(Id(w.idParam()))
 }
 
 func (w walkElementWriter) getElementFromState() *Statement {
-	return Id(w.dataElementName()).Op("=").Id("engine").Dot("State").Dot(title(w.t.Name)).Index(Id(w.idParam()))
+	return Id(w.dataElementName()).Op("=").Id("engine").Dot("State").Dot(Title(w.t.Name)).Index(Id(w.idParam()))
 }
 
 func (w walkElementWriter) declarePathVar() *Statement {
@@ -50,12 +51,12 @@ func (w walkElementWriter) anyContainerName() string {
 
 func (w walkElementWriter) usedChildIDIdentifier() *Statement {
 	if w.f.HasAnyValue {
-		return Id(w.anyContainerName()).Dot(title(w.v.Name))
+		return Id(w.anyContainerName()).Dot(Title(w.v.Name))
 	}
 	if w.f.HasSliceValue {
 		return Id(w.v.Name + "ID")
 	}
-	return Id(w.dataElementName()).Dot(title(w.f.Name))
+	return Id(w.dataElementName()).Dot(Title(w.f.Name))
 }
 
 func (w walkElementWriter) getChildPath() *Statement {
@@ -82,24 +83,24 @@ func (w walkElementWriter) setChildPathExisting() *Statement {
 }
 
 func (w walkElementWriter) walkChild() *Statement {
-	return Id("engine").Dot("walk"+title(w.v.Name)).Call(w.usedChildIDIdentifier(), Id(w.f.Name+"Path"))
+	return Id("engine").Dot("walk"+Title(w.v.Name)).Call(w.usedChildIDIdentifier(), Id(w.f.Name+"Path"))
 }
 
 func (w walkElementWriter) childrenLoopConditions() *Statement {
-	return List(Id("i"), Id(w.v.Name+"ID")).Op(":=").Range().Id("merge"+title(w.v.Name)+"IDs").Call(
-		Id("engine").Dot("State").Dot(title(w.t.Name)).Index(Id(w.t.Name+"Data").Dot("ID")).Dot(title(w.f.Name)),
-		Id("engine").Dot("Patch").Dot(title(w.t.Name)).Index(Id(w.t.Name+"Data").Dot("ID")).Dot(title(w.f.Name)),
+	return List(Id("i"), Id(w.v.Name+"ID")).Op(":=").Range().Id("merge"+Title(w.v.Name)+"IDs").Call(
+		Id("engine").Dot("State").Dot(Title(w.t.Name)).Index(Id(w.t.Name+"Data").Dot("ID")).Dot(Title(w.f.Name)),
+		Id("engine").Dot("Patch").Dot(Title(w.t.Name)).Index(Id(w.t.Name+"Data").Dot("ID")).Dot(Title(w.f.Name)),
 	)
 }
 
 func (w walkElementWriter) anyChildLoopConditions() *Statement {
-	return List(Id("i"), Id("anyID")).Op(":=").Range().Id(w.dataElementName()).Dot(title(w.f.Name))
+	return List(Id("i"), Id("anyID")).Op(":=").Range().Id(w.dataElementName()).Dot(Title(w.f.Name))
 }
 
 func (w walkElementWriter) declareAnyContainer() *Statement {
 	idName := Id("anyID")
 	if !w.f.HasSliceValue {
-		idName = Id(w.dataElementName()).Dot(title(w.f.Name))
+		idName = Id(w.dataElementName()).Dot(Title(w.f.Name))
 	}
 	return Id(w.anyContainerName()).Op(":=").Id("engine").Dot(w.f.ValueTypeName).Call(idName).Dot(w.f.ValueTypeName)
 }

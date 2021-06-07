@@ -48,7 +48,7 @@ func (s *EngineFactory) writeWalkElement() *EngineFactory {
 				if !field.HasSliceValue {
 					return &Statement{
 						w.declareAnyContainer().Line(),
-						forEachFieldValueComparison(field, *Id(field.Name + "Container").Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+						ForEachFieldValueComparison(field, *Id(field.Name + "Container").Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 							w.v = valueType
 							return writeEvaluateChildPath(w)
 
@@ -57,7 +57,7 @@ func (s *EngineFactory) writeWalkElement() *EngineFactory {
 				}
 				return For(w.anyChildLoopConditions()).Block(
 					w.declareAnyContainer(),
-					forEachFieldValueComparison(field, *Id(field.Name + "Container").Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
+					ForEachFieldValueComparison(field, *Id(field.Name + "Container").Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						w.v = valueType
 						return writeEvaluateChildPath(w)
 

@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -19,9 +20,9 @@ func (r remover) receiverParams() *Statement {
 func (r remover) name() string {
 	var optionalSuffix string
 	if r.f.HasAnyValue {
-		optionalSuffix = title(r.v.Name)
+		optionalSuffix = Title(r.v.Name)
 	}
-	return "Remove" + title(r.f.Name) + optionalSuffix
+	return "Remove" + Title(r.f.Name) + optionalSuffix
 }
 
 func (r remover) toRemoveParamName() string {
@@ -36,7 +37,7 @@ func (r remover) params() *Statement {
 	if r.v.IsBasicType {
 		return toRemoveParam.Id("..." + r.v.Name)
 	}
-	return toRemoveParam.Id("..." + title(r.v.Name) + "ID")
+	return toRemoveParam.Id("..." + Title(r.v.Name) + "ID")
 }
 
 func (r remover) returns() string {
@@ -44,7 +45,7 @@ func (r remover) returns() string {
 }
 
 func (r remover) reassignElement() *Statement {
-	return Id(r.t.Name).Op(":=").Id(r.receiverName()).Dot(r.t.Name).Dot("engine").Dot(title(r.t.Name)).Call(Id(r.receiverName()).Dot(r.t.Name).Dot("ID"))
+	return Id(r.t.Name).Op(":=").Id(r.receiverName()).Dot(r.t.Name).Dot("engine").Dot(Title(r.t.Name)).Call(Id(r.receiverName()).Dot(r.t.Name).Dot("ID"))
 }
 
 func (r remover) isOperationKindDelete() *Statement {
@@ -60,7 +61,7 @@ func (r remover) declareNewElements() *Statement {
 	if r.v.IsBasicType {
 		newElementsType = newElementsType + r.f.ValueTypeName
 	} else {
-		newElementsType = newElementsType + title(r.f.ValueTypeName) + "ID"
+		newElementsType = newElementsType + Title(r.f.ValueTypeName) + "ID"
 	}
 	return Var().Id("newElements").Id(newElementsType)
 }
@@ -72,7 +73,7 @@ func (r remover) existingElementsLoopConditions() *Statement {
 	} else if r.f.HasAnyValue {
 		assignedVariableId = "anyContainerID"
 	}
-	return List(Id("_"), Id(assignedVariableId)).Op(":=").Range().Id(r.t.Name).Dot(r.t.Name).Dot(title(r.f.Name))
+	return List(Id("_"), Id(assignedVariableId)).Op(":=").Range().Id(r.t.Name).Dot(r.t.Name).Dot(Title(r.f.Name))
 }
 
 func (r remover) declareToBeRemovedBool() *Statement {
@@ -100,9 +101,9 @@ func (r remover) deleteElement() *Statement {
 	if r.f.HasPointerValue {
 		assignedVariableId = "refElement"
 	}
-	deleteCall := "delete" + title(r.f.ValueTypeName)
+	deleteCall := "delete" + Title(r.f.ValueTypeName)
 	if r.f.HasAnyValue && !r.f.HasPointerValue {
-		deleteCall = "delete" + title(r.v.Name)
+		deleteCall = "delete" + Title(r.v.Name)
 	}
 	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(deleteCall).Call(Id(assignedVariableId))
 }
@@ -126,7 +127,7 @@ func (r remover) isWereElementsAltered() *Statement {
 }
 
 func (r remover) setNewElements() *Statement {
-	return Id(r.t.Name).Dot(r.t.Name).Dot(title(r.f.Name)).Op("=").Id("newElements")
+	return Id(r.t.Name).Dot(r.t.Name).Dot(Title(r.f.Name)).Op("=").Id("newElements")
 }
 
 func (r remover) setOperationKind() *Statement {
@@ -134,7 +135,7 @@ func (r remover) setOperationKind() *Statement {
 }
 
 func (r remover) updateElementInPatch() *Statement {
-	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot("Patch").Dot(title(r.t.Name)).Index(Id(r.t.Name).Dot(r.t.Name).Dot("ID")).Op("=").Id(r.t.Name).Dot(r.t.Name)
+	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot("Patch").Dot(Title(r.t.Name)).Index(Id(r.t.Name).Dot(r.t.Name).Dot("ID")).Op("=").Id(r.t.Name).Dot(r.t.Name)
 }
 
 func (r remover) receiverName() string {
@@ -143,7 +144,7 @@ func (r remover) receiverName() string {
 
 func (r remover) declareElementFromRef() *Statement {
 	if r.f.HasAnyValue {
-		return Id("element").Op(":=").Id("anyContainer").Dot(title(r.v.Name)).Call().Dot("ID").Call()
+		return Id("element").Op(":=").Id("anyContainer").Dot(Title(r.v.Name)).Call().Dot("ID").Call()
 	}
 	return Id("element").Op(":=").Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(r.f.ValueTypeName).Call(Id("refElement")).Dot(r.f.ValueTypeName).Dot("ReferencedElementID")
 }

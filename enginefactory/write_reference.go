@@ -34,7 +34,7 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 			)
 		}
 
-		decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(lower(r.returnTypeOfGet())).Block(
+		decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())).Block(
 			r.reassignRef(),
 			r.returnReferencedElement(),
 		)
@@ -58,16 +58,16 @@ func (s *EngineFactory) writeDereference() *EngineFactory {
 			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 				For(d.allIDsLoopConditions()).Block(
 					d.declareRef(),
-					onlyIf(field.HasAnyValue, d.declareAnyContainer()),
-					onlyIf(field.HasAnyValue, If(d.anyContainerContainsElemenKind()).Block(
+					OnlyIf(field.HasAnyValue, d.declareAnyContainer()),
+					OnlyIf(field.HasAnyValue, If(d.anyContainerContainsElemenKind()).Block(
 						Continue(),
 					)),
 					If(d.dereferenceCondition()).Block(
-						onlyIf(field.HasSliceValue, &Statement{
+						OnlyIf(field.HasSliceValue, &Statement{
 							d.declareParent().Line(),
 							d.removeChildReferenceFromParent(),
 						}),
-						onlyIf(!field.HasSliceValue, &Statement{
+						OnlyIf(!field.HasSliceValue, &Statement{
 							d.unsetRef(),
 						}),
 					),

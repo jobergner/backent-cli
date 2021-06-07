@@ -56,8 +56,8 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 				If(s.isRefAlreadyAssigned()).Block(
 					s.deleteExistingRef(),
 				),
-				onlyIf(field.HasAnyValue, s.createAnyContainer()),
-				onlyIf(field.HasAnyValue, s.setAnyContainer()),
+				OnlyIf(field.HasAnyValue, s.createAnyContainer()),
+				OnlyIf(field.HasAnyValue, s.setAnyContainer()),
 				s.createNewRef(),
 				s.setNewRef(),
 				s.setOperationKind(),

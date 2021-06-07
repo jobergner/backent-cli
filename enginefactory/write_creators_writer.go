@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -15,7 +16,7 @@ func (cw creatorWrapperWriter) receiverParams() *Statement {
 }
 
 func (cw creatorWrapperWriter) name() string {
-	return "Create" + title(cw.t.Name)
+	return "Create" + Title(cw.t.Name)
 }
 
 func (cw creatorWrapperWriter) returns() string {
@@ -30,7 +31,7 @@ func (cw creatorWrapperWriter) createElement() *Statement {
 		callParam = Lit(false)
 	}
 
-	return Id("engine").Dot("create" + title(cw.t.Name)).Call(callParam)
+	return Id("engine").Dot("create" + Title(cw.t.Name)).Call(callParam)
 }
 
 type creatorWriter struct {
@@ -43,7 +44,7 @@ func (c creatorWriter) receiverParams() *Statement {
 }
 
 func (c creatorWriter) name() string {
-	return "create" + title(c.t.Name)
+	return "create" + Title(c.t.Name)
 }
 
 func (c creatorWriter) returns() string {
@@ -73,7 +74,7 @@ func (c creatorWriter) assignEngine() *Statement {
 }
 
 func (c creatorWriter) generateID() *Statement {
-	return Id("element").Dot("ID").Op("=").Id(title(c.t.Name) + "ID").Call(Id("engine").Dot("GenerateID").Call())
+	return Id("element").Dot("ID").Op("=").Id(Title(c.t.Name) + "ID").Call(Id("engine").Dot("GenerateID").Call())
 }
 
 func (c creatorWriter) setHasParent() *Statement {
@@ -81,10 +82,10 @@ func (c creatorWriter) setHasParent() *Statement {
 }
 
 func (c creatorWriter) createChildElement() *Statement {
-	return Id("element" + title(c.f.Name)).Op(":=").Id("engine").Dot("create" + title(c.f.ValueTypeName)).Call(Lit(true))
+	return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueTypeName)).Call(Lit(true))
 }
 func (c creatorWriter) setChildElement() *Statement {
-	return Id("element").Dot(title(c.f.Name)).Op("=").Id("element" + title(c.f.Name)).Dot(c.f.ValueTypeName).Dot("ID")
+	return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot(c.f.ValueTypeName).Dot("ID")
 }
 
 func (c creatorWriter) setOperationKind() *Statement {
@@ -92,7 +93,7 @@ func (c creatorWriter) setOperationKind() *Statement {
 }
 
 func (c creatorWriter) updateElementInPatch() *Statement {
-	return Id("engine").Dot("Patch").Dot(title(c.t.Name)).Index(Id("element").Dot("ID")).Op("=").Id("element")
+	return Id("engine").Dot("Patch").Dot(Title(c.t.Name)).Index(Id("element").Dot("ID")).Op("=").Id("element")
 }
 
 func (c creatorWriter) returnElement() *Statement {
@@ -111,7 +112,7 @@ func (c generatedTypeCreatorWriter) receiverParams() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) name() string {
-	return "create" + title(c.typeName)
+	return "create" + Title(c.typeName)
 }
 
 func (c generatedTypeCreatorWriter) params() *Statement {
@@ -119,7 +120,7 @@ func (c generatedTypeCreatorWriter) params() *Statement {
 	if c.f.HasAnyValue {
 		referencedElementType = anyNameByField(c.f)
 	}
-	return List(Id("referencedElementID").Id(title(referencedElementType)+"ID"), Id("parentID").Id(title(c.f.Parent.Name)+"ID"))
+	return List(Id("referencedElementID").Id(Title(referencedElementType)+"ID"), Id("parentID").Id(Title(c.f.Parent.Name)+"ID"))
 }
 
 func (c generatedTypeCreatorWriter) returns() string {
@@ -143,7 +144,7 @@ func (c generatedTypeCreatorWriter) setParentID() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) setID() *Statement {
-	return Id("element").Dot("ID").Op("=").Id(title(c.typeName) + "ID").Call(Id("engine").Dot("GenerateID").Call())
+	return Id("element").Dot("ID").Op("=").Id(Title(c.typeName) + "ID").Call(Id("engine").Dot("GenerateID").Call())
 }
 
 func (c generatedTypeCreatorWriter) setOperationKind() *Statement {
@@ -151,19 +152,19 @@ func (c generatedTypeCreatorWriter) setOperationKind() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) assignElementToPatch() *Statement {
-	return Id("engine").Dot("Patch").Dot(title(c.typeName)).Index(Id("element").Dot("ID")).Op("=").Id("element")
+	return Id("engine").Dot("Patch").Dot(Title(c.typeName)).Index(Id("element").Dot("ID")).Op("=").Id("element")
 }
 
 func (c generatedTypeCreatorWriter) createChildElement() *Statement {
-	return Id("element" + title(c.f.ValueType().Name)).Op(":=").Id("engine").Dot("create" + title(c.f.ValueType().Name)).Call(True())
+	return Id("element" + Title(c.f.ValueType().Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueType().Name)).Call(True())
 }
 
 func (c generatedTypeCreatorWriter) assignChildElement() *Statement {
-	return Id("element").Dot(title(c.f.ValueType().Name)).Op("=").Id("element" + title(c.f.ValueType().Name)).Dot(c.f.ValueType().Name).Dot("ID")
+	return Id("element").Dot(Title(c.f.ValueType().Name)).Op("=").Id("element" + Title(c.f.ValueType().Name)).Dot(c.f.ValueType().Name).Dot("ID")
 }
 
 func (c generatedTypeCreatorWriter) assignElementKind() *Statement {
-	return Id("element").Dot("ElementKind").Op("=").Id("ElementKind" + title(c.f.ValueType().Name))
+	return Id("element").Dot("ElementKind").Op("=").Id("ElementKind" + Title(c.f.ValueType().Name))
 }
 
 func (c generatedTypeCreatorWriter) returnElement() *Statement {

@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -11,11 +12,11 @@ type stateWriter struct {
 }
 
 func (s stateWriter) fieldName() string {
-	return title(s.typeName())
+	return Title(s.typeName())
 }
 
 func (s stateWriter) mapKey() *Statement {
-	return Id(title(s.typeName()) + "ID")
+	return Id(Title(s.typeName()) + "ID")
 }
 
 func (s stateWriter) mapValue() string {
@@ -45,7 +46,7 @@ func (e elementWriter) fieldValue() string {
 	if e.f.ValueType().IsBasicType {
 		value += e.f.ValueTypeName
 	} else {
-		value += title(e.f.ValueTypeName) + "ID"
+		value += Title(e.f.ValueTypeName) + "ID"
 	}
 
 	return value
@@ -60,7 +61,7 @@ func (e elementWriter) metaFieldTag(name string) string {
 }
 
 func (e elementWriter) fieldName() string {
-	return title(e.f.Name)
+	return Title(e.f.Name)
 }
 
 func (e elementWriter) name() string {
@@ -68,5 +69,5 @@ func (e elementWriter) name() string {
 }
 
 func (e elementWriter) idType() string {
-	return title(e.t.Name) + "ID"
+	return Title(e.t.Name) + "ID"
 }

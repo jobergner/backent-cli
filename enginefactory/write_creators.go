@@ -28,7 +28,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.declareElement(),
 			c.assignEngine(),
 			c.generateID(),
-			onlyIf(!configType.IsRootType, c.setHasParent()),
+			OnlyIf(!configType.IsRootType, c.setHasParent()),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				c.f = &field
 				if field.HasSliceValue || field.ValueType().IsBasicType || field.HasPointerValue {

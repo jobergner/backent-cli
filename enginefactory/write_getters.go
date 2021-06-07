@@ -12,7 +12,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		t := typeGetterWriter{
 			name: func() string {
-				return title(configType.Name)
+				return Title(configType.Name)
 			},
 			typeName: func() string {
 				return configType.Name
@@ -24,7 +24,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				return configType.Name
 			},
 			returns: func() string {
-				return title(configType.Name) + "ID"
+				return Title(configType.Name) + "ID"
 			},
 			idFieldToReturn: func() string {
 				return "ID"
@@ -43,13 +43,13 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			decls.File.Func().Params(f.receiverParams()).Id(f.name()).Params().Id(f.returns()).Block(
 				f.reassignElement(),
 				// if slice
-				onlyIf(field.HasSliceValue, f.declareSliceOfElements()),
-				onlyIf(field.HasSliceValue, For(f.loopConditions().Block(
+				OnlyIf(field.HasSliceValue, f.declareSliceOfElements()),
+				OnlyIf(field.HasSliceValue, For(f.loopConditions().Block(
 					f.appendElement(),
 				))),
-				onlyIf(field.HasSliceValue, Return(f.returnSliceOfType())),
+				OnlyIf(field.HasSliceValue, Return(f.returnSliceOfType())),
 				// if not slice
-				onlyIf(!field.HasSliceValue, Return(f.returnSingleType())),
+				OnlyIf(!field.HasSliceValue, Return(f.returnSingleType())),
 			)
 		})
 
@@ -70,11 +70,11 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 
 		if field.HasAnyValue {
 			i.returns = func() string {
-				return title(anyNameByField(field)) + "ID"
+				return Title(anyNameByField(field)) + "ID"
 			}
 		} else {
 			i.returns = func() string {
-				return title(field.ValueType().Name) + "ID"
+				return Title(field.ValueType().Name) + "ID"
 			}
 		}
 
@@ -96,7 +96,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				return "ID"
 			},
 			returns: func() string {
-				return title(t.name()) + "ID"
+				return Title(t.name()) + "ID"
 			},
 		}
 
@@ -107,9 +107,9 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 		writeIDGetter(&decls, i)
 
 		field.RangeValueTypes(func(valueType *ast.ConfigType) {
-			decls.File.Func().Params(Id("_"+t.name()).Id(t.name())).Id(title(valueType.Name)).Params().Id(valueType.Name).Block(
+			decls.File.Func().Params(Id("_"+t.name()).Id(t.name())).Id(Title(valueType.Name)).Params().Id(valueType.Name).Block(
 				Id(t.name()).Op(":=").Id("_"+t.name()).Dot(t.name()).Dot("engine").Dot(t.name()).Call(Id("_"+t.name()).Dot(t.name()).Dot("ID")),
-				Return(Id(t.name()).Dot(t.name()).Dot("engine").Dot(title(valueType.Name)).Call(Id(t.name()).Dot(t.name()).Dot(title(valueType.Name)))),
+				Return(Id(t.name()).Dot(t.name()).Dot("engine").Dot(Title(valueType.Name)).Call(Id(t.name()).Dot(t.name()).Dot(Title(valueType.Name)))),
 			)
 		})
 	})

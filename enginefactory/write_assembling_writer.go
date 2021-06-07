@@ -1,9 +1,10 @@
 package enginefactory
 
 import (
-	. "github.com/dave/jennifer/jen"
-
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
+
+	. "github.com/dave/jennifer/jen"
 )
 
 type assembleTreeWriter struct {
@@ -19,7 +20,7 @@ func (a assembleTreeWriter) receiverParams() *Statement {
 }
 
 func (a assembleTreeWriter) patchLoopConditions() *Statement {
-	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("engine").Dot("Patch").Dot(title(a.t.Name))
+	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("engine").Dot("Patch").Dot(Title(a.t.Name))
 }
 
 func (a assembleTreeWriter) elementHasNoParent() *Statement {
@@ -27,105 +28,105 @@ func (a assembleTreeWriter) elementHasNoParent() *Statement {
 }
 
 func (a assembleTreeWriter) elementNonExistentInTree() (*Statement, *Statement) {
-	condition := List(Id("_"), Id("ok")).Op(":=").Id("engine").Dot("Tree").Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID"))
+	condition := List(Id("_"), Id("ok")).Op(":=").Id("engine").Dot("Tree").Dot(Title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID"))
 	return condition, Id("!ok")
 }
 
 func (a assembleTreeWriter) assembleElement() *Statement {
 	variableNames := List(Id(a.t.Name), Id("include"), Id("_"))
-	return variableNames.Op(":=").Id("engine").Dot("assemble"+title(a.t.Name)).Call(Id(a.dataElementName()).Dot("ID"), Nil(), Id("config"))
+	return variableNames.Op(":=").Id("engine").Dot("assemble"+Title(a.t.Name)).Call(Id(a.dataElementName()).Dot("ID"), Nil(), Id("config"))
 }
 
 func (a assembleTreeWriter) setElementInTree() *Statement {
-	return Id("engine").Dot("Tree").Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Op("=").Id(a.t.Name)
+	return Id("engine").Dot("Tree").Dot(Title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Op("=").Id(a.t.Name)
 }
 
 func (a assembleTreeWriter) stateLoopConditions() *Statement {
-	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("engine").Dot("State").Dot(title(a.t.Name))
+	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("engine").Dot("State").Dot(Title(a.t.Name))
 }
 
 func (a assembleTreeWriter) createConfig() *Statement {
 	return Id("config").Op(":=").Id("assembleConfig").Values(Dict{Id("forceInclude"): False()})
 }
 
-type assembleElement struct {
+type assembleElementWriter struct {
 	t ast.ConfigType
 	f *ast.Field
 }
 
-func (a assembleElement) treeElementName() string {
+func (a assembleElementWriter) treeElementName() string {
 	return a.t.Name
 }
 
-func (a assembleElement) dataElementName() string {
+func (a assembleElementWriter) dataElementName() string {
 	return a.t.Name + "Data"
 }
 
-func (a assembleElement) treeTypeName() string {
-	return title(a.t.Name)
+func (a assembleElementWriter) treeTypeName() string {
+	return Title(a.t.Name)
 }
 
-func (a assembleElement) receiverParams() *Statement {
+func (a assembleElementWriter) receiverParams() *Statement {
 	return Id("engine").Id("*Engine")
 }
 
-func (a assembleElement) name() string {
-	return "assemble" + title(a.t.Name)
+func (a assembleElementWriter) name() string {
+	return "assemble" + Title(a.t.Name)
 }
 
-func (a assembleElement) idParam() string {
+func (a assembleElementWriter) idParam() string {
 	return a.t.Name + "ID"
 }
 
-func (a assembleElement) params() (*Statement, *Statement, *Statement) {
-	return Id(a.idParam()).Id(title(a.t.Name) + "ID"), Id("check").Id("*recursionCheck"), Id("config").Id("assembleConfig")
+func (a assembleElementWriter) params() (*Statement, *Statement, *Statement) {
+	return Id(a.idParam()).Id(Title(a.t.Name) + "ID"), Id("check").Id("*recursionCheck"), Id("config").Id("assembleConfig")
 }
 
-func (a assembleElement) returns() (*Statement, *Statement, *Statement) {
+func (a assembleElementWriter) returns() (*Statement, *Statement, *Statement) {
 	return Id(a.treeTypeName()), Bool(), Bool()
 }
 
-func (a assembleElement) checkIsDefined() *Statement {
+func (a assembleElementWriter) checkIsDefined() *Statement {
 	return Id("check").Op("!=").Nil()
 }
 
-func (a assembleElement) elementExistsInCheck() (*Statement, *Statement) {
+func (a assembleElementWriter) elementExistsInCheck() (*Statement, *Statement) {
 	return Id("alreadyExists").Op(":=").Id("check").Dot(a.t.Name).Index(Id(a.idParam())), Id("alreadyExists")
 }
 
-func (a assembleElement) returnEmpty() (*Statement, *Statement, *Statement) {
-	return Id(title(a.t.Name)).Values(), False(), False()
+func (a assembleElementWriter) returnEmpty() (*Statement, *Statement, *Statement) {
+	return Id(Title(a.t.Name)).Values(), False(), False()
 }
 
-func (a assembleElement) checkElement() *Statement {
+func (a assembleElementWriter) checkElement() *Statement {
 	return Id("check").Dot(a.t.Name).Index(Id(a.idParam())).Op("=").True()
 }
 
-func (a assembleElement) getElementFromPatch() *Statement {
-	return List(Id(a.dataElementName()), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(title(a.t.Name)).Index(Id(a.idParam()))
+func (a assembleElementWriter) getElementFromPatch() *Statement {
+	return List(Id(a.dataElementName()), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(Title(a.t.Name)).Index(Id(a.idParam()))
 }
 
-func (a assembleElement) getElementFromState() *Statement {
-	return Id(a.dataElementName()).Op("=").Id("engine").Dot("State").Dot(title(a.t.Name)).Index(Id(a.idParam()))
+func (a assembleElementWriter) getElementFromState() *Statement {
+	return Id(a.dataElementName()).Op("=").Id("engine").Dot("State").Dot(Title(a.t.Name)).Index(Id(a.idParam()))
 }
 
-func (a assembleElement) declareTreeElement() *Statement {
+func (a assembleElementWriter) declareTreeElement() *Statement {
 	return Var().Id(a.treeElementName()).Id(a.treeTypeName())
 }
 
-func (a assembleElement) typeFieldOn(from string) *Statement {
-	return Id("engine").Dot(from).Dot(title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Dot(title(a.f.Name))
+func (a assembleElementWriter) typeFieldOn(from string) *Statement {
+	return Id("engine").Dot(from).Dot(Title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Dot(Title(a.f.Name))
 }
 
-func (a assembleElement) sliceFieldLoopConditions() *Statement {
+func (a assembleElementWriter) sliceFieldLoopConditions() *Statement {
 	loopVars := List(Id("_"), Id(a.f.ValueTypeName+"ID"))
-	mergeFuncName := "merge" + title(a.f.ValueTypeName) + "IDs"
+	mergeFuncName := "merge" + Title(a.f.ValueTypeName) + "IDs"
 	return loopVars.Op(":=").Range().Id(mergeFuncName).Call(a.typeFieldOn("State"), a.typeFieldOn("Patch"))
 }
 
-func (a assembleElement) usedAssembleID(configType ast.ConfigType, field ast.Field, valueType *ast.ConfigType) *Statement {
+func (a assembleElementWriter) usedAssembleID(configType ast.ConfigType, field ast.Field, valueType *ast.ConfigType) *Statement {
 	if !field.HasPointerValue && !field.HasAnyValue && !field.HasSliceValue {
-		return Id(a.dataElementName()).Dot(title(field.Name))
+		return Id(a.dataElementName()).Dot(Title(field.Name))
 	} else if field.HasPointerValue && !field.HasAnyValue && !field.HasSliceValue {
 		return Id(configType.Name + "ID")
 	} else if field.HasPointerValue && field.HasSliceValue {
@@ -135,29 +136,29 @@ func (a assembleElement) usedAssembleID(configType ast.ConfigType, field ast.Fie
 	return Id(valueType.Name + "ID")
 }
 
-func (a assembleElement) elementHasUpdated(valueType *ast.ConfigType, assembleID *Statement) (*Statement, *Statement) {
+func (a assembleElementWriter) elementHasUpdated(valueType *ast.ConfigType, assembleID *Statement) (*Statement, *Statement) {
 	handledElementTypeName := a.f.ValueTypeName
 	if a.f.HasAnyValue && !a.f.HasPointerValue {
 		handledElementTypeName = valueType.Name
 	}
-	conditionVars := List(Id("tree"+title(handledElementTypeName)), Id("include"), Id("childHasUpdated"))
-	condition := conditionVars.Op(":=").Id("engine").Dot("assemble"+title(handledElementTypeName)).Call(assembleID, Id("check"), Id("config"))
+	conditionVars := List(Id("tree"+Title(handledElementTypeName)), Id("include"), Id("childHasUpdated"))
+	condition := conditionVars.Op(":=").Id("engine").Dot("assemble"+Title(handledElementTypeName)).Call(assembleID, Id("check"), Id("config"))
 	return condition, Id("include")
 }
 
-func (a assembleElement) setHasUpdatedTrue() *Statement {
+func (a assembleElementWriter) setHasUpdatedTrue() *Statement {
 	return Id("hasUpdated").Op("=").True()
 }
 
-func (a assembleElement) appendToElementsInField(valueType *ast.ConfigType) *Statement {
+func (a assembleElementWriter) appendToElementsInField(valueType *ast.ConfigType) *Statement {
 	appendedType := valueType.Name
 	if !a.f.HasAnyValue && a.f.HasPointerValue || (a.f.HasPointerValue && a.f.HasSliceValue && a.f.HasAnyValue) {
 		appendedType = a.f.ValueTypeName
 	}
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(title(a.f.Name)), Id("tree"+title(appendedType)))
+	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(Title(a.f.Name)), Id("tree"+Title(appendedType)))
 }
 
-func (a assembleElement) setFieldElement(valueType *ast.ConfigType) *Statement {
+func (a assembleElementWriter) setFieldElement(valueType *ast.ConfigType) *Statement {
 	var optionalShare string
 	if !a.f.HasPointerValue {
 		optionalShare = "&"
@@ -166,39 +167,39 @@ func (a assembleElement) setFieldElement(valueType *ast.ConfigType) *Statement {
 	if a.f.HasAnyValue && !a.f.HasPointerValue {
 		usedType = valueType.Name
 	}
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(optionalShare + "tree" + title(usedType))
+	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("=").Id(optionalShare + "tree" + Title(usedType))
 }
 
-func (a assembleElement) setField() *Statement {
-	return Id(a.treeElementName()).Dot(title(a.f.Name)).Op("=").Id(a.dataElementName()).Dot(title(a.f.Name))
+func (a assembleElementWriter) setField() *Statement {
+	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("=").Id(a.dataElementName()).Dot(Title(a.f.Name))
 }
 
-func (a assembleElement) setID() *Statement {
+func (a assembleElementWriter) setID() *Statement {
 	return Id(a.treeElementName()).Dot("ID").Op("=").Id(a.dataElementName()).Dot("ID")
 }
 
-func (a assembleElement) setOperationKind() *Statement {
+func (a assembleElementWriter) setOperationKind() *Statement {
 	return Id(a.treeElementName()).Dot("OperationKind").Op("=").Id(a.dataElementName()).Dot("OperationKind")
 }
 
-func (a assembleElement) finalReturn() (*Statement, *Statement, *Statement) {
+func (a assembleElementWriter) finalReturn() (*Statement, *Statement, *Statement) {
 	return Id(a.t.Name), Id("hasUpdated").Op("||").Id("config").Dot("forceInclude"), Id("hasUpdated")
 }
 
-func (a assembleElement) anyContainerName() string {
+func (a assembleElementWriter) anyContainerName() string {
 	return anyNameByField(*a.f) + "Container"
 }
 
-func (a assembleElement) createAnyContainer() *Statement {
+func (a assembleElementWriter) createAnyContainer() *Statement {
 	usedID := Id(anyNameByField(*a.f) + "ID")
 	if !a.f.HasSliceValue {
-		usedID = Id(a.dataElementName()).Dot(title(a.f.Name))
+		usedID = Id(a.dataElementName()).Dot(Title(a.f.Name))
 	}
 	return Id(a.anyContainerName()).Op(":=").Id("engine").Dot(anyNameByField(*a.f)).Call(usedID).Dot(anyNameByField(*a.f))
 }
 
-func (a assembleElement) assignIDFromAnyContainer(valueType *ast.ConfigType) *Statement {
-	return Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(title(valueType.Name))
+func (a assembleElementWriter) assignIDFromAnyContainer(valueType *ast.ConfigType) *Statement {
+	return Id(valueType.Name + "ID").Op(":=").Id(a.anyContainerName()).Dot(Title(valueType.Name))
 }
 
 type referenceWriterMode int
@@ -242,9 +243,9 @@ func (a assembleReferenceWriter) nextValueName() string {
 }
 
 func (a assembleReferenceWriter) params() (*Statement, *Statement, *Statement) {
-	idType := title(a.f.Parent.Name) + "ID"
+	idType := Title(a.f.Parent.Name) + "ID"
 	if a.f.HasSliceValue {
-		idType = title(a.f.ValueTypeName) + "ID"
+		idType = Title(a.f.ValueTypeName) + "ID"
 	}
 	return Id(a.idParam()).Id(idType), Id("check").Id("*recursionCheck"), Id("config").Id("assembleConfig")
 }
@@ -254,19 +255,19 @@ func (a assembleReferenceWriter) returns() (*Statement, *Statement, *Statement) 
 	if !a.f.HasSliceValue {
 		optionalPointer = "*"
 	}
-	return Id(optionalPointer + title(a.nextValueName()) + "Reference"), Bool(), Bool()
+	return Id(optionalPointer + Title(a.nextValueName()) + "Reference"), Bool(), Bool()
 }
 
 func (a assembleReferenceWriter) declareStateElement() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Op(":=").Id("engine").Dot("State").Dot(title(a.f.Parent.Name)).Index(Id(a.idParam()))
+	return Id("state" + Title(a.f.Parent.Name)).Op(":=").Id("engine").Dot("State").Dot(Title(a.f.Parent.Name)).Index(Id(a.idParam()))
 }
 
 func (a assembleReferenceWriter) declarepatchElement() *Statement {
-	return List(Id("patch"+title(a.f.Parent.Name)), Id(a.f.Parent.Name+"IsInPatch")).Op(":=").Id("engine").Dot("Patch").Dot(title(a.f.Parent.Name)).Index(Id(a.idParam()))
+	return List(Id("patch"+Title(a.f.Parent.Name)), Id(a.f.Parent.Name+"IsInPatch")).Op(":=").Id("engine").Dot("Patch").Dot(Title(a.f.Parent.Name)).Index(Id(a.idParam()))
 }
 
 func (a assembleReferenceWriter) refIsNotSet() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0).Op("&&").Params(Id("!" + a.f.Parent.Name + "IsInPatch").Op("||").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0))
+	return Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("==").Lit(0).Op("&&").Params(Id("!" + a.f.Parent.Name + "IsInPatch").Op("||").Id("patch" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("==").Lit(0))
 }
 
 // non-slice gen force: ref := engine.playerTargetRef(patchPlayer.Target)
@@ -280,7 +281,7 @@ func (a assembleReferenceWriter) declareRef() *Statement {
 	if !a.f.HasSliceValue && (a.mode == referenceWriterModeRefDelete || a.mode == referenceWriterModeElementModified) {
 		usedElement = "state"
 	}
-	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(usedElement + title(a.f.Parent.Name)).Dot(title(a.f.Name)))
+	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(usedElement + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)))
 }
 
 // non-slice gen: engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
@@ -303,16 +304,16 @@ func (a assembleReferenceWriter) declareAnyContainer() *Statement {
 // non-slice non-gen: referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
 func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 	if a.f.HasAnyValue {
-		return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))).Dot(a.v.Name)
+		return Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(Id("anyContainer").Dot(a.nextValueName()).Dot(Title(a.v.Name))).Dot(a.v.Name)
 	}
 	if a.f.HasSliceValue {
 		usedRef := "ref"
 		if a.mode == referenceWriterModeRefUpdate {
 			usedRef = "patchRef"
 		}
-		return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id(usedRef).Dot("ReferencedElementID")).Dot(a.v.Name)
+		return Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(Id(usedRef).Dot("ReferencedElementID")).Dot(a.v.Name)
 	}
-	return Id("referencedElement").Op(":=").Id("engine").Dot(title(a.v.Name)).Call(Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")).Dot(a.v.Name)
+	return Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")).Dot(a.v.Name)
 }
 
 // non-slice gen: 									 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
@@ -330,21 +331,21 @@ func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
 	usedID := Id("referencedElement").Dot("ID")
 	if a.mode == referenceWriterModeElementModified {
 		if a.f.HasAnyValue {
-			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(Title(a.v.Name))
 		} else if !a.f.HasSliceValue {
 			usedID = Id("ref").Dot("ID").Call()
 		} else {
 			usedID = Id("ref").Dot("ReferencedElementID")
 		}
 	}
-	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
+	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+Title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
 func (a assembleReferenceWriter) retrievePath() *Statement {
 	usedID := Id("referencedElement").Dot("ID")
 	if a.mode == referenceWriterModeElementModified {
 		if a.f.HasAnyValue {
-			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(Title(a.v.Name))
 		} else if !a.f.HasSliceValue {
 			usedID = Id("ref").Dot("ID").Call()
 		} else {
@@ -395,7 +396,7 @@ func (a assembleReferenceWriter) defineReference() *Statement {
 	usedID := Id("referencedElement").Dot("ID")
 	if a.mode == referenceWriterModeElementModified {
 		if a.f.HasAnyValue {
-			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(title(a.v.Name))
+			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(Title(a.v.Name))
 		} else if !a.f.HasSliceValue {
 			usedID = Id("ref").Dot("ID").Call()
 		}
@@ -420,10 +421,10 @@ func (a assembleReferenceWriter) defineReference() *Statement {
 		dataStatus = Id("ReferencedDataModified")
 	}
 
-	return Id(optionalShare+title(a.nextValueName())+"Reference").Values(
+	return Id(optionalShare+Title(a.nextValueName())+"Reference").Values(
 		operationKindStatement,
 		usedID,
-		Id("ElementKind"+title(a.v.Name)),
+		Id("ElementKind"+Title(a.v.Name)),
 		dataStatus,
 		Id("path").Dot("toJSONPath").Call(),
 		element,
@@ -459,30 +460,30 @@ func (a assembleReferenceWriter) hasUpdated() *Statement {
 }
 
 func (a assembleReferenceWriter) refWasCreated() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0))
+	return Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("==").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("!=").Lit(0))
 }
 
 func (a assembleReferenceWriter) refWasRemoved() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("==").Lit(0))
+	return Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("!=").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("==").Lit(0))
 }
 
 func (a assembleReferenceWriter) refHasBeenReplaced() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0))
+	return Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("!=").Lit(0).Op("&&").Params(Id(a.f.Parent.Name + "IsInPatch").Op("&&").Id("patch" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("!=").Lit(0))
 }
 
 func (a assembleReferenceWriter) refWasReplaced() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Id("patch" + title(a.f.Parent.Name)).Dot(title(a.f.Name))
+	return Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("!=").Id("patch" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name))
 }
 
 func (a assembleReferenceWriter) referencedElementGotUpdated() *Statement {
-	return Id("state" + title(a.f.Parent.Name)).Dot(title(a.f.Name)).Op("!=").Lit(0)
+	return Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)).Op("!=").Lit(0)
 }
 
 func (a assembleReferenceWriter) finalReturn() *Statement {
 	if !a.f.HasSliceValue {
 		return Nil()
 	}
-	return Id(title(a.nextValueName()) + "Reference").Values()
+	return Id(Title(a.nextValueName()) + "Reference").Values()
 }
 
 func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
@@ -527,7 +528,7 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement 
 		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		Var().Id("el").Id("*" + title(a.v.Name)).Line(),
+		Var().Id("el").Id("*" + Title(a.v.Name)).Line(),
 		If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 			Id("el").Op("=").Id("&element"),
 		).Line(),
@@ -588,5 +589,5 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefElementUpdated() *Sta
 }
 
 func (a assembleReferenceWriter) sliceRefHasUpdated() (*Statement, *Statement) {
-	return List(Id("patchRef"), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(title(a.f.ValueTypeName)).Index(Id("refID")), Id("hasUpdated")
+	return List(Id("patchRef"), Id("hasUpdated")).Op(":=").Id("engine").Dot("Patch").Dot(Title(a.f.ValueTypeName)).Index(Id("refID")), Id("hasUpdated")
 }

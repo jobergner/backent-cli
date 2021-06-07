@@ -25,12 +25,12 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 				f: field,
 				v: *valueType,
 			}
-			decls.File.Func().Params(s.wrapperReceiverParams()).Id("Set"+title(valueType.Name)).Params().Id(valueType.Name).Block(
+			decls.File.Func().Params(s.wrapperReceiverParams()).Id("Set"+Title(valueType.Name)).Params().Id(valueType.Name).Block(
 				s.createChild(),
 				s.callSetter(),
 				Return(Id(valueType.Name)),
 			)
-			decls.File.Func().Params(s.receiverParams()).Id("set"+title(valueType.Name)).Params(s.params()).Block(
+			decls.File.Func().Params(s.receiverParams()).Id("set"+Title(valueType.Name)).Params(s.params()).Block(
 				s.reassignAnyContainer(),
 				ForEachValueOfField(field, func(_valueType *ast.ConfigType) *Statement {
 					if _valueType.Name == valueType.Name {
@@ -56,7 +56,7 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 			Switch(Id("any").Dot("ElementKind")).Block(
 				ForEachValueOfField(field, func(valueType *ast.ConfigType) *Statement {
 					d.v = valueType
-					return Case(Id("ElementKind" + title(valueType.Name))).Block(
+					return Case(Id("ElementKind" + Title(valueType.Name))).Block(
 						d.deleteChild(),
 					)
 				}),

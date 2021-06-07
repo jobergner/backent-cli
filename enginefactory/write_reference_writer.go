@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -23,11 +24,11 @@ func (r referenceWriter) returnIsSet() *Statement {
 }
 
 func (r referenceWriter) deleteSelf() *Statement {
-	return Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot("delete" + title(r.f.ValueTypeName)).Call(Id("ref").Dot(r.f.ValueTypeName).Dot("ID"))
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot("delete" + Title(r.f.ValueTypeName)).Call(Id("ref").Dot(r.f.ValueTypeName).Dot("ID"))
 }
 
 func (r referenceWriter) declareParent() *Statement {
-	return Id("parent").Op(":=").Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot(title(r.f.Parent.Name)).Call(Id("ref").Dot(r.f.ValueTypeName).Dot("ParentID")).Dot(r.f.Parent.Name)
+	return Id("parent").Op(":=").Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot(Title(r.f.Parent.Name)).Call(Id("ref").Dot(r.f.ValueTypeName).Dot("ParentID")).Dot(r.f.Parent.Name)
 }
 
 func (r referenceWriter) parentIsDeleted() *Statement {
@@ -35,7 +36,7 @@ func (r referenceWriter) parentIsDeleted() *Statement {
 }
 
 func (r referenceWriter) setRefIDInParent() *Statement {
-	return Id("parent").Dot(title(r.f.Name)).Op("=").Lit(0)
+	return Id("parent").Dot(Title(r.f.Name)).Op("=").Lit(0)
 }
 
 func (r referenceWriter) setParentOperationKind() *Statement {
@@ -43,14 +44,14 @@ func (r referenceWriter) setParentOperationKind() *Statement {
 }
 
 func (r referenceWriter) updateParentInPatch() *Statement {
-	return Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot("Patch").Dot(title(r.f.Parent.Name)).Index(Id("parent").Dot("ID")).Op("=").Id("parent")
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot("Patch").Dot(Title(r.f.Parent.Name)).Index(Id("parent").Dot("ID")).Op("=").Id("parent")
 }
 
 func (r referenceWriter) returnTypeOfGet() string {
 	if r.f.HasAnyValue {
 		return anyNameByField(r.f)
 	}
-	return title(r.f.ValueType().Name)
+	return Title(r.f.ValueType().Name)
 }
 
 func (r referenceWriter) returnReferencedElement() *Statement {
@@ -71,12 +72,12 @@ func (d dereferenceWriter) receiverParams() *Statement {
 }
 
 func (d dereferenceWriter) name() string {
-	return "dereference" + title(d.f.ValueTypeName) + "s" + d.optionalSuffix()
+	return "dereference" + Title(d.f.ValueTypeName) + "s" + d.optionalSuffix()
 }
 
 func (d dereferenceWriter) optionalSuffix() string {
 	if len(d.f.ValueTypes) > 1 {
-		return title(d.v.Name)
+		return Title(d.v.Name)
 	}
 	return ""
 }
@@ -86,18 +87,18 @@ func (d dereferenceWriter) idParam() string {
 }
 
 func (d dereferenceWriter) params() *Statement {
-	return Id(d.idParam()).Id(title(d.v.Name) + "ID")
+	return Id(d.idParam()).Id(Title(d.v.Name) + "ID")
 }
 
 func (d dereferenceWriter) dereferenceCondition() *Statement {
 	if d.f.HasAnyValue {
-		return Id("anyContainer").Dot(anyNameByField(d.f)).Dot(title(d.v.Name)).Op("==").Id(d.v.Name + "ID")
+		return Id("anyContainer").Dot(anyNameByField(d.f)).Dot(Title(d.v.Name)).Op("==").Id(d.v.Name + "ID")
 	}
 	return Id("ref").Dot(d.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(d.v.Name + "ID")
 }
 
 func (d dereferenceWriter) allIDsLoopConditions() *Statement {
-	return List(Id("_"), Id("refID")).Op(":=").Range().Id("engine").Dot("all" + title(d.f.ValueTypeName) + "IDs").Call()
+	return List(Id("_"), Id("refID")).Op(":=").Range().Id("engine").Dot("all" + Title(d.f.ValueTypeName) + "IDs").Call()
 }
 
 func (d dereferenceWriter) declareRef() *Statement {
@@ -109,15 +110,15 @@ func (d dereferenceWriter) declareAnyContainer() *Statement {
 }
 
 func (d dereferenceWriter) anyContainerContainsElemenKind() *Statement {
-	return Id("anyContainer").Dot(anyNameByField(d.f)).Dot("ElementKind").Op("!=").Id("ElementKind" + title(d.v.Name))
+	return Id("anyContainer").Dot(anyNameByField(d.f)).Dot("ElementKind").Op("!=").Id("ElementKind" + Title(d.v.Name))
 }
 
 func (d dereferenceWriter) declareParent() *Statement {
-	return Id("parent").Op(":=").Id("engine").Dot(title(d.f.Parent.Name)).Call(Id("ref").Dot(d.f.ValueTypeName).Dot("ParentID"))
+	return Id("parent").Op(":=").Id("engine").Dot(Title(d.f.Parent.Name)).Call(Id("ref").Dot(d.f.ValueTypeName).Dot("ParentID"))
 }
 
 func (d dereferenceWriter) removeChildReferenceFromParent() *Statement {
-	return Id("parent").Dot("Remove" + title(d.f.Name) + d.optionalSuffix()).Call(Id(d.v.Name + "ID"))
+	return Id("parent").Dot("Remove" + Title(d.f.Name) + d.optionalSuffix()).Call(Id(d.v.Name + "ID"))
 }
 
 func (d dereferenceWriter) unsetRef() *Statement {

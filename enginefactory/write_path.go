@@ -13,14 +13,14 @@ func (s *EngineFactory) writePathTrack() *EngineFactory {
 	decls.File.Type().Id("pathTrack").Struct(
 		Id("_iterations").Int(),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			return Id(configType.Name).Map(Id(title(configType.Name) + "ID")).Id("path")
+			return Id(configType.Name).Map(Id(Title(configType.Name) + "ID")).Id("path")
 		}),
 	)
 
 	decls.File.Func().Id("newPathTrack").Params().Id("pathTrack").Block(
 		Return(Id("pathTrack").Block(
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				return Id(configType.Name).Id(":").Make(Map(Id(title(configType.Name) + "ID")).Id("path")).Id(",")
+				return Id(configType.Name).Id(":").Make(Map(Id(Title(configType.Name) + "ID")).Id("path")).Id(",")
 			}),
 		)),
 	)
@@ -42,7 +42,7 @@ func (s *EngineFactory) writeIdentifiers() *EngineFactory {
 				identifierValue -= 1
 			}
 			return &Statement{
-				onlyIf(!typeIdentifierShouldBeWritten, Id(configType.Name+"Identifier").Int().Op("=").Lit(identifierValue).Line()),
+				OnlyIf(!typeIdentifierShouldBeWritten, Id(configType.Name+"Identifier").Int().Op("=").Lit(identifierValue).Line()),
 				ForEachFieldInType(configType, func(field ast.Field) *Statement {
 					if alreadyWrittenCheck[field.Name] {
 						return Empty()
@@ -149,7 +149,7 @@ func (s *EngineFactory) writePath() *EngineFactory {
 				alreadyWritten := alreadyWrittenCheck[configType.Name]
 				alreadyWrittenCheck[configType.Name] = true
 				return &Statement{
-					onlyIf(!alreadyWritten, Case(Id(configType.Name+"Identifier")).Block(
+					OnlyIf(!alreadyWritten, Case(Id(configType.Name+"Identifier")).Block(
 						Return(Lit(configType.Name)),
 					).Line()),
 					ForEachFieldInType(configType, func(field ast.Field) *Statement {

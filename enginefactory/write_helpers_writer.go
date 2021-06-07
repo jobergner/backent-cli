@@ -2,6 +2,7 @@ package enginefactory
 
 import (
 	"bar-cli/ast"
+	. "bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -11,7 +12,7 @@ type deduplicateWriter struct {
 }
 
 func (d deduplicateWriter) idType() string {
-	return title(d.f.Parent.Name) + title(pluralizeClient.Singular(d.f.Name)) + "RefID"
+	return Title(d.f.Parent.Name) + Title(Singular(d.f.Name)) + "RefID"
 }
 
 func (d deduplicateWriter) name() string {
@@ -55,7 +56,7 @@ type allIDsMehtodWriter struct {
 }
 
 func (a allIDsMehtodWriter) typeName() string {
-	return title(a.f.Parent.Name) + title(pluralizeClient.Singular(a.f.Name)) + "Ref"
+	return Title(a.f.Parent.Name) + Title(Singular(a.f.Name)) + "Ref"
 }
 
 func (a allIDsMehtodWriter) idType() string {
@@ -83,11 +84,11 @@ func (a allIDsMehtodWriter) declareStateIDsSlice() *Statement {
 }
 
 func (a allIDsMehtodWriter) stateIDsLoopConditions() *Statement {
-	return Id(lower(a.idType())).Op(":=").Range().Id("engine").Dot("State").Dot(a.typeName())
+	return Id(Lower(a.idType())).Op(":=").Range().Id("engine").Dot("State").Dot(a.typeName())
 }
 
 func (a allIDsMehtodWriter) appendStateID() *Statement {
-	return Id(a.idSliceName("state")).Op("=").Append(Id(a.idSliceName("state")), Id(lower(a.idType())))
+	return Id(a.idSliceName("state")).Op("=").Append(Id(a.idSliceName("state")), Id(Lower(a.idType())))
 }
 
 func (a allIDsMehtodWriter) declarePatchIDsSlice() *Statement {
@@ -95,11 +96,11 @@ func (a allIDsMehtodWriter) declarePatchIDsSlice() *Statement {
 }
 
 func (a allIDsMehtodWriter) patchIDsLoopConditions() *Statement {
-	return Id(lower(a.idType())).Op(":=").Range().Id("engine").Dot("Patch").Dot(a.typeName())
+	return Id(Lower(a.idType())).Op(":=").Range().Id("engine").Dot("Patch").Dot(a.typeName())
 }
 
 func (a allIDsMehtodWriter) appendPatchID() *Statement {
-	return Id(a.idSliceName("patch")).Op("=").Append(Id(a.idSliceName("patch")), Id(lower(a.idType())))
+	return Id(a.idSliceName("patch")).Op("=").Append(Id(a.idSliceName("patch")), Id(Lower(a.idType())))
 }
 
 func (a allIDsMehtodWriter) deduplicatedIDs() *Statement {
