@@ -6,7 +6,15 @@ import (
 	"strings"
 
 	"github.com/dave/jennifer/jen"
+	"github.com/gertd/go-pluralize"
 )
+
+// pluralizeClient.Singular is used to find the singular of field names
+// this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
+// with getting the singular form of a plural, this field:
+// { pieces []piece }
+// can have the coherent adder method of "AddPiece"
+var Singular func(string) string = pluralize.NewClient().Singular
 
 func ForEachParamInAction(action ast.Action, fn func(param ast.Field) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
@@ -78,6 +86,39 @@ func ForEachActionInAST(config *ast.AST, fn func(action ast.Action) *jen.Stateme
 		statements = append(statements, jen.Line())
 	})
 	return &statements
+}
+
+func ForEachFieldValueComparison(field ast.Field, comparator jen.Statement, fn func(configType *ast.ConfigType) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	first := true
+	field.RangeValueTypes(func(valueType *ast.ConfigType) {
+		statement := jen.Empty()
+		if !first {
+			statement.Else()
+		}
+		_comparator := comparator
+		statement.If(_comparator.Op("==").Id("ElementKind" + Title(valueType.Name))).Block(
+			fn(valueType),
+		)
+		statements = append(statements, statement)
+		first = false
+	})
+	return &statements
+}
+
+func Title(name string) string {
+	return strings.Title(name)
+}
+
+func Lower(name string) string {
+	return strings.ToLower(name[:1]) + name[1:]
+}
+
+func OnlyIf(is bool, statement *jen.Statement) *jen.Statement {
+	if is {
+		return statement
+	}
+	return jen.Empty()
 }
 
 type DeclSet struct {
