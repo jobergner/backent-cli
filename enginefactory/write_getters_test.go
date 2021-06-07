@@ -64,10 +64,17 @@ func TestWriteGetters(t *testing.T) {
 			_ID_playerTargetedByRef_func,
 			anyOfPlayerPosition_Engine_func,
 			_ID_anyOfPlayerPosition_func,
+			_Player_anyOfPlayerPosition_func,
+			_Position_anyOfPlayerPosition_func,
 			anyOfPlayerZoneItem_Engine_func,
 			_ID_anyOfPlayerZoneItem_func,
+			_Player_anyOfPlayerZoneItem_func,
+			_ZoneItem_anyOfPlayerZoneItem_func,
 			anyOfItemPlayerZoneItem_Engine_func,
 			_ID_anyOfItemPlayerZoneItem_func,
+			_Item_anyOfItemPlayerZoneItem_func,
+			_Player_anyOfItemPlayerZoneItem_func,
+			_ZoneItem_anyOfItemPlayerZoneItem_func,
 		}, "\n"))
 
 		if expected != actual {
