@@ -52,6 +52,10 @@ Despite the fact that each of these errors would find a place in one of the abov
 
 
 TODO:
-- let IDs of types be a valid type (like playerID) and treat them as int
-- consider not alloweing types with ID suffix
+- implement any validation `anyOf<foo,bar>`
 - consider not allowing pointers in action params
+- what happens if action has same name as type
+- recursion validation should probably not happen on actions, they must not be used as types anyway
+- dont allow direct type usage in actions, only allow IDs of types
+- needs to allow any IDs `anyOf<foo,bar>ID`
+- consider not allowing types with ID suffix
