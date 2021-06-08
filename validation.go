@@ -153,6 +153,9 @@ func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
 
 func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
 
+	sameNameErrs := validateTypeAndActionWithSameName(stateConfigData, actionsConfigData)
+	errs = append(errs, sameNameErrs...)
+
 	// join configs and treat them as one. Actions are treated as types, params are treated as fields
 	jointConfigData := joinConfigs(stateConfigData, actionsConfigData)
 
