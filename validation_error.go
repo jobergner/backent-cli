@@ -122,3 +122,13 @@ func newValidationErrorUnavailableFieldName(keyName string) error {
 		),
 	)
 }
+func newValidationErrorDirectTypeUsage(actionName, typeName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrIllegalDirectTypeUsage: The type \"%s\" was used directly in \"%s\" instead of it's ID (\"%sID\")",
+			typeName,
+			actionName,
+			typeName,
+		),
+	)
+}
