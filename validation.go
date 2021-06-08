@@ -102,7 +102,7 @@ func generalValidation(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func thematicalValidationActions(data map[interface{}]interface{}) (errs []error) {
+func thematicalValidationActions(data map[interface{}]interface{}, availableTypeIDs []string) (errs []error) {
 	capitalizationErrs := validateIllegalCapitalization(data)
 	errs = append(errs, capitalizationErrs...)
 
@@ -111,6 +111,12 @@ func thematicalValidationActions(data map[interface{}]interface{}) (errs []error
 
 	incompatibleValueErrs := validateIncompatibleValue(data)
 	errs = append(errs, incompatibleValueErrs...)
+
+	directTypeUsageErrs := validateDirectTypeUsage(data, availableTypeIDs)
+	errs = append(errs, directTypeUsageErrs...)
+
+	pointerParameterErrs := validateIllegalPointerParameter(data)
+	errs = append(errs, pointerParameterErrs...)
 
 	return
 }
@@ -147,9 +153,6 @@ func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
 
 func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
 
-	stateConfigErrs := ValidateStateConfig(stateConfigData)
-	errs = append(errs, stateConfigErrs...)
-
 	// join configs and treat them as one. Actions are treated as types, params are treated as fields
 	jointConfigData := joinConfigs(stateConfigData, actionsConfigData)
 
@@ -160,8 +163,8 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 
 	// collect all names of actions
 	var actionsNames []string
-	for _definedActionName := range actionsConfigData {
-		definedActionName := fmt.Sprintf("%v", _definedActionName)
+	for keyName := range actionsConfigData {
+		definedActionName := fmt.Sprintf("%v", keyName)
 		actionsNames = append(actionsNames, definedActionName)
 	}
 
@@ -170,7 +173,13 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 	actionUsedAsTypeErr := validateTypeNotFound(jointConfigData, actionsNames...)
 	errs = append(errs, actionUsedAsTypeErr...)
 
-	thematicalErrs := thematicalValidationActions(jointConfigData)
+	var availableTypeIDs []string
+	for _, keyName := range stateConfigData {
+		typeName := fmt.Sprintf("%v", keyName)
+		availableTypeIDs = append(availableTypeIDs, typeName+"ID")
+	}
+
+	thematicalErrs := thematicalValidationActions(jointConfigData, availableTypeIDs)
 	errs = append(errs, thematicalErrs...)
 
 	// deduplicate errors as stateConfigData is being validated twice (ValidateStateConfig, generalValidation)

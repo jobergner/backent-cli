@@ -125,9 +125,18 @@ func newValidationErrorUnavailableFieldName(keyName string) error {
 func newValidationErrorDirectTypeUsage(actionName, typeName string) error {
 	return errors.New(
 		fmt.Sprintf(
-			"ErrIllegalDirectTypeUsage: The type \"%s\" was used directly in \"%s\" instead of it's ID (\"%sID\")",
+			"ErrDirectTypeUsage: the type \"%s\" was used directly in \"%s\" instead of it's ID (\"%sID\")",
 			typeName,
 			actionName,
+			typeName,
+		),
+	)
+}
+func newValidationErrorIllegalPointerParameter(typeName, fieldName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrIllegalPointerParameter: the parameter \"%s\" in \"%s\" contains a pointer value",
+			fieldName,
 			typeName,
 		),
 	)
