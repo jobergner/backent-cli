@@ -315,16 +315,12 @@ func TestValidateActionsConfig(t *testing.T) {
 
 		actualErrors := ValidateActionsConfig(data, actionsConfigData)
 		expectedErrors := []error{
-			newValidationErrorNonObjectType("foo"),
-			newValidationErrorNonObjectType("bar"),
-			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
-			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
-			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
-			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
 			newValidationErrorTypeNotFound("fooAction", "barAction"),
 			newValidationErrorIllegalCapitalization("BazAction", literalKindType),
 			newValidationErrorDirectTypeUsage("barAction", "baz"),
 			newValidationErrorIllegalPointerParameter("barAction", "bum"),
+			newValidationErrorDirectTypeUsage("barAction", "fooAction"),
+			newValidationErrorDirectTypeUsage("barAction", "*baz"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
