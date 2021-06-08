@@ -156,6 +156,15 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 	// join configs and treat them as one. Actions are treated as types, params are treated as fields
 	jointConfigData := joinConfigs(stateConfigData, actionsConfigData)
 
+	// collect all availableIDs and insert them into the jointConfigData so the validator cosinders them to be valid types
+	var availableTypeIDs []string
+	for keyName := range stateConfigData {
+		typeName := fmt.Sprintf("%v", keyName)
+		idName := typeName + "ID"
+		availableTypeIDs = append(availableTypeIDs, idName)
+		jointConfigData[idName] = "int"
+	}
+
 	// general validation with joint config so validator is aware of all defined types in
 	// the state config data when validating types used within actions
 	generalErrs := generalValidation(jointConfigData)
@@ -173,13 +182,7 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 	actionUsedAsTypeErr := validateTypeNotFound(jointConfigData, actionsNames...)
 	errs = append(errs, actionUsedAsTypeErr...)
 
-	var availableTypeIDs []string
-	for _, keyName := range stateConfigData {
-		typeName := fmt.Sprintf("%v", keyName)
-		availableTypeIDs = append(availableTypeIDs, typeName+"ID")
-	}
-
-	thematicalErrs := thematicalValidationActions(jointConfigData, availableTypeIDs)
+	thematicalErrs := thematicalValidationActions(actionsConfigData, availableTypeIDs)
 	errs = append(errs, thematicalErrs...)
 
 	// deduplicate errors as stateConfigData is being validated twice (ValidateStateConfig, generalValidation)
