@@ -50,6 +50,7 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrUnavailableFieldName | "{KeyName}" not an available name. | Due to internal usage of this FieldName it is unavailable. |
 | ErrDirectTypeUsage | the type "{TypeName}" was used directly in "{ActionName}" instead of it's ID ("{TypeName}ID") | Only IDs of types are available in actions |
 | ErrIllegalPointerParameter | the parameter "{FieldName}" in "{ActionName}" contains a pointer value | Pointers can not be used as parameter as it would not make any sense |
+| ErrTypeAndActionWithSameName | type and action "{Name}" have the same name | Types and Actions with the same name would cause conflicts in the generated code |
 <br/>
 
 TODO:

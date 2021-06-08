@@ -141,3 +141,11 @@ func newValidationErrorIllegalPointerParameter(typeName, fieldName string) error
 		),
 	)
 }
+func newValidationErrorTypeAndActionWithSameName(name string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrTypeAndActionWithSameName: type and action \"%s\" have the same name",
+			name,
+		),
+	)
+}
