@@ -303,6 +303,8 @@ func TestValidateActionsConfig(t *testing.T) {
 			"barAction": map[interface{}]interface{}{
 				"bug":  "fooAction",
 				"bam":  "baz",
+				"bum":  "*baz",
+				"lum":  "bazID",
 				"foot": "string",
 				"feet": "string",
 			},
@@ -321,6 +323,8 @@ func TestValidateActionsConfig(t *testing.T) {
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
 			newValidationErrorTypeNotFound("fooAction", "barAction"),
 			newValidationErrorIllegalCapitalization("BazAction", literalKindType),
+			newValidationErrorDirectTypeUsage("barAction", "baz"),
+			newValidationErrorIllegalPointerParameter("barAction", "bum"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
