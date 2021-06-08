@@ -13,9 +13,9 @@ func validateTypeAndActionWithSameName(stateData, actionsData map[interface{}]in
 	}
 
 	var actionNames []string
-	for key := range stateData {
-		actoinName := fmt.Sprintf("%v", key)
-		actionNames = append(actionNames, actoinName)
+	for key := range actionsData {
+		actionName := fmt.Sprintf("%v", key)
+		actionNames = append(actionNames, actionName)
 	}
 
 	for _, typeName := range typeNames {
