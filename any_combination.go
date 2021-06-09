@@ -12,17 +12,23 @@ type anyOfTypeIterator struct {
 	currentTypeIndex int
 }
 
+func newAnyOfTypeIterator(parentName, fieldName, valueString string) anyOfTypeIterator {
+	return anyOfTypeIterator{
+		parentName: parentName,
+		fieldName:  fieldName,
+		types:      extractTypes(valueString)[1:], // omit first element as `extractTypes` consider the `anyOf` prefix a type
+	}
+}
+
 type anyOfTypeCombinator struct {
 	anyOfTypes       []anyOfTypeIterator
 	dataCombinations []map[interface{}]interface{}
 	data             map[interface{}]interface{} // contains given data excluding `anyOf<>` fields
 }
 
-func newAnyOfType(parentName, fieldName, valueString string) anyOfTypeIterator {
-	return anyOfTypeIterator{
-		parentName: parentName,
-		fieldName:  fieldName,
-		types:      extractTypes(valueString),
+func newAnyOfTypeCombinator() *anyOfTypeCombinator {
+	return &anyOfTypeCombinator{
+		dataCombinations: make([]map[interface{}]interface{}, 0),
 	}
 }
 
@@ -41,7 +47,7 @@ func (a *anyOfTypeCombinator) build(data map[interface{}]interface{}) []error {
 			_keyName := fmt.Sprintf("%v", _k)
 			valueString := fmt.Sprintf("%v", _v)
 			if isAnyOfTypes(valueString) {
-				a.anyOfTypes = append(a.anyOfTypes, newAnyOfType(keyName, _keyName, valueString))
+				a.anyOfTypes = append(a.anyOfTypes, newAnyOfTypeIterator(keyName, _keyName, valueString))
 				delete(valueObject, _keyName)
 				manipulatedData[keyName] = valueObject
 			}
