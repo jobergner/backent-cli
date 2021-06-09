@@ -54,14 +54,14 @@ func (_ref playerTargetRef) Unset() {
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
 
-func (_ref playerTargetRef) Get() anyOfPlayerZoneItem {
+func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItem {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref.playerTargetRef.engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
+	return ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 }
 
-func (_ref playerTargetedByRef) Get() anyOfPlayerZoneItem {
+func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItem {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
-	return ref.playerTargetedByRef.engine.anyOfPlayerZoneItem(ref.playerTargetedByRef.ReferencedElementID)
+	return ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 }
 
 func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
@@ -107,10 +107,10 @@ func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
-		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
 			continue
 		}
-		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
+		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
 			ref.Unset()
 		}
 	}
@@ -120,10 +120,10 @@ func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID)
 	for _, refID := range engine.allPlayerTargetRefIDs() {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
-		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
 			continue
 		}
-		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
+		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
 			ref.Unset()
 		}
 	}
@@ -133,10 +133,10 @@ func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
 	for _, refID := range engine.allPlayerTargetedByRefIDs() {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
-		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindPlayer {
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
 			continue
 		}
-		if anyContainer.anyOfPlayerZoneItem.Player == playerID {
+		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
 			parent := engine.Player(ref.playerTargetedByRef.ParentID)
 			parent.RemoveTargetedByPlayer(playerID)
 		}
@@ -147,10 +147,10 @@ func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneIte
 	for _, refID := range engine.allPlayerTargetedByRefIDs() {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
-		if anyContainer.anyOfPlayerZoneItem.ElementKind != ElementKindZoneItem {
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
 			continue
 		}
-		if anyContainer.anyOfPlayerZoneItem.ZoneItem == zoneItemID {
+		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
 			parent := engine.Player(ref.playerTargetedByRef.ParentID)
 			parent.RemoveTargetedByZoneItem(zoneItemID)
 		}

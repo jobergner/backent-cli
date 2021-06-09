@@ -11,59 +11,59 @@ type PlayerGuildMemberRefID int
 type ItemBoundToRefID int
 type EquipmentSetEquipmentRefID int
 type PlayerEquipmentSetRefID int
-type AnyOfItemPlayerZoneItemID int
-type AnyOfPlayerZoneItemID int
-type AnyOfPlayerPositionID int
+type AnyOfItem_Player_ZoneItemID int
+type AnyOfPlayer_ZoneItemID int
+type AnyOfPlayer_PositionID int
 type PlayerTargetRefID int
 type PlayerTargetedByRefID int
 
 type State struct {
-	EquipmentSet             map[EquipmentSetID]equipmentSetCore                         `json:"equipmentSet"`
-	GearScore                map[GearScoreID]gearScoreCore                               `json:"gearScore"`
-	Item                     map[ItemID]itemCore                                         `json:"item"`
-	Player                   map[PlayerID]playerCore                                     `json:"player"`
-	Position                 map[PositionID]positionCore                                 `json:"position"`
-	Zone                     map[ZoneID]zoneCore                                         `json:"zone"`
-	ZoneItem                 map[ZoneItemID]zoneItemCore                                 `json:"zoneItem"`
-	EquipmentSetEquipmentRef map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore `json:"equipmentSetEquipmentRef"`
-	ItemBoundToRef           map[ItemBoundToRefID]itemBoundToRefCore                     `json:"itemBoundToRef"`
-	PlayerEquipmentSetRef    map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore       `json:"playerEquipmentSetRef"`
-	PlayerGuildMemberRef     map[PlayerGuildMemberRefID]playerGuildMemberRefCore         `json:"playerGuildMemberRef"`
-	PlayerTargetRef          map[PlayerTargetRefID]playerTargetRefCore                   `json:"playerTargetRef"`
-	PlayerTargetedByRef      map[PlayerTargetedByRefID]playerTargetedByRefCore           `json:"playerTargetedByRef"`
-	AnyOfPlayerPosition      map[AnyOfPlayerPositionID]anyOfPlayerPositionCore           `json:"anyOfPlayerPosition"`
-	AnyOfPlayerZoneItem      map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore           `json:"anyOfPlayerZoneItem"`
-	AnyOfItemPlayerZoneItem  map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore   `json:"anyOfItemPlayerZoneItem"`
+	EquipmentSet              map[EquipmentSetID]equipmentSetCore                           `json:"equipmentSet"`
+	GearScore                 map[GearScoreID]gearScoreCore                                 `json:"gearScore"`
+	Item                      map[ItemID]itemCore                                           `json:"item"`
+	Player                    map[PlayerID]playerCore                                       `json:"player"`
+	Position                  map[PositionID]positionCore                                   `json:"position"`
+	Zone                      map[ZoneID]zoneCore                                           `json:"zone"`
+	ZoneItem                  map[ZoneItemID]zoneItemCore                                   `json:"zoneItem"`
+	EquipmentSetEquipmentRef  map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore   `json:"equipmentSetEquipmentRef"`
+	ItemBoundToRef            map[ItemBoundToRefID]itemBoundToRefCore                       `json:"itemBoundToRef"`
+	PlayerEquipmentSetRef     map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore         `json:"playerEquipmentSetRef"`
+	PlayerGuildMemberRef      map[PlayerGuildMemberRefID]playerGuildMemberRefCore           `json:"playerGuildMemberRef"`
+	PlayerTargetRef           map[PlayerTargetRefID]playerTargetRefCore                     `json:"playerTargetRef"`
+	PlayerTargetedByRef       map[PlayerTargetedByRefID]playerTargetedByRefCore             `json:"playerTargetedByRef"`
+	AnyOfPlayer_Position      map[AnyOfPlayer_PositionID]anyOfPlayer_PositionCore           `json:"anyOfPlayer_Position"`
+	AnyOfPlayer_ZoneItem      map[AnyOfPlayer_ZoneItemID]anyOfPlayer_ZoneItemCore           `json:"anyOfPlayer_ZoneItem"`
+	AnyOfItem_Player_ZoneItem map[AnyOfItem_Player_ZoneItemID]anyOfItem_Player_ZoneItemCore `json:"anyOfItem_Player_ZoneItem"`
 }
 
 func newState() State {
 	return State{
-		EquipmentSet:             make(map[EquipmentSetID]equipmentSetCore),
-		GearScore:                make(map[GearScoreID]gearScoreCore),
-		Item:                     make(map[ItemID]itemCore),
-		Player:                   make(map[PlayerID]playerCore),
-		Position:                 make(map[PositionID]positionCore),
-		Zone:                     make(map[ZoneID]zoneCore),
-		ZoneItem:                 make(map[ZoneItemID]zoneItemCore),
-		EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore),
-		ItemBoundToRef:           make(map[ItemBoundToRefID]itemBoundToRefCore),
-		PlayerEquipmentSetRef:    make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore),
-		PlayerGuildMemberRef:     make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore),
-		PlayerTargetRef:          make(map[PlayerTargetRefID]playerTargetRefCore),
-		PlayerTargetedByRef:      make(map[PlayerTargetedByRefID]playerTargetedByRefCore),
-		AnyOfPlayerPosition:      make(map[AnyOfPlayerPositionID]anyOfPlayerPositionCore),
-		AnyOfPlayerZoneItem:      make(map[AnyOfPlayerZoneItemID]anyOfPlayerZoneItemCore),
-		AnyOfItemPlayerZoneItem:  make(map[AnyOfItemPlayerZoneItemID]anyOfItemPlayerZoneItemCore),
+		EquipmentSet:              make(map[EquipmentSetID]equipmentSetCore),
+		GearScore:                 make(map[GearScoreID]gearScoreCore),
+		Item:                      make(map[ItemID]itemCore),
+		Player:                    make(map[PlayerID]playerCore),
+		Position:                  make(map[PositionID]positionCore),
+		Zone:                      make(map[ZoneID]zoneCore),
+		ZoneItem:                  make(map[ZoneItemID]zoneItemCore),
+		EquipmentSetEquipmentRef:  make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore),
+		ItemBoundToRef:            make(map[ItemBoundToRefID]itemBoundToRefCore),
+		PlayerEquipmentSetRef:     make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore),
+		PlayerGuildMemberRef:      make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore),
+		PlayerTargetRef:           make(map[PlayerTargetRefID]playerTargetRefCore),
+		PlayerTargetedByRef:       make(map[PlayerTargetedByRefID]playerTargetedByRefCore),
+		AnyOfPlayer_Position:      make(map[AnyOfPlayer_PositionID]anyOfPlayer_PositionCore),
+		AnyOfPlayer_ZoneItem:      make(map[AnyOfPlayer_ZoneItemID]anyOfPlayer_ZoneItemCore),
+		AnyOfItem_Player_ZoneItem: make(map[AnyOfItem_Player_ZoneItemID]anyOfItem_Player_ZoneItemCore),
 	}
 }
 
 type zoneCore struct {
-	ID            ZoneID                      `json:"id"`
-	Interactables []AnyOfItemPlayerZoneItemID `json:"interactables"`
-	Items         []ZoneItemID                `json:"items"`
-	Players       []PlayerID                  `json:"players"`
-	Tags          []string                    `json:"tags"`
-	OperationKind OperationKind               `json:"operationKind"`
+	ID            ZoneID                        `json:"id"`
+	Interactables []AnyOfItem_Player_ZoneItemID `json:"interactables"`
+	Items         []ZoneItemID                  `json:"items"`
+	Players       []PlayerID                    `json:"players"`
+	Tags          []string                      `json:"tags"`
+	OperationKind OperationKind                 `json:"operationKind"`
 	engine        *Engine
 }
 
@@ -81,13 +81,13 @@ type zoneItemCore struct {
 type zoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
-	ID            ItemID                `json:"id"`
-	BoundTo       ItemBoundToRefID      `json:"boundTo"`
-	GearScore     GearScoreID           `json:"gearScore"`
-	Name          string                `json:"name"`
-	Origin        AnyOfPlayerPositionID `json:"origin"`
-	OperationKind OperationKind         `json:"operationKind"`
-	HasParent     bool                  `json:"hasParent"`
+	ID            ItemID                 `json:"id"`
+	BoundTo       ItemBoundToRefID       `json:"boundTo"`
+	GearScore     GearScoreID            `json:"gearScore"`
+	Name          string                 `json:"name"`
+	Origin        AnyOfPlayer_PositionID `json:"origin"`
+	OperationKind OperationKind          `json:"operationKind"`
+	HasParent     bool                   `json:"hasParent"`
 	engine        *Engine
 }
 
@@ -181,55 +181,55 @@ type playerEquipmentSetRefCore struct {
 
 type playerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }
 
-type anyOfPlayerPositionCore struct {
-	ID            AnyOfPlayerPositionID `json:"id"`
-	ElementKind   ElementKind           `json:"elementKind"`
-	Player        PlayerID              `json:"player"`
-	Position      PositionID            `json:"position"`
-	OperationKind OperationKind         `json:"operationKind"`
+type anyOfPlayer_PositionCore struct {
+	ID            AnyOfPlayer_PositionID `json:"id"`
+	ElementKind   ElementKind            `json:"elementKind"`
+	Player        PlayerID               `json:"player"`
+	Position      PositionID             `json:"position"`
+	OperationKind OperationKind          `json:"operationKind"`
 	engine        *Engine
 }
 
-type anyOfPlayerPosition struct{ anyOfPlayerPosition anyOfPlayerPositionCore }
+type anyOfPlayer_Position struct{ anyOfPlayer_Position anyOfPlayer_PositionCore }
 
-type anyOfPlayerZoneItemCore struct {
-	ID            AnyOfPlayerZoneItemID `json:"id"`
-	ElementKind   ElementKind           `json:"elementKind"`
-	Player        PlayerID              `json:"player"`
-	ZoneItem      ZoneItemID            `json:"zoneItem"`
-	OperationKind OperationKind         `json:"operationKind"`
+type anyOfPlayer_ZoneItemCore struct {
+	ID            AnyOfPlayer_ZoneItemID `json:"id"`
+	ElementKind   ElementKind            `json:"elementKind"`
+	Player        PlayerID               `json:"player"`
+	ZoneItem      ZoneItemID             `json:"zoneItem"`
+	OperationKind OperationKind          `json:"operationKind"`
 	engine        *Engine
 }
 
-type anyOfPlayerZoneItem struct{ anyOfPlayerZoneItem anyOfPlayerZoneItemCore }
+type anyOfPlayer_ZoneItem struct{ anyOfPlayer_ZoneItem anyOfPlayer_ZoneItemCore }
 
-type anyOfItemPlayerZoneItemCore struct {
-	ID            AnyOfItemPlayerZoneItemID `json:"id"`
-	ElementKind   ElementKind               `json:"elementKind"`
-	Item          ItemID                    `json:"item"`
-	Player        PlayerID                  `json:"player"`
-	ZoneItem      ZoneItemID                `json:"zoneItem"`
-	OperationKind OperationKind             `json:"operationKind"`
+type anyOfItem_Player_ZoneItemCore struct {
+	ID            AnyOfItem_Player_ZoneItemID `json:"id"`
+	ElementKind   ElementKind                 `json:"elementKind"`
+	Item          ItemID                      `json:"item"`
+	Player        PlayerID                    `json:"player"`
+	ZoneItem      ZoneItemID                  `json:"zoneItem"`
+	OperationKind OperationKind               `json:"operationKind"`
 	engine        *Engine
 }
 
-type anyOfItemPlayerZoneItem struct{ anyOfItemPlayerZoneItem anyOfItemPlayerZoneItemCore }
+type anyOfItem_Player_ZoneItem struct{ anyOfItem_Player_ZoneItem anyOfItem_Player_ZoneItemCore }
 
 type playerTargetRefCore struct {
-	ID                  PlayerTargetRefID     `json:"id"`
-	ParentID            PlayerID              `json:"parentID"`
-	ReferencedElementID AnyOfPlayerZoneItemID `json:"referencedElementID"`
-	OperationKind       OperationKind         `json:"operationKind"`
+	ID                  PlayerTargetRefID      `json:"id"`
+	ParentID            PlayerID               `json:"parentID"`
+	ReferencedElementID AnyOfPlayer_ZoneItemID `json:"referencedElementID"`
+	OperationKind       OperationKind          `json:"operationKind"`
 	engine              *Engine
 }
 
 type playerTargetRef struct{ playerTargetRef playerTargetRefCore }
 
 type playerTargetedByRefCore struct {
-	ID                  PlayerTargetedByRefID `json:"id"`
-	ParentID            PlayerID              `json:"parentID"`
-	ReferencedElementID AnyOfPlayerZoneItemID `json:"referencedElementID"`
-	OperationKind       OperationKind         `json:"operationKind"`
+	ID                  PlayerTargetedByRefID  `json:"id"`
+	ParentID            PlayerID               `json:"parentID"`
+	ReferencedElementID AnyOfPlayer_ZoneItemID `json:"referencedElementID"`
+	OperationKind       OperationKind          `json:"operationKind"`
 	engine              *Engine
 }
 

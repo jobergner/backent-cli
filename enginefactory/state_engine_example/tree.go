@@ -119,15 +119,15 @@ type GearScoreReference struct {
 }
 
 type Player struct {
-	ID            PlayerID                       `json:"id"`
-	EquipmentSets []EquipmentSetReference        `json:"equipmentSets"`
-	GearScore     *GearScore                     `json:"gearScore"`
-	GuildMembers  []PlayerReference              `json:"guildMembers"`
-	Items         []Item                         `json:"items"`
-	Position      *Position                      `json:"position"`
-	Target        *AnyOfPlayerZoneItemReference  `json:"target"`
-	TargetedBy    []AnyOfPlayerZoneItemReference `json:"targetedBy"`
-	OperationKind OperationKind                  `json:"operationKind"`
+	ID            PlayerID                        `json:"id"`
+	EquipmentSets []EquipmentSetReference         `json:"equipmentSets"`
+	GearScore     *GearScore                      `json:"gearScore"`
+	GuildMembers  []PlayerReference               `json:"guildMembers"`
+	Items         []Item                          `json:"items"`
+	Position      *Position                       `json:"position"`
+	Target        *AnyOfPlayer_ZoneItemReference  `json:"target"`
+	TargetedBy    []AnyOfPlayer_ZoneItemReference `json:"targetedBy"`
+	OperationKind OperationKind                   `json:"operationKind"`
 }
 type PlayerReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
@@ -155,7 +155,7 @@ type ZoneReference struct {
 	Zone                 *Zone                `json:"zone"`
 }
 
-type AnyOfPlayerZoneItemReference struct {
+type AnyOfPlayer_ZoneItemReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            int                  `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`

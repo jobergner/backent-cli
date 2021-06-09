@@ -39,8 +39,8 @@ func (engine *Engine) createItem(hasParent bool) item {
 	element.HasParent = hasParent
 	elementGearScore := engine.createGearScore(true)
 	element.GearScore = elementGearScore.gearScore.ID
-	elementOrigin := engine.createAnyOfPlayerPosition(true)
-	element.Origin = elementOrigin.anyOfPlayerPosition.ID
+	elementOrigin := engine.createAnyOfPlayer_Position(true)
+	element.Origin = elementOrigin.anyOfPlayer_Position.ID
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.Item[element.ID] = element
 	return item{item: element}
@@ -152,7 +152,7 @@ func (engine *Engine) createPlayerEquipmentSetRef(referencedElementID EquipmentS
 	return element
 }
 
-func (engine *Engine) createPlayerTargetRef(referencedElementID AnyOfPlayerZoneItemID, parentID PlayerID) playerTargetRefCore {
+func (engine *Engine) createPlayerTargetRef(referencedElementID AnyOfPlayer_ZoneItemID, parentID PlayerID) playerTargetRefCore {
 	var element playerTargetRefCore
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
@@ -163,7 +163,7 @@ func (engine *Engine) createPlayerTargetRef(referencedElementID AnyOfPlayerZoneI
 	return element
 }
 
-func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayerZoneItemID, parentID PlayerID) playerTargetedByRefCore {
+func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayer_ZoneItemID, parentID PlayerID) playerTargetedByRefCore {
 	var element playerTargetedByRefCore
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
@@ -174,44 +174,44 @@ func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayerZ
 	return element
 }
 
-func (engine *Engine) createAnyOfPlayerZoneItem(setDefaultValue bool) anyOfPlayerZoneItem {
-	var element anyOfPlayerZoneItemCore
+func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool) anyOfPlayer_ZoneItem {
+	var element anyOfPlayer_ZoneItemCore
 	element.engine = engine
-	element.ID = AnyOfPlayerZoneItemID(engine.GenerateID())
+	element.ID = AnyOfPlayer_ZoneItemID(engine.GenerateID())
 	if setDefaultValue {
 		elementPlayer := engine.createPlayer(true)
 		element.Player = elementPlayer.player.ID
 		element.ElementKind = ElementKindPlayer
 	}
 	element.OperationKind = OperationKindUpdate
-	engine.Patch.AnyOfPlayerZoneItem[element.ID] = element
-	return anyOfPlayerZoneItem{anyOfPlayerZoneItem: element}
+	engine.Patch.AnyOfPlayer_ZoneItem[element.ID] = element
+	return anyOfPlayer_ZoneItem{anyOfPlayer_ZoneItem: element}
 }
 
-func (engine *Engine) createAnyOfPlayerPosition(setDefaultValue bool) anyOfPlayerPosition {
-	var element anyOfPlayerPositionCore
+func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool) anyOfPlayer_Position {
+	var element anyOfPlayer_PositionCore
 	element.engine = engine
-	element.ID = AnyOfPlayerPositionID(engine.GenerateID())
+	element.ID = AnyOfPlayer_PositionID(engine.GenerateID())
 	if setDefaultValue {
 		elementPlayer := engine.createPlayer(true)
 		element.Player = elementPlayer.player.ID
 		element.ElementKind = ElementKindPlayer
 	}
 	element.OperationKind = OperationKindUpdate
-	engine.Patch.AnyOfPlayerPosition[element.ID] = element
-	return anyOfPlayerPosition{anyOfPlayerPosition: element}
+	engine.Patch.AnyOfPlayer_Position[element.ID] = element
+	return anyOfPlayer_Position{anyOfPlayer_Position: element}
 }
 
-func (engine *Engine) createAnyOfItemPlayerZoneItem(setDefaultValue bool) anyOfItemPlayerZoneItem {
-	var element anyOfItemPlayerZoneItemCore
+func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool) anyOfItem_Player_ZoneItem {
+	var element anyOfItem_Player_ZoneItemCore
 	element.engine = engine
-	element.ID = AnyOfItemPlayerZoneItemID(engine.GenerateID())
+	element.ID = AnyOfItem_Player_ZoneItemID(engine.GenerateID())
 	if setDefaultValue {
 		elementItem := engine.createItem(true)
 		element.Item = elementItem.item.ID
 		element.ElementKind = ElementKindItem
 	}
 	element.OperationKind = OperationKindUpdate
-	engine.Patch.AnyOfItemPlayerZoneItem[element.ID] = element
-	return anyOfItemPlayerZoneItem{anyOfItemPlayerZoneItem: element}
+	engine.Patch.AnyOfItem_Player_ZoneItem[element.ID] = element
+	return anyOfItem_Player_ZoneItem{anyOfItem_Player_ZoneItem: element}
 }

@@ -66,9 +66,9 @@ func (_zone zone) RemoveInteractablesItem(itemsToRemove ...ItemID) zone {
 		return zone
 	}
 	var wereElementsAltered bool
-	var newElements []AnyOfItemPlayerZoneItemID
+	var newElements []AnyOfItem_Player_ZoneItemID
 	for _, anyContainerID := range zone.zone.Interactables {
-		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
 		element := anyContainer.Item().ID()
 		if element == 0 {
 			continue
@@ -83,7 +83,7 @@ func (_zone zone) RemoveInteractablesItem(itemsToRemove ...ItemID) zone {
 			}
 		}
 		if !toBeRemoved {
-			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+			newElements = append(newElements, anyContainer.anyOfItem_Player_ZoneItem.ID)
 		}
 	}
 	if !wereElementsAltered {
@@ -101,9 +101,9 @@ func (_zone zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) zone {
 		return zone
 	}
 	var wereElementsAltered bool
-	var newElements []AnyOfItemPlayerZoneItemID
+	var newElements []AnyOfItem_Player_ZoneItemID
 	for _, anyContainerID := range zone.zone.Interactables {
-		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
 		element := anyContainer.Player().ID()
 		if element == 0 {
 			continue
@@ -118,7 +118,7 @@ func (_zone zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) zone {
 			}
 		}
 		if !toBeRemoved {
-			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+			newElements = append(newElements, anyContainer.anyOfItem_Player_ZoneItem.ID)
 		}
 	}
 	if !wereElementsAltered {
@@ -136,9 +136,9 @@ func (_zone zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) z
 		return zone
 	}
 	var wereElementsAltered bool
-	var newElements []AnyOfItemPlayerZoneItemID
+	var newElements []AnyOfItem_Player_ZoneItemID
 	for _, anyContainerID := range zone.zone.Interactables {
-		anyContainer := zone.zone.engine.anyOfItemPlayerZoneItem(anyContainerID)
+		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
 		element := anyContainer.ZoneItem().ID()
 		if element == 0 {
 			continue
@@ -153,7 +153,7 @@ func (_zone zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) z
 			}
 		}
 		if !toBeRemoved {
-			newElements = append(newElements, anyContainer.anyOfItemPlayerZoneItem.ID)
+			newElements = append(newElements, anyContainer.anyOfItem_Player_ZoneItem.ID)
 		}
 	}
 	if !wereElementsAltered {

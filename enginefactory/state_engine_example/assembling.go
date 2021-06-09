@@ -111,17 +111,17 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		item.GearScore = &treeGearScore
 	}
 
-	anyOfPlayerPositionContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition
-	if anyOfPlayerPositionContainer.ElementKind == ElementKindPlayer {
-		playerID := anyOfPlayerPositionContainer.Player
+	anyOfPlayer_PositionContainer := engine.anyOfPlayer_Position(itemData.Origin).anyOfPlayer_Position
+	if anyOfPlayer_PositionContainer.ElementKind == ElementKindPlayer {
+		playerID := anyOfPlayer_PositionContainer.Player
 		if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
 			if childHasUpdated {
 				hasUpdated = true
 			}
 			item.Origin = &treePlayer
 		}
-	} else if anyOfPlayerPositionContainer.ElementKind == ElementKindPosition {
-		positionID := anyOfPlayerPositionContainer.Position
+	} else if anyOfPlayer_PositionContainer.ElementKind == ElementKindPosition {
+		positionID := anyOfPlayer_PositionContainer.Position
 		if treePosition, include, childHasUpdated := engine.assemblePosition(positionID, check, config); include {
 			if childHasUpdated {
 				hasUpdated = true
@@ -265,26 +265,26 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 
 	var zone Zone
 
-	for _, anyOfItemPlayerZoneItemID := range mergeAnyOfItemPlayerZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
-		anyOfItemPlayerZoneItemContainer := engine.anyOfItemPlayerZoneItem(anyOfItemPlayerZoneItemID).anyOfItemPlayerZoneItem
-		if anyOfItemPlayerZoneItemContainer.ElementKind == ElementKindItem {
-			itemID := anyOfItemPlayerZoneItemContainer.Item
+	for _, anyOfItem_Player_ZoneItemID := range mergeAnyOfItem_Player_ZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
+		anyOfItem_Player_ZoneItemContainer := engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID).anyOfItem_Player_ZoneItem
+		if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindItem {
+			itemID := anyOfItem_Player_ZoneItemContainer.Item
 			if treeItem, include, childHasUpdated := engine.assembleItem(itemID, check, config); include {
 				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treeItem)
 			}
-		} else if anyOfItemPlayerZoneItemContainer.ElementKind == ElementKindPlayer {
-			playerID := anyOfItemPlayerZoneItemContainer.Player
+		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindPlayer {
+			playerID := anyOfItem_Player_ZoneItemContainer.Player
 			if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
 				if childHasUpdated {
 					hasUpdated = true
 				}
 				zone.Interactables = append(zone.Interactables, treePlayer)
 			}
-		} else if anyOfItemPlayerZoneItemContainer.ElementKind == ElementKindZoneItem {
-			zoneItemID := anyOfItemPlayerZoneItemContainer.ZoneItem
+		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindZoneItem {
+			zoneItemID := anyOfItem_Player_ZoneItemContainer.ZoneItem
 			if treeZoneItem, include, childHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
 				if childHasUpdated {
 					hasUpdated = true
@@ -318,7 +318,7 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 	return zone, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursionCheck, config assembleConfig) (*AnyOfPlayerZoneItemReference, bool, bool) {
+func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursionCheck, config assembleConfig) (*AnyOfPlayer_ZoneItemReference, bool, bool) {
 	statePlayer := engine.State.Player[playerID]
 	patchPlayer, playerIsInPatch := engine.Patch.Player[playerID]
 
@@ -330,9 +330,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	// force include
 	if config.forceInclude {
 		ref := engine.playerTargetRef(patchPlayer.Target)
-		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
-			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -341,9 +341,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			return &AnyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -352,7 +352,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return &AnyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -360,9 +360,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	if statePlayer.Target == 0 && (playerIsInPatch && patchPlayer.Target != 0) {
 		config.forceInclude = true
 		ref := engine.playerTargetRef(patchPlayer.Target)
-		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
-			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -372,9 +372,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -384,16 +384,23 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
+			return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), &element}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
 	// ref was definitely removed
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target == 0) {
+<<<<<<< HEAD
+		ref := engine.playerTargetRef(patchPlayer.Target)
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
+=======
 		ref := engine.playerTargetRef(statePlayer.Target)
 		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
 			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+>>>>>>> 2f490f83bfc6840e62d8e085fc3995aeec355f50
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -402,9 +409,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			return &AnyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -413,7 +420,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return &AnyOfPlayerZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+			return &AnyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -421,9 +428,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target != 0) {
 		if statePlayer.Target != patchPlayer.Target {
 			ref := engine.playerTargetRef(patchPlayer.Target)
-			anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
-			if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
-				referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+			anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+			if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+				referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 				if check == nil {
 					check = newRecursionCheck()
 				}
@@ -432,9 +439,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 					referencedDataStatus = ReferencedDataModified
 				}
 				path, _ := engine.PathTrack.player[referencedElement.ID]
-				return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
-			} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-				referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+			} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+				referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 				if check == nil {
 					check = newRecursionCheck()
 				}
@@ -443,7 +450,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 					referencedDataStatus = ReferencedDataModified
 				}
 				path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-				return &AnyOfPlayerZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
+				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, referencedDataStatus == ReferencedDataModified
 			}
 		}
 	}
@@ -451,22 +458,22 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	// element got updated - OperationKindUpdate
 	if statePlayer.Target != 0 {
 		ref := engine.playerTargetRef(statePlayer.Target)
-		anyContainer := engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
 			if check == nil {
 				check = newRecursionCheck()
 			}
-			if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayerZoneItem.Player, check, config); hasUpdatedDownstream {
-				path, _ := engine.PathTrack.player[anyContainer.anyOfPlayerZoneItem.Player]
-				return &AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+			if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayer_ZoneItem.Player, check, config); hasUpdatedDownstream {
+				path, _ := engine.PathTrack.player[anyContainer.anyOfPlayer_ZoneItem.Player]
+				return &AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 			}
-		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
+		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
 				check = newRecursionCheck()
 			}
-			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
-				path, _ := engine.PathTrack.zoneItem[anyContainer.anyOfPlayerZoneItem.ZoneItem]
-				return &AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
+				path, _ := engine.PathTrack.zoneItem[anyContainer.anyOfPlayer_ZoneItem.ZoneItem]
+				return &AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 			}
 		}
 	}
@@ -562,12 +569,12 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 	return nil, false, false
 }
 
-func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (AnyOfPlayerZoneItemReference, bool, bool) {
+func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (AnyOfPlayer_ZoneItemReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
-		anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
-		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
-			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -576,9 +583,9 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			return AnyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -587,7 +594,7 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				referencedDataStatus = ReferencedDataModified
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return AnyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -595,9 +602,9 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 		if patchRef.OperationKind == OperationKindUpdate {
 			config.forceInclude = true
 		}
-		anyContainer := engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID)
-		if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
-			referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+		anyContainer := engine.anyOfPlayer_ZoneItem(patchRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -611,9 +618,9 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				el = &element
 			}
 			path, _ := engine.PathTrack.player[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem).zoneItem
+			return AnyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			if check == nil {
 				check = newRecursionCheck()
 			}
@@ -627,7 +634,7 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 				el = &element
 			}
 			path, _ := engine.PathTrack.zoneItem[referencedElement.ID]
-			return AnyOfPlayerZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return AnyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, path.toJSONPath(), el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -635,20 +642,20 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 	if check == nil {
 		check = newRecursionCheck()
 	}
-	anyContainer := engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
-	if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindPlayer {
-		if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayerZoneItem.Player, check, config); hasUpdatedDownstream {
-			path, _ := engine.PathTrack.player[anyContainer.anyOfPlayerZoneItem.Player]
-			return AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+	anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
+	if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+		if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayer_ZoneItem.Player, check, config); hasUpdatedDownstream {
+			path, _ := engine.PathTrack.player[anyContainer.anyOfPlayer_ZoneItem.Player]
+			return AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 		}
-	} else if anyContainer.anyOfPlayerZoneItem.ElementKind == ElementKindZoneItem {
-		if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
-			path, _ := engine.PathTrack.zoneItem[anyContainer.anyOfPlayerZoneItem.ZoneItem]
-			return AnyOfPlayerZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayerZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
+	} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+		if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
+			path, _ := engine.PathTrack.zoneItem[anyContainer.anyOfPlayer_ZoneItem.ZoneItem]
+			return AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, path.toJSONPath(), nil}, true, true
 		}
 	}
 
-	return AnyOfPlayerZoneItemReference{}, false, false
+	return AnyOfPlayer_ZoneItemReference{}, false, false
 }
 
 func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (PlayerReference, bool, bool) {

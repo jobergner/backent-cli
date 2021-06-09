@@ -427,8 +427,8 @@ func mergePlayerEquipmentSetRefIDs(currentIDs, nextIDs []PlayerEquipmentSetRefID
 	return ids
 }
 
-func mergeAnyOfPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfPlayerZoneItemID) []AnyOfPlayerZoneItemID {
-	ids := make([]AnyOfPlayerZoneItemID, len(currentIDs))
+func mergeAnyOfPlayer_ZoneItemIDs(currentIDs, nextIDs []AnyOfPlayer_ZoneItemID) []AnyOfPlayer_ZoneItemID {
+	ids := make([]AnyOfPlayer_ZoneItemID, len(currentIDs))
 	copy(ids, currentIDs)
 	var j int
 
@@ -446,8 +446,8 @@ func mergeAnyOfPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfPlayerZoneItemID) []
 	return ids
 }
 
-func mergeAnyOfPlayerPositionIDs(currentIDs, nextIDs []AnyOfPlayerPositionID) []AnyOfPlayerPositionID {
-	ids := make([]AnyOfPlayerPositionID, len(currentIDs))
+func mergeAnyOfPlayer_PositionIDs(currentIDs, nextIDs []AnyOfPlayer_PositionID) []AnyOfPlayer_PositionID {
+	ids := make([]AnyOfPlayer_PositionID, len(currentIDs))
 	copy(ids, currentIDs)
 	var j int
 
@@ -465,8 +465,8 @@ func mergeAnyOfPlayerPositionIDs(currentIDs, nextIDs []AnyOfPlayerPositionID) []
 	return ids
 }
 
-func mergeAnyOfItemPlayerZoneItemIDs(currentIDs, nextIDs []AnyOfItemPlayerZoneItemID) []AnyOfItemPlayerZoneItemID {
-	ids := make([]AnyOfItemPlayerZoneItemID, len(currentIDs))
+func mergeAnyOfItem_Player_ZoneItemIDs(currentIDs, nextIDs []AnyOfItem_Player_ZoneItemID) []AnyOfItem_Player_ZoneItemID {
+	ids := make([]AnyOfItem_Player_ZoneItemID, len(currentIDs))
 	copy(ids, currentIDs)
 	var j int
 
