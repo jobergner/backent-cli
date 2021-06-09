@@ -12,8 +12,14 @@ import (
 
 func anyNameByField(f ast.Field) string {
 	name := "anyOf"
+	firstIteration := true
 	f.RangeValueTypes(func(configType *ast.ConfigType) {
-		name += Title(configType.Name)
+		if firstIteration {
+			name += Title(configType.Name)
+		} else {
+			name += "_" + Title(configType.Name)
+		}
+		firstIteration = false
 	})
 	return name
 }

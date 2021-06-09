@@ -284,9 +284,9 @@ func (a assembleReferenceWriter) declareRef() *Statement {
 	return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(usedElement + Title(a.f.Parent.Name)).Dot(Title(a.f.Name)))
 }
 
-// non-slice gen: engine.anyOfPlayerZoneItem(ref.playerTargetRef.ReferencedElementID)
-// slice gen: 		engine.anyOfPlayerZoneItem(ref.ReferencedElementID)
-// __ ref updated:engine.anyOfPlayerZoneItem(patchRef.ReferencedElementID)
+// non-slice gen: engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+// slice gen: 		engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
+// __ ref updated:engine.anyOfPlayer_ZoneItem(patchRef.ReferencedElementID)
 func (a assembleReferenceWriter) declareAnyContainer() *Statement {
 	usedID := Id("ref").Dot(a.f.ValueTypeName).Dot("ReferencedElementID")
 	if a.f.HasSliceValue {
@@ -299,8 +299,8 @@ func (a assembleReferenceWriter) declareAnyContainer() *Statement {
 }
 
 // slice non gen: referencedElement := engine.Player(ref.ReferencedElementID).player
-// slice gen: referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
-// non-slice gen:referencedElement := engine.Player(anyContainer.anyOfPlayerZoneItem.Player).player
+// slice gen: referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
+// non-slice gen:referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 // non-slice non-gen: referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
 func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 	if a.f.HasAnyValue {
@@ -317,7 +317,7 @@ func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 }
 
 // non-slice gen: 									 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
-// __ on referenced element update:  engine.assembleZoneItem(anyContainer.anyOfPlayerZoneItem.ZoneItem, check,
+// __ on referenced element update:  engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check,
 // non-slice non-gen:  							 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 // __ on referenced element update:  engine.assembleZoneItem(ref.ID(), check,
 // slice non-gen:		  							 engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
