@@ -24,21 +24,28 @@ type anyOfTypeCombinator struct {
 	anyOfTypes       []anyOfTypeIterator
 	dataCombinations []map[interface{}]interface{}
 	data             map[interface{}]interface{} // contains given data excluding `anyOf<>` fields
+	originalData     map[interface{}]interface{}
 }
 
-func newAnyOfTypeCombinator() *anyOfTypeCombinator {
+func newAnyOfTypeCombinator(data map[interface{}]interface{}) *anyOfTypeCombinator {
 	return &anyOfTypeCombinator{
 		dataCombinations: make([]map[interface{}]interface{}, 0),
+		originalData:     data,
 	}
 }
 
-func (a *anyOfTypeCombinator) build(data map[interface{}]interface{}) []error {
-	structuralErrs := structuralValidation(data)
+func (a *anyOfTypeCombinator) build() []error {
+	// pre-validate as we need to have a minimum amount of data entegrity before combining
+	structuralErrs := structuralValidation(a.originalData)
 	if len(structuralErrs) != 0 {
 		return structuralErrs
 	}
+	nonObjectErrs := validateNonObjectType(a.originalData)
+	if len(nonObjectErrs) != 0 {
+		return nonObjectErrs
+	}
 
-	manipulatedData := copyData(data)
+	manipulatedData := copyData(a.originalData)
 
 	for k, v := range manipulatedData {
 		keyName := fmt.Sprintf("%v", k)
@@ -60,6 +67,10 @@ func (a *anyOfTypeCombinator) build(data map[interface{}]interface{}) []error {
 }
 
 func (a *anyOfTypeCombinator) generateCombinations() []map[interface{}]interface{} {
+	if len(a.anyOfTypes) == 0 {
+		a.dataCombinations = append(a.dataCombinations, a.originalData)
+		return a.dataCombinations
+	}
 	a.recursivelyIterateAnyOfTypes(0)
 	return a.dataCombinations
 }
