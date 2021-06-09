@@ -34,17 +34,7 @@ func newAnyOfTypeCombinator(data map[interface{}]interface{}) *anyOfTypeCombinat
 	}
 }
 
-func (a *anyOfTypeCombinator) build() []error {
-	// pre-validate as we need to have a minimum amount of data entegrity before combining
-	structuralErrs := structuralValidation(a.originalData)
-	if len(structuralErrs) != 0 {
-		return structuralErrs
-	}
-	nonObjectErrs := validateNonObjectType(a.originalData)
-	if len(nonObjectErrs) != 0 {
-		return nonObjectErrs
-	}
-
+func (a *anyOfTypeCombinator) build() (errs []error) {
 	manipulatedData := copyData(a.originalData)
 
 	for k, v := range manipulatedData {
@@ -54,6 +44,9 @@ func (a *anyOfTypeCombinator) build() []error {
 			_keyName := fmt.Sprintf("%v", _k)
 			valueString := fmt.Sprintf("%v", _v)
 			if isAnyOfTypes(valueString) {
+				if err := validateAnyOfDefinition(valueString); err != nil {
+					errs = append(errs, err)
+				}
 				a.anyOfTypes = append(a.anyOfTypes, newAnyOfTypeIterator(keyName, _keyName, valueString))
 				delete(valueObject, _keyName)
 				manipulatedData[keyName] = valueObject
@@ -62,8 +55,7 @@ func (a *anyOfTypeCombinator) build() []error {
 	}
 
 	a.data = manipulatedData
-
-	return nil
+	return
 }
 
 func (a *anyOfTypeCombinator) generateCombinations() []map[interface{}]interface{} {

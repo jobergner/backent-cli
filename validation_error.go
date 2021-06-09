@@ -149,3 +149,11 @@ func newValidationErrorTypeAndActionWithSameName(name string) error {
 		),
 	)
 }
+func newValidationErrorInvalidAnyOfDefinition(valueString string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrInvalidAnyOfDefinition: \"%s\" is not a valid `anyOf` definition",
+			valueString,
+		),
+	)
+}
