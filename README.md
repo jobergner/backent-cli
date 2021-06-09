@@ -366,7 +366,4 @@ currently my best option is to assemble the tree server side, make sure all nece
 ### TODO
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
-- are objects with no direct usage (only references) root objects?
 - is redeclaring via getter always necessary, or only after exported methods were used
-- anyOf<item,zone,player> and anyOf<itemZone,player> both produce the `anyOfItemZonePlayer` type => bad!
-- consider deleting elements directly out of patch if delete is called on item which is not even in state (cause currently the client could receive OperationKindDelete elements which have not even existed at that point)
