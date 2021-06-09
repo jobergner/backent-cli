@@ -66,8 +66,14 @@ func fieldValueTypeName(field Field) string {
 	}
 	if field.HasAnyValue {
 		name := "anyOf"
+		firstIteration := true
 		field.RangeValueTypes(func(configType *ConfigType) {
-			name += title(configType.Name)
+			if firstIteration {
+				name += title(configType.Name)
+			} else {
+				name += "_" + title(configType.Name)
+			}
+			firstIteration = false
 		})
 		return name
 	}

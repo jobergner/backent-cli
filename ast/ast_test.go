@@ -315,7 +315,7 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, fooField.ValueTypes["person"].Name, "person")
 		assert.Equal(t, fooField.ValueTypes["address"].IsBasicType, false)
 		assert.Equal(t, fooField.ValueTypes["person"].IsBasicType, false)
-		assert.Equal(t, fooField.ValueTypeName, "anyOfAddressPerson")
+		assert.Equal(t, fooField.ValueTypeName, "anyOfAddress_Person")
 		barField := personType.Fields["bar"]
 		assert.Equal(t, barField.Parent.Name, "person")
 		assert.Equal(t, barField.ValueTypes["address"].Name, "address")
@@ -329,7 +329,7 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, bazField.ValueTypes["person"].Name, "person")
 		assert.Equal(t, bazField.ValueTypes["address"].IsBasicType, false)
 		assert.Equal(t, bazField.ValueTypes["person"].IsBasicType, false)
-		assert.Equal(t, bazField.ValueTypeName, "anyOfAddressPerson")
+		assert.Equal(t, bazField.ValueTypeName, "anyOfAddress_Person")
 		banField := personType.Fields["ban"]
 		assert.Equal(t, banField.Parent.Name, "person")
 		assert.Equal(t, banField.ValueTypes["address"].Name, "address")

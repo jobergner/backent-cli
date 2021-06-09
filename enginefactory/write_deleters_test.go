@@ -33,9 +33,9 @@ func TestWriteDeleters(t *testing.T) {
 			deletePlayerGuildMemberRef_Engine_func,
 			deletePlayerTargetRef_Engine_func,
 			deletePlayerTargetedByRef_Engine_func,
-			deleteAnyOfPlayerPosition_Engine_func,
-			deleteAnyOfPlayerZoneItem_Engine_func,
-			deleteAnyOfItemPlayerZoneItem_Engine_func,
+			deleteAnyOfPlayer_Position_Engine_func,
+			deleteAnyOfPlayer_ZoneItem_Engine_func,
+			deleteAnyOfItem_Player_ZoneItem_Engine_func,
 		}, "\n"))
 
 		if expected != actual {

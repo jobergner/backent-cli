@@ -26,9 +26,9 @@ func TestWriteState(t *testing.T) {
 			_PlayerGuildMemberRefID_type,
 			_PlayerTargetRefID_type,
 			_PlayerTargetedByRefID_type,
-			_AnyOfPlayerPositionID_type,
-			_AnyOfPlayerZoneItemID_type,
-			_AnyOfItemPlayerZoneItemID_type,
+			_AnyOfPlayer_PositionID_type,
+			_AnyOfPlayer_ZoneItemID_type,
+			_AnyOfItem_Player_ZoneItemID_type,
 		}, "\n"))
 
 		if expected != actual {
@@ -81,12 +81,12 @@ func TestWriteState(t *testing.T) {
 			playerTargetRef_type,
 			playerTargetedByRefCore_type,
 			playerTargetedByRef_type,
-			anyOfPlayerPositionCore_type,
-			anyOfPlayerPosition_type,
-			anyOfPlayerZoneItemCore_type,
-			anyOfPlayerZoneItem_type,
-			anyOfItemPlayerZoneItemCore_type,
-			anyOfItemPlayerZoneItem_type,
+			anyOfPlayer_PositionCore_type,
+			anyOfPlayer_Position_type,
+			anyOfPlayer_ZoneItemCore_type,
+			anyOfPlayer_ZoneItem_type,
+			anyOfItem_Player_ZoneItemCore_type,
+			anyOfItem_Player_ZoneItem_type,
 		}, "\n"))
 
 		if expected != actual {

@@ -33,9 +33,9 @@ func TestWriteCreators(t *testing.T) {
 			createPlayerGuildMemberRef_Engine_func,
 			createPlayerTargetRef_Engine_func,
 			createPlayerTargetedByRef_Engine_func,
-			createAnyOfPlayerPosition_Engine_func,
-			createAnyOfPlayerZoneItem_Engine_func,
-			createAnyOfItemPlayerZoneItem_Engine_func,
+			createAnyOfPlayer_Position_Engine_func,
+			createAnyOfPlayer_ZoneItem_Engine_func,
+			createAnyOfItem_Player_ZoneItem_Engine_func,
 		}, "\n"))
 
 		if expected != actual {
