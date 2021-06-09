@@ -66,12 +66,15 @@ func (a *anyOfTypeCombinator) generateCombinations() []map[interface{}]interface
 
 func (a *anyOfTypeCombinator) recursivelyIterateAnyOfTypes(currentAnyOfTypeIndex int) {
 	for range a.anyOfTypes[currentAnyOfTypeIndex].types {
-		a.anyOfTypes[currentAnyOfTypeIndex].currentTypeIndex += 1
-		a.generateData()
+		if currentAnyOfTypeIndex == len(a.anyOfTypes)-1 {
+			a.generateData()
+		}
 		if currentAnyOfTypeIndex < len(a.anyOfTypes)-1 {
 			a.recursivelyIterateAnyOfTypes(currentAnyOfTypeIndex + 1)
 		}
+		a.anyOfTypes[currentAnyOfTypeIndex].currentTypeIndex += 1
 	}
+	a.anyOfTypes[currentAnyOfTypeIndex].currentTypeIndex = 0
 }
 
 func (a *anyOfTypeCombinator) generateData() {
