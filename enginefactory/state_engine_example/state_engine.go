@@ -137,28 +137,28 @@ func (engine *Engine) UpdateState() {
 			engine.State.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
 		}
 	}
-	for _, anyOfPlayerPosition := range engine.Patch.AnyOfPlayerPosition {
-		if anyOfPlayerPosition.OperationKind == OperationKindDelete {
-			delete(engine.State.AnyOfPlayerPosition, anyOfPlayerPosition.ID)
+	for _, anyOfPlayer_Position := range engine.Patch.AnyOfPlayer_Position {
+		if anyOfPlayer_Position.OperationKind == OperationKindDelete {
+			delete(engine.State.AnyOfPlayer_Position, anyOfPlayer_Position.ID)
 		} else {
-			anyOfPlayerPosition.OperationKind = OperationKindUnchanged
-			engine.State.AnyOfPlayerPosition[anyOfPlayerPosition.ID] = anyOfPlayerPosition
+			anyOfPlayer_Position.OperationKind = OperationKindUnchanged
+			engine.State.AnyOfPlayer_Position[anyOfPlayer_Position.ID] = anyOfPlayer_Position
 		}
 	}
-	for _, anyOfPlayerZoneItem := range engine.Patch.AnyOfPlayerZoneItem {
-		if anyOfPlayerZoneItem.OperationKind == OperationKindDelete {
-			delete(engine.State.AnyOfPlayerZoneItem, anyOfPlayerZoneItem.ID)
+	for _, anyOfPlayer_ZoneItem := range engine.Patch.AnyOfPlayer_ZoneItem {
+		if anyOfPlayer_ZoneItem.OperationKind == OperationKindDelete {
+			delete(engine.State.AnyOfPlayer_ZoneItem, anyOfPlayer_ZoneItem.ID)
 		} else {
-			anyOfPlayerZoneItem.OperationKind = OperationKindUnchanged
-			engine.State.AnyOfPlayerZoneItem[anyOfPlayerZoneItem.ID] = anyOfPlayerZoneItem
+			anyOfPlayer_ZoneItem.OperationKind = OperationKindUnchanged
+			engine.State.AnyOfPlayer_ZoneItem[anyOfPlayer_ZoneItem.ID] = anyOfPlayer_ZoneItem
 		}
 	}
-	for _, anyOfItemPlayerZoneItem := range engine.Patch.AnyOfItemPlayerZoneItem {
-		if anyOfItemPlayerZoneItem.OperationKind == OperationKindDelete {
-			delete(engine.State.AnyOfItemPlayerZoneItem, anyOfItemPlayerZoneItem.ID)
+	for _, anyOfItem_Player_ZoneItem := range engine.Patch.AnyOfItem_Player_ZoneItem {
+		if anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
+			delete(engine.State.AnyOfItem_Player_ZoneItem, anyOfItem_Player_ZoneItem.ID)
 		} else {
-			anyOfItemPlayerZoneItem.OperationKind = OperationKindUnchanged
-			engine.State.AnyOfItemPlayerZoneItem[anyOfItemPlayerZoneItem.ID] = anyOfItemPlayerZoneItem
+			anyOfItem_Player_ZoneItem.OperationKind = OperationKindUnchanged
+			engine.State.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItem.ID] = anyOfItem_Player_ZoneItem
 		}
 	}
 
@@ -201,13 +201,13 @@ func (engine *Engine) UpdateState() {
 	for key := range engine.Patch.PlayerTargetedByRef {
 		delete(engine.Patch.PlayerTargetedByRef, key)
 	}
-	for key := range engine.Patch.AnyOfPlayerPosition {
-		delete(engine.Patch.AnyOfPlayerPosition, key)
+	for key := range engine.Patch.AnyOfPlayer_Position {
+		delete(engine.Patch.AnyOfPlayer_Position, key)
 	}
-	for key := range engine.Patch.AnyOfPlayerZoneItem {
-		delete(engine.Patch.AnyOfPlayerZoneItem, key)
+	for key := range engine.Patch.AnyOfPlayer_ZoneItem {
+		delete(engine.Patch.AnyOfPlayer_ZoneItem, key)
 	}
-	for key := range engine.Patch.AnyOfItemPlayerZoneItem {
-		delete(engine.Patch.AnyOfItemPlayerZoneItem, key)
+	for key := range engine.Patch.AnyOfItem_Player_ZoneItem {
+		delete(engine.Patch.AnyOfItem_Player_ZoneItem, key)
 	}
 }

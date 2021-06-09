@@ -26,7 +26,7 @@ func (engine *Engine) walkItem(itemID ItemID, p path) {
 	}
 	engine.walkGearScore(itemData.GearScore, gearScorePath)
 
-	originContainer := engine.anyOfPlayerPosition(itemData.Origin).anyOfPlayerPosition
+	originContainer := engine.anyOfPlayer_Position(itemData.Origin).anyOfPlayer_Position
 	if originContainer.ElementKind == ElementKindPlayer {
 		var originPath path
 		if existingPath, pathExists := engine.PathTrack.player[originContainer.Player]; !pathExists {
@@ -115,7 +115,7 @@ func (engine *Engine) walkZone(zoneID ZoneID, p path) {
 	}
 
 	for i, anyID := range zoneData.Interactables {
-		interactablesContainer := engine.anyOfItemPlayerZoneItem(anyID).anyOfItemPlayerZoneItem
+		interactablesContainer := engine.anyOfItem_Player_ZoneItem(anyID).anyOfItem_Player_ZoneItem
 		if interactablesContainer.ElementKind == ElementKindItem {
 			var interactablesPath path
 			if existingPath, pathExists := engine.PathTrack.item[interactablesContainer.Item]; !pathExists || !existingPath.equals(p) {

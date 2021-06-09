@@ -1,46 +1,46 @@
 package state
 
-func (_any anyOfPlayerZoneItem) Kind() ElementKind {
-	any := _any.anyOfPlayerZoneItem.engine.anyOfPlayerZoneItem(_any.anyOfPlayerZoneItem.ID)
-	return any.anyOfPlayerZoneItem.ElementKind
+func (_any anyOfPlayer_ZoneItem) Kind() ElementKind {
+	any := _any.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_any.anyOfPlayer_ZoneItem.ID)
+	return any.anyOfPlayer_ZoneItem.ElementKind
 }
 
-func (_any anyOfPlayerZoneItem) SetZoneItem() zoneItem {
-	zoneItem := _any.anyOfPlayerZoneItem.engine.createZoneItem(true)
-	_any.anyOfPlayerZoneItem.setZoneItem(zoneItem.ID())
+func (_any anyOfPlayer_ZoneItem) SetZoneItem() zoneItem {
+	zoneItem := _any.anyOfPlayer_ZoneItem.engine.createZoneItem(true)
+	_any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID())
 	return zoneItem
 }
 
-func (_any anyOfPlayerZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
-	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+func (_any anyOfPlayer_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
+	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	if any.Player != 0 {
 		any.engine.deletePlayer(any.Player)
 		any.Player = 0
 	}
 	any.ElementKind = ElementKindZoneItem
 	any.ZoneItem = zoneItemID
-	any.engine.Patch.AnyOfPlayerZoneItem[any.ID] = any
+	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }
 
-func (_any anyOfPlayerZoneItem) SetPlayer() player {
-	player := _any.anyOfPlayerZoneItem.engine.createPlayer(true)
-	_any.anyOfPlayerZoneItem.setPlayer(player.ID())
+func (_any anyOfPlayer_ZoneItem) SetPlayer() player {
+	player := _any.anyOfPlayer_ZoneItem.engine.createPlayer(true)
+	_any.anyOfPlayer_ZoneItem.setPlayer(player.ID())
 	return player
 }
 
-func (_any anyOfPlayerZoneItemCore) setPlayer(playerID PlayerID) {
-	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+func (_any anyOfPlayer_ZoneItemCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	if any.ZoneItem != 0 {
 		any.engine.deleteZoneItem(any.ZoneItem)
 		any.ZoneItem = 0
 	}
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
-	any.engine.Patch.AnyOfPlayerZoneItem[any.ID] = any
+	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }
 
-func (_any anyOfPlayerZoneItemCore) deleteChild() {
-	any := _any.engine.anyOfPlayerZoneItem(_any.ID).anyOfPlayerZoneItem
+func (_any anyOfPlayer_ZoneItemCore) deleteChild() {
+	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	switch any.ElementKind {
 	case ElementKindPlayer:
 		any.engine.deletePlayer(any.Player)
@@ -49,30 +49,30 @@ func (_any anyOfPlayerZoneItemCore) deleteChild() {
 	}
 }
 
-func (_any anyOfPlayerPosition) Kind() ElementKind {
-	any := _any.anyOfPlayerPosition.engine.anyOfPlayerPosition(_any.anyOfPlayerPosition.ID)
-	return any.anyOfPlayerPosition.ElementKind
+func (_any anyOfPlayer_Position) Kind() ElementKind {
+	any := _any.anyOfPlayer_Position.engine.anyOfPlayer_Position(_any.anyOfPlayer_Position.ID)
+	return any.anyOfPlayer_Position.ElementKind
 }
 
-func (_any anyOfPlayerPosition) SetPosition() position {
-	position := _any.anyOfPlayerPosition.engine.createPosition(true)
-	_any.anyOfPlayerPosition.setPosition(position.ID())
+func (_any anyOfPlayer_Position) SetPosition() position {
+	position := _any.anyOfPlayer_Position.engine.createPosition(true)
+	_any.anyOfPlayer_Position.setPosition(position.ID())
 	return position
 }
 
-func (_any anyOfPlayerPositionCore) setPosition(positionID PositionID) {
-	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+func (_any anyOfPlayer_PositionCore) setPosition(positionID PositionID) {
+	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	if any.Player != 0 {
 		any.engine.deletePlayer(any.Player)
 		any.Player = 0
 	}
 	any.ElementKind = ElementKindPosition
 	any.Position = positionID
-	any.engine.Patch.AnyOfPlayerPosition[any.ID] = any
+	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }
 
-func (_any anyOfPlayerPositionCore) deleteChild() {
-	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+func (_any anyOfPlayer_PositionCore) deleteChild() {
+	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	switch any.ElementKind {
 	case ElementKindPlayer:
 		any.engine.deletePlayer(any.Player)
@@ -81,36 +81,36 @@ func (_any anyOfPlayerPositionCore) deleteChild() {
 	}
 }
 
-func (_any anyOfPlayerPosition) SetPlayer() player {
-	player := _any.anyOfPlayerPosition.engine.createPlayer(true)
-	_any.anyOfPlayerPosition.setPlayer(player.ID())
+func (_any anyOfPlayer_Position) SetPlayer() player {
+	player := _any.anyOfPlayer_Position.engine.createPlayer(true)
+	_any.anyOfPlayer_Position.setPlayer(player.ID())
 	return player
 }
 
-func (_any anyOfPlayerPositionCore) setPlayer(playerID PlayerID) {
-	any := _any.engine.anyOfPlayerPosition(_any.ID).anyOfPlayerPosition
+func (_any anyOfPlayer_PositionCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	if any.Position != 0 {
 		any.engine.deletePosition(any.Position)
 		any.Position = 0
 	}
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
-	any.engine.Patch.AnyOfPlayerPosition[any.ID] = any
+	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }
 
-func (_any anyOfItemPlayerZoneItem) Kind() ElementKind {
-	any := _any.anyOfItemPlayerZoneItem.engine.anyOfItemPlayerZoneItem(_any.anyOfItemPlayerZoneItem.ID)
-	return any.anyOfItemPlayerZoneItem.ElementKind
+func (_any anyOfItem_Player_ZoneItem) Kind() ElementKind {
+	any := _any.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_any.anyOfItem_Player_ZoneItem.ID)
+	return any.anyOfItem_Player_ZoneItem.ElementKind
 }
 
-func (_any anyOfItemPlayerZoneItem) SetZoneItem() zoneItem {
-	zoneItem := _any.anyOfItemPlayerZoneItem.engine.createZoneItem(true)
-	_any.anyOfItemPlayerZoneItem.setZoneItem(zoneItem.ID())
+func (_any anyOfItem_Player_ZoneItem) SetZoneItem() zoneItem {
+	zoneItem := _any.anyOfItem_Player_ZoneItem.engine.createZoneItem(true)
+	_any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID())
 	return zoneItem
 }
 
-func (_any anyOfItemPlayerZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
-	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+func (_any anyOfItem_Player_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
+	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	if any.Item != 0 {
 		any.engine.deleteItem(any.Item)
 		any.Item = 0
@@ -121,17 +121,17 @@ func (_any anyOfItemPlayerZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
 	}
 	any.ElementKind = ElementKindZoneItem
 	any.ZoneItem = zoneItemID
-	any.engine.Patch.AnyOfItemPlayerZoneItem[any.ID] = any
+	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
-func (_any anyOfItemPlayerZoneItem) SetPlayer() player {
-	player := _any.anyOfItemPlayerZoneItem.engine.createPlayer(true)
-	_any.anyOfItemPlayerZoneItem.setPlayer(player.ID())
+func (_any anyOfItem_Player_ZoneItem) SetPlayer() player {
+	player := _any.anyOfItem_Player_ZoneItem.engine.createPlayer(true)
+	_any.anyOfItem_Player_ZoneItem.setPlayer(player.ID())
 	return player
 }
 
-func (_any anyOfItemPlayerZoneItemCore) setPlayer(playerID PlayerID) {
-	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+func (_any anyOfItem_Player_ZoneItemCore) setPlayer(playerID PlayerID) {
+	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	if any.Item != 0 {
 		any.engine.deleteItem(any.Item)
 		any.Item = 0
@@ -142,17 +142,17 @@ func (_any anyOfItemPlayerZoneItemCore) setPlayer(playerID PlayerID) {
 	}
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
-	any.engine.Patch.AnyOfItemPlayerZoneItem[any.ID] = any
+	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
-func (_any anyOfItemPlayerZoneItem) SetItem() item {
-	item := _any.anyOfItemPlayerZoneItem.engine.createItem(true)
-	_any.anyOfItemPlayerZoneItem.setItem(item.ID())
+func (_any anyOfItem_Player_ZoneItem) SetItem() item {
+	item := _any.anyOfItem_Player_ZoneItem.engine.createItem(true)
+	_any.anyOfItem_Player_ZoneItem.setItem(item.ID())
 	return item
 }
 
-func (_any anyOfItemPlayerZoneItemCore) setItem(itemID ItemID) {
-	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+func (_any anyOfItem_Player_ZoneItemCore) setItem(itemID ItemID) {
+	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	if any.Player != 0 {
 		any.engine.deletePlayer(any.Player)
 		any.Player = 0
@@ -163,11 +163,11 @@ func (_any anyOfItemPlayerZoneItemCore) setItem(itemID ItemID) {
 	}
 	any.ElementKind = ElementKindItem
 	any.Item = itemID
-	any.engine.Patch.AnyOfItemPlayerZoneItem[any.ID] = any
+	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
-func (_any anyOfItemPlayerZoneItemCore) deleteChild() {
-	any := _any.engine.anyOfItemPlayerZoneItem(_any.ID).anyOfItemPlayerZoneItem
+func (_any anyOfItem_Player_ZoneItemCore) deleteChild() {
+	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	switch any.ElementKind {
 	case ElementKindItem:
 		any.engine.deleteItem(any.Item)
