@@ -369,6 +369,30 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 		assert.Empty(t, missingErrors)
 		assert.Empty(t, redundantErrors)
 	})
+	t.Run("returns invalid anyOf definition error", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": map[interface{}]interface{}{
+				"fan": "string",
+			},
+			"bar": map[interface{}]interface{}{
+				"lar": "anyOf<foo>",
+			},
+			"baz": map[interface{}]interface{}{
+				"ban": "anyOf<bar,bar>",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{
+			newValidationErrorInvalidAnyOfDefinition("anyOf<foo>"),
+			newValidationErrorInvalidAnyOfDefinition("anyOf<bar,bar>"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
 	t.Run("on invalid anyOf definitions, it just considers field as ill-defined", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"baz": map[interface{}]interface{}{
@@ -392,7 +416,7 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 				"fan": "string",
 			},
 			"bar": map[interface{}]interface{}{
-				"lar": "anyOf<foo,baz>",
+				"lar": "anyOf<baz,foo>",
 			},
 			"baz": map[interface{}]interface{}{
 				"ban": "anyOf<bar,foo>",
@@ -416,10 +440,10 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 				"fan": "string",
 			},
 			"bar": map[interface{}]interface{}{
-				"lar": "anyOf<foo,baz>",
+				"lar": "anyOf<baz,foo>",
 			},
 			"baz": map[interface{}]interface{}{
-				"ban": "anyOf<foo,fam>",
+				"ban": "anyOf<fam,foo>",
 			},
 			"fam": map[interface{}]interface{}{
 				"lam": "int",

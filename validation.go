@@ -142,10 +142,21 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 }
 
 func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
-	cmb := newAnyOfTypeCombinator(data)
-	structuralErrs := cmb.build()
+	// pre-validate as we need to have a minimum amount of data entegrity before combining
+	structuralErrs := structuralValidation(data)
 	if len(structuralErrs) != 0 {
 		return structuralErrs
+	}
+	nonObjectErrs := validateNonObjectType(data)
+	if len(nonObjectErrs) != 0 {
+		return nonObjectErrs
+	}
+
+	cmb := newAnyOfTypeCombinator(data)
+
+	invalidAnyOfDefinitionErrs := cmb.build()
+	if len(invalidAnyOfDefinitionErrs) != 0 {
+		return invalidAnyOfDefinitionErrs
 	}
 
 	cmb.generateCombinations()

@@ -51,9 +51,9 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrDirectTypeUsage | the type "{TypeName}" was used directly in "{ActionName}" instead of it's ID ("{TypeName}ID") | Only IDs of types are available in actions |
 | ErrIllegalPointerParameter | the parameter "{FieldName}" in "{ActionName}" contains a pointer value | Pointers can not be used as parameter as it would not make any sense |
 | ErrTypeAndActionWithSameName | type and action "{Name}" have the same name | Types and Actions with the same name would cause conflicts in the generated code |
+| ErrInvalidAnyOfDefinition | "{valueString}" is not a valid `anyOf` definition | anyOf definitions can not have single or duplicate types and must be in alphabetical order |
 <br/>
 
 TODO:
-- implement any validation `anyOf<foo,bar>`
-- needs to allow any IDs `anyOf<foo,bar>ID`
+- (no it does not. why would you use that in state, and it is not really useful in params as user shuld choose either or) needs to allow any IDs `anyOf<foo,bar>ID`
 - consider not allowing types with ID suffix
