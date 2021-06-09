@@ -55,7 +55,5 @@ Despite the fact that each of these errors would find a place in one of the abov
 
 TODO:
 - implement any validation `anyOf<foo,bar>`
-- what happens if action has same name as type
-- recursion validation should probably not happen on actions, they must not be used as types anyway
 - needs to allow any IDs `anyOf<foo,bar>ID`
 - consider not allowing types with ID suffix
