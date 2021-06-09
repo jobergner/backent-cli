@@ -19,8 +19,8 @@ func TestAnyCombination(t *testing.T) {
 			},
 		}
 
-		cmb := newAnyOfTypeCombinator()
-		cmb.build(data)
+		cmb := newAnyOfTypeCombinator(data)
+		cmb.build()
 
 		expectedData := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
@@ -49,8 +49,8 @@ func TestAnyCombination(t *testing.T) {
 			},
 		}
 
-		cmb := newAnyOfTypeCombinator()
-		cmb.build(data)
+		cmb := newAnyOfTypeCombinator(data)
+		cmb.build()
 		cmb.generateCombinations()
 
 		assert.Equal(t, 4, len(cmb.dataCombinations))

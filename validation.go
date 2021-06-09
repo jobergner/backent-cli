@@ -142,8 +142,28 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 }
 
 func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
+	cmb := newAnyOfTypeCombinator(data)
+	structuralErrs := cmb.build()
+	if len(structuralErrs) != 0 {
+		return structuralErrs
+	}
+
+	cmb.generateCombinations()
+
+	for _, anyOfTypeCombination := range cmb.dataCombinations {
+		validationErrs := validateStateConfig(anyOfTypeCombination)
+		errs = append(errs, validationErrs...)
+	}
+
+	return
+}
+
+func validateStateConfig(data map[interface{}]interface{}) (errs []error) {
 	generalErrs := generalValidation(data)
 	errs = append(errs, generalErrs...)
+	if len(errs) != 0 {
+		return
+	}
 
 	thematicalErrs := thematicalValidationState(data)
 	errs = append(errs, thematicalErrs...)

@@ -234,7 +234,7 @@ func TestValidateStateConfig(t *testing.T) {
 			},
 		}
 
-		errs := ValidateStateConfig(data)
+		errs := validateStateConfig(data)
 
 		assert.Empty(t, errs)
 	})
@@ -259,7 +259,7 @@ func TestValidateStateConfig(t *testing.T) {
 			},
 		}
 
-		actualErrors := ValidateStateConfig(data)
+		actualErrors := validateStateConfig(data)
 		expectedErrors := []error{
 			newValidationErrorUnavailableFieldName("iD"),
 			newValidationErrorUnavailableFieldName("hasParent"),
@@ -322,6 +322,112 @@ func TestValidateActionsConfig(t *testing.T) {
 			newValidationErrorDirectTypeUsage("barAction", "fooAction"),
 			newValidationErrorDirectTypeUsage("barAction", "*baz"),
 		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+}
+
+func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
+	t.Run("returns only pre-validation errors if existent (1/2)", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": "int",
+			"bar": nil,
+			"baz": map[interface{}]interface{}{
+				"ban": "",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{
+			newValidationErrorIllegalValue("bar", "root"),
+			newValidationErrorIllegalValue("ban", "baz"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+	t.Run("returns only pre-validation errors if existent (2/2)", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": "int",
+			"baz": map[interface{}]interface{}{
+				"ban": "int",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{
+			newValidationErrorNonObjectType("foo"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+	t.Run("on invalid anyOf definitions, it just considers field as ill-defined", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"baz": map[interface{}]interface{}{
+				"ban": "anyof<>",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{
+			newValidationErrorInvalidValueString("anyof<>", "ban", "baz"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+	t.Run("returns errors of different combinations when multiple exist", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": map[interface{}]interface{}{
+				"fan": "string",
+			},
+			"bar": map[interface{}]interface{}{
+				"lar": "anyOf<foo,baz>",
+			},
+			"baz": map[interface{}]interface{}{
+				"ban": "anyOf<bar,foo>",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{
+			newValidationErrorRecursiveTypeUsage([]string{"bar.lar", "baz.ban", "bar"}),
+			newValidationErrorRecursiveTypeUsage([]string{"baz.ban", "bar.lar", "baz"}),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+	t.Run("does not cause any erros on valid definition", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": map[interface{}]interface{}{
+				"fan": "string",
+			},
+			"bar": map[interface{}]interface{}{
+				"lar": "anyOf<foo,baz>",
+			},
+			"baz": map[interface{}]interface{}{
+				"ban": "anyOf<foo,fam>",
+			},
+			"fam": map[interface{}]interface{}{
+				"lam": "int",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
 
