@@ -57,7 +57,7 @@ func WriteServer(buf *bytes.Buffer, stateConfigData, actionsConfigData map[inter
 }
 
 func (s *ServerFactory) writePackageName() *ServerFactory {
-	s.buf.WriteString("package main\n")
+	s.buf.WriteString("package state\n")
 	return s
 }
 

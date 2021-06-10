@@ -127,7 +127,7 @@ type DeclSet struct {
 
 func NewDeclSet() DeclSet {
 	return DeclSet{
-		File: jen.NewFile("main"),
+		File: jen.NewFile("state"),
 	}
 }
 
@@ -142,7 +142,7 @@ func (d DeclSet) Render(buf *bytes.Buffer) {
 }
 
 func TrimPackageName(sourceCode string) string {
-	tmp := strings.TrimPrefix(sourceCode, "package main")
+	tmp := strings.TrimPrefix(sourceCode, "package state")
 	tmp = strings.TrimSpace(tmp)
 	return tmp
 }

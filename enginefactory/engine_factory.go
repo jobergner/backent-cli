@@ -78,7 +78,7 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 }
 
 func (s *EngineFactory) writePackageName() *EngineFactory {
-	s.buf.WriteString("package main\n")
+	s.buf.WriteString("package state\n")
 	return s
 }
 
