@@ -1,8 +1,11 @@
 package serverfactory
 
 import (
+	. "bar-cli/factoryutils"
 	"bytes"
-	"strings"
+	"go/format"
+	"go/parser"
+	"go/token"
 
 	"bar-cli/ast"
 )
@@ -33,6 +36,38 @@ func newServerFactory(config *ast.AST) *ServerFactory {
 	}
 }
 
-func title(name string) string {
-	return strings.Title(name)
+// WriteServerFrom writes source code for a given ActionsConfig
+func WriteServer(buf *bytes.Buffer, stateConfigData, actionsConfigData map[interface{}]interface{}) {
+	config := ast.Parse(stateConfigData, actionsConfigData)
+	s := newServerFactory(config).
+		writePackageName(). // to be able to format the code without errors
+		writeMessageKinds().
+		writeActions().
+		writeParameters().
+		writeProcessClientMessage().
+		writeStart()
+
+	err := s.format()
+	if err != nil {
+		// unexpected error
+		panic(err)
+	}
+
+	buf.WriteString(TrimPackageName(s.buf.String()))
+}
+
+func (s *ServerFactory) writePackageName() *ServerFactory {
+	s.buf.WriteString("package main\n")
+	return s
+}
+
+func (s *ServerFactory) format() error {
+	config, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
+	if err != nil {
+		return err
+	}
+
+	s.buf.Reset()
+	err = format.Node(s.buf, token.NewFileSet(), config)
+	return err
 }

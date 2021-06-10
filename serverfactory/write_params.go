@@ -31,11 +31,11 @@ type paramsWriter struct {
 }
 
 func (p paramsWriter) name() string {
-	return title(p.a.Name) + "Params"
+	return Title(p.a.Name) + "Params"
 }
 
 func (p paramsWriter) fieldName() string {
-	return title(p.p.Name)
+	return Title(p.p.Name)
 }
 
 func (p paramsWriter) paramType(s *ServerFactory) string {
@@ -44,7 +44,7 @@ func (p paramsWriter) paramType(s *ServerFactory) string {
 		typeName += "[]"
 	}
 	if s.isIDTypeOfType(p.p.ValueType().Name) || !p.p.ValueType().IsBasicType {
-		return typeName + title(p.p.ValueType().Name)
+		return typeName + Title(p.p.ValueType().Name)
 	}
 	return typeName + p.p.ValueType().Name
 }
