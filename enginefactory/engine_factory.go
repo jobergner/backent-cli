@@ -2,9 +2,6 @@ package enginefactory
 
 import (
 	"bytes"
-	"go/format"
-	"go/parser"
-	"go/token"
 
 	"bar-cli/ast"
 	. "bar-cli/factoryutils"
@@ -34,7 +31,6 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
 	s := newStateFactory(config).
 		writePackageName(). // to be able to format the code without errors
-		writeImports().
 		writeAdders().
 		writeAny().
 		writeAssembleTree().
@@ -68,7 +64,7 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeRecursionCheck().
 		writeWalkElement()
 
-	err := s.format()
+	err := Format(s.buf)
 	if err != nil {
 		// unexpected error
 		panic(err)
@@ -82,25 +78,9 @@ func (s *EngineFactory) writePackageName() *EngineFactory {
 	return s
 }
 
-func (s *EngineFactory) writeImports() *EngineFactory {
-	s.buf.WriteString("import \"strconv\"\n")
-	return s
-}
-
 func newStateFactory(config *ast.AST) *EngineFactory {
 	return &EngineFactory{
 		config: config,
 		buf:    &bytes.Buffer{},
 	}
-}
-
-func (s *EngineFactory) format() error {
-	config, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
-	if err != nil {
-		return err
-	}
-
-	s.buf.Reset()
-	err = format.Node(s.buf, token.NewFileSet(), config)
-	return err
 }

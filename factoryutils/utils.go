@@ -3,6 +3,9 @@ package factoryutils
 import (
 	"bar-cli/ast"
 	"bytes"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"strings"
 
 	"github.com/dave/jennifer/jen"
@@ -142,7 +145,16 @@ func (d DeclSet) Render(buf *bytes.Buffer) {
 }
 
 func TrimPackageName(sourceCode string) string {
-	tmp := strings.TrimPrefix(sourceCode, "package state")
-	tmp = strings.TrimSpace(tmp)
-	return tmp
+	return strings.TrimPrefix(sourceCode, "package state")
+}
+
+func Format(buf *bytes.Buffer) error {
+	f, err := parser.ParseFile(token.NewFileSet(), "", buf.String(), parser.AllErrors)
+	if err != nil {
+		return err
+	}
+
+	buf.Reset()
+	err = format.Node(buf, token.NewFileSet(), f)
+	return nil
 }
