@@ -3,9 +3,6 @@ package serverfactory
 import (
 	. "bar-cli/factoryutils"
 	"bytes"
-	"go/format"
-	"go/parser"
-	"go/token"
 
 	"bar-cli/ast"
 )
@@ -47,7 +44,7 @@ func WriteServer(buf *bytes.Buffer, stateConfigData, actionsConfigData map[inter
 		writeProcessClientMessage().
 		writeStart()
 
-	err := s.format()
+	err := Format(s.buf)
 	if err != nil {
 		// unexpected error
 		panic(err)
@@ -59,15 +56,4 @@ func WriteServer(buf *bytes.Buffer, stateConfigData, actionsConfigData map[inter
 func (s *ServerFactory) writePackageName() *ServerFactory {
 	s.buf.WriteString("package state\n")
 	return s
-}
-
-func (s *ServerFactory) format() error {
-	config, err := parser.ParseFile(token.NewFileSet(), "", s.buf.String(), parser.AllErrors)
-	if err != nil {
-		return err
-	}
-
-	s.buf.Reset()
-	err = format.Node(s.buf, token.NewFileSet(), config)
-	return err
 }
