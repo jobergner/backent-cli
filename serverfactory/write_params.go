@@ -43,10 +43,10 @@ func (p paramsWriter) paramType(s *ServerFactory) string {
 	if p.p.HasSliceValue {
 		typeName += "[]"
 	}
-	if s.isIDTypeOfType(p.p.ValueType.Name) || !p.p.ValueType.IsBasicType {
-		return typeName + title(p.p.ValueType.Name)
+	if s.isIDTypeOfType(p.p.ValueType().Name) || !p.p.ValueType().IsBasicType {
+		return typeName + title(p.p.ValueType().Name)
 	}
-	return typeName + p.p.ValueType.Name
+	return typeName + p.p.ValueType().Name
 }
 
 func (p paramsWriter) fieldTag() string {

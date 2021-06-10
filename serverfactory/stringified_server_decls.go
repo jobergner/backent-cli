@@ -15,18 +15,18 @@ const messageKindAction_addItemToPlayer_type string = `const (
 )`
 
 const _MovePlayerParams_type string = `type MovePlayerParams struct {
-	ChangeX		float64		` + "`" + `json:"changeX"` + "`" + `
-	ChangeY		float64		` + "`" + `json:"changeY"` + "`" + `
-	PlayerID	PlayerID	` + "`" + `json:"playerID"` + "`" + `
+	ChangeX	float64		` + "`" + `json:"changeX"` + "`" + `
+	ChangeY	float64		` + "`" + `json:"changeY"` + "`" + `
+	Player	PlayerID	` + "`" + `json:"player"` + "`" + `
 }`
 
 const _AddItemToPlayerParams_type string = `type AddItemToPlayerParams struct {
-	Item		Item		` + "`" + `json:"item"` + "`" + `
-	PlayerID	PlayerID	` + "`" + `json:"playerID"` + "`" + `
+	Item	ItemID	` + "`" + `json:"item"` + "`" + `
+	NewName	string	` + "`" + `json:"newName"` + "`" + `
 }`
 
 const _SpawnZoneItemsParams_type string = `type SpawnZoneItemsParams struct {
-	Items []Item ` + "`" + `json:"items"` + "`" + `
+	Items []ItemID ` + "`" + `json:"items"` + "`" + `
 }`
 
 const actions_type string = `type actions struct {

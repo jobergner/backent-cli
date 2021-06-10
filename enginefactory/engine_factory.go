@@ -29,7 +29,7 @@ type EngineFactory struct {
 	buf    *bytes.Buffer
 }
 
-// WriteEngineFrom writes source code for a given State-/ActionsConfig
+// WriteEngineFrom writes source code for a given StateConfig
 func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
 	s := newStateFactory(config).

@@ -2,15 +2,15 @@ package examples
 
 var ActionsConfig = map[interface{}]interface{}{
 	"movePlayer": map[interface{}]interface{}{
-		"playerID": "playerID",
-		"changeX":  "float64",
-		"changeY":  "float64",
+		"player":  "playerID",
+		"changeX": "float64",
+		"changeY": "float64",
 	},
 	"addItemToPlayer": map[interface{}]interface{}{
-		"item":     "item",
-		"playerID": "playerID",
+		"item":    "itemID",
+		"newName": "string",
 	},
 	"spawnZoneItems": map[interface{}]interface{}{
-		"items": "[]item",
+		"items": "[]itemID",
 	},
 }
