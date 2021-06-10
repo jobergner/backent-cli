@@ -29,11 +29,11 @@ type EngineFactory struct {
 	buf    *bytes.Buffer
 }
 
-// WriteEngineFrom writes source code for a given StateConfig
-func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
+// WriteEngine writes source code for a given StateConfig
+func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{}) {
 	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
 	s := newStateFactory(config).
-		writePackageName().
+		writePackageName(). // to be able to format the code without errors
 		writeImports().
 		writeAdders().
 		writeAny().
@@ -74,11 +74,11 @@ func WriteEngineFrom(stateConfigData map[interface{}]interface{}) []byte {
 		panic(err)
 	}
 
-	return s.writtenSourceCode()
+	buf.WriteString(TrimPackageName(s.buf.String()))
 }
 
 func (s *EngineFactory) writePackageName() *EngineFactory {
-	s.buf.WriteString("package state\n")
+	s.buf.WriteString("package main\n")
 	return s
 }
 
@@ -92,10 +92,6 @@ func newStateFactory(config *ast.AST) *EngineFactory {
 		config: config,
 		buf:    &bytes.Buffer{},
 	}
-}
-
-func (s *EngineFactory) writtenSourceCode() []byte {
-	return s.buf.Bytes()
 }
 
 func (s *EngineFactory) format() error {

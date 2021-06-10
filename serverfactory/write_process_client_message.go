@@ -54,7 +54,7 @@ func (p processClientMessageWriter) actionMessageKind() string {
 }
 
 func (p processClientMessageWriter) declareParams() *Statement {
-	return Var().Id("params").Id(title(p.a.Name) + "Params")
+	return Var().Id("params").Id(Title(p.a.Name) + "Params")
 }
 
 func (p processClientMessageWriter) unmarshalMessageContent() *Statement {

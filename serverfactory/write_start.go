@@ -11,7 +11,7 @@ func (s *ServerFactory) writeStart() *ServerFactory {
 	decls := NewDeclSet()
 
 	decls.File.Func().Id("Start").Params(ForEachActionInAST(s.config, func(action ast.Action) *Statement {
-		return Id(action.Name).Func().Params(Id(title(action.Name)+"Params"), Id("*Engine")).Id(",")
+		return Id(action.Name).Func().Params(Id(Title(action.Name)+"Params"), Id("*Engine")).Id(",")
 	}).Id("onDeploy").Func().Params(Id("*Engine")),
 		Id("onFrameTick").Func().Params(Id("*Engine")),
 	).Block(

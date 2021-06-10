@@ -12,7 +12,7 @@ func (s *ServerFactory) writeActions() *ServerFactory {
 
 	decls.File.Type().Id("actions").Struct(
 		ForEachActionInAST(s.config, func(action ast.Action) *Statement {
-			return Id(action.Name).Func().Params(Id(title(action.Name)+"Params"), Id("*Engine"))
+			return Id(action.Name).Func().Params(Id(Title(action.Name)+"Params"), Id("*Engine"))
 		}),
 	)
 

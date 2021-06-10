@@ -137,7 +137,12 @@ func (d DeclSet) Render(buf *bytes.Buffer) {
 	if err != nil {
 		panic(err)
 	}
-	code := strings.TrimPrefix(_buf.String(), "package main")
-	code = strings.TrimSpace(code)
+	code := TrimPackageName(_buf.String())
 	buf.WriteString("\n" + code + "\n")
+}
+
+func TrimPackageName(sourceCode string) string {
+	tmp := strings.TrimPrefix(sourceCode, "package main")
+	tmp = strings.TrimSpace(tmp)
+	return tmp
 }
