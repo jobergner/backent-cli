@@ -27,13 +27,13 @@ func validateConflictingSingularObject(
 
 	for key := range objectData {
 		keyName := fmt.Sprintf("%v", key)
-		if pluralizeClient.IsPlural(keyName) {
-			for _key := range objectData {
-				_keyName := fmt.Sprintf("%v", _key)
-				singularForm := pluralizeClient.Singular(keyName)
-				if singularForm == _keyName {
-					errs = append(errs, newValidationErrorConflictingSingular(_keyName, keyName, singularForm))
-				}
+		for _key := range objectData {
+			_keyName := fmt.Sprintf("%v", _key)
+			if keyName == _keyName {
+				continue
+			}
+			if left, right := pluralizeClient.Singular(keyName), pluralizeClient.Singular(_keyName); left == right {
+				errs = append(errs, newValidationErrorConflictingSingular(_keyName, keyName, left))
 			}
 		}
 	}
