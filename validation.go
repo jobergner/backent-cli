@@ -166,7 +166,7 @@ func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
 		errs = append(errs, validationErrs...)
 	}
 
-	return
+	return deduplicateErrs(errs)
 }
 
 func validateStateConfig(data map[interface{}]interface{}) (errs []error) {

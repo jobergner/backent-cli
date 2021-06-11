@@ -10,13 +10,15 @@ func TestValidateDataConflictingSingular(t *testing.T) {
 	t.Run("should fail on usage of two field names with same singular", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
-				"foot": "string",
-				"feet": "string",
+				"foot":      "string",
+				"feet":      "string",
+				"equipment": "string",
 			},
 		}
 
 		actualErrors := validateConflictingSingular(data)
 		expectedErrors := []error{
+			newValidationErrorConflictingSingular("feet", "foot", "foot"),
 			newValidationErrorConflictingSingular("foot", "feet", "foot"),
 		}
 
