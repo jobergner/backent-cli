@@ -444,6 +444,9 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 			},
 			"baz": map[interface{}]interface{}{
 				"ban": "anyOf<fam,foo>",
+				"ran": "[]anyOf<bar,foo>",
+				"kan": "*anyOf<bar,foo>",
+				"man": "[]*anyOf<bar,foo>",
 			},
 			"fam": map[interface{}]interface{}{
 				"lam": "int",

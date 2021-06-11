@@ -34,6 +34,6 @@ func validateIllegalPointerParameterObject(objectData map[interface{}]interface{
 }
 
 func hasPointerValue(valueString string) bool {
-	re := regexp.MustCompile(`\*[A-Za-z]+[0-9]*`)
+	re := regexp.MustCompile(`\*`)
 	return re.MatchString(valueString)
 }

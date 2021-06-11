@@ -14,6 +14,7 @@ func TestValidateDataIllegalPointerParameter(t *testing.T) {
 				"ban": "[]int",
 				"baz": "*ran",
 				"bau": "*ranID",
+				"lau": "*[]ranID",
 			},
 		}
 
@@ -21,6 +22,7 @@ func TestValidateDataIllegalPointerParameter(t *testing.T) {
 		expectedErrors := []error{
 			newValidationErrorIllegalPointerParameter("foo", "baz"),
 			newValidationErrorIllegalPointerParameter("foo", "bau"),
+			newValidationErrorIllegalPointerParameter("foo", "lau"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

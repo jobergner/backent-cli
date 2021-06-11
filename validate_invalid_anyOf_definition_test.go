@@ -10,6 +10,8 @@ func TestValidateDataInvalidAnyOfDefinition(t *testing.T) {
 	t.Run("returns nil on valid anyOf definition", func(t *testing.T) {
 		input := "anyOf< bar, baz,foo>"
 		assert.Equal(t, nil, validateAnyOfDefinition(input))
+		input = "*anyOf< bar, baz,foo>"
+		assert.Equal(t, nil, validateAnyOfDefinition(input))
 	})
 	t.Run("returns error on too few types in definition", func(t *testing.T) {
 		input := "anyOf<foo>"

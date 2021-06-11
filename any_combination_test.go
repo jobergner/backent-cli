@@ -33,19 +33,19 @@ func TestAnyCombination(t *testing.T) {
 
 		assert.Equal(t, expectedData, cmb.data)
 
-		assert.Contains(t, cmb.anyOfTypes, anyOfTypeIterator{"foo", "baz", []string{"yee", "oot"}, 0})
-		assert.Contains(t, cmb.anyOfTypes, anyOfTypeIterator{"soo", "saz", []string{"wii"}, 0})
+		assert.Contains(t, cmb.anyOfTypes, anyOfTypeIterator{"foo", "baz", false, false, []string{"yee", "oot"}, 0})
+		assert.Contains(t, cmb.anyOfTypes, anyOfTypeIterator{"soo", "saz", false, false, []string{"wii"}, 0})
 	})
 	t.Run("should generate combinations", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
 				"bar": "string",
-				"baz": "anyOf<yee,oot>",
+				"baz": "*anyOf<yee,oot>",
 			},
 			"soo": map[interface{}]interface{}{
-				"saz": "anyOf<wii, loo>",
+				"saz": "[]*anyOf<wii, loo>",
 				"sar": "string",
-				"sam": "anyOf<guu>",
+				"sam": "[]anyOf<guu>",
 			},
 		}
 
@@ -58,12 +58,12 @@ func TestAnyCombination(t *testing.T) {
 		expectedData1 := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
 				"bar": "string",
-				"baz": "yee",
+				"baz": "*yee",
 			},
 			"soo": map[interface{}]interface{}{
-				"saz": "wii",
+				"saz": "[]*wii",
 				"sar": "string",
-				"sam": "guu",
+				"sam": "[]guu",
 			},
 		}
 
@@ -72,12 +72,12 @@ func TestAnyCombination(t *testing.T) {
 		expectedData2 := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
 				"bar": "string",
-				"baz": "oot",
+				"baz": "*oot",
 			},
 			"soo": map[interface{}]interface{}{
-				"saz": "wii",
+				"saz": "[]*wii",
 				"sar": "string",
-				"sam": "guu",
+				"sam": "[]guu",
 			},
 		}
 
@@ -86,12 +86,12 @@ func TestAnyCombination(t *testing.T) {
 		expectedData3 := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
 				"bar": "string",
-				"baz": "yee",
+				"baz": "*yee",
 			},
 			"soo": map[interface{}]interface{}{
-				"saz": "loo",
+				"saz": "[]*loo",
 				"sar": "string",
-				"sam": "guu",
+				"sam": "[]guu",
 			},
 		}
 
@@ -100,12 +100,12 @@ func TestAnyCombination(t *testing.T) {
 		expectedData4 := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
 				"bar": "string",
-				"baz": "oot",
+				"baz": "*oot",
 			},
 			"soo": map[interface{}]interface{}{
-				"saz": "loo",
+				"saz": "[]*loo",
 				"sar": "string",
-				"sam": "guu",
+				"sam": "[]guu",
 			},
 		}
 
