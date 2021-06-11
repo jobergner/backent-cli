@@ -3,6 +3,7 @@ package main
 import (
 	"bar-cli/enginefactory"
 	"bar-cli/examples"
+	"bar-cli/getstartedfactory"
 	"bar-cli/serverfactory"
 	"bytes"
 	"fmt"
@@ -29,4 +30,6 @@ func main() {
 	} else {
 		fmt.Println(string(out))
 	}
+
+	fmt.Println(getstartedfactory.WriteGetStarted(examples.StateConfig, examples.ActionsConfig))
 }
