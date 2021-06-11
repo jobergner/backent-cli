@@ -11,21 +11,41 @@ import (
 	"path/filepath"
 )
 
-var importedDirs = [2]string{
+var importedDirs = []string{
 	"./serverfactory/server_example/server",
 	"./enginefactory/state_engine_example",
 }
 
 var excludedFiles = []string{
 	"serverfactory/server_example/server/gets_generated.go",
+	"serverfactory/server_example/server/gets_generated_easyjson.go",
 	"serverfactory/server_example/server/message_easyjson.go",
 	"serverfactory/server_example/server/state.go",
+	"serverfactory/server_example/server/state_easyjson.go",
 	"enginefactory/state_engine_example/state_engine_test.go",
 	"enginefactory/state_engine_example/state_engine_bench_test.go",
 	"enginefactory/state_engine_example/tree_easyjson.go",
 }
 
-func scanDeclsInDir(directoryPath string) ([]ast.Decl, error) {
+func isExcludedFileName(filePath string) bool {
+	for _, excludedFile := range excludedFiles {
+		if filePath == excludedFile {
+			return true
+		}
+	}
+	return false
+}
+
+func isForceIncludeFileName(filePath string, forceIncludeFileNames []string) bool {
+	for _, forceIncludeFileName := range forceIncludeFileNames {
+		if filePath == forceIncludeFileName {
+			return true
+		}
+	}
+	return false
+}
+
+func scanDeclsInDir(directoryPath string, forceIncludeFileNames ...string) ([]ast.Decl, error) {
 
 	fileInfos, err := ioutil.ReadDir(directoryPath)
 	if err != nil {
@@ -34,7 +54,6 @@ func scanDeclsInDir(directoryPath string) ([]ast.Decl, error) {
 
 	var decls []ast.Decl
 
-IterateFiles:
 	for _, fileInfo := range fileInfos {
 		if fileInfo.IsDir() {
 			continue
@@ -47,10 +66,8 @@ IterateFiles:
 			continue
 		}
 
-		for _, excludedFile := range excludedFiles {
-			if filepath.Join(directoryPath, fileName) == excludedFile {
-				continue IterateFiles
-			}
+		if isExcludedFileName(filePath) && !isForceIncludeFileName(filePath, forceIncludeFileNames) {
+			continue
 		}
 
 		content, err := ioutil.ReadFile(filePath)
@@ -93,7 +110,7 @@ func writeCombinedImport(buf *bytes.Buffer) {
 
 	var decls []ast.Decl
 	for _, importedDir := range importedDirs {
-		dirDecls, err := scanDeclsInDir(importedDir)
+		dirDecls, err := scanDeclsInDir(importedDir, "serverfactory/server_example/server/gets_generated.go")
 		if err != nil {
 			panic(err)
 		}
