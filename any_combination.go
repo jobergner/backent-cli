@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
 )
@@ -8,16 +9,37 @@ import (
 type anyOfTypeIterator struct {
 	parentName       string
 	fieldName        string
+	hasSliceType     bool
+	hasPointerType   bool
 	types            []string
 	currentTypeIndex int
 }
 
+func (a anyOfTypeIterator) currentValueString() string {
+	var buf bytes.Buffer
+	if a.hasSliceType {
+		buf.WriteString("[]")
+	}
+	if a.hasPointerType {
+		buf.WriteString("*")
+	}
+	buf.WriteString(a.types[a.currentTypeIndex])
+	return buf.String()
+}
+
 func newAnyOfTypeIterator(parentName, fieldName, valueString string) anyOfTypeIterator {
 	return anyOfTypeIterator{
-		parentName: parentName,
-		fieldName:  fieldName,
-		types:      extractTypes(valueString)[1:], // omit first element as `extractTypes` consider the `anyOf` prefix a type
+		parentName:     parentName,
+		fieldName:      fieldName,
+		hasSliceType:   hasSliceValue(valueString),
+		hasPointerType: hasPointerValue(valueString),
+		types:          extractTypes(valueString)[1:], // omit first element as `extractTypes` consider the `anyOf` prefix a type
 	}
+}
+
+func hasSliceValue(valueString string) bool {
+	re := regexp.MustCompile(`\[\]`)
+	return re.MatchString(valueString)
 }
 
 type anyOfTypeCombinator struct {
@@ -86,7 +108,7 @@ func (a *anyOfTypeCombinator) generateData() {
 	for _, anyOfType := range a.anyOfTypes {
 		value := dataCombination[anyOfType.parentName]
 		valueObject := value.(map[interface{}]interface{})
-		valueObject[anyOfType.fieldName] = anyOfType.types[anyOfType.currentTypeIndex]
+		valueObject[anyOfType.fieldName] = anyOfType.currentValueString()
 		dataCombination[anyOfType.parentName] = valueObject
 	}
 
@@ -107,6 +129,10 @@ func copyData(data map[interface{}]interface{}) map[interface{}]interface{} {
 }
 
 func isAnyOfTypes(valueString string) bool {
-	re := regexp.MustCompile(`anyOf<\s*([A-Za-z]+\s*,\s*)*\s*([A-Za-z]+\s*)>`)
-	return re.MatchString(valueString)
+	re := regexp.MustCompile(`(\[\])?\*?anyOf<\s*([A-Za-z]+\s*,\s*)*\s*([A-Za-z]+\s*)>`)
+	s := re.FindString(valueString)
+	if len(s) == 0 || len(s) != len(valueString) {
+		return false
+	}
+	return true
 }
