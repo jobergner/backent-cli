@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/Java-Jonas/bar-cli/getstartedfactory"
@@ -18,7 +19,6 @@ var outDirname = flag.String("out", "./tmp", "where to write the files to")
 func main() {
 	flag.Parse()
 
-	fmt.Println(*engineOnlyFlag)
 	c, err := readConfig()
 	if err != nil {
 		panic(err)
@@ -34,6 +34,10 @@ func main() {
 		panic("errors during config validation")
 	}
 
+	if err := ensureDir(); err != nil {
+		panic("err")
+	}
+
 	code := writeCode(c)
 	if err := ioutil.WriteFile(filepath.Join(*outDirname, outFile), code, 0644); err != nil {
 		panic(err)
@@ -44,4 +48,14 @@ func main() {
 	}
 
 	fmt.Println(getstartedfactory.WriteGetStarted(c.State, c.Actions))
+}
+
+func ensureDir() error {
+	err := os.MkdirAll(*outDirname, os.ModeDir)
+
+	if err == nil || os.IsExist(err) {
+		return nil
+	} else {
+		return err
+	}
 }
