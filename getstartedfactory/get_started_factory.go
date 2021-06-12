@@ -28,12 +28,6 @@ func WriteGetStarted(stateConfigData, actionsConfigData map[interface{}]interfac
 		writeImport().
 		writeMainFunc()
 
-	// err := Format(g.buf)
-	// if err != nil {
-	// 	// unexpected error
-	// 	panic(err)
-	// }
-
 	return g.buf.String()
 }
 

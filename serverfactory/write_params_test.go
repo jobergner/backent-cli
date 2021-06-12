@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/Java-Jonas/bar-cli/ast"
-	"github.com/Java-Jonas/bar-cli/examples"
+	"github.com/Java-Jonas/bar-cli/examples/configs"
 	"github.com/Java-Jonas/bar-cli/testutils"
 )
 
 func newSimpleASTExample() *ast.AST {
-	simpleAST := ast.Parse(examples.StateConfig, examples.ActionsConfig)
+	simpleAST := ast.Parse(configs.StateConfig, configs.ActionsConfig)
 	return simpleAST
 }
 
