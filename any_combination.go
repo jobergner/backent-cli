@@ -136,3 +136,26 @@ func isAnyOfTypes(valueString string) bool {
 	}
 	return true
 }
+
+func stateConfigCombinationsFrom(data map[interface{}]interface{}) ([]map[interface{}]interface{}, []error) {
+	// pre-validate as we need to have a minimum amount of data entegrity before combining
+	structuralErrs := structuralValidation(data)
+	if len(structuralErrs) != 0 {
+		return nil, structuralErrs
+	}
+	nonObjectErrs := validateNonObjectType(data)
+	if len(nonObjectErrs) != 0 {
+		return nil, nonObjectErrs
+	}
+
+	cmb := newAnyOfTypeCombinator(data)
+
+	invalidAnyOfDefinitionErrs := cmb.build()
+	if len(invalidAnyOfDefinitionErrs) != 0 {
+		return nil, invalidAnyOfDefinitionErrs
+	}
+
+	cmb.generateCombinations()
+
+	return cmb.dataCombinations, nil
+}

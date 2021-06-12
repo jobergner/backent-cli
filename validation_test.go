@@ -283,17 +283,22 @@ func TestValidateStateConfig(t *testing.T) {
 func TestValidateActionsConfig(t *testing.T) {
 	t.Run("should procude expected errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
-			"foo": "int",
-			"bar": "float64",
+			"foo": map[interface{}]interface{}{
+				"bar": "int32",
+			},
+			"wii": map[interface{}]interface{}{
+				"wuu": "int32",
+			},
 			"baz": map[interface{}]interface{}{
 				"ban":  "int32",
-				"bam":  "bar",
+				"bam":  "foo",
 				"bunt": "[]foo",
-				"bap":  "map[bar]foo",
-				"bal":  "***bar",
-				"slap": "**[]**bar",
+				"bap":  "map[foo]foo",
+				"bal":  "***foo",
+				"slap": "**[]**foo",
 				"arg":  "*foo",
 				"barg": "[3]foo",
+				"buu":  "*anyOf<baz,wii>",
 			},
 		}
 		actionsConfigData := map[interface{}]interface{}{
@@ -462,3 +467,80 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 		assert.Empty(t, redundantErrors)
 	})
 }
+
+// func TestFoo(t *testing.T) {
+// 	var StateConfig = map[interface{}]interface{}{
+// 		"player": map[interface{}]interface{}{
+// 			"items":         "[]item",
+// 			"equipmentSets": "[]*equipmentSet",
+// 			"gearScore":     "gearScore",
+// 			"position":      "position",
+// 			"guildMembers":  "[]*player",
+// 			"target":        "*anyOf<player,zoneItem>",
+// 			"targetedBy":    "[]*anyOf<player,zoneItem>",
+// 		},
+// 		"zone": map[interface{}]interface{}{
+// 			"items":         "[]zoneItem",
+// 			"players":       "[]player",
+// 			"tags":          "[]string",
+// 			"interactables": "[]anyOf<item,player,zoneItem>",
+// 		},
+// 		"zoneItem": map[interface{}]interface{}{
+// 			"position": "position",
+// 			"item":     "item",
+// 		},
+// 		"position": map[interface{}]interface{}{
+// 			"x": "float64",
+// 			"y": "float64",
+// 		},
+// 		"item": map[interface{}]interface{}{
+// 			"name":      "string",
+// 			"gearScore": "gearScore",
+// 			"boundTo":   "*player",
+// 			"origin":    "anyOf<player,position>",
+// 		},
+// 		"gearScore": map[interface{}]interface{}{
+// 			"level": "int",
+// 			"score": "int",
+// 		},
+// 		"equipmentSet": map[interface{}]interface{}{
+// 			"name":      "string",
+// 			"equipment": "[]*item",
+// 		},
+// 	}
+
+// 	t.Run("returns only pre-validation errors if existent (1/2)", func(t *testing.T) {
+
+// 		actualErrors := ValidateStateConfig(StateConfig)
+// 		expectedErrors := []error{}
+
+// 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+// 		assert.Empty(t, missingErrors)
+// 		assert.Empty(t, redundantErrors)
+// 	})
+// 	var ActionsConfig = map[interface{}]interface{}{
+// 		"movePlayer": map[interface{}]interface{}{
+// 			"player":  "playerID",
+// 			"changeX": "float64",
+// 			"changeY": "float64",
+// 		},
+// 		"addItemToPlayer": map[interface{}]interface{}{
+// 			"item":    "itemID",
+// 			"newName": "string",
+// 		},
+// 		"spawnZoneItems": map[interface{}]interface{}{
+// 			"items": "[]itemID",
+// 		},
+// 	}
+// 	t.Run("returns only pre-validation errors if existent (1/2)", func(t *testing.T) {
+
+// 		actualErrors := ValidateActionsConfig(StateConfig, ActionsConfig)
+// 		expectedErrors := []error{}
+
+// 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+// 		assert.Empty(t, missingErrors)
+// 		assert.Empty(t, redundantErrors)
+// 	})
+// }
