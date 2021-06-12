@@ -142,26 +142,12 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 }
 
 func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
-	// pre-validate as we need to have a minimum amount of data entegrity before combining
-	structuralErrs := structuralValidation(data)
-	if len(structuralErrs) != 0 {
-		return structuralErrs
-	}
-	nonObjectErrs := validateNonObjectType(data)
-	if len(nonObjectErrs) != 0 {
-		return nonObjectErrs
+	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(data)
+	if len(prevalidationErrs) != 0 {
+		return prevalidationErrs
 	}
 
-	cmb := newAnyOfTypeCombinator(data)
-
-	invalidAnyOfDefinitionErrs := cmb.build()
-	if len(invalidAnyOfDefinitionErrs) != 0 {
-		return invalidAnyOfDefinitionErrs
-	}
-
-	cmb.generateCombinations()
-
-	for _, anyOfTypeCombination := range cmb.dataCombinations {
+	for _, anyOfTypeCombination := range dataCombinations {
 		validationErrs := validateStateConfig(anyOfTypeCombination)
 		errs = append(errs, validationErrs...)
 	}
@@ -182,7 +168,14 @@ func validateStateConfig(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
+func ValidateActionsConfig(data map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
+	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(data)
+	if len(prevalidationErrs) != 0 {
+		return prevalidationErrs
+	}
+
+	// use first combination as it does not matter which types of anyOf<> definitions are taken as value
+	stateConfigData := dataCombinations[0]
 
 	sameNameErrs := validateTypeAndActionWithSameName(stateConfigData, actionsConfigData)
 	errs = append(errs, sameNameErrs...)
