@@ -1,10 +1,11 @@
 package serverfactory
 
 import (
-	. "bar-cli/factoryutils"
 	"bytes"
 
-	"bar-cli/ast"
+	. "github.com/Java-Jonas/bar-cli/factoryutils"
+
+	"github.com/Java-Jonas/bar-cli/ast"
 )
 
 type ServerFactory struct {

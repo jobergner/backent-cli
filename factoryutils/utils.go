@@ -1,12 +1,13 @@
 package factoryutils
 
 import (
-	"bar-cli/ast"
 	"bytes"
 	"go/format"
 	"go/parser"
 	"go/token"
 	"strings"
+
+	"github.com/Java-Jonas/bar-cli/ast"
 
 	"github.com/dave/jennifer/jen"
 	"github.com/gertd/go-pluralize"

@@ -1,8 +1,8 @@
 package serverfactory
 
 import (
-	"bar-cli/ast"
-	. "bar-cli/factoryutils"
+	"github.com/Java-Jonas/bar-cli/ast"
+	. "github.com/Java-Jonas/bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )

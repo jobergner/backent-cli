@@ -1,9 +1,10 @@
 package serverfactory
 
 import (
-	"bar-cli/testutils"
 	"strings"
 	"testing"
+
+	"github.com/Java-Jonas/bar-cli/testutils"
 )
 
 func TestWriteProcessClientMessage(t *testing.T) {
