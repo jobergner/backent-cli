@@ -1,3 +1,4 @@
+//go:generate bash ./generate.sh
 package main
 
 import (
@@ -12,7 +13,7 @@ import (
 
 const outFile = "state.go"
 
-var configNameFlag = flag.String("config", "./barcli.config.json", "path of config")
+var configNameFlag = flag.String("config", "./example.config.json", "path of config")
 var engineOnlyFlag = flag.Bool("engine_only", false, "only state")
 var outDirname = flag.String("out", "./tmp", "where to write the files to")
 
