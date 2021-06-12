@@ -1,4 +1,4 @@
-package examples
+package configs
 
 var StateConfig = map[interface{}]interface{}{
 	"player": map[interface{}]interface{}{

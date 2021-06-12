@@ -2,7 +2,7 @@ package enginefactory
 
 import (
 	"github.com/Java-Jonas/bar-cli/ast"
-	"github.com/Java-Jonas/bar-cli/examples"
+	"github.com/Java-Jonas/bar-cli/examples/configs"
 	// "github.com/Java-Jonas/bar-cli/testutils"
 	// "io/ioutil"
 	// "testing"
@@ -24,6 +24,6 @@ import (
 // }
 
 func newSimpleASTExample() *ast.AST {
-	simpleAST := ast.Parse(examples.StateConfig, map[interface{}]interface{}{})
+	simpleAST := ast.Parse(configs.StateConfig, map[interface{}]interface{}{})
 	return simpleAST
 }

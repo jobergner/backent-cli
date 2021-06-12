@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	state "github.com/Java-Jonas/bar-cli/serverfactory/server_example/server"
+	state "github.com/Java-Jonas/bar-cli/examples/application/server"
 )
 
 func main() {

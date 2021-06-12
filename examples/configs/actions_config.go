@@ -1,4 +1,4 @@
-package examples
+package configs
 
 var ActionsConfig = map[interface{}]interface{}{
 	"movePlayer": map[interface{}]interface{}{

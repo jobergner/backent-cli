@@ -14,19 +14,19 @@ import (
 )
 
 var importedDirs = []string{
-	"./serverfactory/server_example/server",
-	"./enginefactory/state_engine_example",
+	"./examples/application/server",
+	"./examples/engine",
 }
 
 var excludedFiles = []string{
-	"serverfactory/server_example/server/gets_generated.go",
-	"serverfactory/server_example/server/gets_generated_easyjson.go",
-	"serverfactory/server_example/server/message_easyjson.go",
-	"serverfactory/server_example/server/state.go",
-	"serverfactory/server_example/server/state_easyjson.go",
-	"enginefactory/state_engine_example/state_engine_test.go",
-	"enginefactory/state_engine_example/state_engine_bench_test.go",
-	"enginefactory/state_engine_example/tree_easyjson.go",
+	"examples/application/server/gets_generated.go",
+	"examples/application/server/gets_generated_easyjson.go",
+	"examples/application/server/message_easyjson.go",
+	"examples/application/server/state.go",
+	"examples/application/server/state_easyjson.go",
+	"examples/engine/state_engine_test.go",
+	"examples/engine/state_engine_bench_test.go",
+	"examples/engine/tree_easyjson.go",
 }
 
 func isExcludedFileName(filePath string) bool {
@@ -121,7 +121,7 @@ func generateImportDecl(engineOnly bool) string {
 		decls = append(decls, dirDecls...)
 	} else {
 		for _, importedDir := range importedDirs {
-			dirDecls, err := scanDeclsInDir(importedDir, "serverfactory/server_example/server/gets_generated.go")
+			dirDecls, err := scanDeclsInDir(importedDir, "examples/application/server/gets_generated.go")
 			if err != nil {
 				panic(err)
 			}
