@@ -1,9 +1,9 @@
 package enginefactory
 
 import (
-	"bar-cli/ast"
-	"bar-cli/examples"
-	// "bar-cli/testutils"
+	"github.com/Java-Jonas/bar-cli/ast"
+	"github.com/Java-Jonas/bar-cli/examples"
+	// "github.com/Java-Jonas/bar-cli/testutils"
 	// "io/ioutil"
 	// "testing"
 )

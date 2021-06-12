@@ -1,11 +1,12 @@
 package main
 
 import (
-	"bar-cli/getstartedfactory"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/Java-Jonas/bar-cli/getstartedfactory"
 )
 
 const outDir = "./tmp"
