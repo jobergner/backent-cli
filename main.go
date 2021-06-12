@@ -13,18 +13,32 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
+	"encoding/json"
 )
 
 const outDir = "./tmp"
 const outFile = "state.go"
 
 type config struct {
-	State   map[interface{}]interface{} `yaml:"state"`
-	Actions map[interface{}]interface{} `yaml:"actions"`
+	State   map[string]interface{} `json:"state"`
+	Actions map[string]interface{} `json:"actions"`
 }
 
-var configNameFlag = flag.String("config", "./barcli.config.yaml", "path of config")
+var configNameFlag = flag.String("config", "./barcli.config.json", "path of config")
+
+func atob(a map[string]interface{}) map[interface{}]interface{} {
+	b := make(map[interface{}]interface{})
+	for k, v := range a {
+		x := make(map[interface{}]interface{})
+		// TODO a LOT!
+		// what if a string and not map[string]interface{}
+		for k_, v_ := range v.(map[string]interface{}) {
+			x[k_] = v_
+		}
+		b[k] = x
+	}
+	return b
+}
 
 func main() {
 	configFile, err := ioutil.ReadFile(*configNameFlag)
@@ -32,28 +46,28 @@ func main() {
 		panic(err)
 	}
 	c := config{}
-	err = yaml.Unmarshal([]byte(configFile), &c)
+	err = json.Unmarshal(configFile, &c)
 	if err != nil {
 		panic(err)
 	}
-	if errs := validator.ValidateStateConfig(c.State); len(errs) != 0 {
+	fmt.Println(atob(c.State))
+	if errs := validator.ValidateStateConfig(atob(c.State)); len(errs) != 0 {
 		for _, err := range errs {
 			fmt.Println(err)
 		}
 		panic("errors")
 	}
-	if errs := validator.ValidateActionsConfig(c.State, c.Actions); len(errs) != 0 {
+	if errs := validator.ValidateActionsConfig(atob(c.State), atob(c.Actions)); len(errs) != 0 {
 		for _, err := range errs {
 			fmt.Println(err)
 		}
 		panic("errors")
 	}
-	fmt.Printf("%+v\n", c)
 	buf := bytes.NewBufferString("package state\n")
 	writeCombinedImport(buf)
 	writeImportedFiles(buf)
-	enginefactory.WriteEngine(buf, c.State)
-	serverfactory.WriteServer(buf, c.State, c.Actions)
+	enginefactory.WriteEngine(buf, atob(c.State))
+	serverfactory.WriteServer(buf, atob(c.State), atob(c.Actions))
 	if err := ioutil.WriteFile(filepath.Join(outDir, outFile), buf.Bytes(), 0644); err != nil {
 		panic(err)
 	}
@@ -63,5 +77,5 @@ func main() {
 	} else {
 		fmt.Println(string(out))
 	}
-	fmt.Println(getstartedfactory.WriteGetStarted(examples.StateConfig, examples.ActionsConfig))
+	fmt.Println(getstartedfactory.WriteGetStarted(atob(c.State), examples.ActionsConfig))
 }
