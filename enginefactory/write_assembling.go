@@ -1,11 +1,11 @@
 package enginefactory
 
 import (
-	. "bar-cli/factoryutils"
+	. "github.com/Java-Jonas/bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 
-	"bar-cli/ast"
+	"github.com/Java-Jonas/bar-cli/ast"
 )
 
 func (s *EngineFactory) writeAssembleTree() *EngineFactory {

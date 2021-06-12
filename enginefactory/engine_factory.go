@@ -3,8 +3,8 @@ package enginefactory
 import (
 	"bytes"
 
-	"bar-cli/ast"
-	. "bar-cli/factoryutils"
+	"github.com/Java-Jonas/bar-cli/ast"
+	. "github.com/Java-Jonas/bar-cli/factoryutils"
 )
 
 func anyNameByField(f ast.Field) string {

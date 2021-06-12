@@ -1,8 +1,9 @@
 package state
 
 import (
-	"bar-cli/testutils"
 	"testing"
+
+	"github.com/Java-Jonas/bar-cli/testutils"
 
 	"github.com/stretchr/testify/assert"
 )

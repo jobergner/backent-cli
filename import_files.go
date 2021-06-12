@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bar-cli/factoryutils"
 	"bytes"
 	"go/ast"
 	"go/parser"
@@ -9,6 +8,8 @@ import (
 	"go/token"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/Java-Jonas/bar-cli/factoryutils"
 )
 
 var importedDirs = []string{

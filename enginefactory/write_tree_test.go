@@ -1,9 +1,10 @@
 package enginefactory
 
 import (
-	"bar-cli/testutils"
 	"strings"
 	"testing"
+
+	"github.com/Java-Jonas/bar-cli/testutils"
 )
 
 func TestWriteTree(t *testing.T) {

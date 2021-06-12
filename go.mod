@@ -1,4 +1,4 @@
-module bar-cli
+module github.com/Java-Jonas/bar-cli
 
 go 1.13
 
@@ -10,6 +10,5 @@ require (
 	github.com/mailru/easyjson v0.7.7
 	github.com/sergi/go-diff v1.1.0
 	github.com/stretchr/testify v1.7.0
-	gopkg.in/yaml.v2 v2.2.8
 	nhooyr.io/websocket v1.8.6
 )
