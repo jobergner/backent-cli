@@ -11,10 +11,14 @@ func writeCode(c *config) []byte {
 	buf := bytes.NewBufferString("package state\n")
 
 	writeCombinedImport(buf)
-	writeImportedFiles(buf)
+	if !*engineOnlyFlag {
+		writeImportedFiles(buf)
+	}
 
 	enginefactory.WriteEngine(buf, c.State)
-	serverfactory.WriteServer(buf, c.State, c.Actions)
+	if !*engineOnlyFlag {
+		serverfactory.WriteServer(buf, c.State, c.Actions)
+	}
 
 	return buf.Bytes()
 }

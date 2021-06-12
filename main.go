@@ -9,13 +9,16 @@ import (
 	"github.com/Java-Jonas/bar-cli/getstartedfactory"
 )
 
-const outDir = "./tmp"
 const outFile = "state.go"
 
 var configNameFlag = flag.String("config", "./barcli.config.json", "path of config")
+var engineOnlyFlag = flag.Bool("engine_only", false, "only state")
+var outDirname = flag.String("out", "./tmp", "where to write the files to")
 
 func main() {
+	flag.Parse()
 
+	fmt.Println(*engineOnlyFlag)
 	c, err := readConfig()
 	if err != nil {
 		panic(err)
@@ -32,7 +35,7 @@ func main() {
 	}
 
 	code := writeCode(c)
-	if err := ioutil.WriteFile(filepath.Join(outDir, outFile), code, 0644); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(*outDirname, outFile), code, 0644); err != nil {
 		panic(err)
 	}
 

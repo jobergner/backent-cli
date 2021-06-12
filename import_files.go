@@ -110,12 +110,20 @@ func writeCombinedImport(buf *bytes.Buffer) {
 	}
 
 	var decls []ast.Decl
-	for _, importedDir := range importedDirs {
-		dirDecls, err := scanDeclsInDir(importedDir, "serverfactory/server_example/server/gets_generated.go")
+	if *engineOnlyFlag {
+		dirDecls, err := scanDeclsInDir(importedDirs[1])
 		if err != nil {
 			panic(err)
 		}
 		decls = append(decls, dirDecls...)
+	} else {
+		for _, importedDir := range importedDirs {
+			dirDecls, err := scanDeclsInDir(importedDir, "serverfactory/server_example/server/gets_generated.go")
+			if err != nil {
+				panic(err)
+			}
+			decls = append(decls, dirDecls...)
+		}
 	}
 
 	for _, decl := range decls {

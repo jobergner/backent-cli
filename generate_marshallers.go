@@ -7,7 +7,7 @@ import (
 )
 
 func generateMarshallers() error {
-	cmd := exec.Command("easyjson", "-all", "-omit_empty", filepath.Join(outDir, outFile))
+	cmd := exec.Command("easyjson", "-all", "-omit_empty", filepath.Join(*outDirname, outFile))
 	if out, err := cmd.Output(); err != nil {
 		return err
 	} else {
