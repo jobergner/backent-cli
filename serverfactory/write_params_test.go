@@ -1,11 +1,12 @@
 package serverfactory
 
 import (
-	"bar-cli/ast"
-	"bar-cli/examples"
-	"bar-cli/testutils"
 	"strings"
 	"testing"
+
+	"github.com/Java-Jonas/bar-cli/ast"
+	"github.com/Java-Jonas/bar-cli/examples"
+	"github.com/Java-Jonas/bar-cli/testutils"
 )
 
 func newSimpleASTExample() *ast.AST {

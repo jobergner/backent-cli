@@ -1,8 +1,9 @@
 package main
 
 import (
-	state "bar-cli/serverfactory/server_example/server"
 	"log"
+
+	state "github.com/Java-Jonas/bar-cli/serverfactory/server_example/server"
 )
 
 func main() {
