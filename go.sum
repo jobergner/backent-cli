@@ -1,9 +1,3 @@
-github.com/Java-Jonas/validator v0.0.0-20210611144805-9a4dfec16698 h1:onEYnOKMqSD6GDrxQ3HHCqe/ICNE/HhITte7knuySNE=
-github.com/Java-Jonas/validator v0.0.0-20210611144805-9a4dfec16698/go.mod h1:By5TZett34StUjJ1c/Su5k1Ntb+CLAsoKrDX+VCBRms=
-github.com/Java-Jonas/validator v0.0.0-20210611165518-1afd35939878 h1:4dM4yODo3LpnhYk9ml6MMtqUT5tgty1sLGePHMbyasQ=
-github.com/Java-Jonas/validator v0.0.0-20210611165518-1afd35939878/go.mod h1:By5TZett34StUjJ1c/Su5k1Ntb+CLAsoKrDX+VCBRms=
-github.com/Java-Jonas/validator v0.0.0-20210611210341-146f3f87a4bf h1:jJXsxdhSc+5jlox2o7ubhz9L/8iYzZZ0p0JnOhQB5XU=
-github.com/Java-Jonas/validator v0.0.0-20210611210341-146f3f87a4bf/go.mod h1:By5TZett34StUjJ1c/Su5k1Ntb+CLAsoKrDX+VCBRms=
 github.com/Java-Jonas/validator v0.0.0-20210612085320-2b5fd079a0c2 h1:SPFqv1s17SIB7zKa3D9iR7riS0wDqrmTWwMSth0INq4=
 github.com/Java-Jonas/validator v0.0.0-20210612085320-2b5fd079a0c2/go.mod h1:By5TZett34StUjJ1c/Su5k1Ntb+CLAsoKrDX+VCBRms=
 github.com/dave/jennifer v1.4.1 h1:XyqG6cn5RQsTj3qlWQTKlRGAyrTcsk1kUmWdZBzRjDw=
