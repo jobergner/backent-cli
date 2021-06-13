@@ -8,15 +8,15 @@ import (
 
 func generateMarshallers() error {
 	if ok := commandExists("easyjson"); !ok {
-		panic("easyjson is required!\n\ninstall with `go get -u github.com/mailru/easyjson/...`")
+		return fmt.Errorf("easyjson is required!\n\ninstall with `go get -u github.com/mailru/easyjson/...`")
 	}
+
 	cmd := exec.Command("easyjson", "-all", "-omit_empty", filepath.Join(*outDirname, outFile))
-	if out, err := cmd.Output(); err != nil {
-		fmt.Printf("error generating marshallers - is the output directory `%s` in GOPATH?\nif so you may just ignore this error\n", *outDirname)
-		return err
-	} else {
-		fmt.Println(string(out))
-	}
+	// error is being swallowed as easyjson throws errors while actually functioning properly
+	// all underlying requirements have already been checked with `validateOutDir` at this point
+	// whether generating the marshallers was successfull will be validated with running `go build` later
+	cmd.Run()
+
 	return nil
 }
 
