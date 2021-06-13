@@ -46,6 +46,10 @@ func main() {
 		panic(fmt.Errorf("error while generating marshallers: %s", err))
 	}
 
+	if err := validateBuild(); err != nil {
+		panic("something went wrong. Please create an issue containing your environment details and config! You may also want to run `go build` in the out directory an include any errors.")
+	}
+
 	fmt.Println(getstartedfactory.WriteGetStarted(c.State, c.Actions))
 }
 
@@ -67,6 +71,17 @@ func validateOutDir() error {
 	stdout, err := cmd.Output()
 	if len(stdout) == 1 && string(stdout[0]) == "\n" {
 		return fmt.Errorf("defined out target \"%s\" is not within GOPATH which is required for generating marshallers\ntip: initialize a go module in directory or its parent!", *outDirname)
+	}
+
+	return nil
+}
+
+func validateBuild() error {
+	cmd := exec.Command("go", "build", ".")
+	cmd.Dir = *outDirname
+
+	if err := cmd.Run(); err != nil {
+		return err
 	}
 
 	return nil
