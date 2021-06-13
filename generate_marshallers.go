@@ -12,7 +12,7 @@ func generateMarshallers() error {
 	}
 	cmd := exec.Command("easyjson", "-all", "-omit_empty", filepath.Join(*outDirname, outFile))
 	if out, err := cmd.Output(); err != nil {
-		fmt.Printf("error generating marshallers - is the output directory `%s` in GOPATH?\n", *outDirname)
+		fmt.Printf("error generating marshallers - is the output directory `%s` in GOPATH?\nif so you may just ignore this error\n", *outDirname)
 		return err
 	} else {
 		fmt.Println(string(out))
