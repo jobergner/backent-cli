@@ -62,7 +62,7 @@ func isMap(unknown interface{}) (map[string]interface{}, bool) {
 
 func validateJSONConfig(jc jsonConfig) error {
 	if len(jc.State) == 0 {
-		return fmt.Errorf("no configuration found for \"state\"")
+		return fmt.Errorf("\"state\" field in json not found but is required")
 	}
 	return nil
 }
@@ -70,12 +70,12 @@ func validateJSONConfig(jc jsonConfig) error {
 func readConfig() (*config, error) {
 	configFile, err := ioutil.ReadFile(*configNameFlag)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("error reading config file: %s", err)
 	}
 	jc := jsonConfig{}
 	err = json.Unmarshal(configFile, &jc)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing config: %s", err)
 	}
 	err = validateJSONConfig(jc)
 	if err != nil {
