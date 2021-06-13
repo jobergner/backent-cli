@@ -1,3 +1,4 @@
 gets_generated_easyjson.go
 state_easyjson.go
 state.go
+message_easyjson.go
