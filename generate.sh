@@ -5,6 +5,7 @@ go run generate/*;
 go run . -engine_only -out examples/application/server/;
 easyjson -all -omit_empty -output_filename examples/engine/tree_easyjson.go examples/engine/tree.go;
 easyjson -all -omit_empty -output_filename examples/application/server/gets_generated_easyjson.go examples/application/server/gets_generated.go;
+easyjson -all -omit_empty -output_filename examples/application/server/message_easyjson.go examples/application/server/message.go;
 
 # required for running tests
 decltostring -input ./examples/application/server/ -output ./serverfactory/stringified_server_decls.go -package serverfactory -only "gets_generated.go";
