@@ -20,7 +20,7 @@ func BenchmarkEngine(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		players := zone.Players()
 		zone.RemovePlayers(players[rand.Intn(len(players))].ID())
-		for _, player := range players {
+		for _, player := range zone.Players() {
 			playerGearScore := player.GearScore()
 			playerGearScore.SetLevel(playerGearScore.Level() + 1)
 			items := player.Items()
