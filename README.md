@@ -364,6 +364,16 @@ currently my best option is to assemble the tree server side, make sure all nece
 
 
 ### TODO
+- correctly implement patch updating in server with walktree etc
+- new realistic benchmark test for engine (with assembling)
+- improve performance
+- review error handling in server
+- 
+
+
+- custom handlers
+- data persistence
+
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
 - is redeclaring via getter always necessary, or only after exported methods were used
