@@ -14,12 +14,13 @@ func (s *ServerFactory) writeStart() *ServerFactory {
 		return Id(action.Name).Func().Params(Id(Title(action.Name)+"Params"), Id("*Engine")).Id(",")
 	}).Id("onDeploy").Func().Params(Id("*Engine")),
 		Id("onFrameTick").Func().Params(Id("*Engine")),
-	).Block(
+	).Id("error").Block(
 		Id("a").Op(":=").Id("actions").Values(ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 			return Id(action.Name).Id(",")
 		})),
 		Id("setupRoutes").Call(Id("a"), Id("onDeploy"), Id("onFrameTick")),
-		Id("log.Fatal(http.ListenAndServe(\":8080\", nil))"),
+		Id("err").Op(":=").Id("http").Dot("ListenAndServe").Call(Lit(":8080"), Nil()),
+		Return(Id("err")),
 	)
 
 	decls.Render(s.buf)

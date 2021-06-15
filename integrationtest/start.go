@@ -1,21 +1,18 @@
 package main
 
 import (
+	"github.com/Java-Jonas/bar-cli/integrationtest/state"
 	"log"
-
-	state "github.com/Java-Jonas/bar-cli/examples/application/server"
 )
 
-func main() {
-
+func startServer() {
 	var playerID state.PlayerID
 
-	state.Start(
+	err := state.Start(
 		func(a state.AddItemToPlayerParams, e *state.Engine) {},
 		func(p state.MovePlayerParams, e *state.Engine) {
 			if playerID == 0 {
 				player := e.CreatePlayer()
-				log.Println(player.ID())
 				playerID = player.ID()
 			}
 			log.Println("moving player..")
@@ -25,4 +22,6 @@ func main() {
 		func(*state.Engine) {},
 		func(*state.Engine) {},
 	)
+
+	panic(err)
 }
