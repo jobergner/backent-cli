@@ -365,10 +365,12 @@ currently my best option is to assemble the tree server side, make sure all nece
 
 ### TODO
 - correctly implement patch updating in server with walktree etc
-- new realistic benchmark test for engine (with assembling)
-- improve performance
 - review error handling in server
-- 
+- find a neat way for integration tests
+
+- new realistic benchmark test for engine (with assembling)
+- improve performance (eg sync.Pool, walkTree-like assemble planner etc.)
+- find a way to create a UI to observe changes  
 
 
 - custom handlers

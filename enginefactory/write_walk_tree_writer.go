@@ -108,3 +108,45 @@ func (w walkElementWriter) declareAnyContainer() *Statement {
 func (w walkElementWriter) updatePath() *Statement {
 	return Id("engine").Dot("PathTrack").Dot(w.t.Name).Index(Id(w.idParam())).Op("=").Id("p")
 }
+
+type walkTreeWriter struct {
+	t *ast.ConfigType
+}
+
+func (w walkTreeWriter) receiverParams() *Statement {
+	return Id("engine").Id("*Engine")
+}
+
+func (w walkTreeWriter) dataElement() string {
+	return w.t.Name + "Data"
+}
+
+func (w walkTreeWriter) checkWalked() *Statement {
+	return Id("walkedCheck").Dot(w.t.Name).Index(Id(w.t.Name + "Data").Dot("ID")).Op("=").True()
+}
+
+func (w walkTreeWriter) walkElement() *Statement {
+	return Id("engine").Dot("walk"+Title(w.t.Name)).Call(Id(w.t.Name+"Data").Dot("ID"), Id("newPath").Call(Id(w.t.Name+"Identifier"), Int().Call(Id("id"))))
+}
+
+func (w walkTreeWriter) patchLoopConditions() *Statement {
+	return List(Id("id"), Id(w.t.Name+"Data")).Op(":=").Range().Id("engine").Dot("Patch").Dot(Title(w.t.Name))
+}
+
+func (w walkTreeWriter) elementDoesNotHaveParent() *Statement {
+	return Id("!" + w.t.Name + "Data").Dot("HasParent")
+}
+
+func (w walkTreeWriter) stateLoopConditions() *Statement {
+	return List(Id("id"), Id(w.t.Name+"Data")).Op(":=").Range().Id("engine").Dot("State").Dot(Title(w.t.Name))
+}
+
+func (w walkTreeWriter) hasNotBeenWalked() (*Statement, *Statement) {
+	return List(Id("_"), Id("ok")).Op(":=").Id("walkedCheck").Dot(w.t.Name).Index(Id(w.t.Name + "Data").Dot("ID")), Id("!ok")
+}
+
+func (w walkTreeWriter) clearPathTrack() *Statement {
+	return For(Id("key").Op(":=").Range().Id("engine").Dot("PathTrack").Dot(w.t.Name)).Block(
+		Delete(Id("engine").Dot("PathTrack").Dot(w.t.Name), Id("key")),
+	)
+}

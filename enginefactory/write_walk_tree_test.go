@@ -8,6 +8,19 @@ import (
 )
 
 func TestWriteWalkTree(t *testing.T) {
+	t.Run("writes walk tree", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeWalkTree()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			walkTree_Engine_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 	t.Run("writes walk element", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeWalkElement()
