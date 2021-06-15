@@ -11,6 +11,12 @@ type assembleTreeWriter struct {
 	t *ast.ConfigType
 }
 
+func (w assembleTreeWriter) clearTree() *Statement {
+	return For(Id("key").Op(":=").Range().Id("engine").Dot("Tree").Dot(Title(w.t.Name))).Block(
+		Delete(Id("engine").Dot("Tree").Dot(Title(w.t.Name)), Id("key")),
+	)
+}
+
 func (a assembleTreeWriter) dataElementName() string {
 	return a.t.Name + "Data"
 }

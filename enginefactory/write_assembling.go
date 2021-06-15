@@ -18,6 +18,10 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 	a := assembleTreeWriter{}
 
 	decls.File.Func().Params(a.receiverParams()).Id("assembleTree").Params().Id("Tree").Block(
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			a.t = &configType
+			return a.clearTree()
+		}),
 		a.createConfig(),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType

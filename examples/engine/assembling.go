@@ -797,6 +797,28 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 
 func (engine *Engine) assembleTree() Tree {
 
+	for key := range engine.Tree.EquipmentSet {
+		delete(engine.Tree.EquipmentSet, key)
+	}
+	for key := range engine.Tree.GearScore {
+		delete(engine.Tree.GearScore, key)
+	}
+	for key := range engine.Tree.Item {
+		delete(engine.Tree.Item, key)
+	}
+	for key := range engine.Tree.Player {
+		delete(engine.Tree.Player, key)
+	}
+	for key := range engine.Tree.Position {
+		delete(engine.Tree.Position, key)
+	}
+	for key := range engine.Tree.Zone {
+		delete(engine.Tree.Zone, key)
+	}
+	for key := range engine.Tree.ZoneItem {
+		delete(engine.Tree.ZoneItem, key)
+	}
+
 	config := assembleConfig{
 		forceInclude: false,
 	}
