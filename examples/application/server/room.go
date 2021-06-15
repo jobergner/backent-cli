@@ -69,7 +69,8 @@ func (r *Room) runHandleConnections() {
 }
 
 func (r *Room) answerInitRequests() error {
-	stateBytes, err := r.state.State.MarshalJSON()
+	tree := r.state.assembleTree(true)
+	stateBytes, err := tree.MarshalJSON()
 	if err != nil {
 		return err
 	}
@@ -115,7 +116,7 @@ Exit:
 
 func (r *Room) publishPatch() error {
 	r.state.walkTree()
-	tree := r.state.assembleTree()
+	tree := r.state.assembleTree(false)
 	patchBytes, err := tree.MarshalJSON()
 	if err != nil {
 		return err
