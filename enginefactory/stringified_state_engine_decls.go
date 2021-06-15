@@ -1060,7 +1060,7 @@ const assembleEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engin
 	return ItemReference{}, false, false
 }`
 
-const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() Tree {
+const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
 	for key := range engine.Tree.EquipmentSet {
 		delete(engine.Tree.EquipmentSet, key)
 	}
@@ -1082,7 +1082,7 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() Tr
 	for key := range engine.Tree.ZoneItem {
 		delete(engine.Tree.ZoneItem, key)
 	}
-	config := assembleConfig{forceInclude: false}
+	config := assembleConfig{forceInclude: assembleEntireTree}
 	for _, equipmentSetData := range engine.Patch.EquipmentSet {
 		equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
 		if include {

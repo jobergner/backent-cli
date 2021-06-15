@@ -795,7 +795,7 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 	return ItemReference{}, false, false
 }
 
-func (engine *Engine) assembleTree() Tree {
+func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
 
 	for key := range engine.Tree.EquipmentSet {
 		delete(engine.Tree.EquipmentSet, key)
@@ -820,7 +820,7 @@ func (engine *Engine) assembleTree() Tree {
 	}
 
 	config := assembleConfig{
-		forceInclude: false,
+		forceInclude: assembleEntireTree,
 	}
 
 	for _, equipmentSetData := range engine.Patch.EquipmentSet {

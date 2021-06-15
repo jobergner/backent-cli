@@ -25,6 +25,10 @@ func (a assembleTreeWriter) receiverParams() *Statement {
 	return Id("engine").Id("*Engine")
 }
 
+func (a assembleTreeWriter) params() *Statement {
+	return Id("assembleEntireTree").Bool()
+}
+
 func (a assembleTreeWriter) patchLoopConditions() *Statement {
 	return List(Id("_"), Id(a.dataElementName())).Op(":=").Range().Id("engine").Dot("Patch").Dot(Title(a.t.Name))
 }
@@ -52,7 +56,7 @@ func (a assembleTreeWriter) stateLoopConditions() *Statement {
 }
 
 func (a assembleTreeWriter) createConfig() *Statement {
-	return Id("config").Op(":=").Id("assembleConfig").Values(Dict{Id("forceInclude"): False()})
+	return Id("config").Op(":=").Id("assembleConfig").Values(Dict{Id("forceInclude"): Id("assembleEntireTree")})
 }
 
 type assembleElementWriter struct {

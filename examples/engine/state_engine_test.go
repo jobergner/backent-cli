@@ -226,7 +226,7 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
 	expectedTree := newTree()
 	define(se, &expectedTree)
 	se.walkTree()
-	actualTree := se.assembleTree()
+	actualTree := se.assembleTree(false)
 
 	if !assert.ObjectsAreEqual(expectedTree, actualTree) {
 		actual, _ := actualTree.MarshalJSON()
