@@ -4,7 +4,6 @@ package serverfactory
 
 const gets_generated_go_import string = `import (
 	"errors"
-	"log"
 	"net/http"
 )`
 
@@ -64,8 +63,9 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 	return nil
 }`
 
-const _Start_func string = `func Start(addItemToPlayer func(AddItemToPlayerParams, *Engine), movePlayer func(MovePlayerParams, *Engine), spawnZoneItems func(SpawnZoneItemsParams, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) {
+const _Start_func string = `func Start(addItemToPlayer func(AddItemToPlayerParams, *Engine), movePlayer func(MovePlayerParams, *Engine), spawnZoneItems func(SpawnZoneItemsParams, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) error {
 	a := actions{addItemToPlayer, movePlayer, spawnZoneItems}
 	setupRoutes(a, onDeploy, onFrameTick)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	err := http.ListenAndServe(":8080", nil)
+	return err
 }`

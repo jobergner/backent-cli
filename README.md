@@ -364,6 +364,7 @@ currently my best option is to assemble the tree server side, make sure all nece
 
 
 ### TODO
+- server.Start should return the error
 - correctly implement patch updating in server with walktree etc
 - review error handling in server
 - find a neat way for integration tests

@@ -2,7 +2,6 @@ package state
 
 import (
 	"errors"
-	"log"
 	"net/http"
 )
 
@@ -69,8 +68,9 @@ func Start(
 	spawnZoneItems func(SpawnZoneItemsParams, *Engine),
 	onDeploy func(*Engine),
 	onFrameTick func(*Engine),
-) {
+) error {
 	a := actions{addItemToPlayer, movePlayer, spawnZoneItems}
 	setupRoutes(a, onDeploy, onFrameTick)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	err := http.ListenAndServe(":8080", nil)
+	return err
 }
