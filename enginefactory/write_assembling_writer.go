@@ -160,12 +160,40 @@ func (a assembleElementWriter) setHasUpdatedTrue() *Statement {
 	return Id("hasUpdated").Op("=").True()
 }
 
+func (a assembleElementWriter) makeMap(valueType *ast.ConfigType) *Statement {
+	mapValueType := Id(Title(valueType.Name) + "Reference")
+	if a.f.HasPointerValue && a.f.HasAnyValue {
+		mapValueType = Id(Title(anyNameByField(*a.f) + "Reference"))
+	}
+	if a.f.HasAnyValue && !a.f.HasPointerValue {
+		mapValueType = Id("interface{}")
+	}
+	if !a.f.HasPointerValue && !a.f.HasAnyValue {
+		mapValueType = Id(Title(valueType.Name))
+	}
+	mapKeyType := Id(Title(valueType.Name) + "ID")
+	if a.f.HasAnyValue {
+		mapKeyType = Int()
+	}
+	return If(Id(a.t.Name).Dot(Title(a.f.Name)).Op("==").Nil()).Block(
+		Id(a.t.Name).Dot(Title(a.f.Name)).Op("=").Make(Map(mapKeyType).Add(mapValueType)),
+	)
+}
+
 func (a assembleElementWriter) appendToElementsInField(valueType *ast.ConfigType) *Statement {
 	appendedType := valueType.Name
 	if !a.f.HasAnyValue && a.f.HasPointerValue || (a.f.HasPointerValue && a.f.HasSliceValue && a.f.HasAnyValue) {
 		appendedType = a.f.ValueTypeName
 	}
-	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(Title(a.f.Name)), Id("tree"+Title(appendedType)))
+	usedID := "ElementID"
+	if !a.f.HasPointerValue {
+		usedID = "ID"
+	}
+	mapKeyType := Id("tree" + Title(appendedType)).Dot(usedID)
+	if a.f.HasAnyValue && !a.f.HasPointerValue {
+		mapKeyType = Int().Call(Id("tree" + Title(appendedType)).Dot(usedID))
+	}
+	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Index(mapKeyType).Op("=").Id("tree" + Title(appendedType))
 }
 
 func (a assembleElementWriter) setFieldElement(valueType *ast.ConfigType) *Statement {
