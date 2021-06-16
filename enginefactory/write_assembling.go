@@ -126,7 +126,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 										If(Id("childHasUpdated")).Block(
 											a.setHasUpdatedTrue(),
 										),
-										a.makeMap(valueType),
+										a.makeMap(),
 										a.appendToElementsInField(valueType),
 									),
 								}
@@ -138,7 +138,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 								If(Id("childHasUpdated")).Block(
 									a.setHasUpdatedTrue(),
 								),
-								a.makeMap(field.ValueType()),
+								a.makeMap(),
 								a.appendToElementsInField(field.ValueType()),
 							),
 						)

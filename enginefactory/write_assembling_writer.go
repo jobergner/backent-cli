@@ -160,18 +160,18 @@ func (a assembleElementWriter) setHasUpdatedTrue() *Statement {
 	return Id("hasUpdated").Op("=").True()
 }
 
-func (a assembleElementWriter) makeMap(valueType *ast.ConfigType) *Statement {
-	mapValueType := Id(Title(valueType.Name) + "Reference")
-	if a.f.HasPointerValue && a.f.HasAnyValue {
-		mapValueType = Id(Title(anyNameByField(*a.f) + "Reference"))
-	}
+func (a assembleElementWriter) makeMap() *Statement {
+	mapValueType := Id(Title(a.f.ValueType().Name) + "Reference")
 	if a.f.HasAnyValue && !a.f.HasPointerValue {
 		mapValueType = Id("interface{}")
 	}
-	if !a.f.HasPointerValue && !a.f.HasAnyValue {
-		mapValueType = Id(Title(valueType.Name))
+	if a.f.HasPointerValue && a.f.HasAnyValue {
+		mapValueType = Id(Title(anyNameByField(*a.f) + "Reference"))
 	}
-	mapKeyType := Id(Title(valueType.Name) + "ID")
+	if !a.f.HasPointerValue && !a.f.HasAnyValue {
+		mapValueType = Id(Title(a.f.ValueType().Name))
+	}
+	mapKeyType := Id(Title(a.f.ValueType().Name) + "ID")
 	if a.f.HasAnyValue {
 		mapKeyType = Int()
 	}
