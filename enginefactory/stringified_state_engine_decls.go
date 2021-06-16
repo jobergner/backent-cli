@@ -402,7 +402,10 @@ const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleE
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			equipmentSet.Equipment = append(equipmentSet.Equipment, treeEquipmentSetEquipmentRef)
+			if equipmentSet.Equipment == nil {
+				equipmentSet.Equipment = make(map[ItemID]ItemReference)
+			}
+			equipmentSet.Equipment[treeEquipmentSetEquipmentRef.ElementID] = treeEquipmentSetEquipmentRef
 		}
 	}
 	equipmentSet.ID = equipmentSetData.ID
@@ -508,7 +511,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.EquipmentSets = append(player.EquipmentSets, treePlayerEquipmentSetRef)
+			if player.EquipmentSets == nil {
+				player.EquipmentSets = make(map[EquipmentSetID]EquipmentSetReference)
+			}
+			player.EquipmentSets[treePlayerEquipmentSetRef.ElementID] = treePlayerEquipmentSetRef
 		}
 	}
 	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(playerData.GearScore, check, config); include {
@@ -522,7 +528,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.GuildMembers = append(player.GuildMembers, treePlayerGuildMemberRef)
+			if player.GuildMembers == nil {
+				player.GuildMembers = make(map[PlayerID]PlayerReference)
+			}
+			player.GuildMembers[treePlayerGuildMemberRef.ElementID] = treePlayerGuildMemberRef
 		}
 	}
 	for _, itemID := range mergeItemIDs(engine.State.Player[playerData.ID].Items, engine.Patch.Player[playerData.ID].Items) {
@@ -530,7 +539,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.Items = append(player.Items, treeItem)
+			if player.Items == nil {
+				player.Items = make(map[ItemID]Item)
+			}
+			player.Items[treeItem.ID] = treeItem
 		}
 	}
 	if treePosition, include, childHasUpdated := engine.assemblePosition(playerData.Position, check, config); include {
@@ -550,7 +562,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.TargetedBy = append(player.TargetedBy, treePlayerTargetedByRef)
+			if player.TargetedBy == nil {
+				player.TargetedBy = make(map[int]AnyOfPlayer_ZoneItemReference)
+			}
+			player.TargetedBy[treePlayerTargetedByRef.ElementID] = treePlayerTargetedByRef
 		}
 	}
 	player.ID = playerData.ID
@@ -579,7 +594,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treeItem)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treeItem.ID)] = treeItem
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindPlayer {
 			playerID := anyOfItem_Player_ZoneItemContainer.Player
@@ -587,7 +605,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treePlayer)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treePlayer.ID)] = treePlayer
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindZoneItem {
 			zoneItemID := anyOfItem_Player_ZoneItemContainer.ZoneItem
@@ -595,7 +616,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treeZoneItem)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treeZoneItem.ID)] = treeZoneItem
 			}
 		}
 	}
@@ -604,7 +628,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			zone.Items = append(zone.Items, treeZoneItem)
+			if zone.Items == nil {
+				zone.Items = make(map[ZoneItemID]ZoneItem)
+			}
+			zone.Items[treeZoneItem.ID] = treeZoneItem
 		}
 	}
 	for _, playerID := range mergePlayerIDs(engine.State.Zone[zoneData.ID].Players, engine.Patch.Zone[zoneData.ID].Players) {
@@ -612,7 +639,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			zone.Players = append(zone.Players, treePlayer)
+			if zone.Players == nil {
+				zone.Players = make(map[PlayerID]Player)
+			}
+			zone.Players[treePlayer.ID] = treePlayer
 		}
 	}
 	zone.ID = zoneData.ID
@@ -3888,10 +3918,10 @@ const _ItemReference_type string = `type ItemReference struct {
 }`
 
 const _EquipmentSet_type string = `type EquipmentSet struct {
-	ID		EquipmentSetID	` + "`" + `json:"id"` + "`" + `
-	Equipment	[]ItemReference	` + "`" + `json:"equipment"` + "`" + `
-	Name		string		` + "`" + `json:"name"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	ID		EquipmentSetID			` + "`" + `json:"id"` + "`" + `
+	Equipment	map[ItemID]ItemReference	` + "`" + `json:"equipment"` + "`" + `
+	Name		string				` + "`" + `json:"name"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _EquipmentSetReference_type string = `type EquipmentSetReference struct {
@@ -3936,15 +3966,15 @@ const _GearScoreReference_type string = `type GearScoreReference struct {
 }`
 
 const _Player_type string = `type Player struct {
-	ID		PlayerID			` + "`" + `json:"id"` + "`" + `
-	EquipmentSets	[]EquipmentSetReference		` + "`" + `json:"equipmentSets"` + "`" + `
-	GearScore	*GearScore			` + "`" + `json:"gearScore"` + "`" + `
-	GuildMembers	[]PlayerReference		` + "`" + `json:"guildMembers"` + "`" + `
-	Items		[]Item				` + "`" + `json:"items"` + "`" + `
-	Position	*Position			` + "`" + `json:"position"` + "`" + `
-	Target		*AnyOfPlayer_ZoneItemReference	` + "`" + `json:"target"` + "`" + `
-	TargetedBy	[]AnyOfPlayer_ZoneItemReference	` + "`" + `json:"targetedBy"` + "`" + `
-	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	ID		PlayerID					` + "`" + `json:"id"` + "`" + `
+	EquipmentSets	map[EquipmentSetID]EquipmentSetReference	` + "`" + `json:"equipmentSets"` + "`" + `
+	GearScore	*GearScore					` + "`" + `json:"gearScore"` + "`" + `
+	GuildMembers	map[PlayerID]PlayerReference			` + "`" + `json:"guildMembers"` + "`" + `
+	Items		map[ItemID]Item					` + "`" + `json:"items"` + "`" + `
+	Position	*Position					` + "`" + `json:"position"` + "`" + `
+	Target		*AnyOfPlayer_ZoneItemReference			` + "`" + `json:"target"` + "`" + `
+	TargetedBy	map[int]AnyOfPlayer_ZoneItemReference		` + "`" + `json:"targetedBy"` + "`" + `
+	OperationKind	OperationKind					` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _PlayerReference_type string = `type PlayerReference struct {
@@ -3957,12 +3987,12 @@ const _PlayerReference_type string = `type PlayerReference struct {
 }`
 
 const _Zone_type string = `type Zone struct {
-	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
-	Interactables	[]interface{}	` + "`" + `json:"interactables"` + "`" + `
-	Items		[]ZoneItem	` + "`" + `json:"items"` + "`" + `
-	Players		[]Player	` + "`" + `json:"players"` + "`" + `
-	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	ID		ZoneID			` + "`" + `json:"id"` + "`" + `
+	Interactables	map[int]interface{}	` + "`" + `json:"interactables"` + "`" + `
+	Items		map[ZoneItemID]ZoneItem	` + "`" + `json:"items"` + "`" + `
+	Players		map[PlayerID]Player	` + "`" + `json:"players"` + "`" + `
+	Tags		[]string		` + "`" + `json:"tags"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _ZoneReference_type string = `type ZoneReference struct {

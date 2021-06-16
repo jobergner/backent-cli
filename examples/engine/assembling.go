@@ -71,7 +71,10 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			equipmentSet.Equipment = append(equipmentSet.Equipment, treeEquipmentSetEquipmentRef)
+			if equipmentSet.Equipment == nil {
+				equipmentSet.Equipment = make(map[ItemID]ItemReference)
+			}
+			equipmentSet.Equipment[treeEquipmentSetEquipmentRef.ElementID] = treeEquipmentSetEquipmentRef
 		}
 	}
 
@@ -192,7 +195,10 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.EquipmentSets = append(player.EquipmentSets, treePlayerEquipmentSetRef)
+			if player.EquipmentSets == nil {
+				player.EquipmentSets = make(map[EquipmentSetID]EquipmentSetReference)
+			}
+			player.EquipmentSets[treePlayerEquipmentSetRef.ElementID] = treePlayerEquipmentSetRef
 		}
 	}
 
@@ -208,7 +214,10 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.GuildMembers = append(player.GuildMembers, treePlayerGuildMemberRef)
+			if player.GuildMembers == nil {
+				player.GuildMembers = make(map[PlayerID]PlayerReference)
+			}
+			player.GuildMembers[treePlayerGuildMemberRef.ElementID] = treePlayerGuildMemberRef
 		}
 	}
 
@@ -217,7 +226,10 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.Items = append(player.Items, treeItem)
+			if player.Items == nil {
+				player.Items = make(map[ItemID]Item)
+			}
+			player.Items[treeItem.ID] = treeItem
 		}
 	}
 
@@ -240,7 +252,10 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.TargetedBy = append(player.TargetedBy, treePlayerTargetedByRef)
+			if player.TargetedBy == nil {
+				player.TargetedBy = make(map[int]AnyOfPlayer_ZoneItemReference)
+			}
+			player.TargetedBy[treePlayerTargetedByRef.ElementID] = treePlayerTargetedByRef
 		}
 	}
 
@@ -273,7 +288,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treeItem)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treeItem.ID)] = treeItem
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindPlayer {
 			playerID := anyOfItem_Player_ZoneItemContainer.Player
@@ -281,7 +299,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treePlayer)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treePlayer.ID)] = treePlayer
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindZoneItem {
 			zoneItemID := anyOfItem_Player_ZoneItemContainer.ZoneItem
@@ -289,7 +310,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treeZoneItem)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treeZoneItem.ID)] = treeZoneItem
 			}
 		}
 	}
@@ -299,7 +323,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			zone.Items = append(zone.Items, treeZoneItem)
+			if zone.Items == nil {
+				zone.Items = make(map[ZoneItemID]ZoneItem)
+			}
+			zone.Items[treeZoneItem.ID] = treeZoneItem
 		}
 	}
 
@@ -308,7 +335,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			zone.Players = append(zone.Players, treePlayer)
+			if zone.Players == nil {
+				zone.Players = make(map[PlayerID]Player)
+			}
+			zone.Players[treePlayer.ID] = treePlayer
 		}
 	}
 
