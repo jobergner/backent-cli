@@ -21,6 +21,12 @@ func TestEngine(t *testing.T) {
 		_gearScore := se.GearScore(gearScore.ID())
 		assert.NotZero(t, _gearScore.ID())
 	})
+	t.Run("gets every element", func(t *testing.T) {
+		se := newEngine()
+		se.CreateGearScore()
+		se.CreateGearScore()
+		assert.Equal(t, 2, len(se.EveryGearScore()))
+	})
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
