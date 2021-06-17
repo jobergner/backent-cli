@@ -318,20 +318,17 @@ func (engine *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMem
 	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
-func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
-	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
-	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
-	}
-	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
-	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
-	}
-	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
-}
-
 func (_playerEquipmentSetRef playerEquipmentSetRef) ID() EquipmentSetID {
 	return _playerEquipmentSetRef.playerEquipmentSetRef.ReferencedElementID
+}
+
+func (engine *Engine) EveryEquipmentSet() []equipmentSet {
+	equipmentSetIDs := engine.allEquipmentSetIDs()
+	var equipmentSets []equipmentSet
+	for _, equipmentSetID := range equipmentSetIDs {
+		equipmentSets = append(equipmentSets, engine.EquipmentSet(equipmentSetID))
+	}
+	return equipmentSets
 }
 
 func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
@@ -362,6 +359,18 @@ func (_equipmentSet equipmentSet) Equipment() []equipmentSetEquipmentRef {
 		equipment = append(equipment, equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refID))
 	}
 	return equipment
+}
+
+func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
+	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
+	}
+	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
+	}
+	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
 func (_equipmentSetEquipmentRef equipmentSetEquipmentRef) ID() ItemID {

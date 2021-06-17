@@ -370,6 +370,7 @@ currently my best option is to assemble the tree server side, make sure all nece
 
 
 ### TODO
+- should returns of slices include elements with ElementKindDelete?
 - All<Type> methods for every type (currently there is no way of just getting all elements)
 - 
 - actions need to be able to respond because otherwise the client is not aware of the IDs that are being created serverside

@@ -248,12 +248,12 @@ func (engine Engine) allEquipmentSetIDs() []EquipmentSetID {
 
 func (engine Engine) allGearScoreIDs() []GearScoreID {
 	var stateGearScoreIDs []GearScoreID
-	for playerID := range engine.State.GearScore {
-		stateGearScoreIDs = append(stateGearScoreIDs, playerID)
+	for gearScoreID := range engine.State.GearScore {
+		stateGearScoreIDs = append(stateGearScoreIDs, gearScoreID)
 	}
 	var patchGearScoreIDs []GearScoreID
-	for playerID := range engine.Patch.GearScore {
-		patchGearScoreIDs = append(patchGearScoreIDs, playerID)
+	for gearScoreID := range engine.Patch.GearScore {
+		patchGearScoreIDs = append(patchGearScoreIDs, gearScoreID)
 	}
 	return deduplicateGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
 }
@@ -284,24 +284,24 @@ func (engine Engine) allPositionIDs() []PositionID {
 
 func (engine Engine) allZoneIDs() []ZoneID {
 	var stateZoneIDs []ZoneID
-	for positionID := range engine.State.Zone {
-		stateZoneIDs = append(stateZoneIDs, positionID)
+	for zoneID := range engine.State.Zone {
+		stateZoneIDs = append(stateZoneIDs, zoneID)
 	}
 	var patchZoneIDs []ZoneID
-	for positionID := range engine.Patch.Zone {
-		patchZoneIDs = append(patchZoneIDs, positionID)
+	for zoneID := range engine.Patch.Zone {
+		patchZoneIDs = append(patchZoneIDs, zoneID)
 	}
 	return deduplicateZoneIDs(stateZoneIDs, patchZoneIDs)
 }
 
 func (engine Engine) allZoneItemIDs() []ZoneItemID {
 	var stateZoneItemIDs []ZoneItemID
-	for positionID := range engine.State.ZoneItem {
-		stateZoneItemIDs = append(stateZoneItemIDs, positionID)
+	for zoneItemID := range engine.State.ZoneItem {
+		stateZoneItemIDs = append(stateZoneItemIDs, zoneItemID)
 	}
 	var patchZoneItemIDs []ZoneItemID
-	for positionID := range engine.Patch.ZoneItem {
-		patchZoneItemIDs = append(patchZoneItemIDs, positionID)
+	for zoneItemID := range engine.Patch.ZoneItem {
+		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
 	}
 	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
 }

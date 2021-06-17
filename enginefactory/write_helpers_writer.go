@@ -1,18 +1,13 @@
 package enginefactory
 
 import (
-	"github.com/Java-Jonas/bar-cli/ast"
 	. "github.com/Java-Jonas/bar-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 type deduplicateWriter struct {
-	f ast.Field
-}
-
-func (d deduplicateWriter) idType() string {
-	return Title(d.f.Parent.Name) + Title(Singular(d.f.Name)) + "RefID"
+	idType func() string
 }
 
 func (d deduplicateWriter) name() string {
@@ -52,11 +47,7 @@ func (d deduplicateWriter) loopCheck() *Statement {
 }
 
 type allIDsMehtodWriter struct {
-	f ast.Field
-}
-
-func (a allIDsMehtodWriter) typeName() string {
-	return Title(a.f.Parent.Name) + Title(Singular(a.f.Name)) + "Ref"
+	typeName func() string
 }
 
 func (a allIDsMehtodWriter) idType() string {
@@ -104,8 +95,7 @@ func (a allIDsMehtodWriter) appendPatchID() *Statement {
 }
 
 func (a allIDsMehtodWriter) deduplicatedIDs() *Statement {
-	dedu := deduplicateWriter{a.f}
-	return Id(dedu.name()).Call(Id(a.idSliceName("state")), Id(a.idSliceName("patch")))
+	return Id("deduplicate"+a.typeName()+"IDs").Call(Id(a.idSliceName("state")), Id(a.idSliceName("patch")))
 }
 
 type mergeIDsWriter struct {
