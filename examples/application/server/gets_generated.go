@@ -32,34 +32,35 @@ type actions struct {
 	spawnZoneItems  func(SpawnZoneItemsParams, *Engine)
 }
 
-func (r *Room) processClientMessage(msg message) error {
+func (r *Room) processClientMessage(msg message) (response, error) {
 	switch messageKind(msg.Kind) {
 	case messageKindAction_addItemToPlayer:
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return err
+			return response{receiver: msg.source}, nil
 		}
 		r.actions.addItemToPlayer(params, r.state)
+		return response{}, nil
 	case messageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return err
+			return response{}, nil
 		}
 		r.actions.movePlayer(params, r.state)
+		return response{receiver: msg.source}, nil
 	case messageKindAction_spawnZoneItems:
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return err
+			return response{}, nil
 		}
 		r.actions.spawnZoneItems(params, r.state)
+		return response{receiver: msg.source}, nil
 	default:
-		return errors.New("unknown message kind")
+		return response{}, errors.New("unknown message kind")
 	}
-
-	return nil
 }
 
 func Start(
