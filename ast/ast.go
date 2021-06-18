@@ -221,6 +221,10 @@ func (a *AST) fillInReferences() *AST {
 			a.assignFieldTypeReference(&param)
 			action.Params[paramName] = param
 		}
+		for responseValueName, responseValue := range action.Response {
+			a.assignFieldTypeReference(&responseValue)
+			action.Params[responseValueName] = responseValue
+		}
 		a.Actions[actionName] = action
 	}
 

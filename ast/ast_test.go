@@ -380,6 +380,9 @@ func TestStateConfigAST(t *testing.T) {
 		residentsParam := removeResidentsAction.Params["residents"]
 		assert.Equal(t, residentsParam.ValueTypes["person"].Name, "person")
 		assert.Equal(t, residentsParam.ValueTypes["person"].IsBasicType, false)
+		newResidentsCountResponseValue := removeResidentsAction.Response["newResidentsCount"]
+		assert.Equal(t, newResidentsCountResponseValue.ValueTypes["int"].Name, "int")
+		assert.Equal(t, newResidentsCountResponseValue.ValueTypes["int"].IsBasicType, true)
 
 		changeAddressAction := actual.Actions["changeAddress"]
 		newStreetParam := changeAddressAction.Params["newStreet"]
@@ -391,6 +394,9 @@ func TestStateConfigAST(t *testing.T) {
 		newCityParam := changeAddressAction.Params["newCity"]
 		assert.Equal(t, newCityParam.ValueTypes["string"].Name, "string")
 		assert.Equal(t, newCityParam.ValueTypes["string"].IsBasicType, true)
+		isValidAddressResponseValue := changeAddressAction.Response["isValidAddress"]
+		assert.Equal(t, isValidAddressResponseValue.ValueTypes["bool"].Name, "bool")
+		assert.Equal(t, isValidAddressResponseValue.ValueTypes["bool"].IsBasicType, true)
 
 		assert.Equal(t, personType.ReferencedBy, []*Field{&banField, &barField, &friendsField})
 		assert.Equal(t, addressType.ReferencedBy, []*Field{&banField, &barField})
