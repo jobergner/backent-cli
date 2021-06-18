@@ -1,5 +1,14 @@
 package state
 
+func (engine *Engine) EveryPlayer() []player {
+	playerIDs := engine.allPlayerIDs()
+	var players []player
+	for _, playerID := range playerIDs {
+		players = append(players, engine.Player(playerID))
+	}
+	return players
+}
+
 func (engine *Engine) Player(playerID PlayerID) player {
 	patchingPlayer, ok := engine.Patch.Player[playerID]
 	if ok {
@@ -67,6 +76,15 @@ func (_player player) Position() position {
 	return player.player.engine.Position(player.player.Position)
 }
 
+func (engine *Engine) EveryGearScore() []gearScore {
+	gearScoreIDs := engine.allGearScoreIDs()
+	var gearScores []gearScore
+	for _, gearScoreID := range gearScoreIDs {
+		gearScores = append(gearScores, engine.GearScore(gearScoreID))
+	}
+	return gearScores
+}
+
 func (engine *Engine) GearScore(gearScoreID GearScoreID) gearScore {
 	patchingGearScore, ok := engine.Patch.GearScore[gearScoreID]
 	if ok {
@@ -91,6 +109,15 @@ func (_gearScore gearScore) Level() int {
 func (_gearScore gearScore) Score() int {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Score
+}
+
+func (engine *Engine) EveryItem() []item {
+	itemIDs := engine.allItemIDs()
+	var items []item
+	for _, itemID := range itemIDs {
+		items = append(items, engine.Item(itemID))
+	}
+	return items
 }
 
 func (engine *Engine) Item(itemID ItemID) item {
@@ -128,6 +155,15 @@ func (_item item) Origin() anyOfPlayer_Position {
 	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
 }
 
+func (engine *Engine) EveryPosition() []position {
+	positionIDs := engine.allPositionIDs()
+	var positions []position
+	for _, positionID := range positionIDs {
+		positions = append(positions, engine.Position(positionID))
+	}
+	return positions
+}
+
 func (engine *Engine) Position(positionID PositionID) position {
 	patchingPosition, ok := engine.Patch.Position[positionID]
 	if ok {
@@ -154,6 +190,15 @@ func (_position position) Y() float64 {
 	return position.position.Y
 }
 
+func (engine *Engine) EveryZoneItem() []zoneItem {
+	zoneItemIDs := engine.allZoneItemIDs()
+	var zoneItems []zoneItem
+	for _, zoneItemID := range zoneItemIDs {
+		zoneItems = append(zoneItems, engine.ZoneItem(zoneItemID))
+	}
+	return zoneItems
+}
+
 func (engine *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
 	patchingZoneItem, ok := engine.Patch.ZoneItem[zoneItemID]
 	if ok {
@@ -178,6 +223,15 @@ func (_zoneItem zoneItem) Position() position {
 func (_zoneItem zoneItem) Item() item {
 	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
 	return zoneItem.zoneItem.engine.Item(zoneItem.zoneItem.Item)
+}
+
+func (engine *Engine) EveryZone() []zone {
+	zoneIDs := engine.allZoneIDs()
+	var zones []zone
+	for _, zoneID := range zoneIDs {
+		zones = append(zones, engine.Zone(zoneID))
+	}
+	return zones
 }
 
 func (engine *Engine) Zone(zoneID ZoneID) zone {
@@ -264,20 +318,17 @@ func (engine *Engine) playerGuildMemberRef(playerGuildMemberRefID PlayerGuildMem
 	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
-func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
-	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
-	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
-	}
-	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
-	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
-	}
-	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
-}
-
 func (_playerEquipmentSetRef playerEquipmentSetRef) ID() EquipmentSetID {
 	return _playerEquipmentSetRef.playerEquipmentSetRef.ReferencedElementID
+}
+
+func (engine *Engine) EveryEquipmentSet() []equipmentSet {
+	equipmentSetIDs := engine.allEquipmentSetIDs()
+	var equipmentSets []equipmentSet
+	for _, equipmentSetID := range equipmentSetIDs {
+		equipmentSets = append(equipmentSets, engine.EquipmentSet(equipmentSetID))
+	}
+	return equipmentSets
 }
 
 func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
@@ -308,6 +359,18 @@ func (_equipmentSet equipmentSet) Equipment() []equipmentSetEquipmentRef {
 		equipment = append(equipment, equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refID))
 	}
 	return equipment
+}
+
+func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
+	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
+	}
+	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
+	}
+	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
 func (_equipmentSetEquipmentRef equipmentSetEquipmentRef) ID() ItemID {

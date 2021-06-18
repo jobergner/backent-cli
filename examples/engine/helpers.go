@@ -1,5 +1,131 @@
 package state
 
+func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
+
+	check := make(map[ZoneItemID]bool)
+	deduped := make([]ZoneItemID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
+
+	check := make(map[ZoneID]bool)
+	deduped := make([]ZoneID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
+
+	check := make(map[PositionID]bool)
+	deduped := make([]PositionID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
+
+	check := make(map[ItemID]bool)
+	deduped := make([]ItemID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
+
+	check := make(map[GearScoreID]bool)
+	deduped := make([]GearScoreID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []EquipmentSetID {
+
+	check := make(map[EquipmentSetID]bool)
+	deduped := make([]EquipmentSetID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
+func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
+
+	check := make(map[PlayerID]bool)
+	deduped := make([]PlayerID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	return deduped
+}
+
 func deduplicatePlayerTargetedByRefIDs(a []PlayerTargetedByRefID, b []PlayerTargetedByRefID) []PlayerTargetedByRefID {
 
 	check := make(map[PlayerTargetedByRefID]bool)
@@ -106,6 +232,90 @@ func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []
 	}
 
 	return deduped
+}
+
+func (engine Engine) allEquipmentSetIDs() []EquipmentSetID {
+	var stateEquipmentSetIDs []EquipmentSetID
+	for equipmentSetID := range engine.State.EquipmentSet {
+		stateEquipmentSetIDs = append(stateEquipmentSetIDs, equipmentSetID)
+	}
+	var patchEquipmentSetIDs []EquipmentSetID
+	for equipmentSetID := range engine.Patch.EquipmentSet {
+		patchEquipmentSetIDs = append(patchEquipmentSetIDs, equipmentSetID)
+	}
+	return deduplicateEquipmentSetIDs(stateEquipmentSetIDs, patchEquipmentSetIDs)
+}
+
+func (engine Engine) allGearScoreIDs() []GearScoreID {
+	var stateGearScoreIDs []GearScoreID
+	for gearScoreID := range engine.State.GearScore {
+		stateGearScoreIDs = append(stateGearScoreIDs, gearScoreID)
+	}
+	var patchGearScoreIDs []GearScoreID
+	for gearScoreID := range engine.Patch.GearScore {
+		patchGearScoreIDs = append(patchGearScoreIDs, gearScoreID)
+	}
+	return deduplicateGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
+}
+
+func (engine Engine) allItemIDs() []ItemID {
+	var stateItemIDs []ItemID
+	for itemID := range engine.State.Item {
+		stateItemIDs = append(stateItemIDs, itemID)
+	}
+	var patchItemIDs []ItemID
+	for itemID := range engine.Patch.Item {
+		patchItemIDs = append(patchItemIDs, itemID)
+	}
+	return deduplicateItemIDs(stateItemIDs, patchItemIDs)
+}
+
+func (engine Engine) allPositionIDs() []PositionID {
+	var statePositionIDs []PositionID
+	for positionID := range engine.State.Position {
+		statePositionIDs = append(statePositionIDs, positionID)
+	}
+	var patchPositionIDs []PositionID
+	for positionID := range engine.Patch.Position {
+		patchPositionIDs = append(patchPositionIDs, positionID)
+	}
+	return deduplicatePositionIDs(statePositionIDs, patchPositionIDs)
+}
+
+func (engine Engine) allZoneIDs() []ZoneID {
+	var stateZoneIDs []ZoneID
+	for zoneID := range engine.State.Zone {
+		stateZoneIDs = append(stateZoneIDs, zoneID)
+	}
+	var patchZoneIDs []ZoneID
+	for zoneID := range engine.Patch.Zone {
+		patchZoneIDs = append(patchZoneIDs, zoneID)
+	}
+	return deduplicateZoneIDs(stateZoneIDs, patchZoneIDs)
+}
+
+func (engine Engine) allZoneItemIDs() []ZoneItemID {
+	var stateZoneItemIDs []ZoneItemID
+	for zoneItemID := range engine.State.ZoneItem {
+		stateZoneItemIDs = append(stateZoneItemIDs, zoneItemID)
+	}
+	var patchZoneItemIDs []ZoneItemID
+	for zoneItemID := range engine.Patch.ZoneItem {
+		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
+	}
+	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
+}
+
+func (engine Engine) allPlayerIDs() []PlayerID {
+	var statePlayerIDs []PlayerID
+	for playerID := range engine.State.Player {
+		statePlayerIDs = append(statePlayerIDs, playerID)
+	}
+	var patchPlayerIDs []PlayerID
+	for playerID := range engine.Patch.Player {
+		patchPlayerIDs = append(patchPlayerIDs, playerID)
+	}
+	return deduplicatePlayerIDs(statePlayerIDs, patchPlayerIDs)
 }
 
 func (engine Engine) allPlayerTargetedByRefIDs() []PlayerTargetedByRefID {

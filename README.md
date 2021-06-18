@@ -362,14 +362,36 @@ currently my best option is to assemble the tree server side, make sure all nece
 - a path tracker can track all paths. it will persist through multiple UpdateStates
 - when a child of an element is assembled, the assembler checks if the path of that child already exists. if not, or the path has updated, a new path is created and tracked
 
+### Using Maps instead of slices internally
+- paths can be evaluated upon creation of element as there are no shifting indeces (no need for path walking)
+- paths can just be the json path string within each element (exported jsonPath field, internal pathSegments field)
+- users can always retrieve data from the tree by using the path (which never changes)
+- assembling can happen bottom-up (performance improvement for later)
+
 
 ### TODO
 - is `build` the right command for validating? (compile?)
-- correctly implement patch updating in server with walktree etc
-- new realistic benchmark test for engine (with assembling)
-- improve performance
-- review error handling in server
+- should returns of slices include elements with ElementKindDelete?
+- All<Type> methods for every type (currently there is no way of just getting all elements)
 - 
+- actions need to be able to respond because otherwise the client is not aware of the IDs that are being created serverside
+  - purpose:
+  - returning IDs/paths of created elements
+  - todo:
+  - response validation
+  - client-aware response sending
+  - response code generation
+
+- exclude deleted elements option in assemble config? (there is no need for it when rendering the initial tree)
+  - or can this just be handled bu forceInclude assembling directly after UpdateState() as patch will be empty anyway
+
+- correctly implement patch updating in server with walktree etc
+- review error handling in server
+- find a neat way for integration tests
+
+- new realistic benchmark test for engine (with assembling)
+- improve performance (eg sync.Pool, walkTree-like assemble planner etc.)
+- find a way to create a UI to observe changes  
 
 
 - custom handlers

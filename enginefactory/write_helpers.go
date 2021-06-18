@@ -9,52 +9,86 @@ import (
 
 func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 	decls := NewDeclSet()
-	s.config.RangeRefFields(func(field ast.Field) {
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 		d := deduplicateWriter{
-			f: field,
+			idType: func() string {
+				return Title(configType.Name) + "ID"
+			},
 		}
 
-		decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
-			d.defineCheck(),
-			d.defineDeduped(),
-			For(d.loopConditions("a")).Block(
-				d.checkValue(),
-			),
-			For(d.loopConditions("b")).Block(
-				d.checkValue(),
-			),
-			d.loopCheck(),
-			Return(Id("deduped")),
-		)
+		writeDeduplicate(&decls, d)
+	})
+	s.config.RangeRefFields(func(field ast.Field) {
+		d := deduplicateWriter{
+			idType: func() string {
+				return Title(field.ValueTypeName) + "ID"
+				// return Title(field.Parent.Name) + Title(Singular(field.Name)) + "RefID"
+			},
+		}
 
+		writeDeduplicate(&decls, d)
 	})
 
 	decls.Render(s.buf)
 	return s
 }
 
+func writeDeduplicate(decls *DeclSet, d deduplicateWriter) {
+	decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
+		d.defineCheck(),
+		d.defineDeduped(),
+		For(d.loopConditions("a")).Block(
+			d.checkValue(),
+		),
+		For(d.loopConditions("b")).Block(
+			d.checkValue(),
+		),
+		d.loopCheck(),
+		Return(Id("deduped")),
+	)
+}
+
 func (s *EngineFactory) writeAllIDsMethod() *EngineFactory {
 	decls := NewDeclSet()
-	s.config.RangeRefFields(func(field ast.Field) {
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
 		a := allIDsMehtodWriter{
-			f: field,
+			typeName: func() string {
+				return Title(configType.Name)
+			},
 		}
 
-		decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params().Id(a.returns()).Block(
-			a.declareStateIDsSlice(),
-			For(a.stateIDsLoopConditions()).Block(
-				a.appendStateID(),
-			),
-			a.declarePatchIDsSlice(),
-			For(a.patchIDsLoopConditions()).Block(
-				a.appendPatchID(),
-			),
-			Return(a.deduplicatedIDs()),
-		)
+		writeAllIDsMethod(&decls, a)
+	})
+
+	s.config.RangeRefFields(func(field ast.Field) {
+		a := allIDsMehtodWriter{
+			typeName: func() string {
+				return Title(field.ValueTypeName)
+				// return Title(field.Parent.Name) + Title(Singular(field.Name)) + "RefID"
+			},
+		}
+
+		writeAllIDsMethod(&decls, a)
 	})
 
 	decls.Render(s.buf)
 	return s
+}
+
+func writeAllIDsMethod(decls *DeclSet, a allIDsMehtodWriter) {
+	decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params().Id(a.returns()).Block(
+		a.declareStateIDsSlice(),
+		For(a.stateIDsLoopConditions()).Block(
+			a.appendStateID(),
+		),
+		a.declarePatchIDsSlice(),
+		For(a.patchIDsLoopConditions()).Block(
+			a.appendPatchID(),
+		),
+		Return(a.deduplicatedIDs()),
+	)
 }
 
 func (s *EngineFactory) writeMergeIDs() *EngineFactory {

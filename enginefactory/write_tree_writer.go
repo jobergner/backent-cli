@@ -32,15 +32,32 @@ type treeElementWriter struct {
 	f *ast.Field
 }
 
-func (e treeElementWriter) fieldValue() string {
+func (e treeElementWriter) fieldValueMapDefinition() *Statement {
+	mapValueType := Id(Title(e.f.ValueType().Name) + "Reference")
+	if e.f.HasAnyValue && !e.f.HasPointerValue {
+		mapValueType = Id("interface{}")
+	}
+	if e.f.HasPointerValue && e.f.HasAnyValue {
+		mapValueType = Id(Title(anyNameByField(*e.f) + "Reference"))
+	}
+	if !e.f.HasPointerValue && !e.f.HasAnyValue {
+		mapValueType = Id(Title(e.f.ValueType().Name))
+	}
+	mapKeyType := Id(Title(e.f.ValueType().Name) + "ID")
+	if e.f.HasAnyValue {
+		mapKeyType = Int()
+	}
+	return Map(mapKeyType).Add(mapValueType)
+}
+
+func (e treeElementWriter) fieldValue() *Statement {
 	var typeName string
 
 	if e.f.HasAnyValue && !e.f.HasPointerValue {
-		typeName = "interface{}"
-		if e.f.HasSliceValue {
-			return "[]" + typeName
+		if !e.f.HasSliceValue {
+			return Id("interface{}")
 		}
-		return typeName
+		return e.fieldValueMapDefinition()
 	}
 
 	if e.f.ValueType().IsBasicType {
@@ -57,12 +74,15 @@ func (e treeElementWriter) fieldValue() string {
 	}
 
 	if e.f.HasSliceValue {
-		typeName = "[]" + typeName
+		if e.f.ValueType().IsBasicType {
+			return Id("[]" + typeName)
+		}
+		return e.fieldValueMapDefinition()
 	} else if !e.f.ValueType().IsBasicType {
-		typeName = "*" + typeName
+		return Id("*" + typeName)
 	}
 
-	return typeName
+	return Id(typeName)
 }
 
 func (e treeElementWriter) fieldTag() string {

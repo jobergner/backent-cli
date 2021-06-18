@@ -7,6 +7,38 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
+type everyTypeGetterWriter struct {
+	t ast.ConfigType
+}
+
+func (t everyTypeGetterWriter) receiverParams() *Statement {
+	return Id("engine").Id("*Engine")
+}
+
+func (t everyTypeGetterWriter) returns() *Statement {
+	return Id("[]" + t.t.Name)
+}
+
+func (t everyTypeGetterWriter) allIDs() *Statement {
+	return Id(t.t.Name + "IDs").Op(":=").Id("engine").Dot("all" + Title(t.t.Name) + "IDs").Call()
+}
+
+func (t everyTypeGetterWriter) sliceName() string {
+	return t.t.Name + "s"
+}
+
+func (t everyTypeGetterWriter) declareSlice() *Statement {
+	return Var().Id(t.sliceName()).Id("[]" + t.t.Name)
+}
+
+func (t everyTypeGetterWriter) loopConditions() *Statement {
+	return List(Id("_"), Id(t.t.Name+"ID")).Op(":=").Range().Id(t.t.Name + "IDs")
+}
+
+func (t everyTypeGetterWriter) appendElement() *Statement {
+	return Id(t.sliceName()).Op("=").Append(Id(t.sliceName()), Id("engine").Dot(Title(t.t.Name)).Call(Id(t.t.Name+"ID")))
+}
+
 type typeGetterWriter struct {
 	name     func() string
 	typeName func() string

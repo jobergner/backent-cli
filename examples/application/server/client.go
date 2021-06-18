@@ -60,6 +60,7 @@ func (c *Client) runReadMessages() {
 			log.Println(err)
 		}
 
+		msg.source = c
 		c.forwardToRoom(msg)
 	}
 }

@@ -402,7 +402,10 @@ const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleE
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			equipmentSet.Equipment = append(equipmentSet.Equipment, treeEquipmentSetEquipmentRef)
+			if equipmentSet.Equipment == nil {
+				equipmentSet.Equipment = make(map[ItemID]ItemReference)
+			}
+			equipmentSet.Equipment[treeEquipmentSetEquipmentRef.ElementID] = treeEquipmentSetEquipmentRef
 		}
 	}
 	equipmentSet.ID = equipmentSetData.ID
@@ -508,7 +511,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.EquipmentSets = append(player.EquipmentSets, treePlayerEquipmentSetRef)
+			if player.EquipmentSets == nil {
+				player.EquipmentSets = make(map[EquipmentSetID]EquipmentSetReference)
+			}
+			player.EquipmentSets[treePlayerEquipmentSetRef.ElementID] = treePlayerEquipmentSetRef
 		}
 	}
 	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(playerData.GearScore, check, config); include {
@@ -522,7 +528,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.GuildMembers = append(player.GuildMembers, treePlayerGuildMemberRef)
+			if player.GuildMembers == nil {
+				player.GuildMembers = make(map[PlayerID]PlayerReference)
+			}
+			player.GuildMembers[treePlayerGuildMemberRef.ElementID] = treePlayerGuildMemberRef
 		}
 	}
 	for _, itemID := range mergeItemIDs(engine.State.Player[playerData.ID].Items, engine.Patch.Player[playerData.ID].Items) {
@@ -530,7 +539,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.Items = append(player.Items, treeItem)
+			if player.Items == nil {
+				player.Items = make(map[ItemID]Item)
+			}
+			player.Items[treeItem.ID] = treeItem
 		}
 	}
 	if treePosition, include, childHasUpdated := engine.assemblePosition(playerData.Position, check, config); include {
@@ -550,7 +562,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			player.TargetedBy = append(player.TargetedBy, treePlayerTargetedByRef)
+			if player.TargetedBy == nil {
+				player.TargetedBy = make(map[int]AnyOfPlayer_ZoneItemReference)
+			}
+			player.TargetedBy[treePlayerTargetedByRef.ElementID] = treePlayerTargetedByRef
 		}
 	}
 	player.ID = playerData.ID
@@ -579,7 +594,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treeItem)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treeItem.ID)] = treeItem
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindPlayer {
 			playerID := anyOfItem_Player_ZoneItemContainer.Player
@@ -587,7 +605,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treePlayer)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treePlayer.ID)] = treePlayer
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindZoneItem {
 			zoneItemID := anyOfItem_Player_ZoneItemContainer.ZoneItem
@@ -595,7 +616,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				zone.Interactables = append(zone.Interactables, treeZoneItem)
+				if zone.Interactables == nil {
+					zone.Interactables = make(map[int]interface{})
+				}
+				zone.Interactables[int(treeZoneItem.ID)] = treeZoneItem
 			}
 		}
 	}
@@ -604,7 +628,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			zone.Items = append(zone.Items, treeZoneItem)
+			if zone.Items == nil {
+				zone.Items = make(map[ZoneItemID]ZoneItem)
+			}
+			zone.Items[treeZoneItem.ID] = treeZoneItem
 		}
 	}
 	for _, playerID := range mergePlayerIDs(engine.State.Zone[zoneData.ID].Players, engine.Patch.Zone[zoneData.ID].Players) {
@@ -612,7 +639,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			zone.Players = append(zone.Players, treePlayer)
+			if zone.Players == nil {
+				zone.Players = make(map[PlayerID]Player)
+			}
+			zone.Players[treePlayer.ID] = treePlayer
 		}
 	}
 	zone.ID = zoneData.ID
@@ -1060,8 +1090,29 @@ const assembleEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engin
 	return ItemReference{}, false, false
 }`
 
-const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() Tree {
-	config := assembleConfig{forceInclude: false}
+const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
+	for key := range engine.Tree.EquipmentSet {
+		delete(engine.Tree.EquipmentSet, key)
+	}
+	for key := range engine.Tree.GearScore {
+		delete(engine.Tree.GearScore, key)
+	}
+	for key := range engine.Tree.Item {
+		delete(engine.Tree.Item, key)
+	}
+	for key := range engine.Tree.Player {
+		delete(engine.Tree.Player, key)
+	}
+	for key := range engine.Tree.Position {
+		delete(engine.Tree.Position, key)
+	}
+	for key := range engine.Tree.Zone {
+		delete(engine.Tree.Zone, key)
+	}
+	for key := range engine.Tree.ZoneItem {
+		delete(engine.Tree.ZoneItem, key)
+	}
+	config := assembleConfig{forceInclude: assembleEntireTree}
 	for _, equipmentSetData := range engine.Patch.EquipmentSet {
 		equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
 		if include {
@@ -1658,6 +1709,15 @@ const deleteAnyOfItem_Player_ZoneItem_Engine_func string = `func (engine *Engine
 	}
 }`
 
+const _EveryPlayer_Engine_func string = `func (engine *Engine) EveryPlayer() []player {
+	playerIDs := engine.allPlayerIDs()
+	var players []player
+	for _, playerID := range playerIDs {
+		players = append(players, engine.Player(playerID))
+	}
+	return players
+}`
+
 const _Player_Engine_func string = `func (engine *Engine) Player(playerID PlayerID) player {
 	patchingPlayer, ok := engine.Patch.Player[playerID]
 	if ok {
@@ -1725,6 +1785,15 @@ const _Position_player_func string = `func (_player player) Position() position 
 	return player.player.engine.Position(player.player.Position)
 }`
 
+const _EveryGearScore_Engine_func string = `func (engine *Engine) EveryGearScore() []gearScore {
+	gearScoreIDs := engine.allGearScoreIDs()
+	var gearScores []gearScore
+	for _, gearScoreID := range gearScoreIDs {
+		gearScores = append(gearScores, engine.GearScore(gearScoreID))
+	}
+	return gearScores
+}`
+
 const _GearScore_Engine_func string = `func (engine *Engine) GearScore(gearScoreID GearScoreID) gearScore {
 	patchingGearScore, ok := engine.Patch.GearScore[gearScoreID]
 	if ok {
@@ -1749,6 +1818,15 @@ const _Level_gearScore_func string = `func (_gearScore gearScore) Level() int {
 const _Score_gearScore_func string = `func (_gearScore gearScore) Score() int {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Score
+}`
+
+const _EveryItem_Engine_func string = `func (engine *Engine) EveryItem() []item {
+	itemIDs := engine.allItemIDs()
+	var items []item
+	for _, itemID := range itemIDs {
+		items = append(items, engine.Item(itemID))
+	}
+	return items
 }`
 
 const _Item_Engine_func string = `func (engine *Engine) Item(itemID ItemID) item {
@@ -1787,6 +1865,15 @@ const _Origin_item_func string = `func (_item item) Origin() anyOfPlayer_Positio
 	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
 }`
 
+const _EveryPosition_Engine_func string = `func (engine *Engine) EveryPosition() []position {
+	positionIDs := engine.allPositionIDs()
+	var positions []position
+	for _, positionID := range positionIDs {
+		positions = append(positions, engine.Position(positionID))
+	}
+	return positions
+}`
+
 const _Position_Engine_func string = `func (engine *Engine) Position(positionID PositionID) position {
 	patchingPosition, ok := engine.Patch.Position[positionID]
 	if ok {
@@ -1813,6 +1900,15 @@ const _Y_position_func string = `func (_position position) Y() float64 {
 	return position.position.Y
 }`
 
+const _EveryZoneItem_Engine_func string = `func (engine *Engine) EveryZoneItem() []zoneItem {
+	zoneItemIDs := engine.allZoneItemIDs()
+	var zoneItems []zoneItem
+	for _, zoneItemID := range zoneItemIDs {
+		zoneItems = append(zoneItems, engine.ZoneItem(zoneItemID))
+	}
+	return zoneItems
+}`
+
 const _ZoneItem_Engine_func string = `func (engine *Engine) ZoneItem(zoneItemID ZoneItemID) zoneItem {
 	patchingZoneItem, ok := engine.Patch.ZoneItem[zoneItemID]
 	if ok {
@@ -1837,6 +1933,15 @@ const _Position_zoneItem_func string = `func (_zoneItem zoneItem) Position() pos
 const _Item_zoneItem_func string = `func (_zoneItem zoneItem) Item() item {
 	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
 	return zoneItem.zoneItem.engine.Item(zoneItem.zoneItem.Item)
+}`
+
+const _EveryZone_Engine_func string = `func (engine *Engine) EveryZone() []zone {
+	zoneIDs := engine.allZoneIDs()
+	var zones []zone
+	for _, zoneID := range zoneIDs {
+		zones = append(zones, engine.Zone(zoneID))
+	}
+	return zones
 }`
 
 const _Zone_Engine_func string = `func (engine *Engine) Zone(zoneID ZoneID) zone {
@@ -1923,20 +2028,17 @@ const playerGuildMemberRef_Engine_func string = `func (engine *Engine) playerGui
 	return playerGuildMemberRef{playerGuildMemberRef: playerGuildMemberRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const playerEquipmentSetRef_Engine_func string = `func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
-	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
-	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
-	}
-	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
-	if ok {
-		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
-	}
-	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
-}`
-
 const _ID_playerEquipmentSetRef_func string = `func (_playerEquipmentSetRef playerEquipmentSetRef) ID() EquipmentSetID {
 	return _playerEquipmentSetRef.playerEquipmentSetRef.ReferencedElementID
+}`
+
+const _EveryEquipmentSet_Engine_func string = `func (engine *Engine) EveryEquipmentSet() []equipmentSet {
+	equipmentSetIDs := engine.allEquipmentSetIDs()
+	var equipmentSets []equipmentSet
+	for _, equipmentSetID := range equipmentSetIDs {
+		equipmentSets = append(equipmentSets, engine.EquipmentSet(equipmentSetID))
+	}
+	return equipmentSets
 }`
 
 const _EquipmentSet_Engine_func string = `func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
@@ -1967,6 +2069,18 @@ const _Equipment_equipmentSet_func string = `func (_equipmentSet equipmentSet) E
 		equipment = append(equipment, equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refID))
 	}
 	return equipment
+}`
+
+const playerEquipmentSetRef_Engine_func string = `func (engine *Engine) playerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) playerEquipmentSetRef {
+	patchingPlayerEquipmentSetRef, ok := engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: patchingPlayerEquipmentSetRef}
+	}
+	currentPlayerEquipmentSetRef, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]
+	if ok {
+		return playerEquipmentSetRef{playerEquipmentSetRef: currentPlayerEquipmentSetRef}
+	}
+	return playerEquipmentSetRef{playerEquipmentSetRef: playerEquipmentSetRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
 const _ID_equipmentSetEquipmentRef_func string = `func (_equipmentSetEquipmentRef equipmentSetEquipmentRef) ID() ItemID {
@@ -2100,6 +2214,111 @@ const _Item_anyOfItem_Player_ZoneItem_func string = `func (_anyOfItem_Player_Zon
 	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.Item(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.Item)
 }`
 
+const deduplicateZoneItemIDs_func string = `func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
+	check := make(map[ZoneItemID]bool)
+	deduped := make([]ZoneItemID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
+const deduplicateZoneIDs_func string = `func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
+	check := make(map[ZoneID]bool)
+	deduped := make([]ZoneID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
+const deduplicatePositionIDs_func string = `func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
+	check := make(map[PositionID]bool)
+	deduped := make([]PositionID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
+const deduplicateItemIDs_func string = `func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
+	check := make(map[ItemID]bool)
+	deduped := make([]ItemID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
+const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
+	check := make(map[GearScoreID]bool)
+	deduped := make([]GearScoreID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
+const deduplicateEquipmentSetIDs_func string = `func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []EquipmentSetID {
+	check := make(map[EquipmentSetID]bool)
+	deduped := make([]EquipmentSetID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
+const deduplicatePlayerIDs_func string = `func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
+	check := make(map[PlayerID]bool)
+	deduped := make([]PlayerID, 0)
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	return deduped
+}`
+
 const deduplicatePlayerTargetedByRefIDs_func string = `func deduplicatePlayerTargetedByRefIDs(a []PlayerTargetedByRefID, b []PlayerTargetedByRefID) []PlayerTargetedByRefID {
 	check := make(map[PlayerTargetedByRefID]bool)
 	deduped := make([]PlayerTargetedByRefID, 0)
@@ -2188,6 +2407,90 @@ const deduplicateEquipmentSetEquipmentRefIDs_func string = `func deduplicateEqui
 		deduped = append(deduped, val)
 	}
 	return deduped
+}`
+
+const allEquipmentSetIDs_Engine_func string = `func (engine Engine) allEquipmentSetIDs() []EquipmentSetID {
+	var stateEquipmentSetIDs []EquipmentSetID
+	for equipmentSetID := range engine.State.EquipmentSet {
+		stateEquipmentSetIDs = append(stateEquipmentSetIDs, equipmentSetID)
+	}
+	var patchEquipmentSetIDs []EquipmentSetID
+	for equipmentSetID := range engine.Patch.EquipmentSet {
+		patchEquipmentSetIDs = append(patchEquipmentSetIDs, equipmentSetID)
+	}
+	return deduplicateEquipmentSetIDs(stateEquipmentSetIDs, patchEquipmentSetIDs)
+}`
+
+const allGearScoreIDs_Engine_func string = `func (engine Engine) allGearScoreIDs() []GearScoreID {
+	var stateGearScoreIDs []GearScoreID
+	for gearScoreID := range engine.State.GearScore {
+		stateGearScoreIDs = append(stateGearScoreIDs, gearScoreID)
+	}
+	var patchGearScoreIDs []GearScoreID
+	for gearScoreID := range engine.Patch.GearScore {
+		patchGearScoreIDs = append(patchGearScoreIDs, gearScoreID)
+	}
+	return deduplicateGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
+}`
+
+const allItemIDs_Engine_func string = `func (engine Engine) allItemIDs() []ItemID {
+	var stateItemIDs []ItemID
+	for itemID := range engine.State.Item {
+		stateItemIDs = append(stateItemIDs, itemID)
+	}
+	var patchItemIDs []ItemID
+	for itemID := range engine.Patch.Item {
+		patchItemIDs = append(patchItemIDs, itemID)
+	}
+	return deduplicateItemIDs(stateItemIDs, patchItemIDs)
+}`
+
+const allPositionIDs_Engine_func string = `func (engine Engine) allPositionIDs() []PositionID {
+	var statePositionIDs []PositionID
+	for positionID := range engine.State.Position {
+		statePositionIDs = append(statePositionIDs, positionID)
+	}
+	var patchPositionIDs []PositionID
+	for positionID := range engine.Patch.Position {
+		patchPositionIDs = append(patchPositionIDs, positionID)
+	}
+	return deduplicatePositionIDs(statePositionIDs, patchPositionIDs)
+}`
+
+const allZoneIDs_Engine_func string = `func (engine Engine) allZoneIDs() []ZoneID {
+	var stateZoneIDs []ZoneID
+	for zoneID := range engine.State.Zone {
+		stateZoneIDs = append(stateZoneIDs, zoneID)
+	}
+	var patchZoneIDs []ZoneID
+	for zoneID := range engine.Patch.Zone {
+		patchZoneIDs = append(patchZoneIDs, zoneID)
+	}
+	return deduplicateZoneIDs(stateZoneIDs, patchZoneIDs)
+}`
+
+const allZoneItemIDs_Engine_func string = `func (engine Engine) allZoneItemIDs() []ZoneItemID {
+	var stateZoneItemIDs []ZoneItemID
+	for zoneItemID := range engine.State.ZoneItem {
+		stateZoneItemIDs = append(stateZoneItemIDs, zoneItemID)
+	}
+	var patchZoneItemIDs []ZoneItemID
+	for zoneItemID := range engine.Patch.ZoneItem {
+		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
+	}
+	return deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
+}`
+
+const allPlayerIDs_Engine_func string = `func (engine Engine) allPlayerIDs() []PlayerID {
+	var statePlayerIDs []PlayerID
+	for playerID := range engine.State.Player {
+		statePlayerIDs = append(statePlayerIDs, playerID)
+	}
+	var patchPlayerIDs []PlayerID
+	for playerID := range engine.Patch.Player {
+		patchPlayerIDs = append(patchPlayerIDs, playerID)
+	}
+	return deduplicatePlayerIDs(statePlayerIDs, patchPlayerIDs)
 }`
 
 const allPlayerTargetedByRefIDs_Engine_func string = `func (engine Engine) allPlayerTargetedByRefIDs() []PlayerTargetedByRefID {
@@ -3867,10 +4170,10 @@ const _ItemReference_type string = `type ItemReference struct {
 }`
 
 const _EquipmentSet_type string = `type EquipmentSet struct {
-	ID		EquipmentSetID	` + "`" + `json:"id"` + "`" + `
-	Equipment	[]ItemReference	` + "`" + `json:"equipment"` + "`" + `
-	Name		string		` + "`" + `json:"name"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	ID		EquipmentSetID			` + "`" + `json:"id"` + "`" + `
+	Equipment	map[ItemID]ItemReference	` + "`" + `json:"equipment"` + "`" + `
+	Name		string				` + "`" + `json:"name"` + "`" + `
+	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _EquipmentSetReference_type string = `type EquipmentSetReference struct {
@@ -3915,15 +4218,15 @@ const _GearScoreReference_type string = `type GearScoreReference struct {
 }`
 
 const _Player_type string = `type Player struct {
-	ID		PlayerID			` + "`" + `json:"id"` + "`" + `
-	EquipmentSets	[]EquipmentSetReference		` + "`" + `json:"equipmentSets"` + "`" + `
-	GearScore	*GearScore			` + "`" + `json:"gearScore"` + "`" + `
-	GuildMembers	[]PlayerReference		` + "`" + `json:"guildMembers"` + "`" + `
-	Items		[]Item				` + "`" + `json:"items"` + "`" + `
-	Position	*Position			` + "`" + `json:"position"` + "`" + `
-	Target		*AnyOfPlayer_ZoneItemReference	` + "`" + `json:"target"` + "`" + `
-	TargetedBy	[]AnyOfPlayer_ZoneItemReference	` + "`" + `json:"targetedBy"` + "`" + `
-	OperationKind	OperationKind			` + "`" + `json:"operationKind"` + "`" + `
+	ID		PlayerID					` + "`" + `json:"id"` + "`" + `
+	EquipmentSets	map[EquipmentSetID]EquipmentSetReference	` + "`" + `json:"equipmentSets"` + "`" + `
+	GearScore	*GearScore					` + "`" + `json:"gearScore"` + "`" + `
+	GuildMembers	map[PlayerID]PlayerReference			` + "`" + `json:"guildMembers"` + "`" + `
+	Items		map[ItemID]Item					` + "`" + `json:"items"` + "`" + `
+	Position	*Position					` + "`" + `json:"position"` + "`" + `
+	Target		*AnyOfPlayer_ZoneItemReference			` + "`" + `json:"target"` + "`" + `
+	TargetedBy	map[int]AnyOfPlayer_ZoneItemReference		` + "`" + `json:"targetedBy"` + "`" + `
+	OperationKind	OperationKind					` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _PlayerReference_type string = `type PlayerReference struct {
@@ -3936,12 +4239,12 @@ const _PlayerReference_type string = `type PlayerReference struct {
 }`
 
 const _Zone_type string = `type Zone struct {
-	ID		ZoneID		` + "`" + `json:"id"` + "`" + `
-	Interactables	[]interface{}	` + "`" + `json:"interactables"` + "`" + `
-	Items		[]ZoneItem	` + "`" + `json:"items"` + "`" + `
-	Players		[]Player	` + "`" + `json:"players"` + "`" + `
-	Tags		[]string	` + "`" + `json:"tags"` + "`" + `
-	OperationKind	OperationKind	` + "`" + `json:"operationKind"` + "`" + `
+	ID		ZoneID			` + "`" + `json:"id"` + "`" + `
+	Interactables	map[int]interface{}	` + "`" + `json:"interactables"` + "`" + `
+	Items		map[ZoneItemID]ZoneItem	` + "`" + `json:"items"` + "`" + `
+	Players		map[PlayerID]Player	` + "`" + `json:"players"` + "`" + `
+	Tags		[]string		` + "`" + `json:"tags"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
 }`
 
 const _ZoneReference_type string = `type ZoneReference struct {

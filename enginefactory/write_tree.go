@@ -71,7 +71,7 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
-				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
+				return Id(e.fieldName()).Add(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
 			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
 		)
