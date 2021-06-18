@@ -26,10 +26,18 @@ type SpawnZoneItemsParams struct {
 	Items []ItemID `json:"items"`
 }
 
+type AddItemToPlayerResponse struct {
+	PlayerPath string `json:"playerPath"`
+}
+
+type SpawnZoneItemsResponse struct {
+	NewZoneItemPaths []string `json:"newZoneItemPaths"`
+}
+
 type actions struct {
-	addItemToPlayer func(AddItemToPlayerParams, *Engine)
+	addItemToPlayer func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse
 	movePlayer      func(MovePlayerParams, *Engine)
-	spawnZoneItems  func(SpawnZoneItemsParams, *Engine)
+	spawnZoneItems  func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
 }
 
 func (r *Room) processClientMessage(msg message) (response, error) {
@@ -38,15 +46,19 @@ func (r *Room) processClientMessage(msg message) (response, error) {
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{receiver: msg.source}, nil
+			return response{}, err
 		}
-		r.actions.addItemToPlayer(params, r.state)
-		return response{}, nil
+		res := r.actions.addItemToPlayer(params, r.state)
+		resContent, err := res.MarshalJSON()
+		if err != nil {
+			return response{}, err
+		}
+		return response{receiver: msg.source, Content: resContent}, nil
 	case messageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, nil
+			return response{}, err
 		}
 		r.actions.movePlayer(params, r.state)
 		return response{receiver: msg.source}, nil
@@ -54,19 +66,23 @@ func (r *Room) processClientMessage(msg message) (response, error) {
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, nil
+			return response{}, err
 		}
-		r.actions.spawnZoneItems(params, r.state)
-		return response{receiver: msg.source}, nil
+		res := r.actions.spawnZoneItems(params, r.state)
+		resContent, err := res.MarshalJSON()
+		if err != nil {
+			return response{}, err
+		}
+		return response{receiver: msg.source, Content: resContent}, nil
 	default:
 		return response{}, errors.New("unknown message kind")
 	}
 }
 
 func Start(
-	addItemToPlayer func(AddItemToPlayerParams, *Engine),
+	addItemToPlayer func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse,
 	movePlayer func(MovePlayerParams, *Engine),
-	spawnZoneItems func(SpawnZoneItemsParams, *Engine),
+	spawnZoneItems func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse,
 	onDeploy func(*Engine),
 	onFrameTick func(*Engine),
 ) error {

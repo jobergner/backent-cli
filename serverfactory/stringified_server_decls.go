@@ -28,10 +28,18 @@ const _SpawnZoneItemsParams_type string = `type SpawnZoneItemsParams struct {
 	Items []ItemID ` + "`" + `json:"items"` + "`" + `
 }`
 
+const _AddItemToPlayerResponse_type string = `type AddItemToPlayerResponse struct {
+	PlayerPath string ` + "`" + `json:"playerPath"` + "`" + `
+}`
+
+const _SpawnZoneItemsResponse_type string = `type SpawnZoneItemsResponse struct {
+	NewZoneItemPaths []string ` + "`" + `json:"newZoneItemPaths"` + "`" + `
+}`
+
 const actions_type string = `type actions struct {
-	addItemToPlayer	func(AddItemToPlayerParams, *Engine)
+	addItemToPlayer	func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse
 	movePlayer	func(MovePlayerParams, *Engine)
-	spawnZoneItems	func(SpawnZoneItemsParams, *Engine)
+	spawnZoneItems	func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
 }`
 
 const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg message) (response, error) {
@@ -40,15 +48,19 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{receiver: msg.source}, nil
+			return response{}, err
 		}
-		r.actions.addItemToPlayer(params, r.state)
-		return response{}, nil
+		res := r.actions.addItemToPlayer(params, r.state)
+		resContent, err := res.MarshalJSON()
+		if err != nil {
+			return response{}, err
+		}
+		return response{receiver: msg.source, Content: resContent}, nil
 	case messageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, nil
+			return response{}, err
 		}
 		r.actions.movePlayer(params, r.state)
 		return response{receiver: msg.source}, nil
@@ -56,16 +68,20 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, nil
+			return response{}, err
 		}
-		r.actions.spawnZoneItems(params, r.state)
-		return response{receiver: msg.source}, nil
+		res := r.actions.spawnZoneItems(params, r.state)
+		resContent, err := res.MarshalJSON()
+		if err != nil {
+			return response{}, err
+		}
+		return response{receiver: msg.source, Content: resContent}, nil
 	default:
 		return response{}, errors.New("unknown message kind")
 	}
 }`
 
-const _Start_func string = `func Start(addItemToPlayer func(AddItemToPlayerParams, *Engine), movePlayer func(MovePlayerParams, *Engine), spawnZoneItems func(SpawnZoneItemsParams, *Engine), onDeploy func(*Engine), onFrameTick func(*Engine)) error {
+const _Start_func string = `func Start(addItemToPlayer func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse, movePlayer func(MovePlayerParams, *Engine), spawnZoneItems func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse, onDeploy func(*Engine), onFrameTick func(*Engine)) error {
 	a := actions{addItemToPlayer, movePlayer, spawnZoneItems}
 	setupRoutes(a, onDeploy, onFrameTick)
 	err := http.ListenAndServe(":8080", nil)
