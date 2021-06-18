@@ -10,6 +10,20 @@ import (
 func (s *EngineFactory) writeGetters() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
+
+		e := everyTypeGetterWriter{
+			t: configType,
+		}
+
+		decls.File.Func().Params(e.receiverParams()).Id("Every"+Title(configType.Name)).Params().Add(e.returns()).Block(
+			e.allIDs(),
+			e.declareSlice(),
+			For(e.loopConditions()).Block(
+				e.appendElement(),
+			),
+			Return(Id(e.sliceName())),
+		)
+
 		t := typeGetterWriter{
 			name: func() string {
 				return Title(configType.Name)
@@ -18,6 +32,8 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				return configType.Name
 			},
 		}
+
+		writeTypeGetter(&decls, t)
 
 		i := idGetterWriter{
 			typeName: func() string {
@@ -31,7 +47,6 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			},
 		}
 
-		writeTypeGetter(&decls, t)
 		writeIDGetter(&decls, i)
 
 		configType.RangeFields(func(field ast.Field) {

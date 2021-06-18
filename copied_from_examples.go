@@ -64,6 +64,7 @@ func (c *Client) runReadMessages() {
 		if err != nil {
 			log.Println(err)
 		}
+		msg.source = c
 		c.forwardToRoom(msg)
 	}
 }
@@ -142,6 +143,11 @@ type messageKind int
 type message struct {
 	Kind	messageKind	` + "`" +  `json:"kind"` + "`" +  `
 	Content	[]byte		` + "`" +  `json:"content"` + "`" +  `
+	source	*Client
+}
+type response struct {
+	Content		[]byte	` + "`" +  `json:"content"` + "`" +  `
+	receiver	*Client
 }
 type Room struct {
 	clients			map[*Client]bool
@@ -149,6 +155,7 @@ type Room struct {
 	registerChannel		chan *Client
 	unregisterChannel	chan *Client
 	incomingClients		map[*Client]bool
+	pendingResponses	[]response
 	state			*Engine
 	actions			actions
 	onDeploy		func(*Engine)
@@ -162,11 +169,9 @@ func (r *Room) registerClient(client *Client) {
 	r.incomingClients[client] = true
 }
 func (r *Room) unregisterClient(client *Client) {
-	if _, ok := r.clients[client]; ok {
-		close(client.messageChannel)
-		delete(r.clients, client)
-		delete(r.incomingClients, client)
-	}
+	close(client.messageChannel)
+	delete(r.clients, client)
+	delete(r.incomingClients, client)
 }
 func (r *Room) broadcastPatchToClients(patchBytes []byte) error {
 	for client := range r.clients {
@@ -190,7 +195,11 @@ func (r *Room) runHandleConnections() {
 	}
 }
 func (r *Room) answerInitRequests() error {
-	stateBytes, err := r.state.State.MarshalJSON()
+	if len(r.incomingClients) == 0 {
+		return nil
+	}
+	tree := r.state.assembleTree(true)
+	stateBytes, err := tree.MarshalJSON()
 	if err != nil {
 		return err
 	}
@@ -215,10 +224,15 @@ Exit:
 	for {
 		select {
 		case msg := <-r.clientMessageChannel:
-			err := r.processClientMessage(msg)
+			response, err := r.processClientMessage(msg)
 			if err != nil {
-				return err
+				log.Println("error processing client message:", err)
+				continue
 			}
+			if response.receiver == nil {
+				continue
+			}
+			r.pendingResponses = append(r.pendingResponses, response)
 		default:
 			break Exit
 		}
@@ -227,7 +241,9 @@ Exit:
 	return nil
 }
 func (r *Room) publishPatch() error {
-	patchBytes, err := r.state.Patch.MarshalJSON()
+	r.state.walkTree()
+	tree := r.state.assembleTree(false)
+	patchBytes, err := tree.MarshalJSON()
 	if err != nil {
 		return err
 	}
@@ -244,6 +260,16 @@ func (r *Room) handleIncomingClients() error {
 	}
 	r.promoteIncomingClients()
 	return nil
+}
+func (r *Room) handlePendingResponses() {
+	for _, pendingResponse := range r.pendingResponses {
+		select {
+		case pendingResponse.receiver.messageChannel <- pendingResponse.Content:
+		default:
+			r.unregisterClient(pendingResponse.receiver)
+			log.Println("client dropped")
+		}
+	}
 }
 func (r *Room) runProcessingFrames() {
 	ticker := time.NewTicker(time.Second)
@@ -262,6 +288,7 @@ func (r *Room) runProcessingFrames() {
 		if err != nil {
 			log.Println(err)
 		}
+		r.handlePendingResponses()
 	}
 }
 func (r *Room) Deploy() {

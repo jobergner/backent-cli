@@ -83,3 +83,61 @@ func writeEvaluateChildPath(w walkElementWriter) *Statement {
 		w.walkChild(),
 	}
 }
+
+func (s *EngineFactory) writeWalkTree() *EngineFactory {
+	decls := NewDeclSet()
+
+	w := walkTreeWriter{
+		t: nil,
+	}
+
+	decls.File.Func().Params(Id("engine").Id("*Engine")).Id("walkTree").Params().Block(
+		Id("walkedCheck").Op(":=").Id("newRecursionCheck").Call(),
+
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			w.t = &configType
+
+			if configType.IsRootType {
+				return For(w.patchLoopConditions()).Block(
+					w.walkElement(),
+					w.checkWalked(),
+				)
+			}
+			return For(w.patchLoopConditions()).Block(
+				If(w.elementDoesNotHaveParent()).Block(
+					w.walkElement(),
+					w.checkWalked(),
+				),
+			)
+		}),
+
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			w.t = &configType
+			if configType.IsRootType {
+				return For(w.stateLoopConditions()).Block(
+					If(w.hasNotBeenWalked()).Block(
+						w.walkElement(),
+					),
+				)
+			}
+			return For(w.stateLoopConditions()).Block(
+				If(w.elementDoesNotHaveParent()).Block(
+					If(w.hasNotBeenWalked()).Block(
+						w.walkElement(),
+					),
+				),
+			)
+		}),
+
+		Id("engine").Dot("PathTrack").Dot("_iterations").Op("+=").Lit(1),
+		If(Id("engine").Dot("PathTrack").Dot("_iterations").Op("==").Lit(100)).Block(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				w.t = &configType
+				return w.clearPathTrack()
+			}),
+		),
+	)
+
+	decls.Render(s.buf)
+	return s
+}

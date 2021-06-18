@@ -11,12 +11,22 @@ type assembleTreeWriter struct {
 	t *ast.ConfigType
 }
 
+func (w assembleTreeWriter) clearTree() *Statement {
+	return For(Id("key").Op(":=").Range().Id("engine").Dot("Tree").Dot(Title(w.t.Name))).Block(
+		Delete(Id("engine").Dot("Tree").Dot(Title(w.t.Name)), Id("key")),
+	)
+}
+
 func (a assembleTreeWriter) dataElementName() string {
 	return a.t.Name + "Data"
 }
 
 func (a assembleTreeWriter) receiverParams() *Statement {
 	return Id("engine").Id("*Engine")
+}
+
+func (a assembleTreeWriter) params() *Statement {
+	return Id("assembleEntireTree").Bool()
 }
 
 func (a assembleTreeWriter) patchLoopConditions() *Statement {
@@ -46,7 +56,7 @@ func (a assembleTreeWriter) stateLoopConditions() *Statement {
 }
 
 func (a assembleTreeWriter) createConfig() *Statement {
-	return Id("config").Op(":=").Id("assembleConfig").Values(Dict{Id("forceInclude"): False()})
+	return Id("config").Op(":=").Id("assembleConfig").Values(Dict{Id("forceInclude"): Id("assembleEntireTree")})
 }
 
 type assembleElementWriter struct {
@@ -150,12 +160,40 @@ func (a assembleElementWriter) setHasUpdatedTrue() *Statement {
 	return Id("hasUpdated").Op("=").True()
 }
 
+func (a assembleElementWriter) makeMap() *Statement {
+	mapValueType := Id(Title(a.f.ValueType().Name) + "Reference")
+	if a.f.HasAnyValue && !a.f.HasPointerValue {
+		mapValueType = Id("interface{}")
+	}
+	if a.f.HasPointerValue && a.f.HasAnyValue {
+		mapValueType = Id(Title(anyNameByField(*a.f) + "Reference"))
+	}
+	if !a.f.HasPointerValue && !a.f.HasAnyValue {
+		mapValueType = Id(Title(a.f.ValueType().Name))
+	}
+	mapKeyType := Id(Title(a.f.ValueType().Name) + "ID")
+	if a.f.HasAnyValue {
+		mapKeyType = Int()
+	}
+	return If(Id(a.t.Name).Dot(Title(a.f.Name)).Op("==").Nil()).Block(
+		Id(a.t.Name).Dot(Title(a.f.Name)).Op("=").Make(Map(mapKeyType).Add(mapValueType)),
+	)
+}
+
 func (a assembleElementWriter) appendToElementsInField(valueType *ast.ConfigType) *Statement {
 	appendedType := valueType.Name
 	if !a.f.HasAnyValue && a.f.HasPointerValue || (a.f.HasPointerValue && a.f.HasSliceValue && a.f.HasAnyValue) {
 		appendedType = a.f.ValueTypeName
 	}
-	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("=").Append(Id(a.treeElementName()).Dot(Title(a.f.Name)), Id("tree"+Title(appendedType)))
+	usedID := "ElementID"
+	if !a.f.HasPointerValue {
+		usedID = "ID"
+	}
+	mapKeyType := Id("tree" + Title(appendedType)).Dot(usedID)
+	if a.f.HasAnyValue && !a.f.HasPointerValue {
+		mapKeyType = Int().Call(Id("tree" + Title(appendedType)).Dot(usedID))
+	}
+	return Id(a.treeElementName()).Dot(Title(a.f.Name)).Index(mapKeyType).Op("=").Id("tree" + Title(appendedType))
 }
 
 func (a assembleElementWriter) setFieldElement(valueType *ast.ConfigType) *Statement {

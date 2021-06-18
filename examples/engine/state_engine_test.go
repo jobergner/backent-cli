@@ -21,6 +21,12 @@ func TestEngine(t *testing.T) {
 		_gearScore := se.GearScore(gearScore.ID())
 		assert.NotZero(t, _gearScore.ID())
 	})
+	t.Run("gets every element", func(t *testing.T) {
+		se := newEngine()
+		se.CreateGearScore()
+		se.CreateGearScore()
+		assert.Equal(t, 2, len(se.EveryGearScore()))
+	})
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
@@ -226,9 +232,9 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
 	expectedTree := newTree()
 	define(se, &expectedTree)
 	se.walkTree()
-	actualTree := se.assembleTree()
+	actualTree := se.assembleTree(false)
 
-	if !assert.ObjectsAreEqual(expectedTree, actualTree) {
+	if !assert.ObjectsAreEqualValues(expectedTree, actualTree) {
 		actual, _ := actualTree.MarshalJSON()
 		expected, _ := expectedTree.MarshalJSON()
 		actualString := string(actual)
@@ -248,8 +254,8 @@ func TestTree(t *testing.T) {
 				expectedTree.Zone = map[ZoneID]Zone{
 					zone.ID(): {
 						ID: zone.ID(),
-						Players: []Player{
-							{
+						Players: map[PlayerID]Player{
+							player1.ID(): {
 								ID: player1.ID(),
 								GearScore: &GearScore{
 									ID:            player1.GearScore().ID(),
@@ -261,7 +267,7 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUpdate,
 								},
 							},
-							{
+							player2.ID(): {
 								ID: player2.ID(),
 								GearScore: &GearScore{
 									ID:            player2.GearScore().ID(),
@@ -295,8 +301,8 @@ func TestTree(t *testing.T) {
 				expectedTree.Zone = map[ZoneID]Zone{
 					zone.ID(): {
 						ID: zone.ID(),
-						Players: []Player{
-							{
+						Players: map[PlayerID]Player{
+							player1.ID(): {
 								ID: player1.ID(),
 								GearScore: &GearScore{
 									ID:            player1.GearScore().ID(),
@@ -328,11 +334,11 @@ func TestTree(t *testing.T) {
 				expectedTree.Zone = map[ZoneID]Zone{
 					zone.ID(): {
 						ID: zone.ID(),
-						Players: []Player{
-							{
+						Players: map[PlayerID]Player{
+							player1.ID(): {
 								ID: player1.ID(),
-								Items: []Item{
-									{
+								Items: map[ItemID]Item{
+									player1item1.ID(): {
 										ID:            player1item1.ID(),
 										OperationKind: OperationKindUpdate,
 										GearScore: &GearScore{
@@ -381,11 +387,11 @@ func TestTree(t *testing.T) {
 				expectedTree.Zone = map[ZoneID]Zone{
 					zone.ID(): {
 						ID: zone.ID(),
-						Players: []Player{
-							{
+						Players: map[PlayerID]Player{
+							player1.ID(): {
 								ID: player1.ID(),
-								Items: []Item{
-									{
+								Items: map[ItemID]Item{
+									player1item2.ID(): {
 										ID:            player1item2.ID(),
 										OperationKind: OperationKindDelete,
 										GearScore: &GearScore{
@@ -440,8 +446,8 @@ func TestTree(t *testing.T) {
 				expectedTree.Player = map[PlayerID]Player{
 					player.ID(): {
 						ID: player.ID(),
-						Items: []Item{
-							{
+						Items: map[ItemID]Item{
+							playerItem.ID(): {
 								ID:            playerItem.ID(),
 								OperationKind: OperationKindUpdate,
 								GearScore: &GearScore{
@@ -490,8 +496,8 @@ func TestTree(t *testing.T) {
 				expectedTree.Player = map[PlayerID]Player{
 					player1.ID(): {
 						ID: player1.ID(),
-						Items: []Item{
-							{
+						Items: map[ItemID]Item{
+							item.ID(): {
 								ID:        item.ID(),
 								BoundTo:   nil,
 								GearScore: &GearScore{ID: item.GearScore().ID(), OperationKind: OperationKindUpdate},
@@ -510,8 +516,8 @@ func TestTree(t *testing.T) {
 								OperationKind: OperationKindUpdate,
 							},
 						},
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player2.ID(): {
 								OperationKind:        OperationKindUpdate,
 								ElementID:            player2.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -528,8 +534,8 @@ func TestTree(t *testing.T) {
 										ID:            player2.Position().ID(),
 										OperationKind: OperationKindUnchanged,
 									},
-									GuildMembers: []PlayerReference{
-										{
+									GuildMembers: map[PlayerID]PlayerReference{
+										player1.ID(): {
 											OperationKind:        OperationKindUnchanged,
 											ElementID:            player1.ID(),
 											ElementKind:          ElementKindPlayer,
@@ -545,8 +551,8 @@ func TestTree(t *testing.T) {
 					player2.ID(): {
 						ID:            player2.ID(),
 						OperationKind: OperationKindUnchanged,
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player1.ID(): {
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -558,8 +564,8 @@ func TestTree(t *testing.T) {
 					player3.ID(): {
 						ID:            player3.ID(),
 						OperationKind: OperationKindUnchanged,
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player1.ID(): {
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -589,15 +595,15 @@ func TestTree(t *testing.T) {
 				expectedTree.Player = map[PlayerID]Player{
 					player.ID(): {
 						ID: player.ID(),
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player.ID(): {
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            player.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
 								ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
 							},
-							{
+							player.ID(): {
 								OperationKind:        OperationKindUpdate,
 								ElementID:            player.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -614,15 +620,15 @@ func TestTree(t *testing.T) {
 										ID:            player.Position().ID(),
 										OperationKind: OperationKindUnchanged,
 									},
-									GuildMembers: []PlayerReference{
-										{
+									GuildMembers: map[PlayerID]PlayerReference{
+										player.ID(): {
 											OperationKind:        OperationKindUnchanged,
 											ElementID:            player.ID(),
 											ElementKind:          ElementKindPlayer,
 											ReferencedDataStatus: ReferencedDataUnchanged, // TODO: should be modified, but won't fix for now
 											ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
 										},
-										{
+										player.ID(): {
 											OperationKind:        OperationKindUpdate,
 											ElementID:            player.ID(),
 											ElementKind:          ElementKindPlayer,
@@ -675,8 +681,8 @@ func TestTree(t *testing.T) {
 				expectedTree.Player = map[PlayerID]Player{
 					player.ID(): {
 						ID: player.ID(),
-						EquipmentSets: []EquipmentSetReference{
-							{
+						EquipmentSets: map[EquipmentSetID]EquipmentSetReference{
+							equipmentSet.ID(): {
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            equipmentSet.ID(),
 								ElementKind:          ElementKindEquipmentSet,
@@ -690,8 +696,8 @@ func TestTree(t *testing.T) {
 				expectedTree.EquipmentSet = map[EquipmentSetID]EquipmentSet{
 					equipmentSet.ID(): {
 						ID: equipmentSet.ID(),
-						Equipment: []ItemReference{
-							{
+						Equipment: map[ItemID]ItemReference{
+							item.ID(): {
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            item.ID(),
 								ElementKind:          ElementKindItem,
@@ -749,8 +755,8 @@ func TestTree(t *testing.T) {
 					player2.ID(): {
 						ID:            player2.ID(),
 						OperationKind: OperationKindUnchanged,
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player1.ID(): {
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -846,8 +852,8 @@ func TestTree(t *testing.T) {
 					},
 					player2.ID(): {
 						ID: player2.ID(),
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player1.ID(): {
 								OperationKind:        OperationKindUpdate,
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -940,8 +946,8 @@ func TestTree(t *testing.T) {
 					player2.ID(): {
 						ID:            player2.ID(),
 						OperationKind: OperationKindUpdate,
-						GuildMembers: []PlayerReference{
-							{
+						GuildMembers: map[PlayerID]PlayerReference{
+							player1.ID(): {
 								OperationKind:        OperationKindUpdate,
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
@@ -1006,8 +1012,8 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUnchanged,
 									X:             10,
 								},
-								GuildMembers: []PlayerReference{
-									{
+								GuildMembers: map[PlayerID]PlayerReference{
+									player2.ID(): {
 										ElementID:            player2.ID(),
 										OperationKind:        OperationKindUnchanged,
 										ElementKind:          ElementKindPlayer,
@@ -1087,8 +1093,8 @@ func TestTree(t *testing.T) {
 					zone.ID(): {
 						ID:            zone.ID(),
 						OperationKind: OperationKindUpdate,
-						Interactables: []interface{}{
-							Item{
+						Interactables: map[int]interface{}{
+							int(item.ID()): Item{
 								ID: item.ID(),
 								GearScore: &GearScore{
 									ID:            item.GearScore().ID(),
@@ -1108,7 +1114,7 @@ func TestTree(t *testing.T) {
 								},
 								OperationKind: OperationKindUpdate,
 							},
-							ZoneItem{
+							int(zoneItem.ID()): ZoneItem{
 								ID:            zoneItem.ID(),
 								OperationKind: OperationKindUpdate,
 								Position: &Position{
@@ -1222,8 +1228,8 @@ func TestTree(t *testing.T) {
 							ID:            player1.Position().ID(),
 							OperationKind: OperationKindUpdate,
 						},
-						TargetedBy: []AnyOfPlayer_ZoneItemReference{
-							{
+						TargetedBy: map[int]AnyOfPlayer_ZoneItemReference{
+							int(player2.ID()): {
 								OperationKind:        OperationKindUpdate,
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -1291,8 +1297,8 @@ func TestTree(t *testing.T) {
 					zone.ID(): {
 						ID:            zone.ID(),
 						OperationKind: OperationKindUnchanged,
-						Players: []Player{
-							{
+						Players: map[PlayerID]Player{
+							player1.ID(): {
 								ID:            player1.ID(),
 								OperationKind: OperationKindUnchanged,
 								GearScore: &GearScore{
@@ -1338,8 +1344,8 @@ func TestTree(t *testing.T) {
 					zone.ID(): {
 						ID:            zone.ID(),
 						OperationKind: OperationKindUnchanged,
-						Interactables: []interface{}{
-							Player{
+						Interactables: map[int]interface{}{
+							int(player.ID()): Player{
 								ID:            player.ID(),
 								OperationKind: OperationKindUnchanged,
 								GearScore: &GearScore{
