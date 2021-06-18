@@ -160,11 +160,11 @@ func builActionStructure(
 			ValueString:   valueString,
 		}
 
-		if responseConfigData != nil {
-			action.Response = buildResponeStructure(responseConfigData)
-		}
-
 		action.Params[paramName] = param
+	}
+
+	if responseConfigData != nil {
+		action.Response = buildResponeStructure(responseConfigData)
 	}
 
 	return action
@@ -217,13 +217,11 @@ func (a *AST) fillInReferences() *AST {
 	}
 
 	for actionName, action := range a.Actions {
-		for paramName, param := range action.Params {
+		for _, param := range action.Params {
 			a.assignFieldTypeReference(&param)
-			action.Params[paramName] = param
 		}
-		for responseValueName, responseValue := range action.Response {
+		for _, responseValue := range action.Response {
 			a.assignFieldTypeReference(&responseValue)
-			action.Params[responseValueName] = responseValue
 		}
 		a.Actions[actionName] = action
 	}
