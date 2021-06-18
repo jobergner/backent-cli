@@ -29,6 +29,15 @@ func ForEachParamInAction(action ast.Action, fn func(param ast.Field) *jen.State
 	return &statements
 }
 
+func ForEachResponseValueInAction(action ast.Action, fn func(param ast.Field) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	action.RangeResponse(func(field ast.Field) {
+		statements = append(statements, fn(field))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 func ForEachFieldInType(configType ast.ConfigType, fn func(field ast.Field) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
 	configType.RangeFields(func(field ast.Field) {
