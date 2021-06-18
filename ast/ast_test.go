@@ -48,8 +48,17 @@ func TestStateConfigAST(t *testing.T) {
 		},
 	}
 
+	responseData := map[interface{}]interface{}{
+		"removeResidents": map[interface{}]interface{}{
+			"newResidentsCount": "int",
+		},
+		"changeAddress": map[interface{}]interface{}{
+			"isValidAddress": "bool",
+		},
+	}
+
 	t.Run("should build the structure of AST", func(t *testing.T) {
-		actual := buildASTStructure(stateData, actionsData)
+		actual := buildASTStructure(stateData, actionsData, responseData)
 
 		expected := &AST{
 			Actions: map[string]Action{
@@ -60,6 +69,15 @@ func TestStateConfigAST(t *testing.T) {
 							Name:            "residents",
 							ValueString:     "[]person",
 							HasSliceValue:   true,
+							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
+						},
+					},
+					Response: map[string]Field{
+						"newResidentsCount": {
+							Name:            "newResidentsCount",
+							ValueString:     "int",
+							HasSliceValue:   false,
 							HasPointerValue: false,
 							ValueTypes:      make(map[string]*ConfigType),
 						},
@@ -85,6 +103,15 @@ func TestStateConfigAST(t *testing.T) {
 						"newCity": {
 							Name:            "newCity",
 							ValueString:     "string",
+							HasSliceValue:   false,
+							HasPointerValue: false,
+							ValueTypes:      make(map[string]*ConfigType),
+						},
+					},
+					Response: map[string]Field{
+						"isValidAddress": {
+							Name:            "isValidAddress",
+							ValueString:     "bool",
 							HasSliceValue:   false,
 							HasPointerValue: false,
 							ValueTypes:      make(map[string]*ConfigType),
@@ -251,7 +278,7 @@ func TestStateConfigAST(t *testing.T) {
 
 	t.Run("should fill in references of AST", func(t *testing.T) {
 
-		actual := buildASTStructure(stateData, actionsData)
+		actual := buildASTStructure(stateData, actionsData, responseData)
 		actual.fillInReferences().fillInParentalInfo()
 
 		houseType := actual.Types["house"]
@@ -373,7 +400,7 @@ func TestStateConfigAST(t *testing.T) {
 
 	t.Run("should fill in parentalInfo", func(t *testing.T) {
 
-		actual := buildASTStructure(stateData, actionsData)
+		actual := buildASTStructure(stateData, actionsData, responseData)
 		actual.fillInReferences().fillInParentalInfo()
 
 		assert.True(t, actual.Types["house"].IsRootType)

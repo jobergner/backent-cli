@@ -4,7 +4,7 @@ import (
 	"sort"
 )
 
-// TODO clean up
+// TODO clean up!!!
 
 func newAST() *AST {
 	return &AST{
@@ -75,8 +75,12 @@ func (a *AST) RangeActions(fn func(action Action)) {
 	}
 }
 
-func Parse(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) *AST {
-	return buildASTStructure(stateConfigData, actionsConfigData).
+func Parse(
+	stateConfigData map[interface{}]interface{},
+	actionsConfigData map[interface{}]interface{},
+	responsesConfigData map[interface{}]interface{},
+) *AST {
+	return buildASTStructure(stateConfigData, actionsConfigData, responsesConfigData).
 		fillInReferences().
 		fillInParentalInfo()
 }
@@ -84,7 +88,11 @@ func Parse(stateConfigData map[interface{}]interface{}, actionsConfigData map[in
 // buildASTStructure builds the ast structure including all types and fields
 // this needs to happen first so the types in "Parent" and "ValueType" can be referenced
 // in fillInReferences
-func buildASTStructure(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) *AST {
+func buildASTStructure(
+	stateConfigData map[interface{}]interface{},
+	actionsConfigData map[interface{}]interface{},
+	responsesConfigData map[interface{}]interface{},
+) *AST {
 	ast := newAST()
 	for key, value := range stateConfigData {
 		objectValue := value.(map[interface{}]interface{})
@@ -99,9 +107,14 @@ func buildASTStructure(stateConfigData map[interface{}]interface{}, actionsConfi
 		objectValue := value.(map[interface{}]interface{})
 		actionName := getSring(key)
 
-		action := builActionStructure(objectValue, actionName)
-
-		ast.Actions[actionName] = action
+		if responseData, ok := responsesConfigData[actionName]; ok {
+			responseDataObject := responseData.(map[interface{}]interface{})
+			action := builActionStructure(objectValue, actionName, responseDataObject)
+			ast.Actions[actionName] = action
+		} else {
+			action := builActionStructure(objectValue, actionName, nil)
+			ast.Actions[actionName] = action
+		}
 	}
 
 	return ast
@@ -129,7 +142,11 @@ func buildTypeStructure(configTypeData map[interface{}]interface{}, typeName str
 	return configType
 }
 
-func builActionStructure(configActionData map[interface{}]interface{}, actionName string) Action {
+func builActionStructure(
+	configActionData map[interface{}]interface{},
+	actionName string,
+	responseConfigData map[interface{}]interface{},
+) Action {
 	action := newAction(actionName)
 
 	for key, value := range configActionData {
@@ -143,10 +160,34 @@ func builActionStructure(configActionData map[interface{}]interface{}, actionNam
 			ValueString:   valueString,
 		}
 
+		if responseConfigData != nil {
+			action.Response = buildResponeStructure(responseConfigData)
+		}
+
 		action.Params[paramName] = param
 	}
 
 	return action
+}
+
+func buildResponeStructure(responseData map[interface{}]interface{}) map[string]Field {
+	response := make(map[string]Field)
+
+	for key, value := range responseData {
+		valueName := getSring(key)
+		valueString := getSring(value)
+
+		responseValue := Field{
+			ValueTypes:    make(map[string]*ConfigType),
+			Name:          valueName,
+			HasSliceValue: isSliceValue(valueString),
+			ValueString:   valueString,
+		}
+
+		response[valueName] = responseValue
+	}
+
+	return response
 }
 
 // fillInReferences fills in the references of "Parent" and "ValueType"

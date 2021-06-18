@@ -10,8 +10,9 @@ func newAction(name string) Action {
 }
 
 type Action struct {
-	Name   string
-	Params map[string]Field
+	Name     string
+	Params   map[string]Field
+	Response map[string]Field
 }
 
 func (a *Action) RangeParams(fn func(field Field)) {
@@ -22,5 +23,16 @@ func (a *Action) RangeParams(fn func(field Field)) {
 	sort.Slice(keys, caseInsensitiveSort(keys))
 	for _, key := range keys {
 		fn(a.Params[key])
+	}
+}
+
+func (a *Action) RangeResponse(fn func(field Field)) {
+	var keys []string
+	for key := range a.Response {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, caseInsensitiveSort(keys))
+	for _, key := range keys {
+		fn(a.Response[key])
 	}
 }
