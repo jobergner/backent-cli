@@ -35,13 +35,17 @@ func newServerFactory(config *ast.AST) *ServerFactory {
 }
 
 // WriteServerFrom writes source code for a given ActionsConfig
-func WriteServer(buf *bytes.Buffer, stateConfigData, actionsConfigData map[interface{}]interface{}) {
-	config := ast.Parse(stateConfigData, actionsConfigData)
+func WriteServer(
+	buf *bytes.Buffer,
+	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
+) {
+	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 	s := newServerFactory(config).
 		writePackageName(). // to be able to format the code without errors
 		writeMessageKinds().
 		writeActions().
 		writeParameters().
+		writeResponses().
 		writeProcessClientMessage().
 		writeStart()
 
