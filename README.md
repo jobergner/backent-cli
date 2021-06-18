@@ -364,6 +364,7 @@ currently my best option is to assemble the tree server side, make sure all nece
 
 
 ### TODO
+- is `build` the right command for validating? (compile?)
 - correctly implement patch updating in server with walktree etc
 - new realistic benchmark test for engine (with assembling)
 - improve performance
