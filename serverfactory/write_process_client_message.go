@@ -12,7 +12,7 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 
 	p := processClientMessageWriter{}
 
-	decls.File.Func().Params(p.receiverParams()).Id("processClientMessage").Params(p.params()).Id("error").Block(
+	decls.File.Func().Params(p.receiverParams()).Id("processClientMessage").Params(p.params()).Params(Id("message"), Id("error")).Block(
 		Switch().Id("messageKind").Call(Id("msg").Dot("Kind")).Block(
 			ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 				p.a = &action
@@ -20,16 +20,18 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 					p.declareParams(),
 					p.unmarshalMessageContent(),
 					If(Id("err").Op("!=").Nil()).Block(
-						Return(Id("err")),
+						Return(Id("message").Values(), Id("err")),
 					),
 					p.callAction(),
+					OnlyIf(action.Response != nil, p.marshalResponseContent()),
+					OnlyIf(action.Response != nil, p.returnMarshallingError()),
+					p.returnResponse(),
 				)
 			}),
 			Default().Block(
-				Return(Id("errors").Dot("New").Call(Lit("unknown message kind"))),
+				Return(Id("message").Values(), Id("errors").Dot("New").Call(Lit("unknown message kind"))),
 			),
 		),
-		Return(Nil()),
 	)
 
 	decls.Render(s.buf)
@@ -62,5 +64,26 @@ func (p processClientMessageWriter) unmarshalMessageContent() *Statement {
 }
 
 func (p processClientMessageWriter) callAction() *Statement {
-	return Id("r").Dot("actions").Dot(p.a.Name).Call(Id("params"), Id("r").Dot("state"))
+	call := Id("r").Dot("actions").Dot(p.a.Name).Call(Id("params"), Id("r").Dot("state"))
+	if p.a.Response != nil {
+		return Id("res").Op(":=").Add(call)
+	}
+	return call
+}
+
+func (p processClientMessageWriter) marshalResponseContent() *Statement {
+	return List(Id("resContent"), Id("err")).Op(":=").Id("res").Dot("MarshalJSON").Call()
+}
+
+func (p processClientMessageWriter) returnMarshallingError() *Statement {
+	return If(Id("err").Op("!=").Nil()).Block(
+		Return(Id("message").Values(), Id("err")),
+	)
+}
+
+func (p processClientMessageWriter) returnResponse() *Statement {
+	if p.a.Response == nil {
+		return Return(Id("message").Values(), Nil())
+	}
+	return Return(Id("message").Values(Id("msg").Dot("Kind"), Id("resContent"), Id("msg").Dot("client")), Nil())
 }

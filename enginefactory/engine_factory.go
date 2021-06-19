@@ -28,7 +28,7 @@ type EngineFactory struct {
 
 // WriteEngine writes source code for a given StateConfig
 func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{}) {
-	config := ast.Parse(stateConfigData, map[interface{}]interface{}{})
+	config := ast.Parse(stateConfigData, map[interface{}]interface{}{}, map[interface{}]interface{}{})
 	s := newStateFactory(config).
 		writePackageName(). // to be able to format the code without errors
 		writeAdders().

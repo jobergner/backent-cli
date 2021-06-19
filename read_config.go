@@ -8,12 +8,14 @@ import (
 )
 
 type config struct {
-	State   map[interface{}]interface{}
-	Actions map[interface{}]interface{}
+	State     map[interface{}]interface{}
+	Actions   map[interface{}]interface{}
+	Responses map[interface{}]interface{}
 }
 type jsonConfig struct {
-	State   map[string]interface{} `json:"state"`
-	Actions map[string]interface{} `json:"actions"`
+	State     map[string]interface{} `json:"state"`
+	Actions   map[string]interface{} `json:"actions"`
+	Responses map[string]interface{} `json:"responses"`
 }
 
 func makeAmbiguous(a map[string]interface{}) map[interface{}]interface{} {
@@ -82,8 +84,9 @@ func readConfig() (*config, error) {
 		return nil, err
 	}
 	c := &config{
-		State:   makeAmbiguous(jc.State),
-		Actions: makeAmbiguous(jc.Actions),
+		State:     makeAmbiguous(jc.State),
+		Actions:   makeAmbiguous(jc.Actions),
+		Responses: makeAmbiguous(jc.Responses),
 	}
 	return c, nil
 }

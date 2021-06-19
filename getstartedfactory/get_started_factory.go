@@ -21,8 +21,8 @@ func newGetStartedFactory(config *ast.AST) *GetStartedFactory {
 	}
 }
 
-func WriteGetStarted(stateConfigData, actionsConfigData map[interface{}]interface{}) string {
-	config := ast.Parse(stateConfigData, actionsConfigData)
+func WriteGetStarted(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) string {
+	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 	g := newGetStartedFactory(config).
 		writePackageName().
 		writeImport().

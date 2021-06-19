@@ -11,7 +11,7 @@ type Room struct {
 	registerChannel      chan *Client
 	unregisterChannel    chan *Client
 	incomingClients      map[*Client]bool
-	pendingResponses     []response
+	pendingResponses     []message
 	state                *Engine
 	actions              actions
 	onDeploy             func(*Engine)
@@ -107,7 +107,7 @@ Exit:
 				log.Println("error processing client message:", err)
 				continue
 			}
-			if response.receiver == nil {
+			if response.client == nil {
 				continue
 			}
 			r.pendingResponses = append(r.pendingResponses, response)
@@ -147,9 +147,9 @@ func (r *Room) handleIncomingClients() error {
 func (r *Room) handlePendingResponses() {
 	for _, pendingResponse := range r.pendingResponses {
 		select {
-		case pendingResponse.receiver.messageChannel <- pendingResponse.Content:
+		case pendingResponse.client.messageChannel <- pendingResponse.Content:
 		default:
-			r.unregisterClient(pendingResponse.receiver)
+			r.unregisterClient(pendingResponse.client)
 			// TODO what do?
 			log.Println("client dropped")
 		}
