@@ -3,7 +3,7 @@ module github.com/Java-Jonas/bar-cli
 go 1.13
 
 require (
-	github.com/Java-Jonas/validator v0.0.0-20210612085320-2b5fd079a0c2
+	github.com/Java-Jonas/validator v0.0.0-20210619155204-dbc5f5f40072
 	github.com/dave/jennifer v1.4.1
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/google/uuid v1.2.0
