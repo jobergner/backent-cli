@@ -24,6 +24,6 @@ import (
 // }
 
 func newSimpleASTExample() *ast.AST {
-	simpleAST := ast.Parse(configs.StateConfig, map[interface{}]interface{}{})
+	simpleAST := ast.Parse(configs.StateConfig, map[interface{}]interface{}{}, map[interface{}]interface{}{})
 	return simpleAST
 }
