@@ -52,6 +52,7 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrIllegalPointerParameter | the parameter "{FieldName}" in "{ActionName}" contains a pointer value | Pointers can not be used as parameter as it would not make any sense |
 | ErrTypeAndActionWithSameName | type and action "{Name}" have the same name | Types and Actions with the same name would cause conflicts in the generated code |
 | ErrInvalidAnyOfDefinition | "{valueString}" is not a valid `anyOf` definition | anyOf definitions can not have single or duplicate types and must be in alphabetical order |
+| ErrResponeToUnknownAction | there is no action defined for response "{ResponseName}" | a response can only be defined with the same name as the action it belongs to |
 <br/>
 
 TODO:
