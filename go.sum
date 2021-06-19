@@ -1,5 +1,7 @@
 github.com/Java-Jonas/validator v0.0.0-20210612085320-2b5fd079a0c2 h1:SPFqv1s17SIB7zKa3D9iR7riS0wDqrmTWwMSth0INq4=
 github.com/Java-Jonas/validator v0.0.0-20210612085320-2b5fd079a0c2/go.mod h1:By5TZett34StUjJ1c/Su5k1Ntb+CLAsoKrDX+VCBRms=
+github.com/Java-Jonas/validator v0.0.0-20210619155204-dbc5f5f40072 h1:VwWPNafS1J6Gq+/FcW0TJe42XtA0iBI+3EZS3hoZo8w=
+github.com/Java-Jonas/validator v0.0.0-20210619155204-dbc5f5f40072/go.mod h1:By5TZett34StUjJ1c/Su5k1Ntb+CLAsoKrDX+VCBRms=
 github.com/dave/jennifer v1.4.1 h1:XyqG6cn5RQsTj3qlWQTKlRGAyrTcsk1kUmWdZBzRjDw=
 github.com/dave/jennifer v1.4.1/go.mod h1:7jEdnm+qBcxl8PC0zyp7vxcpSRnzXSt9r39tpTVGlwA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
