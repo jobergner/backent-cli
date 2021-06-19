@@ -468,6 +468,38 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 	})
 }
 
+func TestValidateResponsesConfig(t *testing.T) {
+	t.Run("validates responses just like actions but returns error due to response of unknown name", func(t *testing.T) {
+		stateConfigData := map[interface{}]interface{}{
+			"baz": map[interface{}]interface{}{
+				"ban": "string",
+			},
+		}
+		actionsConfigData := map[interface{}]interface{}{
+			"dooFoo": map[interface{}]interface{}{
+				"bar": "int",
+			},
+		}
+		responsesConfigData := map[interface{}]interface{}{
+			"dooFoo": map[interface{}]interface{}{
+				"ban": "bazID",
+				"bau": "*baz",
+			},
+		}
+
+		actualErrors := ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData)
+		expectedErrors := []error{
+			newValidationErrorDirectTypeUsage("dooFoo", "*baz"),
+			newValidationErrorIllegalPointerParameter("dooFoo", "bau"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+}
+
 // func TestFoo(t *testing.T) {
 // 	var StateConfig = map[interface{}]interface{}{
 // 		"player": map[interface{}]interface{}{
