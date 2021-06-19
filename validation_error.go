@@ -157,3 +157,11 @@ func newValidationErrorInvalidAnyOfDefinition(valueString string) error {
 		),
 	)
 }
+func newValidationErrorResponseToUnknownAction(responseName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrResponeToUnknownAction: there is no action defined to for response \"%s\"",
+			responseName,
+		),
+	)
+}

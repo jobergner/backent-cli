@@ -168,24 +168,35 @@ func validateStateConfig(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func ValidateActionsConfig(data map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
-	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(data)
+func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) (errs []error) {
+	// responses and action share the same restrictions/requirements
+	responsesAsActionsValidationErrs := ValidateActionsConfig(stateConfigData, responsesConfigData)
+	errs = append(errs, responsesAsActionsValidationErrs...)
+
+	responseToUnknownActionErrs := validateResponseToUnknownAction(actionsConfigData, responsesConfigData)
+	errs = append(errs, responseToUnknownActionErrs...)
+
+	return
+}
+
+func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
+	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(stateConfigData)
 	if len(prevalidationErrs) != 0 {
 		return prevalidationErrs
 	}
 
 	// use first combination as it does not matter which types of anyOf<> definitions are taken as value
-	stateConfigData := dataCombinations[0]
+	stateConfigDataDerivative := dataCombinations[0]
 
-	sameNameErrs := validateTypeAndActionWithSameName(stateConfigData, actionsConfigData)
+	sameNameErrs := validateTypeAndActionWithSameName(stateConfigDataDerivative, actionsConfigData)
 	errs = append(errs, sameNameErrs...)
 
 	// join configs and treat them as one. Actions are treated as types, params are treated as fields
-	jointConfigData := joinConfigs(stateConfigData, actionsConfigData)
+	jointConfigData := joinConfigs(stateConfigDataDerivative, actionsConfigData)
 
 	// collect all availableIDs and insert them into the jointConfigData so the validator cosinders them to be valid types
 	var availableTypeIDs []string
-	for keyName := range stateConfigData {
+	for keyName := range stateConfigDataDerivative {
 		typeName := fmt.Sprintf("%v", keyName)
 		idName := typeName + "ID"
 		availableTypeIDs = append(availableTypeIDs, idName)
@@ -212,7 +223,7 @@ func ValidateActionsConfig(data map[interface{}]interface{}, actionsConfigData m
 	thematicalErrs := thematicalValidationActions(actionsConfigData, availableTypeIDs)
 	errs = append(errs, thematicalErrs...)
 
-	// deduplicate errors as stateConfigData is being validated twice (ValidateStateConfig, generalValidation)
+	// deduplicate errors as stateConfigDataDerivative is being validated twice (ValidateStateConfig, generalValidation)
 	return deduplicateErrs(errs)
 }
 
