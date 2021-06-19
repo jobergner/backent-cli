@@ -368,30 +368,27 @@ currently my best option is to assemble the tree server side, make sure all nece
 - users can always retrieve data from the tree by using the path (which never changes)
 - assembling can happen bottom-up (performance improvement for later)
 
+### server responses
+the client may need to be aware of the IDs the server generates, or the paths to elements which are created by the clients actions.
+this is why actions need to return responses to the client who sent them.
+
 
 ### TODO
-- is `build` the right command for validating? (compile?)
+- response validation
+- AST - how are IDs of types handled? ("playerID")
 - should returns of slices include elements with ElementKindDelete?
-- All<Type> methods for every type (currently there is no way of just getting all elements)
-- 
-- actions need to be able to respond because otherwise the client is not aware of the IDs that are being created serverside
-  - purpose:
-  - returning IDs/paths of created elements
-  - todo:
-  - response validation
-  - client-aware response sending
-  - response code generation
+- new realistic benchmark test for engine (with assembling)
+- improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
+
+- is `build` the right command for validating? (compile?)
 
 - exclude deleted elements option in assemble config? (there is no need for it when rendering the initial tree)
   - or can this just be handled bu forceInclude assembling directly after UpdateState() as patch will be empty anyway
 
-- correctly implement patch updating in server with walktree etc
 - review error handling in server
 - find a neat way for integration tests
 
-- new realistic benchmark test for engine (with assembling)
-- improve performance (eg sync.Pool, walkTree-like assemble planner etc.)
-- find a way to create a UI to observe changes  
+- find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)
 
 
 - custom handlers
