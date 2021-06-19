@@ -42,42 +42,42 @@ const actions_type string = `type actions struct {
 	spawnZoneItems	func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
 }`
 
-const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg message) (response, error) {
+const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg message) (message, error) {
 	switch messageKind(msg.Kind) {
 	case messageKindAction_addItemToPlayer:
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, err
+			return message{}, err
 		}
 		res := r.actions.addItemToPlayer(params, r.state)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
-			return response{}, err
+			return message{}, err
 		}
-		return response{receiver: msg.source, Content: resContent}, nil
+		return message{msg.Kind, resContent, msg.client}, nil
 	case messageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, err
+			return message{}, err
 		}
 		r.actions.movePlayer(params, r.state)
-		return response{receiver: msg.source}, nil
+		return message{}, nil
 	case messageKindAction_spawnZoneItems:
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return response{}, err
+			return message{}, err
 		}
 		res := r.actions.spawnZoneItems(params, r.state)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
-			return response{}, err
+			return message{}, err
 		}
-		return response{receiver: msg.source, Content: resContent}, nil
+		return message{msg.Kind, resContent, msg.client}, nil
 	default:
-		return response{}, errors.New("unknown message kind")
+		return message{}, errors.New("unknown message kind")
 	}
 }`
 

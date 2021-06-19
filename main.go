@@ -50,7 +50,7 @@ func main() {
 		panic("something went wrong. Please create an issue containing your environment details and config! You may also want to run `go build` in the out directory an include any errors.")
 	}
 
-	fmt.Println(getstartedfactory.WriteGetStarted(c.State, c.Actions))
+	fmt.Println(getstartedfactory.WriteGetStarted(c.State, c.Actions, c.Responses))
 }
 
 func validateOutDir() error {

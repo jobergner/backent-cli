@@ -19,7 +19,7 @@ func writeCode(c *config) []byte {
 
 	enginefactory.WriteEngine(buf, c.State)
 	if !*engineOnlyFlag {
-		serverfactory.WriteServer(buf, c.State, c.Actions)
+		serverfactory.WriteServer(buf, c.State, c.Actions, c.Responses)
 	}
 
 	return buf.Bytes()

@@ -64,7 +64,7 @@ func (c *Client) runReadMessages() {
 		if err != nil {
 			log.Println(err)
 		}
-		msg.source = c
+		msg.client = c
 		c.forwardToRoom(msg)
 	}
 }
@@ -143,11 +143,7 @@ type messageKind int
 type message struct {
 	Kind	messageKind	` + "`" +  `json:"kind"` + "`" +  `
 	Content	[]byte		` + "`" +  `json:"content"` + "`" +  `
-	source	*Client
-}
-type response struct {
-	Content		[]byte	` + "`" +  `json:"content"` + "`" +  `
-	receiver	*Client
+	client	*Client
 }
 type Room struct {
 	clients			map[*Client]bool
@@ -155,7 +151,7 @@ type Room struct {
 	registerChannel		chan *Client
 	unregisterChannel	chan *Client
 	incomingClients		map[*Client]bool
-	pendingResponses	[]response
+	pendingResponses	[]message
 	state			*Engine
 	actions			actions
 	onDeploy		func(*Engine)
@@ -229,7 +225,7 @@ Exit:
 				log.Println("error processing client message:", err)
 				continue
 			}
-			if response.receiver == nil {
+			if response.client == nil {
 				continue
 			}
 			r.pendingResponses = append(r.pendingResponses, response)
@@ -264,9 +260,9 @@ func (r *Room) handleIncomingClients() error {
 func (r *Room) handlePendingResponses() {
 	for _, pendingResponse := range r.pendingResponses {
 		select {
-		case pendingResponse.receiver.messageChannel <- pendingResponse.Content:
+		case pendingResponse.client.messageChannel <- pendingResponse.Content:
 		default:
-			r.unregisterClient(pendingResponse.receiver)
+			r.unregisterClient(pendingResponse.client)
 			log.Println("client dropped")
 		}
 	}
