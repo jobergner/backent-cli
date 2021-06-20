@@ -236,10 +236,12 @@ func (a *AST) assignFieldTypeReference(field *Field) {
 			field.ValueTypes[referencedType.Name] = &referencedType
 		}
 	} else {
-		referencedType, ok := a.Types[extractValueType(field.ValueString)]
-		if ok {
+		referencedType, isUserDefinedType := a.Types[extractValueType(field.ValueString)]
+		if isUserDefinedType {
 			field.ValueTypes[referencedType.Name] = &referencedType
 		} else {
+			// TODO: maybe be more explicit
+			// IDs of types (eg. playerID) are treated this way as well
 			field.ValueTypes[extractValueType(field.ValueString)] = &ConfigType{Name: extractValueType(field.ValueString), IsBasicType: true}
 		}
 	}
