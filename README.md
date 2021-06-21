@@ -374,6 +374,9 @@ this is why actions need to return responses to the client who sent them.
 
 
 ### TODO
+- currently you can call Set on anyOf types which are wrapped by a reference. This deletes the existing child element, even though it is not supposed to (PROBLEM!!)
+  - solution: make reference's `Get()` method return a anyOfFoo_Bar_Reference struct which does not have the `SetFoo()` method
+  - I will need to generate this type
 - make Every[TypeName] getter only return elements which have no parents
 - new realistic benchmark test for engine (with assembling)
 - improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
