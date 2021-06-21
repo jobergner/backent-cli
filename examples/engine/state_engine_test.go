@@ -78,6 +78,25 @@ func TestEngine(t *testing.T) {
 		_item := se.Patch.Item[item.ID()]
 		assert.Equal(t, OperationKindDelete, _item.OperationKind)
 	})
+	t.Run("removes elements of any type", func(t *testing.T) {
+		se := newEngine()
+		zone := se.CreateZone()
+		zone.AddInteractableItem()
+		zone.AddInteractablePlayer()
+		zoneItem := zone.AddInteractableZoneItem()
+		zone.RemoveInteractablesZoneItem(zoneItem.ID())
+		assert.Equal(t, len(zone.Interactables()), 2)
+	})
+	t.Run("removes elements of any type reference", func(t *testing.T) {
+		se := newEngine()
+		player1 := se.CreatePlayer()
+		zoneItem1 := se.CreateZoneItem()
+		player2 := se.CreatePlayer()
+		player1.AddTargetedByZoneItem(zoneItem1.ID())
+		player1.AddTargetedByPlayer(player2.ID())
+		player1.RemoveTargetedByPlayer(player2.ID())
+		assert.Equal(t, len(player1.TargetedBy()), 1)
+	})
 }
 
 func TestReferences(t *testing.T) {
