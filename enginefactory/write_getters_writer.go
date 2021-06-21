@@ -35,8 +35,16 @@ func (t everyTypeGetterWriter) loopConditions() *Statement {
 	return List(Id("_"), Id(t.t.Name+"ID")).Op(":=").Range().Id(t.t.Name + "IDs")
 }
 
+func (t everyTypeGetterWriter) declareElement() *Statement {
+	return Id(t.t.Name).Op(":=").Id("engine").Dot(Title(t.t.Name)).Call(Id(t.t.Name + "ID"))
+}
+
+func (t everyTypeGetterWriter) elementHasParent() *Statement {
+	return Id(t.t.Name).Dot(t.t.Name).Dot("HasParent")
+}
+
 func (t everyTypeGetterWriter) appendElement() *Statement {
-	return Id(t.sliceName()).Op("=").Append(Id(t.sliceName()), Id("engine").Dot(Title(t.t.Name)).Call(Id(t.t.Name+"ID")))
+	return Id(t.sliceName()).Op("=").Append(Id(t.sliceName()), Id(t.t.Name))
 }
 
 type typeGetterWriter struct {

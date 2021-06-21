@@ -4,7 +4,11 @@ func (engine *Engine) EveryPlayer() []player {
 	playerIDs := engine.allPlayerIDs()
 	var players []player
 	for _, playerID := range playerIDs {
-		players = append(players, engine.Player(playerID))
+		player := engine.Player(playerID)
+		if player.player.HasParent {
+			continue
+		}
+		players = append(players, player)
 	}
 	return players
 }
@@ -80,7 +84,11 @@ func (engine *Engine) EveryGearScore() []gearScore {
 	gearScoreIDs := engine.allGearScoreIDs()
 	var gearScores []gearScore
 	for _, gearScoreID := range gearScoreIDs {
-		gearScores = append(gearScores, engine.GearScore(gearScoreID))
+		gearScore := engine.GearScore(gearScoreID)
+		if gearScore.gearScore.HasParent {
+			continue
+		}
+		gearScores = append(gearScores, gearScore)
 	}
 	return gearScores
 }
@@ -115,7 +123,11 @@ func (engine *Engine) EveryItem() []item {
 	itemIDs := engine.allItemIDs()
 	var items []item
 	for _, itemID := range itemIDs {
-		items = append(items, engine.Item(itemID))
+		item := engine.Item(itemID)
+		if item.item.HasParent {
+			continue
+		}
+		items = append(items, item)
 	}
 	return items
 }
@@ -159,7 +171,11 @@ func (engine *Engine) EveryPosition() []position {
 	positionIDs := engine.allPositionIDs()
 	var positions []position
 	for _, positionID := range positionIDs {
-		positions = append(positions, engine.Position(positionID))
+		position := engine.Position(positionID)
+		if position.position.HasParent {
+			continue
+		}
+		positions = append(positions, position)
 	}
 	return positions
 }
@@ -194,7 +210,11 @@ func (engine *Engine) EveryZoneItem() []zoneItem {
 	zoneItemIDs := engine.allZoneItemIDs()
 	var zoneItems []zoneItem
 	for _, zoneItemID := range zoneItemIDs {
-		zoneItems = append(zoneItems, engine.ZoneItem(zoneItemID))
+		zoneItem := engine.ZoneItem(zoneItemID)
+		if zoneItem.zoneItem.HasParent {
+			continue
+		}
+		zoneItems = append(zoneItems, zoneItem)
 	}
 	return zoneItems
 }
@@ -229,7 +249,8 @@ func (engine *Engine) EveryZone() []zone {
 	zoneIDs := engine.allZoneIDs()
 	var zones []zone
 	for _, zoneID := range zoneIDs {
-		zones = append(zones, engine.Zone(zoneID))
+		zone := engine.Zone(zoneID)
+		zones = append(zones, zone)
 	}
 	return zones
 }
@@ -326,7 +347,8 @@ func (engine *Engine) EveryEquipmentSet() []equipmentSet {
 	equipmentSetIDs := engine.allEquipmentSetIDs()
 	var equipmentSets []equipmentSet
 	for _, equipmentSetID := range equipmentSetIDs {
-		equipmentSets = append(equipmentSets, engine.EquipmentSet(equipmentSetID))
+		equipmentSet := engine.EquipmentSet(equipmentSetID)
+		equipmentSets = append(equipmentSets, equipmentSet)
 	}
 	return equipmentSets
 }
