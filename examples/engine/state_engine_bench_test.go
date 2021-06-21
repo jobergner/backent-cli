@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-const benchTestNumberOfZones = 10
-const benchTestNumberOfPlayers = 100
-const benchTestNumberOfPlayerItems = 20
+const benchTestNumberOfZones = 3
+const benchTestNumberOfPlayers = 30
+const benchTestNumberOfPlayerItems = 15
 const benchTestNumberOfEquipmentSetItems = 10
-const benchTestNumberOfEquipmentSets = 30
-const benchTestNumberOfZoneTags = 40
-const benchTestNumberOfInteractables = 80
-const benchTestNumberOfZoneItems = 80
+const benchTestNumberOfEquipmentSets = 10
+const benchTestNumberOfZoneTags = 20
+const benchTestNumberOfInteractables = 30
+const benchTestNumberOfZoneItems = 20
 
 func setUpRealisticZoneForBenchmarkExample(engine *Engine) {
 	zone := engine.CreateZone()
@@ -93,8 +93,8 @@ func setUpRealisticZoneForBenchmarkExample(engine *Engine) {
 
 func benchTestModifyPlayerPosition(engine *Engine) {
 	zone := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-	for _, _player := range zone.Players() {
-		if rand.Intn(3) == 0 {
+	for i, _player := range zone.Players() {
+		if i%3 == 0 {
 			continue
 		}
 		// get the player with getter method
@@ -125,8 +125,8 @@ func benchTestRemovePlayers(engine *Engine, zone zone) {
 
 func benchTestModifyItemGearScore(engine *Engine) {
 	zone := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-	for _, _zoneItem := range zone.Items() {
-		if rand.Intn(5) == 0 {
+	for i, _zoneItem := range zone.Items() {
+		if i%5 == 0 {
 			continue
 		}
 		// get the zoneItem with getter method
@@ -203,5 +203,44 @@ func BenchmarkEngine(b *testing.B) {
 		engine.walkTree()
 		_ = engine.assembleTree(false)
 		engine.UpdateState()
+	}
+}
+
+func BenchmarkUpdateState(b *testing.B) {
+	engine := newEngine()
+	for i := 0; i < benchTestNumberOfZones; i++ {
+		setUpRealisticZoneForBenchmarkExample(engine)
+	}
+	engine.UpdateState()
+
+	for i := 0; i < b.N; i++ {
+		randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+		benchTestAddInteractables(engine, randomZone1)
+		benchTestRemoveInteractables(engine, randomZone1)
+		randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+		benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
+		benchTestRemovePlayers(engine, randomZone2)
+		benchTestModifyPlayerPosition(engine)
+		benchTestModifyItemGearScore(engine)
+		engine.UpdateState()
+	}
+}
+
+func BenchmarkElementModificaton(b *testing.B) {
+	engine := newEngine()
+	for i := 0; i < benchTestNumberOfZones; i++ {
+		setUpRealisticZoneForBenchmarkExample(engine)
+	}
+	engine.UpdateState()
+
+	for i := 0; i < b.N; i++ {
+		randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+		benchTestAddInteractables(engine, randomZone1)
+		benchTestRemoveInteractables(engine, randomZone1)
+		randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+		benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
+		benchTestRemovePlayers(engine, randomZone2)
+		benchTestModifyPlayerPosition(engine)
+		benchTestModifyItemGearScore(engine)
 	}
 }

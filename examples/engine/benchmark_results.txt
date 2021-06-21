@@ -38,3 +38,14 @@ pkg: bar-cli/enginefactory/state_engine_example
 BenchmarkEngine-12    	   42894	     27073 ns/op	    8979 B/op	      45 allocs/op
 PASS
 ok  	bar-cli/enginefactory/state_engine_example	1.449s
+
+Mo 21. Jun 16:54:59 CEST 2021
+goos: linux
+goarch: amd64
+pkg: github.com/Java-Jonas/bar-cli/examples/engine
+BenchmarkAssembleTree-12          	       6	3513453336 ns/op	1078970146 B/op	10381078 allocs/op
+BenchmarkEngine-12                	      15	1341739236 ns/op	343442491 B/op	 3218914 allocs/op
+BenchmarkUpdateState-12           	   12500	   1630712 ns/op	  812951 B/op	    1467 allocs/op
+BenchmarkElementModificaton-12    	    1509	  15541541 ns/op	 6836234 B/op	    7263 allocs/op
+PASS
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	184.265s
