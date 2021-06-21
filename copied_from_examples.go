@@ -237,7 +237,6 @@ Exit:
 	return nil
 }
 func (r *Room) publishPatch() error {
-	r.state.walkTree()
 	tree := r.state.assembleTree(false)
 	patchBytes, err := tree.MarshalJSON()
 	if err != nil {

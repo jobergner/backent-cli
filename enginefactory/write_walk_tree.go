@@ -92,6 +92,14 @@ func (s *EngineFactory) writeWalkTree() *EngineFactory {
 	}
 
 	decls.File.Func().Params(Id("engine").Id("*Engine")).Id("walkTree").Params().Block(
+		If(Id("engine").Dot("PathTrack").Dot("_iterations").Op("==").Lit(100)).Block(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				w.t = &configType
+				return w.clearPathTrack()
+			}),
+		),
+		Id("engine").Dot("PathTrack").Dot("_iterations").Op("+=").Lit(1),
+
 		Id("walkedCheck").Op(":=").Id("newRecursionCheck").Call(),
 
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
@@ -128,14 +136,6 @@ func (s *EngineFactory) writeWalkTree() *EngineFactory {
 				),
 			)
 		}),
-
-		Id("engine").Dot("PathTrack").Dot("_iterations").Op("+=").Lit(1),
-		If(Id("engine").Dot("PathTrack").Dot("_iterations").Op("==").Lit(100)).Block(
-			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				w.t = &configType
-				return w.clearPathTrack()
-			}),
-		),
 	)
 
 	decls.Render(s.buf)
