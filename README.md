@@ -375,7 +375,6 @@ this is why actions need to return responses to the client who sent them.
 
 ### TODO
 - AST - how are IDs of types handled? ("playerID")
-- should returns of slices include elements with ElementKindDelete?
 - new realistic benchmark test for engine (with assembling)
 - improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
 

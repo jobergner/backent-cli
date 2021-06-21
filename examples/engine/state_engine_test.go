@@ -27,6 +27,21 @@ func TestEngine(t *testing.T) {
 		se.CreateGearScore()
 		assert.Equal(t, 2, len(se.EveryGearScore()))
 	})
+	t.Run("gets slice of elements", func(t *testing.T) {
+		se := newEngine()
+		player := se.CreatePlayer()
+		player.AddItem()
+		player.AddItem()
+		assert.Equal(t, 2, len(player.Items()))
+	})
+	t.Run("gets slice of elements excluding elements which have OperationKindDelete", func(t *testing.T) {
+		se := newEngine()
+		player := se.CreatePlayer()
+		item1 := player.AddItem()
+		player.AddItem()
+		player.RemoveItems(item1.ID())
+		assert.Equal(t, 1, len(player.Items()))
+	})
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
