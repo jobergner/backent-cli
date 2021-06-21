@@ -1091,6 +1091,7 @@ const assembleEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engin
 }`
 
 const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
+	engine.walkTree()
 	for key := range engine.Tree.EquipmentSet {
 		delete(engine.Tree.EquipmentSet, key)
 	}
@@ -4439,6 +4440,30 @@ const walkZone_Engine_func string = `func (engine *Engine) walkZone(zoneID ZoneI
 }`
 
 const walkTree_Engine_func string = `func (engine *Engine) walkTree() {
+	if engine.PathTrack._iterations == 100 {
+		for key := range engine.PathTrack.equipmentSet {
+			delete(engine.PathTrack.equipmentSet, key)
+		}
+		for key := range engine.PathTrack.gearScore {
+			delete(engine.PathTrack.gearScore, key)
+		}
+		for key := range engine.PathTrack.item {
+			delete(engine.PathTrack.item, key)
+		}
+		for key := range engine.PathTrack.player {
+			delete(engine.PathTrack.player, key)
+		}
+		for key := range engine.PathTrack.position {
+			delete(engine.PathTrack.position, key)
+		}
+		for key := range engine.PathTrack.zone {
+			delete(engine.PathTrack.zone, key)
+		}
+		for key := range engine.PathTrack.zoneItem {
+			delete(engine.PathTrack.zoneItem, key)
+		}
+	}
+	engine.PathTrack._iterations += 1
 	walkedCheck := newRecursionCheck()
 	for id, equipmentSetData := range engine.Patch.EquipmentSet {
 		engine.walkEquipmentSet(equipmentSetData.ID, newPath(equipmentSetIdentifier, int(id)))
@@ -4521,30 +4546,6 @@ const walkTree_Engine_func string = `func (engine *Engine) walkTree() {
 			if _, ok := walkedCheck.zoneItem[zoneItemData.ID]; !ok {
 				engine.walkZoneItem(zoneItemData.ID, newPath(zoneItemIdentifier, int(id)))
 			}
-		}
-	}
-	engine.PathTrack._iterations += 1
-	if engine.PathTrack._iterations == 100 {
-		for key := range engine.PathTrack.equipmentSet {
-			delete(engine.PathTrack.equipmentSet, key)
-		}
-		for key := range engine.PathTrack.gearScore {
-			delete(engine.PathTrack.gearScore, key)
-		}
-		for key := range engine.PathTrack.item {
-			delete(engine.PathTrack.item, key)
-		}
-		for key := range engine.PathTrack.player {
-			delete(engine.PathTrack.player, key)
-		}
-		for key := range engine.PathTrack.position {
-			delete(engine.PathTrack.position, key)
-		}
-		for key := range engine.PathTrack.zone {
-			delete(engine.PathTrack.zone, key)
-		}
-		for key := range engine.PathTrack.zoneItem {
-			delete(engine.PathTrack.zoneItem, key)
 		}
 	}
 }`

@@ -826,6 +826,7 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 }
 
 func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
+	engine.walkTree()
 
 	for key := range engine.Tree.EquipmentSet {
 		delete(engine.Tree.EquipmentSet, key)

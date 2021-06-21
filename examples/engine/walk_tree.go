@@ -167,6 +167,31 @@ func (engine *Engine) walkZone(zoneID ZoneID, p path) {
 }
 
 func (engine *Engine) walkTree() {
+	if engine.PathTrack._iterations == 100 {
+		for key := range engine.PathTrack.equipmentSet {
+			delete(engine.PathTrack.equipmentSet, key)
+		}
+		for key := range engine.PathTrack.gearScore {
+			delete(engine.PathTrack.gearScore, key)
+		}
+		for key := range engine.PathTrack.item {
+			delete(engine.PathTrack.item, key)
+		}
+		for key := range engine.PathTrack.player {
+			delete(engine.PathTrack.player, key)
+		}
+		for key := range engine.PathTrack.position {
+			delete(engine.PathTrack.position, key)
+		}
+		for key := range engine.PathTrack.zone {
+			delete(engine.PathTrack.zone, key)
+		}
+		for key := range engine.PathTrack.zoneItem {
+			delete(engine.PathTrack.zoneItem, key)
+		}
+	}
+	engine.PathTrack._iterations += 1
+
 	walkedCheck := newRecursionCheck()
 
 	for id, equipmentSetData := range engine.Patch.EquipmentSet {
@@ -254,28 +279,4 @@ func (engine *Engine) walkTree() {
 		}
 	}
 
-	engine.PathTrack._iterations += 1
-	if engine.PathTrack._iterations == 100 {
-		for key := range engine.PathTrack.equipmentSet {
-			delete(engine.PathTrack.equipmentSet, key)
-		}
-		for key := range engine.PathTrack.gearScore {
-			delete(engine.PathTrack.gearScore, key)
-		}
-		for key := range engine.PathTrack.item {
-			delete(engine.PathTrack.item, key)
-		}
-		for key := range engine.PathTrack.player {
-			delete(engine.PathTrack.player, key)
-		}
-		for key := range engine.PathTrack.position {
-			delete(engine.PathTrack.position, key)
-		}
-		for key := range engine.PathTrack.zone {
-			delete(engine.PathTrack.zone, key)
-		}
-		for key := range engine.PathTrack.zoneItem {
-			delete(engine.PathTrack.zoneItem, key)
-		}
-	}
 }

@@ -266,7 +266,6 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
 	se := newEngine()
 	expectedTree := newTree()
 	define(se, &expectedTree)
-	se.walkTree()
 	actualTree := se.assembleTree(false)
 
 	if !assert.ObjectsAreEqualValues(expectedTree, actualTree) {

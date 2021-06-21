@@ -1,51 +1,12 @@
 
-Sa 13. Mär 16:22:16 CET 2021
-goos: linux
-goarch: amd64
-pkg: enginefactory/state_engine_example
-BenchmarkEngine-12    	   27114	     41982 ns/op	   22364 B/op	      65 allocs/op
-PASS
-ok  	enginefactory/state_engine_example	1.590s
-
-Sa 13. Mär 16:33:56 CET 2021
-goos: linux
-goarch: amd64
-pkg: enginefactory/state_engine_example
-BenchmarkEngine-12    	   54373	     21553 ns/op	    6372 B/op	      45 allocs/op
-PASS
-ok  	enginefactory/state_engine_example	1.399s
-
-Sa 20. Mär 18:16:05 CET 2021
-goos: linux
-goarch: amd64
-pkg: bar-cli/enginefactory/state_engine_example
-BenchmarkEngine-12    	   55574	     21647 ns/op	    6371 B/op	      45 allocs/op
-PASS
-ok  	bar-cli/enginefactory/state_engine_example	1.426s
-
-Sa 24. Apr 17:23:57 CEST 2021
-goos: linux
-goarch: amd64
-pkg: bar-cli/enginefactory/state_engine_example
-BenchmarkEngine-12    	   46394	     26410 ns/op	    8250 B/op	      45 allocs/op
-PASS
-ok  	bar-cli/enginefactory/state_engine_example	1.492s
-
-Mi 28. Apr 16:53:15 CEST 2021
-goos: linux
-goarch: amd64
-pkg: bar-cli/enginefactory/state_engine_example
-BenchmarkEngine-12    	   42894	     27073 ns/op	    8979 B/op	      45 allocs/op
-PASS
-ok  	bar-cli/enginefactory/state_engine_example	1.449s
-
-Mo 21. Jun 16:54:59 CEST 2021
+Mo 21. Jun 17:44:09 CEST 2021
 goos: linux
 goarch: amd64
 pkg: github.com/Java-Jonas/bar-cli/examples/engine
-BenchmarkAssembleTree-12          	       6	3513453336 ns/op	1078970146 B/op	10381078 allocs/op
-BenchmarkEngine-12                	      15	1341739236 ns/op	343442491 B/op	 3218914 allocs/op
-BenchmarkUpdateState-12           	   12500	   1630712 ns/op	  812951 B/op	    1467 allocs/op
-BenchmarkElementModificaton-12    	    1509	  15541541 ns/op	 6836234 B/op	    7263 allocs/op
+BenchmarkAssembleTreeForceInclude-12    	      26	 487660205 ns/op	174992017 B/op	 1860648 allocs/op
+BenchmarkAssembleTree-12                	      10	1320244625 ns/op	337374867 B/op	 3698995 allocs/op
+BenchmarkEngine-12                      	    2068	   6045947 ns/op	 1666539 B/op	   15920 allocs/op
+BenchmarkUpdateState-12                 	   16497	    742517 ns/op	  363615 B/op	     861 allocs/op
+BenchmarkElementModificaton-12          	    2604	   5343167 ns/op	 2179771 B/op	    3641 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	184.265s
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	166.130s
