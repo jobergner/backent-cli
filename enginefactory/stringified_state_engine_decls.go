@@ -3245,9 +3245,6 @@ const _RemoveInteractablesItem_zone_func string = `func (_zone zone) RemoveInter
 	for _, anyContainerID := range zone.zone.Interactables {
 		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
 		element := anyContainer.Item().ID()
-		if element == 0 {
-			continue
-		}
 		var toBeRemoved bool
 		for _, elementToRemove := range itemsToRemove {
 			if element == elementToRemove {
@@ -3280,9 +3277,6 @@ const _RemoveInteractablesPlayer_zone_func string = `func (_zone zone) RemoveInt
 	for _, anyContainerID := range zone.zone.Interactables {
 		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
 		element := anyContainer.Player().ID()
-		if element == 0 {
-			continue
-		}
 		var toBeRemoved bool
 		for _, elementToRemove := range playersToRemove {
 			if element == elementToRemove {
@@ -3315,9 +3309,6 @@ const _RemoveInteractablesZoneItem_zone_func string = `func (_zone zone) RemoveI
 	for _, anyContainerID := range zone.zone.Interactables {
 		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
 		element := anyContainer.ZoneItem().ID()
-		if element == 0 {
-			continue
-		}
 		var toBeRemoved bool
 		for _, elementToRemove := range zoneItemsToRemove {
 			if element == elementToRemove {
@@ -3442,9 +3433,6 @@ const _RemoveTargetedByZoneItem_player_func string = `func (_player player) Remo
 	for _, refElement := range player.player.TargetedBy {
 		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
 		element := anyContainer.ZoneItem().ID()
-		if element == 0 {
-			continue
-		}
 		var toBeRemoved bool
 		for _, elementToRemove := range zoneItemsToRemove {
 			if element == elementToRemove {
@@ -3477,9 +3465,6 @@ const _RemoveTargetedByPlayer_player_func string = `func (_player player) Remove
 	for _, refElement := range player.player.TargetedBy {
 		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
 		element := anyContainer.Player().ID()
-		if element == 0 {
-			continue
-		}
 		var toBeRemoved bool
 		for _, elementToRemove := range playersToRemove {
 			if element == elementToRemove {
