@@ -156,7 +156,3 @@ func (r remover) declareAnyContainer() *Statement {
 	}
 	return statement.Call(Id("refElement")).Dot("Get").Call()
 }
-
-func (r remover) elementIsNil() *Statement {
-	return Id("element").Op("==").Lit(0)
-}
