@@ -374,6 +374,7 @@ this is why actions need to return responses to the client who sent them.
 
 
 ### TODO
+- make Every[TypeName] getter only return elements which have no parents
 - new realistic benchmark test for engine (with assembling)
 - improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
 
