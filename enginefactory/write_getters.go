@@ -19,6 +19,10 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			e.allIDs(),
 			e.declareSlice(),
 			For(e.loopConditions()).Block(
+				e.declareElement(),
+				OnlyIf(!configType.IsRootType, If(e.elementHasParent()).Block(
+					Continue(),
+				)),
 				e.appendElement(),
 			),
 			Return(Id(e.sliceName())),

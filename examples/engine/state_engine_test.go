@@ -25,6 +25,7 @@ func TestEngine(t *testing.T) {
 		se := newEngine()
 		se.CreateGearScore()
 		se.CreateGearScore()
+		se.CreatePlayer()
 		assert.Equal(t, 2, len(se.EveryGearScore()))
 	})
 	t.Run("gets slice of elements", func(t *testing.T) {
