@@ -1,1 +1,4 @@
 *easyjson.go
+engine.test
+memprofile.out
+profile.out

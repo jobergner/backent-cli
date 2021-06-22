@@ -1,12 +1,38 @@
 
-Mo 21. Jun 17:44:09 CEST 2021
+Di 22. Jun 16:10:10 CEST 2021
 goos: linux
 goarch: amd64
 pkg: github.com/Java-Jonas/bar-cli/examples/engine
-BenchmarkAssembleTreeForceInclude-12    	      26	 487660205 ns/op	174992017 B/op	 1860648 allocs/op
-BenchmarkAssembleTree-12                	      10	1320244625 ns/op	337374867 B/op	 3698995 allocs/op
-BenchmarkEngine-12                      	    2068	   6045947 ns/op	 1666539 B/op	   15920 allocs/op
-BenchmarkUpdateState-12                 	   16497	    742517 ns/op	  363615 B/op	     861 allocs/op
-BenchmarkElementModificaton-12          	    2604	   5343167 ns/op	 2179771 B/op	    3641 allocs/op
+BenchmarkAssembleTreeForceInclude-12    	       3	 491831666 ns/op	191727930 B/op	 2084886 allocs/op
+BenchmarkAssembleTree-12                	       1	1146506211 ns/op	374948632 B/op	 3790856 allocs/op
+BenchmarkEngine-12                      	       2	1068673783 ns/op	326759808 B/op	 3383263 allocs/op
+BenchmarkUpdateState-12                 	     849	   1488118 ns/op	  445232 B/op	    1070 allocs/op
+BenchmarkElementModificaton-12          	     164	   8024566 ns/op	 2829890 B/op	    4818 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	166.130s
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	11.698s
+
+# use sync.Pools for slices and maps in deduplication helpers
+Di 22. Jun 16:58:07 CEST 2021
+goos: linux
+goarch: amd64
+pkg: github.com/Java-Jonas/bar-cli/examples/engine
+BenchmarkAssembleTreeForceInclude-12    	       3	 546113832 ns/op	187778810 B/op	 2028805 allocs/op
+BenchmarkAssembleTree-12                	       1	1047732168 ns/op	301429296 B/op	 3177922 allocs/op
+BenchmarkEngine-12                      	       1	1088289475 ns/op	294054344 B/op	 3191863 allocs/op
+BenchmarkUpdateState-12                 	    1660	    692403 ns/op	  248724 B/op	     570 allocs/op
+BenchmarkElementModificaton-12          	     289	   4258137 ns/op	 1150241 B/op	    1839 allocs/op
+PASS
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.581s
+
+# use sync.Pools for slices in allIDs helpers
+Di 22. Jun 17:18:26 CEST 2021
+goos: linux
+goarch: amd64
+pkg: github.com/Java-Jonas/bar-cli/examples/engine
+BenchmarkAssembleTreeForceInclude-12    	       3	 483733270 ns/op	183633626 B/op	 1970293 allocs/op
+BenchmarkAssembleTree-12                	       1	1116346379 ns/op	332433408 B/op	 3525929 allocs/op
+BenchmarkEngine-12                      	       1	1228802902 ns/op	366104328 B/op	 4184231 allocs/op
+BenchmarkUpdateState-12                 	    1792	    633446 ns/op	  192940 B/op	     490 allocs/op
+BenchmarkElementModificaton-12          	     360	   3120509 ns/op	  202495 B/op	     677 allocs/op
+PASS
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.283s
