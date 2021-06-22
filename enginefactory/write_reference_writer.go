@@ -54,8 +54,15 @@ func (r referenceWriter) returnTypeOfGet() string {
 	return Title(r.f.ValueType().Name)
 }
 
-func (r referenceWriter) returnReferencedElement() *Statement {
-	return Return(Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot(r.returnTypeOfGet()).Call(Id("ref").Dot(r.f.ValueTypeName).Dot("ReferencedElementID")))
+func (r referenceWriter) getReferencedElement() *Statement {
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("engine").Dot(r.returnTypeOfGet()).Call(Id("ref").Dot(r.f.ValueTypeName).Dot("ReferencedElementID"))
+}
+
+func (r referenceWriter) wrapIntoAnyRefWrapper() *Statement {
+	return Id(anyNameByField(r.f) + "Ref").Values(Dict{
+		Id(anyNameByField(r.f) + "Wrapper"): Id("anyContainer"),
+		Id(anyNameByField(r.f)):             Id("anyContainer").Dot(anyNameByField(r.f)),
+	})
 }
 
 func (r referenceWriter) dereferenceCondition() *Statement {

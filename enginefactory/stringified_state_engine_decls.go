@@ -3131,13 +3131,13 @@ const _Unset_playerTargetRef_func string = `func (_ref playerTargetRef) Unset() 
 const _Get_playerTargetRef_func string = `func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItemWrapper: anyContainer, anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem}
+	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
 }`
 
 const _Get_playerTargetedByRef_func string = `func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
 	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
-	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItemWrapper: anyContainer, anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem}
+	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
 }`
 
 const dereferenceItemBoundToRefs_Engine_func string = `func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
