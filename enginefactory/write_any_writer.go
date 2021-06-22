@@ -104,15 +104,15 @@ func (a anyRefWriter) typeName() string {
 }
 
 func (a anyRefWriter) wrapperName() string {
-	return a.typeName() + "Ref"
-}
-
-func (a anyRefWriter) typeRefName() string {
 	return a.typeName() + "Wrapper"
 }
 
+func (a anyRefWriter) typeRefName() string {
+	return a.typeName() + "Ref"
+}
+
 func (a anyRefWriter) receiverParams() *Statement {
-	return Id("_any").Id(a.typeName())
+	return Id("_any").Id(a.typeRefName())
 }
 
 func (a anyRefWriter) elementKind() *Statement {

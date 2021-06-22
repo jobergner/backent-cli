@@ -72,6 +72,26 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 func (s *EngineFactory) writeAnyRefs() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeAnyFields(func(field ast.Field) {
+
+		a := anyRefWriter{
+			f: field,
+		}
+
+		decls.File.Type().Id(a.typeRefName()).Struct(
+			Id(a.wrapperName()).Id(a.typeName()),
+			Id(a.typeName()).Id(a.typeName()+"Core"),
+		)
+
+		decls.File.Func().Params(a.receiverParams()).Id("Kind").Params().Id("ElementKind").Block(
+			Return(a.elementKind()),
+		)
+
+		field.RangeValueTypes(func(configType *ast.ConfigType) {
+			a.v = configType
+			decls.File.Func().Params(a.receiverParams()).Id(Title(configType.Name)).Params().Id(configType.Name).Block(
+				Return(a.child()),
+			)
+		})
 	})
 
 	decls.Render(s.buf)

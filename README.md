@@ -372,12 +372,15 @@ currently my best option is to assemble the tree server side, make sure all nece
 the client may need to be aware of the IDs the server generates, or the paths to elements which are created by the clients actions.
 this is why actions need to return responses to the client who sent them.
 
+### `Set<TypeName>` methods on references of any types
+any types have setter methods to replace the current contained child element with a different one. Eg the type `anyOfPlayer_ZoneItem` owns the `.SetPlayer()` and `.SetZoneItem()` methods
+which both delete the current child, and create a new one. This however causes problems when you are dealing with references of any types, as a setter method would delete the current child.
+being able to call the setters on these references makes no sense. This is why any types have ref wrappers, which are created just before `Get()` is called on the reference. These wrappers exclude the 
+setter methods.
+
 
 ### TODO
-- currently you can call Set on anyOf types which are wrapped by a reference. This deletes the existing child element, even though it is not supposed to (PROBLEM!!)
-  - solution: make reference's `Get()` method return a anyOfFoo_Bar_Reference struct which does not have the `SetFoo()` method
-  - I will need to generate this type
-- make Every[TypeName] getter only return elements which have no parents
+- any type Setters need to return existing type if the requested type is already in place
 - new realistic benchmark test for engine (with assembling)
 - improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
 

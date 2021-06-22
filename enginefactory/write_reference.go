@@ -34,10 +34,18 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 			)
 		}
 
-		decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())).Block(
-			r.reassignRef(),
-			r.returnReferencedElement(),
-		)
+		if field.HasAnyValue {
+			decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())+"Ref").Block(
+				r.reassignRef(),
+				Id("anyContainer").Op(":=").Add(r.getReferencedElement()),
+				Return(r.wrapIntoAnyRefWrapper()),
+			)
+		} else {
+			decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())).Block(
+				r.reassignRef(),
+				Return(r.getReferencedElement()),
+			)
+		}
 
 	})
 

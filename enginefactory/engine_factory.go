@@ -33,6 +33,7 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writePackageName(). // to be able to format the code without errors
 		writeAdders().
 		writeAny().
+		writeAnyRefs().
 		writeAssembleTree().
 		writeAssembleTreeElement().
 		writeAssembleTreeReference().
