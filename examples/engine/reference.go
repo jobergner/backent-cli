@@ -54,14 +54,16 @@ func (_ref playerTargetRef) Unset() {
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
 
-func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItem {
+func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+	anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItemWrapper: anyContainer, anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem}
 }
 
-func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItem {
+func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
-	return ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
+	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
+	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItemWrapper: anyContainer, anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem}
 }
 
 func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {

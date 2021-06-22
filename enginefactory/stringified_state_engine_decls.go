@@ -164,6 +164,61 @@ const _AddEquipment_equipmentSet_func string = `func (_equipmentSet equipmentSet
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 }`
 
+const anyOfPlayer_PositionRef_type string = `type anyOfPlayer_PositionRef struct {
+	anyOfPlayer_PositionWrapper	anyOfPlayer_Position
+	anyOfPlayer_Position		anyOfPlayer_PositionCore
+}`
+
+const _Kind_anyOfPlayer_PositionRef_func string = `func (_any anyOfPlayer_PositionRef) Kind() ElementKind {
+	return _any.anyOfPlayer_PositionWrapper.Kind()
+}`
+
+const _Player_anyOfPlayer_PositionRef_func string = `func (_any anyOfPlayer_PositionRef) Player() player {
+	return _any.anyOfPlayer_PositionWrapper.Player()
+}`
+
+const _Position_anyOfPlayer_PositionRef_func string = `func (_any anyOfPlayer_PositionRef) Position() position {
+	return _any.anyOfPlayer_PositionWrapper.Position()
+}`
+
+const anyOfPlayer_ZoneItemRef_type string = `type anyOfPlayer_ZoneItemRef struct {
+	anyOfPlayer_ZoneItemWrapper	anyOfPlayer_ZoneItem
+	anyOfPlayer_ZoneItem		anyOfPlayer_ZoneItemCore
+}`
+
+const _Kind_anyOfPlayer_ZoneItemRef_func string = `func (_any anyOfPlayer_ZoneItemRef) Kind() ElementKind {
+	return _any.anyOfPlayer_ZoneItemWrapper.Kind()
+}`
+
+const _Player_anyOfPlayer_ZoneItemRef_func string = `func (_any anyOfPlayer_ZoneItemRef) Player() player {
+	return _any.anyOfPlayer_ZoneItemWrapper.Player()
+}`
+
+const _ZoneItem_anyOfPlayer_ZoneItemRef_func string = `func (_any anyOfPlayer_ZoneItemRef) ZoneItem() zoneItem {
+	return _any.anyOfPlayer_ZoneItemWrapper.ZoneItem()
+}`
+
+const anyOfItem_Player_ZoneItemRef_type string = `type anyOfItem_Player_ZoneItemRef struct {
+	anyOfItem_Player_ZoneItemWrapper	anyOfItem_Player_ZoneItem
+	anyOfItem_Player_ZoneItem		anyOfItem_Player_ZoneItemCore
+}`
+
+const _Kind_anyOfItem_Player_ZoneItemRef_func string = `func (_any anyOfItem_Player_ZoneItemRef) Kind() ElementKind {
+	return _any.anyOfItem_Player_ZoneItemWrapper.Kind()
+}`
+
+const _Item_anyOfItem_Player_ZoneItemRef_func string = `func (_any anyOfItem_Player_ZoneItemRef) Item() item {
+	return _any.anyOfItem_Player_ZoneItemWrapper.Item()
+}`
+
+const _Player_anyOfItem_Player_ZoneItemRef_func string = `func (_any anyOfItem_Player_ZoneItemRef) Player() player {
+	return _any.anyOfItem_Player_ZoneItemWrapper.Player()
+}`
+
+const _ZoneItem_anyOfItem_Player_ZoneItemRef_func string = `func (_any anyOfItem_Player_ZoneItemRef) ZoneItem() zoneItem {
+	return _any.anyOfItem_Player_ZoneItemWrapper.ZoneItem()
+}`
+
 const _Kind_anyOfPlayer_ZoneItem_func string = `func (_any anyOfPlayer_ZoneItem) Kind() ElementKind {
 	any := _any.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_any.anyOfPlayer_ZoneItem.ID)
 	return any.anyOfPlayer_ZoneItem.ElementKind
@@ -3073,14 +3128,16 @@ const _Unset_playerTargetRef_func string = `func (_ref playerTargetRef) Unset() 
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }`
 
-const _Get_playerTargetRef_func string = `func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItem {
+const _Get_playerTargetRef_func string = `func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+	anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
+	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItemWrapper: anyContainer, anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem}
 }`
 
-const _Get_playerTargetedByRef_func string = `func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItem {
+const _Get_playerTargetedByRef_func string = `func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
-	return ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
+	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
+	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItemWrapper: anyContainer, anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem}
 }`
 
 const dereferenceItemBoundToRefs_Engine_func string = `func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {

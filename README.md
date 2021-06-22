@@ -387,6 +387,7 @@ this is why actions need to return responses to the client who sent them.
   - or can this just be handled bu forceInclude assembling directly after UpdateState() as patch will be empty anyway
 
 - review error handling in server
+- review channel handling in server
 - find a neat way for integration tests
 
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)

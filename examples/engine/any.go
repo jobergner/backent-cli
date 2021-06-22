@@ -1,5 +1,60 @@
 package state
 
+type anyOfPlayer_PositionRef struct {
+	anyOfPlayer_PositionWrapper anyOfPlayer_Position
+	anyOfPlayer_Position        anyOfPlayer_PositionCore
+}
+
+func (_any anyOfPlayer_PositionRef) Kind() ElementKind {
+	return _any.anyOfPlayer_PositionWrapper.Kind()
+}
+
+func (_any anyOfPlayer_PositionRef) Player() player {
+	return _any.anyOfPlayer_PositionWrapper.Player()
+}
+
+func (_any anyOfPlayer_PositionRef) Position() position {
+	return _any.anyOfPlayer_PositionWrapper.Position()
+}
+
+type anyOfPlayer_ZoneItemRef struct {
+	anyOfPlayer_ZoneItemWrapper anyOfPlayer_ZoneItem
+	anyOfPlayer_ZoneItem        anyOfPlayer_ZoneItemCore
+}
+
+func (_any anyOfPlayer_ZoneItemRef) Kind() ElementKind {
+	return _any.anyOfPlayer_ZoneItemWrapper.Kind()
+}
+
+func (_any anyOfPlayer_ZoneItemRef) Player() player {
+	return _any.anyOfPlayer_ZoneItemWrapper.Player()
+}
+
+func (_any anyOfPlayer_ZoneItemRef) ZoneItem() zoneItem {
+	return _any.anyOfPlayer_ZoneItemWrapper.ZoneItem()
+}
+
+type anyOfItem_Player_ZoneItemRef struct {
+	anyOfItem_Player_ZoneItemWrapper anyOfItem_Player_ZoneItem
+	anyOfItem_Player_ZoneItem        anyOfItem_Player_ZoneItemCore
+}
+
+func (_any anyOfItem_Player_ZoneItemRef) Kind() ElementKind {
+	return _any.anyOfItem_Player_ZoneItemWrapper.Kind()
+}
+
+func (_any anyOfItem_Player_ZoneItemRef) Item() item {
+	return _any.anyOfItem_Player_ZoneItemWrapper.Item()
+}
+
+func (_any anyOfItem_Player_ZoneItemRef) Player() player {
+	return _any.anyOfItem_Player_ZoneItemWrapper.Player()
+}
+
+func (_any anyOfItem_Player_ZoneItemRef) ZoneItem() zoneItem {
+	return _any.anyOfItem_Player_ZoneItemWrapper.ZoneItem()
+}
+
 func (_any anyOfPlayer_ZoneItem) Kind() ElementKind {
 	any := _any.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_any.anyOfPlayer_ZoneItem.ID)
 	return any.anyOfPlayer_ZoneItem.ElementKind
