@@ -61,6 +61,9 @@ func (_any anyOfPlayer_ZoneItem) Kind() ElementKind {
 }
 
 func (_any anyOfPlayer_ZoneItem) SetZoneItem() zoneItem {
+	if _any.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
+		return _any.ZoneItem()
+	}
 	zoneItem := _any.anyOfPlayer_ZoneItem.engine.createZoneItem(true)
 	_any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID())
 	return zoneItem
@@ -78,6 +81,9 @@ func (_any anyOfPlayer_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
 }
 
 func (_any anyOfPlayer_ZoneItem) SetPlayer() player {
+	if _any.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
+		return _any.Player()
+	}
 	player := _any.anyOfPlayer_ZoneItem.engine.createPlayer(true)
 	_any.anyOfPlayer_ZoneItem.setPlayer(player.ID())
 	return player
@@ -110,6 +116,9 @@ func (_any anyOfPlayer_Position) Kind() ElementKind {
 }
 
 func (_any anyOfPlayer_Position) SetPosition() position {
+	if _any.anyOfPlayer_Position.ElementKind == ElementKindPosition {
+		return _any.Position()
+	}
 	position := _any.anyOfPlayer_Position.engine.createPosition(true)
 	_any.anyOfPlayer_Position.setPosition(position.ID())
 	return position
@@ -137,6 +146,9 @@ func (_any anyOfPlayer_PositionCore) deleteChild() {
 }
 
 func (_any anyOfPlayer_Position) SetPlayer() player {
+	if _any.anyOfPlayer_Position.ElementKind == ElementKindPlayer {
+		return _any.Player()
+	}
 	player := _any.anyOfPlayer_Position.engine.createPlayer(true)
 	_any.anyOfPlayer_Position.setPlayer(player.ID())
 	return player
@@ -159,6 +171,9 @@ func (_any anyOfItem_Player_ZoneItem) Kind() ElementKind {
 }
 
 func (_any anyOfItem_Player_ZoneItem) SetZoneItem() zoneItem {
+	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindZoneItem {
+		return _any.ZoneItem()
+	}
 	zoneItem := _any.anyOfItem_Player_ZoneItem.engine.createZoneItem(true)
 	_any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID())
 	return zoneItem
@@ -180,6 +195,9 @@ func (_any anyOfItem_Player_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
 }
 
 func (_any anyOfItem_Player_ZoneItem) SetPlayer() player {
+	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindPlayer {
+		return _any.Player()
+	}
 	player := _any.anyOfItem_Player_ZoneItem.engine.createPlayer(true)
 	_any.anyOfItem_Player_ZoneItem.setPlayer(player.ID())
 	return player
@@ -201,6 +219,9 @@ func (_any anyOfItem_Player_ZoneItemCore) setPlayer(playerID PlayerID) {
 }
 
 func (_any anyOfItem_Player_ZoneItem) SetItem() item {
+	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindItem {
+		return _any.Item()
+	}
 	item := _any.anyOfItem_Player_ZoneItem.engine.createItem(true)
 	_any.anyOfItem_Player_ZoneItem.setItem(item.ID())
 	return item
