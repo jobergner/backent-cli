@@ -185,3 +185,54 @@ func newRecursionCheck() *recursionCheck {
 		zoneItem:     make(map[ZoneItemID]bool),
 	}
 }
+
+type assembleCache struct {
+	equipmentSet map[EquipmentSetID]equipmentSetCacheElement
+	gearScore    map[GearScoreID]gearScoreCacheElement
+	item         map[ItemID]itemCacheElement
+	player       map[PlayerID]playerCacheElement
+	position     map[PositionID]positionCacheElement
+	zone         map[ZoneID]zoneCacheElement
+	zoneItem     map[ZoneItemID]zoneItemCacheElement
+}
+
+func newAssembleCache() assembleCache {
+	return assembleCache{
+		equipmentSet: make(map[EquipmentSetID]equipmentSetCacheElement),
+		gearScore:    make(map[GearScoreID]gearScoreCacheElement),
+		item:         make(map[ItemID]itemCacheElement),
+		player:       make(map[PlayerID]playerCacheElement),
+		position:     make(map[PositionID]positionCacheElement),
+		zone:         make(map[ZoneID]zoneCacheElement),
+		zoneItem:     make(map[ZoneItemID]zoneItemCacheElement),
+	}
+}
+
+type equipmentSetCacheElement struct {
+	hasUpdatedDownstream bool
+	equipmentSet         EquipmentSet
+}
+type gearScoreCacheElement struct {
+	hasUpdatedDownstream bool
+	gearScore            GearScore
+}
+type itemCacheElement struct {
+	hasUpdatedDownstream bool
+	item                 Item
+}
+type playerCacheElement struct {
+	hasUpdatedDownstream bool
+	player               Player
+}
+type positionCacheElement struct {
+	hasUpdatedDownstream bool
+	position             Position
+}
+type zoneCacheElement struct {
+	hasUpdatedDownstream bool
+	zone                 Zone
+}
+type zoneItemCacheElement struct {
+	hasUpdatedDownstream bool
+	zoneItem             ZoneItem
+}

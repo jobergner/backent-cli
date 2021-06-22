@@ -9,20 +9,22 @@ const (
 )
 
 type Engine struct {
-	State     State
-	Patch     State
-	Tree      Tree
-	PathTrack pathTrack
-	IDgen     int
+	State         State
+	Patch         State
+	Tree          Tree
+	PathTrack     pathTrack
+	assembleCache assembleCache
+	IDgen         int
 }
 
 func newEngine() *Engine {
 	return &Engine{
-		IDgen:     1,
-		Patch:     newState(),
-		PathTrack: newPathTrack(),
-		State:     newState(),
-		Tree:      newTree(),
+		IDgen:         1,
+		Patch:         newState(),
+		PathTrack:     newPathTrack(),
+		State:         newState(),
+		Tree:          newTree(),
+		assembleCache: newAssembleCache(),
 	}
 }
 
