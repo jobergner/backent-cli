@@ -40,4 +40,29 @@ func TestWriteAny(t *testing.T) {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
+	t.Run("writes anyRefs", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeAnyRefs()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			anyOfPlayer_PositionRef_type,
+			_Kind_anyOfPlayer_PositionRef_func,
+			_Player_anyOfPlayer_PositionRef_func,
+			_Position_anyOfPlayer_PositionRef_func,
+			anyOfPlayer_ZoneItemRef_type,
+			_Kind_anyOfPlayer_ZoneItemRef_func,
+			_Player_anyOfPlayer_ZoneItemRef_func,
+			_ZoneItem_anyOfPlayer_ZoneItemRef_func,
+			anyOfItem_Player_ZoneItemRef_type,
+			_Kind_anyOfItem_Player_ZoneItemRef_func,
+			_Item_anyOfItem_Player_ZoneItemRef_func,
+			_Player_anyOfItem_Player_ZoneItemRef_func,
+			_ZoneItem_anyOfItem_Player_ZoneItemRef_func,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 }
