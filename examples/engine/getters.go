@@ -10,6 +10,7 @@ func (engine *Engine) EveryPlayer() []player {
 		}
 		players = append(players, player)
 	}
+	playerIDSlicePool.Put(playerIDs)
 	return players
 }
 
@@ -90,6 +91,7 @@ func (engine *Engine) EveryGearScore() []gearScore {
 		}
 		gearScores = append(gearScores, gearScore)
 	}
+	gearScoreIDSlicePool.Put(gearScoreIDs)
 	return gearScores
 }
 
@@ -129,6 +131,7 @@ func (engine *Engine) EveryItem() []item {
 		}
 		items = append(items, item)
 	}
+	itemIDSlicePool.Put(itemIDs)
 	return items
 }
 
@@ -177,6 +180,7 @@ func (engine *Engine) EveryPosition() []position {
 		}
 		positions = append(positions, position)
 	}
+	positionIDSlicePool.Put(positionIDs)
 	return positions
 }
 
@@ -216,6 +220,7 @@ func (engine *Engine) EveryZoneItem() []zoneItem {
 		}
 		zoneItems = append(zoneItems, zoneItem)
 	}
+	zoneItemIDSlicePool.Put(zoneItemIDs)
 	return zoneItems
 }
 
@@ -252,6 +257,7 @@ func (engine *Engine) EveryZone() []zone {
 		zone := engine.Zone(zoneID)
 		zones = append(zones, zone)
 	}
+	zoneIDSlicePool.Put(zoneIDs)
 	return zones
 }
 
@@ -350,6 +356,7 @@ func (engine *Engine) EveryEquipmentSet() []equipmentSet {
 		equipmentSet := engine.EquipmentSet(equipmentSetID)
 		equipmentSets = append(equipmentSets, equipmentSet)
 	}
+	equipmentSetIDSlicePool.Put(equipmentSetIDs)
 	return equipmentSets
 }
 

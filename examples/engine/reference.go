@@ -67,46 +67,55 @@ func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
 }
 
 func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
-	for _, refID := range engine.allItemBoundToRefIDs() {
+	allItemBoundToRefIDs := engine.allItemBoundToRefIDs()
+	for _, refID := range allItemBoundToRefIDs {
 		ref := engine.itemBoundToRef(refID)
 		if ref.itemBoundToRef.ReferencedElementID == playerID {
 			ref.Unset()
 		}
 	}
+	itemBoundToRefIDSlicePool.Put(allItemBoundToRefIDs)
 }
 
 func (engine *Engine) dereferenceEquipmentSetEquipmentRefs(itemID ItemID) {
-	for _, refID := range engine.allEquipmentSetEquipmentRefIDs() {
+	allEquipmentSetEquipmentRefIDs := engine.allEquipmentSetEquipmentRefIDs()
+	for _, refID := range allEquipmentSetEquipmentRefIDs {
 		ref := engine.equipmentSetEquipmentRef(refID)
 		if ref.equipmentSetEquipmentRef.ReferencedElementID == itemID {
 			parent := engine.EquipmentSet(ref.equipmentSetEquipmentRef.ParentID)
 			parent.RemoveEquipment(itemID)
 		}
 	}
+	equipmentSetEquipmentRefIDSlicePool.Put(allEquipmentSetEquipmentRefIDs)
 }
 
 func (engine *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
-	for _, refID := range engine.allPlayerGuildMemberRefIDs() {
+	allPlayerGuildMemberRefIDs := engine.allPlayerGuildMemberRefIDs()
+	for _, refID := range allPlayerGuildMemberRefIDs {
 		ref := engine.playerGuildMemberRef(refID)
 		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
 			parent := engine.Player(ref.playerGuildMemberRef.ParentID)
 			parent.RemoveGuildMembers(playerID)
 		}
 	}
+	playerGuildMemberRefIDSlicePool.Put(allPlayerGuildMemberRefIDs)
 }
 
 func (engine *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID EquipmentSetID) {
-	for _, refID := range engine.allPlayerEquipmentSetRefIDs() {
+	allPlayerEquipmentSetRefIDs := engine.allPlayerEquipmentSetRefIDs()
+	for _, refID := range allPlayerEquipmentSetRefIDs {
 		ref := engine.playerEquipmentSetRef(refID)
 		if ref.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
 			parent := engine.Player(ref.playerEquipmentSetRef.ParentID)
 			parent.RemoveEquipmentSets(equipmentSetID)
 		}
 	}
+	playerEquipmentSetRefIDSlicePool.Put(allPlayerEquipmentSetRefIDs)
 }
 
 func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
-	for _, refID := range engine.allPlayerTargetRefIDs() {
+	allPlayerTargetRefIDs := engine.allPlayerTargetRefIDs()
+	for _, refID := range allPlayerTargetRefIDs {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
@@ -116,10 +125,12 @@ func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 			ref.Unset()
 		}
 	}
+	playerTargetRefIDSlicePool.Put(allPlayerTargetRefIDs)
 }
 
 func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID) {
-	for _, refID := range engine.allPlayerTargetRefIDs() {
+	allPlayerTargetRefIDs := engine.allPlayerTargetRefIDs()
+	for _, refID := range allPlayerTargetRefIDs {
 		ref := engine.playerTargetRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
@@ -129,10 +140,12 @@ func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID)
 			ref.Unset()
 		}
 	}
+	playerTargetRefIDSlicePool.Put(allPlayerTargetRefIDs)
 }
 
 func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
-	for _, refID := range engine.allPlayerTargetedByRefIDs() {
+	allPlayerTargetedByRefIDs := engine.allPlayerTargetedByRefIDs()
+	for _, refID := range allPlayerTargetedByRefIDs {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
@@ -143,10 +156,12 @@ func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
 			parent.RemoveTargetedByPlayer(playerID)
 		}
 	}
+	playerTargetedByRefIDSlicePool.Put(allPlayerTargetedByRefIDs)
 }
 
 func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneItemID) {
-	for _, refID := range engine.allPlayerTargetedByRefIDs() {
+	allPlayerTargetedByRefIDs := engine.allPlayerTargetedByRefIDs()
+	for _, refID := range allPlayerTargetedByRefIDs {
 		ref := engine.playerTargetedByRef(refID)
 		anyContainer := ref.Get()
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
@@ -157,4 +172,5 @@ func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneIte
 			parent.RemoveTargetedByZoneItem(zoneItemID)
 		}
 	}
+	playerTargetedByRefIDSlicePool.Put(allPlayerTargetedByRefIDs)
 }

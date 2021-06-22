@@ -1,23 +1,12 @@
 package state
 
-import (
-	"sync"
-)
-
-var zoneItemCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[ZoneItemID]bool) },
-}
-var zoneItemSlicePool = sync.Pool{
-	New: func() interface{} { return make([]ZoneItemID, 10) },
-}
-
 func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
 
 	check := zoneItemCheckPool.Get().(map[ZoneItemID]bool)
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := zoneItemSlicePool.Get().([]ZoneItemID)[:0]
+	deduped := zoneItemIDSlicePool.Get().([]ZoneItemID)[:0]
 
 	for _, val := range a {
 		check[val] = true
@@ -31,16 +20,8 @@ func deduplicateZoneItemIDs(a []ZoneItemID, b []ZoneItemID) []ZoneItemID {
 	}
 
 	zoneItemCheckPool.Put(check)
-	zoneItemSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var zoneCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[ZoneID]bool) },
-}
-var zoneSlicePool = sync.Pool{
-	New: func() interface{} { return make([]ZoneID, 10) },
 }
 
 func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
@@ -49,7 +30,7 @@ func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := zoneSlicePool.Get().([]ZoneID)[:0]
+	deduped := zoneIDSlicePool.Get().([]ZoneID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -62,16 +43,8 @@ func deduplicateZoneIDs(a []ZoneID, b []ZoneID) []ZoneID {
 	}
 
 	zoneCheckPool.Put(check)
-	zoneSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var playerCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[PlayerID]bool) },
-}
-var playerSlicePool = sync.Pool{
-	New: func() interface{} { return make([]PlayerID, 10) },
 }
 
 func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
@@ -80,7 +53,7 @@ func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := playerSlicePool.Get().([]PlayerID)[:0]
+	deduped := playerIDSlicePool.Get().([]PlayerID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -93,16 +66,8 @@ func deduplicatePlayerIDs(a []PlayerID, b []PlayerID) []PlayerID {
 	}
 
 	playerCheckPool.Put(check)
-	playerSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var positionCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[PositionID]bool) },
-}
-var positionSlicePool = sync.Pool{
-	New: func() interface{} { return make([]PositionID, 10) },
 }
 
 func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
@@ -111,7 +76,7 @@ func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := positionSlicePool.Get().([]PositionID)[:0]
+	deduped := positionIDSlicePool.Get().([]PositionID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -124,16 +89,8 @@ func deduplicatePositionIDs(a []PositionID, b []PositionID) []PositionID {
 	}
 
 	positionCheckPool.Put(check)
-	positionSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var itemCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[ItemID]bool) },
-}
-var itemSlicePool = sync.Pool{
-	New: func() interface{} { return make([]ItemID, 10) },
 }
 
 func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
@@ -142,7 +99,7 @@ func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := itemSlicePool.Get().([]ItemID)[:0]
+	deduped := itemIDSlicePool.Get().([]ItemID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -155,16 +112,8 @@ func deduplicateItemIDs(a []ItemID, b []ItemID) []ItemID {
 	}
 
 	itemCheckPool.Put(check)
-	itemSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var gearScoreCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[GearScoreID]bool) },
-}
-var gearScoreSlicePool = sync.Pool{
-	New: func() interface{} { return make([]GearScoreID, 10) },
 }
 
 func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
@@ -173,7 +122,7 @@ func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := gearScoreSlicePool.Get().([]GearScoreID)[:0]
+	deduped := gearScoreIDSlicePool.Get().([]GearScoreID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -186,16 +135,8 @@ func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
 	}
 
 	gearScoreCheckPool.Put(check)
-	gearScoreSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var equipmentSetCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[EquipmentSetID]bool) },
-}
-var equipmentSetSlicePool = sync.Pool{
-	New: func() interface{} { return make([]EquipmentSetID, 10) },
 }
 
 func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []EquipmentSetID {
@@ -204,7 +145,7 @@ func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []Equipm
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := equipmentSetSlicePool.Get().([]EquipmentSetID)[:0]
+	deduped := equipmentSetIDSlicePool.Get().([]EquipmentSetID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -217,16 +158,8 @@ func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []Equipm
 	}
 
 	equipmentSetCheckPool.Put(check)
-	equipmentSetSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var playerTargetedByRefCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[PlayerTargetedByRefID]bool) },
-}
-var playerTargetedByRefSlicePool = sync.Pool{
-	New: func() interface{} { return make([]PlayerTargetedByRefID, 10) },
 }
 
 func deduplicatePlayerTargetedByRefIDs(a []PlayerTargetedByRefID, b []PlayerTargetedByRefID) []PlayerTargetedByRefID {
@@ -235,7 +168,7 @@ func deduplicatePlayerTargetedByRefIDs(a []PlayerTargetedByRefID, b []PlayerTarg
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := playerTargetedByRefSlicePool.Get().([]PlayerTargetedByRefID)[:0]
+	deduped := playerTargetedByRefIDSlicePool.Get().([]PlayerTargetedByRefID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -248,16 +181,8 @@ func deduplicatePlayerTargetedByRefIDs(a []PlayerTargetedByRefID, b []PlayerTarg
 	}
 
 	playerTargetedByRefCheckPool.Put(check)
-	playerTargetedByRefSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var playerTargetRefCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[PlayerTargetRefID]bool) },
-}
-var playerTargetRefSlicePool = sync.Pool{
-	New: func() interface{} { return make([]PlayerTargetRefID, 10) },
 }
 
 func deduplicatePlayerTargetRefIDs(a []PlayerTargetRefID, b []PlayerTargetRefID) []PlayerTargetRefID {
@@ -266,7 +191,7 @@ func deduplicatePlayerTargetRefIDs(a []PlayerTargetRefID, b []PlayerTargetRefID)
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := playerTargetRefSlicePool.Get().([]PlayerTargetRefID)[:0]
+	deduped := playerTargetRefIDSlicePool.Get().([]PlayerTargetRefID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -279,16 +204,8 @@ func deduplicatePlayerTargetRefIDs(a []PlayerTargetRefID, b []PlayerTargetRefID)
 	}
 
 	playerTargetRefCheckPool.Put(check)
-	playerTargetRefSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var itemBoundToRefCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[ItemBoundToRefID]bool) },
-}
-var itemBoundToRefSlicePool = sync.Pool{
-	New: func() interface{} { return make([]ItemBoundToRefID, 10) },
 }
 
 func deduplicateItemBoundToRefIDs(a []ItemBoundToRefID, b []ItemBoundToRefID) []ItemBoundToRefID {
@@ -297,7 +214,7 @@ func deduplicateItemBoundToRefIDs(a []ItemBoundToRefID, b []ItemBoundToRefID) []
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := itemBoundToRefSlicePool.Get().([]ItemBoundToRefID)[:0]
+	deduped := itemBoundToRefIDSlicePool.Get().([]ItemBoundToRefID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -310,16 +227,8 @@ func deduplicateItemBoundToRefIDs(a []ItemBoundToRefID, b []ItemBoundToRefID) []
 	}
 
 	itemBoundToRefCheckPool.Put(check)
-	itemBoundToRefSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var playerGuildMemberRefCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[PlayerGuildMemberRefID]bool) },
-}
-var playerGuildMemberRefSlicePool = sync.Pool{
-	New: func() interface{} { return make([]PlayerGuildMemberRefID, 10) },
 }
 
 func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGuildMemberRefID) []PlayerGuildMemberRefID {
@@ -328,7 +237,7 @@ func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGu
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := playerGuildMemberRefSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
+	deduped := playerGuildMemberRefIDSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -341,16 +250,8 @@ func deduplicatePlayerGuildMemberRefIDs(a []PlayerGuildMemberRefID, b []PlayerGu
 	}
 
 	playerGuildMemberRefCheckPool.Put(check)
-	playerGuildMemberRefSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var playerEquipmentSetRefCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[PlayerEquipmentSetRefID]bool) },
-}
-var playerEquipmentSetRefSlicePool = sync.Pool{
-	New: func() interface{} { return make([]PlayerEquipmentSetRefID, 10) },
 }
 
 func deduplicatePlayerEquipmentSetRefIDs(a []PlayerEquipmentSetRefID, b []PlayerEquipmentSetRefID) []PlayerEquipmentSetRefID {
@@ -359,7 +260,7 @@ func deduplicatePlayerEquipmentSetRefIDs(a []PlayerEquipmentSetRefID, b []Player
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := playerEquipmentSetRefSlicePool.Get().([]PlayerEquipmentSetRefID)[:0]
+	deduped := playerEquipmentSetRefIDSlicePool.Get().([]PlayerEquipmentSetRefID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -372,16 +273,8 @@ func deduplicatePlayerEquipmentSetRefIDs(a []PlayerEquipmentSetRefID, b []Player
 	}
 
 	playerEquipmentSetRefCheckPool.Put(check)
-	playerEquipmentSetRefSlicePool.Put(deduped)
 
 	return deduped
-}
-
-var equipmentSetEquipmentRefCheckPool = sync.Pool{
-	New: func() interface{} { return make(map[EquipmentSetEquipmentRefID]bool) },
-}
-var equipmentSetEquipmentRefSlicePool = sync.Pool{
-	New: func() interface{} { return make([]EquipmentSetEquipmentRefID, 10) },
 }
 
 func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []EquipmentSetEquipmentRefID) []EquipmentSetEquipmentRefID {
@@ -390,7 +283,7 @@ func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []
 	for k := range check {
 		delete(check, k)
 	}
-	deduped := equipmentSetEquipmentRefSlicePool.Get().([]EquipmentSetEquipmentRefID)[:0]
+	deduped := equipmentSetEquipmentRefIDSlicePool.Get().([]EquipmentSetEquipmentRefID)[:0]
 	for _, val := range a {
 		check[val] = true
 	}
@@ -403,228 +296,227 @@ func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []
 	}
 
 	equipmentSetEquipmentRefCheckPool.Put(check)
-	equipmentSetEquipmentRefSlicePool.Put(deduped)
 
 	return deduped
 }
 
 func (engine Engine) allEquipmentSetIDs() []EquipmentSetID {
-	stateEquipmentSetIDs := equipmentSetSlicePool.Get().([]EquipmentSetID)[:0]
+	stateEquipmentSetIDs := equipmentSetIDSlicePool.Get().([]EquipmentSetID)[:0]
 	for equipmentSetID := range engine.State.EquipmentSet {
 		stateEquipmentSetIDs = append(stateEquipmentSetIDs, equipmentSetID)
 	}
-	patchEquipmentSetIDs := equipmentSetSlicePool.Get().([]EquipmentSetID)[:0]
+	patchEquipmentSetIDs := equipmentSetIDSlicePool.Get().([]EquipmentSetID)[:0]
 	for equipmentSetID := range engine.Patch.EquipmentSet {
 		patchEquipmentSetIDs = append(patchEquipmentSetIDs, equipmentSetID)
 	}
 	dedupedIDs := deduplicateEquipmentSetIDs(stateEquipmentSetIDs, patchEquipmentSetIDs)
 
-	equipmentSetSlicePool.Put(stateEquipmentSetIDs)
-	equipmentSetSlicePool.Put(patchEquipmentSetIDs)
+	equipmentSetIDSlicePool.Put(stateEquipmentSetIDs)
+	equipmentSetIDSlicePool.Put(patchEquipmentSetIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allGearScoreIDs() []GearScoreID {
-	stateGearScoreIDs := gearScoreSlicePool.Get().([]GearScoreID)[:0]
+	stateGearScoreIDs := gearScoreIDSlicePool.Get().([]GearScoreID)[:0]
 	for gearScoreID := range engine.State.GearScore {
 		stateGearScoreIDs = append(stateGearScoreIDs, gearScoreID)
 	}
-	patchGearScoreIDs := gearScoreSlicePool.Get().([]GearScoreID)[:0]
+	patchGearScoreIDs := gearScoreIDSlicePool.Get().([]GearScoreID)[:0]
 	for gearScoreID := range engine.Patch.GearScore {
 		patchGearScoreIDs = append(patchGearScoreIDs, gearScoreID)
 	}
 	dedupedIDs := deduplicateGearScoreIDs(stateGearScoreIDs, patchGearScoreIDs)
 
-	gearScoreSlicePool.Put(stateGearScoreIDs)
-	gearScoreSlicePool.Put(patchGearScoreIDs)
+	gearScoreIDSlicePool.Put(stateGearScoreIDs)
+	gearScoreIDSlicePool.Put(patchGearScoreIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allItemIDs() []ItemID {
-	stateItemIDs := itemSlicePool.Get().([]ItemID)[:0]
+	stateItemIDs := itemIDSlicePool.Get().([]ItemID)[:0]
 	for itemID := range engine.State.Item {
 		stateItemIDs = append(stateItemIDs, itemID)
 	}
-	patchItemIDs := itemSlicePool.Get().([]ItemID)[:0]
+	patchItemIDs := itemIDSlicePool.Get().([]ItemID)[:0]
 	for itemID := range engine.Patch.Item {
 		patchItemIDs = append(patchItemIDs, itemID)
 	}
 	dedupedIDs := deduplicateItemIDs(stateItemIDs, patchItemIDs)
 
-	itemSlicePool.Put(stateItemIDs)
-	itemSlicePool.Put(patchItemIDs)
+	itemIDSlicePool.Put(stateItemIDs)
+	itemIDSlicePool.Put(patchItemIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allPositionIDs() []PositionID {
-	statePositionIDs := positionSlicePool.Get().([]PositionID)[:0]
+	statePositionIDs := positionIDSlicePool.Get().([]PositionID)[:0]
 	for positionID := range engine.State.Position {
 		statePositionIDs = append(statePositionIDs, positionID)
 	}
-	patchPositionIDs := positionSlicePool.Get().([]PositionID)[:0]
+	patchPositionIDs := positionIDSlicePool.Get().([]PositionID)[:0]
 	for positionID := range engine.Patch.Position {
 		patchPositionIDs = append(patchPositionIDs, positionID)
 	}
 	dedupedIDs := deduplicatePositionIDs(statePositionIDs, patchPositionIDs)
 
-	positionSlicePool.Put(statePositionIDs)
-	positionSlicePool.Put(patchPositionIDs)
+	positionIDSlicePool.Put(statePositionIDs)
+	positionIDSlicePool.Put(patchPositionIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allZoneIDs() []ZoneID {
-	stateZoneIDs := zoneSlicePool.Get().([]ZoneID)[:0]
+	stateZoneIDs := zoneIDSlicePool.Get().([]ZoneID)[:0]
 	for zoneID := range engine.State.Zone {
 		stateZoneIDs = append(stateZoneIDs, zoneID)
 	}
-	patchZoneIDs := zoneSlicePool.Get().([]ZoneID)[:0]
+	patchZoneIDs := zoneIDSlicePool.Get().([]ZoneID)[:0]
 	for zoneID := range engine.Patch.Zone {
 		patchZoneIDs = append(patchZoneIDs, zoneID)
 	}
 	dedupedIDs := deduplicateZoneIDs(stateZoneIDs, patchZoneIDs)
 
-	zoneSlicePool.Put(stateZoneIDs)
-	zoneSlicePool.Put(patchZoneIDs)
+	zoneIDSlicePool.Put(stateZoneIDs)
+	zoneIDSlicePool.Put(patchZoneIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allZoneItemIDs() []ZoneItemID {
-	stateZoneItemIDs := zoneItemSlicePool.Get().([]ZoneItemID)[:0]
+	stateZoneItemIDs := zoneItemIDSlicePool.Get().([]ZoneItemID)[:0]
 	for zoneItemID := range engine.State.ZoneItem {
 		stateZoneItemIDs = append(stateZoneItemIDs, zoneItemID)
 	}
-	patchZoneItemIDs := zoneItemSlicePool.Get().([]ZoneItemID)[:0]
+	patchZoneItemIDs := zoneItemIDSlicePool.Get().([]ZoneItemID)[:0]
 	for zoneItemID := range engine.Patch.ZoneItem {
 		patchZoneItemIDs = append(patchZoneItemIDs, zoneItemID)
 	}
 	dedupedIDs := deduplicateZoneItemIDs(stateZoneItemIDs, patchZoneItemIDs)
 
-	zoneItemSlicePool.Put(stateZoneItemIDs)
-	zoneItemSlicePool.Put(patchZoneItemIDs)
+	zoneItemIDSlicePool.Put(stateZoneItemIDs)
+	zoneItemIDSlicePool.Put(patchZoneItemIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allPlayerIDs() []PlayerID {
-	statePlayerIDs := playerSlicePool.Get().([]PlayerID)[:0]
+	statePlayerIDs := playerIDSlicePool.Get().([]PlayerID)[:0]
 	for playerID := range engine.State.Player {
 		statePlayerIDs = append(statePlayerIDs, playerID)
 	}
-	patchPlayerIDs := playerSlicePool.Get().([]PlayerID)[:0]
+	patchPlayerIDs := playerIDSlicePool.Get().([]PlayerID)[:0]
 	for playerID := range engine.Patch.Player {
 		patchPlayerIDs = append(patchPlayerIDs, playerID)
 	}
 	dedupedIDs := deduplicatePlayerIDs(statePlayerIDs, patchPlayerIDs)
 
-	playerSlicePool.Put(statePlayerIDs)
-	playerSlicePool.Put(patchPlayerIDs)
+	playerIDSlicePool.Put(statePlayerIDs)
+	playerIDSlicePool.Put(patchPlayerIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allPlayerTargetedByRefIDs() []PlayerTargetedByRefID {
-	statePlayerTargetedByRefIDs := playerTargetedByRefSlicePool.Get().([]PlayerTargetedByRefID)[:0]
+	statePlayerTargetedByRefIDs := playerTargetedByRefIDSlicePool.Get().([]PlayerTargetedByRefID)[:0]
 	for playerTargetedByRefID := range engine.State.PlayerTargetedByRef {
 		statePlayerTargetedByRefIDs = append(statePlayerTargetedByRefIDs, playerTargetedByRefID)
 	}
-	patchPlayerTargetedByRefIDs := playerTargetedByRefSlicePool.Get().([]PlayerTargetedByRefID)[:0]
+	patchPlayerTargetedByRefIDs := playerTargetedByRefIDSlicePool.Get().([]PlayerTargetedByRefID)[:0]
 	for playerTargetedByRefID := range engine.Patch.PlayerTargetedByRef {
 		patchPlayerTargetedByRefIDs = append(patchPlayerTargetedByRefIDs, playerTargetedByRefID)
 	}
 	dedupedIDs := deduplicatePlayerTargetedByRefIDs(statePlayerTargetedByRefIDs, patchPlayerTargetedByRefIDs)
 
-	playerTargetedByRefSlicePool.Put(statePlayerTargetedByRefIDs)
-	playerTargetedByRefSlicePool.Put(patchPlayerTargetedByRefIDs)
+	playerTargetedByRefIDSlicePool.Put(statePlayerTargetedByRefIDs)
+	playerTargetedByRefIDSlicePool.Put(patchPlayerTargetedByRefIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allPlayerTargetRefIDs() []PlayerTargetRefID {
-	statePlayerTargetRefIDs := playerTargetRefSlicePool.Get().([]PlayerTargetRefID)[:0]
+	statePlayerTargetRefIDs := playerTargetRefIDSlicePool.Get().([]PlayerTargetRefID)[:0]
 	for playerTargetRefID := range engine.State.PlayerTargetRef {
 		statePlayerTargetRefIDs = append(statePlayerTargetRefIDs, playerTargetRefID)
 	}
-	patchPlayerTargetRefIDs := playerTargetRefSlicePool.Get().([]PlayerTargetRefID)[:0]
+	patchPlayerTargetRefIDs := playerTargetRefIDSlicePool.Get().([]PlayerTargetRefID)[:0]
 	for playerTargetRefID := range engine.Patch.PlayerTargetRef {
 		patchPlayerTargetRefIDs = append(patchPlayerTargetRefIDs, playerTargetRefID)
 	}
 	dedupedIDs := deduplicatePlayerTargetRefIDs(statePlayerTargetRefIDs, patchPlayerTargetRefIDs)
 
-	playerTargetRefSlicePool.Put(statePlayerTargetRefIDs)
-	playerTargetRefSlicePool.Put(patchPlayerTargetRefIDs)
+	playerTargetRefIDSlicePool.Put(statePlayerTargetRefIDs)
+	playerTargetRefIDSlicePool.Put(patchPlayerTargetRefIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
-	stateItemBoundToRefIDs := itemBoundToRefSlicePool.Get().([]ItemBoundToRefID)[:0]
+	stateItemBoundToRefIDs := itemBoundToRefIDSlicePool.Get().([]ItemBoundToRefID)[:0]
 	for itemBoundToRefID := range engine.State.ItemBoundToRef {
 		stateItemBoundToRefIDs = append(stateItemBoundToRefIDs, itemBoundToRefID)
 	}
-	patchItemBoundToRefIDs := itemBoundToRefSlicePool.Get().([]ItemBoundToRefID)[:0]
+	patchItemBoundToRefIDs := itemBoundToRefIDSlicePool.Get().([]ItemBoundToRefID)[:0]
 	for itemBoundToRefID := range engine.Patch.ItemBoundToRef {
 		patchItemBoundToRefIDs = append(patchItemBoundToRefIDs, itemBoundToRefID)
 	}
 	dedupedIDs := deduplicateItemBoundToRefIDs(stateItemBoundToRefIDs, patchItemBoundToRefIDs)
 
-	itemBoundToRefSlicePool.Put(stateItemBoundToRefIDs)
-	itemBoundToRefSlicePool.Put(patchItemBoundToRefIDs)
+	itemBoundToRefIDSlicePool.Put(stateItemBoundToRefIDs)
+	itemBoundToRefIDSlicePool.Put(patchItemBoundToRefIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
-	statePlayerGuildMemberRefIDs := playerGuildMemberRefSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
+	statePlayerGuildMemberRefIDs := playerGuildMemberRefIDSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
 	for playerGuildMemberRefID := range engine.State.PlayerGuildMemberRef {
 		statePlayerGuildMemberRefIDs = append(statePlayerGuildMemberRefIDs, playerGuildMemberRefID)
 	}
-	patchPlayerGuildMemberRefIDs := playerGuildMemberRefSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
+	patchPlayerGuildMemberRefIDs := playerGuildMemberRefIDSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
 	for playerGuildMemberRefID := range engine.Patch.PlayerGuildMemberRef {
 		patchPlayerGuildMemberRefIDs = append(patchPlayerGuildMemberRefIDs, playerGuildMemberRefID)
 	}
 	dedupedIDs := deduplicatePlayerGuildMemberRefIDs(statePlayerGuildMemberRefIDs, patchPlayerGuildMemberRefIDs)
 
-	playerGuildMemberRefSlicePool.Put(statePlayerGuildMemberRefIDs)
-	playerGuildMemberRefSlicePool.Put(patchPlayerGuildMemberRefIDs)
+	playerGuildMemberRefIDSlicePool.Put(statePlayerGuildMemberRefIDs)
+	playerGuildMemberRefIDSlicePool.Put(patchPlayerGuildMemberRefIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allPlayerEquipmentSetRefIDs() []PlayerEquipmentSetRefID {
-	statePlayerEquipmentSetRefIDs := playerEquipmentSetRefSlicePool.Get().([]PlayerEquipmentSetRefID)[:0]
+	statePlayerEquipmentSetRefIDs := playerEquipmentSetRefIDSlicePool.Get().([]PlayerEquipmentSetRefID)[:0]
 	for playerEquipmentSetRefID := range engine.State.PlayerEquipmentSetRef {
 		statePlayerEquipmentSetRefIDs = append(statePlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
 	}
-	patchPlayerEquipmentSetRefIDs := playerEquipmentSetRefSlicePool.Get().([]PlayerEquipmentSetRefID)[:0]
+	patchPlayerEquipmentSetRefIDs := playerEquipmentSetRefIDSlicePool.Get().([]PlayerEquipmentSetRefID)[:0]
 	for playerEquipmentSetRefID := range engine.Patch.PlayerEquipmentSetRef {
 		patchPlayerEquipmentSetRefIDs = append(patchPlayerEquipmentSetRefIDs, playerEquipmentSetRefID)
 	}
 	dedupedIDs := deduplicatePlayerEquipmentSetRefIDs(statePlayerEquipmentSetRefIDs, patchPlayerEquipmentSetRefIDs)
 
-	playerEquipmentSetRefSlicePool.Put(statePlayerEquipmentSetRefIDs)
-	playerEquipmentSetRefSlicePool.Put(patchPlayerEquipmentSetRefIDs)
+	playerEquipmentSetRefIDSlicePool.Put(statePlayerEquipmentSetRefIDs)
+	playerEquipmentSetRefIDSlicePool.Put(patchPlayerEquipmentSetRefIDs)
 
 	return dedupedIDs
 }
 
 func (engine Engine) allEquipmentSetEquipmentRefIDs() []EquipmentSetEquipmentRefID {
-	stateEquipmentSetEquipmentRefIDs := equipmentSetEquipmentRefSlicePool.Get().([]EquipmentSetEquipmentRefID)[:0]
+	stateEquipmentSetEquipmentRefIDs := equipmentSetEquipmentRefIDSlicePool.Get().([]EquipmentSetEquipmentRefID)[:0]
 	for equipmentSetEquipmentRefID := range engine.State.EquipmentSetEquipmentRef {
 		stateEquipmentSetEquipmentRefIDs = append(stateEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
 	}
-	patchEquipmentSetEquipmentRefIDs := equipmentSetEquipmentRefSlicePool.Get().([]EquipmentSetEquipmentRefID)[:0]
+	patchEquipmentSetEquipmentRefIDs := equipmentSetEquipmentRefIDSlicePool.Get().([]EquipmentSetEquipmentRefID)[:0]
 	for equipmentSetEquipmentRefID := range engine.Patch.EquipmentSetEquipmentRef {
 		patchEquipmentSetEquipmentRefIDs = append(patchEquipmentSetEquipmentRefIDs, equipmentSetEquipmentRefID)
 	}
 	dedupedIDs := deduplicateEquipmentSetEquipmentRefIDs(stateEquipmentSetEquipmentRefIDs, patchEquipmentSetEquipmentRefIDs)
 
-	equipmentSetEquipmentRefSlicePool.Put(stateEquipmentSetEquipmentRefIDs)
-	equipmentSetEquipmentRefSlicePool.Put(patchEquipmentSetEquipmentRefIDs)
+	equipmentSetEquipmentRefIDSlicePool.Put(stateEquipmentSetEquipmentRefIDs)
+	equipmentSetEquipmentRefIDSlicePool.Put(patchEquipmentSetEquipmentRefIDs)
 
 	return dedupedIDs
 }
