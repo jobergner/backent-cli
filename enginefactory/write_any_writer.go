@@ -93,3 +93,32 @@ func (d anyDeleteChildWriter) reassignAnyContainer() *Statement {
 func (d anyDeleteChildWriter) deleteChild() *Statement {
 	return Id("any").Dot("engine").Dot("delete" + Title(d.v.Name)).Call(Id("any").Dot(Title(d.v.Name)))
 }
+
+type anyRefWriter struct {
+	f ast.Field
+	v *ast.ConfigType
+}
+
+func (a anyRefWriter) typeName() string {
+	return anyNameByField(a.f)
+}
+
+func (a anyRefWriter) wrapperName() string {
+	return a.typeName() + "Ref"
+}
+
+func (a anyRefWriter) typeRefName() string {
+	return a.typeName() + "Wrapper"
+}
+
+func (a anyRefWriter) receiverParams() *Statement {
+	return Id("_any").Id(a.typeName())
+}
+
+func (a anyRefWriter) elementKind() *Statement {
+	return Id("_any").Dot(a.wrapperName()).Dot("Kind").Call()
+}
+
+func (a anyRefWriter) child() *Statement {
+	return Id("_any").Dot(a.wrapperName()).Dot(Title(a.v.Name)).Call()
+}

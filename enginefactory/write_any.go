@@ -68,3 +68,12 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 	decls.Render(s.buf)
 	return s
 }
+
+func (s *EngineFactory) writeAnyRefs() *EngineFactory {
+	decls := NewDeclSet()
+	s.config.RangeAnyFields(func(field ast.Field) {
+	})
+
+	decls.Render(s.buf)
+	return s
+}
