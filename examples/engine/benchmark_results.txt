@@ -49,3 +49,16 @@ BenchmarkUpdateState-12                 	    1858	    543258 ns/op	  192473 B/op
 BenchmarkElementModificaton-12          	     350	   3136361 ns/op	  208985 B/op	     751 allocs/op
 PASS
 ok  	github.com/Java-Jonas/bar-cli/examples/engine	8.050s
+
+# fix usage of putting slices of IDs
+Di 22. Jun 20:57:47 CEST 2021
+goos: linux
+goarch: amd64
+pkg: github.com/Java-Jonas/bar-cli/examples/engine
+BenchmarkAssembleTreeForceInclude-12    	     264	   4307761 ns/op	 1183230 B/op	   14788 allocs/op
+BenchmarkAssembleTree-12                	       1	1038205601 ns/op	274252776 B/op	 2808590 allocs/op
+BenchmarkEngine-12                      	       1	1234194028 ns/op	342681768 B/op	 3391739 allocs/op
+BenchmarkUpdateState-12                 	    2192	    542066 ns/op	  192449 B/op	     488 allocs/op
+BenchmarkElementModificaton-12          	     357	   3266508 ns/op	  203289 B/op	     676 allocs/op
+PASS
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.347s
