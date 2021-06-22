@@ -33,6 +33,14 @@ func (a anySetterWriter) wrapperReceiverParams() *Statement {
 	return Id("_any").Id(anyNameByField(a.f))
 }
 
+func (a anySetterWriter) isAlreadyRequestedElement() *Statement {
+	return Id("_any").Dot(anyNameByField(a.f)).Dot("ElementKind").Op("==").Id("ElementKind" + Title(a.v.Name))
+}
+
+func (a anySetterWriter) currentElement() *Statement {
+	return Id("_any").Dot(Title(a.v.Name)).Call()
+}
+
 func (a anySetterWriter) createChild() *Statement {
 	return Id(a.v.Name).Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot("create" + Title(a.v.Name)).Call(True())
 }
