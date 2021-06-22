@@ -380,9 +380,8 @@ setter methods.
 
 
 ### TODO
-- any type Setters need to return existing type if the requested type is already in place
-- new realistic benchmark test for engine (with assembling)
 - improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
+  - release tree func (release slices, maps, and the pointers themselves)
 
 - is `build` the right command for validating? (compile?)
 
