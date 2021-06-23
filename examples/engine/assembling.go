@@ -18,8 +18,11 @@ func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursio
 		gearScoreData = engine.State.GearScore[gearScoreID]
 	}
 
-	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok && config.forceInclude {
+	if cachedGearScore, ok := engine.forceIncludeAssembleCache.gearScore[gearScoreData.ID]; ok && config.forceInclude {
 		return cachedGearScore.gearScore, true, cachedGearScore.hasUpdatedDownstream
+	}
+	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok && !config.forceInclude {
+		return cachedGearScore.gearScore, cachedGearScore.hasUpdatedDownstream || config.forceInclude, cachedGearScore.hasUpdatedDownstream
 	}
 
 	var gearScore GearScore
@@ -30,6 +33,8 @@ func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursio
 	gearScore.Score = gearScoreData.Score
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdatedDownstream: hasUpdated, gearScore: gearScore}
+	} else {
 		engine.assembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdatedDownstream: hasUpdated, gearScore: gearScore}
 	}
 
@@ -50,8 +55,11 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 		positionData = engine.State.Position[positionID]
 	}
 
-	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok && config.forceInclude {
+	if cachedPosition, ok := engine.forceIncludeAssembleCache.position[positionData.ID]; ok && config.forceInclude {
 		return cachedPosition.position, true, cachedPosition.hasUpdatedDownstream
+	}
+	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok && !config.forceInclude {
+		return cachedPosition.position, cachedPosition.hasUpdatedDownstream || config.forceInclude, cachedPosition.hasUpdatedDownstream
 	}
 
 	var position Position
@@ -62,6 +70,8 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 	position.Y = positionData.Y
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.position[position.ID] = positionCacheElement{hasUpdatedDownstream: hasUpdated, position: position}
+	} else {
 		engine.assembleCache.position[position.ID] = positionCacheElement{hasUpdatedDownstream: hasUpdated, position: position}
 	}
 
@@ -82,8 +92,11 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
 	}
 
-	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok && config.forceInclude {
+	if cachedEquipmentSet, ok := engine.forceIncludeAssembleCache.equipmentSet[equipmentSetData.ID]; ok && config.forceInclude {
 		return cachedEquipmentSet.equipmentSet, true, cachedEquipmentSet.hasUpdatedDownstream
+	}
+	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok && !config.forceInclude {
+		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdatedDownstream || config.forceInclude, cachedEquipmentSet.hasUpdatedDownstream
 	}
 
 	var equipmentSet EquipmentSet
@@ -105,6 +118,8 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 	equipmentSet.Name = equipmentSetData.Name
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdatedDownstream: hasUpdated, equipmentSet: equipmentSet}
+	} else {
 		engine.assembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdatedDownstream: hasUpdated, equipmentSet: equipmentSet}
 	}
 
@@ -125,8 +140,11 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		itemData = engine.State.Item[itemID]
 	}
 
-	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok && config.forceInclude {
+	if cachedItem, ok := engine.forceIncludeAssembleCache.item[itemData.ID]; ok && config.forceInclude {
 		return cachedItem.item, true, cachedItem.hasUpdatedDownstream
+	}
+	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok && !config.forceInclude {
+		return cachedItem.item, cachedItem.hasUpdatedDownstream || config.forceInclude, cachedItem.hasUpdatedDownstream
 	}
 
 	var item Item
@@ -169,6 +187,8 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 	item.Name = itemData.Name
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.item[item.ID] = itemCacheElement{hasUpdatedDownstream: hasUpdated, item: item}
+	} else {
 		engine.assembleCache.item[item.ID] = itemCacheElement{hasUpdatedDownstream: hasUpdated, item: item}
 	}
 
@@ -189,8 +209,11 @@ func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCh
 		zoneItemData = engine.State.ZoneItem[zoneItemID]
 	}
 
-	if cachedZonezoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok && config.forceInclude {
+	if cachedZonezoneItem, ok := engine.forceIncludeAssembleCache.zoneItem[zoneItemData.ID]; ok && config.forceInclude {
 		return cachedZonezoneItem.zoneItem, true, cachedZonezoneItem.hasUpdatedDownstream
+	}
+	if cachedZonezoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok && !config.forceInclude {
+		return cachedZonezoneItem.zoneItem, cachedZonezoneItem.hasUpdatedDownstream || config.forceInclude, cachedZonezoneItem.hasUpdatedDownstream
 	}
 
 	var zoneItem ZoneItem
@@ -213,6 +236,8 @@ func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCh
 	zoneItem.OperationKind = zoneItemData.OperationKind
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdatedDownstream: hasUpdated, zoneItem: zoneItem}
+	} else {
 		engine.assembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdatedDownstream: hasUpdated, zoneItem: zoneItem}
 	}
 
@@ -233,8 +258,11 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		playerData = engine.State.Player[playerID]
 	}
 
-	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok && config.forceInclude {
+	if cachedPlayer, ok := engine.forceIncludeAssembleCache.player[playerData.ID]; ok && config.forceInclude {
 		return cachedPlayer.player, true, cachedPlayer.hasUpdatedDownstream
+	}
+	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok && !config.forceInclude {
+		return cachedPlayer.player, cachedPlayer.hasUpdatedDownstream || config.forceInclude, cachedPlayer.hasUpdatedDownstream
 	}
 
 	var player Player
@@ -312,6 +340,8 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 	player.OperationKind = playerData.OperationKind
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.player[player.ID] = playerCacheElement{hasUpdatedDownstream: hasUpdated, player: player}
+	} else {
 		engine.assembleCache.player[player.ID] = playerCacheElement{hasUpdatedDownstream: hasUpdated, player: player}
 	}
 
@@ -332,8 +362,11 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 		zoneData = engine.State.Zone[zoneID]
 	}
 
-	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok && config.forceInclude {
+	if cachedZone, ok := engine.forceIncludeAssembleCache.zone[zoneData.ID]; ok && config.forceInclude {
 		return cachedZone.zone, true, cachedZone.hasUpdatedDownstream
+	}
+	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok && !config.forceInclude {
+		return cachedZone.zone, cachedZone.hasUpdatedDownstream || config.forceInclude, cachedZone.hasUpdatedDownstream
 	}
 
 	var zone Zone
@@ -405,6 +438,8 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 	zone.Tags = zoneData.Tags
 
 	if config.forceInclude {
+		engine.forceIncludeAssembleCache.zone[zone.ID] = zoneCacheElement{hasUpdatedDownstream: hasUpdated, zone: zone}
+	} else {
 		engine.assembleCache.zone[zone.ID] = zoneCacheElement{hasUpdatedDownstream: hasUpdated, zone: zone}
 	}
 
@@ -910,6 +945,28 @@ func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
 	}
 	for key := range engine.assembleCache.zoneItem {
 		delete(engine.assembleCache.zoneItem, key)
+	}
+
+	for key := range engine.forceIncludeAssembleCache.equipmentSet {
+		delete(engine.forceIncludeAssembleCache.equipmentSet, key)
+	}
+	for key := range engine.forceIncludeAssembleCache.gearScore {
+		delete(engine.forceIncludeAssembleCache.gearScore, key)
+	}
+	for key := range engine.forceIncludeAssembleCache.item {
+		delete(engine.forceIncludeAssembleCache.item, key)
+	}
+	for key := range engine.forceIncludeAssembleCache.player {
+		delete(engine.forceIncludeAssembleCache.player, key)
+	}
+	for key := range engine.forceIncludeAssembleCache.position {
+		delete(engine.forceIncludeAssembleCache.position, key)
+	}
+	for key := range engine.forceIncludeAssembleCache.zone {
+		delete(engine.forceIncludeAssembleCache.zone, key)
+	}
+	for key := range engine.forceIncludeAssembleCache.zoneItem {
+		delete(engine.forceIncludeAssembleCache.zoneItem, key)
 	}
 
 	for key := range engine.Tree.EquipmentSet {
