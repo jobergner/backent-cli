@@ -94,3 +94,51 @@ var equipmentSetEquipmentRefCheckPool = sync.Pool{
 var equipmentSetEquipmentRefIDSlicePool = sync.Pool{
 	New: func() interface{} { return make([]EquipmentSetEquipmentRefID, 0) },
 }
+
+//
+
+var gearScorePool = sync.Pool{
+	New: func() interface{} { return new(GearScore) },
+}
+var positionPool = sync.Pool{
+	New: func() interface{} { return new(Position) },
+}
+var anyOfPlayer_ZoneItemReferencePool = sync.Pool{
+	New: func() interface{} { return new(AnyOfPlayer_ZoneItemReference) },
+}
+var playerEquipmentSetsMapPool = sync.Pool{
+	New: func() interface{} { return make(map[EquipmentSetID]EquipmentSetReference) },
+}
+var playerGuildMembersMapPool = sync.Pool{
+	New: func() interface{} { return make(map[PlayerID]PlayerReference) },
+}
+var playerItemsMapPool = sync.Pool{
+	New: func() interface{} { return make(map[ItemID]Item) },
+}
+var playerTargetedByMapPool = sync.Pool{
+	New: func() interface{} { return make(map[int]AnyOfPlayer_ZoneItemReference) },
+}
+var zonePlayersMapPool = sync.Pool{
+	New: func() interface{} { return make(map[PlayerID]Player) },
+}
+var playerReferencePool = sync.Pool{
+	New: func() interface{} { return new(PlayerReference) },
+}
+var playerPool = sync.Pool{
+	New: func() interface{} { return new(Player) },
+}
+
+//
+var recursionCheckPool = sync.Pool{
+	New: func() interface{} {
+		return &recursionCheck{
+			equipmentSet: make(map[EquipmentSetID]bool),
+			gearScore:    make(map[GearScoreID]bool),
+			item:         make(map[ItemID]bool),
+			player:       make(map[PlayerID]bool),
+			position:     make(map[PositionID]bool),
+			zone:         make(map[ZoneID]bool),
+			zoneItem:     make(map[ZoneItemID]bool),
+		}
+	},
+}

@@ -184,7 +184,7 @@ func BenchmarkAssembleTreeForceInclude(b *testing.B) {
 	}
 }
 
-func BenchmarkAssembleTree(b *testing.B) {
+func BenchmarkAssembleTreex(b *testing.B) {
 	engine := newEngine()
 	for i := 0; i < benchTestNumberOfZones; i++ {
 		setUpRealisticZoneForBenchmarkExample(engine)
@@ -203,6 +203,7 @@ func BenchmarkAssembleTree(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = engine.assembleTree(false)
+		engine.recycleTree()
 	}
 }
 

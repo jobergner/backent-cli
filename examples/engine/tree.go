@@ -175,15 +175,31 @@ type recursionCheck struct {
 }
 
 func newRecursionCheck() *recursionCheck {
-	return &recursionCheck{
-		equipmentSet: make(map[EquipmentSetID]bool),
-		gearScore:    make(map[GearScoreID]bool),
-		item:         make(map[ItemID]bool),
-		player:       make(map[PlayerID]bool),
-		position:     make(map[PositionID]bool),
-		zone:         make(map[ZoneID]bool),
-		zoneItem:     make(map[ZoneItemID]bool),
+	check := recursionCheckPool.Get().(*recursionCheck)
+
+	for key := range check.equipmentSet {
+		delete(check.equipmentSet, key)
 	}
+	for key := range check.gearScore {
+		delete(check.gearScore, key)
+	}
+	for key := range check.item {
+		delete(check.item, key)
+	}
+	for key := range check.player {
+		delete(check.player, key)
+	}
+	for key := range check.position {
+		delete(check.position, key)
+	}
+	for key := range check.zone {
+		delete(check.zone, key)
+	}
+	for key := range check.zoneItem {
+		delete(check.zoneItem, key)
+	}
+
+	return check
 }
 
 type assembleCache struct {
