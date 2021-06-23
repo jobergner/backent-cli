@@ -75,3 +75,5 @@ BenchmarkUpdateState-12                 	    1914	    536090 ns/op	  192996 B/op
 BenchmarkElementModificaton-12          	     350	   3280246 ns/op	  203514 B/op	     667 allocs/op
 PASS
 ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.537s
+
+# remove BenchmarkElementModificaton as it's ns/op dependet on length of bench duration. Its actual performance is better represented in BenchmarkUpdateState 
