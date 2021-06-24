@@ -122,10 +122,10 @@ func (p path) origin() path {
 	return newPath
 }
 
-func (p path) index(i int) path {
+func (p path) id(id int) path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
-	newPath = append(newPath, i)
+	newPath = append(newPath, id)
 	return newPath
 }
 
