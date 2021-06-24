@@ -12,7 +12,6 @@ type Engine struct {
 	State                     State
 	Patch                     State
 	Tree                      Tree
-	PathTrack                 pathTrack
 	forceIncludeAssembleCache assembleCache
 	assembleCache             assembleCache
 	IDgen                     int
@@ -22,7 +21,6 @@ func newEngine() *Engine {
 	return &Engine{
 		IDgen:                     1,
 		Patch:                     newState(),
-		PathTrack:                 newPathTrack(),
 		State:                     newState(),
 		Tree:                      newTree(),
 		forceIncludeAssembleCache: newAssembleCache(),

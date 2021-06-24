@@ -380,6 +380,7 @@ setter methods.
 
 
 ### TODO
+- SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
 - improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
   - release tree func (release slices, maps, and the pointers themselves)
 

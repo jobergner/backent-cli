@@ -1,96 +1,146 @@
 package state
 
-func (engine *Engine) CreateGearScore() gearScore {
-	return engine.createGearScore(false)
+func (engine *Engine) CreateEquipmentSet() equipmentSet {
+	return engine.createEquipmentSet(newPath(equipmentSetIdentifier), true)
 }
 
-func (engine *Engine) createGearScore(hasParent bool) gearScore {
+func (engine *Engine) createEquipmentSet(p path, extendWithID bool) equipmentSet {
+	var element equipmentSetCore
+	element.engine = engine
+	element.ID = EquipmentSetID(engine.GenerateID())
+	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
+	engine.Patch.EquipmentSet[element.ID] = element
+	return equipmentSet{equipmentSet: element}
+}
+
+func (engine *Engine) CreateGearScore() gearScore {
+	return engine.createGearScore(newPath(gearScoreIdentifier), true)
+}
+
+func (engine *Engine) createGearScore(p path, extendWithID bool) gearScore {
 	var element gearScoreCore
 	element.engine = engine
 	element.ID = GearScoreID(engine.GenerateID())
-	element.HasParent = hasParent
 	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
 	engine.Patch.GearScore[element.ID] = element
 	return gearScore{gearScore: element}
 }
 
 func (engine *Engine) CreatePosition() position {
-	return engine.createPosition(false)
+	return engine.createPosition(newPath(positionIdentifier), true)
 }
 
-func (engine *Engine) createPosition(hasParent bool) position {
+func (engine *Engine) createPosition(p path, extendWithID bool) position {
 	var element positionCore
 	element.engine = engine
 	element.ID = PositionID(engine.GenerateID())
-	element.HasParent = hasParent
 	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
 	engine.Patch.Position[element.ID] = element
 	return position{position: element}
 }
 
 func (engine *Engine) CreateItem() item {
-	return engine.createItem(false)
+	return engine.createItem(newPath(itemIdentifier), true)
 }
 
-func (engine *Engine) createItem(hasParent bool) item {
+func (engine *Engine) createItem(p path, extendWithID bool) item {
 	var element itemCore
 	element.engine = engine
 	element.ID = ItemID(engine.GenerateID())
-	element.HasParent = hasParent
-	elementGearScore := engine.createGearScore(true)
+	elementGearScore := engine.createGearScore(p.gearScore(), false)
 	element.GearScore = elementGearScore.gearScore.ID
-	elementOrigin := engine.createAnyOfPlayer_Position(true)
+	elementOrigin := engine.createAnyOfPlayer_Position(true, p.origin())
 	element.Origin = elementOrigin.anyOfPlayer_Position.ID
 	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
 	engine.Patch.Item[element.ID] = element
 	return item{item: element}
 }
 
 func (engine *Engine) CreateZoneItem() zoneItem {
-	return engine.createZoneItem(false)
+	return engine.createZoneItem(newPath(zoneItemIdentifier), true)
 }
 
-func (engine *Engine) createZoneItem(hasParent bool) zoneItem {
+func (engine *Engine) createZoneItem(p path, extendWithID bool) zoneItem {
 	var element zoneItemCore
 	element.engine = engine
 	element.ID = ZoneItemID(engine.GenerateID())
-	element.HasParent = hasParent
-	elementItem := engine.createItem(true)
+	elementItem := engine.createItem(p.item(), false)
 	element.Item = elementItem.item.ID
-	elementPosition := engine.createPosition(true)
+	elementPosition := engine.createPosition(p.position(), false)
 	element.Position = elementPosition.position.ID
 	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
 	engine.Patch.ZoneItem[element.ID] = element
 	return zoneItem{zoneItem: element}
 }
 
 func (engine *Engine) CreatePlayer() player {
-	return engine.createPlayer(false)
+	return engine.createPlayer(newPath(playerIdentifier), true)
 }
 
-func (engine *Engine) createPlayer(hasParent bool) player {
+func (engine *Engine) createPlayer(p path, extendWithID bool) player {
 	var element playerCore
 	element.engine = engine
 	element.ID = PlayerID(engine.GenerateID())
-	element.HasParent = hasParent
-	elementGearScore := engine.createGearScore(true)
+	elementGearScore := engine.createGearScore(p.gearScore(), false)
 	element.GearScore = elementGearScore.gearScore.ID
-	elementPosition := engine.createPosition(true)
+	elementPosition := engine.createPosition(p.position(), false)
 	element.Position = elementPosition.position.ID
 	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
 	engine.Patch.Player[element.ID] = element
 	return player{player: element}
 }
 
 func (engine *Engine) CreateZone() zone {
-	return engine.createZone()
+	return engine.createZone(newPath(zoneIdentifier), true)
 }
 
-func (engine *Engine) createZone() zone {
+func (engine *Engine) createZone(p path, extendWithID bool) zone {
 	var element zoneCore
 	element.engine = engine
 	element.ID = ZoneID(engine.GenerateID())
 	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(p) > 1
+	element.path = p
+	if extendWithID {
+		element.path = element.path.id(int(element.ID))
+	}
+	element.Path = element.path.toJSONPath()
 	engine.Patch.Zone[element.ID] = element
 	return zone{zone: element}
 }
@@ -115,19 +165,6 @@ func (engine *Engine) createPlayerGuildMemberRef(referencedElementID PlayerID, p
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerGuildMemberRef[element.ID] = element
 	return element
-}
-
-func (engine *Engine) CreateEquipmentSet() equipmentSet {
-	return engine.createEquipmentSet()
-}
-
-func (engine *Engine) createEquipmentSet() equipmentSet {
-	var element equipmentSetCore
-	element.engine = engine
-	element.ID = EquipmentSetID(engine.GenerateID())
-	element.OperationKind = OperationKindUpdate
-	engine.Patch.EquipmentSet[element.ID] = element
-	return equipmentSet{equipmentSet: element}
 }
 
 func (engine *Engine) createEquipmentSetEquipmentRef(referencedElementID ItemID, parentID EquipmentSetID) equipmentSetEquipmentRefCore {
@@ -174,44 +211,47 @@ func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayer_
 	return element
 }
 
-func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool) anyOfPlayer_ZoneItem {
+func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, containedElementPath path) anyOfPlayer_ZoneItem {
 	var element anyOfPlayer_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_ZoneItemID(engine.GenerateID())
 	if setDefaultValue {
-		elementPlayer := engine.createPlayer(true)
+		elementPlayer := engine.createPlayer(containedElementPath, false)
 		element.Player = elementPlayer.player.ID
 		element.ElementKind = ElementKindPlayer
 	}
 	element.OperationKind = OperationKindUpdate
+	element.ContainedElementPath = containedElementPath
 	engine.Patch.AnyOfPlayer_ZoneItem[element.ID] = element
 	return anyOfPlayer_ZoneItem{anyOfPlayer_ZoneItem: element}
 }
 
-func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool) anyOfPlayer_Position {
+func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, containedElementPath path) anyOfPlayer_Position {
 	var element anyOfPlayer_PositionCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_PositionID(engine.GenerateID())
 	if setDefaultValue {
-		elementPlayer := engine.createPlayer(true)
+		elementPlayer := engine.createPlayer(containedElementPath, false)
 		element.Player = elementPlayer.player.ID
 		element.ElementKind = ElementKindPlayer
 	}
 	element.OperationKind = OperationKindUpdate
+	element.ContainedElementPath = containedElementPath
 	engine.Patch.AnyOfPlayer_Position[element.ID] = element
 	return anyOfPlayer_Position{anyOfPlayer_Position: element}
 }
 
-func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool) anyOfItem_Player_ZoneItem {
+func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, containedElementPath path) anyOfItem_Player_ZoneItem {
 	var element anyOfItem_Player_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfItem_Player_ZoneItemID(engine.GenerateID())
 	if setDefaultValue {
-		elementItem := engine.createItem(true)
+		elementItem := engine.createItem(containedElementPath, false)
 		element.Item = elementItem.item.ID
 		element.ElementKind = ElementKindItem
 	}
 	element.OperationKind = OperationKindUpdate
+	element.ContainedElementPath = containedElementPath
 	engine.Patch.AnyOfItem_Player_ZoneItem[element.ID] = element
 	return anyOfItem_Player_ZoneItem{anyOfItem_Player_ZoneItem: element}
 }
