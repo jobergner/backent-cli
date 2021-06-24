@@ -378,27 +378,14 @@ which both delete the current child, and create a new one. This however causes p
 being able to call the setters on these references makes no sense. This is why any types have ref wrappers, which are created just before `Get()` is called on the reference. These wrappers exclude the 
 setter methods.
 
-
 ### TODO
 - SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
-- improve performance (eg sync.Pool, walkTree-like assemble planner, path evaluation in elements on element creation  etc.)
-  - release tree func (release slices, maps, and the pointers themselves)
-
 - is `build` the right command for validating? (compile?)
-
-- exclude deleted elements option in assemble config? (there is no need for it when rendering the initial tree)
-  - or can this just be handled bu forceInclude assembling directly after UpdateState() as patch will be empty anyway
-
 - review error handling in server
 - review channel handling in server
 - find a neat way for integration tests
-
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)
-
-
 - custom handlers
 - data persistence
-
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
-- find out if sync.Pool is helpful for managing tree structs (cause theyre very big)
-- is redeclaring via getter always necessary, or only after exported methods were used
+- release tree func (release slices, maps, and the pointers themselves)
