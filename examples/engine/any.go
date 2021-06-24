@@ -64,16 +64,18 @@ func (_any anyOfPlayer_ZoneItem) SetZoneItem() zoneItem {
 	if _any.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 		return _any.ZoneItem()
 	}
-	zoneItem := _any.anyOfPlayer_ZoneItem.engine.createZoneItem(_any.anyOfPlayer_ZoneItem.ContainedElementPath, false)
-	_any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID())
+	zoneItem := _any.anyOfPlayer_ZoneItem.engine.createZoneItem(_any.anyOfPlayer_ZoneItem.ChildElementPath, false)
+	_any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID(), true)
 	return zoneItem
 }
 
-func (_any anyOfPlayer_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
+func (_any anyOfPlayer_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
-	if any.Player != 0 {
-		any.engine.deletePlayer(any.Player)
-		any.Player = 0
+	if deleteCurrentChild {
+		if any.Player != 0 {
+			any.engine.deletePlayer(any.Player)
+			any.Player = 0
+		}
 	}
 	any.ElementKind = ElementKindZoneItem
 	any.ZoneItem = zoneItemID
@@ -84,17 +86,19 @@ func (_any anyOfPlayer_ZoneItem) SetPlayer() player {
 	if _any.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
 		return _any.Player()
 	}
-	player := _any.anyOfPlayer_ZoneItem.engine.createPlayer(_any.anyOfPlayer_ZoneItem.ContainedElementPath, false)
-	_any.anyOfPlayer_ZoneItem.setPlayer(player.ID())
+	player := _any.anyOfPlayer_ZoneItem.engine.createPlayer(_any.anyOfPlayer_ZoneItem.ChildElementPath, false)
+	_any.anyOfPlayer_ZoneItem.setPlayer(player.ID(), true)
 	return player
 }
 
-func (_any anyOfPlayer_ZoneItemCore) setPlayer(playerID PlayerID) {
+func (_any anyOfPlayer_ZoneItemCore) setPlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
+	// if deleteCurrentChild {
 	if any.ZoneItem != 0 {
 		any.engine.deleteZoneItem(any.ZoneItem)
 		any.ZoneItem = 0
 	}
+	// }
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
@@ -119,16 +123,18 @@ func (_any anyOfPlayer_Position) SetPosition() position {
 	if _any.anyOfPlayer_Position.ElementKind == ElementKindPosition {
 		return _any.Position()
 	}
-	position := _any.anyOfPlayer_Position.engine.createPosition(_any.anyOfPlayer_Position.ContainedElementPath, false)
-	_any.anyOfPlayer_Position.setPosition(position.ID())
+	position := _any.anyOfPlayer_Position.engine.createPosition(_any.anyOfPlayer_Position.ChildElementPath, false)
+	_any.anyOfPlayer_Position.setPosition(position.ID(), true)
 	return position
 }
 
-func (_any anyOfPlayer_PositionCore) setPosition(positionID PositionID) {
+func (_any anyOfPlayer_PositionCore) setPosition(positionID PositionID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
-	if any.Player != 0 {
-		any.engine.deletePlayer(any.Player)
-		any.Player = 0
+	if deleteCurrentChild {
+		if any.Player != 0 {
+			any.engine.deletePlayer(any.Player)
+			any.Player = 0
+		}
 	}
 	any.ElementKind = ElementKindPosition
 	any.Position = positionID
@@ -149,16 +155,18 @@ func (_any anyOfPlayer_Position) SetPlayer() player {
 	if _any.anyOfPlayer_Position.ElementKind == ElementKindPlayer {
 		return _any.Player()
 	}
-	player := _any.anyOfPlayer_Position.engine.createPlayer(_any.anyOfPlayer_Position.ContainedElementPath, false)
-	_any.anyOfPlayer_Position.setPlayer(player.ID())
+	player := _any.anyOfPlayer_Position.engine.createPlayer(_any.anyOfPlayer_Position.ChildElementPath, false)
+	_any.anyOfPlayer_Position.setPlayer(player.ID(), true)
 	return player
 }
 
-func (_any anyOfPlayer_PositionCore) setPlayer(playerID PlayerID) {
+func (_any anyOfPlayer_PositionCore) setPlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
-	if any.Position != 0 {
-		any.engine.deletePosition(any.Position)
-		any.Position = 0
+	if deleteCurrentChild {
+		if any.Position != 0 {
+			any.engine.deletePosition(any.Position)
+			any.Position = 0
+		}
 	}
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
@@ -174,20 +182,22 @@ func (_any anyOfItem_Player_ZoneItem) SetZoneItem() zoneItem {
 	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindZoneItem {
 		return _any.ZoneItem()
 	}
-	zoneItem := _any.anyOfItem_Player_ZoneItem.engine.createZoneItem(_any.anyOfItem_Player_ZoneItem.ContainedElementPath, false)
-	_any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID())
+	zoneItem := _any.anyOfItem_Player_ZoneItem.engine.createZoneItem(_any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	_any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID(), true)
 	return zoneItem
 }
 
-func (_any anyOfItem_Player_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID) {
+func (_any anyOfItem_Player_ZoneItemCore) setZoneItem(zoneItemID ZoneItemID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
-	if any.Item != 0 {
-		any.engine.deleteItem(any.Item)
-		any.Item = 0
-	}
-	if any.Player != 0 {
-		any.engine.deletePlayer(any.Player)
-		any.Player = 0
+	if deleteCurrentChild {
+		if any.Item != 0 {
+			any.engine.deleteItem(any.Item)
+			any.Item = 0
+		}
+		if any.Player != 0 {
+			any.engine.deletePlayer(any.Player)
+			any.Player = 0
+		}
 	}
 	any.ElementKind = ElementKindZoneItem
 	any.ZoneItem = zoneItemID
@@ -198,20 +208,22 @@ func (_any anyOfItem_Player_ZoneItem) SetPlayer() player {
 	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindPlayer {
 		return _any.Player()
 	}
-	player := _any.anyOfItem_Player_ZoneItem.engine.createPlayer(_any.anyOfItem_Player_ZoneItem.ContainedElementPath, false)
-	_any.anyOfItem_Player_ZoneItem.setPlayer(player.ID())
+	player := _any.anyOfItem_Player_ZoneItem.engine.createPlayer(_any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	_any.anyOfItem_Player_ZoneItem.setPlayer(player.ID(), true)
 	return player
 }
 
-func (_any anyOfItem_Player_ZoneItemCore) setPlayer(playerID PlayerID) {
+func (_any anyOfItem_Player_ZoneItemCore) setPlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
-	if any.Item != 0 {
-		any.engine.deleteItem(any.Item)
-		any.Item = 0
-	}
-	if any.ZoneItem != 0 {
-		any.engine.deleteZoneItem(any.ZoneItem)
-		any.ZoneItem = 0
+	if deleteCurrentChild {
+		if any.Item != 0 {
+			any.engine.deleteItem(any.Item)
+			any.Item = 0
+		}
+		if any.ZoneItem != 0 {
+			any.engine.deleteZoneItem(any.ZoneItem)
+			any.ZoneItem = 0
+		}
 	}
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
@@ -222,20 +234,22 @@ func (_any anyOfItem_Player_ZoneItem) SetItem() item {
 	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindItem {
 		return _any.Item()
 	}
-	item := _any.anyOfItem_Player_ZoneItem.engine.createItem(_any.anyOfItem_Player_ZoneItem.ContainedElementPath, false)
-	_any.anyOfItem_Player_ZoneItem.setItem(item.ID())
+	item := _any.anyOfItem_Player_ZoneItem.engine.createItem(_any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	_any.anyOfItem_Player_ZoneItem.setItem(item.ID(), true)
 	return item
 }
 
-func (_any anyOfItem_Player_ZoneItemCore) setItem(itemID ItemID) {
+func (_any anyOfItem_Player_ZoneItemCore) setItem(itemID ItemID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
-	if any.Player != 0 {
-		any.engine.deletePlayer(any.Player)
-		any.Player = 0
-	}
-	if any.ZoneItem != 0 {
-		any.engine.deleteZoneItem(any.ZoneItem)
-		any.ZoneItem = 0
+	if deleteCurrentChild {
+		if any.Player != 0 {
+			any.engine.deletePlayer(any.Player)
+			any.Player = 0
+		}
+		if any.ZoneItem != 0 {
+			any.engine.deleteZoneItem(any.ZoneItem)
+			any.ZoneItem = 0
+		}
 	}
 	any.ElementKind = ElementKindItem
 	any.Item = itemID
