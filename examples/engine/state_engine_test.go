@@ -140,9 +140,9 @@ func TestReferences(t *testing.T) {
 	})
 	t.Run("deletes reference when Set is called on field which already has reference", func(t *testing.T) {
 		se := newEngine()
-		item := se.createItem(false)
-		player := se.createPlayer(false)
-		player2 := se.createPlayer(false)
+		item := se.CreateItem()
+		player := se.CreatePlayer()
+		player2 := se.CreatePlayer()
 		item.SetBoundTo(player.ID())
 		item.SetBoundTo(player2.ID())
 		assert.Equal(t, 1, len(se.Patch.ItemBoundToRef))
@@ -461,8 +461,8 @@ func TestTree(t *testing.T) {
 	t.Run("includes element which has reference of updating element", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				item := se.createItem(false).SetName("myItem")
-				player := se.createPlayer(false)
+				item := se.CreateItem().SetName("myItem")
+				player := se.CreatePlayer()
 				item.SetBoundTo(player.ID())
 
 				se.UpdateState()
@@ -473,7 +473,7 @@ func TestTree(t *testing.T) {
 					item.ID(): {
 						ID:            item.ID(),
 						Name:          "myItem",
-						BoundTo:       &PlayerReference{OperationKindUnchanged, player.ID(), ElementKindPlayer, ReferencedDataModified, newPath(playerIdentifier, int(player.ID())).toJSONPath(), nil},
+						BoundTo:       &PlayerReference{OperationKindUnchanged, player.ID(), ElementKindPlayer, ReferencedDataModified, newPath(playerIdentifier).id(int(player.ID())).toJSONPath(), nil},
 						OperationKind: OperationKindUnchanged,
 					},
 				}
@@ -515,9 +515,9 @@ func TestTree(t *testing.T) {
 	t.Run("includes elements which have references of updating elements", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				player2 := se.createPlayer(false)
-				player3 := se.createPlayer(false)
+				player1 := se.CreatePlayer()
+				player2 := se.CreatePlayer()
+				player3 := se.CreatePlayer()
 
 				player2.AddGuildMember(player1.ID())
 				player3.AddGuildMember(player1.ID())
@@ -556,7 +556,7 @@ func TestTree(t *testing.T) {
 								ElementID:            player2.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player2.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
 								Player: &Player{
 									ID:            player2.ID(),
 									OperationKind: OperationKindUnchanged,
@@ -574,7 +574,7 @@ func TestTree(t *testing.T) {
 											ElementID:            player1.ID(),
 											ElementKind:          ElementKindPlayer,
 											ReferencedDataStatus: ReferencedDataModified,
-											ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+											ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 										},
 									},
 								},
@@ -591,7 +591,7 @@ func TestTree(t *testing.T) {
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 							},
 						},
 					},
@@ -604,7 +604,7 @@ func TestTree(t *testing.T) {
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 							},
 						},
 					},
@@ -619,7 +619,7 @@ func TestTree(t *testing.T) {
 	t.Run("does not break when element references itself", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player := se.createPlayer(false)
+				player := se.CreatePlayer()
 				player.AddGuildMember(player.ID())
 
 				se.UpdateState()
@@ -635,14 +635,14 @@ func TestTree(t *testing.T) {
 								ElementID:            player.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player.ID())).toJSONPath(),
 							},
 							player.ID(): {
 								OperationKind:        OperationKindUpdate,
 								ElementID:            player.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player.ID())).toJSONPath(),
 								Player: &Player{
 									ID:            player.ID(),
 									OperationKind: OperationKindUpdate,
@@ -660,14 +660,14 @@ func TestTree(t *testing.T) {
 											ElementID:            player.ID(),
 											ElementKind:          ElementKindPlayer,
 											ReferencedDataStatus: ReferencedDataUnchanged, // TODO: should be modified, but won't fix for now
-											ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
+											ElementPath:          newPath(playerIdentifier).id(int(player.ID())).toJSONPath(),
 										},
 										player.ID(): {
 											OperationKind:        OperationKindUpdate,
 											ElementID:            player.ID(),
 											ElementKind:          ElementKindPlayer,
 											ReferencedDataStatus: ReferencedDataUnchanged, // TODO: should be modified, but won't fix for now
-											ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
+											ElementPath:          newPath(playerIdentifier).id(int(player.ID())).toJSONPath(),
 										},
 									},
 								},
@@ -686,9 +686,9 @@ func TestTree(t *testing.T) {
 	t.Run("includes all elements in a reference chain", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player := se.createPlayer(false)
-				item := se.createItem(false)
-				equipmentSet := se.createEquipmentSet()
+				player := se.CreatePlayer()
+				item := se.CreateItem()
+				equipmentSet := se.CreateEquipmentSet()
 
 				player.AddEquipmentSet(equipmentSet.ID())
 				equipmentSet.AddEquipment(item.ID())
@@ -707,7 +707,7 @@ func TestTree(t *testing.T) {
 							ElementID:            player.ID(),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath(playerIdentifier, int(player.ID())).toJSONPath(),
+							ElementPath:          newPath(playerIdentifier).id(int(player.ID())).toJSONPath(),
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -721,7 +721,7 @@ func TestTree(t *testing.T) {
 								ElementID:            equipmentSet.ID(),
 								ElementKind:          ElementKindEquipmentSet,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(equipmentSetIdentifier, int(equipmentSet.ID())).toJSONPath(),
+								ElementPath:          newPath(equipmentSetIdentifier).id(int(equipmentSet.ID())).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUnchanged,
@@ -736,7 +736,7 @@ func TestTree(t *testing.T) {
 								ElementID:            item.ID(),
 								ElementKind:          ElementKindItem,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(itemIdentifier, int(item.ID())).toJSONPath(),
+								ElementPath:          newPath(itemIdentifier).id(int(item.ID())).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUnchanged,
@@ -752,9 +752,9 @@ func TestTree(t *testing.T) {
 	t.Run("recursively travels tree to find if any downstream data has updated", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				player2 := se.createPlayer(false)
-				item := se.createItem(false)
+				player1 := se.CreatePlayer()
+				player2 := se.CreatePlayer()
+				item := se.CreateItem()
 
 				item.SetBoundTo(player1.ID())
 				player2.AddGuildMember(player1.ID())
@@ -771,7 +771,7 @@ func TestTree(t *testing.T) {
 							ElementID:            player1.ID(),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 						},
 						OperationKind: OperationKindUnchanged,
 					},
@@ -795,7 +795,7 @@ func TestTree(t *testing.T) {
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 							},
 						},
 					},
@@ -809,8 +809,8 @@ func TestTree(t *testing.T) {
 	t.Run("does not include references if nothing related to them got updated", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				item := se.createItem(false)
+				player1 := se.CreatePlayer()
+				item := se.CreateItem()
 
 				item.SetBoundTo(player1.ID())
 
@@ -838,9 +838,9 @@ func TestTree(t *testing.T) {
 	t.Run("considers downstream updated data even if reference got assigned after state update", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				player2 := se.createPlayer(false)
-				item := se.createItem(false)
+				player1 := se.CreatePlayer()
+				player2 := se.CreatePlayer()
+				item := se.CreateItem()
 
 				se.UpdateState()
 				item.SetBoundTo(player1.ID())
@@ -856,7 +856,7 @@ func TestTree(t *testing.T) {
 							ElementID:            player1.ID(),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 							Player: &Player{
 								ID:            player1.ID(),
 								OperationKind: OperationKindUnchanged,
@@ -892,7 +892,7 @@ func TestTree(t *testing.T) {
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 								Player: &Player{
 									ID:            player1.ID(),
 									OperationKind: OperationKindUnchanged,
@@ -947,7 +947,7 @@ func TestTree(t *testing.T) {
 							ElementID:            player1.ID(),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
-							ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -959,7 +959,7 @@ func TestTree(t *testing.T) {
 							ElementID:            player1.ID(),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
-							ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 							Player: &Player{
 								ID:            player1.ID(),
 								OperationKind: OperationKindUnchanged,
@@ -986,7 +986,7 @@ func TestTree(t *testing.T) {
 								ElementID:            player1.ID(),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataUnchanged,
-								ElementPath:          newPath(playerIdentifier, int(player1.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
 								Player: &Player{
 									ID:            player1.ID(),
 									OperationKind: OperationKindUnchanged,
@@ -1012,10 +1012,10 @@ func TestTree(t *testing.T) {
 	t.Run("builds entire referenced player when ref is created", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				item := se.createItem(false).SetName("myItem")
-				player2 := se.createPlayer(false)
+				item := se.CreateItem().SetName("myItem")
+				player2 := se.CreatePlayer()
 				player2.GearScore().SetLevel(2)
-				player := se.createPlayer(false)
+				player := se.CreatePlayer()
 				player.Position().SetX(10)
 				player.GearScore().SetLevel(8)
 				player.AddGuildMember(player2.ID())
@@ -1032,7 +1032,7 @@ func TestTree(t *testing.T) {
 							player.ID(),
 							ElementKindPlayer,
 							ReferencedDataUnchanged,
-							newPath(playerIdentifier, int(player.ID())).toJSONPath(),
+							newPath(playerIdentifier).id(int(player.ID())).toJSONPath(),
 							&Player{
 								ID:            player.ID(),
 								OperationKind: OperationKindUnchanged,
@@ -1052,7 +1052,7 @@ func TestTree(t *testing.T) {
 										OperationKind:        OperationKindUnchanged,
 										ElementKind:          ElementKindPlayer,
 										ReferencedDataStatus: ReferencedDataUnchanged,
-										ElementPath:          newPath(playerIdentifier, int(player2.ID())).toJSONPath(),
+										ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
 										Player:               nil,
 									},
 								},
@@ -1071,9 +1071,9 @@ func TestTree(t *testing.T) {
 	t.Run("builds any kind", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				item1 := se.createItem(false)
+				item1 := se.CreateItem()
 
-				item2 := se.createItem(false)
+				item2 := se.CreateItem()
 				item2.Origin().SetPosition()
 
 				expectedTree.Item = map[ItemID]Item{
@@ -1119,7 +1119,7 @@ func TestTree(t *testing.T) {
 	t.Run("builds []any kinds", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				zone := se.createZone()
+				zone := se.CreateZone()
 				item := zone.AddInteractableItem()
 				zoneItem := zone.AddInteractableZoneItem()
 
@@ -1188,8 +1188,8 @@ func TestTree(t *testing.T) {
 	t.Run("builds *any kind", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				player2 := se.createPlayer(false)
+				player1 := se.CreatePlayer()
+				player2 := se.CreatePlayer()
 				player1.SetTargetPlayer(player2.ID())
 
 				expectedTree.Player = map[PlayerID]Player{
@@ -1209,7 +1209,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player2.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath(playerIdentifier, int(player2.ID())).toJSONPath(),
+							ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
 							Element: &Player{
 								ID:            player2.ID(),
 								OperationKind: OperationKindUpdate,
@@ -1246,8 +1246,8 @@ func TestTree(t *testing.T) {
 	t.Run("builds []*any kind", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				player1 := se.createPlayer(false)
-				player2 := se.createPlayer(false)
+				player1 := se.CreatePlayer()
+				player2 := se.CreatePlayer()
 				player1.AddTargetedByPlayer(player2.ID())
 
 				expectedTree.Player = map[PlayerID]Player{
@@ -1268,7 +1268,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath(playerIdentifier, int(player2.ID())).toJSONPath(),
+								ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
 								Element: &Player{
 									ID:            player2.ID(),
 									OperationKind: OperationKindUpdate,
@@ -1306,9 +1306,9 @@ func TestTree(t *testing.T) {
 	t.Run("build tree with path to element of any type", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				zone := se.createZone()
+				zone := se.CreateZone()
 				player1 := zone.AddPlayer()
-				player2 := se.createPlayer(false)
+				player2 := se.CreatePlayer()
 				player2.SetTargetPlayer(player1.ID())
 
 				se.UpdateState()
@@ -1323,7 +1323,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath(zoneIdentifier, int(zone.ID())).players().id(int(player1.ID())).toJSONPath(),
+							ElementPath:          newPath(zoneIdentifier).id(int(zone.ID())).players().id(int(player1.ID())).toJSONPath(),
 						},
 					},
 				}
@@ -1353,9 +1353,9 @@ func TestTree(t *testing.T) {
 	t.Run("assembles tree with correct path no non-ref any type", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
-				zone := se.createZone()
+				zone := se.CreateZone()
 				player := zone.AddInteractablePlayer()
-				item := se.createItem(false)
+				item := se.CreateItem()
 				item.SetBoundTo(player.ID())
 
 				se.UpdateState()
@@ -1370,7 +1370,7 @@ func TestTree(t *testing.T) {
 							ElementID:            player.ID(),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath(zoneIdentifier, int(zone.ID())).interactables().id(int(player.ID())).toJSONPath(),
+							ElementPath:          newPath(zoneIdentifier).id(int(zone.ID())).interactables().id(int(player.ID())).toJSONPath(),
 						},
 					},
 				}

@@ -77,3 +77,14 @@ PASS
 ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.537s
 
 # remove BenchmarkElementModificaton as it's ns/op dependet on length of bench duration. Its actual performance is better represented in BenchmarkUpdateState 
+# replace tree walking with path building on element creation
+Do 24. Jun 13:31:47 CEST 2021
+goos: linux
+goarch: amd64
+pkg: github.com/Java-Jonas/bar-cli/examples/engine
+BenchmarkAssembleTreeForceInclude-12    	     370	   2923516 ns/op	  968984 B/op	    6575 allocs/op
+BenchmarkAssembleTree-12                	     342	   3464019 ns/op	  904554 B/op	    7646 allocs/op
+BenchmarkEngine-12                      	     628	   1673975 ns/op	  425770 B/op	    3136 allocs/op
+BenchmarkUpdateState-12                 	    1730	    607165 ns/op	  248083 B/op	     811 allocs/op
+PASS
+ok  	github.com/Java-Jonas/bar-cli/examples/engine	6.725s
