@@ -211,47 +211,47 @@ func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayer_
 	return element
 }
 
-func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, containedElementPath path) anyOfPlayer_ZoneItem {
+func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, childElementPath path) anyOfPlayer_ZoneItem {
 	var element anyOfPlayer_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_ZoneItemID(engine.GenerateID())
 	if setDefaultValue {
-		elementPlayer := engine.createPlayer(containedElementPath, false)
+		elementPlayer := engine.createPlayer(childElementPath, false)
 		element.Player = elementPlayer.player.ID
 		element.ElementKind = ElementKindPlayer
 	}
 	element.OperationKind = OperationKindUpdate
-	element.ContainedElementPath = containedElementPath
+	element.ChildElementPath = childElementPath
 	engine.Patch.AnyOfPlayer_ZoneItem[element.ID] = element
 	return anyOfPlayer_ZoneItem{anyOfPlayer_ZoneItem: element}
 }
 
-func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, containedElementPath path) anyOfPlayer_Position {
+func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, childElementPath path) anyOfPlayer_Position {
 	var element anyOfPlayer_PositionCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_PositionID(engine.GenerateID())
 	if setDefaultValue {
-		elementPlayer := engine.createPlayer(containedElementPath, false)
+		elementPlayer := engine.createPlayer(childElementPath, false)
 		element.Player = elementPlayer.player.ID
 		element.ElementKind = ElementKindPlayer
 	}
 	element.OperationKind = OperationKindUpdate
-	element.ContainedElementPath = containedElementPath
+	element.ChildElementPath = childElementPath
 	engine.Patch.AnyOfPlayer_Position[element.ID] = element
 	return anyOfPlayer_Position{anyOfPlayer_Position: element}
 }
 
-func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, containedElementPath path) anyOfItem_Player_ZoneItem {
+func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, childElementPath path) anyOfItem_Player_ZoneItem {
 	var element anyOfItem_Player_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfItem_Player_ZoneItemID(engine.GenerateID())
 	if setDefaultValue {
-		elementItem := engine.createItem(containedElementPath, false)
+		elementItem := engine.createItem(childElementPath, false)
 		element.Item = elementItem.item.ID
 		element.ElementKind = ElementKindItem
 	}
 	element.OperationKind = OperationKindUpdate
-	element.ContainedElementPath = containedElementPath
+	element.ChildElementPath = childElementPath
 	engine.Patch.AnyOfItem_Player_ZoneItem[element.ID] = element
 	return anyOfItem_Player_ZoneItem{anyOfItem_Player_ZoneItem: element}
 }

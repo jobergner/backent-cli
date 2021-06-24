@@ -96,7 +96,7 @@ func (_player player) SetTargetPlayer(playerID PlayerID) player {
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil)
-	anyContainer.anyOfPlayer_ZoneItem.setPlayer(playerID)
+	anyContainer.anyOfPlayer_ZoneItem.setPlayer(playerID, false)
 	ref := player.player.engine.createPlayerTargetRef(anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID)
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
@@ -116,7 +116,7 @@ func (_player player) SetTargetZoneItem(zoneItemID ZoneItemID) player {
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil)
-	anyContainer.anyOfPlayer_ZoneItem.setZoneItem(zoneItemID)
+	anyContainer.anyOfPlayer_ZoneItem.setZoneItem(zoneItemID, false)
 	ref := player.player.engine.createPlayerTargetRef(anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID)
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate

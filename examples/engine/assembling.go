@@ -542,6 +542,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	// immediate replacement of refs
 	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target != 0) {
 		if statePlayer.Target != patchPlayer.Target {
+			config.forceInclude = true
 			ref := engine.playerTargetRef(patchPlayer.Target)
 			anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 			if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
@@ -550,20 +551,22 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 					check = newRecursionCheck()
 				}
 				referencedDataStatus := ReferencedDataUnchanged
-				if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+				element, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
+				if hasUpdatedDownstream {
 					referencedDataStatus = ReferencedDataModified
 				}
-				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
+				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 			} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 				referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 				if check == nil {
 					check = newRecursionCheck()
 				}
 				referencedDataStatus := ReferencedDataUnchanged
-				if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
+				element, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config)
+				if hasUpdatedDownstream {
 					referencedDataStatus = ReferencedDataModified
 				}
-				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
+				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 			}
 		}
 	}
@@ -649,16 +652,18 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 	// immediate replacement of refs
 	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
 		if stateItem.BoundTo != patchItem.BoundTo {
+			config.forceInclude = true
 			ref := engine.itemBoundToRef(patchItem.BoundTo)
 			referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
 			if check == nil {
 				check = newRecursionCheck()
 			}
 			referencedDataStatus := ReferencedDataUnchanged
-			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
+			element, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
+			if hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
+			return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
