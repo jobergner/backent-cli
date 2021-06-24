@@ -93,12 +93,12 @@ func (_any anyOfPlayer_ZoneItem) SetPlayer() player {
 
 func (_any anyOfPlayer_ZoneItemCore) setPlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
-	// if deleteCurrentChild {
-	if any.ZoneItem != 0 {
-		any.engine.deleteZoneItem(any.ZoneItem)
-		any.ZoneItem = 0
+	if deleteCurrentChild {
+		if any.ZoneItem != 0 {
+			any.engine.deleteZoneItem(any.ZoneItem)
+			any.ZoneItem = 0
+		}
 	}
-	// }
 	any.ElementKind = ElementKindPlayer
 	any.Player = playerID
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any

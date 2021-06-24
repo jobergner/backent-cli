@@ -379,13 +379,13 @@ being able to call the setters on these references makes no sense. This is why a
 setter methods.
 
 ### TODO
-- SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
-- is `build` the right command for validating? (compile?)
 - review error handling in server
 - review channel handling in server
 - find a neat way for integration tests
+- is `build` the right command for validating? (compile?)
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)
 - custom handlers
 - data persistence
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - release tree func (release slices, maps, and the pointers themselves)
+- (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the ElementKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!! 
