@@ -29,17 +29,19 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 		Id("State").Id("State"),
 		Id("Patch").Id("State"),
 		Id("Tree").Id("Tree"),
-		Id("PathTrack").Id("pathTrack"),
+		Id("assembleCache").Id("assembleCache"),
+		Id("forceIncludeAssembleCache").Id("assembleCache"),
 		Id("IDgen").Int(),
 	)
 
 	decls.File.Func().Id("newEngine").Params().Id("*Engine").Block(
 		Return(Id("&Engine").Values(Dict{
-			Id("State"):     Id("newState").Call(),
-			Id("Patch"):     Id("newState").Call(),
-			Id("Tree"):      Id("newTree").Call(),
-			Id("PathTrack"): Id("newPathTrack").Call(),
-			Id("IDgen"):     Lit(1),
+			Id("State"):                     Id("newState").Call(),
+			Id("Patch"):                     Id("newState").Call(),
+			Id("Tree"):                      Id("newTree").Call(),
+			Id("assembleCache"):             Id("newAssembleCache").Call(),
+			Id("forceIncludeAssembleCache"): Id("newAssembleCache").Call(),
+			Id("IDgen"):                     Lit(1),
 		})),
 	)
 

@@ -8,20 +8,6 @@ import (
 )
 
 func TestWritePath(t *testing.T) {
-	t.Run("writes path track", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
-		sf.writePathTrack()
-
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
-			pathTrack_type,
-			newPathTrack_func,
-		}, "\n"))
-
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
-		}
-	})
 	t.Run("writes path identifiers", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeIdentifiers()
@@ -66,7 +52,7 @@ func TestWritePath(t *testing.T) {
 		expected := testutils.FormatCode(strings.Join([]string{
 			path_type,
 			newPath_func,
-			index_path_func,
+			id_path_func,
 			equals_path_func,
 			toJSONPath_path_func,
 			pathIdentifierToString_func,

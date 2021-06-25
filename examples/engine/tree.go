@@ -209,30 +209,30 @@ func newAssembleCache() assembleCache {
 }
 
 type equipmentSetCacheElement struct {
-	hasUpdatedDownstream bool
-	equipmentSet         EquipmentSet
+	hasUpdated   bool
+	equipmentSet EquipmentSet
 }
 type gearScoreCacheElement struct {
-	hasUpdatedDownstream bool
-	gearScore            GearScore
+	hasUpdated bool
+	gearScore  GearScore
 }
 type itemCacheElement struct {
-	hasUpdatedDownstream bool
-	item                 Item
+	hasUpdated bool
+	item       Item
 }
 type playerCacheElement struct {
-	hasUpdatedDownstream bool
-	player               Player
+	hasUpdated bool
+	player     Player
 }
 type positionCacheElement struct {
-	hasUpdatedDownstream bool
-	position             Position
+	hasUpdated bool
+	position   Position
 }
 type zoneCacheElement struct {
-	hasUpdatedDownstream bool
-	zone                 Zone
+	hasUpdated bool
+	zone       Zone
 }
 type zoneItemCacheElement struct {
-	hasUpdatedDownstream bool
-	zoneItem             ZoneItem
+	hasUpdated bool
+	zoneItem   ZoneItem
 }

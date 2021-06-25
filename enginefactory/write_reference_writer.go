@@ -104,8 +104,16 @@ func (d dereferenceWriter) dereferenceCondition() *Statement {
 	return Id("ref").Dot(d.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(d.v.Name + "ID")
 }
 
+func (d dereferenceWriter) allIdsSliceName() string {
+	return "all" + Title(d.f.ValueTypeName) + "IDs"
+}
+
+func (d dereferenceWriter) declareAllIDs() *Statement {
+	return Id(d.allIdsSliceName()).Op(":=").Id("engine").Dot("all" + Title(d.f.ValueTypeName) + "IDs").Call()
+}
+
 func (d dereferenceWriter) allIDsLoopConditions() *Statement {
-	return List(Id("_"), Id("refID")).Op(":=").Range().Id("engine").Dot("all" + Title(d.f.ValueTypeName) + "IDs").Call()
+	return List(Id("_"), Id("refID")).Op(":=").Range().Id(d.allIdsSliceName())
 }
 
 func (d dereferenceWriter) declareRef() *Statement {
@@ -130,4 +138,8 @@ func (d dereferenceWriter) removeChildReferenceFromParent() *Statement {
 
 func (d dereferenceWriter) unsetRef() *Statement {
 	return Id("ref").Dot("Unset").Call()
+}
+
+func (d dereferenceWriter) returnSliceToPool() *Statement {
+	return Id(d.f.ValueTypeName + "IDSlicePool").Dot("Put").Call(Id(d.allIdsSliceName()))
 }

@@ -117,11 +117,11 @@ func (s setRefFieldWeiter) deleteExistingRef() *Statement {
 }
 
 func (s setRefFieldWeiter) createAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create" + Title(anyNameByField(s.f))).Call(False())
+	return Id("anyContainer").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create"+Title(anyNameByField(s.f))).Call(False(), Nil())
 }
 
 func (s setRefFieldWeiter) setAnyContainer() *Statement {
-	return Id("anyContainer").Dot(anyNameByField(s.f)).Dot("set" + Title(s.v.Name)).Call(Id(s.idParam()))
+	return Id("anyContainer").Dot(anyNameByField(s.f)).Dot("set"+Title(s.v.Name)).Call(Id(s.idParam()), False())
 }
 
 func (s setRefFieldWeiter) createNewRef() *Statement {

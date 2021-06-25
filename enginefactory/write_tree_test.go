@@ -91,4 +91,25 @@ func TestWriteTree(t *testing.T) {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
+	t.Run("writes assembleCache", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeAssembleCache()
+
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			assembleCache_type,
+			newAssembleCache_func,
+			equipmentSetCacheElement_type,
+			gearScoreCacheElement_type,
+			itemCacheElement_type,
+			playerCacheElement_type,
+			positionCacheElement_type,
+			zoneCacheElement_type,
+			zoneItemCacheElement_type,
+		}, "\n"))
+
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 }
