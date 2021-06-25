@@ -2,6 +2,7 @@ package state
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -36,7 +37,7 @@ func (c *Connection) Close() {
 
 func (c *Connection) ReadMessage() (int, []byte, error) {
 	msgType, msg, err := c.Conn.Read(c.ctx)
-	return int(msgType), msg, err
+	return int(msgType), msg, fmt.Errorf("error reading message from connection: %s", err)
 }
 
 func (c *Connection) WriteMessage(msg []byte) error {

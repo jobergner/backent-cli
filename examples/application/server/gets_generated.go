@@ -1,7 +1,7 @@
 package state
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -75,7 +75,7 @@ func (r *Room) processClientMessage(msg message) (message, error) {
 		}
 		return message{msg.Kind, resContent, msg.client}, nil
 	default:
-		return message{}, errors.New("unknown message kind")
+		return message{}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
 	}
 }
 

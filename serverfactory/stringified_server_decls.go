@@ -3,7 +3,7 @@
 package serverfactory
 
 const gets_generated_go_import string = `import (
-	"errors"
+	"fmt"
 	"net/http"
 )`
 
@@ -77,7 +77,7 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 		}
 		return message{msg.Kind, resContent, msg.client}, nil
 	default:
-		return message{}, errors.New("unknown message kind")
+		return message{}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
 	}
 }`
 
