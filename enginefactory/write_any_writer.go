@@ -42,19 +42,19 @@ func (a anySetterWriter) currentElement() *Statement {
 }
 
 func (a anySetterWriter) createChild() *Statement {
-	return Id(a.v.Name).Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot("create" + Title(a.v.Name)).Call(True())
+	return Id(a.v.Name).Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id("_any").Dot(anyNameByField(a.f)).Dot("ChildElementPath"), False())
 }
 
 func (a anySetterWriter) callSetter() *Statement {
-	return Id("_any").Dot(anyNameByField(a.f)).Dot("set" + Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call())
+	return Id("_any").Dot(anyNameByField(a.f)).Dot("set"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
 }
 
 func (a anySetterWriter) receiverParams() *Statement {
 	return Id("_any").Id(anyNameByField(a.f) + "Core")
 }
 
-func (a anySetterWriter) params() *Statement {
-	return Id(a.v.Name + "ID").Id(Title(a.v.Name + "ID"))
+func (a anySetterWriter) params() (*Statement, *Statement) {
+	return Id(a.v.Name + "ID").Id(Title(a.v.Name + "ID")), Id("deleteCurrentChild").Bool()
 }
 
 func (a anySetterWriter) reassignAnyContainer() *Statement {

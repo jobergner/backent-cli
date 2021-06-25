@@ -43,6 +43,10 @@ func (t everyTypeGetterWriter) elementHasParent() *Statement {
 	return Id(t.t.Name).Dot(t.t.Name).Dot("HasParent")
 }
 
+func (t everyTypeGetterWriter) returnToIdsSliceToPool() *Statement {
+	return Id(t.t.Name + "IDSlicePool").Dot("Put").Call(Id(t.t.Name + "IDs"))
+}
+
 func (t everyTypeGetterWriter) appendElement() *Statement {
 	return Id(t.sliceName()).Op("=").Append(Id(t.sliceName()), Id(t.t.Name))
 }

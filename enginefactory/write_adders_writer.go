@@ -72,19 +72,23 @@ func (a adderWriter) returnDeletedElement() *Statement {
 }
 
 func (a adderWriter) createNewElement() *Statement {
-	return Id(a.v.Name).Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + Title(a.v.Name)).Call(True())
+	return Id(a.v.Name).Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id(a.t.Name).Dot(a.t.Name).Dot("path").Dot(a.f.Name).Call(), True())
 }
 
 func (a adderWriter) createAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + Title(anyNameByField(a.f))).Call(False()).Dot(anyNameByField(a.f))
+	secondParam := Id(a.t.Name).Dot(a.t.Name).Dot("path").Dot(a.f.Name).Call()
+	if a.f.HasPointerValue {
+		secondParam = Nil()
+	}
+	return Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create"+Title(anyNameByField(a.f))).Call(False(), secondParam).Dot(anyNameByField(a.f))
 }
 
 func (a adderWriter) setAnyContainer() *Statement {
 	statement := Id("anyContainer").Dot("set" + Title(a.v.Name))
 	if a.f.HasPointerValue {
-		return statement.Call(Id(a.idParam()))
+		return statement.Call(Id(a.idParam()), False())
 	}
-	return statement.Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID"))
+	return statement.Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID"), False())
 }
 
 func (a adderWriter) createRef() *Statement {
