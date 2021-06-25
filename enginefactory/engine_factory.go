@@ -61,7 +61,8 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeElementKinds().
 		writeTree().
 		writeTreeElements().
-		writeRecursionCheck()
+		writeRecursionCheck().
+		writePools()
 
 	err := Format(s.buf)
 	if err != nil {

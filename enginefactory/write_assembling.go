@@ -18,25 +18,21 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 	a := assembleTreeWriter{}
 
 	decls.File.Func().Params(a.receiverParams()).Id("assembleTree").Params(a.params()).Id("Tree").Block(
-		a.walkTree(),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
-			return a.clearTree()
+			return a.clearMap("assembleCache", false)
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			a.t = &configType
+			return a.clearMap("forceIncludeAssembleCache", false)
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			a.t = &configType
+			return a.clearMap("Tree", true)
 		}),
 		a.createConfig(),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
-
-			if a.t.IsRootType {
-				return &Statement{
-					For(a.patchLoopConditions()).Block(
-						a.assembleElement(),
-						If(Id("include")).Block(
-							a.setElementInTree(),
-						),
-					),
-				}
-			}
 
 			return &Statement{
 				For(a.patchLoopConditions()).Block(
@@ -52,19 +48,6 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
-
-			if a.t.IsRootType {
-				return &Statement{
-					For(a.stateLoopConditions()).Block(
-						If(a.elementNonExistentInTree()).Block(
-							a.assembleElement(),
-							If(Id("include")).Block(
-								a.setElementInTree(),
-							),
-						),
-					),
-				}
-			}
 
 			return &Statement{
 				For(a.stateLoopConditions()).Block(
@@ -107,6 +90,12 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 			a.getElementFromPatch(),
 			If(Id("!hasUpdated")).Block(
 				a.getElementFromState(),
+			),
+			If(a.shouldRetrieveFromForceInlcudeCache()).Block(
+				a.returnCachedForceIncludeElement(),
+			),
+			If(a.shouldRetrieveFromCache()).Block(
+				a.returnCachedElement(),
 			),
 			a.declareTreeElement(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
@@ -181,6 +170,11 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 
 				return a.setField()
 			}),
+			If(Id("config").Dot("forceInclude")).Block(
+				a.putInCache("forceIncludeAssembleCache"),
+			).Else().Block(
+				a.putInCache("assembleCache"),
+			),
 			Return(a.finalReturn()),
 		)
 	})
@@ -236,6 +230,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				If(a.refHasBeenReplaced()).Block(
 					a.setMode(referenceWriterModeRefReplace),
 					If(a.refWasReplaced()).Block(
+						Id("config").Dot("forceInclude").Op("=").True(),
 						a.declareRef(),
 						a.declareAnyContainer(),
 						ForEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
@@ -288,6 +283,7 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				If(a.refHasBeenReplaced()).Block(
 					a.setMode(referenceWriterModeRefReplace),
 					If(a.refWasReplaced()).Block(
+						Id("config").Dot("forceInclude").Op("=").True(),
 						a.declareRef(),
 						a.writeNonSliceTreeReferenceRefReplaced(),
 					),
