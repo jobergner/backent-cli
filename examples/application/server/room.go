@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"log"
 	"time"
 )
@@ -10,6 +11,7 @@ type Room struct {
 	clientMessageChannel chan message
 	registerChannel      chan *Client
 	unregisterChannel    chan *Client
+	promotionChannel     chan *Client
 	incomingClients      map[*Client]bool
 	pendingResponses     []message
 	state                *Engine
@@ -21,9 +23,10 @@ type Room struct {
 func newRoom(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) *Room {
 	return &Room{
 		clients:              make(map[*Client]bool),
-		clientMessageChannel: make(chan message, 264),
+		clientMessageChannel: make(chan message, 1024),
 		registerChannel:      make(chan *Client),
 		unregisterChannel:    make(chan *Client),
+		promotionChannel:     make(chan *Client),
 		incomingClients:      make(map[*Client]bool),
 		state:                newEngine(),
 		onDeploy:             onDeploy,
@@ -36,65 +39,51 @@ func (r *Room) registerClient(client *Client) {
 	r.incomingClients[client] = true
 }
 
+func (r *Room) promoteIncomingClient(client *Client) {
+	r.clients[client] = true
+	delete(r.incomingClients, client)
+}
+
 func (r *Room) unregisterClient(client *Client) {
+	log.Printf("unregistering client %s", client.id)
+	// TODO: panic close of closed channel?
 	close(client.messageChannel)
 	delete(r.clients, client)
 	delete(r.incomingClients, client)
 }
 
-func (r *Room) broadcastPatchToClients(patchBytes []byte) error {
+func (r *Room) broadcastPatchToClients(patchBytes []byte) {
 	for client := range r.clients {
 		select {
 		case client.messageChannel <- patchBytes:
 		default:
-			r.unregisterClient(client)
-			// TODO what do?
-			log.Println("client dropped")
-		}
-	}
-
-	return nil
-}
-
-func (r *Room) runHandleConnections() {
-	for {
-		select {
-		case client := <-r.registerChannel:
-			r.registerClient(client)
-		case client := <-r.unregisterChannel:
+			log.Printf("client's message buffer full -> dropping client %s", client.id)
 			r.unregisterClient(client)
 		}
 	}
 }
 
-func (r *Room) answerInitRequests() error {
+func (r *Room) handleIncomingClients() error {
 	if len(r.incomingClients) == 0 {
 		return nil
 	}
 	tree := r.state.assembleTree(true)
 	stateBytes, err := tree.MarshalJSON()
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshalling tree for init request: %s", err)
 	}
 
 	for client := range r.incomingClients {
 		select {
 		case client.messageChannel <- stateBytes:
+			r.promotionChannel <- client
 		default:
+			log.Printf("client's message buffer full -> dropping client %s", client.id)
 			r.unregisterClient(client)
-			// TODO what do?
-			log.Println("client dropped")
 		}
 	}
 
 	return nil
-}
-
-func (r *Room) promoteIncomingClients() {
-	for client := range r.incomingClients {
-		r.clients[client] = true
-		delete(r.incomingClients, client)
-	}
 }
 
 func (r *Room) processFrame() error {
@@ -125,21 +114,9 @@ func (r *Room) publishPatch() error {
 	tree := r.state.assembleTree(false)
 	patchBytes, err := tree.MarshalJSON()
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshalling tree for patch: %s", err)
 	}
-	err = r.broadcastPatchToClients(patchBytes)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Room) handleIncomingClients() error {
-	err := r.answerInitRequests()
-	if err != nil {
-		return err
-	}
-	r.promoteIncomingClients()
+	r.broadcastPatchToClients(patchBytes)
 	return nil
 }
 
@@ -148,36 +125,47 @@ func (r *Room) handlePendingResponses() {
 		select {
 		case pendingResponse.client.messageChannel <- pendingResponse.Content:
 		default:
+			log.Printf("client's message buffer full -> dropping client %s", pendingResponse.client.id)
 			r.unregisterClient(pendingResponse.client)
-			// TODO what do?
-			log.Println("client dropped")
 		}
 	}
+	r.pendingResponses = r.pendingResponses[:0]
 }
 
-func (r *Room) runProcessingFrames() {
+func (r *Room) process() {
+	err := r.processFrame()
+	if err != nil {
+		log.Println(err)
+	}
+	err = r.publishPatch()
+	if err != nil {
+		log.Println(err)
+	}
+	r.state.UpdateState()
+	err = r.handleIncomingClients()
+	if err != nil {
+		log.Println(err)
+	}
+	r.handlePendingResponses()
+}
+
+func (r *Room) run() {
 	ticker := time.NewTicker(time.Second)
 	for {
-		<-ticker.C
-		err := r.processFrame()
-		if err != nil {
-			log.Println(err)
+		select {
+		case client := <-r.registerChannel:
+			r.registerClient(client)
+		case client := <-r.unregisterChannel:
+			r.unregisterClient(client)
+		case client := <-r.promotionChannel:
+			r.promoteIncomingClient(client)
+		case <-ticker.C:
+			r.process()
 		}
-		err = r.publishPatch()
-		if err != nil {
-			log.Println(err)
-		}
-		r.state.UpdateState()
-		err = r.handleIncomingClients()
-		if err != nil {
-			log.Println(err)
-		}
-		r.handlePendingResponses()
 	}
 }
 
 func (r *Room) Deploy() {
 	r.onDeploy(r.state)
-	go r.runHandleConnections()
-	go r.runProcessingFrames()
+	go r.run()
 }

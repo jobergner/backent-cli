@@ -7,3 +7,12 @@ type message struct {
 	Content []byte      `json:"content"`
 	client  *Client
 }
+
+func printMessage(msg message) string {
+	b, err := msg.MarshalJSON()
+	if err != nil {
+		return err.Error()
+	} else {
+		return string(b)
+	}
+}

@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -16,7 +17,7 @@ type Client struct {
 func newClient(websocketConnector Connector) (*Client, error) {
 	clientID, err := uuid.NewRandom()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error generating client ID: %s", err)
 	}
 	c := Client{
 		conn:           websocketConnector,
@@ -40,8 +41,8 @@ func (c *Client) forwardToRoom(msg message) {
 	select {
 	case c.room.clientMessageChannel <- msg:
 	default:
-		// TODO what do?
-		log.Println("message dropped")
+		log.Println("room's message buffer full -> message dropped:")
+		log.Println(printMessage(msg))
 	}
 }
 
@@ -57,7 +58,7 @@ func (c *Client) runReadMessages() {
 		var msg message
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
-			log.Println(err)
+			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
 		}
 
 		msg.client = c
@@ -70,6 +71,7 @@ func (c *Client) runWriteMessages() {
 	for {
 		msg, ok := <-c.messageChannel
 		if !ok {
+			log.Printf("messageChannel of client %s has been closed", c.id)
 			return
 		}
 		c.conn.WriteMessage(msg)
