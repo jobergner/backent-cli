@@ -35,16 +35,18 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 			)
 			decls.File.Func().Params(s.receiverParams()).Id("set"+Title(valueType.Name)).Params(s.params()).Block(
 				s.reassignAnyContainer(),
-				ForEachValueOfField(field, func(_valueType *ast.ConfigType) *Statement {
-					if _valueType.Name == valueType.Name {
-						return Empty()
-					}
-					s._v = _valueType
-					return If(s.otherValueIsSet()).Block(
-						s.deleteOtherValue(),
-						s.unsetIDInContainer(),
-					)
-				}),
+				If(Id("deleteCurrentChild")).Block(
+					ForEachValueOfField(field, func(_valueType *ast.ConfigType) *Statement {
+						if _valueType.Name == valueType.Name {
+							return Empty()
+						}
+						s._v = _valueType
+						return If(s.otherValueIsSet()).Block(
+							s.deleteOtherValue(),
+							s.unsetIDInContainer(),
+						)
+					}),
+				),
 				s.setElementKind(),
 				s.setChildID(),
 				s.updateContainerInPatch(),

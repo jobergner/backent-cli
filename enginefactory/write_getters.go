@@ -25,6 +25,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				)),
 				e.appendElement(),
 			),
+			e.returnToIdsSliceToPool(),
 			Return(Id(e.sliceName())),
 		)
 

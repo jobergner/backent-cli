@@ -24,14 +24,7 @@ func (cw creatorWrapperWriter) returns() string {
 }
 
 func (cw creatorWrapperWriter) createElement() *Statement {
-	var callParam *Statement
-	if cw.t.IsRootType {
-		callParam = Empty()
-	} else {
-		callParam = Lit(false)
-	}
-
-	return Id("engine").Dot("create" + Title(cw.t.Name)).Call(callParam)
+	return Id("engine").Dot("create"+Title(cw.t.Name)).Call(Id("newPath").Call(Id(cw.t.Name+"Identifier")), True())
 }
 
 type creatorWriter struct {
@@ -51,18 +44,8 @@ func (c creatorWriter) returns() string {
 	return c.t.Name
 }
 
-func (c creatorWriter) hasParentParam() string {
-	if c.t.IsRootType {
-		return ""
-	}
-	return "hasParent"
-}
-
-func (c creatorWriter) params() *Statement {
-	if c.t.IsRootType {
-		return Empty()
-	}
-	return Id(c.hasParentParam()).Bool()
+func (c creatorWriter) params() (*Statement, *Statement) {
+	return Id("p").Id("path"), Id("extendWithID").Bool()
 }
 
 func (c creatorWriter) declareElement() *Statement {
@@ -78,11 +61,27 @@ func (c creatorWriter) generateID() *Statement {
 }
 
 func (c creatorWriter) setHasParent() *Statement {
-	return Id("element").Dot("HasParent").Op("=").Id(c.hasParentParam())
+	return Id("element").Dot("HasParent").Op("=").Len(Id("p")).Op(">").Lit(1)
+}
+
+func (c creatorWriter) setPath() *Statement {
+	return Id("element").Dot("path").Op("=").Id("p")
+}
+
+func (c creatorWriter) extendPathWithID() *Statement {
+	return Id("element").Dot("path").Op("=").Id("element").Dot("path").Dot("id").Call(Int().Call(Id("element").Dot("ID")))
+}
+
+func (c creatorWriter) setJSONPath() *Statement {
+	return Id("element").Dot("Path").Op("=").Id("element").Dot("path").Dot("toJSONPath").Call()
 }
 
 func (c creatorWriter) createChildElement() *Statement {
-	return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueTypeName)).Call(Lit(true))
+	statement := Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueTypeName))
+	if c.f.HasAnyValue {
+		return statement.Call(True(), Id("p").Dot(c.f.Name).Call())
+	}
+	return statement.Call(Id("p").Dot(c.f.Name).Call(), False())
 }
 func (c creatorWriter) setChildElement() *Statement {
 	return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot(c.f.ValueTypeName).Dot("ID")
@@ -156,7 +155,7 @@ func (c generatedTypeCreatorWriter) assignElementToPatch() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) createChildElement() *Statement {
-	return Id("element" + Title(c.f.ValueType().Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueType().Name)).Call(True())
+	return Id("element"+Title(c.f.ValueType().Name)).Op(":=").Id("engine").Dot("create"+Title(c.f.ValueType().Name)).Call(Id("childElementPath"), False())
 }
 
 func (c generatedTypeCreatorWriter) assignChildElement() *Statement {
@@ -165,6 +164,10 @@ func (c generatedTypeCreatorWriter) assignChildElement() *Statement {
 
 func (c generatedTypeCreatorWriter) assignElementKind() *Statement {
 	return Id("element").Dot("ElementKind").Op("=").Id("ElementKind" + Title(c.f.ValueType().Name))
+}
+
+func (c generatedTypeCreatorWriter) setChildElementPath() *Statement {
+	return Id("element").Dot("ChildElementPath").Op("=").Id("childElementPath")
 }
 
 func (c generatedTypeCreatorWriter) returnElement() *Statement {
