@@ -11,13 +11,13 @@ type assembleTreeWriter struct {
 	t *ast.ConfigType
 }
 
-func (w assembleTreeWriter) walkTree() *Statement {
-	return Id("engine").Dot("walkTree").Call()
-}
-
-func (w assembleTreeWriter) clearTree() *Statement {
-	return For(Id("key").Op(":=").Range().Id("engine").Dot("Tree").Dot(Title(w.t.Name))).Block(
-		Delete(Id("engine").Dot("Tree").Dot(Title(w.t.Name)), Id("key")),
+func (w assembleTreeWriter) clearMap(engineFieldName string, capitalizeSubMapName bool) *Statement {
+	subMapName := w.t.Name
+	if capitalizeSubMapName {
+		subMapName = Title(w.t.Name)
+	}
+	return For(Id("key").Op(":=").Range().Id("engine").Dot(engineFieldName).Dot(subMapName)).Block(
+		Delete(Id("engine").Dot(engineFieldName).Dot(subMapName), Id("key")),
 	)
 }
 
@@ -128,6 +128,22 @@ func (a assembleElementWriter) declareTreeElement() *Statement {
 	return Var().Id(a.treeElementName()).Id(a.treeTypeName())
 }
 
+func (a assembleElementWriter) shouldRetrieveFromForceInlcudeCache() (*Statement, *Statement) {
+	return List(Id("cached"+Title(a.t.Name)), Id("ok")).Op(":=").Id("engine").Dot("forceIncludeAssembleCache").Dot(a.t.Name).Index(Id(a.dataElementName()).Dot("ID")), Id("ok").Op("&&").Id("config").Dot("forceInclude")
+}
+
+func (a assembleElementWriter) returnCachedForceIncludeElement() *Statement {
+	return Return(Id("cached"+Title(a.t.Name)).Dot(a.t.Name), True(), Id("cached"+Title(a.t.Name)).Dot("hasUpdated"))
+}
+
+func (a assembleElementWriter) shouldRetrieveFromCache() (*Statement, *Statement) {
+	return List(Id("cached"+Title(a.t.Name)), Id("ok")).Op(":=").Id("engine").Dot("assembleCache").Dot(a.t.Name).Index(Id(a.dataElementName()).Dot("ID")), Id("ok").Op("&&").Id("!config").Dot("forceInclude")
+}
+
+func (a assembleElementWriter) returnCachedElement() *Statement {
+	return Return(Id("cached"+Title(a.t.Name)).Dot(a.t.Name), Id("cached"+Title(a.t.Name)).Dot("hasUpdated").Op("||").Id("config").Dot("forceInclude"), Id("cached"+Title(a.t.Name)).Dot("hasUpdated"))
+}
+
 func (a assembleElementWriter) typeFieldOn(from string) *Statement {
 	return Id("engine").Dot(from).Dot(Title(a.t.Name)).Index(Id(a.dataElementName()).Dot("ID")).Dot(Title(a.f.Name))
 }
@@ -222,6 +238,10 @@ func (a assembleElementWriter) setID() *Statement {
 
 func (a assembleElementWriter) setOperationKind() *Statement {
 	return Id(a.treeElementName()).Dot("OperationKind").Op("=").Id(a.dataElementName()).Dot("OperationKind")
+}
+
+func (a assembleElementWriter) putInCache(cacheName string) *Statement {
+	return Id("engine").Dot(cacheName).Dot(a.t.Name).Index(Id(a.t.Name).Dot("ID")).Op("=").Id(a.t.Name + "CacheElement").Values(List(Id("hasUpdated").Op(":").Id("hasUpdated"), Id(a.t.Name).Op(":").Id(a.t.Name)))
 }
 
 func (a assembleElementWriter) finalReturn() (*Statement, *Statement, *Statement) {
@@ -367,7 +387,7 @@ func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 
 func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
 	firstReturn := "_"
-	if a.mode == referenceWriterModeRefCreate || a.mode == referenceWriterModeRefUpdate {
+	if a.mode == referenceWriterModeRefCreate || a.mode == referenceWriterModeRefUpdate || a.mode == referenceWriterModeRefReplace {
 		firstReturn = "element"
 	}
 	usedID := Id("referencedElement").Dot("ID")
@@ -383,20 +403,6 @@ func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
 	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+Title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
-func (a assembleReferenceWriter) retrievePath() *Statement {
-	usedID := Id("referencedElement").Dot("ID")
-	if a.mode == referenceWriterModeElementModified {
-		if a.f.HasAnyValue {
-			usedID = Id("anyContainer").Dot(a.nextValueName()).Dot(Title(a.v.Name))
-		} else if !a.f.HasSliceValue {
-			usedID = Id("ref").Dot("ID").Call()
-		} else {
-			usedID = Id("ref").Dot("ReferencedElementID")
-		}
-	}
-	return List(Id("path"), Id("_")).Op(":=").Id("engine").Dot("PathTrack").Dot(a.v.Name).Index(usedID)
-}
-
 // non-slice gen force: ref.playerTargetRef.OperationKind
 //   "          create: OperationKindUpdate
 //							remove: OperationKindDelete
@@ -410,7 +416,7 @@ func (a assembleReferenceWriter) retrievePath() *Statement {
 
 func (a assembleReferenceWriter) defineReference() *Statement {
 	element := Nil()
-	if a.mode == referenceWriterModeRefCreate {
+	if a.mode == referenceWriterModeRefCreate || a.mode == referenceWriterModeRefReplace {
 		element = Id("&element")
 	}
 	if a.mode == referenceWriterModeRefUpdate {
@@ -468,7 +474,7 @@ func (a assembleReferenceWriter) defineReference() *Statement {
 		usedID,
 		Id("ElementKind"+Title(a.v.Name)),
 		dataStatus,
-		Id("path").Dot("toJSONPath").Call(),
+		Id("referencedElement").Dot("Path"),
 		element,
 	)
 }
@@ -530,41 +536,39 @@ func (a assembleReferenceWriter) finalReturn() *Statement {
 
 func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
+		a.declareReferencedElement().Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
 		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath().Line(),
 		Return(a.defineReference(), True(), a.hasUpdated()).Line(),
 	}
 }
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefCreated() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
+		a.declareReferencedElement().Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
 		a.assembleReferencedElement().Line(),
 		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath().Line(),
 		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
 func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
+		a.declareReferencedElement().Line(),
 		a.assembleReferencedElement().Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
 		If(Id("hasUpdatedDownstream")).Block(
@@ -574,37 +578,35 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement 
 		If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 			Id("el").Op("=").Id("&element"),
 		).Line(),
-		a.retrievePath().Line(),
 		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefRemoved() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
+		a.declareReferencedElement().Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
 		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath().Line(),
 		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
 
 func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefReplaced() *Statement {
 	return &Statement{
-		a.declareReferencedElement().Line(),
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
+		a.declareReferencedElement().Line(),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
-		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
+		a.assembleReferencedElement().Line(),
+		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		a.retrievePath().Line(),
 		Return(a.defineReference(), True(), a.hasUpdated()),
 	}
 }
@@ -614,8 +616,8 @@ func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefElementUpdated() *
 		If(Id("check").Op("==").Nil()).Block(
 			Id("check").Op("=").Id("newRecursionCheck").Call(),
 		).Line(),
+		a.declareReferencedElement().Line(),
 		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
-			a.retrievePath(),
 			Return(a.defineReference(), True(), a.hasUpdated()),
 		),
 	}
@@ -623,8 +625,8 @@ func (a assembleReferenceWriter) writeNonSliceTreeReferenceRefElementUpdated() *
 
 func (a assembleReferenceWriter) writeSliceTreeReferenceRefElementUpdated() *Statement {
 	return &Statement{
+		a.declareReferencedElement().Line(),
 		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
-			a.retrievePath(),
 			Return(a.defineReference(), True(), a.hasUpdated()),
 		),
 	}
