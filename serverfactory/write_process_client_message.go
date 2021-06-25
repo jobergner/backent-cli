@@ -29,7 +29,7 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 				)
 			}),
 			Default().Block(
-				Return(Id("message").Values(), Id("errors").Dot("New").Call(Lit("unknown message kind"))),
+				Return(Id("message").Values(), Id("fmt").Dot("Errorf").Call(Lit("unknown message kind in: %s"), Id("printMessage").Call(Id("msg")))),
 			),
 		),
 	)
