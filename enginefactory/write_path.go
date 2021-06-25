@@ -7,28 +7,6 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *EngineFactory) writePathTrack() *EngineFactory {
-	decls := NewDeclSet()
-
-	decls.File.Type().Id("pathTrack").Struct(
-		Id("_iterations").Int(),
-		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			return Id(configType.Name).Map(Id(Title(configType.Name) + "ID")).Id("path")
-		}),
-	)
-
-	decls.File.Func().Id("newPathTrack").Params().Id("pathTrack").Block(
-		Return(Id("pathTrack").Block(
-			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				return Id(configType.Name).Id(":").Make(Map(Id(Title(configType.Name) + "ID")).Id("path")).Id(",")
-			}),
-		)),
-	)
-
-	decls.Render(s.buf)
-	return s
-}
-
 func (s *EngineFactory) writeIdentifiers() *EngineFactory {
 	decls := NewDeclSet()
 
@@ -104,14 +82,14 @@ func (s *EngineFactory) writePath() *EngineFactory {
 
 	decls.File.Type().Id("path").Id("[]int")
 
-	decls.File.Func().Id("newPath").Params(Id("elementIdentifier"), Id("id").Int()).Id("path").Block(
-		Return(Id("[]int").Values(Id("elementIdentifier"), Id("id"))),
+	decls.File.Func().Id("newPath").Params(Id("elementIdentifier").Int()).Id("path").Block(
+		Return(Id("[]int").Values(Id("elementIdentifier"))),
 	)
 
-	decls.File.Func().Params(Id("p").Id("path")).Id("index").Params(Id("i").Id("int")).Id("path").Block(
+	decls.File.Func().Params(Id("p").Id("path")).Id("id").Params(Id("id").Id("int")).Id("path").Block(
 		Id("newPath").Op(":=").Make(Id("[]int"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
 		Copy(Id("newPath"), Id("p")),
-		Id("newPath").Op("=").Append(Id("newPath"), Id("i")),
+		Id("newPath").Op("=").Append(Id("newPath"), Id("id")),
 		Return(Id("newPath")),
 	)
 

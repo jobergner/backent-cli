@@ -64,6 +64,7 @@ func (s *EngineFactory) writeDereference() *EngineFactory {
 			}
 
 			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+				d.declareAllIDs(),
 				For(d.allIDsLoopConditions()).Block(
 					d.declareRef(),
 					OnlyIf(field.HasAnyValue, d.declareAnyContainer()),
@@ -80,6 +81,7 @@ func (s *EngineFactory) writeDereference() *EngineFactory {
 						}),
 					),
 				),
+				d.returnSliceToPool(),
 			)
 		})
 

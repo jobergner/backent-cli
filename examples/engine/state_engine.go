@@ -12,8 +12,8 @@ type Engine struct {
 	State                     State
 	Patch                     State
 	Tree                      Tree
-	forceIncludeAssembleCache assembleCache
 	assembleCache             assembleCache
+	forceIncludeAssembleCache assembleCache
 	IDgen                     int
 }
 
@@ -23,8 +23,8 @@ func newEngine() *Engine {
 		Patch:                     newState(),
 		State:                     newState(),
 		Tree:                      newTree(),
-		forceIncludeAssembleCache: newAssembleCache(),
 		assembleCache:             newAssembleCache(),
+		forceIncludeAssembleCache: newAssembleCache(),
 	}
 }
 

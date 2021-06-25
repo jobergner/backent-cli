@@ -112,7 +112,9 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
 			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
-			OnlyIf(!configType.IsRootType, Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line()),
+			Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line(),
+			Id("Path").String().Id(e.metaFieldTag("path")),
+			Id("path").Id("path"),
 			Id("engine").Id("*Engine").Line(),
 		)
 
@@ -140,6 +142,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 		decls.File.Type().Id(anyNameByField(field)+"Core").Struct(
 			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
+			Id("ChildElementPath").Id("path").Id(fieldTag("childElementPath")).Line(),
 			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
 				return Id(Title(configType.Name)).Id(Title(configType.Name) + "ID").Id(fieldTag(configType.Name)).Line()
 			}),

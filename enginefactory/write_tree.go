@@ -110,7 +110,7 @@ func (s *EngineFactory) writeRecursionCheck() *EngineFactory {
 
 	decls.File.Type().Id("recursionCheck").Struct(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			r := recursionCheckWriter{
+			r := elementMapWriter{
 				typeName: func() string {
 					return configType.Name
 				},
@@ -124,7 +124,7 @@ func (s *EngineFactory) writeRecursionCheck() *EngineFactory {
 		Return(Id("&recursionCheck").Block(
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 
-				r := recursionCheckWriter{
+				r := elementMapWriter{
 					typeName: func() string {
 						return configType.Name
 					},
@@ -134,6 +134,47 @@ func (s *EngineFactory) writeRecursionCheck() *EngineFactory {
 			}),
 		)),
 	)
+
+	decls.Render(s.buf)
+	return s
+}
+
+func (s *EngineFactory) writeAssembleCache() *EngineFactory {
+	decls := NewDeclSet()
+
+	decls.File.Type().Id("assembleCache").Struct(
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			e := elementMapWriter{
+				typeName: func() string {
+					return configType.Name
+				},
+			}
+
+			return Id(e.fieldName()).Map(e.mapKey()).Id(configType.Name + "CacheElement").Line()
+		}),
+	)
+
+	decls.File.Func().Id("newAssembleCache").Params().Id("assembleCache").Block(
+		Return(Id("assembleCache").Block(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+
+				e := elementMapWriter{
+					typeName: func() string {
+						return configType.Name
+					},
+				}
+
+				return Id(e.fieldName()).Id(":").Make(Map(e.mapKey()).Id(configType.Name + "CacheElement")).Id(",")
+			}),
+		)),
+	)
+
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		decls.File.Type().Id(configType.Name+"CacheElement").Struct(
+			Id("hasUpdated").Bool(),
+			Id(configType.Name).Id(Title(configType.Name)),
+		)
+	})
 
 	decls.Render(s.buf)
 	return s

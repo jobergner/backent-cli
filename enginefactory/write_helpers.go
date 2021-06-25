@@ -12,6 +12,9 @@ func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		d := deduplicateWriter{
+			typeName: func() string {
+				return configType.Name
+			},
 			idType: func() string {
 				return Title(configType.Name) + "ID"
 			},
@@ -21,9 +24,11 @@ func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 	})
 	s.config.RangeRefFields(func(field ast.Field) {
 		d := deduplicateWriter{
+			typeName: func() string {
+				return field.ValueTypeName
+			},
 			idType: func() string {
 				return Title(field.ValueTypeName) + "ID"
-				// return Title(field.Parent.Name) + Title(Singular(field.Name)) + "RefID"
 			},
 		}
 
@@ -37,6 +42,9 @@ func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 func writeDeduplicate(decls *DeclSet, d deduplicateWriter) {
 	decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
 		d.defineCheck(),
+		For(d.clearCheckLoopConditions()).Block(
+			d.clearCheckValue(),
+		),
 		d.defineDeduped(),
 		For(d.loopConditions("a")).Block(
 			d.checkValue(),
@@ -45,6 +53,7 @@ func writeDeduplicate(decls *DeclSet, d deduplicateWriter) {
 			d.checkValue(),
 		),
 		d.loopCheck(),
+		d.returnCheckToPool(),
 		Return(Id("deduped")),
 	)
 }
@@ -55,7 +64,7 @@ func (s *EngineFactory) writeAllIDsMethod() *EngineFactory {
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		a := allIDsMehtodWriter{
 			typeName: func() string {
-				return Title(configType.Name)
+				return configType.Name
 			},
 		}
 
@@ -65,8 +74,7 @@ func (s *EngineFactory) writeAllIDsMethod() *EngineFactory {
 	s.config.RangeRefFields(func(field ast.Field) {
 		a := allIDsMehtodWriter{
 			typeName: func() string {
-				return Title(field.ValueTypeName)
-				// return Title(field.Parent.Name) + Title(Singular(field.Name)) + "RefID"
+				return field.ValueTypeName
 			},
 		}
 
@@ -87,7 +95,10 @@ func writeAllIDsMethod(decls *DeclSet, a allIDsMehtodWriter) {
 		For(a.patchIDsLoopConditions()).Block(
 			a.appendPatchID(),
 		),
-		Return(a.deduplicatedIDs()),
+		a.declareDedupedIDs(),
+		a.returnIdSliceToPool("state"),
+		a.returnIdSliceToPool("patch"),
+		Return(Id("dedupedIDs")),
 	)
 }
 

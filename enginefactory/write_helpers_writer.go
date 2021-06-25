@@ -7,7 +7,8 @@ import (
 )
 
 type deduplicateWriter struct {
-	idType func() string
+	typeName func() string
+	idType   func() string
 }
 
 func (d deduplicateWriter) name() string {
@@ -23,11 +24,19 @@ func (d deduplicateWriter) returns() string {
 }
 
 func (d deduplicateWriter) defineCheck() *Statement {
-	return Id("check").Op(":=").Make(Map(Id(d.idType())).Bool())
+	return Id("check").Op(":=").Id(d.typeName() + "CheckPool").Dot("Get").Call().Assert(Map(Id(d.idType())).Bool())
+}
+
+func (d deduplicateWriter) clearCheckLoopConditions() *Statement {
+	return Id("k").Op(":=").Range().Id("check")
+}
+
+func (d deduplicateWriter) clearCheckValue() *Statement {
+	return Delete(Id("check"), Id("k"))
 }
 
 func (d deduplicateWriter) defineDeduped() *Statement {
-	return Id("deduped").Op(":=").Make(Id(d.returns()), Lit(0))
+	return Id("deduped").Op(":=").Id(d.typeName() + "IDSlicePool").Dot("Get").Call().Assert(Id(d.returns())).Index(Op(":").Lit(0))
 
 }
 
@@ -46,6 +55,10 @@ func (d deduplicateWriter) loopCheck() *Statement {
 	return loop
 }
 
+func (d deduplicateWriter) returnCheckToPool() *Statement {
+	return Id(d.typeName() + "CheckPool").Dot("Put").Call(Id("check"))
+}
+
 type allIDsMehtodWriter struct {
 	typeName func() string
 }
@@ -55,7 +68,7 @@ func (a allIDsMehtodWriter) idType() string {
 }
 
 func (a allIDsMehtodWriter) name() string {
-	return "all" + a.idType() + "s"
+	return "all" + Title(a.idType()) + "s"
 }
 
 func (a allIDsMehtodWriter) receiverParams() *Statement {
@@ -63,19 +76,19 @@ func (a allIDsMehtodWriter) receiverParams() *Statement {
 }
 
 func (a allIDsMehtodWriter) returns() string {
-	return "[]" + a.idType()
+	return "[]" + Title(a.idType())
 }
 
 func (a allIDsMehtodWriter) idSliceName(prefix string) string {
-	return prefix + a.idType() + "s"
+	return prefix + Title(a.idType()) + "s"
 }
 
 func (a allIDsMehtodWriter) declareStateIDsSlice() *Statement {
-	return Var().Id(a.idSliceName("state")).Id("[]" + a.idType())
+	return Id(a.idSliceName("state")).Op(":=").Id(a.idType() + "SlicePool").Dot("Get").Call().Assert(Index().Id(Title(a.idType()))).Index(Op(":").Lit(0))
 }
 
 func (a allIDsMehtodWriter) stateIDsLoopConditions() *Statement {
-	return Id(Lower(a.idType())).Op(":=").Range().Id("engine").Dot("State").Dot(a.typeName())
+	return Id(Lower(a.idType())).Op(":=").Range().Id("engine").Dot("State").Dot(Title(a.typeName()))
 }
 
 func (a allIDsMehtodWriter) appendStateID() *Statement {
@@ -83,19 +96,23 @@ func (a allIDsMehtodWriter) appendStateID() *Statement {
 }
 
 func (a allIDsMehtodWriter) declarePatchIDsSlice() *Statement {
-	return Var().Id(a.idSliceName("patch")).Id("[]" + a.idType())
+	return Id(a.idSliceName("patch")).Op(":=").Id(a.idType() + "SlicePool").Dot("Get").Call().Assert(Index().Id(Title(a.idType()))).Index(Op(":").Lit(0))
 }
 
 func (a allIDsMehtodWriter) patchIDsLoopConditions() *Statement {
-	return Id(Lower(a.idType())).Op(":=").Range().Id("engine").Dot("Patch").Dot(a.typeName())
+	return Id(Lower(a.idType())).Op(":=").Range().Id("engine").Dot("Patch").Dot(Title(a.typeName()))
 }
 
 func (a allIDsMehtodWriter) appendPatchID() *Statement {
 	return Id(a.idSliceName("patch")).Op("=").Append(Id(a.idSliceName("patch")), Id(Lower(a.idType())))
 }
 
-func (a allIDsMehtodWriter) deduplicatedIDs() *Statement {
-	return Id("deduplicate"+a.typeName()+"IDs").Call(Id(a.idSliceName("state")), Id(a.idSliceName("patch")))
+func (a allIDsMehtodWriter) declareDedupedIDs() *Statement {
+	return Id("dedupedIDs").Op(":=").Id("deduplicate"+Title(a.typeName())+"IDs").Call(Id(a.idSliceName("state")), Id(a.idSliceName("patch")))
+}
+
+func (a allIDsMehtodWriter) returnIdSliceToPool(prefix string) *Statement {
+	return Id(a.idType() + "SlicePool").Dot("Put").Call(Id(prefix + Title(a.idType()) + "s"))
 }
 
 type mergeIDsWriter struct {

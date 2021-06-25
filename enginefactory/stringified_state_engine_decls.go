@@ -447,10 +447,10 @@ const assembleGearScore_Engine_func string = `func (engine *Engine) assembleGear
 		gearScoreData = engine.State.GearScore[gearScoreID]
 	}
 	if cachedGearScore, ok := engine.forceIncludeAssembleCache.gearScore[gearScoreData.ID]; ok && config.forceInclude {
-		return cachedGearScore.gearScore, true, cachedGearScore.hasUpdatedDownstream
+		return cachedGearScore.gearScore, true, cachedGearScore.hasUpdated
 	}
 	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok && !config.forceInclude {
-		return cachedGearScore.gearScore, cachedGearScore.hasUpdatedDownstream || config.forceInclude, cachedGearScore.hasUpdatedDownstream
+		return cachedGearScore.gearScore, cachedGearScore.hasUpdated || config.forceInclude, cachedGearScore.hasUpdated
 	}
 	var gearScore GearScore
 	gearScore.ID = gearScoreData.ID
@@ -458,9 +458,9 @@ const assembleGearScore_Engine_func string = `func (engine *Engine) assembleGear
 	gearScore.Level = gearScoreData.Level
 	gearScore.Score = gearScoreData.Score
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdatedDownstream: hasUpdated, gearScore: gearScore}
+		engine.forceIncludeAssembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: gearScore}
 	} else {
-		engine.assembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdatedDownstream: hasUpdated, gearScore: gearScore}
+		engine.assembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: gearScore}
 	}
 	return gearScore, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -478,10 +478,10 @@ const assemblePosition_Engine_func string = `func (engine *Engine) assemblePosit
 		positionData = engine.State.Position[positionID]
 	}
 	if cachedPosition, ok := engine.forceIncludeAssembleCache.position[positionData.ID]; ok && config.forceInclude {
-		return cachedPosition.position, true, cachedPosition.hasUpdatedDownstream
+		return cachedPosition.position, true, cachedPosition.hasUpdated
 	}
 	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok && !config.forceInclude {
-		return cachedPosition.position, cachedPosition.hasUpdatedDownstream || config.forceInclude, cachedPosition.hasUpdatedDownstream
+		return cachedPosition.position, cachedPosition.hasUpdated || config.forceInclude, cachedPosition.hasUpdated
 	}
 	var position Position
 	position.ID = positionData.ID
@@ -489,9 +489,9 @@ const assemblePosition_Engine_func string = `func (engine *Engine) assemblePosit
 	position.X = positionData.X
 	position.Y = positionData.Y
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.position[position.ID] = positionCacheElement{hasUpdatedDownstream: hasUpdated, position: position}
+		engine.forceIncludeAssembleCache.position[position.ID] = positionCacheElement{hasUpdated: hasUpdated, position: position}
 	} else {
-		engine.assembleCache.position[position.ID] = positionCacheElement{hasUpdatedDownstream: hasUpdated, position: position}
+		engine.assembleCache.position[position.ID] = positionCacheElement{hasUpdated: hasUpdated, position: position}
 	}
 	return position, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -509,10 +509,10 @@ const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleE
 		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
 	}
 	if cachedEquipmentSet, ok := engine.forceIncludeAssembleCache.equipmentSet[equipmentSetData.ID]; ok && config.forceInclude {
-		return cachedEquipmentSet.equipmentSet, true, cachedEquipmentSet.hasUpdatedDownstream
+		return cachedEquipmentSet.equipmentSet, true, cachedEquipmentSet.hasUpdated
 	}
 	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok && !config.forceInclude {
-		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdatedDownstream || config.forceInclude, cachedEquipmentSet.hasUpdatedDownstream
+		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdated || config.forceInclude, cachedEquipmentSet.hasUpdated
 	}
 	var equipmentSet EquipmentSet
 	for _, equipmentSetEquipmentRefID := range mergeEquipmentSetEquipmentRefIDs(engine.State.EquipmentSet[equipmentSetData.ID].Equipment, engine.Patch.EquipmentSet[equipmentSetData.ID].Equipment) {
@@ -530,9 +530,9 @@ const assembleEquipmentSet_Engine_func string = `func (engine *Engine) assembleE
 	equipmentSet.OperationKind = equipmentSetData.OperationKind
 	equipmentSet.Name = equipmentSetData.Name
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdatedDownstream: hasUpdated, equipmentSet: equipmentSet}
+		engine.forceIncludeAssembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: equipmentSet}
 	} else {
-		engine.assembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdatedDownstream: hasUpdated, equipmentSet: equipmentSet}
+		engine.assembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: equipmentSet}
 	}
 	return equipmentSet, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -550,10 +550,10 @@ const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(item
 		itemData = engine.State.Item[itemID]
 	}
 	if cachedItem, ok := engine.forceIncludeAssembleCache.item[itemData.ID]; ok && config.forceInclude {
-		return cachedItem.item, true, cachedItem.hasUpdatedDownstream
+		return cachedItem.item, true, cachedItem.hasUpdated
 	}
 	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok && !config.forceInclude {
-		return cachedItem.item, cachedItem.hasUpdatedDownstream || config.forceInclude, cachedItem.hasUpdatedDownstream
+		return cachedItem.item, cachedItem.hasUpdated || config.forceInclude, cachedItem.hasUpdated
 	}
 	var item Item
 	if treeItemBoundToRef, include, childHasUpdated := engine.assembleItemBoundToRef(itemID, check, config); include {
@@ -590,9 +590,9 @@ const assembleItem_Engine_func string = `func (engine *Engine) assembleItem(item
 	item.OperationKind = itemData.OperationKind
 	item.Name = itemData.Name
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.item[item.ID] = itemCacheElement{hasUpdatedDownstream: hasUpdated, item: item}
+		engine.forceIncludeAssembleCache.item[item.ID] = itemCacheElement{hasUpdated: hasUpdated, item: item}
 	} else {
-		engine.assembleCache.item[item.ID] = itemCacheElement{hasUpdatedDownstream: hasUpdated, item: item}
+		engine.assembleCache.item[item.ID] = itemCacheElement{hasUpdated: hasUpdated, item: item}
 	}
 	return item, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -610,10 +610,10 @@ const assembleZoneItem_Engine_func string = `func (engine *Engine) assembleZoneI
 		zoneItemData = engine.State.ZoneItem[zoneItemID]
 	}
 	if cachedZonezoneItem, ok := engine.forceIncludeAssembleCache.zoneItem[zoneItemData.ID]; ok && config.forceInclude {
-		return cachedZonezoneItem.zoneItem, true, cachedZonezoneItem.hasUpdatedDownstream
+		return cachedZonezoneItem.zoneItem, true, cachedZonezoneItem.hasUpdated
 	}
 	if cachedZonezoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok && !config.forceInclude {
-		return cachedZonezoneItem.zoneItem, cachedZonezoneItem.hasUpdatedDownstream || config.forceInclude, cachedZonezoneItem.hasUpdatedDownstream
+		return cachedZonezoneItem.zoneItem, cachedZonezoneItem.hasUpdated || config.forceInclude, cachedZonezoneItem.hasUpdated
 	}
 	var zoneItem ZoneItem
 	if treeItem, include, childHasUpdated := engine.assembleItem(zoneItemData.Item, check, config); include {
@@ -631,9 +631,9 @@ const assembleZoneItem_Engine_func string = `func (engine *Engine) assembleZoneI
 	zoneItem.ID = zoneItemData.ID
 	zoneItem.OperationKind = zoneItemData.OperationKind
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdatedDownstream: hasUpdated, zoneItem: zoneItem}
+		engine.forceIncludeAssembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: zoneItem}
 	} else {
-		engine.assembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdatedDownstream: hasUpdated, zoneItem: zoneItem}
+		engine.assembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: zoneItem}
 	}
 	return zoneItem, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -651,10 +651,10 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 		playerData = engine.State.Player[playerID]
 	}
 	if cachedPlayer, ok := engine.forceIncludeAssembleCache.player[playerData.ID]; ok && config.forceInclude {
-		return cachedPlayer.player, true, cachedPlayer.hasUpdatedDownstream
+		return cachedPlayer.player, true, cachedPlayer.hasUpdated
 	}
 	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok && !config.forceInclude {
-		return cachedPlayer.player, cachedPlayer.hasUpdatedDownstream || config.forceInclude, cachedPlayer.hasUpdatedDownstream
+		return cachedPlayer.player, cachedPlayer.hasUpdated || config.forceInclude, cachedPlayer.hasUpdated
 	}
 	var player Player
 	for _, playerEquipmentSetRefID := range mergePlayerEquipmentSetRefIDs(engine.State.Player[playerData.ID].EquipmentSets, engine.Patch.Player[playerData.ID].EquipmentSets) {
@@ -722,9 +722,9 @@ const assemblePlayer_Engine_func string = `func (engine *Engine) assemblePlayer(
 	player.ID = playerData.ID
 	player.OperationKind = playerData.OperationKind
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.player[player.ID] = playerCacheElement{hasUpdatedDownstream: hasUpdated, player: player}
+		engine.forceIncludeAssembleCache.player[player.ID] = playerCacheElement{hasUpdated: hasUpdated, player: player}
 	} else {
-		engine.assembleCache.player[player.ID] = playerCacheElement{hasUpdatedDownstream: hasUpdated, player: player}
+		engine.assembleCache.player[player.ID] = playerCacheElement{hasUpdated: hasUpdated, player: player}
 	}
 	return player, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -742,10 +742,10 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 		zoneData = engine.State.Zone[zoneID]
 	}
 	if cachedZone, ok := engine.forceIncludeAssembleCache.zone[zoneData.ID]; ok && config.forceInclude {
-		return cachedZone.zone, true, cachedZone.hasUpdatedDownstream
+		return cachedZone.zone, true, cachedZone.hasUpdated
 	}
 	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok && !config.forceInclude {
-		return cachedZone.zone, cachedZone.hasUpdatedDownstream || config.forceInclude, cachedZone.hasUpdatedDownstream
+		return cachedZone.zone, cachedZone.hasUpdated || config.forceInclude, cachedZone.hasUpdated
 	}
 	var zone Zone
 	for _, anyOfItem_Player_ZoneItemID := range mergeAnyOfItem_Player_ZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
@@ -811,9 +811,9 @@ const assembleZone_Engine_func string = `func (engine *Engine) assembleZone(zone
 	zone.OperationKind = zoneData.OperationKind
 	zone.Tags = zoneData.Tags
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.zone[zone.ID] = zoneCacheElement{hasUpdatedDownstream: hasUpdated, zone: zone}
+		engine.forceIncludeAssembleCache.zone[zone.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: zone}
 	} else {
-		engine.assembleCache.zone[zone.ID] = zoneCacheElement{hasUpdatedDownstream: hasUpdated, zone: zone}
+		engine.assembleCache.zone[zone.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: zone}
 	}
 	return zone, hasUpdated || config.forceInclude, hasUpdated
 }`
@@ -1304,9 +1304,11 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(asse
 	}
 	config := assembleConfig{forceInclude: assembleEntireTree}
 	for _, equipmentSetData := range engine.Patch.EquipmentSet {
-		equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
-		if include {
-			engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+		if !equipmentSetData.HasParent {
+			equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
+			if include {
+				engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+			}
 		}
 	}
 	for _, gearScoreData := range engine.Patch.GearScore {
@@ -1342,9 +1344,11 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(asse
 		}
 	}
 	for _, zoneData := range engine.Patch.Zone {
-		zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
-		if include {
-			engine.Tree.Zone[zoneData.ID] = zone
+		if !zoneData.HasParent {
+			zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
+			if include {
+				engine.Tree.Zone[zoneData.ID] = zone
+			}
 		}
 	}
 	for _, zoneItemData := range engine.Patch.ZoneItem {
@@ -1356,10 +1360,12 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(asse
 		}
 	}
 	for _, equipmentSetData := range engine.State.EquipmentSet {
-		if _, ok := engine.Tree.EquipmentSet[equipmentSetData.ID]; !ok {
-			equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
-			if include {
-				engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+		if !equipmentSetData.HasParent {
+			if _, ok := engine.Tree.EquipmentSet[equipmentSetData.ID]; !ok {
+				equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
+				if include {
+					engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+				}
 			}
 		}
 	}
@@ -1404,10 +1410,12 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree(asse
 		}
 	}
 	for _, zoneData := range engine.State.Zone {
-		if _, ok := engine.Tree.Zone[zoneData.ID]; !ok {
-			zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
-			if include {
-				engine.Tree.Zone[zoneData.ID] = zone
+		if !zoneData.HasParent {
+			if _, ok := engine.Tree.Zone[zoneData.ID]; !ok {
+				zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
+				if include {
+					engine.Tree.Zone[zoneData.ID] = zone
+				}
 			}
 		}
 	}
@@ -4374,13 +4382,13 @@ const _Engine_type string = `type Engine struct {
 	State				State
 	Patch				State
 	Tree				Tree
-	forceIncludeAssembleCache	assembleCache
 	assembleCache			assembleCache
+	forceIncludeAssembleCache	assembleCache
 	IDgen				int
 }`
 
 const newEngine_func string = `func newEngine() *Engine {
-	return &Engine{IDgen: 1, Patch: newState(), State: newState(), Tree: newTree(), forceIncludeAssembleCache: newAssembleCache(), assembleCache: newAssembleCache()}
+	return &Engine{IDgen: 1, Patch: newState(), State: newState(), Tree: newTree(), assembleCache: newAssembleCache(), forceIncludeAssembleCache: newAssembleCache()}
 }`
 
 const _GenerateID_Engine_func string = `func (engine *Engine) GenerateID() int {
@@ -4760,36 +4768,36 @@ const newAssembleCache_func string = `func newAssembleCache() assembleCache {
 }`
 
 const equipmentSetCacheElement_type string = `type equipmentSetCacheElement struct {
-	hasUpdatedDownstream	bool
-	equipmentSet		EquipmentSet
+	hasUpdated	bool
+	equipmentSet	EquipmentSet
 }`
 
 const gearScoreCacheElement_type string = `type gearScoreCacheElement struct {
-	hasUpdatedDownstream	bool
-	gearScore		GearScore
+	hasUpdated	bool
+	gearScore	GearScore
 }`
 
 const itemCacheElement_type string = `type itemCacheElement struct {
-	hasUpdatedDownstream	bool
-	item			Item
+	hasUpdated	bool
+	item		Item
 }`
 
 const playerCacheElement_type string = `type playerCacheElement struct {
-	hasUpdatedDownstream	bool
-	player			Player
+	hasUpdated	bool
+	player		Player
 }`
 
 const positionCacheElement_type string = `type positionCacheElement struct {
-	hasUpdatedDownstream	bool
-	position		Position
+	hasUpdated	bool
+	position	Position
 }`
 
 const zoneCacheElement_type string = `type zoneCacheElement struct {
-	hasUpdatedDownstream	bool
-	zone			Zone
+	hasUpdated	bool
+	zone		Zone
 }`
 
 const zoneItemCacheElement_type string = `type zoneItemCacheElement struct {
-	hasUpdatedDownstream	bool
-	zoneItem		ZoneItem
+	hasUpdated	bool
+	zoneItem	ZoneItem
 }`
