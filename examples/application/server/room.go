@@ -43,11 +43,15 @@ func (r *Room) promoteIncomingClient(client *Client) {
 }
 
 func (r *Room) unregisterClient(client *Client) {
-	log.Printf("unregistering client %s", client.id)
-	// TODO: panic close of closed channel?
-	close(client.messageChannel)
-	delete(r.clients, client)
-	delete(r.incomingClients, client)
+	if _, ok := r.clients[client]; ok {
+		log.Printf("unregistering client %s", client.id)
+		close(client.messageChannel)
+		delete(r.clients, client)
+	} else if _, ok := r.incomingClients[client]; ok {
+		log.Printf("unregistering incoming client %s", client.id)
+		close(client.messageChannel)
+		delete(r.incomingClients, client)
+	}
 }
 
 func (r *Room) broadcastPatchToClients(patchBytes []byte) {
