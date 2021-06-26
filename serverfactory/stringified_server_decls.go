@@ -8,9 +8,9 @@ const gets_generated_go_import string = `import (
 )`
 
 const messageKindAction_addItemToPlayer_type string = `const (
-	messageKindAction_addItemToPlayer	messageKind	= 1
-	messageKindAction_movePlayer		messageKind	= 2
-	messageKindAction_spawnZoneItems	messageKind	= 3
+	messageKindAction_addItemToPlayer	messageKind	= "addItemToPlayer"
+	messageKindAction_movePlayer		messageKind	= "movePlayer"
+	messageKindAction_spawnZoneItems	messageKind	= "spawnZoneItems"
 )`
 
 const _MovePlayerParams_type string = `type MovePlayerParams struct {

@@ -1,6 +1,6 @@
 package state
 
-type messageKind int
+type messageKind string
 
 type message struct {
 	Kind    messageKind `json:"kind"`
