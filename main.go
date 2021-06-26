@@ -77,7 +77,7 @@ func validateOutDir() error {
 }
 
 func validateBuild() error {
-	cmd := exec.Command("go", "build", ".")
+	cmd := exec.Command("go", "test", ".")
 	cmd.Dir = *outDirname
 
 	if err := cmd.Run(); err != nil {
