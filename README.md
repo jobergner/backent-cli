@@ -378,9 +378,34 @@ which both delete the current child, and create a new one. This however causes p
 being able to call the setters on these references makes no sense. This is why any types have ref wrappers, which are created just before `Get()` is called on the reference. These wrappers exclude the 
 setter methods.
 
+
+### test cases
+- create element -> Create()
+- delete element -> Delete()
+- manipulate element -> SetName()
+- add element -> AddItem()
+- remove element -> RemoveItem()
+- set reference -> SetBoundTo()
+- unset reference -> BoundTo().Unset()
+- add reference -> AddGuildMember()
+- remove reference -> RemoveGuildMember()
+- set anyOf reference -> SetTargetPlayer()
+- unset anyOf reference -> Target().Unset()
+- switch anyOf type in slice -> Interactable.SetItem() 
+- switch anyOf type -> SetOriginPosition() 
+- add anyOf reference -> AddTargetedByPlayer()
+- remove anyOf reference -> RemoveTargetedByPlayer()
+- creation of reference -> a new reference is created
+- deletion of reference -> a reference is deleted
+- replacement of reference -> an existing reference is replaced with a different one
+- includes element if reference of reference got updated
+- manages cyclical references
+- manages self referencing elements
+
+
 ### TODO
 - `Path()` getters for elements
-- find a neat way for integration tests
+- find a neat way for integration tests (very, VERY basic)
 - is `build` the right command for validating? (compile?)
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)
 - custom handlers
