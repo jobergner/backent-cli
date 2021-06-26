@@ -10,11 +10,9 @@ import (
 func (s *ServerFactory) writeMessageKinds() *ServerFactory {
 	decls := NewDeclSet()
 
-	_iota := 0
 	decls.File.Const().Defs(
 		ForEachActionInAST(s.config, func(action ast.Action) *Statement {
-			_iota += 1
-			return Id("messageKindAction_" + action.Name).Id("messageKind").Op("=").Lit(_iota)
+			return Id("messageKindAction_" + action.Name).Id("messageKind").Op("=").Lit(action.Name)
 		}),
 	)
 

@@ -147,7 +147,7 @@ func setupRoutes(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) {
 	})
 }
 
-type messageKind int
+type messageKind string
 type message struct {
 	Kind	messageKind	` + "`" +  `json:"kind"` + "`" +  `
 	Content	[]byte		` + "`" +  `json:"content"` + "`" +  `

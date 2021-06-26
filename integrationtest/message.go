@@ -6,7 +6,7 @@ import (
 
 // i just copy pasted this from the server example
 
-type messageKind int
+type messageKind string
 
 type message struct {
 	Kind    messageKind `json:"kind"`
@@ -14,9 +14,9 @@ type message struct {
 }
 
 const (
-	messageKindAction_addItemToPlayer messageKind = 1
-	messageKindAction_movePlayer      messageKind = 2
-	messageKindAction_spawnZoneItems  messageKind = 3
+	messageKindAction_addItemToPlayer messageKind = "addItemToPlayer"
+	messageKindAction_movePlayer      messageKind = "movePlayer"
+	messageKindAction_spawnZoneItems  messageKind = "spawnZoneItems"
 )
 
 type MovePlayerParams struct {

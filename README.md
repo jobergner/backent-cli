@@ -379,6 +379,7 @@ being able to call the setters on these references makes no sense. This is why a
 setter methods.
 
 ### TODO
+- `Path()` getters for elements
 - find a neat way for integration tests
 - is `build` the right command for validating? (compile?)
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)

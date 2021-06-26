@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/Java-Jonas/bar-cli/integrationtest/state"
 	"log"
 	// "os"
 	"time"
@@ -40,7 +41,7 @@ func runReadMessages(conn *websocket.Conn, ctx context.Context) {
 			log.Println(err)
 			break
 		}
-		log.Println(string(message))
+		log.Println("server response: ", string(message))
 	}
 }
 
@@ -53,10 +54,26 @@ func runSendMessage(ctx context.Context, con *websocket.Conn) {
 		case <-ticker.C:
 			newx += 1
 			msg := message{
-				Kind:    2,
+				Kind:    messageKindAction_movePlayer,
 				Content: []byte(`{"playerID": 2, "changeX": ` + fmt.Sprintf("%f", newx) + `, "changeY": 0}`),
 			}
 			err := wsjson.Write(ctx, con, msg)
+			if err != nil {
+				log.Println(err)
+			}
+			params := state.AddItemToPlayerParams{
+				Item:    state.ItemID(0),
+				NewName: "myItem",
+			}
+			b, err := params.MarshalJSON()
+			if err != nil {
+				log.Println(err)
+			}
+			msg = message{
+				Kind:    messageKindAction_addItemToPlayer,
+				Content: b,
+			}
+			err = wsjson.Write(ctx, con, msg)
 			if err != nil {
 				log.Println(err)
 			}
