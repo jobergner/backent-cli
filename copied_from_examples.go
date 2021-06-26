@@ -105,7 +105,10 @@ func (c *Connection) Close() {
 }
 func (c *Connection) ReadMessage() (int, []byte, error) {
 	msgType, msg, err := c.Conn.Read(c.ctx)
-	return int(msgType), msg, fmt.Errorf("error reading message from connection: %s", err)
+	if err != nil {
+		return 0, nil, fmt.Errorf("error reading message from connection: %s", err)
+	}
+	return int(msgType), msg, nil
 }
 func (c *Connection) WriteMessage(msg []byte) error {
 	err := c.Conn.Write(c.ctx, websocket.MessageText, msg)
@@ -165,7 +168,6 @@ type Room struct {
 	clientMessageChannel	chan message
 	registerChannel		chan *Client
 	unregisterChannel	chan *Client
-	promotionChannel	chan *Client
 	incomingClients		map[*Client]bool
 	pendingResponses	[]message
 	state			*Engine
@@ -175,7 +177,7 @@ type Room struct {
 }
 
 func newRoom(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) *Room {
-	return &Room{clients: make(map[*Client]bool), clientMessageChannel: make(chan message, 1024), registerChannel: make(chan *Client), unregisterChannel: make(chan *Client), promotionChannel: make(chan *Client), incomingClients: make(map[*Client]bool), state: newEngine(), onDeploy: onDeploy, onFrameTick: onFrameTick, actions: a}
+	return &Room{clients: make(map[*Client]bool), clientMessageChannel: make(chan message, 1024), registerChannel: make(chan *Client), unregisterChannel: make(chan *Client), incomingClients: make(map[*Client]bool), state: newEngine(), onDeploy: onDeploy, onFrameTick: onFrameTick, actions: a}
 }
 func (r *Room) registerClient(client *Client) {
 	r.incomingClients[client] = true
@@ -212,7 +214,7 @@ func (r *Room) handleIncomingClients() error {
 	for client := range r.incomingClients {
 		select {
 		case client.messageChannel <- stateBytes:
-			r.promotionChannel <- client
+			r.promoteIncomingClient(client)
 		default:
 			log.Printf("client's message buffer full -> dropping client %s", client.id)
 			r.unregisterClient(client)
@@ -285,8 +287,6 @@ func (r *Room) run() {
 			r.registerClient(client)
 		case client := <-r.unregisterChannel:
 			r.unregisterClient(client)
-		case client := <-r.promotionChannel:
-			r.promoteIncomingClient(client)
 		case <-ticker.C:
 			r.process()
 		}
