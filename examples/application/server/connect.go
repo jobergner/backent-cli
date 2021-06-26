@@ -37,7 +37,10 @@ func (c *Connection) Close() {
 
 func (c *Connection) ReadMessage() (int, []byte, error) {
 	msgType, msg, err := c.Conn.Read(c.ctx)
-	return int(msgType), msg, fmt.Errorf("error reading message from connection: %s", err)
+	if err != nil {
+		return 0, nil, fmt.Errorf("error reading message from connection: %s", err)
+	}
+	return int(msgType), msg, nil
 }
 
 func (c *Connection) WriteMessage(msg []byte) error {
