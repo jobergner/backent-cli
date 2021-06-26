@@ -114,24 +114,24 @@ func (i idGetterWriter) returnID() *Statement {
 	return Id(i.receiverName()).Dot(i.typeName()).Dot(i.idFieldToReturn())
 }
 
-type fieldGetter struct {
+type fieldGetterWriter struct {
 	t ast.ConfigType
 	f ast.Field
 }
 
-func (f fieldGetter) receiverName() string {
+func (f fieldGetterWriter) receiverName() string {
 	return "_" + f.t.Name
 }
 
-func (f fieldGetter) receiverParams() *Statement {
+func (f fieldGetterWriter) receiverParams() *Statement {
 	return Id(f.receiverName()).Id(f.t.Name)
 }
 
-func (f fieldGetter) name() string {
+func (f fieldGetterWriter) name() string {
 	return Title(f.f.Name)
 }
 
-func (f fieldGetter) returnedType() string {
+func (f fieldGetterWriter) returnedType() string {
 
 	if f.f.ValueType().IsBasicType {
 		return f.f.ValueType().Name
@@ -145,7 +145,7 @@ func (f fieldGetter) returnedType() string {
 	return f.f.ValueType().Name
 }
 
-func (f fieldGetter) returns() string {
+func (f fieldGetterWriter) returns() string {
 	returnedLiteral := f.returnedType()
 	if f.f.HasSliceValue {
 		return "[]" + returnedLiteral
@@ -155,11 +155,11 @@ func (f fieldGetter) returns() string {
 	return returnedLiteral
 }
 
-func (f fieldGetter) reassignElement() *Statement {
+func (f fieldGetterWriter) reassignElement() *Statement {
 	return Id(f.t.Name).Op(":=").Id(f.receiverName()).Dot(f.t.Name).Dot("engine").Dot(Title(f.t.Name)).Call(Id(f.receiverName()).Dot(f.t.Name).Dot("ID"))
 }
 
-func (f fieldGetter) declareSliceOfElements() *Statement {
+func (f fieldGetterWriter) declareSliceOfElements() *Statement {
 	returnedType := f.returnedType()
 	if f.f.HasSliceValue {
 		returnedType = "[]" + returnedType
@@ -167,7 +167,7 @@ func (f fieldGetter) declareSliceOfElements() *Statement {
 	return Var().Id(f.f.Name).Id(returnedType)
 }
 
-func (f fieldGetter) loopedElementIdentifier() string {
+func (f fieldGetterWriter) loopedElementIdentifier() string {
 	if f.f.ValueType().IsBasicType {
 		return "element"
 	}
@@ -180,12 +180,12 @@ func (f fieldGetter) loopedElementIdentifier() string {
 	return f.f.ValueType().Name + "ID"
 }
 
-func (f fieldGetter) loopConditions() *Statement {
+func (f fieldGetterWriter) loopConditions() *Statement {
 	identifier := f.loopedElementIdentifier()
 	return List(Id("_"), Id(identifier)).Op(":=").Range().Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))
 }
 
-func (f fieldGetter) appendedItem() *Statement {
+func (f fieldGetterWriter) appendedItem() *Statement {
 	if f.f.ValueType().IsBasicType {
 		return Id(f.loopedElementIdentifier())
 	}
@@ -196,19 +196,19 @@ func (f fieldGetter) appendedItem() *Statement {
 	return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(returnedType).Call(Id(f.loopedElementIdentifier()))
 }
 
-func (f fieldGetter) appendElement() *Statement {
+func (f fieldGetterWriter) appendElement() *Statement {
 	return Id(f.f.Name).Op("=").Append(Id(f.f.Name), f.appendedItem())
 }
 
-func (f fieldGetter) returnSliceOfType() *Statement {
+func (f fieldGetterWriter) returnSliceOfType() *Statement {
 	return Id(f.f.Name)
 }
 
-func (f fieldGetter) returnBasicType() *Statement {
+func (f fieldGetterWriter) returnBasicType() *Statement {
 	return Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))
 }
 
-func (f fieldGetter) returnNamedType() *Statement {
+func (f fieldGetterWriter) returnNamedType() *Statement {
 	engine := Id(f.t.Name).Dot(f.t.Name).Dot("engine")
 	if f.f.HasPointerValue {
 		return engine.Dot(f.returnedType()).Call(Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))).Id(",").Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name)).Op("!=").Lit(0)
@@ -220,9 +220,25 @@ func (f fieldGetter) returnNamedType() *Statement {
 	return engine.Dot(returnedType).Call(Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name)))
 }
 
-func (f fieldGetter) returnSingleType() *Statement {
+func (f fieldGetterWriter) returnSingleType() *Statement {
 	if f.f.ValueType().IsBasicType {
 		return f.returnBasicType()
 	}
 	return f.returnNamedType()
+}
+
+type pathGetterWriter struct {
+	t ast.ConfigType
+}
+
+func (p pathGetterWriter) receiverName() string {
+	return "_" + p.t.Name
+}
+
+func (p pathGetterWriter) receiverParams() *Statement {
+	return Id(p.receiverName()).Id(p.t.Name)
+}
+
+func (p pathGetterWriter) returnPath() *Statement {
+	return Id(p.receiverName()).Dot(p.t.Name).Dot("Path")
 }

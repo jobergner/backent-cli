@@ -30,6 +30,10 @@ func (_player player) ID() PlayerID {
 	return _player.player.ID
 }
 
+func (_player player) Path() string {
+	return _player.player.Path
+}
+
 func (_player player) Target() (playerTargetRef, bool) {
 	player := _player.player.engine.Player(_player.player.ID)
 	return player.player.engine.playerTargetRef(player.player.Target), player.player.Target != 0
@@ -111,6 +115,10 @@ func (_gearScore gearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }
 
+func (_gearScore gearScore) Path() string {
+	return _gearScore.gearScore.Path
+}
+
 func (_gearScore gearScore) Level() int {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Level
@@ -149,6 +157,10 @@ func (engine *Engine) Item(itemID ItemID) item {
 
 func (_item item) ID() ItemID {
 	return _item.item.ID
+}
+
+func (_item item) Path() string {
+	return _item.item.Path
 }
 func (_item item) Name() string {
 	item := _item.item.engine.Item(_item.item.ID)
@@ -200,6 +212,10 @@ func (_position position) ID() PositionID {
 	return _position.position.ID
 }
 
+func (_position position) Path() string {
+	return _position.position.Path
+}
+
 func (_position position) X() float64 {
 	position := _position.position.engine.Position(_position.position.ID)
 	return position.position.X
@@ -240,6 +256,10 @@ func (_zoneItem zoneItem) ID() ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }
 
+func (_zoneItem zoneItem) Path() string {
+	return _zoneItem.zoneItem.Path
+}
+
 func (_zoneItem zoneItem) Position() position {
 	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
 	return zoneItem.zoneItem.engine.Position(zoneItem.zoneItem.Position)
@@ -275,6 +295,10 @@ func (engine *Engine) Zone(zoneID ZoneID) zone {
 
 func (_zone zone) ID() ZoneID {
 	return _zone.zone.ID
+}
+
+func (_zone zone) Path() string {
+	return _zone.zone.Path
 }
 
 func (_zone zone) Players() []player {
@@ -374,6 +398,10 @@ func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
 
 func (_equipmentSet equipmentSet) ID() EquipmentSetID {
 	return _equipmentSet.equipmentSet.ID
+}
+
+func (_equipmentSet equipmentSet) Path() string {
+	return _equipmentSet.equipmentSet.Path
 }
 
 func (_equipmentSet equipmentSet) Name() string {

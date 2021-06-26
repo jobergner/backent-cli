@@ -14,20 +14,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 		e := everyTypeGetterWriter{
 			t: configType,
 		}
-
-		decls.File.Func().Params(e.receiverParams()).Id("Every"+Title(configType.Name)).Params().Add(e.returns()).Block(
-			e.allIDs(),
-			e.declareSlice(),
-			For(e.loopConditions()).Block(
-				e.declareElement(),
-				OnlyIf(!configType.IsRootType, If(e.elementHasParent()).Block(
-					Continue(),
-				)),
-				e.appendElement(),
-			),
-			e.returnToIdsSliceToPool(),
-			Return(Id(e.sliceName())),
-		)
+		writeEveryTypeGetter(&decls, e)
 
 		t := typeGetterWriter{
 			name: func() string {
@@ -37,7 +24,6 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				return configType.Name
 			},
 		}
-
 		writeTypeGetter(&decls, t)
 
 		i := idGetterWriter{
@@ -51,15 +37,20 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 				return "ID"
 			},
 		}
-
 		writeIDGetter(&decls, i)
 
+		p := pathGetterWriter{
+			t: configType,
+		}
+		decls.File.Func().Params(p.receiverParams()).Id("Path").Params().String().Block(
+			Return(p.returnPath()),
+		)
+
 		configType.RangeFields(func(field ast.Field) {
-			f := fieldGetter{
+			f := fieldGetterWriter{
 				t: configType,
 				f: field,
 			}
-
 			decls.File.Func().Params(f.receiverParams()).Id(f.name()).Params().Id(f.returns()).Block(
 				f.reassignElement(),
 				// if slice
@@ -136,6 +127,22 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 
 	decls.Render(s.buf)
 	return s
+}
+
+func writeEveryTypeGetter(decls *DeclSet, e everyTypeGetterWriter) {
+	decls.File.Func().Params(e.receiverParams()).Id("Every"+Title(e.t.Name)).Params().Add(e.returns()).Block(
+		e.allIDs(),
+		e.declareSlice(),
+		For(e.loopConditions()).Block(
+			e.declareElement(),
+			OnlyIf(!e.t.IsRootType, If(e.elementHasParent()).Block(
+				Continue(),
+			)),
+			e.appendElement(),
+		),
+		e.returnToIdsSliceToPool(),
+		Return(Id(e.sliceName())),
+	)
 }
 
 func writeTypeGetter(decls *DeclSet, t typeGetterWriter) {

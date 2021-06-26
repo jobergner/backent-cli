@@ -1979,6 +1979,10 @@ const _ID_player_func string = `func (_player player) ID() PlayerID {
 	return _player.player.ID
 }`
 
+const _Path_player_func string = `func (_player player) Path() string {
+	return _player.player.Path
+}`
+
 const _Target_player_func string = `func (_player player) Target() (playerTargetRef, bool) {
 	player := _player.player.engine.Player(_player.player.ID)
 	return player.player.engine.playerTargetRef(player.player.Target), player.player.Target != 0
@@ -2060,6 +2064,10 @@ const _ID_gearScore_func string = `func (_gearScore gearScore) ID() GearScoreID 
 	return _gearScore.gearScore.ID
 }`
 
+const _Path_gearScore_func string = `func (_gearScore gearScore) Path() string {
+	return _gearScore.gearScore.Path
+}`
+
 const _Level_gearScore_func string = `func (_gearScore gearScore) Level() int {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Level
@@ -2098,6 +2106,10 @@ const _Item_Engine_func string = `func (engine *Engine) Item(itemID ItemID) item
 
 const _ID_item_func string = `func (_item item) ID() ItemID {
 	return _item.item.ID
+}`
+
+const _Path_item_func string = `func (_item item) Path() string {
+	return _item.item.Path
 }`
 
 const _Name_item_func string = `func (_item item) Name() string {
@@ -2150,6 +2162,10 @@ const _ID_position_func string = `func (_position position) ID() PositionID {
 	return _position.position.ID
 }`
 
+const _Path_position_func string = `func (_position position) Path() string {
+	return _position.position.Path
+}`
+
 const _X_position_func string = `func (_position position) X() float64 {
 	position := _position.position.engine.Position(_position.position.ID)
 	return position.position.X
@@ -2190,6 +2206,10 @@ const _ID_zoneItem_func string = `func (_zoneItem zoneItem) ID() ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }`
 
+const _Path_zoneItem_func string = `func (_zoneItem zoneItem) Path() string {
+	return _zoneItem.zoneItem.Path
+}`
+
 const _Position_zoneItem_func string = `func (_zoneItem zoneItem) Position() position {
 	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
 	return zoneItem.zoneItem.engine.Position(zoneItem.zoneItem.Position)
@@ -2225,6 +2245,10 @@ const _Zone_Engine_func string = `func (engine *Engine) Zone(zoneID ZoneID) zone
 
 const _ID_zone_func string = `func (_zone zone) ID() ZoneID {
 	return _zone.zone.ID
+}`
+
+const _Path_zone_func string = `func (_zone zone) Path() string {
+	return _zone.zone.Path
 }`
 
 const _Players_zone_func string = `func (_zone zone) Players() []player {
@@ -2324,6 +2348,10 @@ const _EquipmentSet_Engine_func string = `func (engine *Engine) EquipmentSet(equ
 
 const _ID_equipmentSet_func string = `func (_equipmentSet equipmentSet) ID() EquipmentSetID {
 	return _equipmentSet.equipmentSet.ID
+}`
+
+const _Path_equipmentSet_func string = `func (_equipmentSet equipmentSet) Path() string {
+	return _equipmentSet.equipmentSet.Path
 }`
 
 const _Name_equipmentSet_func string = `func (_equipmentSet equipmentSet) Name() string {
