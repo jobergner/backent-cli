@@ -379,7 +379,7 @@ being able to call the setters on these references makes no sense. This is why a
 setter methods.
 
 
-### test cases
+### test cases check list
 - create element -> Create()
 - delete element -> Delete()
 - manipulate element -> SetName()
@@ -405,6 +405,7 @@ setter methods.
 
 ### TODO
 - `Path()` getters for elements
+- `path` as reserved field name in validator
 - find a neat way for integration tests (very, VERY basic)
 - is `build` the right command for validating? (compile?)
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)
