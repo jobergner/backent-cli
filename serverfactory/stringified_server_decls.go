@@ -7,10 +7,10 @@ const gets_generated_go_import string = `import (
 	"net/http"
 )`
 
-const messageKindAction_addItemToPlayer_type string = `const (
-	messageKindAction_addItemToPlayer	messageKind	= "addItemToPlayer"
-	messageKindAction_movePlayer		messageKind	= "movePlayer"
-	messageKindAction_spawnZoneItems	messageKind	= "spawnZoneItems"
+const _MessageKindAction_addItemToPlayer_type string = `const (
+	MessageKindAction_addItemToPlayer	MessageKind	= "addItemToPlayer"
+	MessageKindAction_movePlayer		MessageKind	= "movePlayer"
+	MessageKindAction_spawnZoneItems	MessageKind	= "spawnZoneItems"
 )`
 
 const _MovePlayerParams_type string = `type MovePlayerParams struct {
@@ -42,42 +42,42 @@ const actions_type string = `type actions struct {
 	spawnZoneItems	func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
 }`
 
-const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg message) (message, error) {
-	switch messageKind(msg.Kind) {
-	case messageKindAction_addItemToPlayer:
+const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) (Message, error) {
+	switch MessageKind(msg.Kind) {
+	case MessageKindAction_addItemToPlayer:
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return message{}, err
+			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
 		res := r.actions.addItemToPlayer(params, r.state)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
-			return message{}, err
+			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
 		}
-		return message{msg.Kind, resContent, msg.client}, nil
-	case messageKindAction_movePlayer:
+		return Message{msg.Kind, resContent, msg.client}, nil
+	case MessageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return message{}, err
+			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
 		r.actions.movePlayer(params, r.state)
-		return message{}, nil
-	case messageKindAction_spawnZoneItems:
+		return Message{}, nil
+	case MessageKindAction_spawnZoneItems:
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return message{}, err
+			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
 		res := r.actions.spawnZoneItems(params, r.state)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
-			return message{}, err
+			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
 		}
-		return message{msg.Kind, resContent, msg.client}, nil
+		return Message{msg.Kind, resContent, msg.client}, nil
 	default:
-		return message{}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
+		return Message{MessageKindError, []byte("unknown message kind " + msg.Kind), msg.client}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
 	}
 }`
 

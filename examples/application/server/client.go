@@ -37,7 +37,7 @@ func (c *Client) assignToRoom(room *Room) {
 	c.room = room
 }
 
-func (c *Client) forwardToRoom(msg message) {
+func (c *Client) forwardToRoom(msg Message) {
 	select {
 	case c.room.clientMessageChannel <- msg:
 	default:
@@ -55,7 +55,7 @@ func (c *Client) runReadMessages() {
 			break
 		}
 
-		var msg message
+		var msg Message
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
 			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)

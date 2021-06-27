@@ -12,7 +12,7 @@ func (s *ServerFactory) writeMessageKinds() *ServerFactory {
 
 	decls.File.Const().Defs(
 		ForEachActionInAST(s.config, func(action ast.Action) *Statement {
-			return Id("messageKindAction_" + action.Name).Id("messageKind").Op("=").Lit(action.Name)
+			return Id("MessageKindAction_" + action.Name).Id("MessageKind").Op("=").Lit(action.Name)
 		}),
 	)
 

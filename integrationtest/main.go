@@ -41,7 +41,9 @@ func runReadMessages(conn *websocket.Conn, ctx context.Context) {
 			log.Println(err)
 			break
 		}
-		log.Println("server response: ", string(message))
+		var res state.Message
+		err = res.UnmarshalJSON(message)
+		log.Println("server response. kind: ", res.Kind, "content:", string(res.Content), "err:", err)
 	}
 }
 
@@ -52,15 +54,15 @@ func runSendMessage(ctx context.Context, con *websocket.Conn) {
 	for {
 		select {
 		case <-ticker.C:
-			newx += 1
-			msg := message{
-				Kind:    messageKindAction_movePlayer,
-				Content: []byte(`{"playerID": 2, "changeX": ` + fmt.Sprintf("%f", newx) + `, "changeY": 0}`),
-			}
-			err := wsjson.Write(ctx, con, msg)
-			if err != nil {
-				log.Println(err)
-			}
+			// newx += 1
+			// msg := message{
+			// 	Kind:    messageKindAction_movePlayer,
+			// 	Content: []byte(`{"playerID": 2, "changeX": ` + fmt.Sprintf("%f", newx) + `, "changeY": 0}`),
+			// }
+			// err := wsjson.Write(ctx, con, msg)
+			// if err != nil {
+			// 	log.Println(err)
+			// }
 			params := state.AddItemToPlayerParams{
 				Item:    state.ItemID(0),
 				NewName: "myItem",
@@ -69,7 +71,7 @@ func runSendMessage(ctx context.Context, con *websocket.Conn) {
 			if err != nil {
 				log.Println(err)
 			}
-			msg = message{
+			msg := message{
 				Kind:    messageKindAction_addItemToPlayer,
 				Content: b,
 			}
