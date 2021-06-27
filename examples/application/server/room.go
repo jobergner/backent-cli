@@ -8,11 +8,11 @@ import (
 
 type Room struct {
 	clients              map[*Client]bool
-	clientMessageChannel chan message
+	clientMessageChannel chan Message
 	registerChannel      chan *Client
 	unregisterChannel    chan *Client
 	incomingClients      map[*Client]bool
-	pendingResponses     []message
+	pendingResponses     []Message
 	state                *Engine
 	actions              actions
 	onDeploy             func(*Engine)
@@ -22,7 +22,7 @@ type Room struct {
 func newRoom(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) *Room {
 	return &Room{
 		clients:              make(map[*Client]bool),
-		clientMessageChannel: make(chan message, 1024),
+		clientMessageChannel: make(chan Message, 1024),
 		registerChannel:      make(chan *Client),
 		unregisterChannel:    make(chan *Client),
 		incomingClients:      make(map[*Client]bool),
@@ -54,10 +54,10 @@ func (r *Room) unregisterClient(client *Client) {
 	}
 }
 
-func (r *Room) broadcastPatchToClients(patchBytes []byte) {
+func (r *Room) broadcastPatchToClients(stateUpdateBytes []byte) {
 	for client := range r.clients {
 		select {
-		case client.messageChannel <- patchBytes:
+		case client.messageChannel <- stateUpdateBytes:
 		default:
 			log.Printf("client's message buffer full -> dropping client %s", client.id)
 			r.unregisterClient(client)
@@ -75,9 +75,18 @@ func (r *Room) handleIncomingClients() error {
 		return fmt.Errorf("error marshalling tree for init request: %s", err)
 	}
 
+	currentStateMsg := Message{
+		Kind:    MessageKindCurrentState,
+		Content: stateBytes,
+	}
+	response, err := currentStateMsg.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("error marshalling response message for init request: %s", err)
+	}
+
 	for client := range r.incomingClients {
 		select {
-		case client.messageChannel <- stateBytes:
+		case client.messageChannel <- response:
 			r.promoteIncomingClient(client)
 		default:
 			log.Printf("client's message buffer full -> dropping client %s", client.id)
@@ -98,7 +107,7 @@ Exit:
 				log.Println("error processing client message:", err)
 				continue
 			}
-			if response.client == nil {
+			if len(msg.Content) == 0 {
 				continue
 			}
 			r.pendingResponses = append(r.pendingResponses, response)
@@ -118,14 +127,29 @@ func (r *Room) publishPatch() error {
 	if err != nil {
 		return fmt.Errorf("error marshalling tree for patch: %s", err)
 	}
-	r.broadcastPatchToClients(patchBytes)
+
+	stateUpdateMsg := Message{
+		Kind:    MessageKindUpdate,
+		Content: patchBytes,
+	}
+	stateUpdateBytes, err := stateUpdateMsg.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("error marshalling state update message: %s", err)
+	}
+
+	r.broadcastPatchToClients(stateUpdateBytes)
 	return nil
 }
 
 func (r *Room) handlePendingResponses() {
 	for _, pendingResponse := range r.pendingResponses {
+		response, err := pendingResponse.MarshalJSON()
+		if err != nil {
+			log.Printf("error marshalling response message pending response: %s", err)
+			continue
+		}
 		select {
-		case pendingResponse.client.messageChannel <- pendingResponse.Content:
+		case pendingResponse.client.messageChannel <- response:
 		default:
 			log.Printf("client's message buffer full -> dropping client %s", pendingResponse.client.id)
 			r.unregisterClient(pendingResponse.client)

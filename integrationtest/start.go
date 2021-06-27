@@ -12,12 +12,13 @@ func startServer() {
 	err := state.Start(
 		func(a state.AddItemToPlayerParams, e *state.Engine) state.AddItemToPlayerResponse {
 			log.Println("addItemToPlayer", a)
-			if playerID != 0 {
-				item := e.Player(playerID).AddItem()
-				item.SetName(a.NewName)
-				return state.AddItemToPlayerResponse{PlayerPath: item.Name()}
+			if playerID == 0 {
+				player := e.CreatePlayer()
+				playerID = player.ID()
 			}
-			return state.AddItemToPlayerResponse{}
+			item := e.Player(playerID).AddItem()
+			item.SetName(a.NewName)
+			return state.AddItemToPlayerResponse{PlayerPath: item.Name()}
 		},
 		func(p state.MovePlayerParams, e *state.Engine) {
 			if playerID == 0 {

@@ -404,8 +404,11 @@ setter methods.
 
 
 ### TODO
+- bootstrap script (install easyjson, decltostring)
+- setters to return if new value == current value so no change is triggered
 - `path` as reserved field name in validator
 - find a neat way for integration tests (very, VERY basic)
+- documentation
 - find a way to create a UI to observe changes  (one where you can define and send actions, get the updated state, the state change, and response displayed)
 - custom handlers
 - data persistence

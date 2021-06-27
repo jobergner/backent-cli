@@ -14,7 +14,7 @@ func TestWriteMessageKinds(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			messageKindAction_addItemToPlayer_type,
+			_MessageKindAction_addItemToPlayer_type,
 		}, "\n"))
 
 		if expected != actual {
