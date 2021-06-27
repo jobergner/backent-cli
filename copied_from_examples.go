@@ -170,10 +170,10 @@ func printMessage(msg Message) string {
 	}
 }
 func messageUnmarshallingError(msgContent []byte, err error) []byte {
-	return []byte(fmt.Sprintf("error unmarshalling received message content ` + "`" +  `%s` + "`" +  `: %s", msgContent, err))
+	return []byte(fmt.Sprintf("error when unmarshalling received message content ` + "`" +  `%s` + "`" +  `: %s", msgContent, err))
 }
 func responseMarshallingError(msgContent []byte, err error) []byte {
-	return []byte(fmt.Sprintf("error marshalling response to ` + "`" +  `%s` + "`" +  `: %s", msgContent, err))
+	return []byte(fmt.Sprintf("error when marshalling response to ` + "`" +  `%s` + "`" +  `: %s", msgContent, err))
 }
 
 type Room struct {
@@ -253,9 +253,8 @@ Exit:
 			response, err := r.processClientMessage(msg)
 			if err != nil {
 				log.Println("error processing client message:", err)
-				continue
 			}
-			if len(msg.Content) == 0 {
+			if response.client == nil {
 				continue
 			}
 			r.pendingResponses = append(r.pendingResponses, response)

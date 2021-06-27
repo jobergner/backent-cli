@@ -1,4 +1,4 @@
-package main
+package integrationtest
 
 import (
 	"log"
@@ -12,27 +12,27 @@ func startServer() {
 	err := state.Start(
 		func(a state.AddItemToPlayerParams, e *state.Engine) state.AddItemToPlayerResponse {
 			log.Println("addItemToPlayer", a)
-			if playerID == 0 {
-				player := e.CreatePlayer()
-				playerID = player.ID()
-			}
-			item := e.Player(playerID).AddItem()
+			player := e.Player(playerID)
+			item := player.AddItem()
 			item.SetName(a.NewName)
-			return state.AddItemToPlayerResponse{PlayerPath: item.Name()}
+			return state.AddItemToPlayerResponse{PlayerPath: player.Path()}
 		},
 		func(p state.MovePlayerParams, e *state.Engine) {
-			if playerID == 0 {
-				player := e.CreatePlayer()
-				playerID = player.ID()
-			}
-			log.Println("moving player..")
-			e.Player(playerID).Position().SetX(p.ChangeX)
+			log.Println("movePlayer", p)
+			playerPosition := e.Player(playerID).Position()
+			playerPosition.SetX(playerPosition.X() + p.ChangeX)
 		},
 		func(a state.SpawnZoneItemsParams, e *state.Engine) state.SpawnZoneItemsResponse {
 			return state.SpawnZoneItemsResponse{}
 		},
-		func(*state.Engine) {},
-		func(*state.Engine) {},
+		func(e *state.Engine) {
+			player := e.CreatePlayer()
+			playerID = player.ID()
+		},
+		func(e *state.Engine) {
+			playerGearScore := e.Player(playerID).GearScore()
+			playerGearScore.SetLevel(playerGearScore.Level() + 1)
+		},
 	)
 
 	panic(err)

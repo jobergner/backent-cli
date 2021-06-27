@@ -1,4 +1,4 @@
-package main
+package integrationtest
 
 import (
 	"context"
@@ -12,75 +12,109 @@ import (
 	"nhooyr.io/websocket/wsjson"
 )
 
-func main() {
-	go startServer()
-	cancel := dialServer()
-	time.Sleep(time.Second * 10)
-	cancel()
-}
-
-func dialServer() context.CancelFunc {
+func dialServer(serverResponseChannel chan state.Message) (*websocket.Conn, context.Context, context.CancelFunc) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
 	if err != nil {
 		panic(err)
 	}
-	go runReadMessages(c, ctx)
 
-	go runSendMessage(ctx, c)
+	go runReadMessages(serverResponseChannel, c, ctx)
 
-	return cancel
+	return c, ctx, cancel
 }
 
-func runReadMessages(conn *websocket.Conn, ctx context.Context) {
+func runReadMessages(serverResponseChannel chan state.Message, conn *websocket.Conn, ctx context.Context) {
+
 	defer fmt.Println("client discontinued")
+
 	for {
-		_, message, err := conn.Read(ctx)
+		_, serverResponseBytes, err := conn.Read(ctx)
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		var res state.Message
-		err = res.UnmarshalJSON(message)
-		log.Println("server response. kind: ", res.Kind, "content:", string(res.Content), "err:", err)
+
+		var serverResponse state.Message
+		err = serverResponse.UnmarshalJSON(serverResponseBytes)
+		if err != nil {
+			log.Println(err)
+		}
+
+		select {
+		case serverResponseChannel <- serverResponse:
+		default:
+			log.Println("serverResponseChannel full")
+		}
 	}
 }
-
-var newx = 1.1
 
 func runSendMessage(ctx context.Context, con *websocket.Conn) {
 	ticker := time.NewTicker(time.Second)
 	for {
 		select {
 		case <-ticker.C:
-			// newx += 1
-			// msg := message{
-			// 	Kind:    messageKindAction_movePlayer,
-			// 	Content: []byte(`{"playerID": 2, "changeX": ` + fmt.Sprintf("%f", newx) + `, "changeY": 0}`),
-			// }
-			// err := wsjson.Write(ctx, con, msg)
-			// if err != nil {
-			// 	log.Println(err)
-			// }
-			params := state.AddItemToPlayerParams{
-				Item:    state.ItemID(0),
-				NewName: "myItem",
-			}
-			b, err := params.MarshalJSON()
-			if err != nil {
-				log.Println(err)
-			}
-			msg := message{
-				Kind:    messageKindAction_addItemToPlayer,
-				Content: b,
-			}
-			err = wsjson.Write(ctx, con, msg)
-			if err != nil {
-				log.Println(err)
-			}
 		case <-ctx.Done():
 			break
 		}
+	}
+}
+
+func sendActionMovePlayer(ctx context.Context, c *websocket.Conn) {
+	params := state.MovePlayerParams{
+		ChangeX: 1,
+	}
+	b, err := params.MarshalJSON()
+	if err != nil {
+		log.Println(err)
+	}
+	msg := state.Message{
+		Kind:    state.MessageKindAction_movePlayer,
+		Content: b,
+	}
+	err = wsjson.Write(ctx, c, msg)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func sendActionAddItemToPlayer(ctx context.Context, c *websocket.Conn) {
+	params := state.AddItemToPlayerParams{
+		Item:    state.ItemID(0),
+		NewName: "myItem",
+	}
+	b, err := params.MarshalJSON()
+	if err != nil {
+		log.Println(err)
+	}
+	msg := state.Message{
+		Kind:    state.MessageKindAction_addItemToPlayer,
+		Content: b,
+	}
+	err = wsjson.Write(ctx, c, msg)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func sendActionUnknownKind(ctx context.Context, c *websocket.Conn) {
+	msg := state.Message{
+		Kind: "whoami",
+	}
+	err := wsjson.Write(ctx, c, msg)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func sendActionBadContent(ctx context.Context, c *websocket.Conn) {
+	msg := state.Message{
+		Kind:    state.MessageKindAction_movePlayer,
+		Content: []byte(`{ badcontent123# "playerID": 0, "changeX": 1, "changeY": 0}`),
+	}
+	err := wsjson.Write(ctx, c, msg)
+	if err != nil {
+		log.Println(err)
 	}
 }
