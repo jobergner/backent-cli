@@ -105,9 +105,8 @@ Exit:
 			response, err := r.processClientMessage(msg)
 			if err != nil {
 				log.Println("error processing client message:", err)
-				continue
 			}
-			if len(msg.Content) == 0 {
+			if response.client == nil {
 				continue
 			}
 			r.pendingResponses = append(r.pendingResponses, response)
