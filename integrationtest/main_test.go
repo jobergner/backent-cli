@@ -77,4 +77,20 @@ func TestIntegration(t *testing.T) {
 	if expected != actual {
 		t.Error(testutils.Diff(actual, expected))
 	}
+
+	sendBadAction(ctx, c)
+	serverResponse = <-serverResponseChannel
+	assert.Equal(t, state.MessageKindError, serverResponse.Kind)
+	expected = "error when unmarshalling received message content `\"foo bar\"\n`: parse error: expected { near offset 9 of 'foo bar'"
+	actual = string(serverResponse.Content)
+	if expected != actual {
+		t.Error(testutils.Diff(actual, expected))
+	}
+	serverResponse = <-serverResponseChannel
+	assert.Equal(t, state.MessageKindUpdate, serverResponse.Kind)
+	expected = `{"player":{"1":{"id":1,"gearScore":{"id":2,"level":6,"operationKind":"UPDATE"},"operationKind":"UNCHANGED"}}}`
+	actual = string(serverResponse.Content)
+	if expected != actual {
+		t.Error(testutils.Diff(actual, expected))
+	}
 }

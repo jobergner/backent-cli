@@ -51,14 +51,16 @@ func (c *Client) runReadMessages() {
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
-			break
+			log.Printf("error while reading connection: %s", err)
+			continue
 		}
 
 		var msg Message
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
 			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
+			c.room.pendingResponsesChannel <- Message{MessageKindError, messageUnmarshallingError(msgBytes, err), c}
+			continue
 		}
 
 		msg.client = c
