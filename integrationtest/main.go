@@ -32,14 +32,13 @@ func runReadMessages(serverResponseChannel chan state.Message, conn *websocket.C
 	for {
 		_, serverResponseBytes, err := conn.Read(ctx)
 		if err != nil {
-			log.Println(err)
-			break
+			panic(err)
 		}
 
 		var serverResponse state.Message
 		err = serverResponse.UnmarshalJSON(serverResponseBytes)
 		if err != nil {
-			log.Println(err)
+			panic(err)
 		}
 
 		select {
@@ -67,7 +66,7 @@ func sendActionMovePlayer(ctx context.Context, c *websocket.Conn) {
 	}
 	b, err := params.MarshalJSON()
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 	msg := state.Message{
 		Kind:    state.MessageKindAction_movePlayer,
@@ -75,7 +74,7 @@ func sendActionMovePlayer(ctx context.Context, c *websocket.Conn) {
 	}
 	err = wsjson.Write(ctx, c, msg)
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 }
 
@@ -86,7 +85,7 @@ func sendActionAddItemToPlayer(ctx context.Context, c *websocket.Conn) {
 	}
 	b, err := params.MarshalJSON()
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 	msg := state.Message{
 		Kind:    state.MessageKindAction_addItemToPlayer,
@@ -94,7 +93,7 @@ func sendActionAddItemToPlayer(ctx context.Context, c *websocket.Conn) {
 	}
 	err = wsjson.Write(ctx, c, msg)
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 }
 
@@ -104,7 +103,7 @@ func sendActionUnknownKind(ctx context.Context, c *websocket.Conn) {
 	}
 	err := wsjson.Write(ctx, c, msg)
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 }
 
@@ -115,6 +114,6 @@ func sendActionBadContent(ctx context.Context, c *websocket.Conn) {
 	}
 	err := wsjson.Write(ctx, c, msg)
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 }

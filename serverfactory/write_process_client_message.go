@@ -17,6 +17,9 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 			ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 				p.a = &action
 				return Case(Id(p.actionMessageKind())).Block(
+					If(p.actionIsUndefined()).Block(
+						Break(),
+					),
 					p.declareParams(),
 					p.unmarshalMessageContent(),
 					If(Id("err").Op("!=").Nil()).Block(
@@ -32,6 +35,7 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 				Return(p.unknownMessageKindResponse(), Id("fmt").Dot("Errorf").Call(Lit("unknown message kind in: %s"), Id("printMessage").Call(Id("msg")))),
 			),
 		),
+		Return(Id("Message").Values(), Nil()),
 	)
 
 	decls.Render(s.buf)
@@ -55,6 +59,10 @@ func (p processClientMessageWriter) actionMessageKind() string {
 	return "MessageKindAction_" + p.a.Name
 }
 
+func (p processClientMessageWriter) actionIsUndefined() *Statement {
+	return Id("r").Dot("actions").Dot(Title(p.a.Name)).Op("==").Nil()
+}
+
 func (p processClientMessageWriter) declareParams() *Statement {
 	return Var().Id("params").Id(Title(p.a.Name) + "Params")
 }
@@ -68,7 +76,7 @@ func (p processClientMessageWriter) returnErrorMessage() (*Statement, *Statement
 }
 
 func (p processClientMessageWriter) callAction() *Statement {
-	call := Id("r").Dot("actions").Dot(p.a.Name).Call(Id("params"), Id("r").Dot("state"))
+	call := Id("r").Dot("actions").Dot(Title(p.a.Name)).Call(Id("params"), Id("r").Dot("state"))
 	if p.a.Response != nil {
 		return Id("res").Op(":=").Add(call)
 	}

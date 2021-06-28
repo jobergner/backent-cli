@@ -14,7 +14,7 @@ func TestWriteActions(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			actions_type,
+			_Actions_type,
 		}, "\n"))
 
 		if expected != actual {

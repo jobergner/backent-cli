@@ -43,17 +43,19 @@ func WriteServer(
 	s := newServerFactory(config).
 		writePackageName(). // to be able to format the code without errors
 		writeMessageKinds().
-		writeActions().
 		writeParameters().
 		writeResponses().
-		writeProcessClientMessage().
-		writeStart()
+		writeProcessClientMessage()
 
 	err := Format(s.buf)
 	if err != nil {
 		// unexpected error
 		panic(err)
 	}
+
+	// TODO: comments were being swallowed during format. find out why
+	s.writeActions().
+		writeSideEffects()
 
 	buf.WriteString(TrimPackageName(s.buf.String()))
 }
