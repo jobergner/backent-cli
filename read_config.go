@@ -69,24 +69,24 @@ func validateJSONConfig(jc jsonConfig) error {
 	return nil
 }
 
-func readConfig() (*config, error) {
+func readConfig() (*config, []byte, error) {
 	configFile, err := ioutil.ReadFile(*configNameFlag)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config file: %s", err)
+		return nil, nil, fmt.Errorf("error reading config file: %s", err)
 	}
 	jc := jsonConfig{}
 	err = json.Unmarshal(configFile, &jc)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing config: %s", err)
+		return nil, nil, fmt.Errorf("error parsing config: %s", err)
 	}
 	err = validateJSONConfig(jc)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	c := &config{
 		State:     makeAmbiguous(jc.State),
 		Actions:   makeAmbiguous(jc.Actions),
 		Responses: makeAmbiguous(jc.Responses),
 	}
-	return c, nil
+	return c, configFile, nil
 }

@@ -21,7 +21,7 @@ var outDirname = flag.String("out", "./tmp", "where to write the files to")
 func main() {
 	flag.Parse()
 
-	c, err := readConfig()
+	c, configJson, err := readConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +38,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(*outDirname, outFile), writeCode(c), 0644); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(*outDirname, outFile), writeCode(c, configJson), 0644); err != nil {
 		panic(fmt.Errorf("error while writing generated code to file system: %s", err))
 	}
 

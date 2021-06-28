@@ -8,7 +8,7 @@ import (
 	"nhooyr.io/websocket"
 )
 
-func homePage(w http.ResponseWriter, r *http.Request) {
+func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
 
@@ -39,7 +39,8 @@ func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
 	room := newRoom(actions, sideEffects, fps)
 	room.Deploy()
 
-	http.HandleFunc("/", homePage)
+	http.HandleFunc("/", homePageHandler)
+	http.HandleFunc("/inspect", inspectHandler)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { wsEndpoint(w, r, room) })
 }
 

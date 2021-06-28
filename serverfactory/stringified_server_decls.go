@@ -4,6 +4,7 @@ package serverfactory
 
 const gets_generated_go_import string = `import (
 	"fmt"
+	"net/http"
 )`
 
 const _MessageKindAction_addItemToPlayer_type string = `const (
@@ -93,4 +94,70 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 		return Message{MessageKindError, []byte("unknown message kind " + msg.Kind), msg.client}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
 	}
 	return Message{}, nil
+}`
+
+const inspectHandler_func string = `func inspectHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, ` + "`" + `{
+  "state": {
+    "player": {
+      "items": "[]item",
+      "equipmentSets": "[]*equipmentSet",
+      "gearScore": "gearScore",
+      "position": "position",
+      "guildMembers": "[]*player",
+      "target": "*anyOf<player,zoneItem>",
+      "targetedBy": "[]*anyOf<player,zoneItem>"
+    },
+    "zone": {
+      "items": "[]zoneItem",
+      "players": "[]player",
+      "tags": "[]string",
+      "interactables": "[]anyOf<item,player,zoneItem>"
+    },
+    "zoneItem": {
+      "position": "position",
+      "item": "item"
+    },
+    "position": {
+      "x": "float64",
+      "y": "float64"
+    },
+    "item": {
+      "name": "string",
+      "gearScore": "gearScore",
+      "boundTo": "*player",
+      "origin": "anyOf<player,position>"
+    },
+    "gearScore": {
+      "level": "int",
+      "score": "int"
+    },
+    "equipmentSet": {
+      "name": "string",
+      "equipment": "[]*item"
+    }
+  },
+  "actions": {
+    "movePlayer": {
+      "player": "playerID",
+      "changeX": "float64",
+      "changeY": "float64"
+    },
+    "addItemToPlayer": {
+      "item": "itemID",
+      "newName": "string"
+    },
+    "spawnZoneItems": {
+      "items": "[]itemID"
+    }
+  },
+  "responses" : {
+    "addItemToPlayer": {
+      "playerPath": "string"
+    },
+    "spawnZoneItems": {
+      "newZoneItemPaths": "string"
+    }
+  }
+}` + "`" + `)
 }`

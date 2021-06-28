@@ -1,14 +1,18 @@
 package integrationtest
 
 import (
+	"encoding/json"
 	"github.com/Java-Jonas/bar-cli/integrationtest/state"
 	"github.com/Java-Jonas/bar-cli/testutils"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"testing"
 )
 
 func TestIntegration(t *testing.T) {
 	go startServer()
+
 	serverResponseChannel := make(chan state.Message)
 	c, ctx, _ := dialServer(serverResponseChannel)
 
@@ -93,4 +97,89 @@ func TestIntegration(t *testing.T) {
 	if expected != actual {
 		t.Error(testutils.Diff(actual, expected))
 	}
+
+	resp, err := http.Get("http://localhost:8080/inspect")
+	if err != nil {
+		panic(err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	expected = expectedConfig
+	actual = string(body)
+	if expected != actual {
+		t.Error(testutils.Diff(actual, expected))
+	}
+	m := make(map[string]interface{})
+	err = json.Unmarshal(body, &m)
+	if err != nil {
+		t.Error("expected inspection result to be unmarshallable, but it was not")
+	}
+	assert.Equal(t, 3, len(m))
 }
+
+const expectedConfig = `{
+  "state": {
+    "player": {
+      "items": "[]item",
+      "equipmentSets": "[]*equipmentSet",
+      "gearScore": "gearScore",
+      "position": "position",
+      "guildMembers": "[]*player",
+      "target": "*anyOf<player,zoneItem>",
+      "targetedBy": "[]*anyOf<player,zoneItem>"
+    },
+    "zone": {
+      "items": "[]zoneItem",
+      "players": "[]player",
+      "tags": "[]string",
+      "interactables": "[]anyOf<item,player,zoneItem>"
+    },
+    "zoneItem": {
+      "position": "position",
+      "item": "item"
+    },
+    "position": {
+      "x": "float64",
+      "y": "float64"
+    },
+    "item": {
+      "name": "string",
+      "gearScore": "gearScore",
+      "boundTo": "*player",
+      "origin": "anyOf<player,position>"
+    },
+    "gearScore": {
+      "level": "int",
+      "score": "int"
+    },
+    "equipmentSet": {
+      "name": "string",
+      "equipment": "[]*item"
+    }
+  },
+  "actions": {
+    "movePlayer": {
+      "player": "playerID",
+      "changeX": "float64",
+      "changeY": "float64"
+    },
+    "addItemToPlayer": {
+      "item": "itemID",
+      "newName": "string"
+    },
+    "spawnZoneItems": {
+      "items": "[]itemID"
+    }
+  },
+  "responses" : {
+    "addItemToPlayer": {
+      "playerPath": "string"
+    },
+    "spawnZoneItems": {
+      "newZoneItemPaths": "string"
+    }
+  }
+}
+`
