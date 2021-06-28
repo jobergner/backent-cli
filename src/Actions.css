@@ -1,0 +1,25 @@
+.Actions {
+    display: flex;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.ActionMessage {
+    flex:1;
+}
+
+.ActionResponse {
+    flex:1;
+}
+
+.Action {
+}
+
+.SliceInput {
+    width: 100%;
+    display: flex;
+}
+
+.InputField {
+    display: flex;
+}

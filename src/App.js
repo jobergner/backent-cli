@@ -1,23 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { Button, Card, H5, Classes } from "@blueprintjs/core";
+import Actions from "./Actions"
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <div className="App bp3-dark">
+      <Card elevation={0} className="card card1">
+        <H5>hello</H5>
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          User interfaces that enable people to interact smoothly with data, ask
+          better questions, and make better decisions.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Button text="Explore products" className={Classes.BUTTON} />
+      </Card>
+      <Actions />
     </div>
   );
 }
