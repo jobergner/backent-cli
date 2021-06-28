@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Java-Jonas/validator"
+	validator "github.com/Java-Jonas/bar-cli/validator"
 )
 
 func validateConfig(c *config) []error {
