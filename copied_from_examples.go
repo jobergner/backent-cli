@@ -60,13 +60,15 @@ func (c *Client) runReadMessages() {
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
-			break
+			log.Printf("error while reading connection: %s", err)
+			continue
 		}
 		var msg Message
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
 			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
+			c.room.pendingResponsesChannel <- Message{MessageKindError, messageUnmarshallingError(msgBytes, err), c}
+			continue
 		}
 		msg.client = c
 		c.forwardToRoom(msg)
@@ -188,10 +190,10 @@ func responseMarshallingError(msgContent []byte, err error) []byte {
 type Room struct {
 	clients			map[*Client]bool
 	clientMessageChannel	chan Message
+	pendingResponsesChannel	chan Message
 	registerChannel		chan *Client
 	unregisterChannel	chan *Client
 	incomingClients		map[*Client]bool
-	pendingResponses	[]Message
 	state			*Engine
 	actions			Actions
 	sideEffects		SideEffects
@@ -199,7 +201,7 @@ type Room struct {
 }
 
 func newRoom(a Actions, sideEffects SideEffects, fps int) *Room {
-	return &Room{clients: make(map[*Client]bool), clientMessageChannel: make(chan Message, 1024), registerChannel: make(chan *Client), unregisterChannel: make(chan *Client), incomingClients: make(map[*Client]bool), state: newEngine(), sideEffects: sideEffects, actions: a, fps: fps}
+	return &Room{clients: make(map[*Client]bool), clientMessageChannel: make(chan Message, 1024), pendingResponsesChannel: make(chan Message, 1024), unregisterChannel: make(chan *Client), registerChannel: make(chan *Client), incomingClients: make(map[*Client]bool), state: newEngine(), sideEffects: sideEffects, actions: a, fps: fps}
 }
 func (r *Room) registerClient(client *Client) {
 	r.incomingClients[client] = true
@@ -266,7 +268,11 @@ Exit:
 			if response.client == nil {
 				continue
 			}
-			r.pendingResponses = append(r.pendingResponses, response)
+			select {
+			case r.pendingResponsesChannel <- response:
+			default:
+				log.Printf("pending responses channel full, skipping response")
+			}
 		default:
 			break Exit
 		}
@@ -291,20 +297,25 @@ func (r *Room) publishPatch() error {
 	return nil
 }
 func (r *Room) handlePendingResponses() {
-	for _, pendingResponse := range r.pendingResponses {
-		response, err := pendingResponse.MarshalJSON()
-		if err != nil {
-			log.Printf("error marshalling response message pending response: %s", err)
-			continue
-		}
+Exit:
+	for {
 		select {
-		case pendingResponse.client.messageChannel <- response:
+		case pendingResponse := <-r.pendingResponsesChannel:
+			response, err := pendingResponse.MarshalJSON()
+			if err != nil {
+				log.Printf("error marshalling pending response message: %s", err)
+				continue
+			}
+			select {
+			case pendingResponse.client.messageChannel <- response:
+			default:
+				log.Printf("client's message buffer full -> dropping client %s", pendingResponse.client.id)
+				r.unregisterClient(pendingResponse.client)
+			}
 		default:
-			log.Printf("client's message buffer full -> dropping client %s", pendingResponse.client.id)
-			r.unregisterClient(pendingResponse.client)
+			break Exit
 		}
 	}
-	r.pendingResponses = r.pendingResponses[:0]
 }
 func (r *Room) process() {
 	err := r.processFrame()

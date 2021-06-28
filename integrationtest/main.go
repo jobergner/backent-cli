@@ -117,3 +117,10 @@ func sendActionBadContent(ctx context.Context, c *websocket.Conn) {
 		panic(err)
 	}
 }
+
+func sendBadAction(ctx context.Context, c *websocket.Conn) {
+	err := wsjson.Write(ctx, c, "foo bar")
+	if err != nil {
+		panic(err)
+	}
+}
