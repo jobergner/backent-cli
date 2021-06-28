@@ -404,8 +404,6 @@ setter methods.
 
 
 ### TODO
-- bootstrap script (install easyjson, decltostring)
-- make start func less convoluted and include fps     
 - setters to return if new value == current value so no change is triggered
 - `path` as reserved field name in validator
 - documentation
