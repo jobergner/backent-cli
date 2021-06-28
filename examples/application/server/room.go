@@ -161,6 +161,7 @@ func (r *Room) handlePendingResponses() {
 
 func (r *Room) process() {
 	err := r.processFrame()
+	r.handlePendingResponses()
 	if err != nil {
 		log.Println(err)
 	}
@@ -173,7 +174,6 @@ func (r *Room) process() {
 	if err != nil {
 		log.Println(err)
 	}
-	r.handlePendingResponses()
 }
 
 func (r *Room) run() {
