@@ -138,13 +138,22 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 	go c.runWriteMessages()
 	<-r.Context().Done()
 }
-func setupRoutes(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) {
-	room := newRoom(a, onDeploy, onFrameTick)
+func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
+	room := newRoom(actions, sideEffects, fps)
 	room.Deploy()
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		wsEndpoint(w, r, room)
 	})
+}
+func Start(actions Actions, sideEffects SideEffects, fps int) error {
+	if fps < 1 {
+		setupRoutes(actions, sideEffects, 1)
+	} else {
+		setupRoutes(actions, sideEffects, fps)
+	}
+	err := http.ListenAndServe(":8080", nil)
+	return err
 }
 
 type MessageKind string
@@ -184,13 +193,13 @@ type Room struct {
 	incomingClients		map[*Client]bool
 	pendingResponses	[]Message
 	state			*Engine
-	actions			actions
-	onDeploy		func(*Engine)
-	onFrameTick		func(*Engine)
+	actions			Actions
+	sideEffects		SideEffects
+	fps			int
 }
 
-func newRoom(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) *Room {
-	return &Room{clients: make(map[*Client]bool), clientMessageChannel: make(chan Message, 1024), registerChannel: make(chan *Client), unregisterChannel: make(chan *Client), incomingClients: make(map[*Client]bool), state: newEngine(), onDeploy: onDeploy, onFrameTick: onFrameTick, actions: a}
+func newRoom(a Actions, sideEffects SideEffects, fps int) *Room {
+	return &Room{clients: make(map[*Client]bool), clientMessageChannel: make(chan Message, 1024), registerChannel: make(chan *Client), unregisterChannel: make(chan *Client), incomingClients: make(map[*Client]bool), state: newEngine(), sideEffects: sideEffects, actions: a, fps: fps}
 }
 func (r *Room) registerClient(client *Client) {
 	r.incomingClients[client] = true
@@ -262,7 +271,9 @@ Exit:
 			break Exit
 		}
 	}
-	r.onFrameTick(r.state)
+	if r.sideEffects.OnFrameTick != nil {
+		r.sideEffects.OnFrameTick(r.state)
+	}
 	return nil
 }
 func (r *Room) publishPatch() error {
@@ -312,7 +323,7 @@ func (r *Room) process() {
 	r.handlePendingResponses()
 }
 func (r *Room) run() {
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Second / time.Duration(r.fps))
 	for {
 		select {
 		case client := <-r.registerChannel:
@@ -325,6 +336,8 @@ func (r *Room) run() {
 	}
 }
 func (r *Room) Deploy() {
-	r.onDeploy(r.state)
+	if r.sideEffects.OnDeploy != nil {
+		r.sideEffects.OnDeploy(r.state)
+	}
 	go r.run()
 }`

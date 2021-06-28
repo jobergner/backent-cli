@@ -7,14 +7,17 @@ import (
 	"github.com/Java-Jonas/bar-cli/testutils"
 )
 
-func TestWriteStart(t *testing.T) {
-	t.Run("writes start", func(t *testing.T) {
+func TestWriteSideEffects(t *testing.T) {
+	t.Run("writes actions", func(t *testing.T) {
 		sf := newServerFactory(newSimpleASTExample())
-		sf.writeStart()
+		sf.writeSideEffects()
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			_Start_func,
+			`type SideEffects struct {
+	OnDeploy    func(*Engine)
+	OnFrameTick func(*Engine)
+}`,
 		}, "\n"))
 
 		if expected != actual {

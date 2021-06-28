@@ -4,7 +4,6 @@ package serverfactory
 
 const gets_generated_go_import string = `import (
 	"fmt"
-	"net/http"
 )`
 
 const _MessageKindAction_addItemToPlayer_type string = `const (
@@ -36,41 +35,55 @@ const _SpawnZoneItemsResponse_type string = `type SpawnZoneItemsResponse struct 
 	NewZoneItemPaths []string ` + "`" + `json:"newZoneItemPaths"` + "`" + `
 }`
 
-const actions_type string = `type actions struct {
-	addItemToPlayer	func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse
-	movePlayer	func(MovePlayerParams, *Engine)
-	spawnZoneItems	func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
+const _Actions_type string = `type Actions struct {
+	AddItemToPlayer	func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse
+	MovePlayer	func(MovePlayerParams, *Engine)
+	SpawnZoneItems	func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
+}`
+
+const _SideEffects_type string = `type SideEffects struct {
+	OnDeploy	func(*Engine)
+	OnFrameTick	func(*Engine)
 }`
 
 const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) (Message, error) {
 	switch MessageKind(msg.Kind) {
 	case MessageKindAction_addItemToPlayer:
+		if r.actions.AddItemToPlayer == nil {
+			break
+		}
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		res := r.actions.addItemToPlayer(params, r.state)
+		res := r.actions.AddItemToPlayer(params, r.state)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
 		}
 		return Message{msg.Kind, resContent, msg.client}, nil
 	case MessageKindAction_movePlayer:
+		if r.actions.MovePlayer == nil {
+			break
+		}
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		r.actions.movePlayer(params, r.state)
+		r.actions.MovePlayer(params, r.state)
 		return Message{}, nil
 	case MessageKindAction_spawnZoneItems:
+		if r.actions.SpawnZoneItems == nil {
+			break
+		}
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		res := r.actions.spawnZoneItems(params, r.state)
+		res := r.actions.SpawnZoneItems(params, r.state)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
@@ -79,11 +92,5 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 	default:
 		return Message{MessageKindError, []byte("unknown message kind " + msg.Kind), msg.client}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
 	}
-}`
-
-const _Start_func string = `func Start(addItemToPlayer func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse, movePlayer func(MovePlayerParams, *Engine), spawnZoneItems func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse, onDeploy func(*Engine), onFrameTick func(*Engine)) error {
-	a := actions{addItemToPlayer, movePlayer, spawnZoneItems}
-	setupRoutes(a, onDeploy, onFrameTick)
-	err := http.ListenAndServe(":8080", nil)
-	return err
+	return Message{}, nil
 }`

@@ -35,10 +35,20 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 	<-r.Context().Done()
 }
 
-func setupRoutes(a actions, onDeploy func(*Engine), onFrameTick func(*Engine)) {
-	room := newRoom(a, onDeploy, onFrameTick)
+func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
+	room := newRoom(actions, sideEffects, fps)
 	room.Deploy()
 
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { wsEndpoint(w, r, room) })
+}
+
+func Start(actions Actions, sideEffects SideEffects, fps int) error {
+	if fps < 1 {
+		setupRoutes(actions, sideEffects, 1)
+	} else {
+		setupRoutes(actions, sideEffects, fps)
+	}
+	err := http.ListenAndServe(":8080", nil)
+	return err
 }

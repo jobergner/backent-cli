@@ -41,23 +41,36 @@ func (g *GetStartedFactory) writeImport() *GetStartedFactory {
 	g.buf.WriteString(`
 import (
 	"foo/tmp"
-)
-	`)
+)`)
 	return g
 }
 
 func (g *GetStartedFactory) writeMainFunc() *GetStartedFactory {
 	decls := NewDeclSet()
 
-	decls.File.Func().Id("main").Params().Block(
-		Id("state").Dot("Start").Call(
+	decls.File.Const().Id("fps").Op("=").Lit(30)
+
+	decls.File.Var().Id("sideEffects").Op("=").Id("state").Dot("SideEffects").Values(Dict{
+		Id("OnDeploy"):    Func().Params(Id("engine").Id("*state.Engine")).Block(),
+		Id("OnFrameTick"): Func().Params(Id("engine").Id("*state.Engine")).Block(),
+	}).Line()
+
+	decls.File.Var().Id("actions").Op("=").Id("state").Dot("Actions").Values(
+		Line().Add(
 			ForEachActionInAST(g.config, func(action ast.Action) *Statement {
-				return Line().Func().Params(Id("state").Dot(Title(action.Name)+"Params"), Id("*state").Dot("Engine")).Block().Id(",")
-			}).
-				Comment("onDeploy").Line().
-				Func().Params(Id("*state").Dot("Engine")).Block().Id(",").Line().
-				Comment("onFrameTick").Line().
-				Func().Params(Id("*state").Dot("Engine")).Block().Id(",").Line(),
+				responseName := Id(Title(action.Name) + "Response")
+				if action.Response == nil {
+					responseName = Empty()
+				}
+				return Id(Title(action.Name)).Op(":").Func().Params(Id("params").Id("state").Dot(Title(action.Name)+"Params"), Id("engine").Id("*state.Engine")).Add(responseName).Block().Id(",")
+			}),
+		),
+	)
+
+	decls.File.Func().Id("main").Params().Block(
+		Id("err").Op(":=").Id("state").Dot("Start").Call(Id("actions"), Id("sideEffects"), Id("fps")),
+		If(Id("err").Op("!=").Nil()).Block(
+			Panic(Id("err")),
 		),
 	)
 
