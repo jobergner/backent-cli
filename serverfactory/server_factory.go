@@ -38,6 +38,7 @@ func newServerFactory(config *ast.AST) *ServerFactory {
 func WriteServer(
 	buf *bytes.Buffer,
 	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
+	configJson []byte,
 ) {
 	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 	s := newServerFactory(config).
@@ -45,7 +46,8 @@ func WriteServer(
 		writeMessageKinds().
 		writeParameters().
 		writeResponses().
-		writeProcessClientMessage()
+		writeProcessClientMessage().
+		writeInspectHandler(configJson)
 
 	err := Format(s.buf)
 	if err != nil {

@@ -119,7 +119,7 @@ func (c *Connection) WriteMessage(msg []byte) error {
 	}
 	return nil
 }
-func homePage(w http.ResponseWriter, r *http.Request) {
+func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
 func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
@@ -143,7 +143,8 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
 	room := newRoom(actions, sideEffects, fps)
 	room.Deploy()
-	http.HandleFunc("/", homePage)
+	http.HandleFunc("/", homePageHandler)
+	http.HandleFunc("/inspect", inspectHandler)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		wsEndpoint(w, r, room)
 	})
