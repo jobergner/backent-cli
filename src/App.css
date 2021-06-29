@@ -14,6 +14,11 @@
     width: 100%;
   }
 }
+@media only screen and (max-width: 947px) {
+  .Action {
+    max-width: unset !important;
+  }
+}
 @media only screen and (min-width: 1300px) {
   .App {
     width: 75%;
