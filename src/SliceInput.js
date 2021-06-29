@@ -1,49 +1,125 @@
-import * as React from "react";
-import { TagInput, Button, Intent } from "@blueprintjs/core";
+import React, { useState } from "react";
+import { Card, TagInput, Button, Intent } from "@blueprintjs/core";
+import evalInput from "./evalInput";
+import { Popover2 } from "@blueprintjs/popover2";
 
-class SliceInput extends React.Component {
-    state = {
-        addOnBlur: false,
-        addOnPaste: true,
-        disabled: false,
-        fill: false,
-        intent: "none",
-        large: false,
-        leftIcon: true,
-        tagIntents: false,
-        tagMinimal: false,
-    };
+const numericTypes = [
+  "int8",
+  "uint8",
+  "int16",
+  "uint16",
+  "int32",
+  "uint32",
+  "int64",
+  "uint64",
+  "int",
+  "uint",
+  "uintptr",
+  "float32",
+  "float64",
+  "complex64",
+  "complex128",
+];
+const textTypes = ["string", "byte", "rune", "[]byte"];
+// TODO expand list
+const defualtValuePerValue = (value) => {
+  if (numericTypes.includes(value)) {
+    return 0;
+  }
+  if (textTypes.includes(value)) {
+    return "";
+  }
+  return false;
+};
 
-    render() {
-        const clearButton = (
-            <Button
-                key="clearButton"
-                icon={"cross"}
-                minimal={true}
-                onClick={this.handleClear}
-            />
-        );
-        const addButton = <Button
-            icon={"add"}
-            key="addButton"
-            minimal
-            onClick={this.handleClear}
-            intent={Intent.PRIMARY}
-        />
+function SliceInput(props) {
+  const [isOpen, setOpen] = useState(false);
+  const [newValue, setNewValue] = useState("");
+  const { setFormContent, currentFormContent, fieldName, value } = props;
+  console.log(newValue);
 
-        return <div className="SliceInput">
-            <TagInput
-                onChange={this.handleChange}
-                placeholder="Separate values with commas..."
-                rightElement={[addButton, clearButton]}
-                values={[<div>hello</div>]}
-                inputProps={{ style: { display: "none" } }}
-                tagProps={{ minimal: true }}
-            />
-        </div>
-    }
+  const currentValues = currentFormContent[fieldName] || [];
 
+  const clearButton = (
+    <Button
+      onClick={() =>
+        setFormContent({
+          ...currentFormContent,
+          [fieldName]: [],
+        })
+      }
+      key="clearButton"
+      icon={"cross"}
+      minimal={true}
+    />
+  );
+
+  const popoverContent = (
+    <Card elevation={2}>
+      <span>Add New:</span>
+      {evalInput(
+        fieldName,
+        value,
+        (wrappedNewvalue) => {
+          console.log(wrappedNewvalue);
+          setNewValue(wrappedNewvalue[fieldName]);
+        },
+        { [fieldName]: newValue },
+        true
+      )}
+      <Button intent={Intent.DANGER} minimal onClick={() => setOpen(false)}>
+        close
+      </Button>
+      <Button
+        intent={Intent.PRIMARY}
+        minimal
+        disabled={newValue === ""}
+        onClick={() => {
+          setOpen(false);
+          setFormContent({
+            ...currentFormContent,
+            [fieldName]: [...currentValues, newValue || defualtValuePerValue(value)],
+          });
+        }}
+      >
+        add
+      </Button>
+    </Card>
+  );
+
+  const addButton = (
+    <Popover2
+      key="addButton"
+      modifiers={{ arrow: { enabled: true } }}
+      isOpen={isOpen}
+      content={popoverContent}
+    >
+      <Button
+        icon={"add"}
+        minimal
+        onClick={() => setOpen(true)}
+        intent={Intent.PRIMARY}
+      />
+    </Popover2>
+  );
+
+  return (
+    <div className="SliceInput">
+      <TagInput
+        onChange={(remainingTags) =>
+          setFormContent({
+            ...currentFormContent,
+            [fieldName]: remainingTags,
+          })
+        }
+        placeholder={fieldName}
+        rightElement={[addButton, clearButton]}
+        values={currentValues}
+        inputProps={{ style: { display: "none" } }}
+        tagProps={{ minimal: true }}
+      />
+    </div>
+  );
 }
 
 export default SliceInput;
-

@@ -1,5 +1,6 @@
 .Action {
   flex: 1;
+  max-width: calc(50% - 20px);
   min-width: 400px;
   display: flex;
   flex-direction: column;
