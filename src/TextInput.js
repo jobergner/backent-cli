@@ -1,13 +1,20 @@
 import { InputGroup } from "@blueprintjs/core";
 
 function TextInput(props) {
-    return (<>
-        <InputGroup
-            placeholder="Enter your password..."
-            type={"text"}
-        />
-    </>);
+  const { setFormContent, currentFormContent, fieldName } = props;
+  return (
+    <>
+      <InputGroup
+        onChange={(e) => {
+          setFormContent({
+            ...currentFormContent,
+            [fieldName]: e.target.value,
+          });
+        }}
+        placeholder={fieldName}
+      />
+    </>
+  );
 }
 
 export default TextInput;
-
