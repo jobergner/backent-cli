@@ -1,20 +1,24 @@
 import "./App.css";
-import { Button, Card, H5, Classes } from "@blueprintjs/core";
+import {Icon, Intent, Button, Card, H5, Classes } from "@blueprintjs/core";
 import Actions from "./Actions"
+import ResponseCard from "./ResponseCard"
+import InitialStateCard from "./InitialStateCard"
+import UpdateCard from "./UpdateCard"
+import AppBar from "./AppBar"
 
 function App() {
   return (
-    <div className="App bp3-dark">
-      <Card elevation={0} className="card card1">
-        <H5>hello</H5>
-        <p>
-          User interfaces that enable people to interact smoothly with data, ask
-          better questions, and make better decisions.
-        </p>
-        <Button text="Explore products" className={Classes.BUTTON} />
-      </Card>
-      <Actions />
-    </div>
+    <>
+      <div className="bp3-dark">
+        <AppBar />
+      </div>
+      <div className="App bp3-dark">
+        <InitialStateCard />
+        <UpdateCard />
+        <ResponseCard />
+        <Actions />
+      </div>
+    </>
   );
 }
 

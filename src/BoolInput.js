@@ -1,13 +1,30 @@
 import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 
-function BoolInput() {
-    return (<div className="BoolInput">
-        <ButtonGroup style={{ minWidth: 120 }}>
-            <Button intent={Intent.PRIMARY} >true</Button>
-            <Button>false</Button>
-        </ButtonGroup>
-    </div>);
+function BoolInput(props) {
+  const { setFormContent, currentFormContent, fieldName } = props;
+    const currentValue = currentFormContent[fieldName]
+  return (
+    <div className="BoolInput">
+      <ButtonGroup style={{ minWidth: 120 }}>
+        <Button
+          onClick={() =>
+            setFormContent({ ...currentFormContent, [fieldName]: true })
+          }
+            intent={currentValue ? Intent.PRIMARY : Intent.NONE}
+        >
+          true
+        </Button>
+        <Button
+          onClick={() =>
+            setFormContent({ ...currentFormContent, [fieldName]: false })
+          }
+            intent={!currentValue ? Intent.PRIMARY : Intent.NONE}
+        >
+          false
+        </Button>
+      </ButtonGroup>
+    </div>
+  );
 }
 
 export default BoolInput;
-

@@ -1,5 +1,8 @@
 {
   "state": {
+    "aaa": ["aa"],
+    "foo": 1,
+    "bar": true,
     "player": {
       "items": "[]item",
       "equipmentSets": "[]*equipmentSet",
@@ -41,15 +44,20 @@
   "actions": {
     "movePlayer": {
       "player": "playerID",
+      "someBool": "bool",
       "changeX": "float64",
+      "items": "[]bool",
       "changeY": "float64",
       "hasMoved": "bool"
     },
     "addItemToPlayer": {
+      "items": "[]bool",
       "item": "itemID",
+      "changeY": "float64",
       "newName": "string"
     },
     "spawnZoneItems": {
+      "newName": "string",
       "items": "[]itemID"
     }
   },
