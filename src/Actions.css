@@ -1,25 +1,39 @@
-.Actions {
-    display: flex;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.ActionMessage {
-    flex:1;
-}
-
-.ActionResponse {
-    flex:1;
-}
-
 .Action {
+  flex: 1;
+  min-width: 400px;
+  width: 40%;
+}
+
+.BoolInput {
 }
 
 .SliceInput {
-    width: 100%;
-    display: flex;
+  width: 100%;
+  display: flex;
 }
 
 .InputField {
-    display: flex;
+  padding-top: 20px;
+  padding-bottom: 3px;
+  display: flex;
+  flex-direction: column;
+}
+
+.HeadlineIcon {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.InputWrapper {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.InputsWrapper {
+  padding: 5px;
+  padding-bottom: 20px;
+}
+
+.InputLabel {
+  font-size: 18px;
 }
