@@ -3,6 +3,7 @@ import TextInput from "./TextInput"
 import BoolInput from "./BoolInput"
 import NumberInput from "./NumberInput"
 import SliceInput from "./SliceInput"
+import {Label} from "@blueprintjs/core";
 
 const numericTypes = ["int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "int", "uint", "uintptr", "float32", "float64", "complex64", "complex128"]
 const textTypes = ["string", "byte", "rune", "[]byte"]
@@ -10,17 +11,20 @@ const textTypes = ["string", "byte", "rune", "[]byte"]
 function Input(props) {
     return (<>
         {Object.entries(props.action).map(([key, value]) => {
+
+    const label = <Label className="InputLabel">{key}:</Label>
+
             if (value.startsWith("[]")) {
-                return <div className="InputField" key={key} >{key}:<SliceInput /></div>
+                return <div className="InputField" key={key} >{label}<SliceInput /></div>
             }
             if (textTypes.includes(value)) {
-                return <div className="InputField" key={key} >{key}:<TextInput /></div>
+                return <div className="InputField" key={key} >{label}<TextInput /></div>
             }
             if (numericTypes.includes(value) || value.endsWith("ID")) {
-                return <div className="InputField" key={key}>{key}:<NumberInput /></div>
+                return <div className="InputField" key={key}>{label}<NumberInput /></div>
             }
             if (value === "bool") {
-                return <div className="InputField" key={key}>{key}:<BoolInput /></div>
+                return <div className="InputField" key={key}>{label}<BoolInput /></div>
             }
             console.log(value)
             return <div />
