@@ -58,11 +58,13 @@ func (g *GetStartedFactory) writeMainFunc() *GetStartedFactory {
 	decls.File.Var().Id("actions").Op("=").Id("state").Dot("Actions").Values(
 		Line().Add(
 			ForEachActionInAST(g.config, func(action ast.Action) *Statement {
-				responseName := Id(Title(action.Name) + "Response")
 				if action.Response == nil {
-					responseName = Empty()
+					return Id(Title(action.Name)).Op(":").Func().Params(Id("params").Id("state").Dot(Title(action.Name)+"Params"), Id("engine").Id("*state.Engine")).Block().Id(",")
 				}
-				return Id(Title(action.Name)).Op(":").Func().Params(Id("params").Id("state").Dot(Title(action.Name)+"Params"), Id("engine").Id("*state.Engine")).Add(responseName).Block().Id(",")
+				responseName := Id("state").Dot(Title(action.Name) + "Response")
+				return Id(Title(action.Name)).Op(":").Func().Params(Id("params").Id("state").Dot(Title(action.Name)+"Params"), Id("engine").Id("*state.Engine")).Add(responseName).Block(
+					Return(responseName).Values(),
+				).Id(",")
 			}),
 		),
 	)
