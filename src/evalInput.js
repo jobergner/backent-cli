@@ -27,7 +27,7 @@ const textTypes = ["string", "byte", "rune", "[]byte"];
 const evalInput = (key, value, setFormContent, currentFormContent, omitLabel) => {
   let label = (
     <Label className="InputLabel">
-      {key}: <span className="bp3-text-muted">({value})</span>
+      {key}: <span className="bp3-text-muted">{value}</span>
     </Label>
   );
   if (omitLabel) {
