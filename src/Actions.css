@@ -73,3 +73,36 @@
 .string-value {
   color: #f2733e !important;
 }
+
+.SlicePopover {
+  width: 240px;
+  text-align: center;
+  padding: 10px;
+  padding-bottom: 4px;
+}
+
+.PopOverButtons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.bp3-button-group {
+  min-width: unset !important;
+}
+
+.bp3-tag-input {
+  width: 80%;
+}
+
+.TextInput {
+  width: 80% !important;
+}
+
+.NumberInput {
+  width: 100%;
+}
+
+.bp3-input-group {
+  width: calc(80% - 30px);
+}
