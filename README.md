@@ -235,14 +235,14 @@ and therefore unique. It will remain "ID".
 
 
 ### code generation: templates vs jennifer
-| Templates        | Jennifer   |
-| ------------- |---------------|
-| writing code is easy and quick | writing code is a bit tedious |
-| can generate anything | only able to generate go code |
-| logic statements with own syntax | is go |
-| no formatting, type-/spellchecking  | some helper methods to reduce the risk of misspelling (jen.Range() etc.) |
-| logic makes templates hardly readable  | easily deal with difficult logic statements |
-| thrown errors are not very comprehensible | throws comprehensible errors based on go/format |
+| Templates                                 | Jennifer                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| writing code is easy and quick            | writing code is a bit tedious                                            |
+| can generate anything                     | only able to generate go code                                            |
+| logic statements with own syntax          | is go                                                                    |
+| no formatting, type-/spellchecking        | some helper methods to reduce the risk of misspelling (jen.Range() etc.) |
+| logic makes templates hardly readable     | easily deal with difficult logic statements                              |
+| thrown errors are not very comprehensible | throws comprehensible errors based on go/format                          |
 
 I believe templates are a great way of generating code, as long as there is not too much logic envolved.
 As soon as a lot of confitionals and loops are used it feels like you are just writing code in a underdeveloped language.
@@ -404,6 +404,7 @@ setter methods.
 
 
 ### TODO
+- make integration test generate
 - setters to return if new value == current value so no change is triggered
 - `path` as reserved field name in validator
 - documentation
