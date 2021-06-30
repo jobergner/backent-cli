@@ -10,7 +10,7 @@ function BoolInput(props) {
           onClick={() =>
             setFormContent({ ...currentFormContent, [fieldName]: true })
           }
-            intent={currentValue ? Intent.PRIMARY : Intent.NONE}
+            intent={currentValue === true ? Intent.PRIMARY : Intent.NONE}
         >
           true
         </Button>
@@ -18,7 +18,7 @@ function BoolInput(props) {
           onClick={() =>
             setFormContent({ ...currentFormContent, [fieldName]: false })
           }
-            intent={!currentValue ? Intent.PRIMARY : Intent.NONE}
+            intent={currentValue === false ? Intent.PRIMARY : Intent.NONE}
         >
           false
         </Button>

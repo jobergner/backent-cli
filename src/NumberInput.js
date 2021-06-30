@@ -5,6 +5,7 @@ function NumberInput(props) {
   return (
     <>
       <NumericInput
+        className="NumberInput"
         onValueChange={(value) => {
           setFormContent({ ...currentFormContent, [fieldName]: value });
         }}

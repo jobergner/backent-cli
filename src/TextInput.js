@@ -5,6 +5,7 @@ function TextInput(props) {
   return (
     <>
       <InputGroup
+        className="TextInput"
         onChange={(e) => {
           setFormContent({
             ...currentFormContent,

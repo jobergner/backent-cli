@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, TagInput, Button, Intent } from "@blueprintjs/core";
+import { Divider, Card, TagInput, Button, Intent } from "@blueprintjs/core";
 import evalInput from "./evalInput";
 import { Popover2 } from "@blueprintjs/popover2";
 
@@ -36,7 +36,6 @@ function SliceInput(props) {
   const [isOpen, setOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
   const { setFormContent, currentFormContent, fieldName, value } = props;
-  console.log(newValue);
 
   const currentValues = currentFormContent[fieldName] || [];
 
@@ -55,35 +54,48 @@ function SliceInput(props) {
   );
 
   const popoverContent = (
-    <Card elevation={2}>
-      <span>Add New:</span>
+    <Card className="SlicePopover" elevation={2}>
+      <span>Append New Value</span>
+      <Divider />
       {evalInput(
         fieldName,
         value,
         (wrappedNewvalue) => {
-          console.log(wrappedNewvalue);
           setNewValue(wrappedNewvalue[fieldName]);
         },
         { [fieldName]: newValue },
         true
       )}
-      <Button intent={Intent.DANGER} minimal onClick={() => setOpen(false)}>
-        close
-      </Button>
-      <Button
-        intent={Intent.PRIMARY}
-        minimal
-        disabled={newValue === ""}
-        onClick={() => {
-          setOpen(false);
-          setFormContent({
-            ...currentFormContent,
-            [fieldName]: [...currentValues, newValue || defualtValuePerValue(value)],
-          });
-        }}
-      >
-        add
-      </Button>
+      <div className="PopOverButtons">
+        <Button
+          intent={Intent.DANGER}
+          minimal
+          onClick={() => {
+            setOpen(false);
+            setNewValue(null);
+          }}
+        >
+          close
+        </Button>
+        <Button
+          intent={Intent.PRIMARY}
+          minimal
+          disabled={newValue === ""}
+          onClick={() => {
+            setOpen(false);
+            setNewValue(null);
+            setFormContent({
+              ...currentFormContent,
+              [fieldName]: [
+                ...currentValues,
+                newValue || defualtValuePerValue(value),
+              ],
+            });
+          }}
+        >
+          add
+        </Button>
+      </div>
     </Card>
   );
 
@@ -114,7 +126,7 @@ function SliceInput(props) {
         }
         placeholder={fieldName}
         rightElement={[addButton, clearButton]}
-        values={currentValues}
+        values={currentValues.map((x) => x.toString())}
         inputProps={{ style: { display: "none" } }}
         tagProps={{ minimal: true }}
       />
