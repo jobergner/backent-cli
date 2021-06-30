@@ -2,35 +2,7 @@ import React, { useState } from "react";
 import { Divider, Card, TagInput, Button, Intent } from "@blueprintjs/core";
 import evalInput from "./evalInput";
 import { Popover2 } from "@blueprintjs/popover2";
-
-const numericTypes = [
-  "int8",
-  "uint8",
-  "int16",
-  "uint16",
-  "int32",
-  "uint32",
-  "int64",
-  "uint64",
-  "int",
-  "uint",
-  "uintptr",
-  "float32",
-  "float64",
-  "complex64",
-  "complex128",
-];
-const textTypes = ["string", "byte", "rune", "[]byte"];
-// TODO expand list
-const defualtValuePerValue = (value) => {
-  if (numericTypes.includes(value)) {
-    return 0;
-  }
-  if (textTypes.includes(value)) {
-    return "";
-  }
-  return false;
-};
+import {defualtValuePerValue} from "./defaultValues"
 
 function SliceInput(props) {
   const [isOpen, setOpen] = useState(false);

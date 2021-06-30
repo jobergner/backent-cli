@@ -2,7 +2,7 @@ import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 
 function BoolInput(props) {
   const { setFormContent, currentFormContent, fieldName } = props;
-    const currentValue = currentFormContent[fieldName]
+  const currentValue = currentFormContent[fieldName];
   return (
     <div className="BoolInput">
       <ButtonGroup style={{ minWidth: 120 }}>
@@ -10,7 +10,7 @@ function BoolInput(props) {
           onClick={() =>
             setFormContent({ ...currentFormContent, [fieldName]: true })
           }
-            intent={currentValue === true ? Intent.PRIMARY : Intent.NONE}
+          intent={currentValue === true ? Intent.PRIMARY : Intent.NONE}
         >
           true
         </Button>
@@ -18,7 +18,7 @@ function BoolInput(props) {
           onClick={() =>
             setFormContent({ ...currentFormContent, [fieldName]: false })
           }
-            intent={currentValue === false ? Intent.PRIMARY : Intent.NONE}
+          intent={currentValue === false ? Intent.PRIMARY : Intent.NONE}
         >
           false
         </Button>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import {defaultValueAction} from "./defaultValues"
 import "./Actions.css";
 import Input from "./Input";
 import {
@@ -14,8 +15,8 @@ import {
 import config from "./example.config.json";
 
 function Action(props) {
-  const [formContent, setFormContent] = useState({});
-  const { keyName, value } = props;
+  const { actionName, action } = props;
+  const [formContent, setFormContent] = useState(defaultValueAction(action));
   return (
     <Card elevation={0} className="card Action">
       <>
@@ -27,11 +28,11 @@ function Action(props) {
               icon="send-to"
               intent={Intent.PRIMARY}
             />
-            {keyName}
+            {actionName}
           </H5>
           <Divider />
           <div className="InputsWrapper">
-            <Input currentFormContent={formContent} setFormContent={setFormContent} action={value} />
+            <Input currentFormContent={formContent} setFormContent={setFormContent} action={action} />
           </div>
         </div>
         <div className="ActionLower">
@@ -63,7 +64,7 @@ function Actions() {
   return (
     <>
       {Object.entries(config.actions).map(([keyName, value]) => {
-        return <Action key={keyName} keyName={keyName} value={value} />;
+        return <Action key={keyName} actionName={keyName} action={value} />;
       })}
     </>
   );
