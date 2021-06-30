@@ -6,10 +6,10 @@ function NumberInput(props) {
     <>
       <NumericInput
         className="NumberInput"
+        placeholder={currentFormContent[fieldName]}
         onValueChange={(value) => {
           setFormContent({ ...currentFormContent, [fieldName]: value });
         }}
-        placeholder={fieldName}
       />
     </>
   );
