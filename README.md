@@ -460,9 +460,11 @@ setter methods.
 - manages self referencing elements
 
 ### TODO
-
+- port param for start method
+- example flag for getStartedFactory
+- should engine.Getters also be able to get non-root entities
+- build fails because of required modules from github. what do?
 - find open port for integratpon test
-- make integration test generate
 - setters to return if new value == current value so no change is triggered
 - `path` as reserved field name in validator
 - documentation
@@ -473,3 +475,207 @@ setter methods.
 - release tree func (release slices, maps, and the pointers themselves)
 - (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the ElementKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
 
+
+
+# backent-cli
+backent-cli generates a server API as package for real-time state broadcasting of entities. It reads a config to create an API which broadcasts all occuring changes to the connected clients automatically.
+### example config.json
+```
+{
+    "state": {
+        "player": {
+            "name": "string",
+            "items": "[]item"
+        },
+        "item": {
+            "name": "string",
+            "value": "float64"
+        }
+    },
+    "actions": {
+        "createPlayer": {
+            "name": "string",
+            "firstItemName": "string"
+        }
+    }
+}
+```
+### Generate Server:
+```
+mkdir backent;
+backent-cli generate -config config.json -out backent/
+```
+### Run the Server:
+```
+package main
+
+import "yourproject/state"
+
+const fps = 30
+
+func main() {
+	err := state.Start(actions, sideEffects, fps)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var actions = state.Actions{
+	CreatePlayer: func(params state.CreatePlayerParams, engine *state.Engine) {
+		player := engine.CreatePlayer()                // creating the player
+		player.SetName(params.Name)                    // setting the player name
+		player.AddItem().SetName(params.FirstItemName) // add and item and set item name
+	}, // state change is automatically broadcasted
+}
+
+var sideEffects = state.SideEffects{
+	OnDeploy:    func(engine *state.Engine) {},
+	OnFrameTick: func(engine *state.Engine) {},
+}
+```
+### Send a Message to trigger the Action:
+```
+{
+    "kind": "createPlayer",
+    "content": "{\"name\": \"string\",\"firstItemName\": \"string\"}"
+}
+```
+
+## Jump right into Experimenting with the Inspector:
+# NICE SCREENSHOT OF INSPECTOR
+```
+mkdir backent_example; cd backent_example;
+mkdir backent; # create a directory to generate the code into
+backent-cli generate -config config.json -out ./backent/ -example;
+go run .;
+backent-cli inspect -port 8080
+```
+
+## Defining the Config:
+The config's syntax is inspired by Go's own syntax. If you have knowledge of Go you will intuitively understand what is going on. And if you find yourself struggling and make mistakes, comprehensive error messages will help you correct them. There are however some additional restrictions to which values you can use where. More info on that here.
+
+The config may consist of 3 parts: `state`, `actions` and `responses`.
+
+### state:
+The state consists of types which you can consider the equivalent to Go's structs: Structures with field names and values describing the types. As it is with go, when defining a type, you can use it as a field's value:
+```
+{
+  "address: {
+    "streetName": "string",
+    "houseNumber": "int
+  },
+  "house": {
+    "address": "address"
+  }
+}
+```
+More about defining state types can be found here.
+### actions:
+Actions is how the server and client communicate. Here you can define which client data you want the server to be aware of in order to react with the assigned behaviour. Defining actions is very similar to defining the state except for some additional limitations. Only Go's basic types, and type references in the form of IDs can be used as values.
+```
+{
+  "buildNewHouse": {
+    "streetName": "string",
+    "houseNumber": "int"
+  }
+}
+```
+The generator creates all necessary structures for you to simply tell the server how to react to a received action. The `params` struct will contain the defined data. Make use of your personal API to manipulate the `engine`'s state. The engine will keep track of all the changes you have made and tell the server to broadcast the changes to all connected clients automatically. 
+```
+// ...
+var actions = state.Actions{
+	BuildNewHouse: func(params state.BuildNewHouseParams, engine *state.Engine) {
+      house := engine.CreateHouse()
+      address := house.Address()
+      address.SetStreetName(params.StreetName)
+      address.SetHouseNumber(params.HouseNumber)
+	},
+}
+// ...
+```
+### responses:
+Sometimes you may want to send back data to the client who sent the action. This can be done with responses. Defining responses works exactly the same way as defining actions. Assigning a response to an actions works by giving the response the same name as the action:
+```
+{
+  "actions": {
+    "buildNewHouse": {
+      "streetName": "string",
+      "houseNumber": "int"
+    }
+  }
+}
+{
+  "responses": {
+    "buildNewHouse": {
+      "houseID": "houseID",
+    }
+  }
+}
+```
+Now we can tell the server to return data to the client.
+```
+// ...
+var actions = state.Actions{
+	BuildNewHouse: func(params state.BuildNewHouseParams, engine *state.Engine) {
+      house := engine.CreateHouse()
+      address := house.Address()
+      address.SetStreetName(params.StreetName)
+      address.SetHouseNumber(params.HouseNumber)
+      // `ID()` is a getter method to acces the ID of an entity
+      return state.BuildNewHouseResponse{houseID: house.ID()} // <- return data to client
+	},
+}
+// ...
+```
+
+## State Structure and Updates:
+Updates are assembled in a tree-like structure, containing only entities that have updated or who's children have updates. In the action section we have learned how to create a new entity of the `house` type. Creating an entity automatically creates all it's children with default values, even if they are not modified. It is just what you'd expect from Go. So the tree update of just the `engine.CreateHouse()` call alone woud look like this:
+```
+{
+    "house": {
+        "1": {
+            "address": {
+                "id": 2,
+                "streetName": "",
+                "houseNumber": 0,
+                "operationKind": "UPDATE"
+            },
+            "operationKind": "UPDATE"
+        }
+    }
+}
+```
+This is the data every connected client would receive as result of a `engine.CreateHouse()` call. You can see how each created entity has a `operationKind:"UPDATE"` value. This tells the client that this entity is new or has updated since the last received update.
+
+Imagine you defined a second action with the name `changeHouseNumber` which behaves like this:
+```
+var actions = state.Actions{
+  // ...
+	ChangeHouseNumber: func(params state.ChangeHouseNumberParams, engine *state.Engine) {
+      house := engine.House(params.HouseID)
+      house.Address().SetHouseNumber(params.NewHouseNumber)
+	},
+}
+```
+Triggering this action with a message would result in the following tree update:
+```
+{
+    "house": {
+        "1": {
+            "address": {
+                "id": 2,
+                "streetName": "",
+                "houseNumber": 1,
+                "operationKind": "UPDATE"
+            },
+            "operationKind": "UNCHANGED"
+        }
+    }
+}
+```
+As the the `house` entity itself has not updated, but only it's child `address`, it maintains the `operationKind:"UNCHANGED"` value. This way the client can tell that the `house` entity has remained the same since last update.
+
+## Type References:
+Sometimes you want an entity to have a certain value, but not necessarily own that value, as the value is an entity that exists on itself, and not as a child of another entity. This can be done by using references.
+
+## Message Structure:
