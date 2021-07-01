@@ -2,13 +2,21 @@ package integrationtest
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"testing"
+
 	"github.com/Java-Jonas/bar-cli/integrationtest/state"
 	"github.com/Java-Jonas/bar-cli/testutils"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
+
+func TestMain(m *testing.M) {
+	// generating goes here
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestIntegration(t *testing.T) {
 	go startServer()

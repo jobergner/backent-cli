@@ -99,11 +99,11 @@ type Connection struct {
 }
 
 func NewConnection(conn *websocket.Conn, r *http.Request) *Connection {
-	return &Connection{Conn: conn, ctx: context.Background()}
+	ctx, cancel := context.WithCancel(context.Background())
+	return &Connection{Conn: conn, ctx: ctx, cancelContext: cancel}
 }
 func (c *Connection) Close() {
 	c.Conn.Close(websocket.StatusNormalClosure, "")
-	c.cancelContext()
 }
 func (c *Connection) ReadMessage() (int, []byte, error) {
 	msgType, msg, err := c.Conn.Read(c.ctx)
@@ -288,6 +288,9 @@ func (r *Room) publishPatch() error {
 	patchBytes, err := tree.MarshalJSON()
 	if err != nil {
 		return fmt.Errorf("error marshalling tree for patch: %s", err)
+	}
+	if len(patchBytes) == 2 {
+		return nil
 	}
 	stateUpdateMsg := Message{Kind: MessageKindUpdate, Content: patchBytes}
 	stateUpdateBytes, err := stateUpdateMsg.MarshalJSON()
