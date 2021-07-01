@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"nhooyr.io/websocket"
 )
@@ -22,11 +21,9 @@ type Connection struct {
 }
 
 func NewConnection(conn *websocket.Conn, r *http.Request) *Connection {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
 	return &Connection{
-		Conn:          conn,
-		ctx:           ctx,
-		cancelContext: cancel,
+		Conn: conn,
+		ctx:  context.Background(),
 	}
 }
 

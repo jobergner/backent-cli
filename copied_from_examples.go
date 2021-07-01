@@ -60,8 +60,9 @@ func (c *Client) runReadMessages() {
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
-			log.Printf("error while reading connection: %s", err)
-			continue
+			log.Printf("unregistering client due to error while reading connection: %s", err)
+			c.room.unregisterChannel <- c
+			break
 		}
 		var msg Message
 		err = msg.UnmarshalJSON(msgBytes)
@@ -98,8 +99,7 @@ type Connection struct {
 }
 
 func NewConnection(conn *websocket.Conn, r *http.Request) *Connection {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
-	return &Connection{Conn: conn, ctx: ctx, cancelContext: cancel}
+	return &Connection{Conn: conn, ctx: context.Background()}
 }
 func (c *Connection) Close() {
 	c.Conn.Close(websocket.StatusNormalClosure, "")

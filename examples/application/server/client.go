@@ -51,8 +51,9 @@ func (c *Client) runReadMessages() {
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
-			log.Printf("error while reading connection: %s", err)
-			continue
+			log.Printf("unregistering client due to error while reading connection: %s", err)
+			c.room.unregisterChannel <- c
+			break
 		}
 
 		var msg Message
