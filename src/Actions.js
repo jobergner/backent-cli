@@ -15,7 +15,7 @@ import {
 import config from "./example.config.json";
 
 function Action(props) {
-  const { actionName, action } = props;
+  const { actionName, action, ws } = props;
   const [formContent, setFormContent] = useState(defaultValueAction(action));
   return (
     <Card elevation={0} className="card Action">
@@ -38,20 +38,23 @@ function Action(props) {
         <div className="ActionLower">
           <Divider />
           <div className="ActionSendButtonWrapper">
-            <Button
+            {/*<Button
               className="CardButton"
               intent={Intent.PRIMARY}
               rightIcon="inbox"
               disabled
               minimal
               text="View Response"
-            />
+            />*/}
             <Button
               intent={Intent.PRIMARY}
               rightIcon="send-message"
               text="Send"
               className={Classes.BUTTON}
-                onClick={() => console.log(formContent)}
+                onClick={() => {
+                ws.send(JSON.stringify({kind: actionName ,content: JSON.stringify(formContent)}))
+                }
+                }
             />
           </div>
         </div>
@@ -60,11 +63,11 @@ function Action(props) {
   );
 }
 
-function Actions() {
+function Actions({ws}) {
   return (
     <>
       {Object.entries(config.actions).map(([keyName, value]) => {
-        return <Action key={keyName} actionName={keyName} action={value} />;
+        return <Action ws={ws} key={keyName} actionName={keyName} action={value} />;
       })}
     </>
   );
