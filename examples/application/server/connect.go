@@ -21,15 +21,16 @@ type Connection struct {
 }
 
 func NewConnection(conn *websocket.Conn, r *http.Request) *Connection {
+	ctx, cancel := context.WithCancel(context.Background())
 	return &Connection{
-		Conn: conn,
-		ctx:  context.Background(),
+		Conn:          conn,
+		ctx:           ctx,
+		cancelContext: cancel,
 	}
 }
 
 func (c *Connection) Close() {
 	c.Conn.Close(websocket.StatusNormalClosure, "")
-	c.cancelContext()
 }
 
 func (c *Connection) ReadMessage() (int, []byte, error) {
