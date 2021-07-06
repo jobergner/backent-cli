@@ -507,7 +507,7 @@ backent-cli generate -example -out ./backent/;
 go run .;
 backent-cli inspect -port 3496;
 ```
-
+# Overview
 ## Example Configuration
 This is what a very simple `config.json` can look like. You may define as many types and actions as you like. You can read more about the possible configurations below!
 ```
@@ -574,6 +574,7 @@ This is how a message the server understands may look like. It interprets the me
     "content": "{\"name\": \"string\",\"firstItemName\": \"string\"}"
 }
 ```
+# The Basics
 ## Defining the Config:
 The config's syntax is inspired by Go's own syntax. If you have knowledge of Go you will intuitively understand what is going on. And if you find yourself struggling and make mistakes, comprehensive error messages will help you correct them. There are however some additional restrictions to which values you can use where. More info on that here.
 
@@ -639,7 +640,7 @@ Now we can tell the server to return data to the client.
 ```
 // ...
 var actions = state.Actions{
-	BuildNewHouse: func(params state.BuildNewHouseParams, engine *state.Engine) {
+	BuildNewHouse: func(params state.BuildNewHouseParams, engine *state.Engine) state.BuildNewHouseResponse {
       house := engine.CreateHouse()
       address := house.Address()
       address.SetStreetName(params.StreetName)
@@ -652,7 +653,7 @@ var actions = state.Actions{
 ```
 
 ## State Structure and Updates:
-Updates are assembled in a tree-like structure, containing only entities that have updated or who's children have updates. In the action section we have learned how to create a new entity of the `house` type. Creating an entity automatically creates all it's children with default values, even if they are not modified. It is just what you'd expect from Go. So the tree update of just the `engine.CreateHouse()` call alone woud look like this:
+Updates are assembled in a tree-like structure, containing only entities that have updated or who's children have updated. In the action section we have learned how to create a new entity of the `house` type. Creating an entity automatically creates all it's children with default values, even if they are not modified. It is just what you'd expect from Go. So the tree update of just the `engine.CreateHouse()` call alone woud look like this:
 ```
 {
     "house": {
@@ -696,9 +697,190 @@ Triggering this action with a message would result in the following tree update:
     }
 }
 ```
-As the the `house` entity itself has not updated, but only it's child `address`, it maintains the `operationKind:"UNCHANGED"` value. This way the client can tell that the `house` entity has remained the same since last update.
+As the the `house` entity itself has not updated, but only it's child `address`, it maintains the `operationKind:"UNCHANGED"` value. This way the client can tell that the `house` entity has remained the same since the last update.
 
+### How Slices Work:
+Slices behave like you'd expect slices to work. However, to make all element paths within a tree structure immutable, slices are marshalled as maps. This way we can use the element's ID instead of it's index which could shift during entity modification. In a scenario where your config looks like this:
+```
+{
+  "address: {
+    "streetName": "string",
+    "houseNumber": "int
+  },
+  "house": {
+    "address": "address",
+    "residents": "[]person"
+  },
+  "person": {
+    "name": "string"
+  }
+}
+```
+and you trigger an action which looks like this:
+```
+// ...
+var actions = state.Actions{
+	AddResidentToHouse: func(params state.AddResidentToHouseParams, engine *state.Engine) {
+      house := engine.House(params.HouseID)
+      house.AddResident()
+	},
+}
+// ...
+```
+this would be the emitted update:
+```
+{
+    "house": {
+        "1": {
+            "residents": {
+                "2": {
+                  "id": 2,
+                  "name": "",
+                  "operationKind": "UPDATE"
+                }
+            },
+            "operationKind": "UPDATE"
+        }
+    }
+}
+```
+(note how the `house` has `operationKind:"UPDATE"` as it's `residents` field got modified)
+
+As you can see even though `residents` is defined as slice, and a getter call of `house.Residents()` would retrieve a slice of `person`, the field is marshalled as if it was a map. This way this particular `person` will always have the same path within the tree throughout it`s entire lifecycle.
+
+# Advanced Types:
 ## Type References:
-Sometimes you want an entity to have a certain value, but not necessarily own that value, as the value is an entity that exists on itself, and not as a child of another entity. This can be done by using references.
+Sometimes you want an entity to have a certain value, but not necessarily own that value, as the value is an entity that exists on itself, and not as a child of another entity. This can be done by using references. An example that would make it's usefullness clear would be this one:
+```
+{
+    "menu": {
+        "dishes": "[]*dish",
+        "glutenFree": "[]*dish",
+        "vegetarian": "[]*dish",
+        "todaysDeal": "*dish"
+    },
+    "dish": {
+        "name": "string",
+        "ingredients": "[]string"
+    }
+}
+```
+Read here on how to use the API to handle references.
 
-## Message Structure:
+## The `anyOf` Type:
+The `anyOf` type is a Quality of Life feature which lets you define fields to contain more than one type. This brings great flexibility with no additional overhead:
+```
+{
+    "farm": {
+        "owner": "string",
+        "animals": "[]anyOf<chicken,cow,pig>"
+    },
+    "chicken": {
+        "eggsPerDay": "int"
+    },
+    "cow": {
+        "weight": "float64"
+    },
+    "pig": {
+        "name": "string"
+    }
+}
+```
+Read here on how to use the API to handle `anyOf` types.
+
+# API Reference
+## getters
+The value of every field can be retrieved by calling the name of the field. Given the following config:
+```
+{
+  "address: {
+    "streetName": "string",
+    "houseNumber": "int
+  },
+  "house": {
+    "address": "address",
+    "residents": "[]person"
+  },
+  "person": {
+    "name": "string"
+  }
+}
+```
+the values can be retrieved like this:
+```
+house := engine.House(id)                  // house
+residents := house.Residents()             // []person
+address := house.Address()                 // address
+streetName := house.Address().StreetName() // string
+name := house.Residents()[0].Name()        // string
+```
+In the case of a referenced value:
+```
+{
+    "menu": {
+        "dishes": "[]*dish",
+        "glutenFree": "[]*dish",
+        "vegetarian": "[]*dish",
+        "todaysDeal": "*dish"
+    },
+    "dish": {
+        "name": "string",
+        "ingredients": "[]string"
+    }
+}
+```
+retrieve the values like this:
+```
+menu := engine.Menu(id)                // menu
+dealRef := menu.TodaysDeal()           // reference object of dish
+isSet := dealRef.IsSet()               // bool
+deal := dealRef.Get()                  // dish
+// if you know that todaysDeal exists you may retrieve it directly
+deal = menu.TodaysDeal().Get()         // dish
+```
+More on references and their methods can be read here.
+
+In case of fields with `anyOf` types:
+```
+{
+    "farm": {
+        "owner": "string",
+        "cutestResident": "anyOf<chicken,cow,pig>
+    },
+    "chicken": {
+        "eggsPerDay": "int"
+    },
+    "cow": {
+        "weight": "float64"
+    },
+    "pig": {
+        "name": "string"
+    }
+}
+```
+retrieve the values like this:
+```
+farm := engine.Farm(id)                   // farm
+cutestResident := farm.CutestResident()   // chicken|cow|pig
+animalKind := cutestResident.Kind()       // "chicken"|"cow"|"pig"
+cow := cutestResident.Cow()               // cow
+// if you know of which kind the animal is you can retrieve it directly
+cow := farm.CutestResident().Cow()        // cow
+```
+More on `anyOf` types and their methods can be read here.
+
+If you try to retrieve a value where there is none, all manipulations applied to this entity will have no effect.
+This can happen during the following curcumstances:
+```
+{
+    "foo": {
+        "bam": "*bar",
+        "bal": "anyOf<bar,baz>"
+    }
+}
+``` 
+```
+foo := engine.Foo(123)      // foo with id 123 may not exist
+bam := foo.Bam()            // bam may not be set
+bal := foo.Bal().Bar()      // bal may be of type baz and not bar
+```

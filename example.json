@@ -1,18 +1,6 @@
 {
-    "state": {
-        "player": {
-            "name": "string",
-            "items": "[]item"
-        },
-        "item": {
-            "name": "string",
-            "value": "float64"
-        }
-    },
-    "actions": {
-        "createPlayer": {
-            "name": "string",
-            "firstItemName": "string"
-        }
+    "foo": {
+        "bam": "*bar",
+        "bal": "anyOf<bar,baz>"
     }
 }
