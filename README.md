@@ -460,6 +460,10 @@ setter methods.
 - manages self referencing elements
 
 ### TODO
+- nice tutorial for inspector
+- document flags
+- inspector to show the sent message as well
+- show config in inspector
 - port param for start method
 - example flag for getStartedFactory
 - should engine.Getters also be able to get non-root entities
@@ -475,11 +479,37 @@ setter methods.
 - release tree func (release slices, maps, and the pointers themselves)
 - (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the ElementKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
 
-
+<br>
+<br>
+<br>
+<br>
 
 # backent-cli
-backent-cli generates a server API as package for real-time state broadcasting of entities. It reads a config to create an API which broadcasts all occuring changes to the connected clients automatically.
-### example config.json
+backent-cli generates a server which enables real-time state broadcasting of entities through websockets. Simply by using the generated API all changes to entities are braodcasted to the connected clients automatically. The API is being generated as a package based on a config where you can define the entity types.
+```
+func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
+
+	player := engine.CreatePlayer()                  // creating the player
+
+	player.SetName(params.Name)                      // setting the player name
+
+	player.AddItem().SetName(params.FirstItemName)   // add an item and set item name
+
+}
+```
+
+## Start Experimenting:
+Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated servers, or in this case an example server that backent-cli will set up for you.
+# NICE SCREENSHOT OF INSPECTOR
+```
+mkdir backent_example; cd backent_example;
+backent-cli generate -example -out ./backent/;
+go run .;
+backent-cli inspect -port 3496;
+```
+
+## Example Configuration
+This is what a very simple `config.json` can look like. You may define as many types and actions as you like. You can read more about the possible configurations below!
 ```
 {
     "state": {
@@ -500,17 +530,18 @@ backent-cli generates a server API as package for real-time state broadcasting o
     }
 }
 ```
-### Generate Server:
+## Generate Server:
+This is how you would generate the backent package as soon as you've defined your entity `config.json`.
 ```
-mkdir backent;
 backent-cli generate -config config.json -out backent/
 ```
-### Run the Server:
+## Run the Server:
 ```
 package main
 
 import "yourproject/state"
 
+// how many processing frames per second the server will run
 const fps = 30
 
 func main() {
@@ -520,37 +551,29 @@ func main() {
 	}
 }
 
+// define what is being executed on receiving a message
 var actions = state.Actions{
 	CreatePlayer: func(params state.CreatePlayerParams, engine *state.Engine) {
 		player := engine.CreatePlayer()                // creating the player
 		player.SetName(params.Name)                    // setting the player name
-		player.AddItem().SetName(params.FirstItemName) // add and item and set item name
+		player.AddItem().SetName(params.FirstItemName) // add an item and set item name
 	}, // state change is automatically broadcasted
 }
 
+// define what is being executed on server deploy and after all actions for a processing frame tick are processed
 var sideEffects = state.SideEffects{
 	OnDeploy:    func(engine *state.Engine) {},
 	OnFrameTick: func(engine *state.Engine) {},
 }
 ```
-### Send a Message to trigger the Action:
+## Send a Message to trigger an Action:
+This is how a message the server understands may look like. It interprets the message to trigger actions. In this case the server will trigger the `CreatePlayer` action with the given data passed as parameter.
 ```
 {
     "kind": "createPlayer",
     "content": "{\"name\": \"string\",\"firstItemName\": \"string\"}"
 }
 ```
-
-## Jump right into Experimenting with the Inspector:
-# NICE SCREENSHOT OF INSPECTOR
-```
-mkdir backent_example; cd backent_example;
-mkdir backent; # create a directory to generate the code into
-backent-cli generate -config config.json -out ./backent/ -example;
-go run .;
-backent-cli inspect -port 8080
-```
-
 ## Defining the Config:
 The config's syntax is inspired by Go's own syntax. If you have knowledge of Go you will intuitively understand what is going on. And if you find yourself struggling and make mistakes, comprehensive error messages will help you correct them. There are however some additional restrictions to which values you can use where. More info on that here.
 
