@@ -97,6 +97,7 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 }`
 
 const inspectHandler_func string = `func inspectHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprintf(w, ` + "`" + `{
   "state": {
     "player": {

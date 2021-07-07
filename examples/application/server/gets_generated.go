@@ -96,6 +96,8 @@ func (r *Room) processClientMessage(msg Message) (Message, error) {
 }
 
 func inspectHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	fmt.Fprintf(w, `{
   "state": {
     "player": {

@@ -70,7 +70,7 @@ func (g *GetStartedFactory) writeMainFunc() *GetStartedFactory {
 	)
 
 	decls.File.Func().Id("main").Params().Block(
-		Id("err").Op(":=").Id("state").Dot("Start").Call(Id("actions"), Id("sideEffects"), Id("fps")),
+		Id("err").Op(":=").Id("state").Dot("Start").Call(Id("actions"), Id("sideEffects"), Id("fps"), Lit(8080)),
 		If(Id("err").Op("!=").Nil()).Block(
 			Panic(Id("err")),
 		),
