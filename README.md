@@ -832,6 +832,7 @@ menu := engine.Menu(id)                // menu
 dealRef := menu.TodaysDeal()           // reference object of dish
 isSet := dealRef.IsSet()               // bool
 deal := dealRef.Get()                  // dish
+
 // if you know that todaysDeal exists you may retrieve it directly
 deal = menu.TodaysDeal().Get()         // dish
 ```
@@ -859,7 +860,7 @@ retrieve the values like this:
 ```
 farm := engine.Farm(id)                   // farm
 cutestResident := farm.CutestResident()   // chicken|cow|pig
-animalKind := cutestResident.Kind()       // "chicken"|"cow"|"pig"
+animalKind := cutestResident.Kind()       // "Chicken"|"Cow"|"Pig"
 cow := cutestResident.Cow()               // cow
 // if you know of which kind the animal is you can retrieve it directly
 cow := farm.CutestResident().Cow()        // cow
@@ -880,4 +881,167 @@ This can happen during the following curcumstances:
 foo := engine.Foo(123)      // foo with id 123 may not exist
 bam := foo.Bam()            // bam may not be set
 bal := foo.Bal().Bar()      // bal may be of type baz and not bar
+```
+
+## creators
+The `engine` has creator methods for all entities. They are as straightforward as it gets:
+```
+{
+    "chicken": {
+        "eggsPerDay": "int"
+    },
+    "cow": {
+        "weight": "float64"
+    },
+    "pig": {
+        "name": "string"
+    }
+}
+```
+```
+chicken := engine.CreateChicken()
+cow := engine.CreateCow()
+pig := engine.CreatePig()
+```
+## deleters
+You can delete created elements just as easily as you created them:
+```
+{
+    "chicken": {
+        "eggsPerDay": "int"
+    },
+    "cow": {
+        "weight": "float64"
+    },
+    "pig": {
+        "name": "string"
+    }
+}
+```
+```
+engine.DeleteChicken(chickenID)
+engine.DeleteCow(cowID)
+engine.DeletePig(pigID)
+```
+
+## setters
+Every field with a value of one of Go's basic types has a setter method to set the value. The method will always be called `Set<FieldName>`. The following config:
+```
+{
+    "chicken": {
+        "eggsPerDay": "int"
+    },
+    "cow": {
+        "weight": "float64"
+    },
+    "pig": {
+        "name": "string"
+    }
+}
+```
+will come with these setters:
+```
+engine.Chicken(chickenID).SetEggsPerDay(3)
+engine.Cow(cowID).SetWeight(56.4)
+engine.Pig(pigID).SetName("Gunter")
+```
+Referenced values will come with additional setters when they are not part of a slice:
+```
+{
+    "chicken": {
+        "bestFriend": "*chicken",
+    }
+}
+```
+```
+chicken := engine.Chicken(id)
+friendlyChicken := engine.CreateChicken()
+chicken.BestFriend().IsSet()                   // false
+
+chicken.SetBestFriend(friendlyChicken.ID())    // sets the reference
+friendlyChicken := chicken.BestFriend().Get()  // the friendly chicken
+chicken.BestFriend().IsSet()                   // true
+
+chicken.BestFriend().Unset()                   // unsets friendlyChicken as chicken's best friend
+chicken.BestFriend().IsSet()                   // false
+```
+Fields with `anyOf` values also have additional setters, when they are not references:
+```
+{
+    "farm": {
+        "owner": "string",
+        "cutestResident": "anyOf<chicken,cow,pig>
+    }
+}
+```
+```
+farm := engine.Farm(id)
+cutestResidentKind := farm.CutestResident().Kind()   // default is always the first type of the list ("Chicken")
+farm.CutestResident().SetCow()
+cutestResidentKind = farm.CutestResident().Kind()    // "Cow"
+```
+## adders
+Adders are methods to add elements to fields with slice values. These are the different variants of slices that exist:
+```
+{
+    "person": {
+        "ensurances": "[]ensurance",
+        "friends": "[]*person",
+        "nickNames": "[]string"
+    }
+}
+```
+The adders look like this:
+```
+person := engine.Person(id)
+newEnsurance := person.AddEnsurance()  // returns the newly created ensurance
+
+newFriend := engine.CreatePerson()
+person.AddFriend(newFriend.ID())       // new friend added, no return
+
+person.AddNickNames("peter", "pete")   // since nickNames is a slice of a basic type AddNickNames is a variadic function
+```
+
+## removers
+Just like you can add to fields with slice values, you can also remove elements:
+```
+{
+    "person": {
+        "ensurances": "[]ensurance",
+        "friends": "[]*person",
+        "nickNames": "[]string"
+    }
+}
+```
+Removers will always return the entity they are called on for convenient method chaining:
+```
+person := engine.Person(id)
+_ = person.RemoveEnsurance(ensuranceID)   // returns person, just like all removers
+
+person = person.RemoveFriend(personID)
+
+person.RemoveNickNames("peter", "pete")
+```
+
+## meta fields
+every entity comes with meta fields that you can access freely. Currently the only meta fields are `Path()` and `ID()`:
+```
+{
+  "address: {
+    "streetName": "string",
+    "houseNumber": "int
+  },
+  "house": {
+    "address": "address",
+  },
+}
+```
+```
+address := engine.CreateHouse().Address()
+
+houseID := house.ID()                   // 1
+housePath := house.Path()               // "$.house.1"
+
+addressID := address.ID()               // 2
+addressPath := address.Path()           // "$.house.1.address"
 ```
