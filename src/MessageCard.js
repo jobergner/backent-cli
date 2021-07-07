@@ -2,7 +2,7 @@ import { Divider, Icon, Intent, Card, H5 } from "@blueprintjs/core";
 import ReactJson from "react-json-view";
 import Empty from "./Empty";
 
-function ResponseCard({ data }) {
+function MessageCard({ data }) {
   return (
     <Card elevation={0} className="card Action nospacebetween">
       <div>
@@ -10,10 +10,10 @@ function ResponseCard({ data }) {
           <Icon
             className="HeadlineIcon"
             iconSize={17}
-            icon="download"
+            icon="send-to"
             intent={Intent.PRIMARY}
           />
-          Latest Response
+          Latest Sent Message
         </H5>
         <Divider />
       </div>
@@ -21,7 +21,7 @@ function ResponseCard({ data }) {
         {data && <ReactJson collapsed src={data} />}
         {!data && (
           <div>
-            <Empty description={"Send an Action to receive a Response!"} />
+            <Empty description={"Send an action and it's content will be displayed here!"} />
           </div>
         )}
       </div>
@@ -29,4 +29,4 @@ function ResponseCard({ data }) {
   );
 }
 
-export default ResponseCard;
+export default MessageCard;

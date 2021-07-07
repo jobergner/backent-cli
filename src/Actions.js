@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import {defaultValueAction} from "./defaultValues"
+import { defaultValueAction } from "./defaultValues";
 import "./Actions.css";
 import Input from "./Input";
 import {
@@ -12,10 +12,9 @@ import {
   Intent,
   Divider,
 } from "@blueprintjs/core";
-import config from "./example.config.json";
 
 function Action(props) {
-  const { actionName, action, ws } = props;
+  const { setSentData, actionName, action, ws } = props;
   const [formContent, setFormContent] = useState(defaultValueAction(action));
   return (
     <Card elevation={0} className="card Action">
@@ -32,7 +31,11 @@ function Action(props) {
           </H5>
           <Divider />
           <div className="InputsWrapper">
-            <Input currentFormContent={formContent} setFormContent={setFormContent} action={action} />
+            <Input
+              currentFormContent={formContent}
+              setFormContent={setFormContent}
+              action={action}
+            />
           </div>
         </div>
         <div className="ActionLower">
@@ -51,10 +54,18 @@ function Action(props) {
               rightIcon="send-message"
               text="Send"
               className={Classes.BUTTON}
-                onClick={() => {
-                ws.send(JSON.stringify({kind: actionName ,content: JSON.stringify(formContent)}))
-                }
-                }
+              onClick={() => {
+                setSentData({
+                  kind: actionName,
+                  content: JSON.stringify(formContent),
+                });
+                ws.send(
+                  JSON.stringify({
+                    kind: actionName,
+                    content: JSON.stringify(formContent),
+                  })
+                );
+              }}
             />
           </div>
         </div>
@@ -63,11 +74,22 @@ function Action(props) {
   );
 }
 
-function Actions({ws}) {
+function Actions({ ws, setSentData, config }) {
+  if (!config) {
+    return null;
+  }
   return (
     <>
       {Object.entries(config.actions).map(([keyName, value]) => {
-        return <Action ws={ws} key={keyName} actionName={keyName} action={value} />;
+        return (
+          <Action
+            ws={ws}
+            setSentData={setSentData}
+            key={keyName}
+            actionName={keyName}
+            action={value}
+          />
+        );
       })}
     </>
   );
