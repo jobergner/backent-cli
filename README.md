@@ -818,9 +818,6 @@ In the case of a referenced value:
 ```
 {
     "menu": {
-        "dishes": "[]*dish",
-        "glutenFree": "[]*dish",
-        "vegetarian": "[]*dish",
         "todaysDeal": "*dish"
     },
     "dish": {
