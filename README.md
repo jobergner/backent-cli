@@ -485,8 +485,10 @@ setter methods.
 <br>
 
 # backent-cli
-backent-cli generates a server which enables real-time state broadcasting of entities through websockets. Simply by using the generated API all changes to entities are braodcasted to the connected clients automatically. The API is being generated as a package based on a config where you can define the entity types.
-```
+backent-cli provides a toolkit to generate a server which enables real-time state broadcasting of entities through websockets.
+
+Create your own API which braodcasts all changes to entities to the connected clients automatically:
+```golang
 func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
 
 	player := engine.CreatePlayer()                  // creating the player
@@ -510,7 +512,7 @@ backent-cli inspect -port 3496;
 # Overview
 ## Example Configuration
 This is what a very simple `config.json` can look like. You may define as many types and actions as you like. You can read more about the possible configurations below!
-```
+```JSON
 {
     "state": {
         "player": {
@@ -536,9 +538,10 @@ This is how you would generate the backent package as soon as you've defined you
 backent-cli generate -config config.json -out backent/
 ```
 ## Run the Server:
-```
+```golang
 package main
 
+// import the API
 import "yourproject/state"
 
 // how many processing frames per second the server will run
@@ -555,8 +558,11 @@ func main() {
 var actions = state.Actions{
 	CreatePlayer: func(params state.CreatePlayerParams, engine *state.Engine) {
 		player := engine.CreatePlayer()                // creating the player
+
 		player.SetName(params.Name)                    // setting the player name
+
 		player.AddItem().SetName(params.FirstItemName) // add an item and set item name
+
 	}, // state change is automatically broadcasted
 }
 
@@ -568,7 +574,7 @@ var sideEffects = state.SideEffects{
 ```
 ## Send a Message to trigger an Action:
 This is how a message the server understands may look like. It interprets the message to trigger actions. In this case the server will trigger the `CreatePlayer` action with the given data passed as parameter.
-```
+```JSON
 {
     "kind": "createPlayer",
     "content": "{\"name\": \"string\",\"firstItemName\": \"string\"}"
@@ -582,11 +588,11 @@ The config may consist of 3 parts: `state`, `actions` and `responses`.
 
 ### state:
 The state consists of types which you can consider the equivalent to Go's structs: Structures with field names and values describing the types. As it is with go, when defining a type, you can use it as a field's value:
-```
+```JSON
 {
-  "address: {
+  "address": {
     "streetName": "string",
-    "houseNumber": "int
+    "houseNumber": "int"
   },
   "house": {
     "address": "address"
@@ -596,7 +602,7 @@ The state consists of types which you can consider the equivalent to Go's struct
 More about defining state types can be found here.
 ### actions:
 Actions is how the server and client communicate. Here you can define which client data you want the server to be aware of in order to react with the assigned behaviour. Defining actions is very similar to defining the state except for some additional limitations. Only Go's basic types, and type references in the form of IDs can be used as values.
-```
+```JSON
 {
   "buildNewHouse": {
     "streetName": "string",
@@ -605,7 +611,7 @@ Actions is how the server and client communicate. Here you can define which clie
 }
 ```
 The generator creates all necessary structures for you to simply tell the server how to react to a received action. The `params` struct will contain the defined data. Make use of your personal API to manipulate the `engine`'s state. The engine will keep track of all the changes you have made and tell the server to broadcast the changes to all connected clients automatically. 
-```
+```golang
 // ...
 var actions = state.Actions{
 	BuildNewHouse: func(params state.BuildNewHouseParams, engine *state.Engine) {
@@ -619,7 +625,7 @@ var actions = state.Actions{
 ```
 ### responses:
 Sometimes you may want to send back data to the client who sent the action. This can be done with responses. Defining responses works exactly the same way as defining actions. Assigning a response to an actions works by giving the response the same name as the action:
-```
+```JSON
 {
   "actions": {
     "buildNewHouse": {
@@ -637,7 +643,7 @@ Sometimes you may want to send back data to the client who sent the action. This
 }
 ```
 Now we can tell the server to return data to the client.
-```
+```golang
 // ...
 var actions = state.Actions{
 	BuildNewHouse: func(params state.BuildNewHouseParams, engine *state.Engine) state.BuildNewHouseResponse {
@@ -654,7 +660,7 @@ var actions = state.Actions{
 
 ## State Structure and Updates:
 Updates are assembled in a tree-like structure, containing only entities that have updated or who's children have updated. In the action section we have learned how to create a new entity of the `house` type. Creating an entity automatically creates all it's children with default values, even if they are not modified. It is just what you'd expect from Go. So the tree update of just the `engine.CreateHouse()` call alone woud look like this:
-```
+```JSON
 {
     "house": {
         "1": {
@@ -672,7 +678,7 @@ Updates are assembled in a tree-like structure, containing only entities that ha
 This is the data every connected client would receive as result of a `engine.CreateHouse()` call. You can see how each created entity has a `operationKind:"UPDATE"` value. This tells the client that this entity is new or has updated since the last received update.
 
 Imagine you defined a second action with the name `changeHouseNumber` which behaves like this:
-```
+```golang
 var actions = state.Actions{
   // ...
 	ChangeHouseNumber: func(params state.ChangeHouseNumberParams, engine *state.Engine) {
@@ -682,7 +688,7 @@ var actions = state.Actions{
 }
 ```
 Triggering this action with a message would result in the following tree update:
-```
+```JSON
 {
     "house": {
         "1": {
@@ -701,11 +707,11 @@ As the the `house` entity itself has not updated, but only it's child `address`,
 
 ### How Slices Work:
 Slices behave like you'd expect slices to work. However, to make all element paths within a tree structure immutable, slices are marshalled as maps. This way we can use the element's ID instead of it's index which could shift during entity modification. In a scenario where your config looks like this:
-```
+```JSON
 {
-  "address: {
+  "address": {
     "streetName": "string",
-    "houseNumber": "int
+    "houseNumber": "int"
   },
   "house": {
     "address": "address",
@@ -717,7 +723,7 @@ Slices behave like you'd expect slices to work. However, to make all element pat
 }
 ```
 and you trigger an action which looks like this:
-```
+```golang
 // ...
 var actions = state.Actions{
 	AddResidentToHouse: func(params state.AddResidentToHouseParams, engine *state.Engine) {
@@ -728,7 +734,7 @@ var actions = state.Actions{
 // ...
 ```
 this would be the emitted update:
-```
+```JSON
 {
     "house": {
         "1": {
@@ -751,7 +757,7 @@ As you can see even though `residents` is defined as slice, and a getter call of
 # Advanced Types:
 ## Type References:
 Sometimes you want an entity to have a certain value, but not necessarily own that value, as the value is an entity that exists on itself, and not as a child of another entity. This can be done by using references. An example that would make it's usefullness clear would be this one:
-```
+```JSON
 {
     "menu": {
         "dishes": "[]*dish",
@@ -769,7 +775,7 @@ Read here on how to use the API to handle references.
 
 ## The `anyOf` Type:
 The `anyOf` type is a Quality of Life feature which lets you define fields to contain more than one type. This brings great flexibility with no additional overhead:
-```
+```JSON
 {
     "farm": {
         "owner": "string",
@@ -791,11 +797,11 @@ Read here on how to use the API to handle `anyOf` types.
 # API Reference
 ## getters
 The value of every field can be retrieved by calling the name of the field. Given the following config:
-```
+```JSON
 {
-  "address: {
+  "address": {
     "streetName": "string",
-    "houseNumber": "int
+    "houseNumber": "int"
   },
   "house": {
     "address": "address",
@@ -807,7 +813,7 @@ The value of every field can be retrieved by calling the name of the field. Give
 }
 ```
 the values can be retrieved like this:
-```
+```golang
 house := engine.House(id)                  // house
 residents := house.Residents()             // []person
 address := house.Address()                 // address
@@ -815,7 +821,7 @@ streetName := house.Address().StreetName() // string
 name := house.Residents()[0].Name()        // string
 ```
 In the case of a referenced value:
-```
+```JSON
 {
     "menu": {
         "todaysDeal": "*dish"
@@ -827,7 +833,7 @@ In the case of a referenced value:
 }
 ```
 retrieve the values like this:
-```
+```golang
 menu := engine.Menu(id)                // menu
 dealRef := menu.TodaysDeal()           // reference object of dish
 isSet := dealRef.IsSet()               // bool
@@ -839,11 +845,11 @@ deal = menu.TodaysDeal().Get()         // dish
 More on references and their methods can be read here.
 
 In case of fields with `anyOf` types:
-```
+```JSON
 {
     "farm": {
         "owner": "string",
-        "cutestResident": "anyOf<chicken,cow,pig>
+        "cutestResident": "anyOf<chicken,cow,pig>"
     },
     "chicken": {
         "eggsPerDay": "int"
@@ -857,7 +863,7 @@ In case of fields with `anyOf` types:
 }
 ```
 retrieve the values like this:
-```
+```golang
 farm := engine.Farm(id)                   // farm
 cutestResident := farm.CutestResident()   // chicken|cow|pig
 animalKind := cutestResident.Kind()       // "Chicken"|"Cow"|"Pig"
@@ -869,7 +875,7 @@ More on `anyOf` types and their methods can be read here.
 
 If you try to retrieve a value where there is none, all manipulations applied to this entity will have no effect.
 This can happen during the following curcumstances:
-```
+```JSON
 {
     "foo": {
         "bam": "*bar",
@@ -877,7 +883,7 @@ This can happen during the following curcumstances:
     }
 }
 ``` 
-```
+```golang
 foo := engine.Foo(123)      // foo with id 123 may not exist
 bam := foo.Bam()            // bam may not be set
 bal := foo.Bal().Bar()      // bal may be of type baz and not bar
@@ -885,7 +891,7 @@ bal := foo.Bal().Bar()      // bal may be of type baz and not bar
 
 ## creators
 The `engine` has creator methods for all entities. They are as straightforward as it gets:
-```
+```JSON
 {
     "chicken": {
         "eggsPerDay": "int"
@@ -898,14 +904,14 @@ The `engine` has creator methods for all entities. They are as straightforward a
     }
 }
 ```
-```
+```golang
 chicken := engine.CreateChicken()
 cow := engine.CreateCow()
 pig := engine.CreatePig()
 ```
 ## deleters
 You can delete created elements just as easily as you created them:
-```
+```JSON
 {
     "chicken": {
         "eggsPerDay": "int"
@@ -918,7 +924,7 @@ You can delete created elements just as easily as you created them:
     }
 }
 ```
-```
+```golang
 engine.DeleteChicken(chickenID)
 engine.DeleteCow(cowID)
 engine.DeletePig(pigID)
@@ -926,7 +932,7 @@ engine.DeletePig(pigID)
 
 ## setters
 Every field with a value of one of Go's basic types has a setter method to set the value. The method will always be called `Set<FieldName>`. The following config:
-```
+```JSON
 {
     "chicken": {
         "eggsPerDay": "int"
@@ -940,20 +946,20 @@ Every field with a value of one of Go's basic types has a setter method to set t
 }
 ```
 will come with these setters:
-```
+```golang
 engine.Chicken(chickenID).SetEggsPerDay(3)
 engine.Cow(cowID).SetWeight(56.4)
 engine.Pig(pigID).SetName("Gunter")
 ```
 Referenced values will come with additional setters when they are not part of a slice:
-```
+```JSON
 {
     "chicken": {
         "bestFriend": "*chicken",
     }
 }
 ```
-```
+```golang
 chicken := engine.Chicken(id)
 friendlyChicken := engine.CreateChicken()
 chicken.BestFriend().IsSet()                   // false
@@ -966,15 +972,15 @@ chicken.BestFriend().Unset()                   // unsets friendlyChicken as chic
 chicken.BestFriend().IsSet()                   // false
 ```
 Fields with `anyOf` values also have additional setters, when they are not references:
-```
+```JSON
 {
     "farm": {
         "owner": "string",
-        "cutestResident": "anyOf<chicken,cow,pig>
+        "cutestResident": "anyOf<chicken,cow,pig>"
     }
 }
 ```
-```
+```golang
 farm := engine.Farm(id)
 cutestResidentKind := farm.CutestResident().Kind()   // default is always the first type of the list ("Chicken")
 farm.CutestResident().SetCow()
@@ -982,7 +988,7 @@ cutestResidentKind = farm.CutestResident().Kind()    // "Cow"
 ```
 ## adders
 Adders are methods to add elements to fields with slice values. These are the different variants of slices that exist:
-```
+```JSON
 {
     "person": {
         "ensurances": "[]ensurance",
@@ -992,7 +998,7 @@ Adders are methods to add elements to fields with slice values. These are the di
 }
 ```
 The adders look like this:
-```
+```golang
 person := engine.Person(id)
 newEnsurance := person.AddEnsurance()  // returns the newly created ensurance
 
@@ -1004,7 +1010,7 @@ person.AddNickNames("peter", "pete")   // since nickNames is a slice of a basic 
 
 ## removers
 Just like you can add to fields with slice values, you can also remove elements:
-```
+```JSON
 {
     "person": {
         "ensurances": "[]ensurance",
@@ -1014,7 +1020,7 @@ Just like you can add to fields with slice values, you can also remove elements:
 }
 ```
 Removers will always return the entity they are called on for convenient method chaining:
-```
+```golang
 person := engine.Person(id)
 _ = person.RemoveEnsurance(ensuranceID)   // returns person, just like all removers
 
@@ -1025,18 +1031,18 @@ person.RemoveNickNames("peter", "pete")
 
 ## meta fields
 every entity comes with meta fields that you can access freely. Currently the only meta fields are `Path()` and `ID()`:
-```
+```JSON
 {
-  "address: {
+  "address": {
     "streetName": "string",
-    "houseNumber": "int
+    "houseNumber": "int"
   },
   "house": {
     "address": "address",
   },
 }
 ```
-```
+```golang
 address := engine.CreateHouse().Address()
 
 houseID := house.ID()                   // 1
