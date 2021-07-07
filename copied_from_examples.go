@@ -149,13 +149,13 @@ func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
 		wsEndpoint(w, r, room)
 	})
 }
-func Start(actions Actions, sideEffects SideEffects, fps int) error {
+func Start(actions Actions, sideEffects SideEffects, fps int, port int) error {
 	if fps < 1 {
 		setupRoutes(actions, sideEffects, 1)
 	} else {
 		setupRoutes(actions, sideEffects, fps)
 	}
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return err
 }
 
