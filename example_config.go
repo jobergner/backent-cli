@@ -1,66 +1,74 @@
 package main
 
-var exampleConfig = config{
-	State: map[interface{}]interface{}{
-		"player": map[interface{}]interface{}{
+var exampleConfig = jsonConfig{
+	State: map[string]interface{}{
+		"player": map[string]interface{}{
 			"name":         "string",
 			"location":     "location",
 			"items":        "[]item",
 			"friendsList":  "[]*player",
 			"inCombatWith": "*anyOf<npc,player>",
 		},
-		"item": map[interface{}]interface{}{
+		"item": map[string]interface{}{
 			"name":          "string",
 			"firstLootedBy": "*player",
 			"isRare":        "bool",
 		},
-		"npc": map[interface{}]interface{}{
+		"npc": map[string]interface{}{
 			"name":     "string",
 			"location": "location",
 		},
-		"location": map[interface{}]interface{}{
+		"location": map[string]interface{}{
 			"x": "float64",
 			"y": "float64",
 		},
 	},
-	Actions: map[interface{}]interface{}{
-		"moveNpc": map[interface{}]interface{}{
+	Actions: map[string]interface{}{
+		"createPlayer": map[string]interface{}{
+			"name": "string",
+		},
+		"moveNpc": map[string]interface{}{
 			"npc":  "npcID",
 			"newX": "float64",
 			"newY": "float64",
 		},
-		"movePlayer": map[interface{}]interface{}{
+		"movePlayer": map[string]interface{}{
 			"player": "playerID",
 			"newX":   "float64",
 			"newY":   "float64",
 		},
-		"addFriend": map[interface{}]interface{}{
+		"addFriend": map[string]interface{}{
 			"player":    "playerID",
 			"newFriend": "playerID",
 		},
-		"setPlayerCombat": map[interface{}]interface{}{
+		"setPlayerCombat": map[string]interface{}{
 			"player":    "playerID",
 			"enemyKind": "string",
+			"enemyID":   "int",
 		},
-		"playerLeaveCombat": map[interface{}]interface{}{
+		"playerLeaveCombat": map[string]interface{}{
 			"player": "playerID",
 		},
-		"addItemToPlayer": map[interface{}]interface{}{
+		"addItemToPlayer": map[string]interface{}{
+			"player":   "playerID",
 			"itemName": "string",
 		},
 	},
-	Responses: map[interface{}]interface{}{
-		"addFriend": map[interface{}]interface{}{
+	Responses: map[string]interface{}{
+		"createPlayer": map[string]interface{}{
+			"playerPath": "string",
+		},
+		"addFriend": map[string]interface{}{
 			"newNumberOfFriends": "int",
 		},
-		"setPlayerCombat": map[interface{}]interface{}{
+		"setPlayerCombat": map[string]interface{}{
 			"enemyEntityKind": "string",
 			"enemyEntityPath": "string",
 		},
-		"playerLeaveCombat": map[interface{}]interface{}{
+		"playerLeaveCombat": map[string]interface{}{
 			"combatWon": "bool",
 		},
-		"addItemToPlayer": map[interface{}]interface{}{
+		"addItemToPlayer": map[string]interface{}{
 			"itemPath": "string",
 		},
 	},

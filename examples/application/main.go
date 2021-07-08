@@ -32,7 +32,7 @@ var sideEffects = state.SideEffects{
 }
 
 func main() {
-	err := state.Start(actions, sideEffects, 1, 8080)
+	err := state.Start(actions, sideEffects, 1, 3496)
 	if err != nil {
 		panic(err)
 	}

@@ -71,11 +71,25 @@ func validateJSONConfig(jc jsonConfig) error {
 	return nil
 }
 
+func useExampleConfig() (*config, []byte, error) {
+	b, err := json.Marshal(exampleConfig)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	c := &config{
+		State:     makeAmbiguous(exampleConfig.State),
+		Actions:   makeAmbiguous(exampleConfig.Actions),
+		Responses: makeAmbiguous(exampleConfig.Responses),
+	}
+
+	return c, b, nil
+}
+
 func readConfig() (*config, []byte, error) {
 
 	if *exampleFlag {
-		b, _ := json.Marshal(exampleConfig)
-		return &exampleConfig, b, nil
+		return useExampleConfig()
 	}
 
 	configFile, err := ioutil.ReadFile(*configNameFlag)

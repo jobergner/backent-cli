@@ -23,12 +23,12 @@ var exampleFlag = flag.Bool("example", false, "when enabled starts example")
 func main() {
 	flag.Parse()
 
-	c, configJson, err := readConfig()
+	config, configJson, err := readConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	validationErrs := validateConfig(c)
+	validationErrs := validateConfig(config)
 	if len(validationErrs) != 0 {
 		for _, validationErr := range validationErrs {
 			fmt.Println(validationErr)
@@ -36,11 +36,15 @@ func main() {
 		panic("\nthe above errors have occured while validating " + *configNameFlag)
 	}
 
+	if err := ensureOutDir(); err != nil {
+		panic(err)
+	}
+
 	if err := validateOutDir(); err != nil {
 		panic(err)
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(*outDirName, outFile), writeCode(c, configJson), 0644); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(*outDirName, outFile), writeCode(config, configJson), 0644); err != nil {
 		panic(fmt.Errorf("error while writing generated code to file system: %s", err))
 	}
 
@@ -54,9 +58,27 @@ func main() {
 
 	if outDirModuleName, err := getModuleName(); err != nil {
 		panic(err)
+	} else if !*exampleFlag {
+		fmt.Println(getstartedfactory.WriteGetStarted(outDirModuleName, false, config.State, config.Actions, config.Responses))
 	} else {
-		fmt.Println(getstartedfactory.WriteGetStarted(outDirModuleName, c.State, c.Actions, c.Responses))
+		cleanOutDirPath := filepath.Clean(*outDirName)
+		outDirPathBase := filepath.Base(cleanOutDirPath)
+		mainFilePath := cleanOutDirPath[0:len(cleanOutDirPath)-len(outDirPathBase)] + "/main.go"
+		mainFileContent := getstartedfactory.WriteGetStarted(outDirModuleName, true, config.State, config.Actions, config.Responses)
+		if err := ioutil.WriteFile(mainFilePath, []byte(mainFileContent), 0644); err != nil {
+			panic(fmt.Errorf("error while writing generated code to file system: %s", err))
+		}
 	}
+}
+
+func ensureOutDir() error {
+	if _, err := os.Stat(*outDirName); os.IsNotExist(err) {
+		err := os.Mkdir(*outDirName, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("error creating directory for generated code: %s", err)
+		}
+	}
+	return nil
 }
 
 func validateOutDir() error {
@@ -106,8 +128,6 @@ func getModuleName() (string, error) {
 	if len(writtenLines) != 3 || len(writtenLines[1]) == 0 {
 		return "", fmt.Errorf("could not read module name of out target")
 	}
-
-	fmt.Println(writtenLines[1])
 
 	return writtenLines[1], nil
 }

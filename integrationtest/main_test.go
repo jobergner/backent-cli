@@ -99,7 +99,7 @@ func TestIntegration(t *testing.T) {
 		t.Error(testutils.Diff(actual, expected))
 	}
 
-	resp, err := http.Get("http://localhost:8080/inspect")
+	resp, err := http.Get("http://localhost:3496/inspect")
 	if err != nil {
 		panic(err)
 	}
