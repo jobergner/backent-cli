@@ -13,12 +13,14 @@ func TestValidateDataUnavailableFieldName(t *testing.T) {
 				"bar":           "[]int32",
 				"ban":           "int",
 				"operationKind": "string",
+				"path":          "int",
 			},
 		}
 
 		actualErrors := validateUnavailableFieldName(data)
 		expectedErrors := []error{
 			newValidationErrorUnavailableFieldName("operationKind"),
+			newValidationErrorUnavailableFieldName("path"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
