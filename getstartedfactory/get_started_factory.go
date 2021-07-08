@@ -21,11 +21,11 @@ func newGetStartedFactory(config *ast.AST) *GetStartedFactory {
 	}
 }
 
-func WriteGetStarted(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) string {
+func WriteGetStarted(moduleName string, stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) string {
 	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 	g := newGetStartedFactory(config).
 		writePackageName().
-		writeImport().
+		writeImport(moduleName).
 		writeMainFunc()
 
 	return g.buf.String()
@@ -37,10 +37,10 @@ func (g *GetStartedFactory) writePackageName() *GetStartedFactory {
 }
 
 // TODO fix
-func (g *GetStartedFactory) writeImport() *GetStartedFactory {
+func (g *GetStartedFactory) writeImport(moduleName string) *GetStartedFactory {
 	g.buf.WriteString(`
 import (
-	"foo/tmp"
+	state "` + moduleName + `
 )`)
 	return g
 }

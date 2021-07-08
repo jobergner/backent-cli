@@ -57,7 +57,9 @@ backent-cli generate -config config.json -out backent/
 package main
 
 // import the API
-import "yourproject/state"
+import (
+    state "yourproject/generatedpackage"
+)
 
 // how many processing frames per second the server will run
 const fps = 30
