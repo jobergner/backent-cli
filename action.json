@@ -1,4 +1,0 @@
-{
-    "kind": "createPlayer",
-    "content": "{\"name\": \"string\",\"firstItemName\": \"string\"}"
-}
