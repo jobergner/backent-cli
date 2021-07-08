@@ -14,7 +14,7 @@ func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
 }
 ```
 
-# Start Experimenting:
+# Start Experimenting!
 Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. 
 ```bash
 # set up directories
@@ -358,12 +358,9 @@ In the case of a referenced value:
 retrieve the values like this:
 ```golang
 menu := engine.Menu(id)                // menu
-dealRef := menu.TodaysDeal()           // reference object of dish
-isSet := dealRef.IsSet()               // bool
+dealRef, isSet := menu.TodaysDeal()    // reference object of dish, bool whether it's set
+isSet = dealRef.IsSet()                // also bool whether it's set
 deal := dealRef.Get()                  // dish
-
-// if you know that todaysDeal exists you may retrieve it directly
-deal = menu.TodaysDeal().Get()         // dish
 ```
 More on references and their methods can be read here.
 
@@ -407,9 +404,10 @@ This can happen during the following curcumstances:
 }
 ``` 
 ```golang
-foo := engine.Foo(123)      // foo with id 123 may not exist
-bam := foo.Bam()            // bam may not be set
-bal := foo.Bal().Bar()      // bal may be of type baz and not bar
+foo := engine.Foo(123)           // foo with id 123 may not exist
+bam := foo.Bam()                 // bam may not be set
+balRef, isSet := foo.Bal()
+bar := balRef.Bar()              // bal may be of type baz and not bar
 ```
 
 ## creators
@@ -485,14 +483,15 @@ Referenced values will come with additional setters when they are not part of a 
 ```golang
 chicken := engine.Chicken(id)
 friendlyChicken := engine.CreateChicken()
-chicken.BestFriend().IsSet()                   // false
+_, isSet := chicken.BestFriend()               // false
 
 chicken.SetBestFriend(friendlyChicken.ID())    // sets the reference
-friendlyChicken := chicken.BestFriend().Get()  // the friendly chicken
-chicken.BestFriend().IsSet()                   // true
+friendlyChickenRef, _ := chicken.BestFriend()  // the friendly chicken reference
+isSet := friendlyChickenRef.IsSet()            // true
+friendlyChicken := friendlyChickenRef.Get()    // the friendly chicken
 
 chicken.BestFriend().Unset()                   // unsets friendlyChicken as chicken's best friend
-chicken.BestFriend().IsSet()                   // false
+isSet = friendlyChickenRef.IsSet()             // false
 ```
 Fields with `anyOf` values also have additional setters, when they are not references:
 ```JSON
@@ -654,8 +653,6 @@ go test ./...
 
 ### TODO
 - describe how operationkindDelete in tree
-- refs actuall return 2 values on get
-- example flag for getStartedFactory
 - nice tutorial for inspector
 - document flags
 - documentation
