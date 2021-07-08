@@ -17,6 +17,7 @@ const outFile = "state.go"
 var configNameFlag = flag.String("config", "./example.config.json", "path of config")
 var engineOnlyFlag = flag.Bool("engine_only", false, "only state")
 var outDirname = flag.String("out", "./tmp", "where to write the files to")
+var exampleFlag = flag.Bool("example", false, "when enabled starts example")
 
 func main() {
 	flag.Parse()

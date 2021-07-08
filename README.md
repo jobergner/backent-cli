@@ -242,8 +242,8 @@ and you trigger an action which looks like this:
 // ...
 var actions = state.Actions{
 	AddResidentToHouse: func(params state.AddResidentToHouseParams, engine *state.Engine) {
-      house := engine.House(params.HouseID)
-      house.AddResident()
+		house := engine.House(params.HouseID)
+		house.AddResident()
 	},
 }
 // ...

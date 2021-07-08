@@ -1,7 +1,7 @@
 package main
 
-var exampleConfig = map[interface{}]interface{}{
-	"state": map[interface{}]interface{}{
+var exampleConfig = config{
+	State: map[interface{}]interface{}{
 		"player": map[interface{}]interface{}{
 			"name":         "string",
 			"location":     "location",
@@ -23,7 +23,7 @@ var exampleConfig = map[interface{}]interface{}{
 			"y": "float64",
 		},
 	},
-	"actions": map[interface{}]interface{}{
+	Actions: map[interface{}]interface{}{
 		"moveNpc": map[interface{}]interface{}{
 			"npc":  "npcID",
 			"newX": "float64",
@@ -49,7 +49,7 @@ var exampleConfig = map[interface{}]interface{}{
 			"itemName": "string",
 		},
 	},
-	"responses": map[interface{}]interface{}{
+	Responses: map[interface{}]interface{}{
 		"addFriend": map[interface{}]interface{}{
 			"newNumberOfFriends": "int",
 		},
