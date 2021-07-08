@@ -649,8 +649,8 @@ go test ./...
 - nice tutorial for inspector
 - document flags
 - documentation
-- build fails because of required modules from github. what do?
-- `path` as reserved field name in validator
+
+- build fails because of required modules from github. what do? (cant reproduce)
 - find open port for integratpon test
 - setters to return if new value == current value so no change is triggered
 - custom handlers

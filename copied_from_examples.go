@@ -155,6 +155,7 @@ func Start(actions Actions, sideEffects SideEffects, fps int, port int) error {
 	} else {
 		setupRoutes(actions, sideEffects, fps)
 	}
+	fmt.Printf("backent running on port %d", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return err
 }

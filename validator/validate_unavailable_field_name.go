@@ -9,6 +9,7 @@ var unavailableFiledNames = []string{
 	"iD",
 	"operationKind",
 	"hasParent",
+	"path",
 }
 
 func isUnavailableFiledName(fieldName string) bool {
