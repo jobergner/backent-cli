@@ -16,9 +16,15 @@ func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
 
 # Start Experimenting:
 Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. 
-```
+```bash
+# set up directories
 mkdir backent_example; cd backent_example;
+go mod init backentexample;
+
+# generate the code
 backent-cli generate -example -out ./backent/;
+
+# run and use the inspector
 go run .;
 backent-cli inspect -port 3496;
 ```
@@ -49,7 +55,7 @@ This is what a very simple `config.json` can look like. You may define as many t
 ```
 ## Generate Server:
 This is how you would generate the backent package as soon as you've defined your entity `config.json`.
-```
+```bash
 backent-cli generate -config config.json -out backent/
 ```
 ## Run the Server:
@@ -65,7 +71,7 @@ import (
 const fps = 30
 
 func main() {
-	err := state.Start(actions, sideEffects, fps, 8080)
+	err := state.Start(actions, sideEffects, fps, 3496)
 	if err != nil {
 		panic(err)
 	}
@@ -647,6 +653,8 @@ go test ./...
 - manages self referencing elements
 
 ### TODO
+- describe how operationkindDelete in tree
+- refs actuall return 2 values on get
 - example flag for getStartedFactory
 - nice tutorial for inspector
 - document flags

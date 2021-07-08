@@ -3,8 +3,10 @@ package integrationtest
 import (
 	"context"
 	"fmt"
-	"github.com/Java-Jonas/bar-cli/integrationtest/state"
 	"log"
+
+	"github.com/Java-Jonas/bar-cli/integrationtest/state"
+
 	// "os"
 	"time"
 
@@ -15,7 +17,7 @@ import (
 func dialServer(serverResponseChannel chan state.Message) (*websocket.Conn, context.Context, context.CancelFunc) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
+	c, _, err := websocket.Dial(ctx, "http://localhost:3496/ws", nil)
 	if err != nil {
 		panic(err)
 	}

@@ -38,6 +38,6 @@ var sideEffects = state.SideEffects{
 }
 
 func startServer() {
-	err := state.Start(actions, sideEffects, 1, 8080)
+	err := state.Start(actions, sideEffects, 10, 3496)
 	panic(err)
 }
