@@ -8,9 +8,9 @@ import (
 )
 
 type config struct {
-	State     map[interface{}]interface{}
-	Actions   map[interface{}]interface{}
-	Responses map[interface{}]interface{}
+	State     map[interface{}]interface{} `json:"state"`
+	Actions   map[interface{}]interface{} `json:"actions"`
+	Responses map[interface{}]interface{} `json:"responses"`
 }
 type jsonConfig struct {
 	State     map[string]interface{} `json:"state"`
@@ -43,10 +43,12 @@ func makeAmbiguous(a map[string]interface{}) map[interface{}]interface{} {
 
 func isString(unknown interface{}) (string, bool) {
 	v := reflect.ValueOf(unknown)
+
 	if v.Kind() == reflect.String {
 		valueString := fmt.Sprintf("%v", unknown)
 		return valueString, true
 	}
+
 	return "", false
 }
 
@@ -70,23 +72,33 @@ func validateJSONConfig(jc jsonConfig) error {
 }
 
 func readConfig() (*config, []byte, error) {
+
+	if *exampleFlag {
+		b, _ := json.Marshal(exampleConfig)
+		return &exampleConfig, b, nil
+	}
+
 	configFile, err := ioutil.ReadFile(*configNameFlag)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error reading config file: %s", err)
 	}
+
 	jc := jsonConfig{}
 	err = json.Unmarshal(configFile, &jc)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error parsing config: %s", err)
 	}
+
 	err = validateJSONConfig(jc)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	c := &config{
 		State:     makeAmbiguous(jc.State),
 		Actions:   makeAmbiguous(jc.Actions),
 		Responses: makeAmbiguous(jc.Responses),
 	}
+
 	return c, configFile, nil
 }

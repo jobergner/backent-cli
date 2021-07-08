@@ -161,6 +161,8 @@ func (a assembleElementWriter) usedAssembleID(configType ast.ConfigType, field a
 		return Id(configType.Name + "ID")
 	} else if field.HasPointerValue && field.HasSliceValue {
 		return Id(field.ValueTypeName + "ID")
+	} else if field.HasPointerValue && field.HasAnyValue && !field.HasSliceValue {
+		return Id(configType.Name + "ID")
 	}
 
 	return Id(valueType.Name + "ID")
