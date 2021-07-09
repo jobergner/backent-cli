@@ -1,7 +1,7 @@
 # backent-cli
 backent-cli provides a toolkit to generate a server which enables real-time state broadcasting of entities through websockets.
 
-Create your own API which braodcasts all changes to entities to the connected clients automatically:
+Generate a custom API through a config which braodcasts all changes to clients automatically:
 ```golang
 func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
 
@@ -96,13 +96,20 @@ var sideEffects = state.SideEffects{
 }
 ```
 ## Send a Message to trigger an Action:
-This is how a message the server understands may look like. It interprets the message to trigger actions. In this case the server will trigger the `CreatePlayer` action with the given data passed as parameter.
+This is an example message the server understands via the `/ws` websocket connection. It interprets the message to trigger actions. In this case the server will trigger the `CreatePlayer` action with the given data passed as parameter.
 ```JSON
 {
     "kind": "createPlayer",
     "content": "{\"name\": \"string\",\"firstItemName\": \"string\"}"
 }
 ```
+## Server Endpoints
+| Endpoint   | Description                                                                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/ws`      | The Websocket endpoint. This is how a client can connect to the server. They will receive the current state of all entities when they connect, and from there all occuring updates. |
+| `/inspect` | Here any client can inspect the config the server was generated with. This can be helpful as it explains all types, actions and responses.                                          |
+| `/state`   | This endpoint returns the current state of all entities.                                                                                                                            |
+
 # The Basics
 ## Defining the Config:
 The config's syntax is inspired by Go's own syntax. If you have knowledge of Go you will intuitively understand what is going on. And if you find yourself struggling and make mistakes, comprehensive error messages will help you correct them. There are however some additional restrictions to which values you can use where. More info on that here.
@@ -203,10 +210,10 @@ This is the data every connected client would receive as result of a `engine.Cre
 Imagine you defined a second action with the name `changeHouseNumber` which behaves like this:
 ```golang
 var actions = state.Actions{
-  // ...
+	// ...
 	ChangeHouseNumber: func(params state.ChangeHouseNumberParams, engine *state.Engine) {
-      house := engine.House(params.HouseID)
-      house.Address().SetHouseNumber(params.NewHouseNumber)
+		house := engine.House(params.HouseID)
+		house.Address().SetHouseNumber(params.NewHouseNumber)
 	},
 }
 ```
@@ -653,8 +660,8 @@ go test ./...
 
 ### TODO
 - some setters dont have return when engine == nil (operationkind delete)
-- current state instead of initial state
 - describe how operationkindDelete in tree
+- document server endpoints
 - nice tutorial for inspector
 - document flags
 - documentation
