@@ -125,6 +125,9 @@ var actions = state.Actions{
 			PlayerPath: player.Path(),
 		}
 	},
+	DeletePlayer: func(params state.DeletePlayerParams, engine *state.Engine) {
+		engine.DeletePlayer(params.Player)
+	},
 	MoveNpc: func(params state.MoveNpcParams, engine *state.Engine) {
 		npc := engine.Npc(params.Npc)
 		npc.Location().SetX(params.NewX).SetY(params.NewY)
@@ -142,6 +145,14 @@ var actions = state.Actions{
 		return state.PlayerLeaveCombatResponse{
 			CombatWon: true,
 		}
+	},
+	RemoveFriend: func(params state.RemoveFriendParams, engine *state.Engine) {
+		player := engine.Player(params.Player)
+		player.RemoveFriendsList(params.FriendToRemove)
+	},
+	RemoveItemFromPlayer: func(params state.RemoveItemFromPlayerParams, engine *state.Engine) {
+		player := engine.Player(params.Player)
+		player.RemoveItems(params.Item)
 	},
 	SetPlayerCombat: func(params state.SetPlayerCombatParams, engine *state.Engine) state.SetPlayerCombatResponse {
 		player := engine.Player(params.Player)

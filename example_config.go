@@ -27,6 +27,9 @@ var exampleConfig = jsonConfig{
 		"createPlayer": map[string]interface{}{
 			"name": "string",
 		},
+		"deletePlayer": map[string]interface{}{
+			"player": "playerID",
+		},
 		"moveNpc": map[string]interface{}{
 			"npc":  "npcID",
 			"newX": "float64",
@@ -41,6 +44,10 @@ var exampleConfig = jsonConfig{
 			"player":    "playerID",
 			"newFriend": "playerID",
 		},
+		"removeFriend": map[string]interface{}{
+			"player":         "playerID",
+			"friendToRemove": "playerID",
+		},
 		"setPlayerCombat": map[string]interface{}{
 			"player":    "playerID",
 			"enemyKind": "string",
@@ -52,6 +59,10 @@ var exampleConfig = jsonConfig{
 		"addItemToPlayer": map[string]interface{}{
 			"player":   "playerID",
 			"itemName": "string",
+		},
+		"removeItemFromPlayer": map[string]interface{}{
+			"player": "playerID",
+			"item":   "itemID",
 		},
 	},
 	Responses: map[string]interface{}{

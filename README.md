@@ -235,6 +235,35 @@ Triggering this action with a message would result in the following tree update:
 ```
 As the the `house` entity itself has not updated, but only it's child `address`, it maintains the `operationKind:"UNCHANGED"` value. This way the client can tell that the `house` entity has remained the same since the last update.
 
+When an entity is deleted, all it's children which are not references will be deleted as well. Eg. delete a house (`engine.DeleteHouse(1)`) in this example:
+```JSON
+{
+  "address": {
+    "streetName": "string",
+    "houseNumber": "int"
+  },
+  "house": {
+    "address": "address"
+  }
+}
+```
+would produce the following update:
+```JSON
+{
+    "house": {
+        "1": {
+            "address": {
+                "id": 2,
+                "streetName": "",
+                "houseNumber": 0,
+                "operationKind": "DELETE"
+            },
+            "operationKind": "DELETE"
+        }
+    }
+}
+```
+
 ### How Slices Work:
 Slices behave like you'd expect slices to work. However, to make all element paths within a tree structure immutable, slices are marshalled as maps. This way we can use the element's ID instead of it's index which could shift during entity modification. In a scenario where your config looks like this:
 ```JSON
@@ -283,6 +312,35 @@ this would be the emitted update:
 (note how the `house` has `operationKind:"UPDATE"` as it's `residents` field got modified)
 
 As you can see even though `residents` is defined as slice, and a getter call of `house.Residents()` would retrieve a slice of `person`, the field is marshalled as if it was a map. This way this particular `person` will always have the same path within the tree throughout it`s entire lifecycle.
+
+Removing an entity from a slice does not delete the entity straight away. The entity persists with `operationKind:"DELETE"` so the client knows the being deleted. The actual deletion of the entity happens in the next update cycle. So triggering the following action:
+```golang
+// ...
+var actions = state.Actions{
+	RemoveResidentFromHouse: func(params state.RemoveResidentFromHouseParams, engine *state.Engine) {
+		house := engine.House(params.HouseID)
+		house.RemoveResident(2)
+	},
+}
+// ...
+```
+would produce this update:
+```JSON
+{
+    "house": {
+        "1": {
+            "residents": {
+                "2": {
+                  "id": 2,
+                  "name": "",
+                  "operationKind": "DELETE"
+                }
+            },
+            "operationKind": "UPDATE"
+        }
+    }
+}
+```
 
 # Advanced Types:
 ## Type References:
