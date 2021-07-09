@@ -1,9 +1,34 @@
 # backent-cli
-backent-cli provides a toolkit to generate a server which enables real-time state broadcasting of entities through websockets.
+backent-cli provides a toolkit to generate a server and a custom API which broadcasts all state changes of entities automatically through websockets.
 
-Generate a custom API through a config which braodcasts all changes to clients automatically:
+### Example `config.json`
+The API is generated on a configuration which may look like this:
+```JSON
+{
+    "state": {
+        "player": {
+            "name": "string",
+            "items": "[]item"
+        },
+        "item": {
+            "name": "string",
+        }
+    },
+    "actions": {
+        "createPlayer": {
+            "name": "string",
+            "firstItemName": "string"
+        }
+    }
+}
+```
+### Generate Server and API with your `config.json`
+```bash
+backent-cli generate -config config.json -out backent/
+```
+### Use the custom-generated API to broadcast all changes automatically
 ```golang
-func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
+func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 
 	player := engine.CreatePlayer()                  // creating the player
 
@@ -15,7 +40,7 @@ func broadcastChanges(params state.ReceivedParams, engine *state.Engine) {
 ```
 
 # Start Experimenting!
-Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. 
+Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
 ```bash
 # set up directories
 mkdir backent_example; cd backent_example;
@@ -28,37 +53,12 @@ backent-cli generate -example -out ./backent/;
 go run .;
 backent-cli inspect -port 3496;
 ```
-The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated servers, or in this case an example server that backent-cli will set up for you.
-# NICE SCREENSHOT OF INSPECTOR
+The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
+
+![alt text](./assets/inspector.png)
+
 # Overview
-## Example Configuration
-This is what a very simple `config.json` can look like. You may define as many types and actions as you like. You can read more about the possible configurations below!
-```JSON
-{
-    "state": {
-        "player": {
-            "name": "string",
-            "items": "[]item"
-        },
-        "item": {
-            "name": "string",
-            "value": "float64"
-        }
-    },
-    "actions": {
-        "createPlayer": {
-            "name": "string",
-            "firstItemName": "string"
-        }
-    }
-}
-```
-## Generate Server:
-This is how you would generate the backent package as soon as you've defined your entity `config.json`.
-```bash
-backent-cli generate -config config.json -out backent/
-```
-## Run the Server:
+When generating a server the console will output the content of a possible `main.go` file for you to copy and paste. You may then edit the actions and sideEffects.
 ```golang
 package main
 
