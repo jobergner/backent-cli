@@ -24,7 +24,7 @@ The API is generated based on a configuration which may look like this:
 ```
 ### Generate Server and API with your `config.json`
 ```bash
-backent-cli generate -config config.json -out backent/
+backent-cli -config config.json -out backent/ generate 
 ```
 ### Use the custom-generated engine API to broadcast all changes automatically
 ```golang
@@ -55,11 +55,11 @@ mkdir backent_example; cd backent_example;
 go mod init backentexample;
 
 # generate the code
-backent-cli generate -example -out ./backent/;
+backent-cli -example -out ./backent/ generate;
 
 # run and use the inspector
 go run .;
-backent-cli inspect -port 3496;
+backent-cli -port 3496 inspect;
 ```
 The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
 
