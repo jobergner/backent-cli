@@ -68,6 +68,7 @@ func (a adderWriter) returnDeletedElement() *Statement {
 	return Id(a.v.Name).Values(Dict{
 		Id(a.v.Name): Id(a.v.Name + "Core").Values(Dict{
 			Id("OperationKind"): Id("OperationKindDelete"),
+			Id("engine"):        Id(a.t.Name).Dot(a.t.Name).Dot("engine"),
 		})})
 }
 
