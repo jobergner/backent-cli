@@ -2,7 +2,7 @@ import { Divider, Icon, Intent, Card, H5 } from "@blueprintjs/core";
 import ReactJson from "react-json-view";
 import Empty from "./Empty";
 
-function InitialStateCard({ data }) {
+function CurrentStateCard({ data }) {
   return (
     <Card elevation={0} className="card card1">
       <H5>
@@ -12,7 +12,7 @@ function InitialStateCard({ data }) {
           icon="diagram-tree"
           intent={Intent.PRIMARY}
         />
-        Initial State
+        Current State
       </H5>
       <Divider />
       <div className="JsonWrapper">
@@ -29,4 +29,4 @@ function InitialStateCard({ data }) {
   );
 }
 
-export default InitialStateCard;
+export default CurrentStateCard;

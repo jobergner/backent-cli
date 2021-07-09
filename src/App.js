@@ -4,11 +4,17 @@ import Actions from "./Actions";
 import axios from "axios";
 import ResponseCard from "./ResponseCard";
 import MessageCard from "./MessageCard";
-import InitialStateCard from "./InitialStateCard";
+import { Intent, Toaster, Toast, Position } from "@blueprintjs/core";
+import CurrentStateCard from "./CurrentStateCard";
 import ConfigCard from "./ConfigCard";
 import UpdateCard from "./UpdateCard";
 import AppBar from "./AppBar";
 import { useEffect, useState, useRef } from "react";
+
+const AppToaster = Toaster.create({
+  className: "recipe-toaster",
+  position: Position.TOP,
+});
 
 class App extends React.Component {
   state = {
@@ -43,11 +49,11 @@ class App extends React.Component {
 
   componentDidMount() {
     var params = new URLSearchParams(window.location.search);
-    let port = params.get("port")
+    let port = params.get("port");
     if (!port) {
-      window.location = window.location + "?port=8080"  
+      port = 3496;
     }
-    const ws = new WebSocket("ws://localhost:"+ port +"/ws");
+    const ws = new WebSocket("ws://localhost:" + port + "/ws");
     ws.open = () => this.setSocketStatus("open");
     ws.onclose = () => this.setSocketStatus("closed");
 
@@ -56,16 +62,23 @@ class App extends React.Component {
     ws.onmessage = (e) => {
       const message = JSON.parse(e.data);
       if (message.kind === "currentState") {
-        this.setReceivedData("initialState", JSON.parse(message.content));
+        this.setReceivedData("currentState", JSON.parse(message.content));
       } else if (message.kind === "update") {
+        AppToaster.show({
+          intent: Intent.PRIMARY,
+          message: "new update received!",
+        });
         this.setReceivedData("update", JSON.parse(message.content));
+        axios.get("http://localhost:" + port + "/state").then((res) => {
+          this.setReceivedData("currentState", res.data);
+        });
       } else {
         this.setReceivedData("latestResponse", JSON.parse(message.content));
       }
     };
 
-    axios.get("http://localhost:"+port+"/inspect").then((res) => {
-      this.setConfigData(res.data)
+    axios.get("http://localhost:" + port + "/inspect").then((res) => {
+      this.setConfigData(res.data);
     });
   }
 
@@ -76,8 +89,8 @@ class App extends React.Component {
           <AppBar />
         </div>
         <div className="App bp3-dark">
-          <ConfigCard data={this.state.configData}/>
-          <InitialStateCard data={this.state.receivedData.initialState} />
+          <ConfigCard data={this.state.configData} />
+          <CurrentStateCard data={this.state.receivedData.currentState} />
           <UpdateCard data={this.state.receivedData.update} />
           <ResponseCard data={this.state.receivedData.latestResponse} />
           <MessageCard data={this.state.sentData} />

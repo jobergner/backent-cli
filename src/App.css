@@ -35,3 +35,7 @@
 .card1 {
   width: 100%;
 }
+
+.bp3-toast {
+  position: fixed !important;
+}
