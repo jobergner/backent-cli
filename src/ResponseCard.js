@@ -21,7 +21,16 @@ function ResponseCard({ data }) {
         {data && <ReactJson collapsed src={data} />}
         {!data && (
           <div>
-            <Empty description={"Send an Action to receive a Response!"} />
+            <Empty
+              description={
+                <div style={{display: "flex", flexDirection: "column"}}>
+                  <span>Send an Action to receive a Response</span>
+                  <span style={{ color: "orange" }}>
+                    Not all messages return a direct response though!
+                  </span>
+                </div>
+              }
+            />
           </div>
         )}
       </div>

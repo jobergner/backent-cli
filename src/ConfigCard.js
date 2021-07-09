@@ -20,7 +20,9 @@ function ConfigCard({ data }) {
         {!data && (
           <Empty
             description={
-              "Currently trying to retrieve the config. Is your server running?"
+              <span style={{color: "red"}}>
+              Currently trying to retrieve the config. Is your server running?
+              </span>
             }
           />
         )}
