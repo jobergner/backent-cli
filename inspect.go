@@ -12,11 +12,11 @@ func inspect() {
 	http.Handle("/", fs)
 
 	fmt.Println("inspector running...")
-	fmt.Println("open your browser on http://localhost:3100")
+	fmt.Println("open your browser on http://localhost:" + *portFlag)
 	fmt.Println("use url query parameter if the server you want to expect ist not listening on 3494")
-	fmt.Println("eg. http://localhost:3100?port=8080")
+	fmt.Println("eg. http://localhost:" + *portFlag + "?port=8080")
 
-	err := http.ListenAndServe(":3100", nil)
+	err := http.ListenAndServe(":"+*portFlag, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

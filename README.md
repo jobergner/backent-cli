@@ -24,7 +24,7 @@ The API is generated based on a configuration which may look like this:
 ```
 ### Generate Server and API with your `config.json`
 ```bash
-backent-cli -config config.json -out backent/ generate 
+backent-cli -config=config.json -out=backent/ generate 
 ```
 ### Use the custom-generated engine API to broadcast all changes automatically
 ```golang
@@ -40,12 +40,16 @@ func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 ```
 
 ### CLI Flags
-| Flag                           | Description                                                                                                            |
+| `generate` flags               | Description                                                                                                            |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `-out <string>`                | Which directory backent-cli is supposed to generate the code into. If the directory does not exist it will be created. |
-| `-config <string>`             | The config file which is used to generate the API                                                                      |
-| `-example <optional bool>`     | With this flag enabled an example server will be generated and the `-config` flag will be ignored.                     |
-| `-engine_only <optional bool>` | Enable to only generate the engine and API part of the package, omitting the server.                                   |
+| `-out=<string>`                | Which directory backent-cli is supposed to generate the code into. If the directory does not exist it will be created. |
+| `-config=<string>`             | The config file which is used to generate the API                                                                      |
+| `-example=<optional bool>`     | With this flag enabled an example server will be generated and the `-config` flag will be ignored.                     |
+| `-engine_only=<optional bool>` | Enable to only generate the engine and API part of the package, omitting the server.                                   |
+
+| `inspect` flags  | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| `-port=<string>` | On which port the inspector should run (defaults to 3100). |
 
 # Start Experimenting!
 Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
@@ -55,11 +59,11 @@ mkdir backent_example; cd backent_example;
 go mod init backentexample;
 
 # generate the code
-backent-cli -example -out ./backent/ generate;
+backent-cli -example -out=./backent/ generate;
 
 # run and use the inspector
 go run .;
-backent-cli -port 3496 inspect;
+backent-cli inspect;
 ```
 The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
 
@@ -718,6 +722,7 @@ go test ./...
 | `/factoryutils`                                    | some utils for code generation                                                                                                                                                            |
 | `/generate`                                        | script to generate `copied_from_examples.go`                                                                                                                                              |
 | `/getstartedfactory`                               | writes the template for the user to copy-paste which is printed during runtime                                                                                                            |
+| `/inspector`                                       | the inspector application (POC)                                                                                                                                                           |
 | `/integrationtest`                                 | starts a server and runs an integration test on `go test .`                                                                                                                               |
 | `/integrationtest/state`                           | server & engine & API generated based on `example.config.json` during `go generate` to test                                                                                               |
 | `/serverfactory`                                   | writes declarations for server (what can be seen in `/examples/application/server/gets_generated.go`)                                                                                     |

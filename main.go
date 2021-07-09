@@ -14,6 +14,7 @@ var engineOnlyFlag = flag.Bool("engine_only", false, "only state")
 var outDirName = flag.String("out", "./tmp", "where to write the files to")
 var exampleFlag = flag.Bool("example", false, "when enabled starts example")
 var devModeFlag = flag.Bool("dev", false, "start in dev mode")
+var portFlag = flag.String("port", "3100", "start in dev mode")
 
 func main() {
 	flag.Parse()
