@@ -42,6 +42,15 @@ func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
 	http.HandleFunc("/", homePageHandler)
 	http.HandleFunc("/inspect", inspectHandler)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { wsEndpoint(w, r, room) })
+	http.HandleFunc("/state", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		tree := room.state.assembleTree(true)
+		stateBytes, err := tree.MarshalJSON()
+		if err != nil {
+			http.Error(w, "Error marshalling tree", 500)
+		}
+		fmt.Fprint(w, string(stateBytes))
+	})
 }
 
 func Start(actions Actions, sideEffects SideEffects, fps int, port int) error {
