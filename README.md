@@ -659,10 +659,8 @@ go test ./...
 - manages self referencing elements
 
 ### TODO
-- some setters dont have return when engine == nil (operationkind delete)
-- describe how operationkindDelete in tree
-- document server endpoints
-- nice tutorial for inspector
+- describe how operationkindDelete in tree works
+- nice tutorial for inspector (maybe a few popups?)
 - document flags
 - documentation
 
