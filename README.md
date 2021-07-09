@@ -63,6 +63,7 @@ backent-cli -example -out=./backent/ generate;
 
 # run and use the inspector
 go run .;
+# in a different window run:
 backent-cli inspect;
 ```
 The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
@@ -106,6 +107,23 @@ var sideEffects = state.SideEffects{
 	OnDeploy:    func(engine *state.Engine) {},
 	OnFrameTick: func(engine *state.Engine) {},
 }
+```
+## Connecting to the websocket endpoint may look like this:
+```javascript
+const ws = new WebSocket("ws://localhost:3496/ws");
+ws.open = () => this.setSocketStatus("open");
+ws.onclose = () => this.setSocketStatus("closed");
+
+ws.onmessage = (e) => {
+    const message = JSON.parse(e.data);
+    if (message.kind === "currentState") {
+        console.log("receiving initial state:", JSON.parse(message.content))
+    } else if (message.kind === "update") {
+        console.log("receiving update", JSON.parse(message.content));
+    } else {
+        this.setReceivedData("received message response", JSON.parse(message.content));
+    }
+};
 ```
 ## Send a Message to trigger an Action:
 This is an example message the server understands via the `/ws` websocket connection. It interprets the message to trigger actions. In this case the server will trigger the `CreatePlayer` action with the given data passed as parameter.
