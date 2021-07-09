@@ -53,7 +53,7 @@ func generate() {
 	} else {
 		cleanOutDirPath := filepath.Clean(*outDirName)
 		outDirPathBase := filepath.Base(cleanOutDirPath)
-		mainFilePath := cleanOutDirPath[0:len(cleanOutDirPath)-len(outDirPathBase)] + "/main.go"
+		mainFilePath := filepath.Join(cleanOutDirPath[0:len(cleanOutDirPath)-len(outDirPathBase)], "main.go")
 		mainFileContent := getstartedfactory.WriteGetStarted(outDirModuleName, true, config.State, config.Actions, config.Responses)
 		if err := ioutil.WriteFile(mainFilePath, []byte(mainFileContent), os.ModePerm); err != nil {
 			panic(fmt.Errorf("error while writing generated code to file system: %s", err))
