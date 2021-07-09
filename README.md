@@ -1,8 +1,8 @@
 # backent-cli
-backent-cli provides a toolkit to generate a server and a custom API which broadcasts all state changes of entities automatically through websockets.
+backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts all state changes automatically.
 
 ### Example `config.json`
-The API is generated on a configuration which may look like this:
+The API is generated based on a configuration which may look like this:
 ```JSON
 {
     "state": {
@@ -26,7 +26,7 @@ The API is generated on a configuration which may look like this:
 ```bash
 backent-cli generate -config config.json -out backent/
 ```
-### Use the custom-generated API to broadcast all changes automatically
+### Use the custom-generated engine API to broadcast all changes automatically
 ```golang
 func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 
@@ -38,6 +38,14 @@ func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 
 }
 ```
+
+### CLI Flags
+| Flag                           | Description                                                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `-out <string>`                | Which directory backent-cli is supposed to generate the code into. If the directory does not exist it will be created. |
+| `-config <string>`             | The config file which is used to generate the API                                                                      |
+| `-example <optional bool>`     | With this flag enabled an example server will be generated and the `-config` flag will be ignored.                     |
+| `-engine_only <optional bool>` | Enable to only generate the engine and API part of the package, omitting the server.                                   |
 
 # Start Experimenting!
 Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
@@ -109,6 +117,7 @@ This is an example message the server understands via the `/ws` websocket connec
 | `/ws`      | The Websocket endpoint. This is how a client can connect to the server. They will receive the current state of all entities when they connect, and from there all occuring updates. |
 | `/inspect` | Here any client can inspect the config the server was generated with. This can be helpful as it explains all types, actions and responses.                                          |
 | `/state`   | This endpoint returns the current state of all entities.                                                                                                                            |
+
 
 # The Basics
 ## Defining the Config:
@@ -189,7 +198,7 @@ var actions = state.Actions{
 ```
 
 ## State Structure and Updates:
-Updates are assembled in a tree-like structure, containing only entities that have updated or who's children have updated. In the action section we have learned how to create a new entity of the `house` type. Creating an entity automatically creates all it's children with default values, even if they are not modified. It is just what you'd expect from Go. So the tree update of just the `engine.CreateHouse()` call alone woud look like this:
+Updates are assembled in a tree-like structure, containing only entities that have updated or who's children have updated. In the action section we have learned how to create a new entity of the `house` type. Creating an entity automatically creates all its children with default values, even if they are not modified. It is just what you'd expect from Go. So the tree update of just the `engine.CreateHouse()` call alone woud look like this:
 ```JSON
 {
     "house": {
@@ -233,9 +242,9 @@ Triggering this action with a message would result in the following tree update:
     }
 }
 ```
-As the the `house` entity itself has not updated, but only it's child `address`, it maintains the `operationKind:"UNCHANGED"` value. This way the client can tell that the `house` entity has remained the same since the last update.
+As the the `house` entity itself has not updated, but only its child `address`, it maintains the `operationKind:"UNCHANGED"` value. This way the client can tell that the `house` entity has remained the same since the last update.
 
-When an entity is deleted, all it's children which are not references will be deleted as well. Eg. delete a house (`engine.DeleteHouse(1)`) in this example:
+When an entity is deleted, all its children which are not references will be deleted as well. Eg. delete a house (`engine.DeleteHouse(1)`) in this example:
 ```JSON
 {
   "address": {
@@ -265,7 +274,7 @@ would produce the following update:
 ```
 
 ### How Slices Work:
-Slices behave like you'd expect slices to work. However, to make all element paths within a tree structure immutable, slices are marshalled as maps. This way we can use the element's ID instead of it's index which could shift during entity modification. In a scenario where your config looks like this:
+Slices behave like you'd expect slices to work. However, to make all element paths within a tree structure immutable, slices are marshalled as maps. This way we can use the element's ID instead of its index which could shift during entity modification. In a scenario where your config looks like this:
 ```JSON
 {
   "address": {
@@ -309,7 +318,7 @@ this would be the emitted update:
     }
 }
 ```
-(note how the `house` has `operationKind:"UPDATE"` as it's `residents` field got modified)
+(note how the `house` has `operationKind:"UPDATE"` as its `residents` field got modified)
 
 As you can see even though `residents` is defined as slice, and a getter call of `house.Residents()` would retrieve a slice of `person`, the field is marshalled as if it was a map. This way this particular `person` will always have the same path within the tree throughout it`s entire lifecycle.
 
@@ -344,7 +353,7 @@ would produce this update:
 
 # Advanced Types:
 ## Type References:
-Sometimes you want an entity to have a certain value, but not necessarily own that value, as the value is an entity that exists on itself, and not as a child of another entity. This can be done by using references. An example that would make it's usefullness clear would be this one:
+Sometimes you want an entity to have a certain value, but not necessarily own that value, as the value is an entity that exists on itself, and not as a child of another entity. This can be done by using references. An example that would make its usefullness clear would be this one:
 ```JSON
 {
     "menu": {
@@ -423,8 +432,8 @@ In the case of a referenced value:
 retrieve the values like this:
 ```golang
 menu := engine.Menu(id)                // menu
-dealRef, isSet := menu.TodaysDeal()    // reference object of dish, bool whether it's set
-isSet = dealRef.IsSet()                // also bool whether it's set
+dealRef, isSet := menu.TodaysDeal()    // reference object of dish, bool whether its set
+isSet = dealRef.IsSet()                // also bool whether its set
 deal := dealRef.Get()                  // dish
 ```
 More on references and their methods can be read here.
@@ -665,18 +674,18 @@ addressPath := address.Path()           // "$.house.1.address"
 
 ### thematical:
 Despite the fact that each of these errors would find a place in one of the above mentioned categories, they are listed separately from them since they are specific to the use case, and not related to the validation of actual go declarations at all.
-| Error                        | Text                                                                                          | Meaning                                                                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| ErrIncompatibleValue         | value "{ValueString}" assigned to "{KeyName}" in "{ParentObject}" is incompatible.            | The assigned value can't be used, as only golang's basic types, self defined types, and slices and pointers of them can be used. |
-| ErrNonObjectType             | type "{TypeName}" is not an object type.                                                      | The defined type is not an object.                                                                                               |
-| ErrIllegalCapitalization     | {type/field name} "{literal}" starts with a capital letter.                                   | A type or field name starts with a capital letter, which is not allowed.                                                         |
-| ErrConflictingSingular       | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}".                      | Due to the way state will be used two field names cannot have the same singular form.                                            |
-| ErrUnavailableFieldName      | "{KeyName}" not an available name.                                                            | Due to internal usage of this FieldName it is unavailable.                                                                       |
-| ErrDirectTypeUsage           | the type "{TypeName}" was used directly in "{ActionName}" instead of it's ID ("{TypeName}ID") | Only IDs of types are available in actions                                                                                       |
-| ErrIllegalPointerParameter   | the parameter "{FieldName}" in "{ActionName}" contains a pointer value                        | Pointers can not be used as parameter as it would not make any sense                                                             |
-| ErrTypeAndActionWithSameName | type and action "{Name}" have the same name                                                   | Types and Actions with the same name would cause conflicts in the generated code                                                 |
-| ErrInvalidAnyOfDefinition    | "{valueString}" is not a valid `anyOf` definition                                             | anyOf definitions can not have single or duplicate types and must be in alphabetical order                                       |
-| ErrResponeToUnknownAction    | there is no action defined for response "{ResponseName}"                                      | a response can only be defined with the same name as the action it belongs to                                                    |
+| Error                        | Text                                                                                         | Meaning                                                                                                                          |
+| ---------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| ErrIncompatibleValue         | value "{ValueString}" assigned to "{KeyName}" in "{ParentObject}" is incompatible.           | The assigned value can't be used, as only golang's basic types, self defined types, and slices and pointers of them can be used. |
+| ErrNonObjectType             | type "{TypeName}" is not an object type.                                                     | The defined type is not an object.                                                                                               |
+| ErrIllegalCapitalization     | {type/field name} "{literal}" starts with a capital letter.                                  | A type or field name starts with a capital letter, which is not allowed.                                                         |
+| ErrConflictingSingular       | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}".                     | Due to the way state will be used two field names cannot have the same singular form.                                            |
+| ErrUnavailableFieldName      | "{KeyName}" not an available name.                                                           | Due to internal usage of this FieldName it is unavailable.                                                                       |
+| ErrDirectTypeUsage           | the type "{TypeName}" was used directly in "{ActionName}" instead of its ID ("{TypeName}ID") | Only IDs of types are available in actions                                                                                       |
+| ErrIllegalPointerParameter   | the parameter "{FieldName}" in "{ActionName}" contains a pointer value                       | Pointers can not be used as parameter as it would not make any sense                                                             |
+| ErrTypeAndActionWithSameName | type and action "{Name}" have the same name                                                  | Types and Actions with the same name would cause conflicts in the generated code                                                 |
+| ErrInvalidAnyOfDefinition    | "{valueString}" is not a valid `anyOf` definition                                            | anyOf definitions can not have single or duplicate types and must be in alphabetical order                                       |
+| ErrResponeToUnknownAction    | there is no action defined for response "{ResponseName}"                                     | a response can only be defined with the same name as the action it belongs to                                                    |
 
 
 # For Developers
@@ -686,12 +695,38 @@ Despite the fact that each of these errors would find a place in one of the abov
 # install necessary dependencies
 bash bootstrap.sh;
 
-# generate necessary files (you may ignore output if it's not an error)
+# generate necessary files (you may ignore output if its not an error)
 go generate;
 
 # run tests
 go test ./...
 ```
+
+## Project Structure
+| location                                           | description                                                                                                                                                                               |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/assets`                                          | assets for README                                                                                                                                                                         |
+| `/ast`                                             | turns valid config.json into AST                                                                                                                                                          |
+| `/enginefactory`                                   | writes the engine & API                                                                                                                                                                   |
+| `/enginefactory/stringified_state_engine_decls.go` | is generated during `go generate`. contains copy-pasted content of `/examples/engine`. Used to test output of `enginefactory` against                                                     |
+| `/examples/application`                            | contains an example of a application                                                                                                                                                      |
+| `/examples/application/server`                     | serves as an example for a server and is a source for copying code into `copied_from_examples.go` during `go generate`                                                                    |
+| `/examples/application/server/gets_generated.go`   | this file contains the only server related declarations that are not copy pasted, but will be generated during runtime based on the config                                                |
+| `/examples/application/server/state.go`            | engine & API generated with `-engine_only` flag during `go generate`, required for server example to run. Generated code is based on `example.config.json`                                |
+| `/examples/configs`                                | contains examples for configs, same as `example.config.json`, but in `go`. its what `/examples/engine/` and `/examples/application/server/gets_generated.json` and all tests are based on |
+| `/examples/engine`                                 | serves as an example for an engine & API. Is also a source for copying code during `go generate` as imports are being used and written into `copied_from_examples.go`                     |
+| `/factoryutils`                                    | some utils for code generation                                                                                                                                                            |
+| `/generate`                                        | script to generate `copied_from_examples.go`                                                                                                                                              |
+| `/getstartedfactory`                               | writes the template for the user to copy-paste which is printed during runtime                                                                                                            |
+| `/integrationtest`                                 | starts a server and runs an integration test on `go test .`                                                                                                                               |
+| `/integrationtest/state`                           | server & engine & API generated based on `example.config.json` during `go generate` to test                                                                                               |
+| `/serverfactory`                                   | writes declarations for server (what can be seen in `/examples/application/server/gets_generated.go`)                                                                                     |
+| `/serverfactory/stringified_server_decls.go`       | is generated during `go generate`. contains copy-pasted content of `/examples/application/server/gets_generated.json`. Used to test output of `serverfactory` against                     |
+| `/testutils`                                       | utils for testing                                                                                                                                                                         |
+| `/tmp`                                             | exists as an out target when running `go run .`                                                                                                                                           |
+| `/validator`                                       | validates a user's config                                                                                                                                                                 |
+| `/copied_from_examples.go`                         | contains code created during `go generate` by `/generate`. content is used during runtime. contains all code that is not written based on a config but can be copy-pasted from examples   |
+
 
 ### test cases check list
 - create element -> Create()
@@ -717,9 +752,7 @@ go test ./...
 - manages self referencing elements
 
 ### TODO
-- describe how operationkindDelete in tree works
-- nice tutorial for inspector (maybe a few popups?)
-- document flags
+- implement inspector into repo
 - documentation
 
 - build fails because of required modules from github. what do? (cant reproduce)
