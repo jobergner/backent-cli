@@ -107,6 +107,7 @@ func TestIntegration(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	resp.Body.Close()
 	expected = expectedConfig
 	actual = string(body)
 	if expected != actual {
@@ -118,6 +119,21 @@ func TestIntegration(t *testing.T) {
 		t.Error("expected inspection result to be unmarshallable, but it was not")
 	}
 	assert.Equal(t, 3, len(m))
+
+	resp, err = http.Get("http://localhost:3496/state")
+	if err != nil {
+		panic(err)
+	}
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	resp.Body.Close()
+	expected = expectedCurrentState
+	actual = string(body)
+	if expected != actual {
+		t.Error(testutils.Diff(actual, expected))
+	}
 }
 
 const expectedConfig = `{
@@ -184,3 +200,5 @@ const expectedConfig = `{
   }
 }
 `
+
+const expectedCurrentState = `{"player":{"1":{"id":1,"gearScore":{"id":2,"level":6,"operationKind":"UNCHANGED"},"items":{"4":{"id":4,"gearScore":{"id":5,"operationKind":"UNCHANGED"},"name":"myItem","origin":{"id":7,"gearScore":{"id":8,"operationKind":"UNCHANGED"},"position":{"id":9,"operationKind":"UNCHANGED"},"operationKind":"UNCHANGED"},"operationKind":"UNCHANGED"}},"position":{"id":3,"x":1,"operationKind":"UNCHANGED"},"operationKind":"UNCHANGED"}}}`
