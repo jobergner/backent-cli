@@ -1,5 +1,5 @@
 # backent-cli
-backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts all state changes automatically.
+backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts state changes to entities automatically.
 
 ### Example `config.json`
 The API is generated based on a configuration which may look like this:
@@ -38,20 +38,7 @@ func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 
 }
 ```
-
-### CLI Flags
-| `generate` flags               | Description                                                                                                            |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `-out=<string>`                | Which directory backent-cli is supposed to generate the code into. If the directory does not exist it will be created. |
-| `-config=<string>`             | The config file which is used to generate the API                                                                      |
-| `-example=<optional bool>`     | With this flag enabled an example server will be generated and the `-config` flag will be ignored.                     |
-| `-engine_only=<optional bool>` | Enable to only generate the engine and API part of the package, omitting the server.                                   |
-
-| `inspect` flags  | Description                                                |
-| ---------------- | ---------------------------------------------------------- |
-| `-port=<string>` | On which port the inspector should run (defaults to 3100). |
-
-# Start Experimenting!
+# Jump right into Experimenting!
 Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
 ```bash
 # set up directories
@@ -139,6 +126,18 @@ This is an example message the server understands via the `/ws` websocket connec
 | `/ws`      | The Websocket endpoint. This is how a client can connect to the server. They will receive the current state of all entities when they connect, and from there all occuring updates. |
 | `/inspect` | Here any client can inspect the config the server was generated with. This can be helpful as it explains all types, actions and responses.                                          |
 | `/state`   | This endpoint returns the current state of all entities.                                                                                                                            |
+
+## CLI Flags
+| generate flags                 | Description                                                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `-out=<string>`                | Which directory backent-cli is supposed to generate the code into. If the directory does not exist it will be created. |
+| `-config=<string>`             | The config file which is used to generate the API                                                                      |
+| `-example=<optional bool>`     | With this flag enabled an example server will be generated and the `-config` flag will be ignored.                     |
+| `-engine_only=<optional bool>` | Enable to only generate the engine and API part of the package, omitting the server.                                   |
+
+| inspect flags    | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| `-port=<string>` | On which port the inspector should run (defaults to 3100). |
 
 
 # The Basics
@@ -741,6 +740,7 @@ go test ./...
 | `/generate`                                        | script to generate `copied_from_examples.go`                                                                                                                                              |
 | `/getstartedfactory`                               | writes the template for the user to copy-paste which is printed during runtime                                                                                                            |
 | `/inspector`                                       | the inspector application (POC)                                                                                                                                                           |
+| `/inspector/build`                                 | contains the built inspector app. the built always needs to be checked in as it's being hosted when calling the `inspect` command                                                         |
 | `/integrationtest`                                 | starts a server and runs an integration test on `go test .`                                                                                                                               |
 | `/integrationtest/state`                           | server & engine & API generated based on `example.config.json` during `go generate` to test                                                                                               |
 | `/serverfactory`                                   | writes declarations for server (what can be seen in `/examples/application/server/gets_generated.go`)                                                                                     |
@@ -750,6 +750,43 @@ go test ./...
 | `/validator`                                       | validates a user's config                                                                                                                                                                 |
 | `/copied_from_examples.go`                         | contains code created during `go generate` by `/generate`. content is used during runtime. contains all code that is not written based on a config but can be copy-pasted from examples   |
 
+
+## Tests
+Before running the tests you need to run `go generate` as it generates the necessary expected outputs for some tests (more on that below). However `go generate` takes a bit of time to run, so feel free to only run the commands that generate the specific files you're working on.
+
+## Testing generated Code:
+I'm not entirely convinced that generating tests alongside generated code is the best way to do things, at least not for me. When I'm testing it is nothing more than an attempt at reducing the likelyhood of my tested code being faulty. I make mistakes while writing code, and I also make mistakes while writing tests. So I can never be really sure if my code does what I think it does, but with each test I can try to get closer to certainty.
+
+Generating tests does not seem to be the right approach for me, as a lot of logic (and developer time!) is involved. That logic comes with additional possible mistakes, which in turn would again require tests. And at this point I have to ask myself: Am I really approximating s state of less faulty code efficiently?
+
+This is why I decided to use the following approach:
+1. write an example of what the code I want to generate looks like (eg. `examples/engine`)
+2. test that code with hardly any logic involved in the tests themselves (eg. `examples/engine/state_engine_test.go`)
+3. use [decltostring](https://github.com/Java-Jonas/decltostring) to take a snapshot of every declaration in my example code (eg. `enginefactory/stringified_state_engine_decls.go`)
+4. check if my generated code looks like the declarations in my snapshot (eg. `enginefactory/write_adders_test.go`)
+
+With this approach I've not only avoided spending time writing generators for tests, I've actually saved time overall. Typing out the example code (eg. `examples/engine`) did not really take very long, it made it very easy to test the code that I want to generate, and it doubles as a base for generating tests for my code generators in a no-effort-manner.
+
+I've thought about whether this approach makes my generated code vulnerable to bugs. After all I'm only testing the example code, which is merely one version of what my generated code can look like. With a different `config.json` the generated code may look completely different. However, this is where this way of doing things really shined in my case. Because my code generator itself serves as a test for my code example.
+
+Imagine I want to generate adders for number types, so my code example looks like this:
+```golang
+func addInts(a, b int) int {
+    return a + b
+}
+func addFloats(a, b float64) float64 {
+    return a - b
+}
+```
+You may have noticed that I've already made a mistake in `addFloats`. This happens quite often. The tests of my example code do not cover every single function, as it would simply take too much time, and they actually don't have to! Because when I'm writing my generators, I'm simultaneously writing these tests. It will become more clear when you look at the generator for these functions.
+```golang
+func generateAdder(typeName string) {
+    Func().Id("add" + Title(typeName) + s).Params(Id("a"), Id("b").Id(typeName)).Id(typeName).Block(
+        Return(Id("a").Op("+").Id("b")),
+    )
+}
+```
+So now when I'm trying to match my code example and my generated code during my tests, I will immediately be notified of the mismatched `-`/`+` in `addFloats`. This is why I consider the generator a test itself. It is an additional layer of logic that assumes a certain output, just like a test, and it actually has cought noumerous errors in my example code during development. For the code generator not to catch that error I would have had to make the same mistake of using a `-` instead of a `+` in all adders, and this kind of mistake would have probably (you never know) been cought by the tests of my code example. The relationship between the example code and the code generator is somewhat like a symbiosis.
 
 ### test cases check list
 - create element -> Create()
