@@ -1,8 +1,8 @@
 package enginefactory
 
 import (
-	"github.com/Java-Jonas/bar-cli/ast"
-	. "github.com/Java-Jonas/bar-cli/factoryutils"
+	"github.com/jobergner/backent-cli/ast"
+	. "github.com/jobergner/backent-cli/factoryutils"
 
 	. "github.com/dave/jennifer/jen"
 )

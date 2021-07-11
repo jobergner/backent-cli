@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Java-Jonas/bar-cli/ast"
-	"github.com/Java-Jonas/bar-cli/examples/configs"
-	"github.com/Java-Jonas/bar-cli/testutils"
+	"github.com/jobergner/backent-cli/ast"
+	"github.com/jobergner/backent-cli/examples/configs"
+	"github.com/jobergner/backent-cli/testutils"
 )
 
 func newSimpleASTExample() *ast.AST {

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Java-Jonas/bar-cli/integrationtest/state"
-	"github.com/Java-Jonas/bar-cli/testutils"
+	"github.com/jobergner/backent-cli/integrationtest/state"
+	"github.com/jobergner/backent-cli/testutils"
 	"github.com/stretchr/testify/assert"
 )
 

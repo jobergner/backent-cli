@@ -3,7 +3,7 @@ backent-cli provides a toolkit to generate a server and a custom API as package 
 
 ## Installation
 ```
-go get github.com/Java-Jonas/backent-cli
+go get github.com/jobergner/backent-cli
 ```
 
 # Jump right into Experimenting!
@@ -302,7 +302,7 @@ would produce the following update:
 ```
 
 ### How Slices Work:
-Slices behave like you'd expect slices to work. However, to make all element paths within a tree structure immutable, slices are marshalled as maps. This way we can use the element's ID instead of its index which could shift during entity modification. In a scenario where your config looks like this:
+Slices behave like you'd expect slices to work. However, to make all entity paths within a tree structure immutable, slices are marshalled as maps. This way we can use the entity's ID instead of its index which could shift during entity modification. In a scenario where your config looks like this:
 ```JSON
 {
   "address": {
@@ -396,7 +396,7 @@ Sometimes you want an entity to have a certain value, but not necessarily own th
     }
 }
 ```
-Read [here](https://github.com/Java-Jonas/bar-cli#api-reference) on how to use the API to handle references.
+Read [here](https://github.com/jobergner/backent-cli#api-reference) on how to use the API to handle references.
 
 ## The `anyOf` Type:
 The `anyOf` type is a Quality of Life feature which lets you define fields to contain more than one type. This brings great flexibility with no additional overhead:
@@ -417,7 +417,7 @@ The `anyOf` type is a Quality of Life feature which lets you define fields to co
     }
 }
 ```
-Read [here](https://github.com/Java-Jonas/bar-cli#api-reference) on how to use the API to handle `anyOf` types.
+Read [here](https://github.com/jobergner/backent-cli#api-reference) on how to use the API to handle `anyOf` types.
 
 # Side Effects:
 The server `Start` method accepts a `SideEffects` object with the `OnDeploy` and `OnFrameTick` methods.
@@ -544,7 +544,7 @@ cow := engine.CreateCow()
 pig := engine.CreatePig()
 ```
 ## deleters
-You can delete created elements just as easily as you created them:
+You can delete created entitys just as easily as you created them:
 ```JSON
 {
     "chicken": {
@@ -622,7 +622,7 @@ farm.CutestResident().SetCow()
 cutestResidentKind = farm.CutestResident().Kind()    // "Cow"
 ```
 ## adders
-Adders are methods to add elements to fields with slice values. These are the different variants of slices that exist:
+Adders are methods to add entitys to fields with slice values. These are the different variants of slices that exist:
 ```JSON
 {
     "person": {
@@ -644,7 +644,7 @@ person.AddNickNames("peter", "pete")   // since nickNames is a slice of a basic 
 ```
 
 ## removers
-Just like you can add to fields with slice values, you can also remove elements:
+Just like you can add to fields with slice values, you can also remove entitys:
 ```JSON
 {
     "person": {
@@ -788,7 +788,7 @@ Generating tests does not seem to be the right approach for me, as a lot of logi
 This is why I decided to use the following approach:
 1. write an example of what the code I want to generate looks like (eg. `examples/engine`)
 2. test that code with hardly any logic involved in the tests themselves (eg. `examples/engine/state_engine_test.go`)
-3. use [decltostring](https://github.com/Java-Jonas/decltostring) to take a snapshot of every declaration in my example code (eg. `enginefactory/stringified_state_engine_decls.go`)
+3. use [decltostring](https://github.com/jobergner/decltostring) to take a snapshot of every declaration in my example code (eg. `enginefactory/stringified_state_engine_decls.go`)
 4. check if my generated code looks like the declarations in my snapshot (eg. `enginefactory/write_adders_test.go`)
 
 With this approach I've not only avoided spending time writing generators for tests, I've actually saved time overall. Typing out the example code (eg. `examples/engine`) did not really take very long, it made it very easy to test the code that I want to generate, and it doubles as a base for generating tests for my code generators in a no-effort-manner.
@@ -816,7 +816,7 @@ So now when I'm trying to match my code example and my generated code during my 
 
 
 ## State Structure
-Entities are structured in a relational manner. An assembling step exists which organizes the data in it's real tree-like structure. The `Engine` owns 2 state objects. One, the `state`, holds all existing entities, and the other, `the patch` holds all modified entities. The API will never directly modify the `state`, but take a copy of the entity out of the `state`, modify it, and put it into the `patch`. This way we keep track of which entities changed at the end of a cycle. Changed entities are also marked with `operationKind:"UPDATE"` or `operationKind:"DELETE"`. With each cycle we take all entities of the `patch` and either put them into `state` and set their `operationKind` to `UNCHANGED` when their `operationKind` was `UPDATE`, or we delete the existing representation of the element in the `state` if the `operationKind` was `DELETE`.
+Entities are structured in a relational manner. An assembling step exists which organizes the data in it's real tree-like structure. The `Engine` owns 2 state objects. One, the `state`, holds all existing entities, and the other, `the patch` holds all modified entities. The API will never directly modify the `state`, but take a copy of the entity out of the `state`, modify it, and put it into the `patch`. This way we keep track of which entities changed at the end of a cycle. Changed entities are also marked with `operationKind:"UPDATE"` or `operationKind:"DELETE"`. With each cycle we take all entities of the `patch` and either put them into `state` and set their `operationKind` to `UNCHANGED` when their `operationKind` was `UPDATE`, or we delete the existing representation of the entity in the `state` if the `operationKind` was `DELETE`.
 ```golang
 for _, player := range engine.Patch.Player {
 	if player.OperationKind == OperationKindDelete {
@@ -841,10 +841,10 @@ The reason why `include` and `hasUpdated` exist the second way of assembling the
 
 ## API Characteristics:
 ### be up to date and diesregard non-existing/deleted entities:
-When handling entities we always make sure we `get` the most recent version of the element from the `engine`, so the user never accidentally uses stale data. If the entity could not be found the `get`ter will return an empty entity with `OperationKindDelete`, so the rest of the API is aware that this entity can be disregarded, even if the user accidentally calls modifying methods on it.
+When handling entities we always make sure we `get` the most recent version of the entity from the `engine`, so the user never accidentally uses stale data. If the entity could not be found the `get`ter will return an empty entity with `OperationKindDelete`, so the rest of the API is aware that this entity can be disregarded, even if the user accidentally calls modifying methods on it.
 ```golang
 func (_gearScore gearScore) SetScore(newScore int) gearScore {
-	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID) // make sure most recent data is used, returns entity with `OperationKindDelete` if element could not be found
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID) // make sure most recent data is used, returns entity with `OperationKindDelete` if entity could not be found
 	if gearScore.gearScore.OperationKind == OperationKindDelete {
 		return gearScore // return if encountering a non-existing entity
 	}
@@ -867,7 +867,7 @@ func (engine *Engine) createPlayer(p path, extendWithID bool) player {
 }
 ```
 ### don't allow `nil` where the cannot be void:
-The API does not allow for deletion of non-root elements by using `delete`rs, as this would cause the parent of the deleted entity to loose a child, which would be very unintuitive behaviour. Compare it with this pseudo-Go example. This is what the logic would look like if the API allowed for non-root entities to be deleted
+The API does not allow for deletion of non-root entitys by using `delete`rs, as this would cause the parent of the deleted entity to loose a child, which would be very unintuitive behaviour. Compare it with this pseudo-Go example. This is what the logic would look like if the API allowed for non-root entities to be deleted
 ```golang
 type Foo struct {
 	bar int
@@ -939,7 +939,7 @@ anyOf types get created for each unique entity pair
 ```
 This way we can provide only the necessary methods for each kind of anyOf type.
 
-Alongside the anyOf types that get created we generate reference containers of these types. any types have setter methods to replace the current contained child element with a different one. Eg the type `anyOfPlayer_ZoneItem` owns the `.SetPlayer()` and `.SetZoneItem()` methods which both delete the current child, and create a new one. This however causes problems when you are dealing with references of any types, as a setter method would delete the current child.
+Alongside the anyOf types that get created we generate reference containers of these types. any types have setter methods to replace the current contained child entity with a different one. Eg the type `anyOfPlayer_ZoneItem` owns the `.SetPlayer()` and `.SetZoneItem()` methods which both delete the current child, and create a new one. This however causes problems when you are dealing with references of any types, as a setter method would delete the current child.
 being able to call the setters on these references makes no sense. This is why any types have ref wrappers, which are created just before `Get()` is called on the reference. These wrappers exclude the
 setter methods.
 
@@ -948,11 +948,11 @@ setter methods.
 the `examples/engine` has benchmark tests with their record and improvements maintained in `benchmark_results.txt`. 
 
 ### test cases check list
-- create element -> Create()
-- delete element -> Delete()
-- manipulate element -> SetName()
-- add element -> AddItem()
-- remove element -> RemoveItem()
+- create entity -> Create()
+- delete entity -> Delete()
+- manipulate entity -> SetName()
+- add entity -> AddItem()
+- remove entity -> RemoveItem()
 - set reference -> SetBoundTo()
 - unset reference -> BoundTo().Unset()
 - add reference -> AddGuildMember()
@@ -966,9 +966,9 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - creation of reference -> a new reference is created
 - deletion of reference -> a reference is deleted
 - replacement of reference -> an existing reference is replaced with a different one
-- includes element if reference of reference got updated
+- includes entity if reference of reference got updated
 - manages cyclical references
-- manages self referencing elements
+- manages self referencing entitys
 
 ### TODO
 - entity, exists := entity.Exists() method??
@@ -979,7 +979,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - setters to return if new value == current value so no change is triggered
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - release tree func (release slices, maps, and the pointers themselves)
-- (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the ElementKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
+- (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the entityKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child entity. CRITICAL ERROR!!!
 
 
 more to come

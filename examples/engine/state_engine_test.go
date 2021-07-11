@@ -3,7 +3,7 @@ package state
 import (
 	"testing"
 
-	"github.com/Java-Jonas/bar-cli/testutils"
+	"github.com/jobergner/backent-cli/testutils"
 
 	"github.com/stretchr/testify/assert"
 )

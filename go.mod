@@ -1,4 +1,4 @@
-module github.com/Java-Jonas/bar-cli
+module github.com/jobergner/backent-cli
 
 go 1.13
 

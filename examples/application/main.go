@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	state "github.com/Java-Jonas/bar-cli/examples/application/server"
+	state "github.com/jobergner/backent-cli/examples/application/server"
 )
 
 var playerID state.PlayerID
