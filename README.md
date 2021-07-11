@@ -1,6 +1,31 @@
 # backent-cli
 backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts state changes to entities automatically.
 
+## Installation
+```
+go get github.com/Java-Jonas/backent-cli
+```
+
+# Jump right into Experimenting!
+Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
+```bash
+# set up directories
+mkdir backent_example; cd backent_example;
+go mod init backentexample;
+
+# generate the code
+backent-cli -example -out=./backent/ generate;
+
+# run and use the inspector
+go run .;
+# in a different window run:
+backent-cli inspect;
+```
+The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
+
+![alt text](./assets/inspector.png)
+
+# A quick Example:
 ### Example `config.json`
 The API is generated based on a configuration which may look like this:
 ```JSON
@@ -38,24 +63,6 @@ func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 
 }
 ```
-# Jump right into Experimenting!
-Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
-```bash
-# set up directories
-mkdir backent_example; cd backent_example;
-go mod init backentexample;
-
-# generate the code
-backent-cli -example -out=./backent/ generate;
-
-# run and use the inspector
-go run .;
-# in a different window run:
-backent-cli inspect;
-```
-The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
-
-![alt text](./assets/inspector.png)
 
 # Overview
 When generating a server the console will output the content of a possible `main.go` file for you to copy and paste. You may then edit the actions and sideEffects.
@@ -389,7 +396,7 @@ Sometimes you want an entity to have a certain value, but not necessarily own th
     }
 }
 ```
-Read here on how to use the API to handle references.
+Read [here](https://github.com/Java-Jonas/bar-cli#api-reference) on how to use the API to handle references.
 
 ## The `anyOf` Type:
 The `anyOf` type is a Quality of Life feature which lets you define fields to contain more than one type. This brings great flexibility with no additional overhead:
@@ -410,7 +417,20 @@ The `anyOf` type is a Quality of Life feature which lets you define fields to co
     }
 }
 ```
-Read here on how to use the API to handle `anyOf` types.
+Read [here](https://github.com/Java-Jonas/bar-cli#api-reference) on how to use the API to handle `anyOf` types.
+
+# Side Effects:
+The server `Start` method accepts a `SideEffects` object with the `OnDeploy` and `OnFrameTick` methods.
+```golang
+var sideEffects = state.SideEffects{
+	OnDeploy:    func(engine *state.Engine) {},
+	OnFrameTick: func(engine *state.Engine) {},
+}
+```
+### OnDeploy
+Is called as soon as the server starts. This is a good opportunity to create entities.
+### OnFrameTick
+Is called after all actions for a frame tick a processed.
 
 # API Reference
 ## getters
@@ -457,7 +477,6 @@ dealRef, isSet := menu.TodaysDeal()    // reference object of dish, bool whether
 isSet = dealRef.IsSet()                // also bool whether its set
 deal := dealRef.Get()                  // dish
 ```
-More on references and their methods can be read here.
 
 In case of fields with `anyOf` types:
 ```JSON
@@ -486,7 +505,6 @@ cow := cutestResident.Cow()               // cow
 // if you know of which kind the animal is you can retrieve it directly
 cow := farm.CutestResident().Cow()        // cow
 ```
-More on `anyOf` types and their methods can be read here.
 
 If you try to retrieve a value where there is none, all manipulations applied to this entity will have no effect.
 This can happen during the following curcumstances:
@@ -669,8 +687,7 @@ addressID := address.ID()               // 2
 addressPath := address.Path()           // "$.house.1.address"
 ```
 
-# Defining the Config
-## Restrictions and their Validation Error Messages
+## Config Restrictions and their Validation Error Messages
 ### structural:
 | Error           | Text                                                             | Meaning                                                         |
 | --------------- | ---------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -751,6 +768,15 @@ go test ./...
 | `/copied_from_examples.go`                         | contains code created during `go generate` by `/generate`. content is used during runtime. contains all code that is not written based on a config but can be copy-pasted from examples   |
 
 
+## The Idea
+The project's only purpose is to provide the API to a server which broadcasts state changes to connected clients. It is not supposed to persist data, provide tools to deploy itself or any other utility, as the user is enabled to do all these things themselves by making use of the existing functionality. I want the project to be good at one thing, not mediocre at many.
+
+Intentionally very little of what is going on under the hood is exposed. The user should only have to interact with method names that are self explanatory. The API should be as simple as possible while giving all necessary access to the data. The API should also feel very intuitive.
+
+The idea is to provide the user with a custom API that is easy to use and prevents them from making mistakes. The user should simply not be able to cause unintended behaviour or panics because they used the API in an incorrect way. This is why the user can eg. `get` an entity which does not even exist and call various methods on it without it affecting the state at all. In these cases the API intercepts by returning an entity with `operationKind:"DELETE"`, and by design all methods called on an entity with `operationKind:"DELETE"` return without actually doing anything, as there is no point in modifying a deleted entity ever.
+
+Knowledge of Go is required to use the tool, but only superficial knowledge. Go was chosen because it's a language that is easy to learn, but allows for writing fast and maintainable code if you are adept at it (but mainly because I like the language if I'm honest). Go also has a neat way of defining types, which makes creating a `config.json` feel very familiar.
+
 ## Tests
 Before running the tests you need to run `go generate` as it generates the necessary expected outputs for some tests (more on that below). However `go generate` takes a bit of time to run, so feel free to only run the commands that generate the specific files you're working on.
 
@@ -772,21 +798,154 @@ I've thought about whether this approach makes my generated code vulnerable to b
 Imagine I want to generate adders for number types, so my code example looks like this:
 ```golang
 func addInts(a, b int) int {
-    return a + b
+	return a + b
 }
 func addFloats(a, b float64) float64 {
-    return a - b
+	return a - b
 }
 ```
 You may have noticed that I've already made a mistake in `addFloats`. This happens quite often. The tests of my example code do not cover every single function, as it would simply take too much time, and they actually don't have to! Because when I'm writing my generators, I'm simultaneously writing these tests. It will become more clear when you look at the generator for these functions.
 ```golang
 func generateAdder(typeName string) {
-    Func().Id("add" + Title(typeName) + s).Params(Id("a"), Id("b").Id(typeName)).Id(typeName).Block(
-        Return(Id("a").Op("+").Id("b")),
-    )
+	Func().Id("add" + Title(typeName) + "s").Params(Id("a"), Id("b").Id(typeName)).Id(typeName).Block(
+		Return(Id("a").Op("+").Id("b")),
+	)
 }
 ```
 So now when I'm trying to match my code example and my generated code during my tests, I will immediately be notified of the mismatched `-`/`+` in `addFloats`. This is why I consider the generator a test itself. It is an additional layer of logic that assumes a certain output, just like a test, and it actually has cought noumerous errors in my example code during development. For the code generator not to catch that error I would have had to make the same mistake of using a `-` instead of a `+` in all adders, and this kind of mistake would have probably (you never know) been cought by the tests of my code example. The relationship between the example code and the code generator is somewhat like a symbiosis.
+
+
+## State Structure
+Entities are structured in a relational manner. An assembling step exists which organizes the data in it's real tree-like structure. The `Engine` owns 2 state objects. One, the `state`, holds all existing entities, and the other, `the patch` holds all modified entities. The API will never directly modify the `state`, but take a copy of the entity out of the `state`, modify it, and put it into the `patch`. This way we keep track of which entities changed at the end of a cycle. Changed entities are also marked with `operationKind:"UPDATE"` or `operationKind:"DELETE"`. With each cycle we take all entities of the `patch` and either put them into `state` and set their `operationKind` to `UNCHANGED` when their `operationKind` was `UPDATE`, or we delete the existing representation of the element in the `state` if the `operationKind` was `DELETE`.
+```golang
+for _, player := range engine.Patch.Player {
+	if player.OperationKind == OperationKindDelete {
+		delete(engine.State.Player, player.ID)
+	} else {
+		player.OperationKind = OperationKindUnchanged
+		engine.State.Player[player.ID] = player
+	}
+}
+```
+
+Entities are never aware of their parents, as an entity could always be defined to be a child of entity `X` but also of entity `Y`. Introducing logic for an entity to be aware of its parent would have been not worth the effort and the decrease in maintainability of the project.
+
+There are 2 different ways of assembling the data. The default way is to assemble a tree which only includes updated entities, but also their parent entities until root is reached. The assembling itself starts from the root, traverses every branch of the tree, and returns a flag whether it has encountered an updated entity. This is why the assembling methods always return 3 values.
+```golang
+player, include, hasUpdated := engine.assemblePlayer(playerData.ID, nil, config)
+```
+`player` is the assembled entity, `include` is whether the entity should be included in its parent, or remain `nil`, and `hasUpdated` which signifies whether the entity or any of its children contain updated data.
+
+The reason why `include` and `hasUpdated` exist the second way of assembling the tree is with the `forceInclude` flag enabled in the `assembleConfig`. While this is the case the assembler includes ALL entities in the tree without regarding whether the data has updated or not.
+
+
+## API Characteristics:
+### be up to date and diesregard non-existing/deleted entities:
+When handling entities we always make sure we `get` the most recent version of the element from the `engine`, so the user never accidentally uses stale data. If the entity could not be found the `get`ter will return an empty entity with `OperationKindDelete`, so the rest of the API is aware that this entity can be disregarded, even if the user accidentally calls modifying methods on it.
+```golang
+func (_gearScore gearScore) SetScore(newScore int) gearScore {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID) // make sure most recent data is used, returns entity with `OperationKindDelete` if element could not be found
+	if gearScore.gearScore.OperationKind == OperationKindDelete {
+		return gearScore // return if encountering a non-existing entity
+	}
+    // ...
+}
+```
+### structure creation like go:
+Similar to go, when creating an entity, all children of this entity are created with default values.
+```golang
+func (engine *Engine) createPlayer(p path, extendWithID bool) player {
+	var element playerCore
+	element.engine = engine
+	element.ID = PlayerID(engine.GenerateID())
+	elementGearScore := engine.createGearScore(p.gearScore(), false)
+	element.GearScore = elementGearScore.gearScore.ID
+	elementPosition := engine.createPosition(p.position(), false)
+	element.Position = elementPosition.position.ID
+	return player{player: element}
+	// ...
+}
+```
+### don't allow `nil` where the cannot be void:
+The API does not allow for deletion of non-root elements by using `delete`rs, as this would cause the parent of the deleted entity to loose a child, which would be very unintuitive behaviour. Compare it with this pseudo-Go example. This is what the logic would look like if the API allowed for non-root entities to be deleted
+```golang
+type Foo struct {
+	bar int
+}
+func main() {
+	x := Foo{1}
+	delete(x, "bar")
+	fmt.Println(x.bar) // panics because void
+}
+```
+Instead the API just returns:
+```golang
+func (engine *Engine) DeletePlayer(playerID PlayerID) {
+	player := engine.Player(playerID).player
+	if player.HasParent {
+		return
+	}
+	engine.deletePlayer(playerID)
+}
+```
+### only show the user what's needed:
+The user will never handle entities directly. They will always be given a wrapper which has access to the required API methods. You can see in the `get`ters that they all wrap the entities before they return it. The reason why wrappers exist for entities is in case I ever decide I want to marshal entities directly before they are assembled in a tree structure (only exported fields can be marshalled). 
+```golang
+// playerCore holds the data
+type playerCore struct {
+	ID            PlayerID                  `json:"id"`
+	// ...
+}
+
+// player wraps playerCore and has access to the data, while providing the methods to the user
+type player struct{ player playerCore }
+
+// getter wraps playerCore in player before returning
+func (engine *Engine) Player(playerID PlayerID) player {
+	patchingPlayer, ok := engine.Patch.Player[playerID]
+	if ok {
+		return player{player: patchingPlayer}
+	}
+	// ...
+}
+
+// AddItem exists on player, not playerCore
+func (_player player) AddItem() item {
+	// ...
+}
+```
+
+### generated entity types:
+Some types are generated alongside the user-defined entities. This happens when a user references a type `*player` or uses an `anyOf` type like `anyOf<Enemy,Player>`. These generated types exist as containers for the actual entities they hold and provide the user with methods to handle them. In case of reference types, a new reference type is generated for each individual field that holds a reference type:
+```JSON
+{
+    "player": {
+        "item": "*item", // creates the playerItemRef
+        "friend": "*friend" // creates the playerFriendRef
+    }
+}
+```
+This is required as no entity is ever aware of their parent, but if a different type is created for each reference, the reference is aware of it's parent's type by desing, and only needs to know the ID of the parent to find it in `state`. We need to be aware of the parent in references because when a reference is `Unset` we loop thorugh all references of that type in the state and find the parent to remove the reference from it. If this was not the case we would have to loop thorugh all entities which can hold references of that entity kind and then check if the reference exists on that parent. My fear was that this could make the api slow and could complicate the code generators. Although I have to admit that this could be a case of premature optimization or decision making based on vague guesses.
+
+anyOf types get created for each unique entity pair
+ ```JSON
+{
+    "player": {
+        "fooOrBar": "anyOf<bar,foo>", // creates anyOfBar_Foo
+        "BarOrFoo": "anyOf<bar,foo>", // does not create a new anyOf type as anyOfBar_Foo is already created
+        "fooOrBaz": "anyOf<baz,foo>" // creates anyOfBaz_Foo
+    }
+}
+```
+This way we can provide only the necessary methods for each kind of anyOf type.
+
+Alongside the anyOf types that get created we generate reference containers of these types. any types have setter methods to replace the current contained child element with a different one. Eg the type `anyOfPlayer_ZoneItem` owns the `.SetPlayer()` and `.SetZoneItem()` methods which both delete the current child, and create a new one. This however causes problems when you are dealing with references of any types, as a setter method would delete the current child.
+being able to call the setters on these references makes no sense. This is why any types have ref wrappers, which are created just before `Get()` is called on the reference. These wrappers exclude the
+setter methods.
+
+
+## Benchmarks
+the `examples/engine` has benchmark tests with their record and improvements maintained in `benchmark_results.txt`. 
 
 ### test cases check list
 - create element -> Create()
@@ -812,15 +971,13 @@ So now when I'm trying to match my code example and my generated code during my 
 - manages self referencing elements
 
 ### TODO
-- implement inspector into repo
+- entity, exists := entity.Exists() method??
 - documentation
 
 - build fails because of required modules from github. what do? (cant reproduce)
 - find open port for integratpon test
 - setters to return if new value == current value so no change is triggered
-- custom handlers
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
-- data persistence
 - release tree func (release slices, maps, and the pointers themselves)
 - (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the ElementKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child element. CRITICAL ERROR!!!
 
