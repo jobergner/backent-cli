@@ -1,4 +1,4 @@
-module github.com/Java-Jonas/decltostring
+module github.com/jobergner/decltostring
 
 go 1.13
 
