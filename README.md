@@ -3,7 +3,7 @@ backent-cli provides a toolkit to generate a server and a custom API as package 
 
 ## Installation
 ```
-go get github.com/jobergner/backent-cli
+go get -u github.com/jobergner/backent-cli
 ```
 
 # Jump right into Experimenting!
@@ -16,14 +16,16 @@ go mod init backentexample;
 # generate the code
 backent-cli -example -out=./backent/ generate;
 
-# run and use the inspector
+# run and the server
 go run .;
-# in a different window run:
+# in a different window run the inspector, then open http://localhost:3100/:
 backent-cli inspect;
 ```
 The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
 
 ![alt text](./assets/inspector.png)
+
+You can also inspect backent servers that are not running on port 3496 by using query parameters in the URL: `http://localhost:3100?port=8080`
 
 # A quick Example:
 ### Example `config.json`
