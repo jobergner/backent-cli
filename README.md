@@ -1,5 +1,5 @@
 # backent-cli
-backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts state changes to entities automatically.
+backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts state changes of entities automatically.
 
 ## Installation
 ```
