@@ -7,7 +7,7 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/Java-Jonas/bar-cli/ast"
+	"github.com/jobergner/backent-cli/ast"
 
 	"github.com/dave/jennifer/jen"
 	"github.com/gertd/go-pluralize"

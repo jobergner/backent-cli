@@ -3,10 +3,10 @@ package getstartedfactory
 import (
 	"bytes"
 
-	. "github.com/Java-Jonas/bar-cli/factoryutils"
+	. "github.com/jobergner/backent-cli/factoryutils"
 
-	"github.com/Java-Jonas/bar-cli/ast"
 	. "github.com/dave/jennifer/jen"
+	"github.com/jobergner/backent-cli/ast"
 )
 
 type GetStartedFactory struct {

@@ -2,89 +2,89 @@
 Di 22. Jun 16:10:10 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	       3	 491831666 ns/op	191727930 B/op	 2084886 allocs/op
 BenchmarkAssembleTree-12                	       1	1146506211 ns/op	374948632 B/op	 3790856 allocs/op
 BenchmarkEngine-12                      	       2	1068673783 ns/op	326759808 B/op	 3383263 allocs/op
 BenchmarkUpdateState-12                 	     849	   1488118 ns/op	  445232 B/op	    1070 allocs/op
 BenchmarkElementModificaton-12          	     164	   8024566 ns/op	 2829890 B/op	    4818 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	11.698s
+ok  	github.com/jobergner/backent-cli/examples/engine	11.698s
 
 # use sync.Pools for slices and maps in deduplication helpers
 Di 22. Jun 16:58:07 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	       3	 546113832 ns/op	187778810 B/op	 2028805 allocs/op
 BenchmarkAssembleTree-12                	       1	1047732168 ns/op	301429296 B/op	 3177922 allocs/op
 BenchmarkEngine-12                      	       1	1088289475 ns/op	294054344 B/op	 3191863 allocs/op
 BenchmarkUpdateState-12                 	    1660	    692403 ns/op	  248724 B/op	     570 allocs/op
 BenchmarkElementModificaton-12          	     289	   4258137 ns/op	 1150241 B/op	    1839 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.581s
+ok  	github.com/jobergner/backent-cli/examples/engine	9.581s
 
 # use sync.Pools for slices in allIDs helpers
 Di 22. Jun 17:18:26 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	       3	 483733270 ns/op	183633626 B/op	 1970293 allocs/op
 BenchmarkAssembleTree-12                	       1	1116346379 ns/op	332433408 B/op	 3525929 allocs/op
 BenchmarkEngine-12                      	       1	1228802902 ns/op	366104328 B/op	 4184231 allocs/op
 BenchmarkUpdateState-12                 	    1792	    633446 ns/op	  192940 B/op	     490 allocs/op
 BenchmarkElementModificaton-12          	     360	   3120509 ns/op	  202495 B/op	     677 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.283s
+ok  	github.com/jobergner/backent-cli/examples/engine	9.283s
 
 # use assemble cache to increase forceInclude assembling performance
 Di 22. Jun 19:21:46 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	     284	   4176067 ns/op	 1211703 B/op	   14619 allocs/op
 BenchmarkAssembleTree-12                	       1	1320573241 ns/op	388121928 B/op	 3928648 allocs/op
 BenchmarkEngine-12                      	       1	1119262034 ns/op	316639184 B/op	 3407873 allocs/op
 BenchmarkUpdateState-12                 	    1858	    543258 ns/op	  192473 B/op	     490 allocs/op
 BenchmarkElementModificaton-12          	     350	   3136361 ns/op	  208985 B/op	     751 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	8.050s
+ok  	github.com/jobergner/backent-cli/examples/engine	8.050s
 
 # fix usage of putting slices of IDs - no performance improvement
 Di 22. Jun 20:57:47 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	     264	   4307761 ns/op	 1183230 B/op	   14788 allocs/op
 BenchmarkAssembleTree-12                	       1	1038205601 ns/op	274252776 B/op	 2808590 allocs/op
 BenchmarkEngine-12                      	       1	1234194028 ns/op	342681768 B/op	 3391739 allocs/op
 BenchmarkUpdateState-12                 	    2192	    542066 ns/op	  192449 B/op	     488 allocs/op
 BenchmarkElementModificaton-12          	     357	   3266508 ns/op	  203289 B/op	     676 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.347s
+ok  	github.com/jobergner/backent-cli/examples/engine	9.347s
 
 # improve assembling performance with assemble cache
 Mi 23. Jun 21:45:09 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	     273	   4394108 ns/op	 1211184 B/op	   14625 allocs/op
 BenchmarkAssembleTree-12                	     253	   4940437 ns/op	 1143410 B/op	   14001 allocs/op
 BenchmarkEngine-12                      	     487	   2118253 ns/op	  405891 B/op	    3915 allocs/op
 BenchmarkUpdateState-12                 	    1914	    536090 ns/op	  192996 B/op	     491 allocs/op
 BenchmarkElementModificaton-12          	     350	   3280246 ns/op	  203514 B/op	     667 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	9.537s
+ok  	github.com/jobergner/backent-cli/examples/engine	9.537s
 
 # remove BenchmarkElementModificaton as it's ns/op dependet on length of bench duration. Its actual performance is better represented in BenchmarkUpdateState 
 # replace tree walking with path building on element creation
 Do 24. Jun 13:31:47 CEST 2021
 goos: linux
 goarch: amd64
-pkg: github.com/Java-Jonas/bar-cli/examples/engine
+pkg: github.com/jobergner/backent-cli/examples/engine
 BenchmarkAssembleTreeForceInclude-12    	     370	   2923516 ns/op	  968984 B/op	    6575 allocs/op
 BenchmarkAssembleTree-12                	     342	   3464019 ns/op	  904554 B/op	    7646 allocs/op
 BenchmarkEngine-12                      	     628	   1673975 ns/op	  425770 B/op	    3136 allocs/op
 BenchmarkUpdateState-12                 	    1730	    607165 ns/op	  248083 B/op	     811 allocs/op
 PASS
-ok  	github.com/Java-Jonas/bar-cli/examples/engine	6.725s
+ok  	github.com/jobergner/backent-cli/examples/engine	6.725s

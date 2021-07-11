@@ -3,9 +3,9 @@ package serverfactory
 import (
 	"bytes"
 
-	. "github.com/Java-Jonas/bar-cli/factoryutils"
+	. "github.com/jobergner/backent-cli/factoryutils"
 
-	"github.com/Java-Jonas/bar-cli/ast"
+	"github.com/jobergner/backent-cli/ast"
 )
 
 type ServerFactory struct {

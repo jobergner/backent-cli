@@ -26,7 +26,7 @@ func staticServePath() string {
 	if *devModeFlag {
 		return "inspector/build"
 	}
-	return gopath() + "/src/github.com/Java-Jonas/bar-cli/inspector/build"
+	return gopath() + "/src/github.com/jobergner/backent-cli/inspector/build"
 }
 
 func gopath() string {

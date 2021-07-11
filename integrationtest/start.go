@@ -3,7 +3,7 @@ package integrationtest
 import (
 	"log"
 
-	"github.com/Java-Jonas/bar-cli/integrationtest/state"
+	"github.com/jobergner/backent-cli/integrationtest/state"
 )
 
 var playerID state.PlayerID

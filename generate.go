@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Java-Jonas/bar-cli/getstartedfactory"
+	"github.com/jobergner/backent-cli/getstartedfactory"
 )
 
 func generate() {

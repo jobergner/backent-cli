@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Java-Jonas/bar-cli/integrationtest/state"
+	"github.com/jobergner/backent-cli/integrationtest/state"
 
 	// "os"
 	"time"

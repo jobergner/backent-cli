@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Java-Jonas/bar-cli/enginefactory"
-	"github.com/Java-Jonas/bar-cli/serverfactory"
+	"github.com/jobergner/backent-cli/enginefactory"
+	"github.com/jobergner/backent-cli/serverfactory"
 
 	"bytes"
 )

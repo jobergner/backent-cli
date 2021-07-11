@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Java-Jonas/bar-cli/testutils"
+	"github.com/jobergner/backent-cli/testutils"
 )
 
 func TestWriteEngine(t *testing.T) {

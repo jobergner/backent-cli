@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Java-Jonas/bar-cli/factoryutils"
+	"github.com/jobergner/backent-cli/factoryutils"
 )
 
 var importedDirs = []string{
