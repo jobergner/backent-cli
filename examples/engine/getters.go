@@ -30,6 +30,10 @@ func (_player player) ID() PlayerID {
 	return _player.player.ID
 }
 
+func (_player player) Exists() (player, bool) {
+	return _player, _player.player.OperationKind != OperationKindDelete
+}
+
 func (_player player) Path() string {
 	return _player.player.Path
 }
@@ -115,6 +119,10 @@ func (_gearScore gearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }
 
+func (_gearScore gearScore) Exists() (gearScore, bool) {
+	return _gearScore, _gearScore.gearScore.OperationKind != OperationKindDelete
+}
+
 func (_gearScore gearScore) Path() string {
 	return _gearScore.gearScore.Path
 }
@@ -157,6 +165,10 @@ func (engine *Engine) Item(itemID ItemID) item {
 
 func (_item item) ID() ItemID {
 	return _item.item.ID
+}
+
+func (_item item) Exists() (item, bool) {
+	return _item, _item.item.OperationKind != OperationKindDelete
 }
 
 func (_item item) Path() string {
@@ -212,6 +224,10 @@ func (_position position) ID() PositionID {
 	return _position.position.ID
 }
 
+func (_position position) Exists() (position, bool) {
+	return _position, _position.position.OperationKind != OperationKindDelete
+}
+
 func (_position position) Path() string {
 	return _position.position.Path
 }
@@ -256,6 +272,10 @@ func (_zoneItem zoneItem) ID() ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }
 
+func (_zoneItem zoneItem) Exists() (zoneItem, bool) {
+	return _zoneItem, _zoneItem.zoneItem.OperationKind != OperationKindDelete
+}
+
 func (_zoneItem zoneItem) Path() string {
 	return _zoneItem.zoneItem.Path
 }
@@ -295,6 +315,10 @@ func (engine *Engine) Zone(zoneID ZoneID) zone {
 
 func (_zone zone) ID() ZoneID {
 	return _zone.zone.ID
+}
+
+func (_zone zone) Exists() (zone, bool) {
+	return _zone, _zone.zone.OperationKind != OperationKindDelete
 }
 
 func (_zone zone) Path() string {
@@ -398,6 +422,10 @@ func (engine *Engine) EquipmentSet(equipmentSetID EquipmentSetID) equipmentSet {
 
 func (_equipmentSet equipmentSet) ID() EquipmentSetID {
 	return _equipmentSet.equipmentSet.ID
+}
+
+func (_equipmentSet equipmentSet) Exists() (equipmentSet, bool) {
+	return _equipmentSet, _equipmentSet.equipmentSet.OperationKind != OperationKindDelete
 }
 
 func (_equipmentSet equipmentSet) Path() string {

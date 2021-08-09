@@ -21,6 +21,15 @@ func TestEngine(t *testing.T) {
 		_gearScore := se.GearScore(gearScore.ID())
 		assert.NotZero(t, _gearScore.ID())
 	})
+	t.Run("gets element and checks of they exist", func(t *testing.T) {
+		se := newEngine()
+		gearScore := se.CreateGearScore()
+		_, gearScoreExists := se.GearScore(gearScore.ID()).Exists()
+		assert.True(t, gearScoreExists)
+
+		_, itemExists := se.Item(ItemID(1)).Exists()
+		assert.False(t, itemExists)
+	})
 	t.Run("gets every element", func(t *testing.T) {
 		se := newEngine()
 		se.CreateGearScore()
