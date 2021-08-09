@@ -1979,6 +1979,10 @@ const _ID_player_func string = `func (_player player) ID() PlayerID {
 	return _player.player.ID
 }`
 
+const _Exists_player_func string = `func (_player player) Exists() (player, bool) {
+	return _player, _player.player.OperationKind != OperationKindDelete
+}`
+
 const _Path_player_func string = `func (_player player) Path() string {
 	return _player.player.Path
 }`
@@ -2064,6 +2068,10 @@ const _ID_gearScore_func string = `func (_gearScore gearScore) ID() GearScoreID 
 	return _gearScore.gearScore.ID
 }`
 
+const _Exists_gearScore_func string = `func (_gearScore gearScore) Exists() (gearScore, bool) {
+	return _gearScore, _gearScore.gearScore.OperationKind != OperationKindDelete
+}`
+
 const _Path_gearScore_func string = `func (_gearScore gearScore) Path() string {
 	return _gearScore.gearScore.Path
 }`
@@ -2106,6 +2114,10 @@ const _Item_Engine_func string = `func (engine *Engine) Item(itemID ItemID) item
 
 const _ID_item_func string = `func (_item item) ID() ItemID {
 	return _item.item.ID
+}`
+
+const _Exists_item_func string = `func (_item item) Exists() (item, bool) {
+	return _item, _item.item.OperationKind != OperationKindDelete
 }`
 
 const _Path_item_func string = `func (_item item) Path() string {
@@ -2162,6 +2174,10 @@ const _ID_position_func string = `func (_position position) ID() PositionID {
 	return _position.position.ID
 }`
 
+const _Exists_position_func string = `func (_position position) Exists() (position, bool) {
+	return _position, _position.position.OperationKind != OperationKindDelete
+}`
+
 const _Path_position_func string = `func (_position position) Path() string {
 	return _position.position.Path
 }`
@@ -2206,6 +2222,10 @@ const _ID_zoneItem_func string = `func (_zoneItem zoneItem) ID() ZoneItemID {
 	return _zoneItem.zoneItem.ID
 }`
 
+const _Exists_zoneItem_func string = `func (_zoneItem zoneItem) Exists() (zoneItem, bool) {
+	return _zoneItem, _zoneItem.zoneItem.OperationKind != OperationKindDelete
+}`
+
 const _Path_zoneItem_func string = `func (_zoneItem zoneItem) Path() string {
 	return _zoneItem.zoneItem.Path
 }`
@@ -2245,6 +2265,10 @@ const _Zone_Engine_func string = `func (engine *Engine) Zone(zoneID ZoneID) zone
 
 const _ID_zone_func string = `func (_zone zone) ID() ZoneID {
 	return _zone.zone.ID
+}`
+
+const _Exists_zone_func string = `func (_zone zone) Exists() (zone, bool) {
+	return _zone, _zone.zone.OperationKind != OperationKindDelete
 }`
 
 const _Path_zone_func string = `func (_zone zone) Path() string {
@@ -2348,6 +2372,10 @@ const _EquipmentSet_Engine_func string = `func (engine *Engine) EquipmentSet(equ
 
 const _ID_equipmentSet_func string = `func (_equipmentSet equipmentSet) ID() EquipmentSetID {
 	return _equipmentSet.equipmentSet.ID
+}`
+
+const _Exists_equipmentSet_func string = `func (_equipmentSet equipmentSet) Exists() (equipmentSet, bool) {
+	return _equipmentSet, _equipmentSet.equipmentSet.OperationKind != OperationKindDelete
 }`
 
 const _Path_equipmentSet_func string = `func (_equipmentSet equipmentSet) Path() string {

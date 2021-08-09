@@ -11,6 +11,10 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
+		ex := existsGetterWriter{
+			t: configType,
+		}
+		writeExistsGetter(&decls, ex)
 		e := everyTypeGetterWriter{
 			t: configType,
 		}
@@ -162,5 +166,11 @@ func writeTypeGetter(decls *DeclSet, t typeGetterWriter) {
 func writeIDGetter(decls *DeclSet, i idGetterWriter) {
 	decls.File.Func().Params(i.receiverParams()).Id(i.name()).Params().Id(i.returns()).Block(
 		Return(i.returnID()),
+	)
+}
+
+func writeExistsGetter(decls *DeclSet, e existsGetterWriter) {
+	decls.File.Func().Params(e.receiverParams()).Id("Exists").Params().Params(e.returnTypes()).Block(
+		Return(Id(e.receiverName()), e.isNotOperationKindDelete()),
 	)
 }
