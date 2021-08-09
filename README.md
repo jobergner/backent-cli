@@ -454,11 +454,12 @@ The value of every field can be retrieved by calling the name of the field. Give
 ```
 the values can be retrieved like this:
 ```golang
-house := engine.House(id)                  // house
-residents := house.Residents()             // []person
-address := house.Address()                 // address
-streetName := house.Address().StreetName() // string
-name := house.Residents()[0].Name()        // string
+house := engine.House(id)                      // house
+alsoHouse, exists := engine.House(id).Exists() // if you can not be sure wether the element exists you can check
+residents := house.Residents()                 // []person
+address := house.Address()                     // address
+streetName := house.Address().StreetName()     // string
+name := house.Residents()[0].Name()            // string
 ```
 In the case of a referenced value:
 ```JSON
