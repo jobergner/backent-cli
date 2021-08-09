@@ -7,6 +7,26 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
+type existsGetterWriter struct {
+	t ast.ConfigType
+}
+
+func (e existsGetterWriter) receiverName() string {
+	return "_" + e.t.Name
+}
+
+func (e existsGetterWriter) receiverParams() *Statement {
+	return Id(e.receiverName()).Id(e.t.Name)
+}
+
+func (e existsGetterWriter) returnTypes() (*Statement, *Statement) {
+	return Id(e.t.Name), Bool()
+}
+
+func (e existsGetterWriter) isNotOperationKindDelete() *Statement {
+	return Id(e.receiverName()).Dot(e.t.Name).Dot("OperationKind").Op("!=").Id("OperationKindDelete")
+}
+
 type everyTypeGetterWriter struct {
 	t ast.ConfigType
 }
