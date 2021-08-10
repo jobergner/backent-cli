@@ -1,31 +1,15 @@
+<p align="center">
+  <img width="280"  src="./assets/gopher.png">
+</p>
+
 # backent-cli
 backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts state changes of entities automatically.
+
 
 ## Installation
 ```
 go get -u github.com/jobergner/backent-cli
 ```
-
-# Jump right into Experimenting!
-Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
-```bash
-# set up directories
-mkdir backent_example; cd backent_example;
-go mod init backentexample;
-
-# generate the code
-backent-cli -example -out=./backent/ generate;
-
-# run and the server
-go run .;
-# in a different window run the inspector, then open http://localhost:3100/:
-backent-cli inspect;
-```
-The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
-
-![alt text](./assets/inspector.png)
-
-You can also inspect backent servers that are not running on port 3496 by using query parameters in the URL: `http://localhost:3100?port=8080`
 
 # A quick Example:
 ### Example `config.json`
@@ -65,6 +49,27 @@ func CreatePlayer(params state.ReceivedParams, engine *state.Engine) {
 
 }
 ```
+
+# Jump right into Experimenting!
+Explore backent-cli and its features with the Inspector and toy around until you feel comfortable. You may also want to explore the generated code itself!
+```bash
+# set up directories
+mkdir backent_example; cd backent_example;
+go mod init backentexample;
+
+# generate the code
+backent-cli -example -out=./backent/ generate;
+
+# run the server
+go run .;
+# in a different window run the inspector, then open http://localhost:3100/:
+backent-cli inspect;
+```
+The Inspector is a graphical user interface for you to run locally and inspect your backent-cli generated server's behaviour, or in this case an example server that backent-cli will set up for you.
+
+You can also inspect backent servers that are not running on port 3496 by using query parameters in the URL: `http://localhost:3100?port=8080`
+
+![alt text](./assets/inspector.png)
 
 # Overview
 When generating a server the console will output the content of a possible `main.go` file for you to copy and paste. You may then edit the actions and sideEffects.
