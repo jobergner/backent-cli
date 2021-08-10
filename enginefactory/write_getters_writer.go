@@ -24,7 +24,11 @@ func (e existsGetterWriter) returnTypes() (*Statement, *Statement) {
 }
 
 func (e existsGetterWriter) isNotOperationKindDelete() *Statement {
-	return Id(e.receiverName()).Dot(e.t.Name).Dot("OperationKind").Op("!=").Id("OperationKindDelete")
+	return Id(e.t.Name).Dot(e.t.Name).Dot("OperationKind").Op("!=").Id("OperationKindDelete")
+}
+
+func (e existsGetterWriter) reassignElement() *Statement {
+	return Id(e.t.Name).Op(":=").Id(e.receiverName()).Dot(e.t.Name).Dot("engine").Dot(Title(e.t.Name)).Call(Id(e.receiverName()).Dot(e.t.Name).Dot("ID"))
 }
 
 type everyTypeGetterWriter struct {
@@ -169,8 +173,6 @@ func (f fieldGetterWriter) returns() string {
 	returnedLiteral := f.returnedType()
 	if f.f.HasSliceValue {
 		return "[]" + returnedLiteral
-	} else if f.f.HasPointerValue {
-		return "(" + returnedLiteral + ", bool)"
 	}
 	return returnedLiteral
 }
@@ -230,11 +232,8 @@ func (f fieldGetterWriter) returnBasicType() *Statement {
 
 func (f fieldGetterWriter) returnNamedType() *Statement {
 	engine := Id(f.t.Name).Dot(f.t.Name).Dot("engine")
-	if f.f.HasPointerValue {
-		return engine.Dot(f.returnedType()).Call(Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))).Id(",").Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name)).Op("!=").Lit(0)
-	}
 	returnedType := f.returnedType()
-	if !f.f.HasAnyValue {
+	if !f.f.HasAnyValue && !f.f.HasPointerValue {
 		returnedType = Title(returnedType)
 	}
 	return engine.Dot(returnedType).Call(Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name)))

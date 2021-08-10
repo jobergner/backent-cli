@@ -15,12 +15,16 @@ func (r referenceWriter) receiverParams() *Statement {
 	return Id("_ref").Id(r.f.ValueTypeName)
 }
 
+func (r referenceWriter) returns() (*Statement, *Statement) {
+	return Id(r.f.ValueTypeName), Bool()
+}
+
 func (r referenceWriter) reassignRef() *Statement {
 	return Id("ref").Op(":=").Id("_ref").Dot(r.f.ValueTypeName).Dot("engine").Dot(r.f.ValueTypeName).Call(Id("_ref").Dot(r.f.ValueTypeName).Dot("ID"))
 }
 
 func (r referenceWriter) returnIsSet() *Statement {
-	return Return(Id("ref").Dot(r.f.ValueTypeName).Dot("ID")).Op("!=").Lit(0)
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("ID").Op("!=").Lit(0)
 }
 
 func (r referenceWriter) deleteSelf() *Statement {
