@@ -480,10 +480,10 @@ In the case of a referenced value:
 ```
 retrieve the values like this:
 ```golang
-menu := engine.Menu(id)                // menu
-dealRef, isSet := menu.TodaysDeal()    // reference object of dish, bool whether its set
-isSet = dealRef.IsSet()                // also bool whether its set
-deal := dealRef.Get()                  // dish
+menu := engine.Menu(id)                           // menu
+dealRef := menu.TodaysDeal()                      // reference object of dish, bool whether its set
+alsoDealRef, isSet := menu.TodaysDeal().IsSet()   // if you can not be sure wether the reference is set you can check
+deal := dealRef.Get()                             // dish
 ```
 
 In case of fields with `anyOf` types:
@@ -527,7 +527,7 @@ This can happen during the following curcumstances:
 ```golang
 foo := engine.Foo(123)           // foo with id 123 may not exist
 bam := foo.Bam()                 // bam may not be set
-balRef, isSet := foo.Bal()
+balRef := foo.Bal()
 bar := balRef.Bar()              // bal may be of type baz and not bar
 ```
 
@@ -604,15 +604,15 @@ Referenced values will come with additional setters when they are not part of a 
 ```golang
 chicken := engine.Chicken(id)
 friendlyChicken := engine.CreateChicken()
-_, isSet := chicken.BestFriend()               // false
+_, isSet := chicken.BestFriend().IsSet()       // false
 
 chicken.SetBestFriend(friendlyChicken.ID())    // sets the reference
 friendlyChickenRef, _ := chicken.BestFriend()  // the friendly chicken reference
-isSet := friendlyChickenRef.IsSet()            // true
+_, isSet := friendlyChickenRef.IsSet()         // true
 friendlyChicken := friendlyChickenRef.Get()    // the friendly chicken
 
 chicken.BestFriend().Unset()                   // unsets friendlyChicken as chicken's best friend
-isSet = friendlyChickenRef.IsSet()             // false
+_, isSet = friendlyChickenRef.IsSet()          // false
 ```
 Fields with `anyOf` values also have additional setters, when they are not references:
 ```JSON
