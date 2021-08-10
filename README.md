@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="280"  src="./assets/gopher.png">
+  <img width="260"  src="./assets/gopher.png">
 </p>
 
 # backent-cli

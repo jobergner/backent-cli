@@ -171,6 +171,7 @@ func writeIDGetter(decls *DeclSet, i idGetterWriter) {
 
 func writeExistsGetter(decls *DeclSet, e existsGetterWriter) {
 	decls.File.Func().Params(e.receiverParams()).Id("Exists").Params().Params(e.returnTypes()).Block(
-		Return(Id(e.receiverName()), e.isNotOperationKindDelete()),
+		e.reassignElement(),
+		Return(Id(e.t.Name), e.isNotOperationKindDelete()),
 	)
 }

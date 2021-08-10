@@ -16,9 +16,9 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 		}
 
 		if !field.HasSliceValue {
-			decls.File.Func().Params(r.receiverParams()).Id("IsSet").Params().Bool().Block(
+			decls.File.Func().Params(r.receiverParams()).Id("IsSet").Params().Params(r.returns()).Block(
 				r.reassignRef(),
-				r.returnIsSet(),
+				Return(Id("ref"), r.returnIsSet()),
 			)
 
 			decls.File.Func().Params(r.receiverParams()).Id("Unset").Params().Block(

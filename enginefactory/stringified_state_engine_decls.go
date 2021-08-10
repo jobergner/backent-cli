@@ -1980,16 +1980,17 @@ const _ID_player_func string = `func (_player player) ID() PlayerID {
 }`
 
 const _Exists_player_func string = `func (_player player) Exists() (player, bool) {
-	return _player, _player.player.OperationKind != OperationKindDelete
+	player := _player.player.engine.Player(_player.player.ID)
+	return player, player.player.OperationKind != OperationKindDelete
 }`
 
 const _Path_player_func string = `func (_player player) Path() string {
 	return _player.player.Path
 }`
 
-const _Target_player_func string = `func (_player player) Target() (playerTargetRef, bool) {
+const _Target_player_func string = `func (_player player) Target() playerTargetRef {
 	player := _player.player.engine.Player(_player.player.ID)
-	return player.player.engine.playerTargetRef(player.player.Target), player.player.Target != 0
+	return player.player.engine.playerTargetRef(player.player.Target)
 }`
 
 const _TargetedBy_player_func string = `func (_player player) TargetedBy() []playerTargetedByRef {
@@ -2069,7 +2070,8 @@ const _ID_gearScore_func string = `func (_gearScore gearScore) ID() GearScoreID 
 }`
 
 const _Exists_gearScore_func string = `func (_gearScore gearScore) Exists() (gearScore, bool) {
-	return _gearScore, _gearScore.gearScore.OperationKind != OperationKindDelete
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	return gearScore, gearScore.gearScore.OperationKind != OperationKindDelete
 }`
 
 const _Path_gearScore_func string = `func (_gearScore gearScore) Path() string {
@@ -2117,7 +2119,8 @@ const _ID_item_func string = `func (_item item) ID() ItemID {
 }`
 
 const _Exists_item_func string = `func (_item item) Exists() (item, bool) {
-	return _item, _item.item.OperationKind != OperationKindDelete
+	item := _item.item.engine.Item(_item.item.ID)
+	return item, item.item.OperationKind != OperationKindDelete
 }`
 
 const _Path_item_func string = `func (_item item) Path() string {
@@ -2134,9 +2137,9 @@ const _GearScore_item_func string = `func (_item item) GearScore() gearScore {
 	return item.item.engine.GearScore(item.item.GearScore)
 }`
 
-const _BoundTo_item_func string = `func (_item item) BoundTo() (itemBoundToRef, bool) {
+const _BoundTo_item_func string = `func (_item item) BoundTo() itemBoundToRef {
 	item := _item.item.engine.Item(_item.item.ID)
-	return item.item.engine.itemBoundToRef(item.item.BoundTo), item.item.BoundTo != 0
+	return item.item.engine.itemBoundToRef(item.item.BoundTo)
 }`
 
 const _Origin_item_func string = `func (_item item) Origin() anyOfPlayer_Position {
@@ -2175,7 +2178,8 @@ const _ID_position_func string = `func (_position position) ID() PositionID {
 }`
 
 const _Exists_position_func string = `func (_position position) Exists() (position, bool) {
-	return _position, _position.position.OperationKind != OperationKindDelete
+	position := _position.position.engine.Position(_position.position.ID)
+	return position, position.position.OperationKind != OperationKindDelete
 }`
 
 const _Path_position_func string = `func (_position position) Path() string {
@@ -2223,7 +2227,8 @@ const _ID_zoneItem_func string = `func (_zoneItem zoneItem) ID() ZoneItemID {
 }`
 
 const _Exists_zoneItem_func string = `func (_zoneItem zoneItem) Exists() (zoneItem, bool) {
-	return _zoneItem, _zoneItem.zoneItem.OperationKind != OperationKindDelete
+	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
+	return zoneItem, zoneItem.zoneItem.OperationKind != OperationKindDelete
 }`
 
 const _Path_zoneItem_func string = `func (_zoneItem zoneItem) Path() string {
@@ -2268,7 +2273,8 @@ const _ID_zone_func string = `func (_zone zone) ID() ZoneID {
 }`
 
 const _Exists_zone_func string = `func (_zone zone) Exists() (zone, bool) {
-	return _zone, _zone.zone.OperationKind != OperationKindDelete
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	return zone, zone.zone.OperationKind != OperationKindDelete
 }`
 
 const _Path_zone_func string = `func (_zone zone) Path() string {
@@ -2375,7 +2381,8 @@ const _ID_equipmentSet_func string = `func (_equipmentSet equipmentSet) ID() Equ
 }`
 
 const _Exists_equipmentSet_func string = `func (_equipmentSet equipmentSet) Exists() (equipmentSet, bool) {
-	return _equipmentSet, _equipmentSet.equipmentSet.OperationKind != OperationKindDelete
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	return equipmentSet, equipmentSet.equipmentSet.OperationKind != OperationKindDelete
 }`
 
 const _Path_equipmentSet_func string = `func (_equipmentSet equipmentSet) Path() string {
@@ -3505,9 +3512,9 @@ const equipmentSetEquipmentRefIDSlicePool_type string = `var equipmentSetEquipme
 	return make([]EquipmentSetEquipmentRefID, 0)
 }}`
 
-const _IsSet_itemBoundToRef_func string = `func (_ref itemBoundToRef) IsSet() bool {
+const _IsSet_itemBoundToRef_func string = `func (_ref itemBoundToRef) IsSet() (itemBoundToRef, bool) {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
-	return ref.itemBoundToRef.ID != 0
+	return ref, ref.itemBoundToRef.ID != 0
 }`
 
 const _Unset_itemBoundToRef_func string = `func (_ref itemBoundToRef) Unset() {
@@ -3542,9 +3549,9 @@ const _Get_equipmentSetEquipmentRef_func string = `func (_ref equipmentSetEquipm
 	return ref.equipmentSetEquipmentRef.engine.Item(ref.equipmentSetEquipmentRef.ReferencedElementID)
 }`
 
-const _IsSet_playerTargetRef_func string = `func (_ref playerTargetRef) IsSet() bool {
+const _IsSet_playerTargetRef_func string = `func (_ref playerTargetRef) IsSet() (playerTargetRef, bool) {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref.playerTargetRef.ID != 0
+	return ref, ref.playerTargetRef.ID != 0
 }`
 
 const _Unset_playerTargetRef_func string = `func (_ref playerTargetRef) Unset() {

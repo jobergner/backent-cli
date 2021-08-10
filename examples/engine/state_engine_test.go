@@ -29,6 +29,11 @@ func TestEngine(t *testing.T) {
 
 		_, itemExists := se.Item(ItemID(1)).Exists()
 		assert.False(t, itemExists)
+
+		player := se.CreatePlayer()
+		se.DeletePlayer(player.ID())
+		_, playerExists := player.Exists()
+		assert.False(t, playerExists)
 	})
 	t.Run("gets every element", func(t *testing.T) {
 		se := newEngine()
@@ -131,7 +136,7 @@ func TestReferences(t *testing.T) {
 		se.deletePlayer(player.ID())
 		_, ok := se.Patch.Item[item.ID()]
 		assert.True(t, ok)
-		_, isSet := se.Item(item.ID()).BoundTo()
+		_, isSet := se.Item(item.ID()).BoundTo().IsSet()
 		assert.False(t, isSet)
 	})
 	t.Run("deletes reference off element if referenced element gets deleted (3/3)", func(t *testing.T) {
@@ -941,7 +946,7 @@ func TestTree(t *testing.T) {
 
 				se.UpdateState()
 
-				ref, _ := item1.BoundTo()
+				ref, _ := item1.BoundTo().IsSet()
 				ref.Unset()
 
 				item2.SetBoundTo(player1.ID())

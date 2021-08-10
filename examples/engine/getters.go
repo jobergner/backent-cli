@@ -31,16 +31,17 @@ func (_player player) ID() PlayerID {
 }
 
 func (_player player) Exists() (player, bool) {
-	return _player, _player.player.OperationKind != OperationKindDelete
+	player := _player.player.engine.Player(_player.player.ID)
+	return player, player.player.OperationKind != OperationKindDelete
 }
 
 func (_player player) Path() string {
 	return _player.player.Path
 }
 
-func (_player player) Target() (playerTargetRef, bool) {
+func (_player player) Target() playerTargetRef {
 	player := _player.player.engine.Player(_player.player.ID)
-	return player.player.engine.playerTargetRef(player.player.Target), player.player.Target != 0
+	return player.player.engine.playerTargetRef(player.player.Target)
 }
 
 func (_player player) TargetedBy() []playerTargetedByRef {
@@ -120,7 +121,8 @@ func (_gearScore gearScore) ID() GearScoreID {
 }
 
 func (_gearScore gearScore) Exists() (gearScore, bool) {
-	return _gearScore, _gearScore.gearScore.OperationKind != OperationKindDelete
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	return gearScore, gearScore.gearScore.OperationKind != OperationKindDelete
 }
 
 func (_gearScore gearScore) Path() string {
@@ -168,7 +170,8 @@ func (_item item) ID() ItemID {
 }
 
 func (_item item) Exists() (item, bool) {
-	return _item, _item.item.OperationKind != OperationKindDelete
+	item := _item.item.engine.Item(_item.item.ID)
+	return item, item.item.OperationKind != OperationKindDelete
 }
 
 func (_item item) Path() string {
@@ -184,9 +187,9 @@ func (_item item) GearScore() gearScore {
 	return item.item.engine.GearScore(item.item.GearScore)
 }
 
-func (_item item) BoundTo() (itemBoundToRef, bool) {
+func (_item item) BoundTo() itemBoundToRef {
 	item := _item.item.engine.Item(_item.item.ID)
-	return item.item.engine.itemBoundToRef(item.item.BoundTo), item.item.BoundTo != 0
+	return item.item.engine.itemBoundToRef(item.item.BoundTo)
 }
 
 func (_item item) Origin() anyOfPlayer_Position {
@@ -225,7 +228,8 @@ func (_position position) ID() PositionID {
 }
 
 func (_position position) Exists() (position, bool) {
-	return _position, _position.position.OperationKind != OperationKindDelete
+	position := _position.position.engine.Position(_position.position.ID)
+	return position, position.position.OperationKind != OperationKindDelete
 }
 
 func (_position position) Path() string {
@@ -273,7 +277,8 @@ func (_zoneItem zoneItem) ID() ZoneItemID {
 }
 
 func (_zoneItem zoneItem) Exists() (zoneItem, bool) {
-	return _zoneItem, _zoneItem.zoneItem.OperationKind != OperationKindDelete
+	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
+	return zoneItem, zoneItem.zoneItem.OperationKind != OperationKindDelete
 }
 
 func (_zoneItem zoneItem) Path() string {
@@ -318,7 +323,8 @@ func (_zone zone) ID() ZoneID {
 }
 
 func (_zone zone) Exists() (zone, bool) {
-	return _zone, _zone.zone.OperationKind != OperationKindDelete
+	zone := _zone.zone.engine.Zone(_zone.zone.ID)
+	return zone, zone.zone.OperationKind != OperationKindDelete
 }
 
 func (_zone zone) Path() string {
@@ -425,7 +431,8 @@ func (_equipmentSet equipmentSet) ID() EquipmentSetID {
 }
 
 func (_equipmentSet equipmentSet) Exists() (equipmentSet, bool) {
-	return _equipmentSet, _equipmentSet.equipmentSet.OperationKind != OperationKindDelete
+	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
+	return equipmentSet, equipmentSet.equipmentSet.OperationKind != OperationKindDelete
 }
 
 func (_equipmentSet equipmentSet) Path() string {

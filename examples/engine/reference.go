@@ -1,8 +1,8 @@
 package state
 
-func (_ref itemBoundToRef) IsSet() bool {
+func (_ref itemBoundToRef) IsSet() (itemBoundToRef, bool) {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
-	return ref.itemBoundToRef.ID != 0
+	return ref, ref.itemBoundToRef.ID != 0
 }
 
 func (_ref itemBoundToRef) Unset() {
@@ -37,9 +37,9 @@ func (_ref equipmentSetEquipmentRef) Get() item {
 	return ref.equipmentSetEquipmentRef.engine.Item(ref.equipmentSetEquipmentRef.ReferencedElementID)
 }
 
-func (_ref playerTargetRef) IsSet() bool {
+func (_ref playerTargetRef) IsSet() (playerTargetRef, bool) {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref.playerTargetRef.ID != 0
+	return ref, ref.playerTargetRef.ID != 0
 }
 
 func (_ref playerTargetRef) Unset() {
