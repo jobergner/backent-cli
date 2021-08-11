@@ -43,6 +43,10 @@ func (s setterWriter) isOperationKindDelete() *Statement {
 	return Id(s.t.Name).Dot(s.t.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
+func (s setterWriter) valueHasNotChanged() *Statement {
+	return Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)).Op("==").Id(s.newValueParam())
+}
+
 func (s setterWriter) setAttribute() *Statement {
 	return Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)).Op("=").Id(s.newValueParam())
 }
@@ -110,6 +114,14 @@ func (s setRefFieldWeiter) isReferencedElementDeleted() *Statement {
 
 func (s setRefFieldWeiter) isRefAlreadyAssigned() *Statement {
 	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name)).Op("!=").Lit(0)
+}
+
+func (s setRefFieldWeiter) isSameID() *Statement {
+	id := Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(s.f.ValueTypeName).Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name))).Dot(s.f.ValueTypeName).Dot("ReferencedElementID")
+	if !s.f.HasAnyValue {
+		return id.Op("==").Id(s.idParam())
+	}
+	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(anyNameByField(s.f)).Call(id).Dot(anyNameByField(s.f)).Dot(Title(s.v.Name)).Op("==").Id(s.idParam())
 }
 
 func (s setRefFieldWeiter) deleteExistingRef() *Statement {
