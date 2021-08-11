@@ -64,6 +64,10 @@ func (d deleteTypeWriter) getElement() *Statement {
 	return Id(d.t.Name).Op(":=").Id("engine").Dot(Title(d.t.Name)).Call(Id(d.idParam())).Dot(d.t.Name)
 }
 
+func (d deleteTypeWriter) isOperationKindDelete() *Statement {
+	return Id(d.t.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
+}
+
 func (d deleteTypeWriter) setOperationKind() *Statement {
 	return Id(d.t.Name).Dot("OperationKind").Op("=").Id("OperationKindDelete")
 }
@@ -135,6 +139,10 @@ func (d deleteGeneratedTypeWriter) params() *Statement {
 
 func (d deleteGeneratedTypeWriter) getElement() *Statement {
 	return Id(d.valueTypeName()).Op(":=").Id("engine").Dot(d.valueTypeName()).Call(Id(d.idParam())).Dot(d.valueTypeName())
+}
+
+func (d deleteGeneratedTypeWriter) isOperationKindDelete() *Statement {
+	return Id(d.valueTypeName()).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
 func (d deleteGeneratedTypeWriter) deleteChild() *Statement {

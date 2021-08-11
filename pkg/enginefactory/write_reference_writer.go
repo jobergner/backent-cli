@@ -23,6 +23,10 @@ func (r referenceWriter) reassignRef() *Statement {
 	return Id("ref").Op(":=").Id("_ref").Dot(r.f.ValueTypeName).Dot("engine").Dot(r.f.ValueTypeName).Call(Id("_ref").Dot(r.f.ValueTypeName).Dot("ID"))
 }
 
+func (r referenceWriter) isOperationKindDelete() *Statement {
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("OperationKind").Op("==").Id("OperationKindDelete")
+}
+
 func (r referenceWriter) returnIsSet() *Statement {
 	return Id("ref").Dot(r.f.ValueTypeName).Dot("ID").Op("!=").Lit(0)
 }

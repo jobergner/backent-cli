@@ -33,20 +33,28 @@ func (a anySetterWriter) wrapperReceiverParams() *Statement {
 	return Id("_any").Id(anyNameByField(a.f))
 }
 
+func (a anySetterWriter) reassignAnyContainerWrapper() *Statement {
+	return Id("any").Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot(anyNameByField(a.f)).Call(Id("_any").Dot(anyNameByField(a.f)).Dot("ID"))
+}
+
 func (a anySetterWriter) isAlreadyRequestedElement() *Statement {
-	return Id("_any").Dot(anyNameByField(a.f)).Dot("ElementKind").Op("==").Id("ElementKind" + Title(a.v.Name))
+	return Id("any").Dot(anyNameByField(a.f)).Dot("ElementKind").Op("==").Id("ElementKind" + Title(a.v.Name))
+}
+
+func (a anySetterWriter) isOperationKindDelete() *Statement {
+	return Id("any").Dot(anyNameByField(a.f)).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
 func (a anySetterWriter) currentElement() *Statement {
-	return Id("_any").Dot(Title(a.v.Name)).Call()
+	return Id("any").Dot(Title(a.v.Name)).Call()
 }
 
 func (a anySetterWriter) createChild() *Statement {
-	return Id(a.v.Name).Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id("_any").Dot(anyNameByField(a.f)).Dot("ChildElementPath"), False())
+	return Id(a.v.Name).Op(":=").Id("any").Dot(anyNameByField(a.f)).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id("any").Dot(anyNameByField(a.f)).Dot("ChildElementPath"), False())
 }
 
 func (a anySetterWriter) callSetter() *Statement {
-	return Id("_any").Dot(anyNameByField(a.f)).Dot("set"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
+	return Id("any").Dot(anyNameByField(a.f)).Dot("set"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
 }
 
 func (a anySetterWriter) receiverParams() *Statement {

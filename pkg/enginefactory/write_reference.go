@@ -23,6 +23,9 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 
 			decls.File.Func().Params(r.receiverParams()).Id("Unset").Params().Block(
 				r.reassignRef(),
+				If(r.isOperationKindDelete()).Block(
+					Return(),
+				),
 				r.deleteSelf(),
 				r.declareParent(),
 				If(r.parentIsDeleted()).Block(

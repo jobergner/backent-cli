@@ -61,6 +61,20 @@ func (a adderWriter) referencedElementDoesntExist() *Statement {
 	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(Title(a.v.Name)).Call(Id(a.idParam())).Dot(a.v.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
+func (a adderWriter) returnIfReferencedElementIsAlreadyReferenced() *Statement {
+	returnCondition := Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(a.idParam())
+	if a.f.HasAnyValue {
+		returnCondition = Id("anyContainer").Dot(anyNameByField(a.f)).Dot(Title(a.v.Name)).Op("==").Id(a.idParam())
+	}
+	return For(List(Id("_"), Id("currentRefID")).Op(":=").Range().Id(a.t.Name).Dot(a.t.Name).Dot(Title(a.f.Name))).Block(
+		Id("currentRef").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(a.f.ValueTypeName).Call(Id("currentRefID")),
+		OnlyIf(a.f.HasAnyValue, Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(anyNameByField(a.f)).Call(Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID"))),
+		If(returnCondition).Block(
+			Return(),
+		),
+	)
+}
+
 func (a adderWriter) returnDeletedElement() *Statement {
 	if a.v.IsBasicType || a.f.HasPointerValue {
 		return Empty()

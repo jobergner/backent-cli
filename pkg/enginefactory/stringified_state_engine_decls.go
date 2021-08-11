@@ -98,6 +98,12 @@ const _AddGuildMember_player_func string = `func (_player player) AddGuildMember
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return
 	}
+	for _, currentRefID := range player.player.GuildMembers {
+		currentRef := player.player.engine.playerGuildMemberRef(currentRefID)
+		if currentRef.playerGuildMemberRef.ReferencedElementID == playerID {
+			return
+		}
+	}
 	ref := player.player.engine.createPlayerGuildMemberRef(playerID, player.player.ID)
 	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
@@ -111,6 +117,13 @@ const _AddTargetedByPlayer_player_func string = `func (_player player) AddTarget
 	}
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return
+	}
+	for _, currentRefID := range player.player.TargetedBy {
+		currentRef := player.player.engine.playerTargetedByRef(currentRefID)
+		anyContainer := player.player.engine.anyOfPlayer_ZoneItem(currentRef.playerTargetedByRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
+			return
+		}
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
 	anyContainer.setPlayer(playerID, false)
@@ -128,6 +141,13 @@ const _AddTargetedByZoneItem_player_func string = `func (_player player) AddTarg
 	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
 		return
 	}
+	for _, currentRefID := range player.player.TargetedBy {
+		currentRef := player.player.engine.playerTargetedByRef(currentRefID)
+		anyContainer := player.player.engine.anyOfPlayer_ZoneItem(currentRef.playerTargetedByRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
+			return
+		}
+	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
 	anyContainer.setZoneItem(zoneItemID, false)
 	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
@@ -144,6 +164,12 @@ const _AddEquipmentSet_player_func string = `func (_player player) AddEquipmentS
 	if player.player.engine.EquipmentSet(equipmentSetID).equipmentSet.OperationKind == OperationKindDelete {
 		return
 	}
+	for _, currentRefID := range player.player.EquipmentSets {
+		currentRef := player.player.engine.playerEquipmentSetRef(currentRefID)
+		if currentRef.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
+			return
+		}
+	}
 	ref := player.player.engine.createPlayerEquipmentSetRef(equipmentSetID, player.player.ID)
 	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
@@ -157,6 +183,12 @@ const _AddEquipment_equipmentSet_func string = `func (_equipmentSet equipmentSet
 	}
 	if equipmentSet.equipmentSet.engine.Item(itemID).item.OperationKind == OperationKindDelete {
 		return
+	}
+	for _, currentRefID := range equipmentSet.equipmentSet.Equipment {
+		currentRef := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(currentRefID)
+		if currentRef.equipmentSetEquipmentRef.ReferencedElementID == itemID {
+			return
+		}
 	}
 	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(itemID, equipmentSet.equipmentSet.ID)
 	equipmentSet.equipmentSet.Equipment = append(equipmentSet.equipmentSet.Equipment, ref.ID)
@@ -225,11 +257,12 @@ const _Kind_anyOfPlayer_ZoneItem_func string = `func (_any anyOfPlayer_ZoneItem)
 }`
 
 const _SetZoneItem_anyOfPlayer_ZoneItem_func string = `func (_any anyOfPlayer_ZoneItem) SetZoneItem() zoneItem {
-	if _any.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-		return _any.ZoneItem()
+	any := _any.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_any.anyOfPlayer_ZoneItem.ID)
+	if any.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem || any.anyOfPlayer_ZoneItem.OperationKind == OperationKindDelete {
+		return any.ZoneItem()
 	}
-	zoneItem := _any.anyOfPlayer_ZoneItem.engine.createZoneItem(_any.anyOfPlayer_ZoneItem.ChildElementPath, false)
-	_any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID(), true)
+	zoneItem := any.anyOfPlayer_ZoneItem.engine.createZoneItem(any.anyOfPlayer_ZoneItem.ChildElementPath, false)
+	any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID(), true)
 	return zoneItem
 }`
 
@@ -247,11 +280,12 @@ const setZoneItem_anyOfPlayer_ZoneItemCore_func string = `func (_any anyOfPlayer
 }`
 
 const _SetPlayer_anyOfPlayer_ZoneItem_func string = `func (_any anyOfPlayer_ZoneItem) SetPlayer() player {
-	if _any.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-		return _any.Player()
+	any := _any.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_any.anyOfPlayer_ZoneItem.ID)
+	if any.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer || any.anyOfPlayer_ZoneItem.OperationKind == OperationKindDelete {
+		return any.Player()
 	}
-	player := _any.anyOfPlayer_ZoneItem.engine.createPlayer(_any.anyOfPlayer_ZoneItem.ChildElementPath, false)
-	_any.anyOfPlayer_ZoneItem.setPlayer(player.ID(), true)
+	player := any.anyOfPlayer_ZoneItem.engine.createPlayer(any.anyOfPlayer_ZoneItem.ChildElementPath, false)
+	any.anyOfPlayer_ZoneItem.setPlayer(player.ID(), true)
 	return player
 }`
 
@@ -284,11 +318,12 @@ const _Kind_anyOfPlayer_Position_func string = `func (_any anyOfPlayer_Position)
 }`
 
 const _SetPosition_anyOfPlayer_Position_func string = `func (_any anyOfPlayer_Position) SetPosition() position {
-	if _any.anyOfPlayer_Position.ElementKind == ElementKindPosition {
-		return _any.Position()
+	any := _any.anyOfPlayer_Position.engine.anyOfPlayer_Position(_any.anyOfPlayer_Position.ID)
+	if any.anyOfPlayer_Position.ElementKind == ElementKindPosition || any.anyOfPlayer_Position.OperationKind == OperationKindDelete {
+		return any.Position()
 	}
-	position := _any.anyOfPlayer_Position.engine.createPosition(_any.anyOfPlayer_Position.ChildElementPath, false)
-	_any.anyOfPlayer_Position.setPosition(position.ID(), true)
+	position := any.anyOfPlayer_Position.engine.createPosition(any.anyOfPlayer_Position.ChildElementPath, false)
+	any.anyOfPlayer_Position.setPosition(position.ID(), true)
 	return position
 }`
 
@@ -316,11 +351,12 @@ const deleteChild_anyOfPlayer_PositionCore_func string = `func (_any anyOfPlayer
 }`
 
 const _SetPlayer_anyOfPlayer_Position_func string = `func (_any anyOfPlayer_Position) SetPlayer() player {
-	if _any.anyOfPlayer_Position.ElementKind == ElementKindPlayer {
-		return _any.Player()
+	any := _any.anyOfPlayer_Position.engine.anyOfPlayer_Position(_any.anyOfPlayer_Position.ID)
+	if any.anyOfPlayer_Position.ElementKind == ElementKindPlayer || any.anyOfPlayer_Position.OperationKind == OperationKindDelete {
+		return any.Player()
 	}
-	player := _any.anyOfPlayer_Position.engine.createPlayer(_any.anyOfPlayer_Position.ChildElementPath, false)
-	_any.anyOfPlayer_Position.setPlayer(player.ID(), true)
+	player := any.anyOfPlayer_Position.engine.createPlayer(any.anyOfPlayer_Position.ChildElementPath, false)
+	any.anyOfPlayer_Position.setPlayer(player.ID(), true)
 	return player
 }`
 
@@ -343,11 +379,12 @@ const _Kind_anyOfItem_Player_ZoneItem_func string = `func (_any anyOfItem_Player
 }`
 
 const _SetZoneItem_anyOfItem_Player_ZoneItem_func string = `func (_any anyOfItem_Player_ZoneItem) SetZoneItem() zoneItem {
-	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindZoneItem {
-		return _any.ZoneItem()
+	any := _any.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_any.anyOfItem_Player_ZoneItem.ID)
+	if any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindZoneItem || any.anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
+		return any.ZoneItem()
 	}
-	zoneItem := _any.anyOfItem_Player_ZoneItem.engine.createZoneItem(_any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
-	_any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID(), true)
+	zoneItem := any.anyOfItem_Player_ZoneItem.engine.createZoneItem(any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID(), true)
 	return zoneItem
 }`
 
@@ -369,11 +406,12 @@ const setZoneItem_anyOfItem_Player_ZoneItemCore_func string = `func (_any anyOfI
 }`
 
 const _SetPlayer_anyOfItem_Player_ZoneItem_func string = `func (_any anyOfItem_Player_ZoneItem) SetPlayer() player {
-	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindPlayer {
-		return _any.Player()
+	any := _any.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_any.anyOfItem_Player_ZoneItem.ID)
+	if any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindPlayer || any.anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
+		return any.Player()
 	}
-	player := _any.anyOfItem_Player_ZoneItem.engine.createPlayer(_any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
-	_any.anyOfItem_Player_ZoneItem.setPlayer(player.ID(), true)
+	player := any.anyOfItem_Player_ZoneItem.engine.createPlayer(any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	any.anyOfItem_Player_ZoneItem.setPlayer(player.ID(), true)
 	return player
 }`
 
@@ -395,11 +433,12 @@ const setPlayer_anyOfItem_Player_ZoneItemCore_func string = `func (_any anyOfIte
 }`
 
 const _SetItem_anyOfItem_Player_ZoneItem_func string = `func (_any anyOfItem_Player_ZoneItem) SetItem() item {
-	if _any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindItem {
-		return _any.Item()
+	any := _any.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_any.anyOfItem_Player_ZoneItem.ID)
+	if any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindItem || any.anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
+		return any.Item()
 	}
-	item := _any.anyOfItem_Player_ZoneItem.engine.createItem(_any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
-	_any.anyOfItem_Player_ZoneItem.setItem(item.ID(), true)
+	item := any.anyOfItem_Player_ZoneItem.engine.createItem(any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	any.anyOfItem_Player_ZoneItem.setItem(item.ID(), true)
 	return item
 }`
 
@@ -1700,6 +1739,9 @@ const _DeletePlayer_Engine_func string = `func (engine *Engine) DeletePlayer(pla
 
 const deletePlayer_Engine_func string = `func (engine *Engine) deletePlayer(playerID PlayerID) {
 	player := engine.Player(playerID).player
+	if player.OperationKind == OperationKindDelete {
+		return
+	}
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferencePlayerTargetRefsPlayer(playerID)
@@ -1737,6 +1779,9 @@ const _DeleteGearScore_Engine_func string = `func (engine *Engine) DeleteGearSco
 
 const deleteGearScore_Engine_func string = `func (engine *Engine) deleteGearScore(gearScoreID GearScoreID) {
 	gearScore := engine.GearScore(gearScoreID).gearScore
+	if gearScore.OperationKind == OperationKindDelete {
+		return
+	}
 	if _, ok := engine.State.GearScore[gearScoreID]; ok {
 		gearScore.OperationKind = OperationKindDelete
 		engine.Patch.GearScore[gearScore.ID] = gearScore
@@ -1755,6 +1800,9 @@ const _DeletePosition_Engine_func string = `func (engine *Engine) DeletePosition
 
 const deletePosition_Engine_func string = `func (engine *Engine) deletePosition(positionID PositionID) {
 	position := engine.Position(positionID).position
+	if position.OperationKind == OperationKindDelete {
+		return
+	}
 	if _, ok := engine.State.Position[positionID]; ok {
 		position.OperationKind = OperationKindDelete
 		engine.Patch.Position[position.ID] = position
@@ -1773,6 +1821,9 @@ const _DeleteItem_Engine_func string = `func (engine *Engine) DeleteItem(itemID 
 
 const deleteItem_Engine_func string = `func (engine *Engine) deleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
+	if item.OperationKind == OperationKindDelete {
+		return
+	}
 	engine.dereferenceEquipmentSetEquipmentRefs(itemID)
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
@@ -1795,6 +1846,9 @@ const _DeleteZoneItem_Engine_func string = `func (engine *Engine) DeleteZoneItem
 
 const deleteZoneItem_Engine_func string = `func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	zoneItem := engine.ZoneItem(zoneItemID).zoneItem
+	if zoneItem.OperationKind == OperationKindDelete {
+		return
+	}
 	engine.dereferencePlayerTargetRefsZoneItem(zoneItemID)
 	engine.dereferencePlayerTargetedByRefsZoneItem(zoneItemID)
 	engine.deleteItem(zoneItem.Item)
@@ -1813,6 +1867,9 @@ const _DeleteZone_Engine_func string = `func (engine *Engine) DeleteZone(zoneID 
 
 const deleteZone_Engine_func string = `func (engine *Engine) deleteZone(zoneID ZoneID) {
 	zone := engine.Zone(zoneID).zone
+	if zone.OperationKind == OperationKindDelete {
+		return
+	}
 	for _, interactableID := range zone.Interactables {
 		engine.deleteAnyOfItem_Player_ZoneItem(interactableID, true)
 	}
@@ -1836,6 +1893,9 @@ const _DeleteEquipmentSet_Engine_func string = `func (engine *Engine) DeleteEqui
 
 const deleteEquipmentSet_Engine_func string = `func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	equipmentSet := engine.EquipmentSet(equipmentSetID).equipmentSet
+	if equipmentSet.OperationKind == OperationKindDelete {
+		return
+	}
 	engine.dereferencePlayerEquipmentSetRefs(equipmentSetID)
 	for _, equipmentID := range equipmentSet.Equipment {
 		engine.deleteEquipmentSetEquipmentRef(equipmentID)
@@ -1850,6 +1910,9 @@ const deleteEquipmentSet_Engine_func string = `func (engine *Engine) deleteEquip
 
 const deletePlayerGuildMemberRef_Engine_func string = `func (engine *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGuildMemberRefID) {
 	playerGuildMemberRef := engine.playerGuildMemberRef(playerGuildMemberRefID).playerGuildMemberRef
+	if playerGuildMemberRef.OperationKind == OperationKindDelete {
+		return
+	}
 	if _, ok := engine.State.PlayerGuildMemberRef[playerGuildMemberRefID]; ok {
 		playerGuildMemberRef.OperationKind = OperationKindDelete
 		engine.Patch.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
@@ -1860,6 +1923,9 @@ const deletePlayerGuildMemberRef_Engine_func string = `func (engine *Engine) del
 
 const deletePlayerEquipmentSetRef_Engine_func string = `func (engine *Engine) deletePlayerEquipmentSetRef(playerEquipmentSetRefID PlayerEquipmentSetRefID) {
 	playerEquipmentSetRef := engine.playerEquipmentSetRef(playerEquipmentSetRefID).playerEquipmentSetRef
+	if playerEquipmentSetRef.OperationKind == OperationKindDelete {
+		return
+	}
 	if _, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]; ok {
 		playerEquipmentSetRef.OperationKind = OperationKindDelete
 		engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
@@ -1870,6 +1936,9 @@ const deletePlayerEquipmentSetRef_Engine_func string = `func (engine *Engine) de
 
 const deleteItemBoundToRef_Engine_func string = `func (engine *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
 	itemBoundToRef := engine.itemBoundToRef(itemBoundToRefID).itemBoundToRef
+	if itemBoundToRef.OperationKind == OperationKindDelete {
+		return
+	}
 	if _, ok := engine.State.ItemBoundToRef[itemBoundToRefID]; ok {
 		itemBoundToRef.OperationKind = OperationKindDelete
 		engine.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
@@ -1880,6 +1949,9 @@ const deleteItemBoundToRef_Engine_func string = `func (engine *Engine) deleteIte
 
 const deleteEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) {
 	equipmentSetEquipmentRef := engine.equipmentSetEquipmentRef(equipmentSetEquipmentRefID).equipmentSetEquipmentRef
+	if equipmentSetEquipmentRef.OperationKind == OperationKindDelete {
+		return
+	}
 	if _, ok := engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]; ok {
 		equipmentSetEquipmentRef.OperationKind = OperationKindDelete
 		engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
@@ -1890,6 +1962,9 @@ const deleteEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine)
 
 const deletePlayerTargetRef_Engine_func string = `func (engine *Engine) deletePlayerTargetRef(playerTargetRefID PlayerTargetRefID) {
 	playerTargetRef := engine.playerTargetRef(playerTargetRefID).playerTargetRef
+	if playerTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
 	engine.deleteAnyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID, false)
 	if _, ok := engine.State.PlayerTargetRef[playerTargetRefID]; ok {
 		playerTargetRef.OperationKind = OperationKindDelete
@@ -1901,6 +1976,9 @@ const deletePlayerTargetRef_Engine_func string = `func (engine *Engine) deletePl
 
 const deletePlayerTargetedByRef_Engine_func string = `func (engine *Engine) deletePlayerTargetedByRef(playerTargetedByRefID PlayerTargetedByRefID) {
 	playerTargetedByRef := engine.playerTargetedByRef(playerTargetedByRefID).playerTargetedByRef
+	if playerTargetedByRef.OperationKind == OperationKindDelete {
+		return
+	}
 	engine.deleteAnyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID, false)
 	if _, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]; ok {
 		playerTargetedByRef.OperationKind = OperationKindDelete
@@ -1912,6 +1990,9 @@ const deletePlayerTargetedByRef_Engine_func string = `func (engine *Engine) dele
 
 const deleteAnyOfPlayer_ZoneItem_Engine_func string = `func (engine *Engine) deleteAnyOfPlayer_ZoneItem(anyOfPlayer_ZoneItemID AnyOfPlayer_ZoneItemID, deleteChild bool) {
 	anyOfPlayer_ZoneItem := engine.anyOfPlayer_ZoneItem(anyOfPlayer_ZoneItemID).anyOfPlayer_ZoneItem
+	if anyOfPlayer_ZoneItem.OperationKind == OperationKindDelete {
+		return
+	}
 	if deleteChild {
 		anyOfPlayer_ZoneItem.deleteChild()
 	}
@@ -1925,6 +2006,9 @@ const deleteAnyOfPlayer_ZoneItem_Engine_func string = `func (engine *Engine) del
 
 const deleteAnyOfPlayer_Position_Engine_func string = `func (engine *Engine) deleteAnyOfPlayer_Position(anyOfPlayer_PositionID AnyOfPlayer_PositionID, deleteChild bool) {
 	anyOfPlayer_Position := engine.anyOfPlayer_Position(anyOfPlayer_PositionID).anyOfPlayer_Position
+	if anyOfPlayer_Position.OperationKind == OperationKindDelete {
+		return
+	}
 	if deleteChild {
 		anyOfPlayer_Position.deleteChild()
 	}
@@ -1938,6 +2022,9 @@ const deleteAnyOfPlayer_Position_Engine_func string = `func (engine *Engine) del
 
 const deleteAnyOfItem_Player_ZoneItem_Engine_func string = `func (engine *Engine) deleteAnyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID AnyOfItem_Player_ZoneItemID, deleteChild bool) {
 	anyOfItem_Player_ZoneItem := engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID).anyOfItem_Player_ZoneItem
+	if anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
+		return
+	}
 	if deleteChild {
 		anyOfItem_Player_ZoneItem.deleteChild()
 	}
@@ -3519,6 +3606,9 @@ const _IsSet_itemBoundToRef_func string = `func (_ref itemBoundToRef) IsSet() (i
 
 const _Unset_itemBoundToRef_func string = `func (_ref itemBoundToRef) Unset() {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
+	if ref.itemBoundToRef.OperationKind == OperationKindDelete {
+		return
+	}
 	ref.itemBoundToRef.engine.deleteItemBoundToRef(ref.itemBoundToRef.ID)
 	parent := ref.itemBoundToRef.engine.Item(ref.itemBoundToRef.ParentID).item
 	if parent.OperationKind == OperationKindDelete {
@@ -3556,6 +3646,9 @@ const _IsSet_playerTargetRef_func string = `func (_ref playerTargetRef) IsSet() 
 
 const _Unset_playerTargetRef_func string = `func (_ref playerTargetRef) Unset() {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
+	if ref.playerTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
 	ref.playerTargetRef.engine.deletePlayerTargetRef(ref.playerTargetRef.ID)
 	parent := ref.playerTargetRef.engine.Player(ref.playerTargetRef.ParentID).player
 	if parent.OperationKind == OperationKindDelete {
