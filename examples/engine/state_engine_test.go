@@ -643,7 +643,6 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				player := se.CreatePlayer()
-				player.AddGuildMember(player.ID())
 
 				se.UpdateState()
 
