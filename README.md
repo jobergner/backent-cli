@@ -979,12 +979,6 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
-- return for `deleters` when entity does not exist
-- return for `Unset` when reference is not set
-- return for `Set<Type>` when anyOf container does not exist
-- return for `Add<TypeReference>` when reference already is set
-- return for `Set<Reference>` when the entity is already referencing this id 
-- setters to return if new value == current value so no change is triggered (`Unset`, !!NOT!! `Set<Type>` (already in place), all normal `setters`)
 - documentation
 
 - build fails because of required modules from github. what do? (cant reproduce)

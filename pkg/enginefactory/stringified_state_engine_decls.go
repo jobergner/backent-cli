@@ -4157,6 +4157,9 @@ const _SetLevel_gearScore_func string = `func (_gearScore gearScore) SetLevel(ne
 	if gearScore.gearScore.OperationKind == OperationKindDelete {
 		return gearScore
 	}
+	if gearScore.gearScore.Level == newLevel {
+		return gearScore
+	}
 	gearScore.gearScore.Level = newLevel
 	gearScore.gearScore.OperationKind = OperationKindUpdate
 	gearScore.gearScore.engine.Patch.GearScore[gearScore.gearScore.ID] = gearScore.gearScore
@@ -4166,6 +4169,9 @@ const _SetLevel_gearScore_func string = `func (_gearScore gearScore) SetLevel(ne
 const _SetScore_gearScore_func string = `func (_gearScore gearScore) SetScore(newScore int) gearScore {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind == OperationKindDelete {
+		return gearScore
+	}
+	if gearScore.gearScore.Score == newScore {
 		return gearScore
 	}
 	gearScore.gearScore.Score = newScore
@@ -4179,6 +4185,9 @@ const _SetX_position_func string = `func (_position position) SetX(newX float64)
 	if position.position.OperationKind == OperationKindDelete {
 		return position
 	}
+	if position.position.X == newX {
+		return position
+	}
 	position.position.X = newX
 	position.position.OperationKind = OperationKindUpdate
 	position.position.engine.Patch.Position[position.position.ID] = position.position
@@ -4190,6 +4199,9 @@ const _SetY_position_func string = `func (_position position) SetY(newY float64)
 	if position.position.OperationKind == OperationKindDelete {
 		return position
 	}
+	if position.position.Y == newY {
+		return position
+	}
 	position.position.Y = newY
 	position.position.OperationKind = OperationKindUpdate
 	position.position.engine.Patch.Position[position.position.ID] = position.position
@@ -4199,6 +4211,9 @@ const _SetY_position_func string = `func (_position position) SetY(newY float64)
 const _SetName_item_func string = `func (_item item) SetName(newName string) item {
 	item := _item.item.engine.Item(_item.item.ID)
 	if item.item.OperationKind == OperationKindDelete {
+		return item
+	}
+	if item.item.Name == newName {
 		return item
 	}
 	item.item.Name = newName
@@ -4213,6 +4228,9 @@ const _SetBoundTo_item_func string = `func (_item item) SetBoundTo(playerID Play
 		return item
 	}
 	if item.item.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return item
+	}
+	if item.item.engine.itemBoundToRef(item.item.BoundTo).itemBoundToRef.ReferencedElementID == playerID {
 		return item
 	}
 	if item.item.BoundTo != 0 {
@@ -4230,6 +4248,9 @@ const _SetName_equipmentSet_func string = `func (_equipmentSet equipmentSet) Set
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
 	}
+	if equipmentSet.equipmentSet.Name == newName {
+		return equipmentSet
+	}
 	equipmentSet.equipmentSet.Name = newName
 	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
@@ -4242,6 +4263,9 @@ const _SetTargetPlayer_player_func string = `func (_player player) SetTargetPlay
 		return player
 	}
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.engine.anyOfPlayer_ZoneItem(player.player.engine.playerTargetRef(player.player.Target).playerTargetRef.ReferencedElementID).anyOfPlayer_ZoneItem.Player == playerID {
 		return player
 	}
 	if player.player.Target != 0 {
@@ -4262,6 +4286,9 @@ const _SetTargetZoneItem_player_func string = `func (_player player) SetTargetZo
 		return player
 	}
 	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
+		return player
+	}
+	if player.player.engine.anyOfPlayer_ZoneItem(player.player.engine.playerTargetRef(player.player.Target).playerTargetRef.ReferencedElementID).anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
 		return player
 	}
 	if player.player.Target != 0 {

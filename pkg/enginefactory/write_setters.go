@@ -26,6 +26,9 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 				If(s.isOperationKindDelete()).Block(
 					Return(Id(configType.Name)),
 				),
+				If(s.valueHasNotChanged()).Block(
+					Return(Id(configType.Name)),
+				),
 				s.setAttribute(),
 				s.setOperationKind(),
 				s.updateElementInPatch(),
@@ -51,6 +54,9 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 					Return(Id(field.Parent.Name)),
 				),
 				If(s.isReferencedElementDeleted()).Block(
+					Return(Id(field.Parent.Name)),
+				),
+				If(s.isSameID()).Block(
 					Return(Id(field.Parent.Name)),
 				),
 				If(s.isRefAlreadyAssigned()).Block(

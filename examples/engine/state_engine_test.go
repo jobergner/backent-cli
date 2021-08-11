@@ -205,6 +205,14 @@ func TestUpdateState(t *testing.T) {
 		_, ok := se.Patch.GearScore[gearScore.ID()]
 		assert.False(t, ok)
 	})
+	t.Run("does not set elements when value has not changed", func(t *testing.T) {
+		se := newEngine()
+		gearScore := se.CreateGearScore().SetLevel(1)
+		se.UpdateState()
+		gearScore.SetLevel(1)
+		_, ok := se.Patch.GearScore[gearScore.ID()]
+		assert.False(t, ok)
+	})
 	t.Run("deletes elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
