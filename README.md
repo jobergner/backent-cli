@@ -979,12 +979,16 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
-- entity, exists := entity.Exists() method??
+- return for `deleters` when entity does not exist
+- return for `Unset` when reference is not set
+- return for `Set<Type>` when anyOf container does not exist
+- return for `Add<TypeReference>` when reference already is set
+- return for `Set<Reference>` when the entity is already referencing this id 
+- setters to return if new value == current value so no change is triggered (`Unset`, !!NOT!! `Set<Type>` (already in place), all normal `setters`)
 - documentation
 
 - build fails because of required modules from github. what do? (cant reproduce)
 - find open port for integratpon test
-- setters to return if new value == current value so no change is triggered
 - the generated code should prefix user defined names (or in some other way alter them to be unique) so they do not conflict with local variables
 - release tree func (release slices, maps, and the pointers themselves)
 - (this only appeared to be an issue because i didnt consider that the Setters create an entirely new Ref with anyContainer as child. So the entityKind is always empty and the delete mthod of the child is therefore never triggered. For more clarity I added a deleteCurrentChild parameter to the function) SetTargetPlayer (a reference field) calls the `setPlayer` method, which removes the child entity. CRITICAL ERROR!!!
