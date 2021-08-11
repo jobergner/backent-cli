@@ -7,6 +7,9 @@ func (_ref itemBoundToRef) IsSet() (itemBoundToRef, bool) {
 
 func (_ref itemBoundToRef) Unset() {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
+	if ref.itemBoundToRef.OperationKind == OperationKindDelete {
+		return
+	}
 	ref.itemBoundToRef.engine.deleteItemBoundToRef(ref.itemBoundToRef.ID)
 	parent := ref.itemBoundToRef.engine.Item(ref.itemBoundToRef.ParentID).item
 	if parent.OperationKind == OperationKindDelete {
@@ -44,6 +47,9 @@ func (_ref playerTargetRef) IsSet() (playerTargetRef, bool) {
 
 func (_ref playerTargetRef) Unset() {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
+	if ref.playerTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
 	ref.playerTargetRef.engine.deletePlayerTargetRef(ref.playerTargetRef.ID)
 	parent := ref.playerTargetRef.engine.Player(ref.playerTargetRef.ParentID).player
 	if parent.OperationKind == OperationKindDelete {
