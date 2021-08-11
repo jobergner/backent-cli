@@ -991,6 +991,7 @@ state.go:11:2: no required module provides package nhooyr.io/websocket; to add i
 	go get nhooyr.io/websocket
 jonas@jonas-Recoil-II:~/code/backent_e
 ```
+- docker for example test
 - documentation
 
 - build fails because of required modules from github. what do? (cant reproduce)
