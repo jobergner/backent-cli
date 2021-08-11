@@ -96,6 +96,12 @@ func (_player player) AddGuildMember(playerID PlayerID) {
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return
 	}
+	for _, currentRefID := range player.player.GuildMembers {
+		currentRef := player.player.engine.playerGuildMemberRef(currentRefID)
+		if currentRef.playerGuildMemberRef.ReferencedElementID == playerID {
+			return
+		}
+	}
 	ref := player.player.engine.createPlayerGuildMemberRef(playerID, player.player.ID)
 	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
@@ -109,6 +115,13 @@ func (_player player) AddTargetedByPlayer(playerID PlayerID) {
 	}
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return
+	}
+	for _, currentRefID := range player.player.TargetedBy {
+		currentRef := player.player.engine.playerTargetedByRef(currentRefID)
+		anyContainer := player.player.engine.anyOfPlayer_ZoneItem(currentRef.playerTargetedByRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
+			return
+		}
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
 	anyContainer.setPlayer(playerID, false)
@@ -126,6 +139,13 @@ func (_player player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
 	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
 		return
 	}
+	for _, currentRefID := range player.player.TargetedBy {
+		currentRef := player.player.engine.playerTargetedByRef(currentRefID)
+		anyContainer := player.player.engine.anyOfPlayer_ZoneItem(currentRef.playerTargetedByRef.ReferencedElementID)
+		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
+			return
+		}
+	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
 	anyContainer.setZoneItem(zoneItemID, false)
 	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
@@ -142,6 +162,12 @@ func (_player player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
 	if player.player.engine.EquipmentSet(equipmentSetID).equipmentSet.OperationKind == OperationKindDelete {
 		return
 	}
+	for _, currentRefID := range player.player.EquipmentSets {
+		currentRef := player.player.engine.playerEquipmentSetRef(currentRefID)
+		if currentRef.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
+			return
+		}
+	}
 	ref := player.player.engine.createPlayerEquipmentSetRef(equipmentSetID, player.player.ID)
 	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
@@ -155,6 +181,12 @@ func (_equipmentSet equipmentSet) AddEquipment(itemID ItemID) {
 	}
 	if equipmentSet.equipmentSet.engine.Item(itemID).item.OperationKind == OperationKindDelete {
 		return
+	}
+	for _, currentRefID := range equipmentSet.equipmentSet.Equipment {
+		currentRef := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(currentRefID)
+		if currentRef.equipmentSetEquipmentRef.ReferencedElementID == itemID {
+			return
+		}
 	}
 	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(itemID, equipmentSet.equipmentSet.ID)
 	equipmentSet.equipmentSet.Equipment = append(equipmentSet.equipmentSet.Equipment, ref.ID)
