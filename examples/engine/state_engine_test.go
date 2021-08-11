@@ -161,6 +161,15 @@ func TestReferences(t *testing.T) {
 		item.SetBoundTo(player2.ID())
 		assert.Equal(t, 1, len(se.Patch.ItemBoundToRef))
 	})
+	t.Run("does not add reference to slice when element is already referenced", func(t *testing.T) {
+		se := newEngine()
+		player1 := se.CreatePlayer()
+		player2 := se.CreatePlayer()
+		player1.AddGuildMember(player2.ID())
+		assert.Equal(t, 1, len(player1.GuildMembers()))
+		player1.AddGuildMember(player2.ID())
+		assert.Equal(t, 1, len(player1.GuildMembers()))
+	})
 }
 
 func TestUpdateState(t *testing.T) {
