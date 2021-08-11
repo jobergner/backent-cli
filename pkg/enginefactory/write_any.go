@@ -26,7 +26,8 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 				v: *valueType,
 			}
 			decls.File.Func().Params(s.wrapperReceiverParams()).Id("Set"+Title(valueType.Name)).Params().Id(valueType.Name).Block(
-				If(s.isAlreadyRequestedElement()).Block(
+				s.reassignAnyContainerWrapper(),
+				If(s.isAlreadyRequestedElement().Op("||").Add(s.isOperationKindDelete())).Block(
 					Return(s.currentElement()),
 				),
 				s.createChild(),

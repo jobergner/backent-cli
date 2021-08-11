@@ -32,6 +32,7 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 					OnlyIf(field.HasPointerValue, If(a.referencedElementDoesntExist()).Block(
 						Return(),
 					)),
+					OnlyIf(field.HasPointerValue, a.returnIfReferencedElementIsAlreadyReferenced()),
 					OnlyIf(!valueType.IsBasicType && !field.HasPointerValue, a.createNewElement()),
 					OnlyIf(field.HasAnyValue, &Statement{
 						a.createAnyContainer().Line(),

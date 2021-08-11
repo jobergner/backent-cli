@@ -30,6 +30,9 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 
 		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 			d.getElement(),
+			If(d.isOperationKindDelete()).Block(
+				Return(),
+			),
 			ForEachReferenceOfType(configType, func(field *ast.Field) *Statement {
 				return d.dereferenceField(field)
 			}),
@@ -62,6 +65,9 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 
 		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 			d.getElement(),
+			If(d.isOperationKindDelete()).Block(
+				Return(),
+			),
 			OnlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
@@ -80,6 +86,9 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 
 		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
 			d.getElement(),
+			If(d.isOperationKindDelete()).Block(
+				Return(),
+			),
 			If(Id("deleteChild")).Block(
 				d.deleteChild(),
 			),
