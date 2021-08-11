@@ -42,6 +42,10 @@ func generate() {
 		panic(fmt.Errorf("error while generating marshallers: %s", err))
 	}
 
+	if err := tidyModules(); err != nil {
+		panic(fmt.Errorf("something went wrong while tidying modules: %s", err))
+	}
+
 	if err := validateBuild(); err != nil {
 		panic(fmt.Errorf("something went wrong when generating the code: %s", err))
 	}
@@ -83,12 +87,23 @@ func validateOutDir() error {
 		return fmt.Errorf("defined out target \"%s\" is not a directory", *outDirName)
 	}
 
-	cmd := exec.Command("go", "env", "GOMOD")
+	cmd := exec.Command("go", "mod", "why")
 	cmd.Dir = *outDirName
 
 	stdout, err := cmd.Output()
-	if len(stdout) == 1 && string(stdout[0]) == "\n" {
+	if len(stdout) == 0 {
 		return fmt.Errorf("defined out target \"%s\" is not within GOPATH which is required for generating marshallers\ntip: initialize a go module in directory or it's parent!", *outDirName)
+	}
+
+	return nil
+}
+
+func tidyModules() error {
+	cmd := exec.Command("go", "mod", "tidy")
+	cmd.Dir = *outDirName
+
+	if err := cmd.Run(); err != nil {
+		return err
 	}
 
 	return nil
