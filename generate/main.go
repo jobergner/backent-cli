@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jobergner/backent-cli/factoryutils"
+	"github.com/jobergner/backent-cli/pkg/factoryutils"
 )
 
 var importedDirs = []string{

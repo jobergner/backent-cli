@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/jobergner/backent-cli/enginefactory"
-	"github.com/jobergner/backent-cli/serverfactory"
+	"github.com/jobergner/backent-cli/pkg/enginefactory"
+	"github.com/jobergner/backent-cli/pkg/serverfactory"
 
 	"bytes"
 )
