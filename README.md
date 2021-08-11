@@ -979,6 +979,18 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- error when using example: (because i need to install mods before running (`go mod tidy`))
+```
+state.go:8:2: no required module provides package github.com/google/uuid; to add it:
+	go get github.com/google/uuid
+state_easyjson.go:8:3: no required module provides package github.com/mailru/easyjson/jlexer; to add it:
+	go get github.com/mailru/easyjson/jlexer
+state_easyjson.go:7:3: no required module provides package github.com/mailru/easyjson/jwriter; to add it:
+	go get github.com/mailru/easyjson/jwriter
+state.go:11:2: no required module provides package nhooyr.io/websocket; to add it:
+	go get nhooyr.io/websocket
+jonas@jonas-Recoil-II:~/code/backent_e
+```
 - documentation
 
 - build fails because of required modules from github. what do? (cant reproduce)
