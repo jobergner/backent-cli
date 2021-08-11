@@ -87,11 +87,11 @@ func validateOutDir() error {
 		return fmt.Errorf("defined out target \"%s\" is not a directory", *outDirName)
 	}
 
-	cmd := exec.Command("go", "mod", "why")
+	cmd := exec.Command("go", "env", "GOMOD")
 	cmd.Dir = *outDirName
 
 	stdout, err := cmd.Output()
-	if len(stdout) == 0 {
+	if string(stdout) == "/dev/null\n" {
 		return fmt.Errorf("defined out target \"%s\" is not within GOPATH which is required for generating marshallers\ntip: initialize a go module in directory or it's parent!", *outDirName)
 	}
 
