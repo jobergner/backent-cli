@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jobergner/backent-cli/getstartedfactory"
+	"github.com/jobergner/backent-cli/pkg/getstartedfactory"
 )
 
 func generate() {

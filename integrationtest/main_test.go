@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/jobergner/backent-cli/integrationtest/state"
-	"github.com/jobergner/backent-cli/testutils"
+	"github.com/jobergner/backent-cli/pkg/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
