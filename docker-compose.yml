@@ -1,0 +1,7 @@
+version: "2"
+services:
+  app:
+    image: golang:latest
+    volumes:
+      - .:/home/backent-cli
+    command: /bin/sh -c "cd /home/backent-cli/; go install; cd ../;mkdir backent_example; cd backent_example;go mod init backentexample;backent-cli -example -out=./backent/ generate;go run .;"
