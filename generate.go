@@ -38,16 +38,12 @@ func generate() {
 		panic(fmt.Errorf("error while writing generated code to file system: %s", err))
 	}
 
-	if err := generateMarshallers(); err != nil {
-		panic(fmt.Errorf("error while generating marshallers: %s", err))
-	}
-
 	if err := tidyModules(); err != nil {
 		panic(fmt.Errorf("something went wrong while tidying modules: %s", err))
 	}
 
-	if err := validateBuild(); err != nil {
-		panic(fmt.Errorf("something went wrong when generating the code: %s", err))
+	if err := generateMarshallers(); err != nil {
+		panic(fmt.Errorf("error while generating marshallers: %s", err))
 	}
 
 	if outDirModuleName, err := getModuleName(); err != nil {
@@ -63,6 +59,7 @@ func generate() {
 			panic(fmt.Errorf("error while writing generated code to file system: %s", err))
 		}
 	}
+
 }
 
 func ensureOutDir() error {
@@ -100,17 +97,6 @@ func validateOutDir() error {
 
 func tidyModules() error {
 	cmd := exec.Command("go", "mod", "tidy")
-	cmd.Dir = *outDirName
-
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func validateBuild() error {
-	cmd := exec.Command("go", "test", ".")
 	cmd.Dir = *outDirName
 
 	if err := cmd.Run(); err != nil {

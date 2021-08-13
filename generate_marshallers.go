@@ -8,7 +8,11 @@ import (
 
 func generateMarshallers() error {
 	if ok := commandExists("easyjson"); !ok {
-		return fmt.Errorf("easyjson is required!\n\ninstall with `go get -u github.com/mailru/easyjson/...`")
+		cmd := exec.Command("go", "get", "-u", "github.com/mailru/easyjson/...")
+		out, err := cmd.Output()
+		if err != nil {
+			return fmt.Errorf("error installing mailru/easyjson: %s \n %s", string(out), err)
+		}
 	}
 
 	cmd := exec.Command("easyjson", "-all", "-byte", "-omit_empty", filepath.Join(*outDirName, outFile))
