@@ -1,7 +1,16 @@
 version: "2"
 services:
-  app:
+  example1:
     image: golang:latest
     volumes:
       - .:/home/backent-cli
     command: /bin/sh -c "cd /home/backent-cli/; go install; cd ../;mkdir backent_example; cd backent_example;go mod init backentexample;backent-cli -example -out=./backent/ generate;go run .;"
+    ports:
+      - "3497:3496"
+  example2:
+    image: golang:latest
+    volumes:
+      - .:/home/backent-cli
+    command: /bin/sh -c "cd /home/backent-cli/; go install; cd ../;mkdir backent_example; cd backent_example;go mod init backentexample;backent-cli -config=../backent-cli/example.config.json -out=backent/ generate > main.go;go run .;"
+    ports:
+      - "3498:3496"

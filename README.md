@@ -752,6 +752,7 @@ go test ./...
 | location                                               | description                                                                                                                                                                               |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/assets`                                              | assets for README                                                                                                                                                                         |
+| `/example.config.json`                                 | used for generating examples in end2end testing and `/integrationtest/state`                                                                                                              |
 | `/examples/application`                                | contains an example of a application                                                                                                                                                      |
 | `/examples/application/server`                         | serves as an example for a server and is a source for copying code into `copied_from_examples.go` during `go generate`                                                                    |
 | `/examples/application/server/gets_generated.go`       | this file contains the only server related declarations that are not copy pasted, but will be generated during runtime based on the config                                                |
@@ -774,6 +775,7 @@ go test ./...
 | `/pkg/validator`                                       | validates a user's config                                                                                                                                                                 |
 | `/tmp`                                                 | exists as an out target when running `go run .`                                                                                                                                           |
 | `/copied_from_examples.go`                             | contains code created during `go generate` by `/generate`. content is used during runtime. contains all code that is not written based on a config but can be copy-pasted from examples   |
+| `/docker-compose.yml`                                  | contains instructions to start docker containers for end2end testing                                                                                                                      |
 
 
 ## The Idea

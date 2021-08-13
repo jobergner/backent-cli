@@ -105,71 +105,107 @@ var sideEffects = state.SideEffects{
 
 var actions = state.Actions{
 	AddFriend: func(params state.AddFriendParams, engine *state.Engine) state.AddFriendResponse {
+
 		player := engine.Player(params.Player)
 		player.AddFriendsList(params.NewFriend)
+
 		return state.AddFriendResponse{
 			NewNumberOfFriends: len(player.FriendsList()),
 		}
+
 	},
+
 	AddItemToPlayer: func(params state.AddItemToPlayerParams, engine *state.Engine) state.AddItemToPlayerResponse {
+
 		player := engine.Player(params.Player)
 		item := player.AddItem().SetName(params.ItemName)
 		item.SetFirstLootedBy(player.ID())
+
 		return state.AddItemToPlayerResponse{
 			ItemPath: item.Path(),
 		}
+
 	},
+
 	CreatePlayer: func(params state.CreatePlayerParams, engine *state.Engine) state.CreatePlayerResponse {
+
 		player := engine.CreatePlayer().SetName(params.Name)
+
 		return state.CreatePlayerResponse{
 			PlayerPath: player.Path(),
 		}
+
 	},
+
 	DeletePlayer: func(params state.DeletePlayerParams, engine *state.Engine) {
+
 		engine.DeletePlayer(params.Player)
+
 	},
+
 	MoveNpc: func(params state.MoveNpcParams, engine *state.Engine) {
+
 		npc := engine.Npc(params.Npc)
 		npc.Location().SetX(params.NewX).SetY(params.NewY)
+
 	},
+
 	MovePlayer: func(params state.MovePlayerParams, engine *state.Engine) {
+
 		player := engine.Player(params.Player)
 		player.Location().SetX(params.NewX).SetY(params.NewY)
+
 	},
+
 	PlayerLeaveCombat: func(params state.PlayerLeaveCombatParams, engine *state.Engine) state.PlayerLeaveCombatResponse {
+
 		player := engine.Player(params.Player)
-		inCombatRef, isSet := player.InCombatWith()
+		inCombatRef, isSet := player.InCombatWith().IsSet()
 		if isSet {
 			inCombatRef.Unset()
 		}
+
 		return state.PlayerLeaveCombatResponse{
 			CombatWon: true,
 		}
+
 	},
+
 	RemoveFriend: func(params state.RemoveFriendParams, engine *state.Engine) {
+
 		player := engine.Player(params.Player)
 		player.RemoveFriendsList(params.FriendToRemove)
+
 	},
+
 	RemoveItemFromPlayer: func(params state.RemoveItemFromPlayerParams, engine *state.Engine) {
+
 		player := engine.Player(params.Player)
 		player.RemoveItems(params.Item)
+
 	},
+
 	SetPlayerCombat: func(params state.SetPlayerCombatParams, engine *state.Engine) state.SetPlayerCombatResponse {
+
 		player := engine.Player(params.Player)
 		if state.ElementKind(params.EnemyKind) == state.ElementKindNpc {
 			enemyNpc := engine.Npc(state.NpcID(params.EnemyID))
 			player.SetInCombatWithNpc(enemyNpc.ID())
+
 			return state.SetPlayerCombatResponse{
 				EnemyEntityKind: string(state.ElementKindNpc),
 				EnemyEntityPath: enemyNpc.Path(),
 			}
 		}
+
 		enemyPlayer := engine.Player(state.PlayerID(params.EnemyID))
 		player.SetInCombatWithPlayer(enemyPlayer.ID())
+
 		return state.SetPlayerCombatResponse{
 			EnemyEntityKind: string(state.ElementKindNpc),
 			EnemyEntityPath: enemyPlayer.Path(),
 		}
+
 	},
 }
 
