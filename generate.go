@@ -38,11 +38,7 @@ func generate() {
 		panic(fmt.Errorf("error while writing generated code to file system: %s", err))
 	}
 
-	if err := tidyModules(); err != nil {
-		panic(fmt.Errorf("something went wrong while tidying modules: %s", err))
-	}
-
-	if err := generateMarshallers(); err != nil {
+	if err := generateMarshallers(true); err != nil {
 		panic(fmt.Errorf("error while generating marshallers: %s", err))
 	}
 
