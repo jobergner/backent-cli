@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func generateMarshallers() error {
+func generateMarshallers(firstAttempt bool) error {
 	if ok := commandExists("easyjson"); !ok {
 		cmd := exec.Command("go", "get", "-u", "github.com/mailru/easyjson/...")
 		out, err := cmd.Output()
@@ -16,10 +16,24 @@ func generateMarshallers() error {
 	}
 
 	cmd := exec.Command("easyjson", "-all", "-byte", "-omit_empty", filepath.Join(*outDirName, outFile))
-	// error is being swallowed as easyjson throws errors while actually functioning properly
+	// error is being printed as a warning as easyjson throws errors while actually functioning properly
 	// all underlying requirements have already been checked with `validateOutDir` at this point
-	// whether generating the marshallers was successfull will be validated with running `go build` later
-	cmd.Run()
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		if firstAttempt {
+
+			if err := tidyModules(); err != nil {
+				panic(fmt.Errorf("something went wrong while tidying modules: %s", err))
+			}
+
+			if err := generateMarshallers(false); err != nil {
+				return err
+			}
+
+		} else {
+			return fmt.Errorf("generating marshallers caused issues:\n %s %s", err, string(output))
+		}
+	}
 
 	return nil
 }
