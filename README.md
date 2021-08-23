@@ -981,6 +981,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- reserved action names "currentState"  "update"
 - error when using example: (because i need to install mods before running (`go mod tidy`))
 ```
 state.go:8:2: no required module provides package github.com/google/uuid; to add it:
