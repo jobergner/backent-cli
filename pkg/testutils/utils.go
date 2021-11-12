@@ -14,7 +14,7 @@ import (
 // creates diff and makes whitespace visible
 func Diff(actual, expected string) string {
 	dmp := diffmatchpatch.New()
-	diffs := dmp.DiffMain(actual, expected, true)
+	diffs := dmp.DiffMain(actual, expected, false)
 
 	for i, diff := range diffs {
 		if diff.Type == diffmatchpatch.DiffDelete || diff.Type == diffmatchpatch.DiffInsert {
