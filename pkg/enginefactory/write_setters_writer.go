@@ -13,7 +13,7 @@ type setterWriter struct {
 }
 
 func (s setterWriter) receiverParams() *Statement {
-	return Id(s.receiverName()).Id(s.t.Name)
+	return Id(s.receiverName()).Id(Title(s.t.Name))
 }
 
 func (s setterWriter) name() string {
@@ -32,7 +32,7 @@ func (s setterWriter) params() *Statement {
 }
 
 func (s setterWriter) returns() string {
-	return s.t.Name
+	return Title(s.t.Name)
 }
 
 func (s setterWriter) reassignElement() *Statement {
@@ -77,7 +77,7 @@ type setRefFieldWeiter struct {
 }
 
 func (s setRefFieldWeiter) receiverParams() *Statement {
-	return Id("_" + s.f.Parent.Name).Id(s.f.Parent.Name)
+	return Id("_" + s.f.Parent.Name).Id(Title(s.f.Parent.Name))
 }
 
 func (s setRefFieldWeiter) name() string {
@@ -97,7 +97,7 @@ func (s setRefFieldWeiter) params() *Statement {
 }
 
 func (s setRefFieldWeiter) returns() string {
-	return s.f.Parent.Name
+	return Title(s.f.Parent.Name)
 }
 
 func (s setRefFieldWeiter) reassignElement() *Statement {

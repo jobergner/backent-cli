@@ -122,7 +122,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 		writeIDGetter(&decls, i)
 
 		field.RangeValueTypes(func(valueType *ast.ConfigType) {
-			decls.File.Func().Params(Id("_"+t.name()).Id(t.name())).Id(Title(valueType.Name)).Params().Id(valueType.Name).Block(
+			decls.File.Func().Params(Id("_"+t.name()).Id(Title(t.name()))).Id(Title(valueType.Name)).Params().Id(Title(valueType.Name)).Block(
 				Id(t.name()).Op(":=").Id("_"+t.name()).Dot(t.name()).Dot("engine").Dot(t.name()).Call(Id("_"+t.name()).Dot(t.name()).Dot("ID")),
 				Return(Id(t.name()).Dot(t.name()).Dot("engine").Dot(Title(valueType.Name)).Call(Id(t.name()).Dot(t.name()).Dot(Title(valueType.Name)))),
 			)
