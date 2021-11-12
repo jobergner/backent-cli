@@ -179,6 +179,7 @@ Actions is how the server and client communicate. Here you can define which clie
 ```JSON
 {
   "buildNewHouse": {
+    "owner": "personID",
     "streetName": "string",
     "houseNumber": "int"
   }
@@ -981,6 +982,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- Fix Exports
 - reserved action names "currentState"  "update"
 - error when using example: (because i need to install mods before running (`go mod tidy`))
 ```
