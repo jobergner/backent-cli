@@ -16,11 +16,11 @@ func (e existsGetterWriter) receiverName() string {
 }
 
 func (e existsGetterWriter) receiverParams() *Statement {
-	return Id(e.receiverName()).Id(e.t.Name)
+	return Id(e.receiverName()).Id(Title(e.t.Name))
 }
 
 func (e existsGetterWriter) returnTypes() (*Statement, *Statement) {
-	return Id(e.t.Name), Bool()
+	return Id(Title(e.t.Name)), Bool()
 }
 
 func (e existsGetterWriter) isNotOperationKindDelete() *Statement {
@@ -40,7 +40,7 @@ func (t everyTypeGetterWriter) receiverParams() *Statement {
 }
 
 func (t everyTypeGetterWriter) returns() *Statement {
-	return Id("[]" + t.t.Name)
+	return Id("[]" + Title(t.t.Name))
 }
 
 func (t everyTypeGetterWriter) allIDs() *Statement {
@@ -52,7 +52,7 @@ func (t everyTypeGetterWriter) sliceName() string {
 }
 
 func (t everyTypeGetterWriter) declareSlice() *Statement {
-	return Var().Id(t.sliceName()).Id("[]" + t.t.Name)
+	return Var().Id(t.sliceName()).Id("[]" + Title(t.t.Name))
 }
 
 func (t everyTypeGetterWriter) loopConditions() *Statement {
@@ -93,7 +93,7 @@ func (t typeGetterWriter) params() *Statement {
 }
 
 func (t typeGetterWriter) returns() string {
-	return t.typeName()
+	return Title(t.typeName())
 }
 
 func (t typeGetterWriter) definePatchingElement() *Statement {
@@ -101,7 +101,7 @@ func (t typeGetterWriter) definePatchingElement() *Statement {
 }
 
 func (t typeGetterWriter) earlyReturnPatching() *Statement {
-	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("patching" + Title(t.typeName()))})
+	return Id(Title(t.typeName())).Values(Dict{Id(t.typeName()): Id("patching" + Title(t.typeName()))})
 }
 
 func (t typeGetterWriter) defineCurrentElement() *Statement {
@@ -109,11 +109,11 @@ func (t typeGetterWriter) defineCurrentElement() *Statement {
 }
 
 func (t typeGetterWriter) earlyReturnCurrent() *Statement {
-	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id("current" + Title(t.typeName()))})
+	return Id(Title(t.typeName())).Values(Dict{Id(t.typeName()): Id("current" + Title(t.typeName()))})
 }
 
 func (t typeGetterWriter) finalReturn() *Statement {
-	return Id(t.typeName()).Values(Dict{Id(t.typeName()): Id(t.typeName() + "Core").Values(Dict{Id("OperationKind"): Id("OperationKindDelete"), Id("engine"): Id("engine")})})
+	return Id(Title(t.typeName())).Values(Dict{Id(t.typeName()): Id(t.typeName() + "Core").Values(Dict{Id("OperationKind"): Id("OperationKindDelete"), Id("engine"): Id("engine")})})
 }
 
 type idGetterWriter struct {
@@ -127,7 +127,7 @@ func (i idGetterWriter) receiverName() string {
 }
 
 func (i idGetterWriter) receiverParams() *Statement {
-	return Id(i.receiverName()).Id(i.typeName())
+	return Id(i.receiverName()).Id(Title(i.typeName()))
 }
 
 func (i idGetterWriter) name() string {
@@ -148,7 +148,7 @@ func (f fieldGetterWriter) receiverName() string {
 }
 
 func (f fieldGetterWriter) receiverParams() *Statement {
-	return Id(f.receiverName()).Id(f.t.Name)
+	return Id(f.receiverName()).Id(Title(f.t.Name))
 }
 
 func (f fieldGetterWriter) name() string {
@@ -161,12 +161,12 @@ func (f fieldGetterWriter) returnedType() string {
 		return f.f.ValueType().Name
 	}
 	if f.f.HasPointerValue {
-		return f.f.Parent.Name + Title(Singular(f.f.Name)) + "Ref"
+		return Title(f.f.Parent.Name) + Title(Singular(f.f.Name)) + "Ref"
 	}
 	if f.f.HasAnyValue {
-		return anyNameByField(f.f)
+		return Title(anyNameByField(f.f))
 	}
-	return f.f.ValueType().Name
+	return Title(f.f.ValueType().Name)
 }
 
 func (f fieldGetterWriter) returns() string {
@@ -211,7 +211,7 @@ func (f fieldGetterWriter) appendedItem() *Statement {
 	if f.f.ValueType().IsBasicType {
 		return Id(f.loopedElementIdentifier())
 	}
-	returnedType := f.returnedType()
+	returnedType := Lower(f.returnedType())
 	if !f.f.HasPointerValue && !f.f.HasAnyValue {
 		returnedType = Title(returnedType)
 	}
@@ -232,7 +232,7 @@ func (f fieldGetterWriter) returnBasicType() *Statement {
 
 func (f fieldGetterWriter) returnNamedType() *Statement {
 	engine := Id(f.t.Name).Dot(f.t.Name).Dot("engine")
-	returnedType := f.returnedType()
+	returnedType := Lower(f.returnedType())
 	if !f.f.HasAnyValue && !f.f.HasPointerValue {
 		returnedType = Title(returnedType)
 	}
@@ -255,7 +255,7 @@ func (p pathGetterWriter) receiverName() string {
 }
 
 func (p pathGetterWriter) receiverParams() *Statement {
-	return Id(p.receiverName()).Id(p.t.Name)
+	return Id(p.receiverName()).Id(Title(p.t.Name))
 }
 
 func (p pathGetterWriter) returnPath() *Statement {
