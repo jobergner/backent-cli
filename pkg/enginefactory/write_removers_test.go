@@ -14,18 +14,18 @@ func TestWriteRemovers(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			_RemoveEquipment_equipmentSet_func,
-			_RemoveEquipmentSets_player_func,
-			_RemoveGuildMembers_player_func,
-			_RemoveItems_player_func,
-			_RemoveTargetedByPlayer_player_func,
-			_RemoveTargetedByZoneItem_player_func,
-			_RemoveInteractablesItem_zone_func,
-			_RemoveInteractablesPlayer_zone_func,
-			_RemoveInteractablesZoneItem_zone_func,
-			_RemoveItems_zone_func,
-			_RemovePlayers_zone_func,
-			_RemoveTags_zone_func,
+			_RemoveEquipment_EquipmentSet_func,
+			_RemoveEquipmentSets_Player_func,
+			_RemoveGuildMembers_Player_func,
+			_RemoveItems_Player_func,
+			_RemoveTargetedByPlayer_Player_func,
+			_RemoveTargetedByZoneItem_Player_func,
+			_RemoveInteractablesItem_Zone_func,
+			_RemoveInteractablesPlayer_Zone_func,
+			_RemoveInteractablesZoneItem_Zone_func,
+			_RemoveItems_Zone_func,
+			_RemovePlayers_Zone_func,
+			_RemoveTags_Zone_func,
 		}, "\n"))
 
 		if expected != actual {

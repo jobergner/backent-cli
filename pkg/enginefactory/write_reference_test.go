@@ -14,16 +14,16 @@ func TestWriteReference(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			_Get_equipmentSetEquipmentRef_func,
-			_IsSet_itemBoundToRef_func,
-			_Unset_itemBoundToRef_func,
-			_Get_itemBoundToRef_func,
-			_Get_playerEquipmentSetRef_func,
-			_Get_playerGuildMemberRef_func,
-			_IsSet_playerTargetRef_func,
-			_Unset_playerTargetRef_func,
-			_Get_playerTargetRef_func,
-			_Get_playerTargetedByRef_func,
+			_Get_EquipmentSetEquipmentRef_func,
+			_IsSet_ItemBoundToRef_func,
+			_Unset_ItemBoundToRef_func,
+			_Get_ItemBoundToRef_func,
+			_Get_PlayerEquipmentSetRef_func,
+			_Get_PlayerGuildMemberRef_func,
+			_IsSet_PlayerTargetRef_func,
+			_Unset_PlayerTargetRef_func,
+			_Get_PlayerTargetRef_func,
+			_Get_PlayerTargetedByRef_func,
 		}, "\n"))
 
 		if expected != actual {
