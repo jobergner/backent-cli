@@ -116,11 +116,3 @@ func (e elementMapWriter) fieldName() string {
 func (e elementMapWriter) mapKey() *Statement {
 	return Id(Title(e.typeName()) + "ID")
 }
-
-func (e elementMapWriter) mapValue() string {
-	return e.typeName() + "Core"
-}
-
-func (e elementMapWriter) fieldTag() string {
-	return "`json:\"" + e.typeName() + "\"`"
-}
