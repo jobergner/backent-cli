@@ -20,142 +20,142 @@ const (
 )
 
 type Tree struct {
-	EquipmentSet map[EquipmentSetID]EquipmentSet `json:"equipmentSet"`
-	GearScore    map[GearScoreID]GearScore       `json:"gearScore"`
-	Item         map[ItemID]Item                 `json:"item"`
-	Player       map[PlayerID]Player             `json:"player"`
-	Position     map[PositionID]Position         `json:"position"`
-	Zone         map[ZoneID]Zone                 `json:"zone"`
-	ZoneItem     map[ZoneItemID]ZoneItem         `json:"zoneItem"`
+	EquipmentSet map[EquipmentSetID]equipmentSet `json:"equipmentSet"`
+	GearScore    map[GearScoreID]gearScore       `json:"gearScore"`
+	Item         map[ItemID]item                 `json:"item"`
+	Player       map[PlayerID]player             `json:"player"`
+	Position     map[PositionID]position         `json:"position"`
+	Zone         map[ZoneID]zone                 `json:"zone"`
+	ZoneItem     map[ZoneItemID]zoneItem         `json:"zoneItem"`
 }
 
 func newTree() Tree {
 	return Tree{
-		EquipmentSet: make(map[EquipmentSetID]EquipmentSet),
-		GearScore:    make(map[GearScoreID]GearScore),
-		Item:         make(map[ItemID]Item),
-		Player:       make(map[PlayerID]Player),
-		Position:     make(map[PositionID]Position),
-		Zone:         make(map[ZoneID]Zone),
-		ZoneItem:     make(map[ZoneItemID]ZoneItem),
+		EquipmentSet: make(map[EquipmentSetID]equipmentSet),
+		GearScore:    make(map[GearScoreID]gearScore),
+		Item:         make(map[ItemID]item),
+		Player:       make(map[PlayerID]player),
+		Position:     make(map[PositionID]position),
+		Zone:         make(map[ZoneID]zone),
+		ZoneItem:     make(map[ZoneItemID]zoneItem),
 	}
 }
 
-type ZoneItem struct {
+type zoneItem struct {
 	ID            ZoneItemID    `json:"id"`
-	Item          *Item         `json:"item"`
-	Position      *Position     `json:"position"`
+	Item          *item         `json:"item"`
+	Position      *position     `json:"position"`
 	OperationKind OperationKind `json:"operationKind"`
 }
-type ZoneItemReference struct {
+type zoneItemReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            ZoneItemID           `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	ZoneItem             *ZoneItem            `json:"zoneItem"`
+	ZoneItem             *zoneItem            `json:"zoneItem"`
 }
 
-type Item struct {
+type item struct {
 	ID            ItemID           `json:"id"`
-	BoundTo       *PlayerReference `json:"boundTo"`
-	GearScore     *GearScore       `json:"gearScore"`
+	BoundTo       *playerReference `json:"boundTo"`
+	GearScore     *gearScore       `json:"gearScore"`
 	Name          string           `json:"name"`
 	Origin        interface{}      `json:"origin"`
 	OperationKind OperationKind    `json:"operationKind"`
 }
-type ItemReference struct {
+type itemReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            ItemID               `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Item                 *Item                `json:"item"`
+	Item                 *item                `json:"item"`
 }
 
-type EquipmentSet struct {
+type equipmentSet struct {
 	ID            EquipmentSetID           `json:"id"`
-	Equipment     map[ItemID]ItemReference `json:"equipment"`
+	Equipment     map[ItemID]itemReference `json:"equipment"`
 	Name          string                   `json:"name"`
 	OperationKind OperationKind            `json:"operationKind"`
 }
-type EquipmentSetReference struct {
+type equipmentSetReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            EquipmentSetID       `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	EquipmentSet         *EquipmentSet        `json:"equipmentSet"`
+	EquipmentSet         *equipmentSet        `json:"equipmentSet"`
 }
 
-type Position struct {
+type position struct {
 	ID            PositionID    `json:"id"`
 	X             float64       `json:"x"`
 	Y             float64       `json:"y"`
 	OperationKind OperationKind `json:"operationKind"`
 }
-type PositionReference struct {
+type positionReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            PositionID           `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Position             *Position            `json:"position"`
+	Position             *position            `json:"position"`
 }
 
-type GearScore struct {
+type gearScore struct {
 	ID            GearScoreID   `json:"id"`
 	Level         int           `json:"level"`
 	Score         int           `json:"score"`
 	OperationKind OperationKind `json:"operationKind"`
 }
-type GearScoreReference struct {
+type gearScoreReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            GearScoreID          `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	GearScore            *GearScore           `json:"gearScore"`
+	GearScore            *gearScore           `json:"gearScore"`
 }
 
-type Player struct {
+type player struct {
 	ID            PlayerID                                 `json:"id"`
-	EquipmentSets map[EquipmentSetID]EquipmentSetReference `json:"equipmentSets"`
-	GearScore     *GearScore                               `json:"gearScore"`
-	GuildMembers  map[PlayerID]PlayerReference             `json:"guildMembers"`
-	Items         map[ItemID]Item                          `json:"items"`
-	Position      *Position                                `json:"position"`
-	Target        *AnyOfPlayer_ZoneItemReference           `json:"target"`
-	TargetedBy    map[int]AnyOfPlayer_ZoneItemReference    `json:"targetedBy"`
+	EquipmentSets map[EquipmentSetID]equipmentSetReference `json:"equipmentSets"`
+	GearScore     *gearScore                               `json:"gearScore"`
+	GuildMembers  map[PlayerID]playerReference             `json:"guildMembers"`
+	Items         map[ItemID]item                          `json:"items"`
+	Position      *position                                `json:"position"`
+	Target        *anyOfPlayer_ZoneItemReference           `json:"target"`
+	TargetedBy    map[int]anyOfPlayer_ZoneItemReference    `json:"targetedBy"`
 	OperationKind OperationKind                            `json:"operationKind"`
 }
-type PlayerReference struct {
+type playerReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            PlayerID             `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Player               *Player              `json:"player"`
+	Player               *player              `json:"player"`
 }
 
-type Zone struct {
+type zone struct {
 	ID            ZoneID                  `json:"id"`
 	Interactables map[int]interface{}     `json:"interactables"`
-	Items         map[ZoneItemID]ZoneItem `json:"items"`
-	Players       map[PlayerID]Player     `json:"players"`
+	Items         map[ZoneItemID]zoneItem `json:"items"`
+	Players       map[PlayerID]player     `json:"players"`
 	Tags          []string                `json:"tags"`
 	OperationKind OperationKind           `json:"operationKind"`
 }
-type ZoneReference struct {
+type zoneReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            ZoneID               `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Zone                 *Zone                `json:"zone"`
+	Zone                 *zone                `json:"zone"`
 }
 
-type AnyOfPlayer_ZoneItemReference struct {
+type anyOfPlayer_ZoneItemReference struct {
 	OperationKind        OperationKind        `json:"operationKind"`
 	ElementID            int                  `json:"id"`
 	ElementKind          ElementKind          `json:"elementKind"`
@@ -210,29 +210,29 @@ func newAssembleCache() assembleCache {
 
 type equipmentSetCacheElement struct {
 	hasUpdated   bool
-	equipmentSet EquipmentSet
+	equipmentSet equipmentSet
 }
 type gearScoreCacheElement struct {
 	hasUpdated bool
-	gearScore  GearScore
+	gearScore  gearScore
 }
 type itemCacheElement struct {
 	hasUpdated bool
-	item       Item
+	item       item
 }
 type playerCacheElement struct {
 	hasUpdated bool
-	player     Player
+	player     player
 }
 type positionCacheElement struct {
 	hasUpdated bool
-	position   Position
+	position   position
 }
 type zoneCacheElement struct {
 	hasUpdated bool
-	zone       Zone
+	zone       zone
 }
 type zoneItemCacheElement struct {
 	hasUpdated bool
-	zoneItem   ZoneItem
+	zoneItem   zoneItem
 }

@@ -1,11 +1,11 @@
 package state
 
-func (_ref itemBoundToRef) IsSet() (itemBoundToRef, bool) {
+func (_ref ItemBoundToRef) IsSet() (ItemBoundToRef, bool) {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
 	return ref, ref.itemBoundToRef.ID != 0
 }
 
-func (_ref itemBoundToRef) Unset() {
+func (_ref ItemBoundToRef) Unset() {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
 	if ref.itemBoundToRef.OperationKind == OperationKindDelete {
 		return
@@ -20,32 +20,32 @@ func (_ref itemBoundToRef) Unset() {
 	ref.itemBoundToRef.engine.Patch.Item[parent.ID] = parent
 }
 
-func (_ref itemBoundToRef) Get() player {
+func (_ref ItemBoundToRef) Get() Player {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
 	return ref.itemBoundToRef.engine.Player(ref.itemBoundToRef.ReferencedElementID)
 }
 
-func (_ref playerGuildMemberRef) Get() player {
+func (_ref PlayerGuildMemberRef) Get() Player {
 	ref := _ref.playerGuildMemberRef.engine.playerGuildMemberRef(_ref.playerGuildMemberRef.ID)
 	return ref.playerGuildMemberRef.engine.Player(ref.playerGuildMemberRef.ReferencedElementID)
 }
 
-func (_ref playerEquipmentSetRef) Get() equipmentSet {
+func (_ref PlayerEquipmentSetRef) Get() EquipmentSet {
 	ref := _ref.playerEquipmentSetRef.engine.playerEquipmentSetRef(_ref.playerEquipmentSetRef.ID)
 	return ref.playerEquipmentSetRef.engine.EquipmentSet(ref.playerEquipmentSetRef.ReferencedElementID)
 }
 
-func (_ref equipmentSetEquipmentRef) Get() item {
+func (_ref EquipmentSetEquipmentRef) Get() Item {
 	ref := _ref.equipmentSetEquipmentRef.engine.equipmentSetEquipmentRef(_ref.equipmentSetEquipmentRef.ID)
 	return ref.equipmentSetEquipmentRef.engine.Item(ref.equipmentSetEquipmentRef.ReferencedElementID)
 }
 
-func (_ref playerTargetRef) IsSet() (playerTargetRef, bool) {
+func (_ref PlayerTargetRef) IsSet() (PlayerTargetRef, bool) {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	return ref, ref.playerTargetRef.ID != 0
 }
 
-func (_ref playerTargetRef) Unset() {
+func (_ref PlayerTargetRef) Unset() {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	if ref.playerTargetRef.OperationKind == OperationKindDelete {
 		return
@@ -60,13 +60,13 @@ func (_ref playerTargetRef) Unset() {
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
 
-func (_ref playerTargetRef) Get() anyOfPlayer_ZoneItemRef {
+func (_ref PlayerTargetRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
 }
 
-func (_ref playerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
+func (_ref PlayerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
 	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}

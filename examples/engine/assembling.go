@@ -4,10 +4,10 @@ type assembleConfig struct {
 	forceInclude bool // include everything, regardless of update status
 }
 
-func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (GearScore, bool, bool) {
+func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (gearScore, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
-			return GearScore{}, false, false
+			return gearScore{}, false, false
 		} else {
 			check.gearScore[gearScoreID] = true
 		}
@@ -25,26 +25,26 @@ func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursio
 		return cachedGearScore.gearScore, cachedGearScore.hasUpdated || config.forceInclude, cachedGearScore.hasUpdated
 	}
 
-	var gearScore GearScore
+	var element gearScore
 
-	gearScore.ID = gearScoreData.ID
-	gearScore.OperationKind = gearScoreData.OperationKind
-	gearScore.Level = gearScoreData.Level
-	gearScore.Score = gearScoreData.Score
+	element.ID = gearScoreData.ID
+	element.OperationKind = gearScoreData.OperationKind
+	element.Level = gearScoreData.Level
+	element.Score = gearScoreData.Score
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: gearScore}
+		engine.forceIncludeAssembleCache.gearScore[element.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: element}
 	} else {
-		engine.assembleCache.gearScore[gearScore.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: gearScore}
+		engine.assembleCache.gearScore[element.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: element}
 	}
 
-	return gearScore, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (Position, bool, bool) {
+func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (position, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.position[positionID]; alreadyExists {
-			return Position{}, false, false
+			return position{}, false, false
 		} else {
 			check.position[positionID] = true
 		}
@@ -62,26 +62,26 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 		return cachedPosition.position, cachedPosition.hasUpdated || config.forceInclude, cachedPosition.hasUpdated
 	}
 
-	var position Position
+	var element position
 
-	position.ID = positionData.ID
-	position.OperationKind = positionData.OperationKind
-	position.X = positionData.X
-	position.Y = positionData.Y
+	element.ID = positionData.ID
+	element.OperationKind = positionData.OperationKind
+	element.X = positionData.X
+	element.Y = positionData.Y
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.position[position.ID] = positionCacheElement{hasUpdated: hasUpdated, position: position}
+		engine.forceIncludeAssembleCache.position[element.ID] = positionCacheElement{hasUpdated: hasUpdated, position: element}
 	} else {
-		engine.assembleCache.position[position.ID] = positionCacheElement{hasUpdated: hasUpdated, position: position}
+		engine.assembleCache.position[element.ID] = positionCacheElement{hasUpdated: hasUpdated, position: element}
 	}
 
-	return position, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (EquipmentSet, bool, bool) {
+func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (equipmentSet, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
-			return EquipmentSet{}, false, false
+			return equipmentSet{}, false, false
 		} else {
 			check.equipmentSet[equipmentSetID] = true
 		}
@@ -99,37 +99,37 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdated || config.forceInclude, cachedEquipmentSet.hasUpdated
 	}
 
-	var equipmentSet EquipmentSet
+	var element equipmentSet
 
 	for _, equipmentSetEquipmentRefID := range mergeEquipmentSetEquipmentRefIDs(engine.State.EquipmentSet[equipmentSetData.ID].Equipment, engine.Patch.EquipmentSet[equipmentSetData.ID].Equipment) {
 		if treeEquipmentSetEquipmentRef, include, childHasUpdated := engine.assembleEquipmentSetEquipmentRef(equipmentSetEquipmentRefID, check, config); include {
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if equipmentSet.Equipment == nil {
-				equipmentSet.Equipment = make(map[ItemID]ItemReference)
+			if element.Equipment == nil {
+				element.Equipment = make(map[ItemID]itemReference)
 			}
-			equipmentSet.Equipment[treeEquipmentSetEquipmentRef.ElementID] = treeEquipmentSetEquipmentRef
+			element.Equipment[treeEquipmentSetEquipmentRef.ElementID] = treeEquipmentSetEquipmentRef
 		}
 	}
 
-	equipmentSet.ID = equipmentSetData.ID
-	equipmentSet.OperationKind = equipmentSetData.OperationKind
-	equipmentSet.Name = equipmentSetData.Name
+	element.ID = equipmentSetData.ID
+	element.OperationKind = equipmentSetData.OperationKind
+	element.Name = equipmentSetData.Name
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: equipmentSet}
+		engine.forceIncludeAssembleCache.equipmentSet[element.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: element}
 	} else {
-		engine.assembleCache.equipmentSet[equipmentSet.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: equipmentSet}
+		engine.assembleCache.equipmentSet[element.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: element}
 	}
 
-	return equipmentSet, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (Item, bool, bool) {
+func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (item, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.item[itemID]; alreadyExists {
-			return Item{}, false, false
+			return item{}, false, false
 		} else {
 			check.item[itemID] = true
 		}
@@ -147,20 +147,20 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		return cachedItem.item, cachedItem.hasUpdated || config.forceInclude, cachedItem.hasUpdated
 	}
 
-	var item Item
+	var element item
 
 	if treeItemBoundToRef, include, childHasUpdated := engine.assembleItemBoundToRef(itemID, check, config); include {
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		item.BoundTo = treeItemBoundToRef
+		element.BoundTo = treeItemBoundToRef
 	}
 
 	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		item.GearScore = &treeGearScore
+		element.GearScore = &treeGearScore
 	}
 
 	anyOfPlayer_PositionContainer := engine.anyOfPlayer_Position(itemData.Origin).anyOfPlayer_Position
@@ -170,7 +170,7 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			item.Origin = &treePlayer
+			element.Origin = &treePlayer
 		}
 	} else if anyOfPlayer_PositionContainer.ElementKind == ElementKindPosition {
 		positionID := anyOfPlayer_PositionContainer.Position
@@ -178,27 +178,27 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			item.Origin = &treePosition
+			element.Origin = &treePosition
 		}
 	}
 
-	item.ID = itemData.ID
-	item.OperationKind = itemData.OperationKind
-	item.Name = itemData.Name
+	element.ID = itemData.ID
+	element.OperationKind = itemData.OperationKind
+	element.Name = itemData.Name
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.item[item.ID] = itemCacheElement{hasUpdated: hasUpdated, item: item}
+		engine.forceIncludeAssembleCache.item[element.ID] = itemCacheElement{hasUpdated: hasUpdated, item: element}
 	} else {
-		engine.assembleCache.item[item.ID] = itemCacheElement{hasUpdated: hasUpdated, item: item}
+		engine.assembleCache.item[element.ID] = itemCacheElement{hasUpdated: hasUpdated, item: element}
 	}
 
-	return item, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (ZoneItem, bool, bool) {
+func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (zoneItem, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
-			return ZoneItem{}, false, false
+			return zoneItem{}, false, false
 		} else {
 			check.zoneItem[zoneItemID] = true
 		}
@@ -216,38 +216,38 @@ func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCh
 		return cachedZoneItem.zoneItem, cachedZoneItem.hasUpdated || config.forceInclude, cachedZoneItem.hasUpdated
 	}
 
-	var zoneItem ZoneItem
+	var element zoneItem
 
 	if treeItem, include, childHasUpdated := engine.assembleItem(zoneItemData.Item, check, config); include {
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		zoneItem.Item = &treeItem
+		element.Item = &treeItem
 	}
 
 	if treePosition, include, childHasUpdated := engine.assemblePosition(zoneItemData.Position, check, config); include {
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		zoneItem.Position = &treePosition
+		element.Position = &treePosition
 	}
 
-	zoneItem.ID = zoneItemData.ID
-	zoneItem.OperationKind = zoneItemData.OperationKind
+	element.ID = zoneItemData.ID
+	element.OperationKind = zoneItemData.OperationKind
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: zoneItem}
+		engine.forceIncludeAssembleCache.zoneItem[element.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: element}
 	} else {
-		engine.assembleCache.zoneItem[zoneItem.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: zoneItem}
+		engine.assembleCache.zoneItem[element.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: element}
 	}
 
-	return zoneItem, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (Player, bool, bool) {
+func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (player, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.player[playerID]; alreadyExists {
-			return Player{}, false, false
+			return player{}, false, false
 		} else {
 			check.player[playerID] = true
 		}
@@ -265,17 +265,17 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		return cachedPlayer.player, cachedPlayer.hasUpdated || config.forceInclude, cachedPlayer.hasUpdated
 	}
 
-	var player Player
+	var element player
 
 	for _, playerEquipmentSetRefID := range mergePlayerEquipmentSetRefIDs(engine.State.Player[playerData.ID].EquipmentSets, engine.Patch.Player[playerData.ID].EquipmentSets) {
 		if treePlayerEquipmentSetRef, include, childHasUpdated := engine.assemblePlayerEquipmentSetRef(playerEquipmentSetRefID, check, config); include {
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if player.EquipmentSets == nil {
-				player.EquipmentSets = make(map[EquipmentSetID]EquipmentSetReference)
+			if element.EquipmentSets == nil {
+				element.EquipmentSets = make(map[EquipmentSetID]equipmentSetReference)
 			}
-			player.EquipmentSets[treePlayerEquipmentSetRef.ElementID] = treePlayerEquipmentSetRef
+			element.EquipmentSets[treePlayerEquipmentSetRef.ElementID] = treePlayerEquipmentSetRef
 		}
 	}
 
@@ -283,7 +283,7 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		player.GearScore = &treeGearScore
+		element.GearScore = &treeGearScore
 	}
 
 	for _, playerGuildMemberRefID := range mergePlayerGuildMemberRefIDs(engine.State.Player[playerData.ID].GuildMembers, engine.Patch.Player[playerData.ID].GuildMembers) {
@@ -291,10 +291,10 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if player.GuildMembers == nil {
-				player.GuildMembers = make(map[PlayerID]PlayerReference)
+			if element.GuildMembers == nil {
+				element.GuildMembers = make(map[PlayerID]playerReference)
 			}
-			player.GuildMembers[treePlayerGuildMemberRef.ElementID] = treePlayerGuildMemberRef
+			element.GuildMembers[treePlayerGuildMemberRef.ElementID] = treePlayerGuildMemberRef
 		}
 	}
 
@@ -303,10 +303,10 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if player.Items == nil {
-				player.Items = make(map[ItemID]Item)
+			if element.Items == nil {
+				element.Items = make(map[ItemID]item)
 			}
-			player.Items[treeItem.ID] = treeItem
+			element.Items[treeItem.ID] = treeItem
 		}
 	}
 
@@ -314,14 +314,14 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		player.Position = &treePosition
+		element.Position = &treePosition
 	}
 
 	if treePlayerTargetRef, include, childHasUpdated := engine.assemblePlayerTargetRef(playerID, check, config); include {
 		if childHasUpdated {
 			hasUpdated = true
 		}
-		player.Target = treePlayerTargetRef
+		element.Target = treePlayerTargetRef
 	}
 
 	for _, playerTargetedByRefID := range mergePlayerTargetedByRefIDs(engine.State.Player[playerData.ID].TargetedBy, engine.Patch.Player[playerData.ID].TargetedBy) {
@@ -329,29 +329,29 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if player.TargetedBy == nil {
-				player.TargetedBy = make(map[int]AnyOfPlayer_ZoneItemReference)
+			if element.TargetedBy == nil {
+				element.TargetedBy = make(map[int]anyOfPlayer_ZoneItemReference)
 			}
-			player.TargetedBy[treePlayerTargetedByRef.ElementID] = treePlayerTargetedByRef
+			element.TargetedBy[treePlayerTargetedByRef.ElementID] = treePlayerTargetedByRef
 		}
 	}
 
-	player.ID = playerData.ID
-	player.OperationKind = playerData.OperationKind
+	element.ID = playerData.ID
+	element.OperationKind = playerData.OperationKind
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.player[player.ID] = playerCacheElement{hasUpdated: hasUpdated, player: player}
+		engine.forceIncludeAssembleCache.player[element.ID] = playerCacheElement{hasUpdated: hasUpdated, player: element}
 	} else {
-		engine.assembleCache.player[player.ID] = playerCacheElement{hasUpdated: hasUpdated, player: player}
+		engine.assembleCache.player[element.ID] = playerCacheElement{hasUpdated: hasUpdated, player: element}
 	}
 
-	return player, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (Zone, bool, bool) {
+func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (zone, bool, bool) {
 	if check != nil {
 		if alreadyExists := check.zone[zoneID]; alreadyExists {
-			return Zone{}, false, false
+			return zone{}, false, false
 		} else {
 			check.zone[zoneID] = true
 		}
@@ -369,7 +369,7 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 		return cachedZone.zone, cachedZone.hasUpdated || config.forceInclude, cachedZone.hasUpdated
 	}
 
-	var zone Zone
+	var element zone
 
 	for _, anyOfItem_Player_ZoneItemID := range mergeAnyOfItem_Player_ZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
 		anyOfItem_Player_ZoneItemContainer := engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID).anyOfItem_Player_ZoneItem
@@ -379,10 +379,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				if zone.Interactables == nil {
-					zone.Interactables = make(map[int]interface{})
+				if element.Interactables == nil {
+					element.Interactables = make(map[int]interface{})
 				}
-				zone.Interactables[int(treeItem.ID)] = treeItem
+				element.Interactables[int(treeItem.ID)] = treeItem
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindPlayer {
 			playerID := anyOfItem_Player_ZoneItemContainer.Player
@@ -390,10 +390,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				if zone.Interactables == nil {
-					zone.Interactables = make(map[int]interface{})
+				if element.Interactables == nil {
+					element.Interactables = make(map[int]interface{})
 				}
-				zone.Interactables[int(treePlayer.ID)] = treePlayer
+				element.Interactables[int(treePlayer.ID)] = treePlayer
 			}
 		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindZoneItem {
 			zoneItemID := anyOfItem_Player_ZoneItemContainer.ZoneItem
@@ -401,10 +401,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 				if childHasUpdated {
 					hasUpdated = true
 				}
-				if zone.Interactables == nil {
-					zone.Interactables = make(map[int]interface{})
+				if element.Interactables == nil {
+					element.Interactables = make(map[int]interface{})
 				}
-				zone.Interactables[int(treeZoneItem.ID)] = treeZoneItem
+				element.Interactables[int(treeZoneItem.ID)] = treeZoneItem
 			}
 		}
 	}
@@ -414,10 +414,10 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if zone.Items == nil {
-				zone.Items = make(map[ZoneItemID]ZoneItem)
+			if element.Items == nil {
+				element.Items = make(map[ZoneItemID]zoneItem)
 			}
-			zone.Items[treeZoneItem.ID] = treeZoneItem
+			element.Items[treeZoneItem.ID] = treeZoneItem
 		}
 	}
 
@@ -426,27 +426,27 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 			if childHasUpdated {
 				hasUpdated = true
 			}
-			if zone.Players == nil {
-				zone.Players = make(map[PlayerID]Player)
+			if element.Players == nil {
+				element.Players = make(map[PlayerID]player)
 			}
-			zone.Players[treePlayer.ID] = treePlayer
+			element.Players[treePlayer.ID] = treePlayer
 		}
 	}
 
-	zone.ID = zoneData.ID
-	zone.OperationKind = zoneData.OperationKind
-	zone.Tags = zoneData.Tags
+	element.ID = zoneData.ID
+	element.OperationKind = zoneData.OperationKind
+	element.Tags = zoneData.Tags
 
 	if config.forceInclude {
-		engine.forceIncludeAssembleCache.zone[zone.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: zone}
+		engine.forceIncludeAssembleCache.zone[element.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: element}
 	} else {
-		engine.assembleCache.zone[zone.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: zone}
+		engine.assembleCache.zone[element.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: element}
 	}
 
-	return zone, hasUpdated || config.forceInclude, hasUpdated
+	return element, hasUpdated || config.forceInclude, hasUpdated
 }
 
-func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursionCheck, config assembleConfig) (*AnyOfPlayer_ZoneItemReference, bool, bool) {
+func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursionCheck, config assembleConfig) (*anyOfPlayer_ZoneItemReference, bool, bool) {
 	statePlayer := engine.State.Player[playerID]
 	patchPlayer, playerIsInPatch := engine.Patch.Player[playerID]
 
@@ -468,7 +468,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &AnyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return &anyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
 				check = newRecursionCheck()
@@ -478,7 +478,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &AnyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return &anyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, ref.playerTargetRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -497,7 +497,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			if hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
+			return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
 				check = newRecursionCheck()
@@ -508,7 +508,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			if hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
+			return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -525,7 +525,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &AnyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
+			return &anyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
 				check = newRecursionCheck()
@@ -535,7 +535,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &AnyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
+			return &anyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -555,7 +555,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				if hasUpdatedDownstream {
 					referencedDataStatus = ReferencedDataModified
 				}
-				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
+				return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 			} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 				if check == nil {
 					check = newRecursionCheck()
@@ -566,7 +566,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 				if hasUpdatedDownstream {
 					referencedDataStatus = ReferencedDataModified
 				}
-				return &AnyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
+				return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 			}
 		}
 	}
@@ -581,7 +581,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			}
 			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayer_ZoneItem.Player, check, config); hasUpdatedDownstream {
-				return &AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
+				return &anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
 			}
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
@@ -589,7 +589,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 			}
 			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
-				return &AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, referencedElement.Path, nil}, true, true
+				return &anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, referencedElement.Path, nil}, true, true
 			}
 		}
 	}
@@ -597,7 +597,7 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 	return nil, false, false
 }
 
-func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*PlayerReference, bool, bool) {
+func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*playerReference, bool, bool) {
 	stateItem := engine.State.Item[itemID]
 	patchItem, itemIsInPatch := engine.Patch.Item[itemID]
 
@@ -617,7 +617,7 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return &PlayerReference{ref.itemBoundToRef.OperationKind, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.itemBoundToRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return &playerReference{ref.itemBoundToRef.OperationKind, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.itemBoundToRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely created
@@ -633,7 +633,7 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
+		return &playerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 	}
 
 	// ref was definitely removed
@@ -647,7 +647,7 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return &PlayerReference{OperationKindDelete, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
+		return &playerReference{OperationKindDelete, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, referencedDataStatus == ReferencedDataModified
 	}
 
 	// immediate replacement of refs
@@ -664,7 +664,7 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 			if hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return &PlayerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
+			return &playerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, &element}, true, referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -676,14 +676,14 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 		}
 		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
-			return &PlayerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
+			return &playerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
 		}
 	}
 
 	return nil, false, false
 }
 
-func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (AnyOfPlayer_ZoneItemReference, bool, bool) {
+func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (anyOfPlayer_ZoneItemReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
 		anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
@@ -696,7 +696,7 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return AnyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return anyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
 				check = newRecursionCheck()
@@ -706,7 +706,7 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			return AnyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return anyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -725,11 +725,11 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 			if hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			var el *Player
+			var el *player
 			if patchRef.OperationKind == OperationKindUpdate {
 				el = &element
 			}
-			return AnyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return anyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 			if check == nil {
 				check = newRecursionCheck()
@@ -740,11 +740,11 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 			if hasUpdatedDownstream {
 				referencedDataStatus = ReferencedDataModified
 			}
-			var el *ZoneItem
+			var el *zoneItem
 			if patchRef.OperationKind == OperationKindUpdate {
 				el = &element
 			}
-			return AnyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+			return anyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 		}
 	}
 
@@ -756,19 +756,19 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 	if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
 		referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayer_ZoneItem.Player, check, config); hasUpdatedDownstream {
-			return AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
+			return anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
 		}
 	} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
 		referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 		if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
-			return AnyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, referencedElement.Path, nil}, true, true
+			return anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, referencedElement.Path, nil}, true, true
 		}
 	}
 
-	return AnyOfPlayer_ZoneItemReference{}, false, false
+	return anyOfPlayer_ZoneItemReference{}, false, false
 }
 
-func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (PlayerReference, bool, bool) {
+func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (playerReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
 		if check == nil {
@@ -779,7 +779,7 @@ func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID,
 		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return PlayerReference{ref.OperationKind, ref.ReferencedElementID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return playerReference{ref.OperationKind, ref.ReferencedElementID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := engine.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
@@ -795,11 +795,11 @@ func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID,
 		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		var el *Player
+		var el *player
 		if patchRef.OperationKind == OperationKindUpdate {
 			el = &element
 		}
-		return PlayerReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return playerReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
@@ -808,13 +808,13 @@ func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID,
 	}
 	referencedElement := engine.Player(ref.ReferencedElementID).player
 	if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return PlayerReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
+		return playerReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataModified, referencedElement.Path, nil}, true, true
 	}
 
-	return PlayerReference{}, false, false
+	return playerReference{}, false, false
 }
 
-func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (EquipmentSetReference, bool, bool) {
+func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (equipmentSetReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
 		if check == nil {
@@ -825,7 +825,7 @@ func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefI
 		if _, _, hasUpdatedDownstream := engine.assembleEquipmentSet(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return EquipmentSetReference{ref.OperationKind, ref.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return equipmentSetReference{ref.OperationKind, ref.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := engine.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
@@ -841,11 +841,11 @@ func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefI
 		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		var el *EquipmentSet
+		var el *equipmentSet
 		if patchRef.OperationKind == OperationKindUpdate {
 			el = &element
 		}
-		return EquipmentSetReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return equipmentSetReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
@@ -854,13 +854,13 @@ func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefI
 	}
 	referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
 	if _, _, hasUpdatedDownstream := engine.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return EquipmentSetReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataModified, referencedElement.Path, nil}, true, true
+		return equipmentSetReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataModified, referencedElement.Path, nil}, true, true
 	}
 
-	return EquipmentSetReference{}, false, false
+	return equipmentSetReference{}, false, false
 }
 
-func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (ItemReference, bool, bool) {
+func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (itemReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
 		if check == nil {
@@ -871,7 +871,7 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 		if _, _, hasUpdatedDownstream := engine.assembleItem(referencedElement.ID, check, config); hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		return ItemReference{ref.OperationKind, ref.ReferencedElementID, ElementKindItem, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return itemReference{ref.OperationKind, ref.ReferencedElementID, ElementKindItem, referencedDataStatus, referencedElement.Path, nil}, true, ref.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	if patchRef, hasUpdated := engine.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
@@ -887,11 +887,11 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 		if hasUpdatedDownstream {
 			referencedDataStatus = ReferencedDataModified
 		}
-		var el *Item
+		var el *item
 		if patchRef.OperationKind == OperationKindUpdate {
 			el = &element
 		}
-		return ItemReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
+		return itemReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, referencedElement.Path, el}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
 	}
 
 	ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
@@ -900,10 +900,10 @@ func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipme
 	}
 	referencedElement := engine.Item(ref.ReferencedElementID).item
 	if _, _, hasUpdatedDownstream := engine.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return ItemReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindItem, ReferencedDataModified, referencedElement.Path, nil}, true, true
+		return itemReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindItem, ReferencedDataModified, referencedElement.Path, nil}, true, true
 	}
 
-	return ItemReference{}, false, false
+	return itemReference{}, false, false
 }
 
 func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {

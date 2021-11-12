@@ -1,6 +1,6 @@
 package state
 
-func (_zone zone) RemovePlayers(playersToRemove ...PlayerID) zone {
+func (_zone Zone) RemovePlayers(playersToRemove ...PlayerID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -30,7 +30,7 @@ func (_zone zone) RemovePlayers(playersToRemove ...PlayerID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
+func (_zone Zone) RemoveItems(itemsToRemove ...ZoneItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -60,7 +60,7 @@ func (_zone zone) RemoveItems(itemsToRemove ...ZoneItemID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveInteractablesItem(itemsToRemove ...ItemID) zone {
+func (_zone Zone) RemoveInteractablesItem(itemsToRemove ...ItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -92,7 +92,7 @@ func (_zone zone) RemoveInteractablesItem(itemsToRemove ...ItemID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) zone {
+func (_zone Zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -124,7 +124,7 @@ func (_zone zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) zone {
 	return zone
 }
 
-func (_zone zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) zone {
+func (_zone Zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -156,7 +156,7 @@ func (_zone zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) z
 	return zone
 }
 
-func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
+func (_player Player) RemoveItems(itemsToRemove ...ItemID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player
@@ -186,7 +186,7 @@ func (_player player) RemoveItems(itemsToRemove ...ItemID) player {
 	return player
 }
 
-func (_player player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetID) player {
+func (_player Player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player
@@ -217,7 +217,7 @@ func (_player player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetI
 	return player
 }
 
-func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) player {
+func (_player Player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player
@@ -248,7 +248,7 @@ func (_player player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) playe
 	return player
 }
 
-func (_player player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) player {
+func (_player Player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player
@@ -280,7 +280,7 @@ func (_player player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) 
 	return player
 }
 
-func (_player player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) player {
+func (_player Player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player
@@ -312,7 +312,7 @@ func (_player player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) player
 	return player
 }
 
-func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
+func (_zone Zone) RemoveTags(tagsToRemove ...string) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
@@ -341,7 +341,7 @@ func (_zone zone) RemoveTags(tagsToRemove ...string) zone {
 	return zone
 }
 
-func (_equipmentSet equipmentSet) RemoveEquipment(equipmentToRemove ...ItemID) equipmentSet {
+func (_equipmentSet EquipmentSet) RemoveEquipment(equipmentToRemove ...ItemID) EquipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet

@@ -70,7 +70,7 @@ type zoneCore struct {
 	engine        *Engine
 }
 
-type zone struct{ zone zoneCore }
+type Zone struct{ zone zoneCore }
 
 type zoneItemCore struct {
 	ID            ZoneItemID    `json:"id"`
@@ -83,7 +83,7 @@ type zoneItemCore struct {
 	engine        *Engine
 }
 
-type zoneItem struct{ zoneItem zoneItemCore }
+type ZoneItem struct{ zoneItem zoneItemCore }
 
 type itemCore struct {
 	ID            ItemID                 `json:"id"`
@@ -98,7 +98,7 @@ type itemCore struct {
 	engine        *Engine
 }
 
-type item struct{ item itemCore }
+type Item struct{ item itemCore }
 
 type playerCore struct {
 	ID            PlayerID                  `json:"id"`
@@ -116,7 +116,7 @@ type playerCore struct {
 	engine        *Engine
 }
 
-type player struct{ player playerCore }
+type Player struct{ player playerCore }
 
 type gearScoreCore struct {
 	ID            GearScoreID   `json:"id"`
@@ -129,7 +129,7 @@ type gearScoreCore struct {
 	engine        *Engine
 }
 
-type gearScore struct{ gearScore gearScoreCore }
+type GearScore struct{ gearScore gearScoreCore }
 
 type positionCore struct {
 	ID            PositionID    `json:"id"`
@@ -142,7 +142,7 @@ type positionCore struct {
 	engine        *Engine
 }
 
-type position struct{ position positionCore }
+type Position struct{ position positionCore }
 
 type equipmentSetCore struct {
 	ID            EquipmentSetID               `json:"id"`
@@ -155,7 +155,7 @@ type equipmentSetCore struct {
 	engine        *Engine
 }
 
-type equipmentSet struct{ equipmentSet equipmentSetCore }
+type EquipmentSet struct{ equipmentSet equipmentSetCore }
 
 type itemBoundToRefCore struct {
 	ID                  ItemBoundToRefID `json:"id"`
@@ -165,7 +165,7 @@ type itemBoundToRefCore struct {
 	engine              *Engine
 }
 
-type itemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }
+type ItemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }
 
 type playerGuildMemberRefCore struct {
 	ID                  PlayerGuildMemberRefID `json:"id"`
@@ -175,7 +175,7 @@ type playerGuildMemberRefCore struct {
 	engine              *Engine
 }
 
-type playerGuildMemberRef struct{ playerGuildMemberRef playerGuildMemberRefCore }
+type PlayerGuildMemberRef struct{ playerGuildMemberRef playerGuildMemberRefCore }
 
 type equipmentSetEquipmentRefCore struct {
 	ID                  EquipmentSetEquipmentRefID `json:"id"`
@@ -185,7 +185,7 @@ type equipmentSetEquipmentRefCore struct {
 	engine              *Engine
 }
 
-type equipmentSetEquipmentRef struct{ equipmentSetEquipmentRef equipmentSetEquipmentRefCore }
+type EquipmentSetEquipmentRef struct{ equipmentSetEquipmentRef equipmentSetEquipmentRefCore }
 
 type playerEquipmentSetRefCore struct {
 	ID                  PlayerEquipmentSetRefID `json:"id"`
@@ -195,7 +195,7 @@ type playerEquipmentSetRefCore struct {
 	engine              *Engine
 }
 
-type playerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }
+type PlayerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }
 
 type anyOfPlayer_PositionCore struct {
 	ID               AnyOfPlayer_PositionID `json:"id"`
@@ -207,7 +207,7 @@ type anyOfPlayer_PositionCore struct {
 	engine           *Engine
 }
 
-type anyOfPlayer_Position struct{ anyOfPlayer_Position anyOfPlayer_PositionCore }
+type AnyOfPlayer_Position struct{ anyOfPlayer_Position anyOfPlayer_PositionCore }
 
 type anyOfPlayer_ZoneItemCore struct {
 	ID               AnyOfPlayer_ZoneItemID `json:"id"`
@@ -219,7 +219,7 @@ type anyOfPlayer_ZoneItemCore struct {
 	engine           *Engine
 }
 
-type anyOfPlayer_ZoneItem struct{ anyOfPlayer_ZoneItem anyOfPlayer_ZoneItemCore }
+type AnyOfPlayer_ZoneItem struct{ anyOfPlayer_ZoneItem anyOfPlayer_ZoneItemCore }
 
 type anyOfItem_Player_ZoneItemCore struct {
 	ID               AnyOfItem_Player_ZoneItemID `json:"id"`
@@ -232,7 +232,7 @@ type anyOfItem_Player_ZoneItemCore struct {
 	engine           *Engine
 }
 
-type anyOfItem_Player_ZoneItem struct{ anyOfItem_Player_ZoneItem anyOfItem_Player_ZoneItemCore }
+type AnyOfItem_Player_ZoneItem struct{ anyOfItem_Player_ZoneItem anyOfItem_Player_ZoneItemCore }
 
 type playerTargetRefCore struct {
 	ID                  PlayerTargetRefID      `json:"id"`
@@ -242,7 +242,7 @@ type playerTargetRefCore struct {
 	engine              *Engine
 }
 
-type playerTargetRef struct{ playerTargetRef playerTargetRefCore }
+type PlayerTargetRef struct{ playerTargetRef playerTargetRefCore }
 
 type playerTargetedByRefCore struct {
 	ID                  PlayerTargetedByRefID  `json:"id"`
@@ -252,4 +252,4 @@ type playerTargetedByRefCore struct {
 	engine              *Engine
 }
 
-type playerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }
+type PlayerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }

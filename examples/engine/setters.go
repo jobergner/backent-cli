@@ -1,6 +1,6 @@
 package state
 
-func (_gearScore gearScore) SetLevel(newLevel int) gearScore {
+func (_gearScore GearScore) SetLevel(newLevel int) GearScore {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind == OperationKindDelete {
 		return gearScore
@@ -14,7 +14,7 @@ func (_gearScore gearScore) SetLevel(newLevel int) gearScore {
 	return gearScore
 }
 
-func (_gearScore gearScore) SetScore(newScore int) gearScore {
+func (_gearScore GearScore) SetScore(newScore int) GearScore {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	if gearScore.gearScore.OperationKind == OperationKindDelete {
 		return gearScore
@@ -28,7 +28,7 @@ func (_gearScore gearScore) SetScore(newScore int) gearScore {
 	return gearScore
 }
 
-func (_position position) SetX(newX float64) position {
+func (_position Position) SetX(newX float64) Position {
 	position := _position.position.engine.Position(_position.position.ID)
 	if position.position.OperationKind == OperationKindDelete {
 		return position
@@ -42,7 +42,7 @@ func (_position position) SetX(newX float64) position {
 	return position
 }
 
-func (_position position) SetY(newY float64) position {
+func (_position Position) SetY(newY float64) Position {
 	position := _position.position.engine.Position(_position.position.ID)
 	if position.position.OperationKind == OperationKindDelete {
 		return position
@@ -56,7 +56,7 @@ func (_position position) SetY(newY float64) position {
 	return position
 }
 
-func (_item item) SetName(newName string) item {
+func (_item Item) SetName(newName string) Item {
 	item := _item.item.engine.Item(_item.item.ID)
 	if item.item.OperationKind == OperationKindDelete {
 		return item
@@ -70,7 +70,7 @@ func (_item item) SetName(newName string) item {
 	return item
 }
 
-func (_item item) SetBoundTo(playerID PlayerID) item {
+func (_item Item) SetBoundTo(playerID PlayerID) Item {
 	item := _item.item.engine.Item(_item.item.ID)
 	if item.item.OperationKind == OperationKindDelete {
 		return item
@@ -91,7 +91,7 @@ func (_item item) SetBoundTo(playerID PlayerID) item {
 	return item
 }
 
-func (_equipmentSet equipmentSet) SetName(newName string) equipmentSet {
+func (_equipmentSet EquipmentSet) SetName(newName string) EquipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
@@ -105,7 +105,7 @@ func (_equipmentSet equipmentSet) SetName(newName string) equipmentSet {
 	return equipmentSet
 }
 
-func (_player player) SetTargetPlayer(playerID PlayerID) player {
+func (_player Player) SetTargetPlayer(playerID PlayerID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player
@@ -128,7 +128,7 @@ func (_player player) SetTargetPlayer(playerID PlayerID) player {
 	return player
 }
 
-func (_player player) SetTargetZoneItem(zoneItemID ZoneItemID) player {
+func (_player Player) SetTargetZoneItem(zoneItemID ZoneItemID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return player

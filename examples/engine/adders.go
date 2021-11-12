@@ -1,9 +1,9 @@
 package state
 
-func (_zone zone) AddPlayer() player {
+func (_zone Zone) AddPlayer() Player {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
-		return player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	player := zone.zone.engine.createPlayer(zone.zone.path.players(), true)
 	zone.zone.Players = append(zone.zone.Players, player.player.ID)
@@ -12,10 +12,10 @@ func (_zone zone) AddPlayer() player {
 	return player
 }
 
-func (_zone zone) AddItem() zoneItem {
+func (_zone Zone) AddItem() ZoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
-		return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path.items(), true)
 	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
@@ -24,10 +24,10 @@ func (_zone zone) AddItem() zoneItem {
 	return zoneItem
 }
 
-func (_zone zone) AddInteractablePlayer() player {
+func (_zone Zone) AddInteractablePlayer() Player {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
-		return player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	player := zone.zone.engine.createPlayer(zone.zone.path.interactables(), true)
 	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path.interactables()).anyOfItem_Player_ZoneItem
@@ -38,10 +38,10 @@ func (_zone zone) AddInteractablePlayer() player {
 	return player
 }
 
-func (_zone zone) AddInteractableZoneItem() zoneItem {
+func (_zone Zone) AddInteractableZoneItem() ZoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
-		return zoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path.interactables(), true)
 	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path.interactables()).anyOfItem_Player_ZoneItem
@@ -52,10 +52,10 @@ func (_zone zone) AddInteractableZoneItem() zoneItem {
 	return zoneItem
 }
 
-func (_zone zone) AddInteractableItem() item {
+func (_zone Zone) AddInteractableItem() Item {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
-		return item{item: itemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	item := zone.zone.engine.createItem(zone.zone.path.interactables(), true)
 	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path.interactables()).anyOfItem_Player_ZoneItem
@@ -66,7 +66,7 @@ func (_zone zone) AddInteractableItem() item {
 	return item
 }
 
-func (_zone zone) AddTags(tags ...string) {
+func (_zone Zone) AddTags(tags ...string) {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return
@@ -76,10 +76,10 @@ func (_zone zone) AddTags(tags ...string) {
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 }
 
-func (_player player) AddItem() item {
+func (_player Player) AddItem() Item {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
-		return item{item: itemCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
 	}
 	item := player.player.engine.createItem(player.player.path.items(), true)
 	player.player.Items = append(player.player.Items, item.item.ID)
@@ -88,7 +88,7 @@ func (_player player) AddItem() item {
 	return item
 }
 
-func (_player player) AddGuildMember(playerID PlayerID) {
+func (_player Player) AddGuildMember(playerID PlayerID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return
@@ -108,7 +108,7 @@ func (_player player) AddGuildMember(playerID PlayerID) {
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 }
 
-func (_player player) AddTargetedByPlayer(playerID PlayerID) {
+func (_player Player) AddTargetedByPlayer(playerID PlayerID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return
@@ -131,7 +131,7 @@ func (_player player) AddTargetedByPlayer(playerID PlayerID) {
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 }
 
-func (_player player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
+func (_player Player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return
@@ -154,7 +154,7 @@ func (_player player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 }
 
-func (_player player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
+func (_player Player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
 		return
@@ -174,7 +174,7 @@ func (_player player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 }
 
-func (_equipmentSet equipmentSet) AddEquipment(itemID ItemID) {
+func (_equipmentSet EquipmentSet) AddEquipment(itemID ItemID) {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return
