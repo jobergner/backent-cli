@@ -104,7 +104,7 @@ func benchTestModifyPlayerPosition(engine *Engine) {
 	}
 }
 
-func benchTestAddNewPlayersAsGuildMembers(engine *Engine, zone zone) {
+func benchTestAddNewPlayersAsGuildMembers(engine *Engine, zone Zone) {
 	for i := 0; i < int(benchTestNumberOfPlayers/3); i++ {
 		// get the player with getter method
 		player := engine.Player(zone.Players()[rand.Intn(benchTestNumberOfPlayers)].ID())
@@ -115,7 +115,7 @@ func benchTestAddNewPlayersAsGuildMembers(engine *Engine, zone zone) {
 	}
 }
 
-func benchTestRemovePlayers(engine *Engine, zone zone) {
+func benchTestRemovePlayers(engine *Engine, zone Zone) {
 	for i := 0; i < int(benchTestNumberOfPlayers/3); i++ {
 		// get the player with getter method
 		player := engine.Player(zone.Players()[rand.Intn(benchTestNumberOfPlayers)].ID())
@@ -135,7 +135,7 @@ func benchTestModifyItemGearScore(engine *Engine) {
 	}
 }
 
-func benchTestAddInteractables(engine *Engine, zone zone) {
+func benchTestAddInteractables(engine *Engine, zone Zone) {
 	for i := 0; i < int(benchTestNumberOfInteractables/9)*3; i++ {
 		if i%3 == 0 {
 			zone.AddInteractableItem()
@@ -147,7 +147,7 @@ func benchTestAddInteractables(engine *Engine, zone zone) {
 	}
 }
 
-func benchTestRemoveInteractables(engine *Engine, zone zone) {
+func benchTestRemoveInteractables(engine *Engine, zone Zone) {
 	for i := 0; i < int(benchTestNumberOfInteractables/9)*3; i++ {
 		// get the interactable with getter method
 		randomInteractable := zone.Interactables()[rand.Intn(benchTestNumberOfInteractables)]

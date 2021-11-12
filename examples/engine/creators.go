@@ -1,10 +1,10 @@
 package state
 
-func (engine *Engine) CreateEquipmentSet() equipmentSet {
+func (engine *Engine) CreateEquipmentSet() EquipmentSet {
 	return engine.createEquipmentSet(newPath(equipmentSetIdentifier), true)
 }
 
-func (engine *Engine) createEquipmentSet(p path, extendWithID bool) equipmentSet {
+func (engine *Engine) createEquipmentSet(p path, extendWithID bool) EquipmentSet {
 	var element equipmentSetCore
 	element.engine = engine
 	element.ID = EquipmentSetID(engine.GenerateID())
@@ -16,14 +16,14 @@ func (engine *Engine) createEquipmentSet(p path, extendWithID bool) equipmentSet
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.EquipmentSet[element.ID] = element
-	return equipmentSet{equipmentSet: element}
+	return EquipmentSet{equipmentSet: element}
 }
 
-func (engine *Engine) CreateGearScore() gearScore {
+func (engine *Engine) CreateGearScore() GearScore {
 	return engine.createGearScore(newPath(gearScoreIdentifier), true)
 }
 
-func (engine *Engine) createGearScore(p path, extendWithID bool) gearScore {
+func (engine *Engine) createGearScore(p path, extendWithID bool) GearScore {
 	var element gearScoreCore
 	element.engine = engine
 	element.ID = GearScoreID(engine.GenerateID())
@@ -35,14 +35,14 @@ func (engine *Engine) createGearScore(p path, extendWithID bool) gearScore {
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.GearScore[element.ID] = element
-	return gearScore{gearScore: element}
+	return GearScore{gearScore: element}
 }
 
-func (engine *Engine) CreatePosition() position {
+func (engine *Engine) CreatePosition() Position {
 	return engine.createPosition(newPath(positionIdentifier), true)
 }
 
-func (engine *Engine) createPosition(p path, extendWithID bool) position {
+func (engine *Engine) createPosition(p path, extendWithID bool) Position {
 	var element positionCore
 	element.engine = engine
 	element.ID = PositionID(engine.GenerateID())
@@ -54,14 +54,14 @@ func (engine *Engine) createPosition(p path, extendWithID bool) position {
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.Position[element.ID] = element
-	return position{position: element}
+	return Position{position: element}
 }
 
-func (engine *Engine) CreateItem() item {
+func (engine *Engine) CreateItem() Item {
 	return engine.createItem(newPath(itemIdentifier), true)
 }
 
-func (engine *Engine) createItem(p path, extendWithID bool) item {
+func (engine *Engine) createItem(p path, extendWithID bool) Item {
 	var element itemCore
 	element.engine = engine
 	element.ID = ItemID(engine.GenerateID())
@@ -77,14 +77,14 @@ func (engine *Engine) createItem(p path, extendWithID bool) item {
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.Item[element.ID] = element
-	return item{item: element}
+	return Item{item: element}
 }
 
-func (engine *Engine) CreateZoneItem() zoneItem {
+func (engine *Engine) CreateZoneItem() ZoneItem {
 	return engine.createZoneItem(newPath(zoneItemIdentifier), true)
 }
 
-func (engine *Engine) createZoneItem(p path, extendWithID bool) zoneItem {
+func (engine *Engine) createZoneItem(p path, extendWithID bool) ZoneItem {
 	var element zoneItemCore
 	element.engine = engine
 	element.ID = ZoneItemID(engine.GenerateID())
@@ -100,14 +100,14 @@ func (engine *Engine) createZoneItem(p path, extendWithID bool) zoneItem {
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.ZoneItem[element.ID] = element
-	return zoneItem{zoneItem: element}
+	return ZoneItem{zoneItem: element}
 }
 
-func (engine *Engine) CreatePlayer() player {
+func (engine *Engine) CreatePlayer() Player {
 	return engine.createPlayer(newPath(playerIdentifier), true)
 }
 
-func (engine *Engine) createPlayer(p path, extendWithID bool) player {
+func (engine *Engine) createPlayer(p path, extendWithID bool) Player {
 	var element playerCore
 	element.engine = engine
 	element.ID = PlayerID(engine.GenerateID())
@@ -123,14 +123,14 @@ func (engine *Engine) createPlayer(p path, extendWithID bool) player {
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.Player[element.ID] = element
-	return player{player: element}
+	return Player{player: element}
 }
 
-func (engine *Engine) CreateZone() zone {
+func (engine *Engine) CreateZone() Zone {
 	return engine.createZone(newPath(zoneIdentifier), true)
 }
 
-func (engine *Engine) createZone(p path, extendWithID bool) zone {
+func (engine *Engine) createZone(p path, extendWithID bool) Zone {
 	var element zoneCore
 	element.engine = engine
 	element.ID = ZoneID(engine.GenerateID())
@@ -142,7 +142,7 @@ func (engine *Engine) createZone(p path, extendWithID bool) zone {
 	}
 	element.Path = element.path.toJSONPath()
 	engine.Patch.Zone[element.ID] = element
-	return zone{zone: element}
+	return Zone{zone: element}
 }
 
 func (engine *Engine) createItemBoundToRef(referencedElementID PlayerID, parentID ItemID) itemBoundToRefCore {
@@ -211,7 +211,7 @@ func (engine *Engine) createPlayerTargetedByRef(referencedElementID AnyOfPlayer_
 	return element
 }
 
-func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, childElementPath path) anyOfPlayer_ZoneItem {
+func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, childElementPath path) AnyOfPlayer_ZoneItem {
 	var element anyOfPlayer_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_ZoneItemID(engine.GenerateID())
@@ -223,10 +223,10 @@ func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, childElem
 	element.OperationKind = OperationKindUpdate
 	element.ChildElementPath = childElementPath
 	engine.Patch.AnyOfPlayer_ZoneItem[element.ID] = element
-	return anyOfPlayer_ZoneItem{anyOfPlayer_ZoneItem: element}
+	return AnyOfPlayer_ZoneItem{anyOfPlayer_ZoneItem: element}
 }
 
-func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, childElementPath path) anyOfPlayer_Position {
+func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, childElementPath path) AnyOfPlayer_Position {
 	var element anyOfPlayer_PositionCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_PositionID(engine.GenerateID())
@@ -238,10 +238,10 @@ func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, childElem
 	element.OperationKind = OperationKindUpdate
 	element.ChildElementPath = childElementPath
 	engine.Patch.AnyOfPlayer_Position[element.ID] = element
-	return anyOfPlayer_Position{anyOfPlayer_Position: element}
+	return AnyOfPlayer_Position{anyOfPlayer_Position: element}
 }
 
-func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, childElementPath path) anyOfItem_Player_ZoneItem {
+func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, childElementPath path) AnyOfItem_Player_ZoneItem {
 	var element anyOfItem_Player_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfItem_Player_ZoneItemID(engine.GenerateID())
@@ -253,5 +253,5 @@ func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, chil
 	element.OperationKind = OperationKindUpdate
 	element.ChildElementPath = childElementPath
 	engine.Patch.AnyOfItem_Player_ZoneItem[element.ID] = element
-	return anyOfItem_Player_ZoneItem{anyOfItem_Player_ZoneItem: element}
+	return AnyOfItem_Player_ZoneItem{anyOfItem_Player_ZoneItem: element}
 }
