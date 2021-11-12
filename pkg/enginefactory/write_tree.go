@@ -82,7 +82,7 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 			Id("ElementKind").Id("ElementKind").Id(e.metaFieldTag("elementKind")).Line(),
 			Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(e.metaFieldTag("referencedDataStatus")).Line(),
 			Id("ElementPath").Id("string").Id(e.metaFieldTag("elementPath")).Line(),
-			Id(Title(configType.Name)).Id("*"+Title(configType.Name)).Id(e.metaFieldTag(configType.Name)).Line(),
+			Id(Title(configType.Name)).Id("*"+configType.Name).Id(e.metaFieldTag(configType.Name)).Line(),
 		)
 
 	})
@@ -91,7 +91,7 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 		if !field.HasPointerValue {
 			return
 		}
-		decls.File.Type().Id(Title(anyNameByField(field))+"Reference").Struct(
+		decls.File.Type().Id(anyNameByField(field)+"Reference").Struct(
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("ElementID").Int().Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
@@ -172,7 +172,7 @@ func (s *EngineFactory) writeAssembleCache() *EngineFactory {
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		decls.File.Type().Id(configType.Name+"CacheElement").Struct(
 			Id("hasUpdated").Bool(),
-			Id(configType.Name).Id(Title(configType.Name)),
+			Id(configType.Name).Id(configType.Name),
 		)
 	})
 

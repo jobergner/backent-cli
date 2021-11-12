@@ -42,19 +42,19 @@ func TestWriteTree(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			_EquipmentSet_type,
+			equipmentSet_type,
 			equipmentSetReference_type,
-			_GearScore_type,
+			gearScore_type,
 			gearScoreReference_type,
-			_Item_type,
+			item_type,
 			itemReference_type,
-			_Player_type,
+			player_type,
 			playerReference_type,
-			_Position_type,
+			position_type,
 			positionReference_type,
-			_Zone_type,
+			zone_type,
 			zoneReference_type,
-			_ZoneItem_type,
+			zoneItem_type,
 			zoneItemReference_type,
 			anyOfPlayer_ZoneItemReference_type,
 		}, "\n"))

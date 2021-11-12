@@ -118,7 +118,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("engine").Id("*Engine").Line(),
 		)
 
-		decls.File.Type().Id(configType.Name).Struct(Id(configType.Name).Id(e.name()))
+		decls.File.Type().Id(Title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
@@ -135,7 +135,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("engine").Id("*Engine").Line(),
 		)
-		decls.File.Type().Id(field.ValueTypeName).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
+		decls.File.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
@@ -149,7 +149,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("engine").Id("*Engine").Line(),
 		)
-		decls.File.Type().Id(anyNameByField(field)).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
+		decls.File.Type().Id(Title(anyNameByField(field))).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
 	})
 
 	decls.Render(s.buf)

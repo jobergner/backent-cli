@@ -20,7 +20,7 @@ func (s treeWriter) mapKey() *Statement {
 }
 
 func (s treeWriter) mapValue() string {
-	return Title(s.t.Name)
+	return s.t.Name
 }
 
 func (s treeWriter) fieldTag() string {
@@ -33,15 +33,15 @@ type treeElementWriter struct {
 }
 
 func (e treeElementWriter) fieldValueMapDefinition() *Statement {
-	mapValueType := Id(Title(e.f.ValueType().Name) + "Reference")
+	mapValueType := Id(e.f.ValueType().Name + "Reference")
 	if e.f.HasAnyValue && !e.f.HasPointerValue {
 		mapValueType = Id("interface{}")
 	}
 	if e.f.HasPointerValue && e.f.HasAnyValue {
-		mapValueType = Id(Title(anyNameByField(*e.f) + "Reference"))
+		mapValueType = Id(anyNameByField(*e.f) + "Reference")
 	}
 	if !e.f.HasPointerValue && !e.f.HasAnyValue {
-		mapValueType = Id(Title(e.f.ValueType().Name))
+		mapValueType = Id(e.f.ValueType().Name)
 	}
 	mapKeyType := Id(Title(e.f.ValueType().Name) + "ID")
 	if e.f.HasAnyValue {
@@ -64,13 +64,13 @@ func (e treeElementWriter) fieldValue() *Statement {
 		typeName = e.f.ValueTypeName
 	} else if e.f.HasPointerValue {
 		if e.f.HasAnyValue {
-			typeName = Title(anyNameByField(*e.f))
+			typeName = anyNameByField(*e.f)
 		} else {
-			typeName = Title(e.f.ValueType().Name)
+			typeName = e.f.ValueType().Name
 		}
 		typeName = typeName + "Reference"
 	} else {
-		typeName = Title(e.f.ValueTypeName)
+		typeName = e.f.ValueTypeName
 	}
 
 	if e.f.HasSliceValue {
@@ -98,7 +98,7 @@ func (e treeElementWriter) fieldName() string {
 }
 
 func (e treeElementWriter) name() string {
-	return Title(e.t.Name)
+	return Lower(e.t.Name)
 }
 
 func (e treeElementWriter) idType() string {
