@@ -20,7 +20,7 @@ func (cw creatorWrapperWriter) name() string {
 }
 
 func (cw creatorWrapperWriter) returns() string {
-	return cw.t.Name
+	return Title(cw.t.Name)
 }
 
 func (cw creatorWrapperWriter) createElement() *Statement {
@@ -41,7 +41,7 @@ func (c creatorWriter) name() string {
 }
 
 func (c creatorWriter) returns() string {
-	return c.t.Name
+	return Title(c.t.Name)
 }
 
 func (c creatorWriter) params() (*Statement, *Statement) {
@@ -96,7 +96,7 @@ func (c creatorWriter) updateElementInPatch() *Statement {
 }
 
 func (c creatorWriter) returnElement() *Statement {
-	return Id(c.t.Name).Values(Dict{
+	return Id(Title(c.t.Name)).Values(Dict{
 		Id(c.t.Name): Id("element"),
 	})
 }
@@ -171,7 +171,7 @@ func (c generatedTypeCreatorWriter) setChildElementPath() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) returnElement() *Statement {
-	return Id(anyNameByField(c.f)).Values(Dict{
+	return Id(Title(anyNameByField(c.f))).Values(Dict{
 		Id(anyNameByField(c.f)): Id("element"),
 	})
 }

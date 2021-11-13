@@ -44,7 +44,7 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 				Return(r.wrapIntoAnyRefWrapper()),
 			)
 		} else {
-			decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())).Block(
+			decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(r.returnTypeOfGet()).Block(
 				r.reassignRef(),
 				Return(r.getReferencedElement()),
 			)

@@ -69,7 +69,7 @@ type assembleElementWriter struct {
 }
 
 func (a assembleElementWriter) treeElementName() string {
-	return a.t.Name
+	return "element"
 }
 
 func (a assembleElementWriter) dataElementName() string {
@@ -77,7 +77,7 @@ func (a assembleElementWriter) dataElementName() string {
 }
 
 func (a assembleElementWriter) treeTypeName() string {
-	return Title(a.t.Name)
+	return a.t.Name
 }
 
 func (a assembleElementWriter) receiverParams() *Statement {
@@ -109,7 +109,7 @@ func (a assembleElementWriter) elementExistsInCheck() (*Statement, *Statement) {
 }
 
 func (a assembleElementWriter) returnEmpty() (*Statement, *Statement, *Statement) {
-	return Id(Title(a.t.Name)).Values(), False(), False()
+	return Id(a.t.Name).Values(), False(), False()
 }
 
 func (a assembleElementWriter) checkElement() *Statement {
@@ -183,22 +183,22 @@ func (a assembleElementWriter) setHasUpdatedTrue() *Statement {
 }
 
 func (a assembleElementWriter) makeMap() *Statement {
-	mapValueType := Id(Title(a.f.ValueType().Name) + "Reference")
+	mapValueType := Id(a.f.ValueType().Name + "Reference")
 	if a.f.HasAnyValue && !a.f.HasPointerValue {
 		mapValueType = Id("interface{}")
 	}
 	if a.f.HasPointerValue && a.f.HasAnyValue {
-		mapValueType = Id(Title(anyNameByField(*a.f) + "Reference"))
+		mapValueType = Id(anyNameByField(*a.f) + "Reference")
 	}
 	if !a.f.HasPointerValue && !a.f.HasAnyValue {
-		mapValueType = Id(Title(a.f.ValueType().Name))
+		mapValueType = Id(a.f.ValueType().Name)
 	}
 	mapKeyType := Id(Title(a.f.ValueType().Name) + "ID")
 	if a.f.HasAnyValue {
 		mapKeyType = Int()
 	}
-	return If(Id(a.t.Name).Dot(Title(a.f.Name)).Op("==").Nil()).Block(
-		Id(a.t.Name).Dot(Title(a.f.Name)).Op("=").Make(Map(mapKeyType).Add(mapValueType)),
+	return If(Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("==").Nil()).Block(
+		Id(a.treeElementName()).Dot(Title(a.f.Name)).Op("=").Make(Map(mapKeyType).Add(mapValueType)),
 	)
 }
 
@@ -243,11 +243,11 @@ func (a assembleElementWriter) setOperationKind() *Statement {
 }
 
 func (a assembleElementWriter) putInCache(cacheName string) *Statement {
-	return Id("engine").Dot(cacheName).Dot(a.t.Name).Index(Id(a.t.Name).Dot("ID")).Op("=").Id(a.t.Name + "CacheElement").Values(List(Id("hasUpdated").Op(":").Id("hasUpdated"), Id(a.t.Name).Op(":").Id(a.t.Name)))
+	return Id("engine").Dot(cacheName).Dot(a.t.Name).Index(Id(a.treeElementName()).Dot("ID")).Op("=").Id(a.t.Name + "CacheElement").Values(List(Id("hasUpdated").Op(":").Id("hasUpdated"), Id(a.t.Name).Op(":").Id(a.treeElementName())))
 }
 
 func (a assembleElementWriter) finalReturn() (*Statement, *Statement, *Statement) {
-	return Id(a.t.Name), Id("hasUpdated").Op("||").Id("config").Dot("forceInclude"), Id("hasUpdated")
+	return Id(a.treeElementName()), Id("hasUpdated").Op("||").Id("config").Dot("forceInclude"), Id("hasUpdated")
 }
 
 func (a assembleElementWriter) anyContainerName() string {
@@ -319,7 +319,7 @@ func (a assembleReferenceWriter) returns() (*Statement, *Statement, *Statement) 
 	if !a.f.HasSliceValue {
 		optionalPointer = "*"
 	}
-	return Id(optionalPointer + Title(a.nextValueName()) + "Reference"), Bool(), Bool()
+	return Id(optionalPointer + a.nextValueName() + "Reference"), Bool(), Bool()
 }
 
 func (a assembleReferenceWriter) declareStateElement() *Statement {
@@ -471,7 +471,7 @@ func (a assembleReferenceWriter) defineReference() *Statement {
 		dataStatus = Id("ReferencedDataModified")
 	}
 
-	return Id(optionalShare+Title(a.nextValueName())+"Reference").Values(
+	return Id(optionalShare+a.nextValueName()+"Reference").Values(
 		operationKindStatement,
 		usedID,
 		Id("ElementKind"+Title(a.v.Name)),
@@ -533,7 +533,7 @@ func (a assembleReferenceWriter) finalReturn() *Statement {
 	if !a.f.HasSliceValue {
 		return Nil()
 	}
-	return Id(Title(a.nextValueName()) + "Reference").Values()
+	return Id(a.nextValueName() + "Reference").Values()
 }
 
 func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
@@ -576,7 +576,7 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement 
 		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		).Line(),
-		Var().Id("el").Id("*" + Title(a.v.Name)).Line(),
+		Var().Id("el").Id("*" + a.v.Name).Line(),
 		If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
 			Id("el").Op("=").Id("&element"),
 		).Line(),
