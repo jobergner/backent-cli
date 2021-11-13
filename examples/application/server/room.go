@@ -135,8 +135,10 @@ func (r *Room) publishPatch() error {
 	if err != nil {
 		return fmt.Errorf("error marshalling tree for patch: %s", err)
 	}
+
 	// TODO: if patch is empty -> find better way for evaluation
-	if len(patchBytes) == 2 {
+	emptyTreeBtes, _ := newTree().MarshalJSON()
+	if len(patchBytes) == len(emptyTreeBtes) {
 		return nil
 	}
 
