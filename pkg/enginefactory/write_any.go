@@ -25,7 +25,7 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 				f: field,
 				v: *valueType,
 			}
-			decls.File.Func().Params(s.wrapperReceiverParams()).Id("Set"+Title(valueType.Name)).Params().Id(valueType.Name).Block(
+			decls.File.Func().Params(s.wrapperReceiverParams()).Id("Set"+Title(valueType.Name)).Params().Id(Title(valueType.Name)).Block(
 				s.reassignAnyContainerWrapper(),
 				If(s.isAlreadyRequestedElement().Op("||").Add(s.isOperationKindDelete())).Block(
 					Return(s.currentElement()),
@@ -84,7 +84,7 @@ func (s *EngineFactory) writeAnyRefs() *EngineFactory {
 		}
 
 		decls.File.Type().Id(a.typeRefName()).Struct(
-			Id(a.wrapperName()).Id(a.typeName()),
+			Id(a.wrapperName()).Id(Title(a.typeName())),
 			Id(a.typeName()).Id(a.typeName()+"Core"),
 		)
 
@@ -94,7 +94,7 @@ func (s *EngineFactory) writeAnyRefs() *EngineFactory {
 
 		field.RangeValueTypes(func(configType *ast.ConfigType) {
 			a.v = configType
-			decls.File.Func().Params(a.receiverParams()).Id(Title(configType.Name)).Params().Id(configType.Name).Block(
+			decls.File.Func().Params(a.receiverParams()).Id(Title(configType.Name)).Params().Id(Title(configType.Name)).Block(
 				Return(a.child()),
 			)
 		})

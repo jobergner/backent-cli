@@ -12,7 +12,7 @@ type anyKindWriter struct {
 }
 
 func (a anyKindWriter) receiverParams() *Statement {
-	return Id("_any").Id(anyNameByField(a.f))
+	return Id("_any").Id(Title(anyNameByField(a.f)))
 }
 
 func (a anyKindWriter) reassignAnyContainer() *Statement {
@@ -30,7 +30,7 @@ type anySetterWriter struct {
 }
 
 func (a anySetterWriter) wrapperReceiverParams() *Statement {
-	return Id("_any").Id(anyNameByField(a.f))
+	return Id("_any").Id(Title(anyNameByField(a.f)))
 }
 
 func (a anySetterWriter) reassignAnyContainerWrapper() *Statement {
