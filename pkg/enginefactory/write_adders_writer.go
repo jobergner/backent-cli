@@ -14,7 +14,7 @@ type adderWriter struct {
 }
 
 func (a adderWriter) receiverParams() *Statement {
-	return Id(a.receiverName()).Id(a.t.Name)
+	return Id(a.receiverName()).Id(Title(a.t.Name))
 }
 
 func (a adderWriter) name() string {
@@ -46,7 +46,7 @@ func (a adderWriter) returns() string {
 	if a.f.ValueType().IsBasicType || a.f.HasPointerValue {
 		return ""
 	}
-	return a.v.Name
+	return Title(a.v.Name)
 }
 
 func (a adderWriter) reassignElement() *Statement {
@@ -79,7 +79,7 @@ func (a adderWriter) returnDeletedElement() *Statement {
 	if a.v.IsBasicType || a.f.HasPointerValue {
 		return Empty()
 	}
-	return Id(a.v.Name).Values(Dict{
+	return Id(Title(a.v.Name)).Values(Dict{
 		Id(a.v.Name): Id(a.v.Name + "Core").Values(Dict{
 			Id("OperationKind"): Id("OperationKindDelete"),
 			Id("engine"):        Id(a.t.Name).Dot(a.t.Name).Dot("engine"),
