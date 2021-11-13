@@ -74,7 +74,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			typeName: anyNameByField(field),
 		}
 
-		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("childElementPath").Id("path")).Id(anyNameByField(field)).Block(
+		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("childElementPath").Id("path")).Id(Title(anyNameByField(field))).Block(
 			c.declareElement(),
 			c.assignEngine(),
 			c.setID(),

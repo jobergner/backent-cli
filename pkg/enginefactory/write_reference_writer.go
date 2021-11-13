@@ -12,11 +12,11 @@ type referenceWriter struct {
 }
 
 func (r referenceWriter) receiverParams() *Statement {
-	return Id("_ref").Id(r.f.ValueTypeName)
+	return Id("_ref").Id(Title(r.f.ValueTypeName))
 }
 
 func (r referenceWriter) returns() (*Statement, *Statement) {
-	return Id(r.f.ValueTypeName), Bool()
+	return Id(Title(r.f.ValueTypeName)), Bool()
 }
 
 func (r referenceWriter) reassignRef() *Statement {
