@@ -457,7 +457,12 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 
 	// force include
 	if config.forceInclude {
-		ref := engine.playerTargetRef(patchPlayer.Target)
+		var ref PlayerTargetRef
+		if patchPlayer.ID == 0 {
+			ref = engine.playerTargetRef(statePlayer.Target)
+		} else {
+			ref = engine.playerTargetRef(patchPlayer.Target)
+		}
 		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
 			if check == nil {
@@ -608,7 +613,12 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 
 	// force include
 	if config.forceInclude {
-		ref := engine.itemBoundToRef(patchItem.BoundTo)
+		var ref ItemBoundToRef
+		if patchItem.ID == 0 {
+			ref = engine.itemBoundToRef(stateItem.BoundTo)
+		} else {
+			ref = engine.itemBoundToRef(patchItem.BoundTo)
+		}
 		if check == nil {
 			check = newRecursionCheck()
 		}

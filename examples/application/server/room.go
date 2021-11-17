@@ -137,8 +137,7 @@ func (r *Room) publishPatch() error {
 	}
 
 	// TODO: if patch is empty -> find better way for evaluation
-	emptyTreeBtes, _ := newTree().MarshalJSON()
-	if len(patchBytes) == len(emptyTreeBtes) {
+	if len(patchBytes) == 2 {
 		return nil
 	}
 

@@ -341,6 +341,16 @@ func (a assembleReferenceWriter) declareRef() *Statement {
 	if a.f.HasSliceValue {
 		return Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id("refID")).Dot(a.f.ValueTypeName)
 	}
+	if a.mode == referenceWriterModeForceInclude && !a.f.HasSliceValue {
+		return &Statement{
+			Var().Id("ref").Id(Title(a.f.ValueTypeName)).Line(),
+			If(Id("patch" + Title(a.f.Parent.Name))).Dot("ID").Op("==").Lit(0).Block(
+				Id("ref").Op("=").Id("engine").Dot(a.f.ValueTypeName).Call(Id("state" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name))),
+			).Else().Block(
+				Id("ref").Op("=").Id("engine").Dot(a.f.ValueTypeName).Call(Id("patch" + Title(a.f.Parent.Name)).Dot(Title(a.f.Name))),
+			).Line(),
+		}
+	}
 	usedElement := "patch"
 	if !a.f.HasSliceValue && (a.mode == referenceWriterModeRefDelete || a.mode == referenceWriterModeElementModified) {
 		usedElement = "state"

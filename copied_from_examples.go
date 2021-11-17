@@ -299,8 +299,7 @@ func (r *Room) publishPatch() error {
 	if err != nil {
 		return fmt.Errorf("error marshalling tree for patch: %s", err)
 	}
-	emptyTreeBtes, _ := newTree().MarshalJSON()
-	if len(patchBytes) == len(emptyTreeBtes) {
+	if len(patchBytes) == 2 {
 		return nil
 	}
 	stateUpdateMsg := Message{Kind: MessageKindUpdate, Content: patchBytes}

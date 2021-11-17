@@ -15,7 +15,7 @@ func generateMarshallers(firstAttempt bool) error {
 		}
 	}
 
-	cmd := exec.Command("easyjson", "-all", "-byte", filepath.Join(*outDirName, outFile))
+	cmd := exec.Command("easyjson", "-all", "-byte", "-omit_empty", filepath.Join(*outDirName, outFile))
 	// error is being printed as a warning as easyjson throws errors while actually functioning properly
 	// all underlying requirements have already been checked with `validateOutDir` at this point
 	output, err := cmd.CombinedOutput()
