@@ -864,7 +864,12 @@ const assemblePlayerTargetRef_Engine_func string = `func (engine *Engine) assemb
 		return nil, false, false
 	}
 	if config.forceInclude {
-		ref := engine.playerTargetRef(patchPlayer.Target)
+		var ref PlayerTargetRef
+		if patchPlayer.ID == 0 {
+			ref = engine.playerTargetRef(statePlayer.Target)
+		} else {
+			ref = engine.playerTargetRef(patchPlayer.Target)
+		}
 		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
 			if check == nil {
@@ -1002,7 +1007,12 @@ const assembleItemBoundToRef_Engine_func string = `func (engine *Engine) assembl
 		return nil, false, false
 	}
 	if config.forceInclude {
-		ref := engine.itemBoundToRef(patchItem.BoundTo)
+		var ref ItemBoundToRef
+		if patchItem.ID == 0 {
+			ref = engine.itemBoundToRef(stateItem.BoundTo)
+		} else {
+			ref = engine.itemBoundToRef(patchItem.BoundTo)
+		}
 		if check == nil {
 			check = newRecursionCheck()
 		}

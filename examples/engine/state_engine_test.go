@@ -293,11 +293,11 @@ func TestActionsOnDeletedItems(t *testing.T) {
 	})
 }
 
-func newTreeTest(define func(*Engine, *Tree), onFail func(errText string)) {
+func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assembleEntireTree bool) {
 	se := newEngine()
 	expectedTree := newTree()
 	define(se, &expectedTree)
-	actualTree := se.assembleTree(false)
+	actualTree := se.assembleTree(assembleEntireTree)
 
 	if !assert.ObjectsAreEqualValues(expectedTree, actualTree) {
 		actual, _ := actualTree.MarshalJSON()
@@ -352,6 +352,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
@@ -385,6 +386,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("assembles tree based on added item", func(t *testing.T) {
@@ -434,6 +436,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("assembles tree based on removed item", func(t *testing.T) {
@@ -487,6 +490,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("includes element which has reference of updating element", func(t *testing.T) {
@@ -541,6 +545,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("includes elements which have references of updating elements", func(t *testing.T) {
@@ -645,6 +650,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("does not break when element references itself", func(t *testing.T) {
@@ -711,6 +717,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("includes all elements in a reference chain", func(t *testing.T) {
@@ -777,6 +784,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("recursively travels tree to find if any downstream data has updated", func(t *testing.T) {
@@ -834,6 +842,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("does not include references if nothing related to them got updated", func(t *testing.T) {
@@ -863,6 +872,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("considers downstream updated data even if reference got assigned after state update", func(t *testing.T) {
@@ -945,6 +955,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("has ReferencedDataUnchanged when data was not changed", func(t *testing.T) {
@@ -1037,6 +1048,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("builds entire referenced player when ref is created", func(t *testing.T) {
@@ -1096,6 +1108,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("builds any kind", func(t *testing.T) {
@@ -1144,6 +1157,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("builds []any kinds", func(t *testing.T) {
@@ -1213,6 +1227,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("builds *any kind", func(t *testing.T) {
@@ -1271,6 +1286,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("builds []*any kind", func(t *testing.T) {
@@ -1331,6 +1347,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("build tree with path to element of any type", func(t *testing.T) {
@@ -1378,6 +1395,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("assembles tree with correct path no non-ref any type", func(t *testing.T) {
@@ -1425,6 +1443,7 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
 		)
 	})
 	t.Run("do not delete ZoneItem when calling player.SetTargetPlayer", func(t *testing.T) {
@@ -1466,6 +1485,66 @@ func TestTree(t *testing.T) {
 			func(errText string) {
 				t.Errorf(errText)
 			},
+			false,
+		)
+	})
+	t.Run("assembles entire tree correctly", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				plyr := se.CreatePlayer()
+				itm := plyr.AddItem().SetName("item1").SetBoundTo(plyr.ID())
+				se.UpdateState()
+
+				expectedTree.Player = map[PlayerID]player{
+					plyr.ID(): {
+						ID:            plyr.ID(),
+						OperationKind: OperationKindUnchanged,
+						GearScore: &gearScore{
+							ID:            plyr.GearScore().ID(),
+							OperationKind: OperationKindUnchanged,
+						},
+						Position: &position{
+							ID:            plyr.Position().ID(),
+							OperationKind: OperationKindUnchanged,
+						},
+						Items: map[ItemID]item{
+							itm.ID(): {
+								ID:            itm.ID(),
+								Name:          "item1",
+								OperationKind: OperationKindUnchanged,
+								GearScore: &gearScore{
+									ID:            itm.GearScore().ID(),
+									OperationKind: OperationKindUnchanged,
+								},
+								BoundTo: &playerReference{
+									OperationKind:        OperationKindUnchanged,
+									ElementID:            plyr.ID(),
+									ElementKind:          ElementKindPlayer,
+									ReferencedDataStatus: ReferencedDataUnchanged,
+									ElementPath:          newPath(playerIdentifier).id(int(plyr.ID())).toJSONPath(),
+									Player:               nil,
+								},
+								Origin: &player{
+									ID:            itm.Origin().Player().ID(),
+									OperationKind: OperationKindUnchanged,
+									Position: &position{
+										ID:            itm.Origin().Player().Position().ID(),
+										OperationKind: OperationKindUnchanged,
+									},
+									GearScore: &gearScore{
+										ID:            itm.Origin().Player().GearScore().ID(),
+										OperationKind: OperationKindUnchanged,
+									},
+								},
+							},
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			true,
 		)
 	})
 }

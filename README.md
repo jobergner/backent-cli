@@ -982,7 +982,22 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
-- Fix Exports
+- what do I want to achieve?
+    - (consistency) no dependency on previously emitted entities, which means:
+        - -> on (created ref/referencing entity update) assemble referenced entity fully
+        - -> paths can only consist of segments which are present in the current update
+        - -> paths cannot be evaluated at time of creation anymore
+        - -> a ton of more complexity
+    - (simplicity) dependency on previously emitted entities (websockets will never receive out-of-order)
+        - -> will always need a client keep to track and update local state -> user will always have acces to full tree at all times
+        - -> can always acces entities, references will never have to include referenced element
+        - -> since I have path to referenced element, can I determine ReferencedDataStatus by checking if it exists in tree?
+            - -> requires map to collect pointers of referenceElements, and map to collect IDs of updating(even descendants) elements
+                -  -> then in a following process manipulate referenceElement.ReferencedDataStatus depending on referenced element in tree
+            - -> would make assembling a lot faster and simpler
+            - -> would reduce data sent
+            - -> would throw out days of work (recursionCheck (cannot be recursive if referenced entities are not assembled), assembleCache (entities will always be assembled only once)) :(
+    
 - reserved action names "currentState"  "update"
 - error when using example: (because i need to install mods before running (`go mod tidy`))
 ```
