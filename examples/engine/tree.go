@@ -53,7 +53,6 @@ type zoneItemReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	ZoneItem             *zoneItem            `json:"zoneItem"`
 }
 
 type item struct {
@@ -70,7 +69,6 @@ type itemReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Item                 *item                `json:"item"`
 }
 
 type equipmentSet struct {
@@ -85,7 +83,6 @@ type equipmentSetReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	EquipmentSet         *equipmentSet        `json:"equipmentSet"`
 }
 
 type position struct {
@@ -100,7 +97,6 @@ type positionReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Position             *position            `json:"position"`
 }
 
 type gearScore struct {
@@ -115,7 +111,6 @@ type gearScoreReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	GearScore            *gearScore           `json:"gearScore"`
 }
 
 type player struct {
@@ -135,7 +130,6 @@ type playerReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Player               *player              `json:"player"`
 }
 
 type zone struct {
@@ -152,7 +146,6 @@ type zoneReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Zone                 *zone                `json:"zone"`
 }
 
 type anyOfPlayer_ZoneItemReference struct {
@@ -161,7 +154,6 @@ type anyOfPlayer_ZoneItemReference struct {
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`
-	Element              interface{}          `json:"element"`
 }
 
 type recursionCheck struct {
