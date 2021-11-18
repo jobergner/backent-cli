@@ -87,9 +87,6 @@ BenchmarkAssembleTree-12                	     342	   3464019 ns/op	  904554 B/op
 BenchmarkEngine-12                      	     628	   1673975 ns/op	  425770 B/op	    3136 allocs/op
 BenchmarkUpdateState-12                 	    1730	    607165 ns/op	  248083 B/op	     811 allocs/op
 PASS
-<<<<<<< Updated upstream
-ok  	github.com/jobergner/backent-cli/examples/engine	6.725s
-=======
 ok  	github.com/jobergner/backent-cli/examples/engine	6.725s
 
 
@@ -106,4 +103,17 @@ BenchmarkEngine-8                     	     824	   1321421 ns/op	  419507 B/op	 
 BenchmarkUpdateState-8                	    2221	    453559 ns/op	  246598 B/op	     807 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	6.668s
->>>>>>> Stashed changes
+
+# remove referenced element from tree References 
+Do 18. Nov 10:47:06 CET 2021
+goos: linux
+goarch: amd64
+pkg: github.com/jobergner/backent-cli/examples/engine
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkAssembleTreeForceInclude-8   	     433	   2817637 ns/op	  781489 B/op	    6209 allocs/op
+BenchmarkAssembleTree-8               	     315	   3312790 ns/op	  649396 B/op	    5990 allocs/op
+BenchmarkEngine-8                     	     499	   2185470 ns/op	  403785 B/op	    3022 allocs/op
+BenchmarkUpdateState-8                	    1663	    624301 ns/op	  245586 B/op	     810 allocs/op
+PASS
+ok  	github.com/jobergner/backent-cli/examples/engine	6.807s
+

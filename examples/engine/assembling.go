@@ -18,7 +18,7 @@ func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursio
 		gearScoreData = engine.State.GearScore[gearScoreID]
 	}
 
-	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok && !config.forceInclude {
+	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok {
 		return cachedGearScore.gearScore, cachedGearScore.hasUpdated || config.forceInclude, cachedGearScore.hasUpdated
 	}
 
@@ -48,7 +48,7 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 		positionData = engine.State.Position[positionID]
 	}
 
-	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok && !config.forceInclude {
+	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok {
 		return cachedPosition.position, cachedPosition.hasUpdated || config.forceInclude, cachedPosition.hasUpdated
 	}
 
@@ -78,7 +78,7 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
 	}
 
-	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok && !config.forceInclude {
+	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok {
 		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdated || config.forceInclude, cachedEquipmentSet.hasUpdated
 	}
 
@@ -119,7 +119,7 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		itemData = engine.State.Item[itemID]
 	}
 
-	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok && !config.forceInclude {
+	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok {
 		return cachedItem.item, cachedItem.hasUpdated || config.forceInclude, cachedItem.hasUpdated
 	}
 
@@ -181,7 +181,7 @@ func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCh
 		zoneItemData = engine.State.ZoneItem[zoneItemID]
 	}
 
-	if cachedZoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok && !config.forceInclude {
+	if cachedZoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok {
 		return cachedZoneItem.zoneItem, cachedZoneItem.hasUpdated || config.forceInclude, cachedZoneItem.hasUpdated
 	}
 
@@ -223,7 +223,7 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		playerData = engine.State.Player[playerID]
 	}
 
-	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok && !config.forceInclude {
+	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok {
 		return cachedPlayer.player, cachedPlayer.hasUpdated || config.forceInclude, cachedPlayer.hasUpdated
 	}
 
@@ -320,7 +320,7 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 		zoneData = engine.State.Zone[zoneID]
 	}
 
-	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok && !config.forceInclude {
+	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok {
 		return cachedZone.zone, cachedZone.hasUpdated || config.forceInclude, cachedZone.hasUpdated
 	}
 
