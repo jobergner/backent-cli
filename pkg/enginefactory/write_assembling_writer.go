@@ -128,14 +128,6 @@ func (a assembleElementWriter) declareTreeElement() *Statement {
 	return Var().Id(a.treeElementName()).Id(a.treeTypeName())
 }
 
-func (a assembleElementWriter) shouldRetrieveFromForceInlcudeCache() (*Statement, *Statement) {
-	return List(Id("cached"+Title(a.t.Name)), Id("ok")).Op(":=").Id("engine").Dot("forceIncludeAssembleCache").Dot(a.t.Name).Index(Id(a.dataElementName()).Dot("ID")), Id("ok").Op("&&").Id("config").Dot("forceInclude")
-}
-
-func (a assembleElementWriter) returnCachedForceIncludeElement() *Statement {
-	return Return(Id("cached"+Title(a.t.Name)).Dot(a.t.Name), True(), Id("cached"+Title(a.t.Name)).Dot("hasUpdated"))
-}
-
 func (a assembleElementWriter) shouldRetrieveFromCache() (*Statement, *Statement) {
 	return List(Id("cached"+Title(a.t.Name)), Id("ok")).Op(":=").Id("engine").Dot("assembleCache").Dot(a.t.Name).Index(Id(a.dataElementName()).Dot("ID")), Id("ok").Op("&&").Id("!config").Dot("forceInclude")
 }
@@ -398,10 +390,6 @@ func (a assembleReferenceWriter) declareReferencedElement() *Statement {
 // __ on referenced element update:  engine.assembleItem(ref.ReferencedElementID, check
 
 func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
-	firstReturn := "_"
-	if a.mode == referenceWriterModeRefCreate || a.mode == referenceWriterModeRefUpdate || a.mode == referenceWriterModeRefReplace {
-		firstReturn = "element"
-	}
 	usedID := Id("referencedElement").Dot("ID")
 	if a.mode == referenceWriterModeElementModified {
 		if a.f.HasAnyValue {
@@ -412,7 +400,7 @@ func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
 			usedID = Id("ref").Dot("ReferencedElementID")
 		}
 	}
-	return List(Id(firstReturn), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+Title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
+	return List(Id("_"), Id("_"), Id("hasUpdatedDownstream")).Op(":=").Id("engine").Dot("assemble"+Title(a.v.Name)).Call(usedID, Id("check"), Id("config"))
 }
 
 // non-slice gen force: ref.playerTargetRef.OperationKind
@@ -427,13 +415,6 @@ func (a assembleReferenceWriter) assembleReferencedElement() *Statement {
 // slice non-gen force: SAME
 
 func (a assembleReferenceWriter) defineReference() *Statement {
-	element := Nil()
-	if a.mode == referenceWriterModeRefCreate || a.mode == referenceWriterModeRefReplace {
-		element = Id("&element")
-	}
-	if a.mode == referenceWriterModeRefUpdate {
-		element = Id("el")
-	}
 
 	operationKindStatement := Id("OperationKindUpdate")
 	if a.mode == referenceWriterModeForceInclude {
@@ -479,6 +460,8 @@ func (a assembleReferenceWriter) defineReference() *Statement {
 	dataStatus := Id("referencedDataStatus")
 	if a.mode == referenceWriterModeElementModified {
 		dataStatus = Id("ReferencedDataModified")
+	} else if a.mode == referenceWriterModeForceInclude {
+		dataStatus = Id("ReferencedDataUnchanged")
 	}
 
 	return Id(optionalShare+a.nextValueName()+"Reference").Values(
@@ -487,7 +470,6 @@ func (a assembleReferenceWriter) defineReference() *Statement {
 		Id("ElementKind"+Title(a.v.Name)),
 		dataStatus,
 		Id("referencedElement").Dot("Path"),
-		element,
 	)
 }
 
@@ -548,15 +530,8 @@ func (a assembleReferenceWriter) finalReturn() *Statement {
 
 func (a assembleReferenceWriter) writeTreeReferenceForceInclude() *Statement {
 	return &Statement{
-		If(Id("check").Op("==").Nil()).Block(
-			Id("check").Op("=").Id("newRecursionCheck").Call(),
-		).Line(),
 		a.declareReferencedElement().Line(),
-		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
-		If(a.assembleReferencedElement(), Id("hasUpdatedDownstream")).Block(
-			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
-		).Line(),
-		Return(a.defineReference(), True(), a.hasUpdated()).Line(),
+		Return(a.defineReference(), True(), False()).Line(),
 	}
 }
 
@@ -585,10 +560,6 @@ func (a assembleReferenceWriter) writeSliceTreeReferenceRefUpdated() *Statement 
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged").Line(),
 		If(Id("hasUpdatedDownstream")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
-		).Line(),
-		Var().Id("el").Id("*" + a.v.Name).Line(),
-		If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
-			Id("el").Op("=").Id("&element"),
 		).Line(),
 		Return(a.defineReference(), True(), a.hasUpdated()),
 	}

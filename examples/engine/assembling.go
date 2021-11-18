@@ -18,9 +18,6 @@ func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursio
 		gearScoreData = engine.State.GearScore[gearScoreID]
 	}
 
-	if cachedGearScore, ok := engine.forceIncludeAssembleCache.gearScore[gearScoreData.ID]; ok && config.forceInclude {
-		return cachedGearScore.gearScore, true, cachedGearScore.hasUpdated
-	}
 	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok && !config.forceInclude {
 		return cachedGearScore.gearScore, cachedGearScore.hasUpdated || config.forceInclude, cachedGearScore.hasUpdated
 	}
@@ -51,9 +48,6 @@ func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCh
 		positionData = engine.State.Position[positionID]
 	}
 
-	if cachedPosition, ok := engine.forceIncludeAssembleCache.position[positionData.ID]; ok && config.forceInclude {
-		return cachedPosition.position, true, cachedPosition.hasUpdated
-	}
 	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok && !config.forceInclude {
 		return cachedPosition.position, cachedPosition.hasUpdated || config.forceInclude, cachedPosition.hasUpdated
 	}
@@ -84,9 +78,6 @@ func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check 
 		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
 	}
 
-	if cachedEquipmentSet, ok := engine.forceIncludeAssembleCache.equipmentSet[equipmentSetData.ID]; ok && config.forceInclude {
-		return cachedEquipmentSet.equipmentSet, true, cachedEquipmentSet.hasUpdated
-	}
 	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok && !config.forceInclude {
 		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdated || config.forceInclude, cachedEquipmentSet.hasUpdated
 	}
@@ -128,9 +119,6 @@ func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config 
 		itemData = engine.State.Item[itemID]
 	}
 
-	if cachedItem, ok := engine.forceIncludeAssembleCache.item[itemData.ID]; ok && config.forceInclude {
-		return cachedItem.item, true, cachedItem.hasUpdated
-	}
 	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok && !config.forceInclude {
 		return cachedItem.item, cachedItem.hasUpdated || config.forceInclude, cachedItem.hasUpdated
 	}
@@ -193,9 +181,6 @@ func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCh
 		zoneItemData = engine.State.ZoneItem[zoneItemID]
 	}
 
-	if cachedZoneItem, ok := engine.forceIncludeAssembleCache.zoneItem[zoneItemData.ID]; ok && config.forceInclude {
-		return cachedZoneItem.zoneItem, true, cachedZoneItem.hasUpdated
-	}
 	if cachedZoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok && !config.forceInclude {
 		return cachedZoneItem.zoneItem, cachedZoneItem.hasUpdated || config.forceInclude, cachedZoneItem.hasUpdated
 	}
@@ -238,9 +223,6 @@ func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, c
 		playerData = engine.State.Player[playerID]
 	}
 
-	if cachedPlayer, ok := engine.forceIncludeAssembleCache.player[playerData.ID]; ok && config.forceInclude {
-		return cachedPlayer.player, true, cachedPlayer.hasUpdated
-	}
 	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok && !config.forceInclude {
 		return cachedPlayer.player, cachedPlayer.hasUpdated || config.forceInclude, cachedPlayer.hasUpdated
 	}
@@ -338,9 +320,6 @@ func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config 
 		zoneData = engine.State.Zone[zoneID]
 	}
 
-	if cachedZone, ok := engine.forceIncludeAssembleCache.zone[zoneData.ID]; ok && config.forceInclude {
-		return cachedZone.zone, true, cachedZone.hasUpdated
-	}
 	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok && !config.forceInclude {
 		return cachedZone.zone, cachedZone.hasUpdated || config.forceInclude, cachedZone.hasUpdated
 	}
@@ -437,15 +416,9 @@ func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursio
 		}
 		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			if check == nil {
-				check = newRecursionCheck()
-			}
 			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			return &anyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			if check == nil {
-				check = newRecursionCheck()
-			}
 			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			return &anyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, ReferencedDataUnchanged, referencedElement.Path}, true, false
 		}
@@ -581,9 +554,6 @@ func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionChec
 		} else {
 			ref = engine.itemBoundToRef(patchItem.BoundTo)
 		}
-		if check == nil {
-			check = newRecursionCheck()
-		}
 		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
 		return &playerReference{ref.itemBoundToRef.OperationKind, referencedElement.ID, ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
 	}
@@ -654,15 +624,9 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
 		anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			if check == nil {
-				check = newRecursionCheck()
-			}
 			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
 			return anyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
 		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			if check == nil {
-				check = newRecursionCheck()
-			}
 			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
 			return anyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, ReferencedDataUnchanged, referencedElement.Path}, true, false
 		}
@@ -718,9 +682,6 @@ func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, c
 func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (playerReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
-		if check == nil {
-			check = newRecursionCheck()
-		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
 		return playerReference{ref.OperationKind, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
 	}
@@ -753,9 +714,6 @@ func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID,
 func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (equipmentSetReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
-		if check == nil {
-			check = newRecursionCheck()
-		}
 		referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
 		return equipmentSetReference{ref.OperationKind, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataUnchanged, referencedElement.Path}, true, false
 	}
@@ -788,9 +746,6 @@ func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefI
 func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (itemReference, bool, bool) {
 	if config.forceInclude {
 		ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
-		if check == nil {
-			check = newRecursionCheck()
-		}
 		referencedElement := engine.Item(ref.ReferencedElementID).item
 		return itemReference{ref.OperationKind, ref.ReferencedElementID, ElementKindItem, ReferencedDataUnchanged, referencedElement.Path}, true, false
 	}
@@ -842,28 +797,6 @@ func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
 	}
 	for key := range engine.assembleCache.zoneItem {
 		delete(engine.assembleCache.zoneItem, key)
-	}
-
-	for key := range engine.forceIncludeAssembleCache.equipmentSet {
-		delete(engine.forceIncludeAssembleCache.equipmentSet, key)
-	}
-	for key := range engine.forceIncludeAssembleCache.gearScore {
-		delete(engine.forceIncludeAssembleCache.gearScore, key)
-	}
-	for key := range engine.forceIncludeAssembleCache.item {
-		delete(engine.forceIncludeAssembleCache.item, key)
-	}
-	for key := range engine.forceIncludeAssembleCache.player {
-		delete(engine.forceIncludeAssembleCache.player, key)
-	}
-	for key := range engine.forceIncludeAssembleCache.position {
-		delete(engine.forceIncludeAssembleCache.position, key)
-	}
-	for key := range engine.forceIncludeAssembleCache.zone {
-		delete(engine.forceIncludeAssembleCache.zone, key)
-	}
-	for key := range engine.forceIncludeAssembleCache.zoneItem {
-		delete(engine.forceIncludeAssembleCache.zoneItem, key)
 	}
 
 	for key := range engine.Tree.EquipmentSet {

@@ -24,10 +24,6 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			a.t = &configType
-			return a.clearMap("forceIncludeAssembleCache", false)
-		}),
-		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			a.t = &configType
 			return a.clearMap("Tree", true)
 		}),
 		a.createConfig(),
@@ -90,9 +86,6 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 			a.getElementFromPatch(),
 			If(Id("!hasUpdated")).Block(
 				a.getElementFromState(),
-			),
-			If(a.shouldRetrieveFromForceInlcudeCache()).Block(
-				a.returnCachedForceIncludeElement(),
 			),
 			If(a.shouldRetrieveFromCache()).Block(
 				a.returnCachedElement(),
@@ -170,11 +163,7 @@ func (s *EngineFactory) writeAssembleTreeElement() *EngineFactory {
 
 				return a.setField()
 			}),
-			If(Id("config").Dot("forceInclude")).Block(
-				a.putInCache("forceIncludeAssembleCache"),
-			).Else().Block(
-				a.putInCache("assembleCache"),
-			),
+			a.putInCache("assembleCache"),
 			Return(a.finalReturn()),
 		)
 	})
@@ -209,7 +198,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				),
 				If(a.refWasCreated()).Block(
 					a.setMode(referenceWriterModeRefCreate),
-					Id("config").Dot("forceInclude").Op("=").True(),
 					a.declareRef(),
 					a.declareAnyContainer(),
 					ForEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
@@ -230,7 +218,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				If(a.refHasBeenReplaced()).Block(
 					a.setMode(referenceWriterModeRefReplace),
 					If(a.refWasReplaced()).Block(
-						Id("config").Dot("forceInclude").Op("=").True(),
 						a.declareRef(),
 						a.declareAnyContainer(),
 						ForEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
@@ -271,7 +258,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				),
 				If(a.refWasCreated()).Block(
 					a.setMode(referenceWriterModeRefCreate),
-					Id("config").Dot("forceInclude").Op("=").True(),
 					a.declareRef(),
 					a.writeNonSliceTreeReferenceRefCreated(),
 				),
@@ -283,7 +269,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				If(a.refHasBeenReplaced()).Block(
 					a.setMode(referenceWriterModeRefReplace),
 					If(a.refWasReplaced()).Block(
-						Id("config").Dot("forceInclude").Op("=").True(),
 						a.declareRef(),
 						a.writeNonSliceTreeReferenceRefReplaced(),
 					),
@@ -312,9 +297,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				),
 				If(a.sliceRefHasUpdated()).Block(
 					a.setMode(referenceWriterModeRefUpdate),
-					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
-						Id("config").Dot("forceInclude").Op("=").True(),
-					),
 					a.declareAnyContainer(),
 					ForEachFieldValueComparison(field, *Id("anyContainer").Dot(a.nextValueName()).Dot("ElementKind"), func(valueType *ast.ConfigType) *Statement {
 						a.v = valueType
@@ -347,9 +329,6 @@ func (s *EngineFactory) writeAssembleTreeReference() *EngineFactory {
 				),
 				If(a.sliceRefHasUpdated()).Block(
 					a.setMode(referenceWriterModeRefUpdate),
-					If(Id("patchRef").Dot("OperationKind").Op("==").Id("OperationKindUpdate")).Block(
-						Id("config").Dot("forceInclude").Op("=").True(),
-					),
 					a.writeSliceTreeReferenceRefUpdated(),
 				),
 				a.setMode(referenceWriterModeElementModified),
