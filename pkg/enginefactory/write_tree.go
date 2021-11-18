@@ -82,7 +82,6 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 			Id("ElementKind").Id("ElementKind").Id(e.metaFieldTag("elementKind")).Line(),
 			Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(e.metaFieldTag("referencedDataStatus")).Line(),
 			Id("ElementPath").Id("string").Id(e.metaFieldTag("elementPath")).Line(),
-			Id(Title(configType.Name)).Id("*"+configType.Name).Id(e.metaFieldTag(configType.Name)).Line(),
 		)
 
 	})
@@ -97,7 +96,6 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
 			Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(fieldTag("referencedDataStatus")).Line(),
 			Id("ElementPath").Id("string").Id(fieldTag("elementPath")).Line(),
-			Id("Element").Interface().Id(fieldTag("element")).Line(),
 		)
 	})
 
