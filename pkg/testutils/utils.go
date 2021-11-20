@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"bytes"
+	"encoding/json"
 	"go/format"
 	"go/parser"
 	"go/token"
@@ -9,6 +10,8 @@ import (
 	"unicode"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/yudai/gojsondiff"
+	"github.com/yudai/gojsondiff/formatter"
 )
 
 // creates diff and makes whitespace visible
@@ -56,4 +59,34 @@ func FormatCode(code string) string {
 	var buf bytes.Buffer
 	err = format.Node(&buf, token.NewFileSet(), ast)
 	return strings.TrimPrefix(buf.String(), packageClause)
+}
+
+func DiffJSON(actual, expected string) string {
+	aString := []byte(actual)
+	bString := []byte(expected)
+
+	differ := gojsondiff.New()
+	d, err := differ.Compare(aString, bString)
+	if err != nil {
+		panic(err)
+	}
+
+	if d.Modified() {
+		var aJson map[string]interface{}
+		json.Unmarshal(aString, &aJson)
+
+		config := formatter.AsciiFormatterConfig{
+			ShowArrayIndex: true,
+			Coloring:       true,
+		}
+
+		formatter := formatter.NewAsciiFormatter(aJson, config)
+		diffString, err := formatter.Format(d)
+		if err != nil {
+			// No error can occur
+		}
+		return diffString
+	}
+
+	return ""
 }

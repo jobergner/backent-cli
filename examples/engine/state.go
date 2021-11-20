@@ -162,6 +162,7 @@ type itemBoundToRefCore struct {
 	ParentID            ItemID           `json:"parentID"`
 	ReferencedElementID PlayerID         `json:"referencedElementID"`
 	OperationKind       OperationKind    `json:"operationKind"`
+	path                path
 	engine              *Engine
 }
 
@@ -172,6 +173,7 @@ type playerGuildMemberRefCore struct {
 	ParentID            PlayerID               `json:"parentID"`
 	ReferencedElementID PlayerID               `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
+	path                path
 	engine              *Engine
 }
 
@@ -182,6 +184,7 @@ type equipmentSetEquipmentRefCore struct {
 	ParentID            EquipmentSetID             `json:"parentID"`
 	ReferencedElementID ItemID                     `json:"referencedElementID"`
 	OperationKind       OperationKind              `json:"operationKind"`
+	path                path
 	engine              *Engine
 }
 
@@ -192,6 +195,7 @@ type playerEquipmentSetRefCore struct {
 	ParentID            PlayerID                `json:"parentID"`
 	ReferencedElementID EquipmentSetID          `json:"referencedElementID"`
 	OperationKind       OperationKind           `json:"operationKind"`
+	path                path
 	engine              *Engine
 }
 
@@ -239,6 +243,7 @@ type playerTargetRefCore struct {
 	ParentID            PlayerID               `json:"parentID"`
 	ReferencedElementID AnyOfPlayer_ZoneItemID `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
+	path                path
 	engine              *Engine
 }
 
@@ -249,6 +254,7 @@ type playerTargetedByRefCore struct {
 	ParentID            PlayerID               `json:"parentID"`
 	ReferencedElementID AnyOfPlayer_ZoneItemID `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
+	path                path
 	engine              *Engine
 }
 

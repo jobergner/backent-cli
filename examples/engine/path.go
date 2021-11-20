@@ -14,6 +14,12 @@ const (
 	interactablesIdentifier int = -9
 	playersIdentifier       int = -10
 	zoneItemIdentifier      int = -11
+	boundToIdentifier       int = -12
+	equipmentIdentifier     int = -13
+	equipmentSetsIdentifier int = -14
+	guildMembersIdentifier  int = -15
+	targetIdentifier        int = -16
+	targetedByIdentifier    int = -17
 )
 
 type path []int
@@ -96,6 +102,48 @@ func (p path) origin() path {
 	newPath := make([]int, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, originIdentifier)
+	return newPath
+}
+
+func (p path) boundTo() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, boundToIdentifier)
+	return newPath
+}
+
+func (p path) equipment() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, equipmentIdentifier)
+	return newPath
+}
+
+func (p path) equipmentSets() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, equipmentSetsIdentifier)
+	return newPath
+}
+
+func (p path) guildMembers() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, guildMembersIdentifier)
+	return newPath
+}
+
+func (p path) target() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, targetIdentifier)
+	return newPath
+}
+
+func (p path) targetedBy() path {
+	newPath := make([]int, len(p), len(p)+1)
+	copy(newPath, p)
+	newPath = append(newPath, targetedByIdentifier)
 	return newPath
 }
 
