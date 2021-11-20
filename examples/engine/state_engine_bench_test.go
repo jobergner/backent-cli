@@ -162,27 +162,27 @@ func benchTestRemoveInteractables(engine *Engine, zone Zone) {
 	}
 }
 
-func BenchmarkAssembleTreeForceInclude(b *testing.B) {
-	engine := newEngine()
-	for i := 0; i < benchTestNumberOfZones; i++ {
-		setUpRealisticZoneForBenchmarkExample(engine)
-	}
-	engine.UpdateState()
+// func BenchmarkAssembleTreeForceInclude(b *testing.B) {
+// 	engine := newEngine()
+// 	for i := 0; i < benchTestNumberOfZones; i++ {
+// 		setUpRealisticZoneForBenchmarkExample(engine)
+// 	}
+// 	engine.UpdateState()
 
-	randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-	benchTestAddInteractables(engine, randomZone1)
-	benchTestRemoveInteractables(engine, randomZone1)
-	randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-	benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
-	benchTestRemovePlayers(engine, randomZone2)
-	benchTestModifyPlayerPosition(engine)
-	benchTestModifyItemGearScore(engine)
+// 	randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+// 	benchTestAddInteractables(engine, randomZone1)
+// 	benchTestRemoveInteractables(engine, randomZone1)
+// 	randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+// 	benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
+// 	benchTestRemovePlayers(engine, randomZone2)
+// 	benchTestModifyPlayerPosition(engine)
+// 	benchTestModifyItemGearScore(engine)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = engine.assembleTree(true)
-	}
-}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		_ = engine.assembleTree(true)
+// 	}
+// }
 
 func BenchmarkAssembleTree(b *testing.B) {
 	engine := newEngine()
@@ -202,7 +202,7 @@ func BenchmarkAssembleTree(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = engine.assembleTree(false)
+		_ = engine.assembleUpdateTree()
 	}
 }
 
@@ -223,7 +223,7 @@ func BenchmarkEngine(b *testing.B) {
 		benchTestRemovePlayers(engine, randomZone2)
 		benchTestModifyPlayerPosition(engine)
 		benchTestModifyItemGearScore(engine)
-		_ = engine.assembleTree(false)
+		_ = engine.assembleUpdateTree()
 		engine.UpdateState()
 	}
 }

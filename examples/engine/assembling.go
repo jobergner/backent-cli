@@ -1,803 +1,378 @@
 package state
 
-type assembleConfig struct {
-	forceInclude bool // include everything, regardless of update status
+import "fmt"
+
+func (engine *Engine) planGearScoreTree(elementID GearScoreID, p path, pIndex int, includedElements map[int]bool) {
+	gearScoreData, ok := engine.Patch.GearScore[elementID]
+	if !ok {
+		gearScoreData = engine.State.GearScore[elementID]
+	}
+
+	includedElements[int(elementID)] = true
+
+	_ = gearScoreData
 }
 
-func (engine *Engine) assembleGearScore(gearScoreID GearScoreID, check *recursionCheck, config assembleConfig) (gearScore, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.gearScore[gearScoreID]; alreadyExists {
-			return gearScore{}, false, false
-		} else {
-			check.gearScore[gearScoreID] = true
-		}
+func (engine *Engine) assembleGearScorePath(element *gearScore, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	gearScoreData, ok := engine.Patch.GearScore[element.ID]
+	if !ok {
+		gearScoreData = engine.State.GearScore[element.ID]
 	}
 
-	gearScoreData, hasUpdated := engine.Patch.GearScore[gearScoreID]
-	if !hasUpdated {
-		gearScoreData = engine.State.GearScore[gearScoreID]
-	}
-
-	if cachedGearScore, ok := engine.assembleCache.gearScore[gearScoreData.ID]; ok {
-		return cachedGearScore.gearScore, cachedGearScore.hasUpdated || config.forceInclude, cachedGearScore.hasUpdated
-	}
-
-	var element gearScore
-
-	element.ID = gearScoreData.ID
 	element.OperationKind = gearScoreData.OperationKind
 	element.Level = gearScoreData.Level
 	element.Score = gearScoreData.Score
 
-	engine.assembleCache.gearScore[element.ID] = gearScoreCacheElement{hasUpdated: hasUpdated, gearScore: element}
-
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	_ = gearScoreData
 }
 
-func (engine *Engine) assemblePosition(positionID PositionID, check *recursionCheck, config assembleConfig) (position, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.position[positionID]; alreadyExists {
-			return position{}, false, false
-		} else {
-			check.position[positionID] = true
-		}
+func (engine *Engine) planPositionTree(elementID PositionID, p path, pIndex int, includedElements map[int]bool) {
+	positionData, ok := engine.Patch.Position[elementID]
+	if !ok {
+		positionData = engine.State.Position[elementID]
 	}
 
-	positionData, hasUpdated := engine.Patch.Position[positionID]
-	if !hasUpdated {
-		positionData = engine.State.Position[positionID]
+	includedElements[int(elementID)] = true
+
+	_ = positionData
+}
+
+func (engine *Engine) assemblePositionPath(element *position, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	positionData, ok := engine.Patch.Position[element.ID]
+	if !ok {
+		positionData = engine.State.Position[element.ID]
 	}
 
-	if cachedPosition, ok := engine.assembleCache.position[positionData.ID]; ok {
-		return cachedPosition.position, cachedPosition.hasUpdated || config.forceInclude, cachedPosition.hasUpdated
-	}
-
-	var element position
-
-	element.ID = positionData.ID
 	element.OperationKind = positionData.OperationKind
 	element.X = positionData.X
 	element.Y = positionData.Y
 
-	engine.assembleCache.position[element.ID] = positionCacheElement{hasUpdated: hasUpdated, position: element}
-
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	_ = positionData
 }
 
-func (engine *Engine) assembleEquipmentSet(equipmentSetID EquipmentSetID, check *recursionCheck, config assembleConfig) (equipmentSet, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.equipmentSet[equipmentSetID]; alreadyExists {
-			return equipmentSet{}, false, false
-		} else {
-			check.equipmentSet[equipmentSetID] = true
-		}
+func (engine *Engine) planEquipmentSetTree(elementID EquipmentSetID, p path, pIndex int, includedElements map[int]bool) {
+	equipmentSetData, ok := engine.Patch.EquipmentSet[elementID]
+	if !ok {
+		equipmentSetData = engine.State.EquipmentSet[elementID]
 	}
 
-	equipmentSetData, hasUpdated := engine.Patch.EquipmentSet[equipmentSetID]
-	if !hasUpdated {
-		equipmentSetData = engine.State.EquipmentSet[equipmentSetID]
+	includedElements[int(elementID)] = true
+
+	_ = equipmentSetData
+}
+
+func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	equipmentSetData, ok := engine.Patch.EquipmentSet[element.ID]
+	if !ok {
+		equipmentSetData = engine.State.EquipmentSet[element.ID]
 	}
 
-	if cachedEquipmentSet, ok := engine.assembleCache.equipmentSet[equipmentSetData.ID]; ok {
-		return cachedEquipmentSet.equipmentSet, cachedEquipmentSet.hasUpdated || config.forceInclude, cachedEquipmentSet.hasUpdated
-	}
-
-	var element equipmentSet
-
-	for _, equipmentSetEquipmentRefID := range mergeEquipmentSetEquipmentRefIDs(engine.State.EquipmentSet[equipmentSetData.ID].Equipment, engine.Patch.EquipmentSet[equipmentSetData.ID].Equipment) {
-		if treeEquipmentSetEquipmentRef, include, childHasUpdated := engine.assembleEquipmentSetEquipmentRef(equipmentSetEquipmentRefID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.Equipment == nil {
-				element.Equipment = make(map[ItemID]itemReference)
-			}
-			element.Equipment[treeEquipmentSetEquipmentRef.ElementID] = treeEquipmentSetEquipmentRef
-		}
-	}
-
-	element.ID = equipmentSetData.ID
 	element.OperationKind = equipmentSetData.OperationKind
 	element.Name = equipmentSetData.Name
 
-	engine.assembleCache.equipmentSet[element.ID] = equipmentSetCacheElement{hasUpdated: hasUpdated, equipmentSet: element}
-
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	_ = equipmentSetData
 }
 
-func (engine *Engine) assembleItem(itemID ItemID, check *recursionCheck, config assembleConfig) (item, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.item[itemID]; alreadyExists {
-			return item{}, false, false
-		} else {
-			check.item[itemID] = true
+func (engine *Engine) planItemTree(elementID ItemID, p path, pIndex int, includedElements map[int]bool) {
+	itemData, ok := engine.Patch.Item[elementID]
+	if !ok {
+		itemData = engine.State.Item[elementID]
+	}
+
+	includedElements[int(elementID)] = true
+
+	switch p[pIndex] {
+	case gearScoreIdentifier:
+		engine.planGearScoreTree(itemData.GearScore, p, pIndex+1, includedElements)
+	case originIdentifier:
+		anyOfPlayer_PositionContainer := engine.anyOfPlayer_Position(itemData.Origin).anyOfPlayer_Position
+		switch anyOfPlayer_PositionContainer.ElementKind {
+		case ElementKindPlayer:
+			engine.planPlayerTree(anyOfPlayer_PositionContainer.Player, p, pIndex+1, includedElements)
+		case ElementKindPosition:
+			engine.planPositionTree(anyOfPlayer_PositionContainer.Position, p, pIndex+1, includedElements)
 		}
 	}
 
-	itemData, hasUpdated := engine.Patch.Item[itemID]
-	if !hasUpdated {
-		itemData = engine.State.Item[itemID]
+	_ = itemData
+}
+
+func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	itemData, ok := engine.Patch.Item[element.ID]
+	if !ok {
+		itemData = engine.State.Item[element.ID]
 	}
 
-	if cachedItem, ok := engine.assembleCache.item[itemData.ID]; ok {
-		return cachedItem.item, cachedItem.hasUpdated || config.forceInclude, cachedItem.hasUpdated
-	}
-
-	var element item
-
-	if treeItemBoundToRef, include, childHasUpdated := engine.assembleItemBoundToRef(itemID, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.BoundTo = treeItemBoundToRef
-	}
-
-	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(itemData.GearScore, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.GearScore = &treeGearScore
-	}
-
-	anyOfPlayer_PositionContainer := engine.anyOfPlayer_Position(itemData.Origin).anyOfPlayer_Position
-	if anyOfPlayer_PositionContainer.ElementKind == ElementKindPlayer {
-		playerID := anyOfPlayer_PositionContainer.Player
-		if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			element.Origin = &treePlayer
-		}
-	} else if anyOfPlayer_PositionContainer.ElementKind == ElementKindPosition {
-		positionID := anyOfPlayer_PositionContainer.Position
-		if treePosition, include, childHasUpdated := engine.assemblePosition(positionID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			element.Origin = &treePosition
-		}
-	}
-
-	element.ID = itemData.ID
 	element.OperationKind = itemData.OperationKind
 	element.Name = itemData.Name
 
-	engine.assembleCache.item[element.ID] = itemCacheElement{hasUpdated: hasUpdated, item: element}
+	if pIndex == len(p) {
+		return
+	}
 
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	switch p[pIndex] {
+	case gearScoreIdentifier:
+		child := element.GearScore
+		if child == nil {
+			child = &gearScore{ID: itemData.GearScore}
+		}
+		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
+		element.GearScore = child
+	case originIdentifier:
+		anyOfPlayer_PositionContainer := engine.anyOfPlayer_Position(itemData.Origin).anyOfPlayer_Position
+		switch anyOfPlayer_PositionContainer.ElementKind {
+		case ElementKindPlayer:
+			if element.Origin == nil {
+				element.Origin = &player{ID: anyOfPlayer_PositionContainer.Player}
+			}
+			child := element.Origin.(*player)
+			engine.assemblePlayerPath(child, p, pIndex+1, includedElements)
+			element.Origin = child
+		case ElementKindPosition:
+			if element.Origin == nil {
+				element.Origin = &position{ID: anyOfPlayer_PositionContainer.Position}
+			}
+			child := element.Origin.(*position)
+			engine.assemblePositionPath(child, p, pIndex+1, includedElements)
+			element.Origin = child
+		}
+	}
+
+	_ = itemData
 }
 
-func (engine *Engine) assembleZoneItem(zoneItemID ZoneItemID, check *recursionCheck, config assembleConfig) (zoneItem, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.zoneItem[zoneItemID]; alreadyExists {
-			return zoneItem{}, false, false
-		} else {
-			check.zoneItem[zoneItemID] = true
-		}
+func (engine *Engine) planZoneItemTree(elementID ZoneItemID, p path, pIndex int, includedElements map[int]bool) {
+	zoneItemData, ok := engine.Patch.ZoneItem[elementID]
+	if !ok {
+		zoneItemData = engine.State.ZoneItem[elementID]
 	}
 
-	zoneItemData, hasUpdated := engine.Patch.ZoneItem[zoneItemID]
-	if !hasUpdated {
-		zoneItemData = engine.State.ZoneItem[zoneItemID]
+	includedElements[int(elementID)] = true
+
+	switch p[pIndex] {
+	case itemIdentifier:
+		engine.planItemTree(zoneItemData.Item, p, pIndex+1, includedElements)
+	case positionIdentifier:
+		engine.planPositionTree(zoneItemData.Position, p, pIndex+1, includedElements)
 	}
 
-	if cachedZoneItem, ok := engine.assembleCache.zoneItem[zoneItemData.ID]; ok {
-		return cachedZoneItem.zoneItem, cachedZoneItem.hasUpdated || config.forceInclude, cachedZoneItem.hasUpdated
+	_ = zoneItemData
+}
+
+func (engine *Engine) assembleZoneItemPath(element *zoneItem, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	zoneItemData, ok := engine.Patch.ZoneItem[element.ID]
+	if !ok {
+		zoneItemData = engine.State.ZoneItem[element.ID]
 	}
 
-	var element zoneItem
-
-	if treeItem, include, childHasUpdated := engine.assembleItem(zoneItemData.Item, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.Item = &treeItem
-	}
-
-	if treePosition, include, childHasUpdated := engine.assemblePosition(zoneItemData.Position, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.Position = &treePosition
-	}
-
-	element.ID = zoneItemData.ID
 	element.OperationKind = zoneItemData.OperationKind
 
-	engine.assembleCache.zoneItem[element.ID] = zoneItemCacheElement{hasUpdated: hasUpdated, zoneItem: element}
+	if pIndex == len(p) {
+		return
+	}
 
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	switch p[pIndex] {
+	case itemIdentifier:
+		child := element.Item
+		if child == nil {
+			child = &item{ID: zoneItemData.Item}
+		}
+		engine.assembleItemPath(child, p, pIndex+1, includedElements)
+		element.Item = child
+	case positionIdentifier:
+		child := element.Position
+		if child == nil {
+			child = &position{ID: zoneItemData.Position}
+		}
+		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
+		element.Position = child
+	}
+
+	_ = zoneItemData
 }
 
-func (engine *Engine) assemblePlayer(playerID PlayerID, check *recursionCheck, config assembleConfig) (player, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.player[playerID]; alreadyExists {
-			return player{}, false, false
-		} else {
-			check.player[playerID] = true
-		}
+func (engine *Engine) planPlayerTree(elementID PlayerID, p path, pIndex int, includedElements map[int]bool) {
+	playerData, ok := engine.Patch.Player[elementID]
+	if !ok {
+		playerData = engine.State.Player[elementID]
 	}
 
-	playerData, hasUpdated := engine.Patch.Player[playerID]
-	if !hasUpdated {
-		playerData = engine.State.Player[playerID]
+	includedElements[int(elementID)] = true
+
+	switch p[pIndex] {
+	case gearScoreIdentifier:
+		engine.planGearScoreTree(playerData.GearScore, p, pIndex+1, includedElements)
+	case itemsIdentifier:
+		engine.planItemTree(ItemID(p[pIndex+1]), p, pIndex+2, includedElements)
+	case positionIdentifier:
+		engine.planPositionTree(playerData.Position, p, pIndex+1, includedElements)
 	}
 
-	if cachedPlayer, ok := engine.assembleCache.player[playerData.ID]; ok {
-		return cachedPlayer.player, cachedPlayer.hasUpdated || config.forceInclude, cachedPlayer.hasUpdated
+	_ = playerData
+}
+
+func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	playerData, ok := engine.Patch.Player[element.ID]
+	if !ok {
+		playerData = engine.State.Player[element.ID]
 	}
 
-	var element player
-
-	for _, playerEquipmentSetRefID := range mergePlayerEquipmentSetRefIDs(engine.State.Player[playerData.ID].EquipmentSets, engine.Patch.Player[playerData.ID].EquipmentSets) {
-		if treePlayerEquipmentSetRef, include, childHasUpdated := engine.assemblePlayerEquipmentSetRef(playerEquipmentSetRefID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.EquipmentSets == nil {
-				element.EquipmentSets = make(map[EquipmentSetID]equipmentSetReference)
-			}
-			element.EquipmentSets[treePlayerEquipmentSetRef.ElementID] = treePlayerEquipmentSetRef
-		}
-	}
-
-	if treeGearScore, include, childHasUpdated := engine.assembleGearScore(playerData.GearScore, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.GearScore = &treeGearScore
-	}
-
-	for _, playerGuildMemberRefID := range mergePlayerGuildMemberRefIDs(engine.State.Player[playerData.ID].GuildMembers, engine.Patch.Player[playerData.ID].GuildMembers) {
-		if treePlayerGuildMemberRef, include, childHasUpdated := engine.assemblePlayerGuildMemberRef(playerGuildMemberRefID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.GuildMembers == nil {
-				element.GuildMembers = make(map[PlayerID]playerReference)
-			}
-			element.GuildMembers[treePlayerGuildMemberRef.ElementID] = treePlayerGuildMemberRef
-		}
-	}
-
-	for _, itemID := range mergeItemIDs(engine.State.Player[playerData.ID].Items, engine.Patch.Player[playerData.ID].Items) {
-		if treeItem, include, childHasUpdated := engine.assembleItem(itemID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.Items == nil {
-				element.Items = make(map[ItemID]item)
-			}
-			element.Items[treeItem.ID] = treeItem
-		}
-	}
-
-	if treePosition, include, childHasUpdated := engine.assemblePosition(playerData.Position, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.Position = &treePosition
-	}
-
-	if treePlayerTargetRef, include, childHasUpdated := engine.assemblePlayerTargetRef(playerID, check, config); include {
-		if childHasUpdated {
-			hasUpdated = true
-		}
-		element.Target = treePlayerTargetRef
-	}
-
-	for _, playerTargetedByRefID := range mergePlayerTargetedByRefIDs(engine.State.Player[playerData.ID].TargetedBy, engine.Patch.Player[playerData.ID].TargetedBy) {
-		if treePlayerTargetedByRef, include, childHasUpdated := engine.assemblePlayerTargetedByRef(playerTargetedByRefID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.TargetedBy == nil {
-				element.TargetedBy = make(map[int]anyOfPlayer_ZoneItemReference)
-			}
-			element.TargetedBy[treePlayerTargetedByRef.ElementID] = treePlayerTargetedByRef
-		}
-	}
-
-	element.ID = playerData.ID
 	element.OperationKind = playerData.OperationKind
 
-	engine.assembleCache.player[element.ID] = playerCacheElement{hasUpdated: hasUpdated, player: element}
+	if pIndex == len(p) {
+		return
+	}
 
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	switch p[pIndex] {
+	case gearScoreIdentifier:
+		child := element.GearScore
+		if child == nil {
+			child = &gearScore{ID: playerData.GearScore}
+		}
+		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
+		element.GearScore = child
+	case itemsIdentifier:
+		if element.Items == nil {
+			element.Items = make(map[ItemID]item)
+		}
+		child, ok := element.Items[ItemID(p[pIndex+1])]
+		if !ok {
+			child = item{ID: ItemID(p[pIndex+1])}
+		}
+		engine.assembleItemPath(&child, p, pIndex+2, includedElements)
+		element.Items[child.ID] = child
+	case positionIdentifier:
+		child := element.Position
+		if child == nil {
+			child = &position{ID: playerData.Position}
+		}
+		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
+		element.Position = child
+	}
+
+	_ = playerData
 }
 
-func (engine *Engine) assembleZone(zoneID ZoneID, check *recursionCheck, config assembleConfig) (zone, bool, bool) {
-	if check != nil {
-		if alreadyExists := check.zone[zoneID]; alreadyExists {
-			return zone{}, false, false
-		} else {
-			check.zone[zoneID] = true
+func (engine *Engine) planZoneTree(elementID ZoneID, p path, pIndex int, includedElements map[int]bool) {
+	zoneData, ok := engine.Patch.Zone[elementID]
+	if !ok {
+		zoneData = engine.State.Zone[elementID]
+	}
+
+	includedElements[int(elementID)] = true
+
+	switch p[pIndex] {
+	case interactablesIdentifier:
+		anyOfItem_Player_ZoneItemContainer := engine.anyOfItem_Player_ZoneItem(AnyOfItem_Player_ZoneItemID(p[pIndex+1])).anyOfItem_Player_ZoneItem
+		switch anyOfItem_Player_ZoneItemContainer.ElementKind {
+		case ElementKindItem:
+			engine.planItemTree(ItemID(p[pIndex+1]), p, pIndex+2, includedElements)
+		case ElementKindPlayer:
+			engine.planPlayerTree(PlayerID(p[pIndex+1]), p, pIndex+2, includedElements)
+		case ElementKindZoneItem:
+			engine.planZoneItemTree(ZoneItemID(p[pIndex+1]), p, pIndex+2, includedElements)
 		}
+	case itemsIdentifier:
+		engine.planItemTree(ItemID(p[pIndex+1]), p, pIndex+2, includedElements)
+	case playersIdentifier:
+		engine.planPlayerTree(PlayerID(p[pIndex+1]), p, pIndex+2, includedElements)
 	}
 
-	zoneData, hasUpdated := engine.Patch.Zone[zoneID]
-	if !hasUpdated {
-		zoneData = engine.State.Zone[zoneID]
+	_ = zoneData
+}
+
+func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includedElements map[int]bool) {
+	includedElements[int(element.ID)] = true
+
+	zoneData, ok := engine.Patch.Zone[element.ID]
+	if !ok {
+		zoneData = engine.State.Zone[element.ID]
 	}
 
-	if cachedZone, ok := engine.assembleCache.zone[zoneData.ID]; ok {
-		return cachedZone.zone, cachedZone.hasUpdated || config.forceInclude, cachedZone.hasUpdated
-	}
-
-	var element zone
-
-	for _, anyOfItem_Player_ZoneItemID := range mergeAnyOfItem_Player_ZoneItemIDs(engine.State.Zone[zoneData.ID].Interactables, engine.Patch.Zone[zoneData.ID].Interactables) {
-		anyOfItem_Player_ZoneItemContainer := engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID).anyOfItem_Player_ZoneItem
-		if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindItem {
-			itemID := anyOfItem_Player_ZoneItemContainer.Item
-			if treeItem, include, childHasUpdated := engine.assembleItem(itemID, check, config); include {
-				if childHasUpdated {
-					hasUpdated = true
-				}
-				if element.Interactables == nil {
-					element.Interactables = make(map[int]interface{})
-				}
-				element.Interactables[int(treeItem.ID)] = treeItem
-			}
-		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindPlayer {
-			playerID := anyOfItem_Player_ZoneItemContainer.Player
-			if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
-				if childHasUpdated {
-					hasUpdated = true
-				}
-				if element.Interactables == nil {
-					element.Interactables = make(map[int]interface{})
-				}
-				element.Interactables[int(treePlayer.ID)] = treePlayer
-			}
-		} else if anyOfItem_Player_ZoneItemContainer.ElementKind == ElementKindZoneItem {
-			zoneItemID := anyOfItem_Player_ZoneItemContainer.ZoneItem
-			if treeZoneItem, include, childHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
-				if childHasUpdated {
-					hasUpdated = true
-				}
-				if element.Interactables == nil {
-					element.Interactables = make(map[int]interface{})
-				}
-				element.Interactables[int(treeZoneItem.ID)] = treeZoneItem
-			}
-		}
-	}
-
-	for _, zoneItemID := range mergeZoneItemIDs(engine.State.Zone[zoneData.ID].Items, engine.Patch.Zone[zoneData.ID].Items) {
-		if treeZoneItem, include, childHasUpdated := engine.assembleZoneItem(zoneItemID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.Items == nil {
-				element.Items = make(map[ZoneItemID]zoneItem)
-			}
-			element.Items[treeZoneItem.ID] = treeZoneItem
-		}
-	}
-
-	for _, playerID := range mergePlayerIDs(engine.State.Zone[zoneData.ID].Players, engine.Patch.Zone[zoneData.ID].Players) {
-		if treePlayer, include, childHasUpdated := engine.assemblePlayer(playerID, check, config); include {
-			if childHasUpdated {
-				hasUpdated = true
-			}
-			if element.Players == nil {
-				element.Players = make(map[PlayerID]player)
-			}
-			element.Players[treePlayer.ID] = treePlayer
-		}
-	}
-
-	element.ID = zoneData.ID
 	element.OperationKind = zoneData.OperationKind
-	element.Tags = zoneData.Tags
+	element.Tags = zoneData.Tags[:]
 
-	engine.assembleCache.zone[element.ID] = zoneCacheElement{hasUpdated: hasUpdated, zone: element}
+	if pIndex == len(p) {
+		return
+	}
 
-	return element, hasUpdated || config.forceInclude, hasUpdated
+	switch p[pIndex] {
+	case interactablesIdentifier:
+		if element.Interactables == nil {
+			element.Interactables = make(map[int]interface{})
+		}
+		anyOfItem_Player_ZoneItemContainer := engine.anyOfItem_Player_ZoneItem(AnyOfItem_Player_ZoneItemID(p[pIndex+1])).anyOfItem_Player_ZoneItem
+		switch anyOfItem_Player_ZoneItemContainer.ElementKind {
+		case ElementKindItem:
+			child := element.Interactables[p[pIndex+1]].(*item)
+			if child == nil {
+				child = &item{ID: anyOfItem_Player_ZoneItemContainer.Item}
+			}
+			engine.assembleItemPath(child, p, pIndex+2, includedElements)
+			element.Interactables[p[pIndex+1]] = child
+		case ElementKindPlayer:
+			child := element.Interactables[p[pIndex+1]].(*player)
+			if child == nil {
+				child = &player{ID: anyOfItem_Player_ZoneItemContainer.Player}
+			}
+			engine.assemblePlayerPath(child, p, pIndex+2, includedElements)
+			element.Interactables[p[pIndex+1]] = child
+		case ElementKindZoneItem:
+			child := element.Interactables[p[pIndex+1]].(*zoneItem)
+			if child == nil {
+				child = &zoneItem{ID: anyOfItem_Player_ZoneItemContainer.ZoneItem}
+			}
+			engine.assembleZoneItemPath(child, p, pIndex+2, includedElements)
+			element.Interactables[p[pIndex+1]] = child
+		}
+	case itemsIdentifier:
+		if element.Items == nil {
+			element.Items = make(map[ZoneItemID]zoneItem)
+		}
+		child, ok := element.Items[ZoneItemID(p[pIndex+1])]
+		if !ok {
+			child = zoneItem{ID: ZoneItemID(p[pIndex+1])}
+		}
+		engine.assembleZoneItemPath(&child, p, pIndex+2, includedElements)
+		element.Items[child.ID] = child
+	case playersIdentifier:
+		if element.Players == nil {
+			element.Players = make(map[PlayerID]player)
+		}
+		child, ok := element.Players[PlayerID(p[pIndex+1])]
+		if !ok {
+			child = player{ID: PlayerID(p[pIndex+1])}
+		}
+		engine.assemblePlayerPath(&child, p, pIndex+2, includedElements)
+		element.Players[child.ID] = child
+	}
+
+	_ = zoneData
 }
 
-func (engine *Engine) assemblePlayerTargetRef(playerID PlayerID, check *recursionCheck, config assembleConfig) (*anyOfPlayer_ZoneItemReference, bool, bool) {
-	statePlayer := engine.State.Player[playerID]
-	patchPlayer, playerIsInPatch := engine.Patch.Player[playerID]
+// assemble basic elements and references which have updated + correct referencedDataModified state
+// 1. get updatedPaths (paths of all elements which have updated (feed all updated elements + updated references in planTree))
+// 2. get updatedElements (a list of all elements) from result 1.
+// 3. save result 1. for later as essentialPaths
+// 4. get all references out of State which reference elements in result 2. and add paths to updatedPaths
+// 5. save length of list of all included elements
+// 6. expand updatedElements by planning tree with new ipdatedPaths
+// 7. compare new length of updatedElements with previous, if increased return to step 4.
+// 8. finally assemble tree with essential paths by passing updatedElements
 
-	// ref not set at all
-	if statePlayer.Target == 0 && (!playerIsInPatch || patchPlayer.Target == 0) {
-		return nil, false, false
-	}
-
-	// force include
-	if config.forceInclude {
-		var ref PlayerTargetRef
-		if patchPlayer.ID == 0 {
-			ref = engine.playerTargetRef(statePlayer.Target)
-		} else {
-			ref = engine.playerTargetRef(patchPlayer.Target)
-		}
-		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-			return &anyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
-		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-			return &anyOfPlayer_ZoneItemReference{ref.playerTargetRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, ReferencedDataUnchanged, referencedElement.Path}, true, false
-		}
-	}
-
-	// ref was definitely created
-	if statePlayer.Target == 0 && (playerIsInPatch && patchPlayer.Target != 0) {
-		ref := engine.playerTargetRef(patchPlayer.Target)
-		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-			referencedDataStatus := ReferencedDataUnchanged
-			_, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
-			if hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-			referencedDataStatus := ReferencedDataUnchanged
-			_, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config)
-			if hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-		}
-	}
-
-	// ref was definitely removed
-	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target == 0) {
-		ref := engine.playerTargetRef(statePlayer.Target)
-		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-			referencedDataStatus := ReferencedDataUnchanged
-			if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return &anyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-			referencedDataStatus := ReferencedDataUnchanged
-			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config); hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return &anyOfPlayer_ZoneItemReference{OperationKindDelete, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-		}
-	}
-
-	// immediate replacement of refs
-	if statePlayer.Target != 0 && (playerIsInPatch && patchPlayer.Target != 0) {
-		if statePlayer.Target != patchPlayer.Target {
-			ref := engine.playerTargetRef(patchPlayer.Target)
-			anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-			if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-				if check == nil {
-					check = newRecursionCheck()
-				}
-				referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-				referencedDataStatus := ReferencedDataUnchanged
-				_, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
-				if hasUpdatedDownstream {
-					referencedDataStatus = ReferencedDataModified
-				}
-				return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-			} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-				if check == nil {
-					check = newRecursionCheck()
-				}
-				referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-				referencedDataStatus := ReferencedDataUnchanged
-				_, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config)
-				if hasUpdatedDownstream {
-					referencedDataStatus = ReferencedDataModified
-				}
-				return &anyOfPlayer_ZoneItemReference{OperationKindUpdate, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-			}
-		}
-	}
-
-	// element got updated - OperationKindUpdate
-	if statePlayer.Target != 0 {
-		ref := engine.playerTargetRef(statePlayer.Target)
-		anyContainer := engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-			if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayer_ZoneItem.Player, check, config); hasUpdatedDownstream {
-				return &anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, referencedElement.Path}, true, true
-			}
-		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-			if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
-				return &anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, referencedElement.Path}, true, true
-			}
-		}
-	}
-
-	return nil, false, false
-}
-
-func (engine *Engine) assembleItemBoundToRef(itemID ItemID, check *recursionCheck, config assembleConfig) (*playerReference, bool, bool) {
-	stateItem := engine.State.Item[itemID]
-	patchItem, itemIsInPatch := engine.Patch.Item[itemID]
-
-	// ref not set at all
-	if stateItem.BoundTo == 0 && (!itemIsInPatch || patchItem.BoundTo == 0) {
-		return nil, false, false
-	}
-
-	// force include
-	if config.forceInclude {
-		var ref ItemBoundToRef
-		if patchItem.ID == 0 {
-			ref = engine.itemBoundToRef(stateItem.BoundTo)
-		} else {
-			ref = engine.itemBoundToRef(patchItem.BoundTo)
-		}
-		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
-		return &playerReference{ref.itemBoundToRef.OperationKind, referencedElement.ID, ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
-	}
-
-	// ref was definitely created
-	if stateItem.BoundTo == 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
-		ref := engine.itemBoundToRef(patchItem.BoundTo)
-		if check == nil {
-			check = newRecursionCheck()
-		}
-		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
-		referencedDataStatus := ReferencedDataUnchanged
-		_, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
-		if hasUpdatedDownstream {
-			referencedDataStatus = ReferencedDataModified
-		}
-		return &playerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-	}
-
-	// ref was definitely removed
-	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo == 0) {
-		ref := engine.itemBoundToRef(stateItem.BoundTo)
-		if check == nil {
-			check = newRecursionCheck()
-		}
-		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
-		referencedDataStatus := ReferencedDataUnchanged
-		if _, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config); hasUpdatedDownstream {
-			referencedDataStatus = ReferencedDataModified
-		}
-		return &playerReference{OperationKindDelete, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-	}
-
-	// immediate replacement of refs
-	if stateItem.BoundTo != 0 && (itemIsInPatch && patchItem.BoundTo != 0) {
-		if stateItem.BoundTo != patchItem.BoundTo {
-			ref := engine.itemBoundToRef(patchItem.BoundTo)
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
-			referencedDataStatus := ReferencedDataUnchanged
-			_, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
-			if hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return &playerReference{OperationKindUpdate, referencedElement.ID, ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, referencedDataStatus == ReferencedDataModified
-		}
-	}
-
-	// OperationKindUpdate element got updated
-	if stateItem.BoundTo != 0 {
-		ref := engine.itemBoundToRef(stateItem.BoundTo)
-		if check == nil {
-			check = newRecursionCheck()
-		}
-		referencedElement := engine.Player(ref.itemBoundToRef.ReferencedElementID).player
-		if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ID(), check, config); hasUpdatedDownstream {
-			return &playerReference{OperationKindUnchanged, ref.ID(), ElementKindPlayer, ReferencedDataModified, referencedElement.Path}, true, true
-		}
-	}
-
-	return nil, false, false
-}
-
-func (engine *Engine) assemblePlayerTargetedByRef(refID PlayerTargetedByRefID, check *recursionCheck, config assembleConfig) (anyOfPlayer_ZoneItemReference, bool, bool) {
-	if config.forceInclude {
-		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
-		anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-			return anyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
-		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-			return anyOfPlayer_ZoneItemReference{ref.OperationKind, int(referencedElement.ID), ElementKindZoneItem, ReferencedDataUnchanged, referencedElement.Path}, true, false
-		}
-	}
-
-	if patchRef, hasUpdated := engine.Patch.PlayerTargetedByRef[refID]; hasUpdated {
-		anyContainer := engine.anyOfPlayer_ZoneItem(patchRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-			_, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
-			referencedDataStatus := ReferencedDataUnchanged
-			if hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return anyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-		} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-			if check == nil {
-				check = newRecursionCheck()
-			}
-			referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-			_, _, hasUpdatedDownstream := engine.assembleZoneItem(referencedElement.ID, check, config)
-			referencedDataStatus := ReferencedDataUnchanged
-			if hasUpdatedDownstream {
-				referencedDataStatus = ReferencedDataModified
-			}
-			return anyOfPlayer_ZoneItemReference{patchRef.OperationKind, int(referencedElement.ID), ElementKindZoneItem, referencedDataStatus, referencedElement.Path}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-		}
-	}
-
-	ref := engine.playerTargetedByRef(refID).playerTargetedByRef
-	if check == nil {
-		check = newRecursionCheck()
-	}
-	anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID)
-	if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer {
-		referencedElement := engine.Player(anyContainer.anyOfPlayer_ZoneItem.Player).player
-		if _, _, hasUpdatedDownstream := engine.assemblePlayer(anyContainer.anyOfPlayer_ZoneItem.Player, check, config); hasUpdatedDownstream {
-			return anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.Player), ElementKindPlayer, ReferencedDataModified, referencedElement.Path}, true, true
-		}
-	} else if anyContainer.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem {
-		referencedElement := engine.ZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem).zoneItem
-		if _, _, hasUpdatedDownstream := engine.assembleZoneItem(anyContainer.anyOfPlayer_ZoneItem.ZoneItem, check, config); hasUpdatedDownstream {
-			return anyOfPlayer_ZoneItemReference{OperationKindUnchanged, int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem), ElementKindZoneItem, ReferencedDataModified, referencedElement.Path}, true, true
-		}
-	}
-
-	return anyOfPlayer_ZoneItemReference{}, false, false
-}
-
-func (engine *Engine) assemblePlayerGuildMemberRef(refID PlayerGuildMemberRefID, check *recursionCheck, config assembleConfig) (playerReference, bool, bool) {
-	if config.forceInclude {
-		ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
-		referencedElement := engine.Player(ref.ReferencedElementID).player
-		return playerReference{ref.OperationKind, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataUnchanged, referencedElement.Path}, true, false
-	}
-
-	if patchRef, hasUpdated := engine.Patch.PlayerGuildMemberRef[refID]; hasUpdated {
-		if check == nil {
-			check = newRecursionCheck()
-		}
-		referencedElement := engine.Player(patchRef.ReferencedElementID).player
-		_, _, hasUpdatedDownstream := engine.assemblePlayer(referencedElement.ID, check, config)
-		referencedDataStatus := ReferencedDataUnchanged
-		if hasUpdatedDownstream {
-			referencedDataStatus = ReferencedDataModified
-		}
-		return playerReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindPlayer, referencedDataStatus, referencedElement.Path}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-	}
-
-	ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
-	if check == nil {
-		check = newRecursionCheck()
-	}
-	referencedElement := engine.Player(ref.ReferencedElementID).player
-	if _, _, hasUpdatedDownstream := engine.assemblePlayer(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return playerReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindPlayer, ReferencedDataModified, referencedElement.Path}, true, true
-	}
-
-	return playerReference{}, false, false
-}
-
-func (engine *Engine) assemblePlayerEquipmentSetRef(refID PlayerEquipmentSetRefID, check *recursionCheck, config assembleConfig) (equipmentSetReference, bool, bool) {
-	if config.forceInclude {
-		ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
-		referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
-		return equipmentSetReference{ref.OperationKind, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataUnchanged, referencedElement.Path}, true, false
-	}
-
-	if patchRef, hasUpdated := engine.Patch.PlayerEquipmentSetRef[refID]; hasUpdated {
-		if check == nil {
-			check = newRecursionCheck()
-		}
-		referencedElement := engine.EquipmentSet(patchRef.ReferencedElementID).equipmentSet
-		_, _, hasUpdatedDownstream := engine.assembleEquipmentSet(referencedElement.ID, check, config)
-		referencedDataStatus := ReferencedDataUnchanged
-		if hasUpdatedDownstream {
-			referencedDataStatus = ReferencedDataModified
-		}
-		return equipmentSetReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindEquipmentSet, referencedDataStatus, referencedElement.Path}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-	}
-
-	ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
-	if check == nil {
-		check = newRecursionCheck()
-	}
-	referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
-	if _, _, hasUpdatedDownstream := engine.assembleEquipmentSet(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return equipmentSetReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindEquipmentSet, ReferencedDataModified, referencedElement.Path}, true, true
-	}
-
-	return equipmentSetReference{}, false, false
-}
-
-func (engine *Engine) assembleEquipmentSetEquipmentRef(refID EquipmentSetEquipmentRefID, check *recursionCheck, config assembleConfig) (itemReference, bool, bool) {
-	if config.forceInclude {
-		ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
-		referencedElement := engine.Item(ref.ReferencedElementID).item
-		return itemReference{ref.OperationKind, ref.ReferencedElementID, ElementKindItem, ReferencedDataUnchanged, referencedElement.Path}, true, false
-	}
-
-	if patchRef, hasUpdated := engine.Patch.EquipmentSetEquipmentRef[refID]; hasUpdated {
-		if check == nil {
-			check = newRecursionCheck()
-		}
-		referencedElement := engine.Item(patchRef.ReferencedElementID).item
-		_, _, hasUpdatedDownstream := engine.assembleItem(referencedElement.ID, check, config)
-		referencedDataStatus := ReferencedDataUnchanged
-		if hasUpdatedDownstream {
-			referencedDataStatus = ReferencedDataModified
-		}
-		return itemReference{patchRef.OperationKind, patchRef.ReferencedElementID, ElementKindItem, referencedDataStatus, referencedElement.Path}, true, patchRef.OperationKind == OperationKindUpdate || referencedDataStatus == ReferencedDataModified
-	}
-
-	ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
-	if check == nil {
-		check = newRecursionCheck()
-	}
-	referencedElement := engine.Item(ref.ReferencedElementID).item
-	if _, _, hasUpdatedDownstream := engine.assembleItem(ref.ReferencedElementID, check, config); hasUpdatedDownstream {
-		return itemReference{OperationKindUnchanged, ref.ReferencedElementID, ElementKindItem, ReferencedDataModified, referencedElement.Path}, true, true
-	}
-
-	return itemReference{}, false, false
-}
-
-func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
-
-	for key := range engine.assembleCache.equipmentSet {
-		delete(engine.assembleCache.equipmentSet, key)
-	}
-	for key := range engine.assembleCache.gearScore {
-		delete(engine.assembleCache.gearScore, key)
-	}
-	for key := range engine.assembleCache.item {
-		delete(engine.assembleCache.item, key)
-	}
-	for key := range engine.assembleCache.player {
-		delete(engine.assembleCache.player, key)
-	}
-	for key := range engine.assembleCache.position {
-		delete(engine.assembleCache.position, key)
-	}
-	for key := range engine.assembleCache.zone {
-		delete(engine.assembleCache.zone, key)
-	}
-	for key := range engine.assembleCache.zoneItem {
-		delete(engine.assembleCache.zoneItem, key)
-	}
+func (engine *Engine) assembleUpdateTree() Tree {
 
 	for key := range engine.Tree.EquipmentSet {
 		delete(engine.Tree.EquipmentSet, key)
@@ -821,137 +396,412 @@ func (engine *Engine) assembleTree(assembleEntireTree bool) Tree {
 		delete(engine.Tree.ZoneItem, key)
 	}
 
-	config := assembleConfig{
-		forceInclude: assembleEntireTree,
+	updatedPaths := make(map[int]path)
+	// TODO possibly big performance boost
+	// updatedElements := make(map[int]bool)
+
+	for _, equipmentSet := range engine.Patch.EquipmentSet {
+		updatedPaths[int(equipmentSet.ID)] = equipmentSet.path
+	}
+	for _, gearScore := range engine.Patch.GearScore {
+		updatedPaths[int(gearScore.ID)] = gearScore.path
+	}
+	for _, item := range engine.Patch.Item {
+		updatedPaths[int(item.ID)] = item.path
+	}
+	for _, player := range engine.Patch.Player {
+		updatedPaths[int(player.ID)] = player.path
+	}
+	for _, position := range engine.Patch.Position {
+		updatedPaths[int(position.ID)] = position.path
+	}
+	for _, zone := range engine.Patch.Zone {
+		updatedPaths[int(zone.ID)] = zone.path
+	}
+	for _, zoneItem := range engine.Patch.ZoneItem {
+		updatedPaths[int(zoneItem.ID)] = zoneItem.path
+	}
+	for _, equipmentSetEquipmentRef := range engine.State.EquipmentSetEquipmentRef {
+		if _, ok := includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+			updatedPaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+		}
+	}
+	for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
+		updatedPaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+	}
+	for _, itemBoundToRef := range engine.State.ItemBoundToRef {
+		if _, ok := includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+			updatedPaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+		}
+	}
+	for _, itemBoundToRef := range engine.Patch.ItemBoundToRef {
+		updatedPaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+	}
+	for _, playerEquipmentSetRef := range engine.State.PlayerEquipmentSetRef {
+		if _, ok := includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+			updatedPaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+		}
+	}
+	for _, playerEquipmentSetRef := range engine.Patch.PlayerEquipmentSetRef {
+		updatedPaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+	}
+	for _, playerGuildMemberRef := range engine.State.PlayerGuildMemberRef {
+		if _, ok := includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+			updatedPaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+		}
+	}
+	for _, playerGuildMemberRef := range engine.Patch.PlayerGuildMemberRef {
+		updatedPaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+	}
+	for _, playerTargetRef := range engine.State.PlayerTargetRef {
+		if _, ok := includedElements[int(playerTargetRef.ReferencedElementID)]; ok {
+			updatedPaths[int(playerTargetRef.ID)] = playerTargetRef.path
+		}
+	}
+	for _, playerTargetRef := range engine.Patch.PlayerTargetRef {
+		updatedPaths[int(playerTargetRef.ID)] = playerTargetRef.path
+	}
+	for _, playerTargetedByRef := range engine.State.PlayerTargetedByRef {
+		if _, ok := includedElements[int(playerTargetedByRef.ReferencedElementID)]; ok {
+			updatedPaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+		}
+	}
+	for _, playerTargetedByRef := range engine.Patch.PlayerTargetedByRef {
+		updatedPaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 	}
 
-	for _, equipmentSetData := range engine.Patch.EquipmentSet {
-		if !equipmentSetData.HasParent {
-			equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
-			if include {
-				engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
+	includedElements := newIncludedElements()
+
+	for _, elementPath := range updatedPaths {
+		switch elementPath[0] {
+		case equipmentSetIdentifier:
+			child, ok := engine.Tree.EquipmentSet[EquipmentSetID(elementPath[1])]
+			if !ok {
+				child = equipmentSet{ID: EquipmentSetID(elementPath[1])}
 			}
-		}
-	}
-	for _, gearScoreData := range engine.Patch.GearScore {
-		if !gearScoreData.HasParent {
-			gearScore, include, _ := engine.assembleGearScore(gearScoreData.ID, nil, config)
-			if include {
-				engine.Tree.GearScore[gearScoreData.ID] = gearScore
+			engine.assembleEquipmentSetPath(&child, elementPath, 2, includedElements)
+			engine.Tree.EquipmentSet[EquipmentSetID(elementPath[1])] = child
+		case gearScoreIdentifier:
+			child, ok := engine.Tree.GearScore[GearScoreID(elementPath[1])]
+			if !ok {
+				child = gearScore{ID: GearScoreID(elementPath[1])}
 			}
-		}
-	}
-	for _, itemData := range engine.Patch.Item {
-		if !itemData.HasParent {
-			item, include, _ := engine.assembleItem(itemData.ID, nil, config)
-			if include {
-				engine.Tree.Item[itemData.ID] = item
+			engine.assembleGearScorePath(&child, elementPath, 2, includedElements)
+			engine.Tree.GearScore[GearScoreID(elementPath[1])] = child
+		case itemIdentifier:
+			child, ok := engine.Tree.Item[ItemID(elementPath[1])]
+			if !ok {
+				child = item{ID: ItemID(elementPath[1])}
 			}
-		}
-	}
-	for _, playerData := range engine.Patch.Player {
-		if !playerData.HasParent {
-			player, include, _ := engine.assemblePlayer(playerData.ID, nil, config)
-			if include {
-				engine.Tree.Player[playerData.ID] = player
+			engine.assembleItemPath(&child, elementPath, 2, includedElements)
+			engine.Tree.Item[ItemID(elementPath[1])] = child
+		case playerIdentifier:
+			child, ok := engine.Tree.Player[PlayerID(elementPath[1])]
+			if !ok {
+				child = player{ID: PlayerID(elementPath[1])}
 			}
-		}
-	}
-	for _, positionData := range engine.Patch.Position {
-		if !positionData.HasParent {
-			position, include, _ := engine.assemblePosition(positionData.ID, nil, config)
-			if include {
-				engine.Tree.Position[positionData.ID] = position
+			engine.assemblePlayerPath(&child, elementPath, 2, includedElements)
+			engine.Tree.Player[PlayerID(elementPath[1])] = child
+		case positionIdentifier:
+			child, ok := engine.Tree.Position[PositionID(elementPath[1])]
+			if !ok {
+				child = position{ID: PositionID(elementPath[1])}
 			}
-		}
-	}
-	for _, zoneData := range engine.Patch.Zone {
-		if !zoneData.HasParent {
-			zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
-			if include {
-				engine.Tree.Zone[zoneData.ID] = zone
+			engine.assemblePositionPath(&child, elementPath, 2, includedElements)
+			engine.Tree.Position[PositionID(elementPath[1])] = child
+		case zoneIdentifier:
+			child, ok := engine.Tree.Zone[ZoneID(elementPath[1])]
+			if !ok {
+				child = zone{ID: ZoneID(elementPath[1])}
 			}
-		}
-	}
-	for _, zoneItemData := range engine.Patch.ZoneItem {
-		if !zoneItemData.HasParent {
-			zoneItem, include, _ := engine.assembleZoneItem(zoneItemData.ID, nil, config)
-			if include {
-				engine.Tree.ZoneItem[zoneItemData.ID] = zoneItem
+			engine.assembleZonePath(&child, elementPath, 2, includedElements)
+			engine.Tree.Zone[ZoneID(elementPath[1])] = child
+		case zoneItemIdentifier:
+			child, ok := engine.Tree.ZoneItem[ZoneItemID(elementPath[1])]
+			if !ok {
+				child = zoneItem{ID: ZoneItemID(elementPath[1])}
 			}
+			engine.assembleZoneItemPath(&child, elementPath, 2, includedElements)
+			engine.Tree.ZoneItem[ZoneItemID(elementPath[1])] = child
 		}
 	}
 
-	for _, equipmentSetData := range engine.State.EquipmentSet {
-		if !equipmentSetData.HasParent {
-			if _, ok := engine.Tree.EquipmentSet[equipmentSetData.ID]; !ok {
-				equipmentSet, include, _ := engine.assembleEquipmentSet(equipmentSetData.ID, nil, config)
-				if include {
-					engine.Tree.EquipmentSet[equipmentSetData.ID] = equipmentSet
-				}
-			}
-		}
-	}
-	for _, gearScoreData := range engine.State.GearScore {
-		if !gearScoreData.HasParent {
-			if _, ok := engine.Tree.GearScore[gearScoreData.ID]; !ok {
-				gearScore, include, _ := engine.assembleGearScore(gearScoreData.ID, nil, config)
-				if include {
-					engine.Tree.GearScore[gearScoreData.ID] = gearScore
-				}
-			}
-		}
-	}
-	for _, itemData := range engine.State.Item {
-		if !itemData.HasParent {
-			if _, ok := engine.Tree.Item[itemData.ID]; !ok {
-				item, include, _ := engine.assembleItem(itemData.ID, nil, config)
-				if include {
-					engine.Tree.Item[itemData.ID] = item
-				}
-			}
-		}
-	}
-	for _, playerData := range engine.State.Player {
-		if !playerData.HasParent {
-			if _, ok := engine.Tree.Player[playerData.ID]; !ok {
-				player, include, _ := engine.assemblePlayer(playerData.ID, nil, config)
-				if include {
-					engine.Tree.Player[playerData.ID] = player
-				}
-			}
-		}
-	}
-	for _, positionData := range engine.State.Position {
-		if !positionData.HasParent {
-			if _, ok := engine.Tree.Position[positionData.ID]; !ok {
-				position, include, _ := engine.assemblePosition(positionData.ID, nil, config)
-				if include {
-					engine.Tree.Position[positionData.ID] = position
-				}
-			}
-		}
-	}
-	for _, zoneData := range engine.State.Zone {
-		if !zoneData.HasParent {
-			if _, ok := engine.Tree.Zone[zoneData.ID]; !ok {
-				zone, include, _ := engine.assembleZone(zoneData.ID, nil, config)
-				if include {
-					engine.Tree.Zone[zoneData.ID] = zone
-				}
-			}
-		}
-	}
-	for _, zoneItemData := range engine.State.ZoneItem {
-		if !zoneItemData.HasParent {
-			if _, ok := engine.Tree.ZoneItem[zoneItemData.ID]; !ok {
-				zoneItem, include, _ := engine.assembleZoneItem(zoneItemData.ID, nil, config)
-				if include {
-					engine.Tree.ZoneItem[zoneItemData.ID] = zoneItem
-				}
-			}
+	for _, elementPath := range updatedPaths {
+		switch elementPath[0] {
+		case equipmentSetIdentifier:
+			child := engine.Tree.EquipmentSet[EquipmentSetID(elementPath[1])]
+			engine.assembleEquipmentSetReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.EquipmentSet[EquipmentSetID(elementPath[1])] = child
+		case gearScoreIdentifier:
+			child := engine.Tree.GearScore[GearScoreID(elementPath[1])]
+			engine.assembleGearScoreReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.GearScore[GearScoreID(elementPath[1])] = child
+		case itemIdentifier:
+			fmt.Println("@", elementPath, engine.Tree.Item)
+			child := engine.Tree.Item[ItemID(elementPath[1])]
+			engine.assembleItemReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.Item[ItemID(elementPath[1])] = child
+		case playerIdentifier:
+			child := engine.Tree.Player[PlayerID(elementPath[1])]
+			engine.assemblePlayerReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.Player[PlayerID(elementPath[1])] = child
+		case positionIdentifier:
+			child := engine.Tree.Position[PositionID(elementPath[1])]
+			engine.assemblePositionReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.Position[PositionID(elementPath[1])] = child
+		case zoneIdentifier:
+			child := engine.Tree.Zone[ZoneID(elementPath[1])]
+			engine.assembleZoneReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.Zone[ZoneID(elementPath[1])] = child
+		case zoneItemIdentifier:
+			child := engine.Tree.ZoneItem[ZoneItemID(elementPath[1])]
+			engine.assembleZoneItemReferences(&child, elementPath, 2, includedElements)
+			engine.Tree.ZoneItem[ZoneItemID(elementPath[1])] = child
 		}
 	}
 
 	return engine.Tree
+}
+
+func (engine *Engine) assembleItemReferences(element *item, p path, pIndex int, includedElements map[int]bool) {
+	itemData, ok := engine.Patch.Item[element.ID]
+	if !ok {
+		itemData = engine.State.Item[element.ID]
+	}
+
+	switch p[pIndex] {
+	case boundToIdentifier:
+		ref := engine.itemBoundToRef(itemData.BoundTo).itemBoundToRef
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
+			referencedDataStatus = ReferencedDataModified
+		}
+		referencedElement := engine.Player(ref.ReferencedElementID).player
+		treeRef := elementReference{
+			OperationKind:        ref.OperationKind,
+			ElementID:            int(ref.ReferencedElementID),
+			ElementKind:          ElementKindPlayer,
+			ReferencedDataStatus: referencedDataStatus,
+			ElementPath:          referencedElement.Path,
+		}
+		element.BoundTo = &treeRef
+	case gearScoreIdentifier:
+		engine.assembleGearScoreReferences(element.GearScore, p, pIndex+1, includedElements)
+	case originIdentifier:
+		switch v := element.Origin.(type) {
+		case *player:
+			engine.assemblePlayerReferences(v, p, pIndex+1, includedElements)
+		case *position:
+			engine.assemblePositionReferences(v, p, pIndex+1, includedElements)
+		}
+	}
+
+	_ = itemData
+}
+
+func (engine *Engine) assembleGearScoreReferences(element *gearScore, p path, pIndex int, includedElements map[int]bool) {
+}
+
+func (engine *Engine) assemblePositionReferences(element *position, p path, pIndex int, includedElements map[int]bool) {
+}
+
+func (engine *Engine) assemblePlayerReferences(element *player, p path, pIndex int, includedElements map[int]bool) {
+	playerData, ok := engine.Patch.Player[element.ID]
+	if !ok {
+		playerData = engine.State.Player[element.ID]
+	}
+
+	switch p[pIndex] {
+	case equipmentSetsIdentifier:
+		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(playerData.EquipmentSets[p[pIndex+1]])).playerEquipmentSetRef
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
+			referencedDataStatus = ReferencedDataModified
+		}
+		referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
+		treeRef := elementReference{
+			OperationKind:        ref.OperationKind,
+			ElementID:            int(ref.ReferencedElementID),
+			ElementKind:          ElementKindPlayer,
+			ReferencedDataStatus: referencedDataStatus,
+			ElementPath:          referencedElement.Path,
+		}
+		if element.EquipmentSets == nil {
+			element.EquipmentSets = make(map[EquipmentSetID]elementReference)
+		}
+		element.EquipmentSets[referencedElement.ID] = treeRef
+	case gearScoreIdentifier:
+		engine.assembleGearScoreReferences(element.GearScore, p, pIndex+1, includedElements)
+	case guildMembersIdentifier:
+		ref := engine.playerGuildMemberRef(PlayerGuildMemberRefID(playerData.GuildMembers[p[pIndex+1]])).playerGuildMemberRef
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
+			referencedDataStatus = ReferencedDataModified
+		}
+		referencedElement := engine.Player(ref.ReferencedElementID).player
+		treeRef := elementReference{
+			OperationKind:        ref.OperationKind,
+			ElementID:            int(ref.ReferencedElementID),
+			ElementKind:          ElementKindPlayer,
+			ReferencedDataStatus: referencedDataStatus,
+			ElementPath:          referencedElement.Path,
+		}
+		if element.GuildMembers == nil {
+			element.GuildMembers = make(map[PlayerID]elementReference)
+		}
+		element.GuildMembers[referencedElement.ID] = treeRef
+	case itemsIdentifier:
+		child := element.Items[ItemID(p[pIndex+1])]
+		engine.assembleItemReferences(&child, p, pIndex+2, includedElements)
+		element.Items[ItemID(p[pIndex+1])] = child
+	case positionIdentifier:
+		engine.assemblePositionReferences(element.Position, p, pIndex+1, includedElements)
+	case targetIdentifier:
+		ref := engine.playerTargetRef(playerData.Target).playerTargetRef
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID).anyOfPlayer_ZoneItem
+		switch anyContainer.ElementKind {
+		case ElementKindPlayer:
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, ok := includedElements[int(anyContainer.Player)]; ok {
+				referencedDataStatus = ReferencedDataModified
+			}
+			referencedElement := engine.Player(anyContainer.Player).player
+			treeRef := elementReference{
+				OperationKind:        playerData.OperationKind,
+				ElementID:            int(anyContainer.Player),
+				ElementKind:          ElementKindPlayer,
+				ReferencedDataStatus: referencedDataStatus,
+				ElementPath:          referencedElement.Path,
+			}
+			element.Target = &treeRef
+		case ElementKindZoneItem:
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, ok := includedElements[int(anyContainer.ZoneItem)]; ok {
+				referencedDataStatus = ReferencedDataModified
+			}
+			referencedElement := engine.ZoneItem(anyContainer.ZoneItem).zoneItem
+			treeRef := elementReference{
+				OperationKind:        playerData.OperationKind,
+				ElementID:            int(anyContainer.ZoneItem),
+				ElementKind:          ElementKindPlayer,
+				ReferencedDataStatus: referencedDataStatus,
+				ElementPath:          referencedElement.Path,
+			}
+			element.Target = &treeRef
+		}
+	case targetedByIdentifier:
+		ref := engine.playerTargetedByRef(playerData.TargetedBy[p[pIndex+1]]).playerTargetedByRef
+		anyContainer := engine.anyOfPlayer_ZoneItem(ref.ReferencedElementID).anyOfPlayer_ZoneItem
+		switch anyContainer.ElementKind {
+		case ElementKindPlayer:
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, ok := includedElements[int(anyContainer.Player)]; ok {
+				referencedDataStatus = ReferencedDataModified
+			}
+			referencedElement := engine.Player(anyContainer.Player).player
+			treeRef := elementReference{
+				OperationKind:        playerData.OperationKind,
+				ElementID:            int(anyContainer.Player),
+				ElementKind:          ElementKindPlayer,
+				ReferencedDataStatus: referencedDataStatus,
+				ElementPath:          referencedElement.Path,
+			}
+			element.Target = &treeRef
+		case ElementKindZoneItem:
+			referencedDataStatus := ReferencedDataUnchanged
+			if _, ok := includedElements[int(anyContainer.ZoneItem)]; ok {
+				referencedDataStatus = ReferencedDataModified
+			}
+			referencedElement := engine.ZoneItem(anyContainer.ZoneItem).zoneItem
+			treeRef := elementReference{
+				OperationKind:        playerData.OperationKind,
+				ElementID:            int(anyContainer.ZoneItem),
+				ElementKind:          ElementKindPlayer,
+				ReferencedDataStatus: referencedDataStatus,
+				ElementPath:          referencedElement.Path,
+			}
+			element.Target = &treeRef
+		}
+	}
+
+	_ = playerData
+}
+
+func (engine *Engine) assembleZoneReferences(element *zone, p path, pIndex int, includedElements map[int]bool) {
+	zoneData, ok := engine.Patch.Zone[element.ID]
+	if !ok {
+		zoneData = engine.State.Zone[element.ID]
+	}
+
+	switch p[pIndex] {
+	case interactablesIdentifier:
+		switch v := element.Interactables[p[pIndex+1]].(type) {
+		case *item:
+			engine.assembleItemReferences(v, p, pIndex+2, includedElements)
+			element.Interactables[p[pIndex+1]] = v
+		case *player:
+			engine.assemblePlayerReferences(v, p, pIndex+2, includedElements)
+			element.Interactables[p[pIndex+1]] = v
+		case *zoneItem:
+			engine.assembleZoneItemReferences(v, p, pIndex+2, includedElements)
+			element.Interactables[p[pIndex+1]] = v
+		}
+	case itemsIdentifier:
+		child := element.Items[ZoneItemID(p[pIndex+1])]
+		engine.assembleZoneItemReferences(&child, p, pIndex+2, includedElements)
+		element.Items[ZoneItemID(p[pIndex+1])] = child
+	case playersIdentifier:
+		child := element.Players[PlayerID(p[pIndex+1])]
+		engine.assemblePlayerReferences(&child, p, pIndex+2, includedElements)
+		element.Players[PlayerID(p[pIndex+1])] = child
+	}
+
+	_ = zoneData
+}
+
+func (engine *Engine) assembleZoneItemReferences(element *zoneItem, p path, pIndex int, includedElements map[int]bool) {
+	zoneItemData, ok := engine.Patch.ZoneItem[element.ID]
+	if !ok {
+		zoneItemData = engine.State.ZoneItem[element.ID]
+	}
+
+	switch p[pIndex] {
+	case itemIdentifier:
+	case gearScoreIdentifier:
+		engine.assembleItemReferences(element.Item, p, pIndex+1, includedElements)
+	case positionIdentifier:
+		engine.assemblePositionReferences(element.Position, p, pIndex+1, includedElements)
+	}
+
+	_ = zoneItemData
+}
+
+func (engine *Engine) assembleEquipmentSetReferences(element *equipmentSet, p path, pIndex int, includedElements map[int]bool) {
+	equipmentSetData, ok := engine.Patch.EquipmentSet[element.ID]
+	if !ok {
+		equipmentSetData = engine.State.EquipmentSet[element.ID]
+	}
+
+	switch p[pIndex] {
+	case equipmentIdentifier:
+		ref := engine.equipmentSetEquipmentRef(EquipmentSetEquipmentRefID(equipmentSetData.Equipment[p[pIndex+1]])).equipmentSetEquipmentRef
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
+			referencedDataStatus = ReferencedDataModified
+		}
+		referencedElement := engine.Item(ref.ReferencedElementID).item
+		treeRef := elementReference{
+			OperationKind:        ref.OperationKind,
+			ElementID:            int(ref.ReferencedElementID),
+			ElementKind:          ElementKindPlayer,
+			ReferencedDataStatus: referencedDataStatus,
+			ElementPath:          referencedElement.Path,
+		}
+		if element.Equipment == nil {
+			element.Equipment = make(map[ItemID]elementReference)
+		}
+		element.Equipment[referencedElement.ID] = treeRef
+	}
+
+	_ = equipmentSetData
 }

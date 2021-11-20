@@ -982,6 +982,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- currently you can not reference the same element twice in a slice of references due to tree using referenced element ID as map keys 
 - what do I want to achieve?
     - (consistency) no dependency on previously emitted entities, which means:
         - -> on (created ref/referencing entity update) assemble referenced entity fully
@@ -994,6 +995,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
         - -> since I have path to referenced element, can I determine ReferencedDataStatus by checking if it exists in tree?
 do i still need assembleCache AND forceIncludeAssembleCache
         - NO YOU CANT BECAUSE AN ELEMENT CAN BE INCLUDED IF ITSELF OR A DESCENDANT REFERENCES AN ELEMENT THAT HAS UPDATED -> need to know 
+        ---- maybe elements which have not updated themselves but have a reference of an updating element should not be included in the tree
             - -> requires map to collect pointers of referenceElements, and map to collect IDs of updating(even descendants) elements
                 -  -> then in a following process manipulate referenceElement.ReferencedDataStatus depending on referenced element in tree
             - -> would make assembling a lot faster and simpler

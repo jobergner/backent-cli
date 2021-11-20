@@ -102,7 +102,7 @@ func (_player Player) AddGuildMember(playerID PlayerID) {
 			return
 		}
 	}
-	ref := player.player.engine.createPlayerGuildMemberRef(playerID, player.player.ID)
+	ref := player.player.engine.createPlayerGuildMemberRef(player.player.path.guildMembers(), true, playerID, player.player.ID)
 	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -125,7 +125,7 @@ func (_player Player) AddTargetedByPlayer(playerID PlayerID) {
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
 	anyContainer.setPlayer(playerID, false)
-	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
+	ref := player.player.engine.createPlayerTargetedByRef(player.player.path.targetedBy(), true, anyContainer.ID, player.player.ID)
 	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -148,7 +148,7 @@ func (_player Player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
 	anyContainer.setZoneItem(zoneItemID, false)
-	ref := player.player.engine.createPlayerTargetedByRef(anyContainer.ID, player.player.ID)
+	ref := player.player.engine.createPlayerTargetedByRef(player.player.path.targetedBy(), true, anyContainer.ID, player.player.ID)
 	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -168,7 +168,7 @@ func (_player Player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
 			return
 		}
 	}
-	ref := player.player.engine.createPlayerEquipmentSetRef(equipmentSetID, player.player.ID)
+	ref := player.player.engine.createPlayerEquipmentSetRef(player.player.path.equipmentSet(), true, equipmentSetID, player.player.ID)
 	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -188,7 +188,7 @@ func (_equipmentSet EquipmentSet) AddEquipment(itemID ItemID) {
 			return
 		}
 	}
-	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(itemID, equipmentSet.equipmentSet.ID)
+	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(equipmentSet.equipmentSet.path.equipment(), true, itemID, equipmentSet.equipmentSet.ID)
 	equipmentSet.equipmentSet.Equipment = append(equipmentSet.equipmentSet.Equipment, ref.ID)
 	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
