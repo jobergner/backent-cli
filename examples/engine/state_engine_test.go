@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jobergner/backent-cli/pkg/testutils"
@@ -493,62 +494,61 @@ func TestTree(t *testing.T) {
 	// 		false,
 	// 	)
 	// })
-	// TODO: leave in test which test elements updated because containing reference of updated element
-	t.Run("includes element which has reference of updating element", func(t *testing.T) {
-		newTreeTest(
-			func(se *Engine, expectedTree *Tree) {
-				itm := se.CreateItem().SetName("myItem")
-				plyr := se.CreatePlayer()
-				itm.SetBoundTo(plyr.ID())
+	// t.Run("includes element which has reference of updating element", func(t *testing.T) {
+	// 	newTreeTest(
+	// 		func(se *Engine, expectedTree *Tree) {
+	// 			itm := se.CreateItem().SetName("myItem")
+	// 			plyr := se.CreatePlayer()
+	// 			itm.SetBoundTo(plyr.ID())
 
-				se.UpdateState()
+	// 			se.UpdateState()
 
-				playerItem := plyr.AddItem()
+	// 			playerItem := plyr.AddItem()
 
-				expectedTree.Item = map[ItemID]item{
-					itm.ID(): {
-						ID:            itm.ID(),
-						Name:          "myItem",
-						BoundTo:       &elementReference{OperationKindUnchanged, int(plyr.ID()), ElementKindPlayer, ReferencedDataModified, newPath(playerIdentifier).id(int(plyr.ID())).toJSONPath()},
-						OperationKind: OperationKindUnchanged,
-					},
-				}
-				expectedTree.Player = map[PlayerID]player{
-					plyr.ID(): {
-						ID: plyr.ID(),
-						Items: map[ItemID]item{
-							playerItem.ID(): {
-								ID:            playerItem.ID(),
-								OperationKind: OperationKindUpdate,
-								GearScore: &gearScore{
-									ID:            playerItem.GearScore().ID(),
-									OperationKind: OperationKindUpdate,
-								},
-								Origin: &player{
-									ID:            playerItem.Origin().Player().ID(),
-									OperationKind: OperationKindUpdate,
-									GearScore: &gearScore{
-										ID:            playerItem.Origin().Player().GearScore().ID(),
-										OperationKind: OperationKindUpdate,
-									},
-									Position: &position{
-										ID:            playerItem.Origin().Player().Position().ID(),
-										OperationKind: OperationKindUpdate,
-									},
-								},
-							},
-						},
-						OperationKind: OperationKindUpdate,
-					},
-				}
+	// 			expectedTree.Item = map[ItemID]item{
+	// 				itm.ID(): {
+	// 					ID:            itm.ID(),
+	// 					Name:          "myItem",
+	// 					BoundTo:       &elementReference{OperationKindUnchanged, int(plyr.ID()), ElementKindPlayer, ReferencedDataModified, newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer).toJSONPath()},
+	// 					OperationKind: OperationKindUnchanged,
+	// 				},
+	// 			}
+	// 			expectedTree.Player = map[PlayerID]player{
+	// 				plyr.ID(): {
+	// 					ID: plyr.ID(),
+	// 					Items: map[ItemID]item{
+	// 						playerItem.ID(): {
+	// 							ID:            playerItem.ID(),
+	// 							OperationKind: OperationKindUpdate,
+	// 							GearScore: &gearScore{
+	// 								ID:            playerItem.GearScore().ID(),
+	// 								OperationKind: OperationKindUpdate,
+	// 							},
+	// 							Origin: &player{
+	// 								ID:            playerItem.Origin().Player().ID(),
+	// 								OperationKind: OperationKindUpdate,
+	// 								GearScore: &gearScore{
+	// 									ID:            playerItem.Origin().Player().GearScore().ID(),
+	// 									OperationKind: OperationKindUpdate,
+	// 								},
+	// 								Position: &position{
+	// 									ID:            playerItem.Origin().Player().Position().ID(),
+	// 									OperationKind: OperationKindUpdate,
+	// 								},
+	// 							},
+	// 						},
+	// 					},
+	// 					OperationKind: OperationKindUpdate,
+	// 				},
+	// 			}
 
-			},
-			func(errText string) {
-				t.Errorf(errText)
-			},
-			false,
-		)
-	})
+	// 		},
+	// 		func(errText string) {
+	// 			t.Errorf(errText)
+	// 		},
+	// 		false,
+	// 	)
+	// })
 	// t.Run("includes elements which have references of updating elements", func(t *testing.T) {
 	// 	newTreeTest(
 	// 		func(se *Engine, expectedTree *Tree) {
@@ -587,13 +587,13 @@ func TestTree(t *testing.T) {
 	// 							OperationKind: OperationKindUpdate,
 	// 						},
 	// 					},
-	// 					GuildMembers: map[PlayerID]playerReference{
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						player2.ID(): {
 	// 							OperationKind:        OperationKindUpdate,
-	// 							ElementID:            player2.ID(),
+	// 							ElementID:            int(player2.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
@@ -601,26 +601,26 @@ func TestTree(t *testing.T) {
 	// 				player2.ID(): {
 	// 					ID:            player2.ID(),
 	// 					OperationKind: OperationKindUnchanged,
-	// 					GuildMembers: map[PlayerID]playerReference{
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						player1.ID(): {
 	// 							OperationKind:        OperationKindUnchanged,
-	// 							ElementID:            player1.ID(),
+	// 							ElementID:            int(player1.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 				},
 	// 				player3.ID(): {
 	// 					ID:            player3.ID(),
 	// 					OperationKind: OperationKindUnchanged,
-	// 					GuildMembers: map[PlayerID]playerReference{
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						player1.ID(): {
 	// 							OperationKind:        OperationKindUnchanged,
-	// 							ElementID:            player1.ID(),
+	// 							ElementID:            int(player1.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 				},
@@ -645,20 +645,13 @@ func TestTree(t *testing.T) {
 	// 			expectedTree.Player = map[PlayerID]player{
 	// 				plyr.ID(): {
 	// 					ID: plyr.ID(),
-	// 					GuildMembers: map[PlayerID]playerReference{
-	// 						plyr.ID(): {
-	// 							OperationKind:        OperationKindUnchanged,
-	// 							ElementID:            plyr.ID(),
-	// 							ElementKind:          ElementKindPlayer,
-	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(plyr.ID())).toJSONPath(),
-	// 						},
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						plyr.ID(): {
 	// 							OperationKind:        OperationKindUpdate,
-	// 							ElementID:            plyr.ID(),
+	// 							ElementID:            int(plyr.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(plyr.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
@@ -691,12 +684,12 @@ func TestTree(t *testing.T) {
 	// 				itm.ID(): {
 	// 					ID:   itm.ID(),
 	// 					Name: "myName",
-	// 					BoundTo: &playerReference{
+	// 					BoundTo: &elementReference{
 	// 						OperationKind:        OperationKindUnchanged,
-	// 						ElementID:            plyr.ID(),
+	// 						ElementID:            int(plyr.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataModified,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(plyr.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
 	// 				},
@@ -704,13 +697,13 @@ func TestTree(t *testing.T) {
 	// 			expectedTree.Player = map[PlayerID]player{
 	// 				plyr.ID(): {
 	// 					ID: plyr.ID(),
-	// 					EquipmentSets: map[EquipmentSetID]equipmentSetReference{
+	// 					EquipmentSets: map[EquipmentSetID]elementReference{
 	// 						eqSet.ID(): {
 	// 							OperationKind:        OperationKindUnchanged,
-	// 							ElementID:            eqSet.ID(),
+	// 							ElementID:            int(eqSet.ID()),
 	// 							ElementKind:          ElementKindEquipmentSet,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(equipmentSetIdentifier).id(int(eqSet.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(equipmentSetIdentifier, int(eqSet.ID()), ElementKindEquipmentSet).toJSONPath(),
 	// 						},
 	// 					},
 	// 					OperationKind: OperationKindUnchanged,
@@ -719,13 +712,13 @@ func TestTree(t *testing.T) {
 	// 			expectedTree.EquipmentSet = map[EquipmentSetID]equipmentSet{
 	// 				eqSet.ID(): {
 	// 					ID: eqSet.ID(),
-	// 					Equipment: map[ItemID]itemReference{
+	// 					Equipment: map[ItemID]elementReference{
 	// 						itm.ID(): {
 	// 							OperationKind:        OperationKindUnchanged,
-	// 							ElementID:            itm.ID(),
+	// 							ElementID:            int(itm.ID()),
 	// 							ElementKind:          ElementKindItem,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(itemIdentifier).id(int(itm.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(itemIdentifier, int(itm.ID()), ElementKindItem).toJSONPath(),
 	// 						},
 	// 					},
 	// 					OperationKind: OperationKindUnchanged,
@@ -756,12 +749,12 @@ func TestTree(t *testing.T) {
 	// 			expectedTree.Item = map[ItemID]item{
 	// 				itm.ID(): {
 	// 					ID: itm.ID(),
-	// 					BoundTo: &playerReference{
+	// 					BoundTo: &elementReference{
 	// 						OperationKind:        OperationKindUnchanged,
-	// 						ElementID:            player1.ID(),
+	// 						ElementID:            int(player1.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataModified,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 					OperationKind: OperationKindUnchanged,
 	// 				},
@@ -779,13 +772,13 @@ func TestTree(t *testing.T) {
 	// 				player2.ID(): {
 	// 					ID:            player2.ID(),
 	// 					OperationKind: OperationKindUnchanged,
-	// 					GuildMembers: map[PlayerID]playerReference{
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						player1.ID(): {
 	// 							OperationKind:        OperationKindUnchanged,
-	// 							ElementID:            player1.ID(),
+	// 							ElementID:            int(player1.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 				},
@@ -843,12 +836,12 @@ func TestTree(t *testing.T) {
 	// 			expectedTree.Item = map[ItemID]item{
 	// 				itm.ID(): {
 	// 					ID: itm.ID(),
-	// 					BoundTo: &playerReference{
+	// 					BoundTo: &elementReference{
 	// 						OperationKind:        OperationKindUpdate,
-	// 						ElementID:            player1.ID(),
+	// 						ElementID:            int(player1.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataModified,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
 	// 				},
@@ -865,13 +858,13 @@ func TestTree(t *testing.T) {
 	// 				},
 	// 				player2.ID(): {
 	// 					ID: player2.ID(),
-	// 					GuildMembers: map[PlayerID]playerReference{
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						player1.ID(): {
 	// 							OperationKind:        OperationKindUpdate,
-	// 							ElementID:            player1.ID(),
+	// 							ElementID:            int(player1.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
@@ -909,24 +902,24 @@ func TestTree(t *testing.T) {
 	// 				item1.ID(): {
 	// 					ID:   item1.ID(),
 	// 					Name: "item1",
-	// 					BoundTo: &playerReference{
+	// 					BoundTo: &elementReference{
 	// 						OperationKind:        OperationKindDelete,
-	// 						ElementID:            player1.ID(),
+	// 						ElementID:            int(player1.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataUnchanged,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
 	// 				},
 	// 				item2.ID(): {
 	// 					ID:   item2.ID(),
 	// 					Name: "item2",
-	// 					BoundTo: &playerReference{
+	// 					BoundTo: &elementReference{
 	// 						OperationKind:        OperationKindUpdate,
-	// 						ElementID:            player1.ID(),
+	// 						ElementID:            int(player1.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataUnchanged,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 					OperationKind: OperationKindUpdate,
 	// 				},
@@ -935,13 +928,13 @@ func TestTree(t *testing.T) {
 	// 				player2.ID(): {
 	// 					ID:            player2.ID(),
 	// 					OperationKind: OperationKindUpdate,
-	// 					GuildMembers: map[PlayerID]playerReference{
+	// 					GuildMembers: map[PlayerID]elementReference{
 	// 						player1.ID(): {
 	// 							OperationKind:        OperationKindUpdate,
-	// 							ElementID:            player1.ID(),
+	// 							ElementID:            int(player1.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataUnchanged,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player1.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 				},
@@ -1091,12 +1084,12 @@ func TestTree(t *testing.T) {
 	// 						ID:            player1.Position().ID(),
 	// 						OperationKind: OperationKindUpdate,
 	// 					},
-	// 					Target: &anyOfPlayer_ZoneItemReference{
+	// 					Target: &elementReference{
 	// 						OperationKind:        OperationKindUpdate,
 	// 						ElementID:            int(player2.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataModified,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 				},
 	// 				player2.ID(): {
@@ -1138,13 +1131,13 @@ func TestTree(t *testing.T) {
 	// 						ID:            player1.Position().ID(),
 	// 						OperationKind: OperationKindUpdate,
 	// 					},
-	// 					TargetedBy: map[int]anyOfPlayer_ZoneItemReference{
+	// 					TargetedBy: map[int]elementReference{
 	// 						int(player2.ID()): {
 	// 							OperationKind:        OperationKindUpdate,
 	// 							ElementID:            int(player2.ID()),
 	// 							ElementKind:          ElementKindPlayer,
 	// 							ReferencedDataStatus: ReferencedDataModified,
-	// 							ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
+	// 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer).toJSONPath(),
 	// 						},
 	// 					},
 	// 				},
@@ -1183,12 +1176,12 @@ func TestTree(t *testing.T) {
 	// 				player2.ID(): {
 	// 					ID:            player2.ID(),
 	// 					OperationKind: OperationKindUnchanged,
-	// 					Target: &anyOfPlayer_ZoneItemReference{
+	// 					Target: &elementReference{
 	// 						OperationKind:        OperationKindUnchanged,
 	// 						ElementID:            int(player1.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataModified,
-	// 						ElementPath:          newPath(zoneIdentifier).id(int(zne.ID())).players().id(int(player1.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(zoneIdentifier, int(zne.ID()), ElementKindZone).extendAndCopy(zone_playersIdentifier, int(player1.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 				},
 	// 			}
@@ -1231,12 +1224,12 @@ func TestTree(t *testing.T) {
 	// 				itm.ID(): {
 	// 					ID:            itm.ID(),
 	// 					OperationKind: OperationKindUnchanged,
-	// 					BoundTo: &playerReference{
+	// 					BoundTo: &elementReference{
 	// 						OperationKind:        OperationKindUnchanged,
-	// 						ElementID:            plyr.ID(),
+	// 						ElementID:            int(plyr.ID()),
 	// 						ElementKind:          ElementKindPlayer,
 	// 						ReferencedDataStatus: ReferencedDataModified,
-	// 						ElementPath:          newPath(zoneIdentifier).id(int(zne.ID())).interactables().id(int(plyr.ID())).toJSONPath(),
+	// 						ElementPath:          newPath().extendAndCopy(zoneIdentifier, int(zne.ID()), ElementKindZone).extendAndCopy(zone_interactablesIdentifier, int(plyr.ID()), ElementKindPlayer).toJSONPath(),
 	// 					},
 	// 				},
 	// 			}
@@ -1264,36 +1257,38 @@ func TestTree(t *testing.T) {
 	// 		false,
 	// 	)
 	// })
-	// t.Run("do not delete ZoneItem when calling player.SetTargetPlayer", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			player1 := se.CreatePlayer()
-	// 			player2 := se.CreatePlayer()
-	// 			zoneItem1 := se.CreateZoneItem()
-	// 			player1.SetTargetZoneItem(zoneItem1.ID())
-	// 			se.UpdateState()
-	// 			player1.SetTargetPlayer(player2.ID())
+	t.Run("do not delete ZoneItem when calling player.SetTargetPlayer", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.CreatePlayer()
+				player2 := se.CreatePlayer()
+				zoneItem1 := se.CreateZoneItem()
+				player1.SetTargetZoneItem(zoneItem1.ID())
+				se.UpdateState()
+				fmt.Println(1, se.Patch.PlayerTargetRef)
+				player1.SetTargetPlayer(player2.ID())
+				fmt.Println(1, se.Patch.PlayerTargetRef)
 
-	// 			expectedTree.Player = map[PlayerID]player{
-	// 				player1.ID(): {
-	// 					ID:            player1.ID(),
-	// 					OperationKind: OperationKindUpdate,
-	// 					Target: &anyOfPlayer_ZoneItemReference{
-	// 						OperationKind:        OperationKindUpdate,
-	// 						ElementID:            int(player2.ID()),
-	// 						ElementKind:          ElementKindPlayer,
-	// 						ReferencedDataStatus: ReferencedDataUnchanged,
-	// 						ElementPath:          newPath(playerIdentifier).id(int(player2.ID())).toJSONPath(),
-	// 					},
-	// 				},
-	// 			}
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 		false,
-	// 	)
-	// })
+				expectedTree.Player = map[PlayerID]player{
+					player1.ID(): {
+						ID:            player1.ID(),
+						OperationKind: OperationKindUpdate,
+						Target: &elementReference{
+							OperationKind:        OperationKindUpdate,
+							ElementID:            int(player2.ID()),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataUnchanged,
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer).toJSONPath(),
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			false,
+		)
+	})
 	// t.Run("assembles entire tree correctly", func(t *testing.T) {
 	// 	newTreeTest(
 	// 		func(se *Engine, expectedTree *Tree) {

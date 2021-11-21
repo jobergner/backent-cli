@@ -65,7 +65,7 @@ func (_any AnyOfPlayer_ZoneItem) SetZoneItem() ZoneItem {
 	if any.anyOfPlayer_ZoneItem.ElementKind == ElementKindZoneItem || any.anyOfPlayer_ZoneItem.OperationKind == OperationKindDelete {
 		return any.ZoneItem()
 	}
-	zoneItem := any.anyOfPlayer_ZoneItem.engine.createZoneItem(any.anyOfPlayer_ZoneItem.ChildElementPath, false)
+	zoneItem := any.anyOfPlayer_ZoneItem.engine.createZoneItem(any.anyOfPlayer_ZoneItem.ParentElementPath, any.anyOfPlayer_ZoneItem.FieldIdentifier)
 	any.anyOfPlayer_ZoneItem.setZoneItem(zoneItem.ID(), true)
 	return zoneItem
 }
@@ -88,7 +88,7 @@ func (_any AnyOfPlayer_ZoneItem) SetPlayer() Player {
 	if any.anyOfPlayer_ZoneItem.ElementKind == ElementKindPlayer || any.anyOfPlayer_ZoneItem.OperationKind == OperationKindDelete {
 		return any.Player()
 	}
-	player := any.anyOfPlayer_ZoneItem.engine.createPlayer(any.anyOfPlayer_ZoneItem.ChildElementPath, false)
+	player := any.anyOfPlayer_ZoneItem.engine.createPlayer(any.anyOfPlayer_ZoneItem.ParentElementPath, any.anyOfPlayer_ZoneItem.FieldIdentifier)
 	any.anyOfPlayer_ZoneItem.setPlayer(player.ID(), true)
 	return player
 }
@@ -126,7 +126,7 @@ func (_any AnyOfPlayer_Position) SetPosition() Position {
 	if any.anyOfPlayer_Position.ElementKind == ElementKindPosition || any.anyOfPlayer_Position.OperationKind == OperationKindDelete {
 		return any.Position()
 	}
-	position := any.anyOfPlayer_Position.engine.createPosition(any.anyOfPlayer_Position.ChildElementPath, false)
+	position := any.anyOfPlayer_Position.engine.createPosition(any.anyOfPlayer_Position.ParentElementPath, any.anyOfPlayer_Position.FieldIdentifier)
 	any.anyOfPlayer_Position.setPosition(position.ID(), true)
 	return position
 }
@@ -159,7 +159,7 @@ func (_any AnyOfPlayer_Position) SetPlayer() Player {
 	if any.anyOfPlayer_Position.ElementKind == ElementKindPlayer || any.anyOfPlayer_Position.OperationKind == OperationKindDelete {
 		return any.Player()
 	}
-	player := any.anyOfPlayer_Position.engine.createPlayer(any.anyOfPlayer_Position.ChildElementPath, false)
+	player := any.anyOfPlayer_Position.engine.createPlayer(any.anyOfPlayer_Position.ParentElementPath, any.anyOfPlayer_Position.FieldIdentifier)
 	any.anyOfPlayer_Position.setPlayer(player.ID(), true)
 	return player
 }
@@ -187,7 +187,7 @@ func (_any AnyOfItem_Player_ZoneItem) SetZoneItem() ZoneItem {
 	if any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindZoneItem || any.anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
 		return any.ZoneItem()
 	}
-	zoneItem := any.anyOfItem_Player_ZoneItem.engine.createZoneItem(any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	zoneItem := any.anyOfItem_Player_ZoneItem.engine.createZoneItem(any.anyOfItem_Player_ZoneItem.ParentElementPath, any.anyOfItem_Player_ZoneItem.FieldIdentifier)
 	any.anyOfItem_Player_ZoneItem.setZoneItem(zoneItem.ID(), true)
 	return zoneItem
 }
@@ -214,7 +214,7 @@ func (_any AnyOfItem_Player_ZoneItem) SetPlayer() Player {
 	if any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindPlayer || any.anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
 		return any.Player()
 	}
-	player := any.anyOfItem_Player_ZoneItem.engine.createPlayer(any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	player := any.anyOfItem_Player_ZoneItem.engine.createPlayer(any.anyOfItem_Player_ZoneItem.ParentElementPath, any.anyOfItem_Player_ZoneItem.FieldIdentifier)
 	any.anyOfItem_Player_ZoneItem.setPlayer(player.ID(), true)
 	return player
 }
@@ -241,7 +241,7 @@ func (_any AnyOfItem_Player_ZoneItem) SetItem() Item {
 	if any.anyOfItem_Player_ZoneItem.ElementKind == ElementKindItem || any.anyOfItem_Player_ZoneItem.OperationKind == OperationKindDelete {
 		return any.Item()
 	}
-	item := any.anyOfItem_Player_ZoneItem.engine.createItem(any.anyOfItem_Player_ZoneItem.ChildElementPath, false)
+	item := any.anyOfItem_Player_ZoneItem.engine.createItem(any.anyOfItem_Player_ZoneItem.ParentElementPath, any.anyOfItem_Player_ZoneItem.FieldIdentifier)
 	any.anyOfItem_Player_ZoneItem.setItem(item.ID(), true)
 	return item
 }
