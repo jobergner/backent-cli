@@ -5,7 +5,7 @@ func (_zone Zone) AddPlayer() Player {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
-	player := zone.zone.engine.createPlayer(zone.zone.path.players(), true)
+	player := zone.zone.engine.createPlayer(zone.zone.path, zone_playersIdentifier)
 	zone.zone.Players = append(zone.zone.Players, player.player.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
@@ -17,7 +17,7 @@ func (_zone Zone) AddItem() ZoneItem {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
-	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path.items(), true)
+	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path, zone_itemsIdentifier)
 	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
@@ -29,8 +29,8 @@ func (_zone Zone) AddInteractablePlayer() Player {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
-	player := zone.zone.engine.createPlayer(zone.zone.path.interactables(), true)
-	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path.interactables()).anyOfItem_Player_ZoneItem
+	player := zone.zone.engine.createPlayer(zone.zone.path, zone_interactablesIdentifier)
+	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
 	anyContainer.setPlayer(player.player.ID, false)
 	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
@@ -43,8 +43,8 @@ func (_zone Zone) AddInteractableZoneItem() ZoneItem {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
-	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path.interactables(), true)
-	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path.interactables()).anyOfItem_Player_ZoneItem
+	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path, zone_interactablesIdentifier)
+	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
 	anyContainer.setZoneItem(zoneItem.zoneItem.ID, false)
 	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
@@ -57,8 +57,8 @@ func (_zone Zone) AddInteractableItem() Item {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
-	item := zone.zone.engine.createItem(zone.zone.path.interactables(), true)
-	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path.interactables()).anyOfItem_Player_ZoneItem
+	item := zone.zone.engine.createItem(zone.zone.path, zone_interactablesIdentifier)
+	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
 	anyContainer.setItem(item.item.ID, false)
 	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
@@ -81,7 +81,7 @@ func (_player Player) AddItem() Item {
 	if player.player.OperationKind == OperationKindDelete {
 		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
 	}
-	item := player.player.engine.createItem(player.player.path.items(), true)
+	item := player.player.engine.createItem(player.player.path, player_itemsIdentifier)
 	player.player.Items = append(player.player.Items, item.item.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -102,7 +102,7 @@ func (_player Player) AddGuildMember(playerID PlayerID) {
 			return
 		}
 	}
-	ref := player.player.engine.createPlayerGuildMemberRef(player.player.path.guildMembers(), true, playerID, player.player.ID)
+	ref := player.player.engine.createPlayerGuildMemberRef(player.player.path, player_guildMembersIdentifier, playerID, player.player.ID)
 	player.player.GuildMembers = append(player.player.GuildMembers, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -123,9 +123,9 @@ func (_player Player) AddTargetedByPlayer(playerID PlayerID) {
 			return
 		}
 	}
-	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
+	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, player.player.path, "").anyOfPlayer_ZoneItem
 	anyContainer.setPlayer(playerID, false)
-	ref := player.player.engine.createPlayerTargetedByRef(player.player.path.targetedBy(), true, anyContainer.ID, player.player.ID)
+	ref := player.player.engine.createPlayerTargetedByRef(player.player.path, player_targetedByIdentifier, anyContainer.ID, player.player.ID, ElementKindPlayer, int(playerID))
 	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -146,9 +146,9 @@ func (_player Player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
 			return
 		}
 	}
-	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, nil).anyOfPlayer_ZoneItem
+	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, player.player.path, "").anyOfPlayer_ZoneItem
 	anyContainer.setZoneItem(zoneItemID, false)
-	ref := player.player.engine.createPlayerTargetedByRef(player.player.path.targetedBy(), true, anyContainer.ID, player.player.ID)
+	ref := player.player.engine.createPlayerTargetedByRef(player.player.path, player_targetedByIdentifier, anyContainer.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -168,7 +168,7 @@ func (_player Player) AddEquipmentSet(equipmentSetID EquipmentSetID) {
 			return
 		}
 	}
-	ref := player.player.engine.createPlayerEquipmentSetRef(player.player.path.equipmentSet(), true, equipmentSetID, player.player.ID)
+	ref := player.player.engine.createPlayerEquipmentSetRef(player.player.path, player_equipmentSetsIdentifier, equipmentSetID, player.player.ID)
 	player.player.EquipmentSets = append(player.player.EquipmentSets, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
 	player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -188,7 +188,7 @@ func (_equipmentSet EquipmentSet) AddEquipment(itemID ItemID) {
 			return
 		}
 	}
-	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(equipmentSet.equipmentSet.path.equipment(), true, itemID, equipmentSet.equipmentSet.ID)
+	ref := equipmentSet.equipmentSet.engine.createEquipmentSetEquipmentRef(equipmentSet.equipmentSet.path, equipmentSet_equipmentIdentifier, itemID, equipmentSet.equipmentSet.ID)
 	equipmentSet.equipmentSet.Equipment = append(equipmentSet.equipmentSet.Equipment, ref.ID)
 	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
 	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet

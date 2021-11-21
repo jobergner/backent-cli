@@ -2,212 +2,155 @@ package state
 
 import "strconv"
 
+type treeFieldIdentifier string
+
 const (
-	equipmentSetIdentifier  int = -1
-	gearScoreIdentifier     int = -2
-	itemIdentifier          int = -3
-	originIdentifier        int = -4
-	playerIdentifier        int = -5
-	itemsIdentifier         int = -6
-	positionIdentifier      int = -7
-	zoneIdentifier          int = -8
-	interactablesIdentifier int = -9
-	playersIdentifier       int = -10
-	zoneItemIdentifier      int = -11
-	boundToIdentifier       int = -12
-	equipmentIdentifier     int = -13
-	equipmentSetsIdentifier int = -14
-	guildMembersIdentifier  int = -15
-	targetIdentifier        int = -16
-	targetedByIdentifier    int = -17
+	equipmentSetIdentifier = "equipmentSet"
+	gearScoreIdentifier    = "gearScore"
+	itemIdentifier         = "item"
+	playerIdentifier       = "player"
+	positionIdentifier     = "position"
+	zoneIdentifier         = "zone"
+	zoneItemIdentifier     = "zoneItem"
+
+	equipmentSet_equipmentIdentifier = "equipmentSet_equipment"
+
+	item_gearScoreIdentifier = "item_gearScore"
+	item_originIdentifier    = "item_origin"
+	item_boundToIdentifier   = "item_boundTo"
+
+	player_equipmentSetsIdentifier = "player_equipmentSets"
+	player_gearScoreIdentifier     = "player_gearScore"
+	player_guildMembersIdentifier  = "player_guildMembers"
+	player_itemsIdentifier         = "player_items"
+	player_positionIdentifier      = "player_position"
+	player_targetIdentifier        = "player_target"
+	player_targetedByIdentifier    = "player_targetedBy"
+
+	zone_itemsIdentifier         = "zone_items"
+	zone_interactablesIdentifier = "zone_interactables"
+	zone_playersIdentifier       = "zone_players"
+
+	zoneItem_itemIdentifier     = "zoneItem_item"
+	zoneItem_positionIdentifier = "zoneItem_position"
 )
 
-type path []int
-
-func newPath(elementIdentifier int) path {
-	return []int{elementIdentifier}
+type segment struct {
+	id         int
+	identifier treeFieldIdentifier
+	kind       ElementKind
 }
 
-func (p path) equipmentSet() path {
-	newPath := make([]int, len(p), len(p)+1)
+type path []segment
+
+func newPath() path {
+	return make(path, 0)
+}
+
+func (p path) extendAndCopy(fieldIdentifier treeFieldIdentifier, id int, kind ElementKind) path {
+	newPath := make(path, len(p), len(p)+1)
 	copy(newPath, p)
-	newPath = append(newPath, equipmentSetIdentifier)
+	newPath = append(newPath, segment{id, fieldIdentifier, kind})
 	return newPath
-}
-
-func (p path) items() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, itemsIdentifier)
-	return newPath
-}
-
-func (p path) player() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, playerIdentifier)
-	return newPath
-}
-
-func (p path) gearScore() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, gearScoreIdentifier)
-	return newPath
-}
-
-func (p path) position() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, positionIdentifier)
-	return newPath
-}
-
-func (p path) players() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, playersIdentifier)
-	return newPath
-}
-
-func (p path) interactables() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, interactablesIdentifier)
-	return newPath
-}
-
-func (p path) item() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, itemIdentifier)
-	return newPath
-}
-
-func (p path) zone() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, zoneIdentifier)
-	return newPath
-}
-
-func (p path) zoneItem() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, zoneItemIdentifier)
-	return newPath
-}
-
-func (p path) origin() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, originIdentifier)
-	return newPath
-}
-
-func (p path) boundTo() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, boundToIdentifier)
-	return newPath
-}
-
-func (p path) equipment() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, equipmentIdentifier)
-	return newPath
-}
-
-func (p path) equipmentSets() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, equipmentSetsIdentifier)
-	return newPath
-}
-
-func (p path) guildMembers() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, guildMembersIdentifier)
-	return newPath
-}
-
-func (p path) target() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, targetIdentifier)
-	return newPath
-}
-
-func (p path) targetedBy() path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, targetedByIdentifier)
-	return newPath
-}
-
-func (p path) id(id int) path {
-	newPath := make([]int, len(p), len(p)+1)
-	copy(newPath, p)
-	newPath = append(newPath, id)
-	return newPath
-}
-
-func (p path) equals(parentPath path) bool {
-	if len(p) != len(parentPath) {
-		return false
-	}
-
-	for i, segment := range parentPath {
-		if segment != p[i] {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (p path) toJSONPath() string {
 	jsonPath := "$"
 
-	for i, seg := range p {
-		if seg < 0 {
-			jsonPath += "." + pathIdentifierToString(seg)
-		} else if i == 1 {
-			jsonPath += "." + strconv.Itoa(seg)
-		} else {
-			jsonPath += "[" + strconv.Itoa(seg) + "]"
+	for _, seg := range p {
+		jsonPath += "." + pathIdentifierToString(seg.identifier)
+		if isSliceFieldIdentifier(seg.identifier) {
+			jsonPath += "[" + strconv.Itoa(seg.id) + "]"
 		}
 	}
 
 	return jsonPath
 }
 
-func pathIdentifierToString(identifier int) string {
-	switch identifier {
+func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
+	switch fieldIdentifier {
 	case equipmentSetIdentifier:
 		return "equipmentSet"
 	case gearScoreIdentifier:
 		return "gearScore"
 	case itemIdentifier:
 		return "item"
-	case originIdentifier:
-		return "origin"
 	case playerIdentifier:
 		return "player"
-	case itemsIdentifier:
-		return "items"
 	case positionIdentifier:
 		return "position"
 	case zoneIdentifier:
 		return "zone"
-	case interactablesIdentifier:
-		return "interactables"
-	case playersIdentifier:
-		return "players"
 	case zoneItemIdentifier:
 		return "zoneItem"
+	case equipmentSet_equipmentIdentifier:
+		return "equipment"
+	case item_gearScoreIdentifier:
+		return "gearScore"
+	case item_originIdentifier:
+		return "origin"
+	case item_boundToIdentifier:
+		return "boundTo"
+	case player_equipmentSetsIdentifier:
+		return "equipmentSets"
+	case player_gearScoreIdentifier:
+		return "gearScore"
+	case player_guildMembersIdentifier:
+		return "guildMembers"
+	case player_itemsIdentifier:
+		return "items"
+	case player_positionIdentifier:
+		return "position"
+	case player_targetIdentifier:
+		return "target"
+	case player_targetedByIdentifier:
+		return "targetedBy"
+	case zone_itemsIdentifier:
+		return "items"
+	case zone_interactablesIdentifier:
+		return "interactables"
+	case zone_playersIdentifier:
+		return "players"
+	case zoneItem_itemIdentifier:
+		return "item"
+	case zoneItem_positionIdentifier:
+		return "position"
 	}
 	return ""
+}
+
+func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
+	switch fieldIdentifier {
+	case equipmentSetIdentifier:
+		return true
+	case gearScoreIdentifier:
+		return true
+	case itemIdentifier:
+		return true
+	case playerIdentifier:
+		return true
+	case positionIdentifier:
+		return true
+	case zoneIdentifier:
+		return true
+	case zoneItemIdentifier:
+		return true
+	case equipmentSet_equipmentIdentifier:
+		return true
+	case player_equipmentSetsIdentifier:
+		return true
+	case player_guildMembersIdentifier:
+		return true
+	case player_itemsIdentifier:
+		return true
+	case player_targetedByIdentifier:
+		return true
+	case zone_itemsIdentifier:
+		return true
+	case zone_interactablesIdentifier:
+		return true
+	case zone_playersIdentifier:
+		return true
+	}
+	return false
 }

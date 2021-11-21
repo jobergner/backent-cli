@@ -202,38 +202,41 @@ type playerEquipmentSetRefCore struct {
 type PlayerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCore }
 
 type anyOfPlayer_PositionCore struct {
-	ID               AnyOfPlayer_PositionID `json:"id"`
-	ElementKind      ElementKind            `json:"elementKind"`
-	ChildElementPath path                   `json:"childElementPath"`
-	Player           PlayerID               `json:"player"`
-	Position         PositionID             `json:"position"`
-	OperationKind    OperationKind          `json:"operationKind"`
-	engine           *Engine
+	ID                AnyOfPlayer_PositionID `json:"id"`
+	ElementKind       ElementKind            `json:"elementKind"`
+	ParentElementPath path                   `json:"parentElementPath"`
+	FieldIdentifier   treeFieldIdentifier    `json:"fieldIdentifier"`
+	Player            PlayerID               `json:"player"`
+	Position          PositionID             `json:"position"`
+	OperationKind     OperationKind          `json:"operationKind"`
+	engine            *Engine
 }
 
 type AnyOfPlayer_Position struct{ anyOfPlayer_Position anyOfPlayer_PositionCore }
 
 type anyOfPlayer_ZoneItemCore struct {
-	ID               AnyOfPlayer_ZoneItemID `json:"id"`
-	ElementKind      ElementKind            `json:"elementKind"`
-	ChildElementPath path                   `json:"childElementPath"`
-	Player           PlayerID               `json:"player"`
-	ZoneItem         ZoneItemID             `json:"zoneItem"`
-	OperationKind    OperationKind          `json:"operationKind"`
-	engine           *Engine
+	ID                AnyOfPlayer_ZoneItemID `json:"id"`
+	ElementKind       ElementKind            `json:"elementKind"`
+	ParentElementPath path                   `json:"parentElementPath"`
+	FieldIdentifier   treeFieldIdentifier    `json:"fieldIdentifier"`
+	Player            PlayerID               `json:"player"`
+	ZoneItem          ZoneItemID             `json:"zoneItem"`
+	OperationKind     OperationKind          `json:"operationKind"`
+	engine            *Engine
 }
 
 type AnyOfPlayer_ZoneItem struct{ anyOfPlayer_ZoneItem anyOfPlayer_ZoneItemCore }
 
 type anyOfItem_Player_ZoneItemCore struct {
-	ID               AnyOfItem_Player_ZoneItemID `json:"id"`
-	ElementKind      ElementKind                 `json:"elementKind"`
-	ChildElementPath path                        `json:"childElementPath"`
-	Item             ItemID                      `json:"item"`
-	Player           PlayerID                    `json:"player"`
-	ZoneItem         ZoneItemID                  `json:"zoneItem"`
-	OperationKind    OperationKind               `json:"operationKind"`
-	engine           *Engine
+	ID                AnyOfItem_Player_ZoneItemID `json:"id"`
+	ElementKind       ElementKind                 `json:"elementKind"`
+	ParentElementPath path                        `json:"parentElementPath"`
+	FieldIdentifier   treeFieldIdentifier         `json:"fieldIdentifier"`
+	Item              ItemID                      `json:"item"`
+	Player            PlayerID                    `json:"player"`
+	ZoneItem          ZoneItemID                  `json:"zoneItem"`
+	OperationKind     OperationKind               `json:"operationKind"`
+	engine            *Engine
 }
 
 type AnyOfItem_Player_ZoneItem struct{ anyOfItem_Player_ZoneItem anyOfItem_Player_ZoneItemCore }

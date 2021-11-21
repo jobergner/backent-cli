@@ -201,7 +201,3 @@ type zoneItemCacheElement struct {
 	hasUpdated bool
 	zoneItem   zoneItem
 }
-
-func newIncludedElements() map[int]bool {
-	return make(map[int]bool)
-}
