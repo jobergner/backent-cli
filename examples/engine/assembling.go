@@ -1,5 +1,7 @@
 package state
 
+import "fmt"
+
 func (engine *Engine) assembleGearScorePath(element *gearScore, p path, pIndex int, includedElements map[int]bool) {
 
 	gearScoreData, ok := engine.Patch.GearScore[element.ID]
@@ -44,16 +46,7 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 
 	switch p[pIndex+1].identifier {
 	case equipmentSet_equipmentIdentifier:
-		var refID EquipmentSetEquipmentRefID
-		for _, refID = range equipmentSetData.Equipment {
-			if int(engine.Patch.EquipmentSetEquipmentRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-			if int(engine.State.EquipmentSetEquipmentRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-		}
-		ref := engine.equipmentSetEquipmentRef(refID).equipmentSetEquipmentRef
+		ref := engine.equipmentSetEquipmentRef(EquipmentSetEquipmentRefID(p[pIndex+1].refID)).equipmentSetEquipmentRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -92,6 +85,9 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 	switch p[pIndex+1].identifier {
 	case item_boundToIdentifier:
 		ref := engine.itemBoundToRef(ItemBoundToRefID(p[pIndex+1].id)).itemBoundToRef
+		if element.BoundTo != nil && ref.OperationKind == OperationKindDelete {
+			break
+		}
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -182,16 +178,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 
 	switch p[pIndex+1].identifier {
 	case player_equipmentSetsIdentifier:
-		var refID PlayerEquipmentSetRefID
-		for _, refID = range playerData.EquipmentSets {
-			if int(engine.Patch.PlayerEquipmentSetRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-			if int(engine.State.PlayerEquipmentSetRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-		}
-		ref := engine.playerEquipmentSetRef(refID).playerEquipmentSetRef
+		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(p[pIndex+1].refID)).playerEquipmentSetRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -216,16 +203,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
 	case player_guildMembersIdentifier:
-		var refID PlayerGuildMemberRefID
-		for _, refID = range playerData.GuildMembers {
-			if int(engine.Patch.PlayerGuildMemberRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-			if int(engine.State.PlayerGuildMemberRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-		}
-		ref := engine.playerGuildMemberRef(refID).playerGuildMemberRef
+		ref := engine.playerGuildMemberRef(PlayerGuildMemberRefID(p[pIndex+1].refID)).playerGuildMemberRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -260,11 +238,16 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
 		element.Position = child
 	case player_targetIdentifier:
-		ref := engine.playerTargetRef(playerData.Target).playerTargetRef
+		ref := engine.playerTargetRef(PlayerTargetRefID(p[pIndex+1].refID)).playerTargetRef
+		if element.Target != nil && ref.OperationKind == OperationKindDelete {
+			break
+		}
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[p[pIndex+1].id]; ok {
 			referencedDataStatus = ReferencedDataModified
 		}
+		// TODO sometimes player first, sometimes zoneItem
+		fmt.Println(p[pIndex+1].kind, ref, playerData.Target)
 		switch p[pIndex+1].kind {
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(p[pIndex+1].id)).player
@@ -281,7 +264,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 			treeRef := elementReference{
 				OperationKind:        ref.OperationKind,
 				ElementID:            p[pIndex+1].id,
-				ElementKind:          ElementKindPlayer,
+				ElementKind:          ElementKindZoneItem,
 				ReferencedDataStatus: referencedDataStatus,
 				ElementPath:          referencedElement.Path,
 			}
@@ -291,16 +274,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		if element.TargetedBy == nil {
 			element.TargetedBy = make(map[int]elementReference)
 		}
-		var refID PlayerTargetedByRefID
-		for _, refID = range playerData.TargetedBy {
-			if int(engine.Patch.PlayerTargetedByRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-			if int(engine.State.PlayerTargetedByRef[refID].ReferencedElementID) == p[pIndex+1].id {
-				break
-			}
-		}
-		ref := engine.playerTargetedByRef(refID).playerTargetedByRef
+		ref := engine.playerTargetedByRef(PlayerTargetedByRefID(p[pIndex+1].refID)).playerTargetedByRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[p[pIndex+1].id]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -399,7 +373,7 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 	_ = zoneData
 }
 
-// 1. get all basic elements and references out of patch, put their paths in updatedPaths
+// 1. get all basic elements and references out of patch, put their paths in updatedReferencePaths
 // 2. go through all paths and put ids in includedElements map, save len(includedElements)
 // 3. get all references out of STATE, check if they reference element in includedElements, if TRUE put reference path into updatedByReferecePaths
 // 4. if len(updatedByReferecePaths) != 0: go through all updatedByReferecePaths and put ids in includedElements map, ELSE continue with 6.
@@ -432,120 +406,203 @@ func (engine *Engine) assembleUpdateTree() Tree {
 		delete(engine.Tree.ZoneItem, key)
 	}
 
-	updatedPaths := make(map[int]path)
+	updatedReferencePaths := make(map[int]path)
+	updatedElementPaths := make(map[int]path)
 	// TODO possibly big performance boost
 	// updatedElements := make(map[int]bool)
 
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
-		updatedPaths[int(equipmentSet.ID)] = equipmentSet.path
+		updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
 	for _, gearScore := range engine.Patch.GearScore {
-		updatedPaths[int(gearScore.ID)] = gearScore.path
+		updatedElementPaths[int(gearScore.ID)] = gearScore.path
 	}
 	for _, item := range engine.Patch.Item {
-		updatedPaths[int(item.ID)] = item.path
+		updatedElementPaths[int(item.ID)] = item.path
 	}
 	for _, player := range engine.Patch.Player {
-		updatedPaths[int(player.ID)] = player.path
+		updatedElementPaths[int(player.ID)] = player.path
 	}
 	for _, position := range engine.Patch.Position {
-		updatedPaths[int(position.ID)] = position.path
+		updatedElementPaths[int(position.ID)] = position.path
 	}
 	for _, zone := range engine.Patch.Zone {
-		updatedPaths[int(zone.ID)] = zone.path
+		updatedElementPaths[int(zone.ID)] = zone.path
 	}
 	for _, zoneItem := range engine.Patch.ZoneItem {
-		updatedPaths[int(zoneItem.ID)] = zoneItem.path
+		updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
 	}
 	for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
-		updatedPaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+		updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
 	}
 	for _, itemBoundToRef := range engine.Patch.ItemBoundToRef {
-		updatedPaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+		updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
 	}
 	for _, playerEquipmentSetRef := range engine.Patch.PlayerEquipmentSetRef {
-		updatedPaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+		updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
 	}
 	for _, playerGuildMemberRef := range engine.Patch.PlayerGuildMemberRef {
-		updatedPaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+		updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
 	}
 	for _, playerTargetRef := range engine.Patch.PlayerTargetRef {
-		// TODO because paths contain the ids of referenced elements (not ids of references) changing a reference
-		// includes the newly referenced element in the path. this is why the referenced element is considered updated
-		updatedPaths[int(playerTargetRef.ID)] = playerTargetRef.path
+		updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 	}
 	for _, playerTargetedByRef := range engine.Patch.PlayerTargetedByRef {
-		updatedPaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+		updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 	}
 
 	includedElements := make(map[int]bool)
 
-	prevousLength := len(updatedPaths)
+	prevousLength := 0
 	for {
-		for _, p := range updatedPaths {
+		for _, p := range updatedElementPaths {
 			for _, seg := range p {
 				includedElements[seg.id] = true
 			}
 		}
-		// TODO in case a reference is newly created and references an element that
-		// enters includedElements at a later iteration, I also need to loop
-		// over patch references again
+		for _, p := range updatedReferencePaths {
+			for _, seg := range p {
+				if seg.refID != 0 {
+					includedElements[seg.refID] = true
+				} else {
+					includedElements[seg.id] = true
+				}
+			}
+		}
 
-		// TODO failing test cases for all todos
+		if prevousLength == len(includedElements) {
+			break
+		}
 
+		prevousLength = len(includedElements)
+
+		for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
+			if _, ok := includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+			}
+		}
 		for _, equipmentSetEquipmentRef := range engine.State.EquipmentSetEquipmentRef {
-			if _, ok := includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; !ok {
-				updatedPaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+			if _, ok := updatedReferencePaths[int(equipmentSetEquipmentRef.ID)]; ok {
+				continue
+			}
+			if _, ok := includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+			}
+		}
+
+		for _, itemBoundToRef := range engine.Patch.ItemBoundToRef {
+			if _, ok := includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
 			}
 		}
 		for _, itemBoundToRef := range engine.State.ItemBoundToRef {
-			if _, ok := includedElements[int(itemBoundToRef.ReferencedElementID)]; !ok {
-				updatedPaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+			if _, ok := updatedReferencePaths[int(itemBoundToRef.ID)]; ok {
+				continue
+			}
+			if _, ok := includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+			}
+		}
+
+		for _, playerEquipmentSetRef := range engine.Patch.PlayerEquipmentSetRef {
+			if _, ok := includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
 			}
 		}
 		for _, playerEquipmentSetRef := range engine.State.PlayerEquipmentSetRef {
-			if _, ok := includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; !ok {
-				updatedPaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+			if _, ok := updatedReferencePaths[int(playerEquipmentSetRef.ID)]; ok {
+				continue
+			}
+			if _, ok := includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+			}
+		}
+
+		for _, playerGuildMemberRef := range engine.Patch.PlayerGuildMemberRef {
+			if _, ok := includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
 			}
 		}
 		for _, playerGuildMemberRef := range engine.State.PlayerGuildMemberRef {
-			if _, ok := includedElements[int(playerGuildMemberRef.ReferencedElementID)]; !ok {
-				updatedPaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+			if _, ok := updatedReferencePaths[int(playerGuildMemberRef.ID)]; ok {
+				continue
+			}
+			if _, ok := includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+				updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
 			}
 		}
-		for _, playerTargetRef := range engine.State.PlayerTargetRef {
+
+		for _, playerTargetRef := range engine.Patch.PlayerTargetRef {
 			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID)
 			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; !ok {
-					updatedPaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; !ok {
-					updatedPaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
+					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				}
+			}
+		}
+		for _, playerTargetRef := range engine.State.PlayerTargetRef {
+			if _, ok := updatedReferencePaths[int(playerTargetRef.ID)]; ok {
+				continue
+			}
+			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID)
+			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
+			case ElementKindPlayer:
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				}
+			case ElementKindZoneItem:
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				}
+			}
+		}
+
+		for _, playerTargetedByRef := range engine.Patch.PlayerTargetedByRef {
+			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID)
+			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
+			case ElementKindPlayer:
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				}
+			case ElementKindZoneItem:
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
 		}
 		for _, playerTargetedByRef := range engine.State.PlayerTargetedByRef {
+			if _, ok := updatedReferencePaths[int(playerTargetedByRef.ID)]; ok {
+				continue
+			}
 			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID)
 			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; !ok {
-					updatedPaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; !ok {
-					updatedPaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
 		}
 
-		if prevousLength == len(updatedPaths) {
-			break
-		}
-
-		prevousLength = len(updatedPaths)
 	}
+
+	updatedPaths := make(map[int]path)
+	for id, path := range updatedElementPaths {
+		updatedPaths[id] = path
+	}
+	for id, path := range updatedReferencePaths {
+		updatedPaths[id] = path
+	}
+
+	fmt.Println(updatedPaths)
 
 	for _, elementPath := range updatedPaths {
 		switch elementPath[0].identifier {

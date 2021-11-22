@@ -39,6 +39,7 @@ type segment struct {
 	id         int
 	identifier treeFieldIdentifier
 	kind       ElementKind
+	refID      int
 }
 
 type path []segment
@@ -47,10 +48,10 @@ func newPath() path {
 	return make(path, 0)
 }
 
-func (p path) extendAndCopy(fieldIdentifier treeFieldIdentifier, id int, kind ElementKind) path {
+func (p path) extendAndCopy(fieldIdentifier treeFieldIdentifier, id int, kind ElementKind, refID int) path {
 	newPath := make(path, len(p), len(p)+1)
 	copy(newPath, p)
-	newPath = append(newPath, segment{id, fieldIdentifier, kind})
+	newPath = append(newPath, segment{id, fieldIdentifier, kind, refID})
 	return newPath
 }
 
