@@ -1,7 +1,6 @@
 package state
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/jobergner/backent-cli/pkg/testutils"
@@ -1383,14 +1382,28 @@ func TestTree(t *testing.T) {
 				item2.BoundTo().Unset()
 
 				player1.GearScore().SetLevel(1)
-				// TODO it actually does what I hoped it to do
-				fmt.Println(item1.ID())
-				fmt.Println(item2.ID())
 
+				expectedTree.Item = map[ItemID]item{
+					item1.ID(): {
+						ID:            item1.ID(),
+						OperationKind: OperationKindUpdate,
+						BoundTo: &elementReference{
+							ElementKind:          ElementKindPlayer,
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementID:            int(player1.ID()),
+							OperationKind:        OperationKindDelete,
+							ReferencedDataStatus: ReferencedDataModified,
+						},
+					},
+					item2.ID(): {
+						ID:            item2.ID(),
+						OperationKind: OperationKindUpdate,
+					},
+				}
 				expectedTree.Player = map[PlayerID]player{
 					player1.ID(): {
 						ID:            player1.ID(),
-						OperationKind: OperationKindUpdate,
+						OperationKind: OperationKindUnchanged,
 						GearScore: &gearScore{
 							OperationKind: OperationKindUpdate,
 							ID:            player1.GearScore().ID(),
