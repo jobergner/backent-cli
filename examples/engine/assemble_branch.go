@@ -106,7 +106,7 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 	case item_gearScoreIdentifier:
 		child := element.GearScore
 		if child == nil {
-			child = &gearScore{ID: itemData.GearScore}
+			child = &gearScore{ID: GearScoreID(nextSeg.id)}
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
@@ -151,14 +151,14 @@ func (engine *Engine) assembleZoneItemPath(element *zoneItem, p path, pIndex int
 	case zoneItem_itemIdentifier:
 		child := element.Item
 		if child == nil {
-			child = &item{ID: zoneItemData.Item}
+			child = &item{ID: ItemID(nextSeg.id)}
 		}
 		engine.assembleItemPath(child, p, pIndex+1, includedElements)
 		element.Item = child
 	case zoneItem_positionIdentifier:
 		child := element.Position
 		if child == nil {
-			child = &position{ID: zoneItemData.Position}
+			child = &position{ID: PositionID(nextSeg.id)}
 		}
 		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
 		element.Position = child
@@ -204,7 +204,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 	case player_gearScoreIdentifier:
 		child := element.GearScore
 		if child == nil {
-			child = &gearScore{ID: playerData.GearScore}
+			child = &gearScore{ID: GearScoreID(nextSeg.id)}
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
@@ -239,7 +239,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 	case player_positionIdentifier:
 		child := element.Position
 		if child == nil {
-			child = &position{ID: playerData.Position}
+			child = &position{ID: PositionID(nextSeg.id)}
 		}
 		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
 		element.Position = child
