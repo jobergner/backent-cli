@@ -142,3 +142,15 @@ BenchmarkUpdateState-8   	      5000	    450113 ns/op	  264166 B/op	     867 all
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	
 
+-------------------------------------------------------------should do before after from now on as results vary with setups of laptop (displays connected etc)
+# make use of goroutines to assemble tree BEFORE:
+Di 23. Nov 16:59:49 CET 2021
+goos: linux
+goarch: amd64
+pkg: github.com/jobergner/backent-cli/examples/engine
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BEFORE: BenchmarkAssembleTree-8   	    5000	   2836422 ns/op	  309688 B/op	    1130 allocs/op
+AFTER : BenchmarkAssembleTree-8   	    5000	   1719938 ns/op	   37441 B/op	     265 allocs/op
+PASS
+ok  	github.com/jobergner/backent-cli/examples/engine	14.258s
+
