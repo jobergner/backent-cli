@@ -184,27 +184,27 @@ func benchTestRemoveInteractables(engine *Engine, zone Zone) {
 // 	}
 // }
 
-func BenchmarkAssembleTree(b *testing.B) {
-	engine := newEngine()
-	for i := 0; i < benchTestNumberOfZones; i++ {
-		setUpRealisticZoneForBenchmarkExample(engine)
-	}
-	engine.UpdateState()
+// func BenchmarkAssembleTree(b *testing.B) {
+// 	engine := newEngine()
+// 	for i := 0; i < benchTestNumberOfZones; i++ {
+// 		setUpRealisticZoneForBenchmarkExample(engine)
+// 	}
+// 	engine.UpdateState()
 
-	randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-	benchTestAddInteractables(engine, randomZone1)
-	benchTestRemoveInteractables(engine, randomZone1)
-	randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-	benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
-	benchTestRemovePlayers(engine, randomZone2)
-	benchTestModifyPlayerPosition(engine)
-	benchTestModifyItemGearScore(engine)
+// 	randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+// 	benchTestAddInteractables(engine, randomZone1)
+// 	benchTestRemoveInteractables(engine, randomZone1)
+// 	randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+// 	benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
+// 	benchTestRemovePlayers(engine, randomZone2)
+// 	benchTestModifyPlayerPosition(engine)
+// 	benchTestModifyItemGearScore(engine)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = engine.assembleUpdateTree()
-	}
-}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		_ = engine.assembleUpdateTree()
+// 	}
+// }
 
 // func BenchmarkEngine(b *testing.B) {
 // 	engine := newEngine()
@@ -228,23 +228,23 @@ func BenchmarkAssembleTree(b *testing.B) {
 // 	}
 // }
 
-// func BenchmarkUpdateState(b *testing.B) {
-// 	engine := newEngine()
-// 	for i := 0; i < benchTestNumberOfZones; i++ {
-// 		setUpRealisticZoneForBenchmarkExample(engine)
-// 	}
-// 	engine.UpdateState()
+func BenchmarkUpdateState(b *testing.B) {
+	engine := newEngine()
+	for i := 0; i < benchTestNumberOfZones; i++ {
+		setUpRealisticZoneForBenchmarkExample(engine)
+	}
+	engine.UpdateState()
 
-// 	b.ResetTimer()
-// 	for i := 0; i < b.N; i++ {
-// 		randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-// 		benchTestAddInteractables(engine, randomZone1)
-// 		benchTestRemoveInteractables(engine, randomZone1)
-// 		randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
-// 		benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
-// 		benchTestRemovePlayers(engine, randomZone2)
-// 		benchTestModifyPlayerPosition(engine)
-// 		benchTestModifyItemGearScore(engine)
-// 		engine.UpdateState()
-// 	}
-// }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		randomZone1 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+		benchTestAddInteractables(engine, randomZone1)
+		benchTestRemoveInteractables(engine, randomZone1)
+		randomZone2 := engine.EveryZone()[rand.Intn(benchTestNumberOfZones)]
+		benchTestAddNewPlayersAsGuildMembers(engine, randomZone2)
+		benchTestRemovePlayers(engine, randomZone2)
+		benchTestModifyPlayerPosition(engine)
+		benchTestModifyItemGearScore(engine)
+		engine.UpdateState()
+	}
+}
