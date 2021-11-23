@@ -21,13 +21,13 @@ type assembler struct {
 	updatedReferencePaths map[int]path
 	updatedElementPaths   map[int]path
 	includedElements      map[int]bool
-	equipmentSetPath      map[EquipmentSetID]path
-	gearScorePath         map[GearScoreID]path
-	itemPath              map[ItemID]path
-	playerPath            map[PlayerID]path
-	positionPath          map[PositionID]path
-	zonePath              map[ZoneID]path
-	zoneItemPath          map[ZoneItemID]path
+	equipmentSetPath      map[int]path
+	gearScorePath         map[int]path
+	itemPath              map[int]path
+	playerPath            map[int]path
+	positionPath          map[int]path
+	zonePath              map[int]path
+	zoneItemPath          map[int]path
 }
 
 func newAssembler() assembler {
@@ -36,13 +36,13 @@ func newAssembler() assembler {
 		updatedElementPaths:   make(map[int]path),
 		updatedReferencePaths: make(map[int]path),
 		includedElements:      make(map[int]bool),
-		equipmentSetPath:      make(map[EquipmentSetID]path),
-		gearScorePath:         make(map[GearScoreID]path),
-		itemPath:              make(map[ItemID]path),
-		playerPath:            make(map[PlayerID]path),
-		positionPath:          make(map[PositionID]path),
-		zonePath:              make(map[ZoneID]path),
-		zoneItemPath:          make(map[ZoneItemID]path),
+		equipmentSetPath:      make(map[int]path),
+		gearScorePath:         make(map[int]path),
+		itemPath:              make(map[int]path),
+		playerPath:            make(map[int]path),
+		positionPath:          make(map[int]path),
+		zonePath:              make(map[int]path),
+		zoneItemPath:          make(map[int]path),
 	}
 }
 

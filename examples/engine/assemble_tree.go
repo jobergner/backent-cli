@@ -1,6 +1,8 @@
 package state
 
-import "sync"
+import (
+	"sync"
+)
 
 func (engine *Engine) assembleUpdateTree() Tree {
 
@@ -25,7 +27,8 @@ func (engine *Engine) assembleUpdateTree() Tree {
 }
 
 func (engine *Engine) assembleEquipmentSets(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.equipmentSetPath {
+	for _, p := range engine.assembler.equipmentSetPath {
+		id := EquipmentSetID(p[0].id)
 		child, ok := engine.Tree.EquipmentSet[id]
 		if !ok {
 			child = equipmentSet{ID: id}
@@ -37,7 +40,8 @@ func (engine *Engine) assembleEquipmentSets(wg *sync.WaitGroup) {
 }
 
 func (engine *Engine) assembleGearScores(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.gearScorePath {
+	for _, p := range engine.assembler.gearScorePath {
+		id := GearScoreID(p[0].id)
 		child, ok := engine.Tree.GearScore[id]
 		if !ok {
 			child = gearScore{ID: id}
@@ -49,7 +53,8 @@ func (engine *Engine) assembleGearScores(wg *sync.WaitGroup) {
 }
 
 func (engine *Engine) assembleItems(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.itemPath {
+	for _, p := range engine.assembler.itemPath {
+		id := ItemID(p[0].id)
 		child, ok := engine.Tree.Item[id]
 		if !ok {
 			child = item{ID: id}
@@ -61,7 +66,8 @@ func (engine *Engine) assembleItems(wg *sync.WaitGroup) {
 }
 
 func (engine *Engine) assemblePlayers(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.playerPath {
+	for _, p := range engine.assembler.playerPath {
+		id := PlayerID(p[0].id)
 		child, ok := engine.Tree.Player[id]
 		if !ok {
 			child = player{ID: id}
@@ -73,7 +79,8 @@ func (engine *Engine) assemblePlayers(wg *sync.WaitGroup) {
 }
 
 func (engine *Engine) assemblePositions(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.positionPath {
+	for _, p := range engine.assembler.positionPath {
+		id := PositionID(p[0].id)
 		child, ok := engine.Tree.Position[id]
 		if !ok {
 			child = position{ID: id}
@@ -85,7 +92,8 @@ func (engine *Engine) assemblePositions(wg *sync.WaitGroup) {
 }
 
 func (engine *Engine) assembleZones(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.zonePath {
+	for _, p := range engine.assembler.zonePath {
+		id := ZoneID(p[0].id)
 		child, ok := engine.Tree.Zone[id]
 		if !ok {
 			child = zone{ID: id}
@@ -97,7 +105,8 @@ func (engine *Engine) assembleZones(wg *sync.WaitGroup) {
 }
 
 func (engine *Engine) assembleZoneItems(wg *sync.WaitGroup) {
-	for id, p := range engine.assembler.zoneItemPath {
+	for _, p := range engine.assembler.zoneItemPath {
+		id := ZoneItemID(p[0].id)
 		child, ok := engine.Tree.ZoneItem[id]
 		if !ok {
 			child = zoneItem{ID: id}
@@ -384,22 +393,22 @@ func (engine *Engine) populateAssembler() {
 	}
 
 	// just to be a bit more organized
-	for _, p := range engine.assembler.updatedPaths {
+	for leafElementID, p := range engine.assembler.updatedPaths {
 		switch p[0].identifier {
 		case equipmentSetIdentifier:
-			engine.assembler.equipmentSetPath[EquipmentSetID(p[0].id)] = p
+			engine.assembler.equipmentSetPath[leafElementID] = p
 		case gearScoreIdentifier:
-			engine.assembler.gearScorePath[GearScoreID(p[0].id)] = p
+			engine.assembler.gearScorePath[leafElementID] = p
 		case itemIdentifier:
-			engine.assembler.itemPath[ItemID(p[0].id)] = p
+			engine.assembler.itemPath[leafElementID] = p
 		case playerIdentifier:
-			engine.assembler.playerPath[PlayerID(p[0].id)] = p
+			engine.assembler.playerPath[leafElementID] = p
 		case positionIdentifier:
-			engine.assembler.positionPath[PositionID(p[0].id)] = p
+			engine.assembler.positionPath[leafElementID] = p
 		case zoneIdentifier:
-			engine.assembler.zonePath[ZoneID(p[0].id)] = p
+			engine.assembler.zonePath[leafElementID] = p
 		case zoneItemIdentifier:
-			engine.assembler.zoneItemPath[ZoneItemID(p[0].id)] = p
+			engine.assembler.zoneItemPath[leafElementID] = p
 		}
 	}
 }
