@@ -390,6 +390,19 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 
 func (engine *Engine) assembleUpdateTree() Tree {
 
+	for key := range engine.assembler.updatedPaths {
+		delete(engine.assembler.updatedPaths, key)
+	}
+	for key := range engine.assembler.updatedElementPaths {
+		delete(engine.assembler.updatedElementPaths, key)
+	}
+	for key := range engine.assembler.updatedReferencePaths {
+		delete(engine.assembler.updatedReferencePaths, key)
+	}
+	for key := range engine.assembler.includedElements {
+		delete(engine.assembler.includedElements, key)
+	}
+
 	for key := range engine.Tree.EquipmentSet {
 		delete(engine.Tree.EquipmentSet, key)
 	}
@@ -412,129 +425,124 @@ func (engine *Engine) assembleUpdateTree() Tree {
 		delete(engine.Tree.ZoneItem, key)
 	}
 
-	updatedReferencePaths := make(map[int]path)
-	updatedElementPaths := make(map[int]path)
 	// TODO possibly big performance boost
-	// updatedElements := make(map[int]bool)
 
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
-		updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
+		engine.assembler.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
 	for _, gearScore := range engine.Patch.GearScore {
-		updatedElementPaths[int(gearScore.ID)] = gearScore.path
+		engine.assembler.updatedElementPaths[int(gearScore.ID)] = gearScore.path
 	}
 	for _, item := range engine.Patch.Item {
-		updatedElementPaths[int(item.ID)] = item.path
+		engine.assembler.updatedElementPaths[int(item.ID)] = item.path
 	}
 	for _, player := range engine.Patch.Player {
-		updatedElementPaths[int(player.ID)] = player.path
+		engine.assembler.updatedElementPaths[int(player.ID)] = player.path
 	}
 	for _, position := range engine.Patch.Position {
-		updatedElementPaths[int(position.ID)] = position.path
+		engine.assembler.updatedElementPaths[int(position.ID)] = position.path
 	}
 	for _, zone := range engine.Patch.Zone {
-		updatedElementPaths[int(zone.ID)] = zone.path
+		engine.assembler.updatedElementPaths[int(zone.ID)] = zone.path
 	}
 	for _, zoneItem := range engine.Patch.ZoneItem {
-		updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+		engine.assembler.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
 	}
 	for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
-		updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+		engine.assembler.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
 	}
 	for _, itemBoundToRef := range engine.Patch.ItemBoundToRef {
-		updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+		engine.assembler.updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
 	}
 	for _, playerEquipmentSetRef := range engine.Patch.PlayerEquipmentSetRef {
-		updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+		engine.assembler.updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
 	}
 	for _, playerGuildMemberRef := range engine.Patch.PlayerGuildMemberRef {
-		updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+		engine.assembler.updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
 	}
 	for _, playerTargetRef := range engine.Patch.PlayerTargetRef {
-		updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+		engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 	}
 	for _, playerTargetedByRef := range engine.Patch.PlayerTargetedByRef {
-		updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+		engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 	}
-
-	includedElements := make(map[int]bool)
 
 	prevousLength := 0
 	for {
-		for _, p := range updatedElementPaths {
+		for _, p := range engine.assembler.updatedElementPaths {
 			for _, seg := range p {
-				includedElements[seg.id] = true
+				engine.assembler.includedElements[seg.id] = true
 			}
 		}
-		for _, p := range updatedReferencePaths {
+		for _, p := range engine.assembler.updatedReferencePaths {
 			for _, seg := range p {
 				if seg.refID != 0 {
-					includedElements[seg.refID] = true
+					engine.assembler.includedElements[seg.refID] = true
 				} else {
-					includedElements[seg.id] = true
+					engine.assembler.includedElements[seg.id] = true
 				}
 			}
 		}
 
-		if prevousLength == len(includedElements) {
+		if prevousLength == len(engine.assembler.includedElements) {
 			break
 		}
 
-		prevousLength = len(includedElements)
+		prevousLength = len(engine.assembler.includedElements)
 
 		for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
-			if _, ok := includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+			if _, ok := engine.assembler.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
 			}
 		}
 		for _, equipmentSetEquipmentRef := range engine.State.EquipmentSetEquipmentRef {
-			if _, ok := updatedReferencePaths[int(equipmentSetEquipmentRef.ID)]; ok {
+			if _, ok := engine.assembler.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)]; ok {
 				continue
 			}
-			if _, ok := includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+			if _, ok := engine.assembler.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
 			}
 		}
 
 		for _, itemBoundToRef := range engine.Patch.ItemBoundToRef {
-			if _, ok := includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+			if _, ok := engine.assembler.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
 			}
 		}
 		for _, itemBoundToRef := range engine.State.ItemBoundToRef {
-			if _, ok := updatedReferencePaths[int(itemBoundToRef.ID)]; ok {
+			if _, ok := engine.assembler.updatedReferencePaths[int(itemBoundToRef.ID)]; ok {
 				continue
 			}
-			if _, ok := includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+			if _, ok := engine.assembler.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
 			}
 		}
 
 		for _, playerEquipmentSetRef := range engine.Patch.PlayerEquipmentSetRef {
-			if _, ok := includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+			if _, ok := engine.assembler.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
 			}
 		}
 		for _, playerEquipmentSetRef := range engine.State.PlayerEquipmentSetRef {
-			if _, ok := updatedReferencePaths[int(playerEquipmentSetRef.ID)]; ok {
+			if _, ok := engine.assembler.updatedReferencePaths[int(playerEquipmentSetRef.ID)]; ok {
 				continue
 			}
-			if _, ok := includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+			if _, ok := engine.assembler.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
 			}
 		}
 
 		for _, playerGuildMemberRef := range engine.Patch.PlayerGuildMemberRef {
-			if _, ok := includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+			if _, ok := engine.assembler.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
 			}
 		}
 		for _, playerGuildMemberRef := range engine.State.PlayerGuildMemberRef {
-			if _, ok := updatedReferencePaths[int(playerGuildMemberRef.ID)]; ok {
+			if _, ok := engine.assembler.updatedReferencePaths[int(playerGuildMemberRef.ID)]; ok {
 				continue
 			}
-			if _, ok := includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
-				updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+			if _, ok := engine.assembler.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+				engine.assembler.updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
 			}
 		}
 
@@ -542,28 +550,28 @@ func (engine *Engine) assembleUpdateTree() Tree {
 			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID)
 			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
-					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			}
 		}
 		for _, playerTargetRef := range engine.State.PlayerTargetRef {
-			if _, ok := updatedReferencePaths[int(playerTargetRef.ID)]; ok {
+			if _, ok := engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)]; ok {
 				continue
 			}
 			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID)
 			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			}
 		}
@@ -572,92 +580,91 @@ func (engine *Engine) assembleUpdateTree() Tree {
 			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID)
 			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
 		}
 		for _, playerTargetedByRef := range engine.State.PlayerTargetedByRef {
-			if _, ok := updatedReferencePaths[int(playerTargetedByRef.ID)]; ok {
+			if _, ok := engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)]; ok {
 				continue
 			}
 			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID)
 			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
-					updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
 		}
 
 	}
 
-	updatedPaths := make(map[int]path)
-	for id, path := range updatedElementPaths {
-		updatedPaths[id] = path
+	for id, path := range engine.assembler.updatedElementPaths {
+		engine.assembler.updatedPaths[id] = path
 	}
-	for id, path := range updatedReferencePaths {
-		updatedPaths[id] = path
+	for id, path := range engine.assembler.updatedReferencePaths {
+		engine.assembler.updatedPaths[id] = path
 	}
 
-	for _, elementPath := range updatedPaths {
+	for _, elementPath := range engine.assembler.updatedPaths {
 		switch elementPath[0].identifier {
 		case equipmentSetIdentifier:
 			child, ok := engine.Tree.EquipmentSet[EquipmentSetID(elementPath[0].id)]
 			if !ok {
 				child = equipmentSet{ID: EquipmentSetID(elementPath[0].id)}
 			}
-			engine.assembleEquipmentSetPath(&child, elementPath, 0, includedElements)
+			engine.assembleEquipmentSetPath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.EquipmentSet[EquipmentSetID(elementPath[0].id)] = child
 		case gearScoreIdentifier:
 			child, ok := engine.Tree.GearScore[GearScoreID(elementPath[0].id)]
 			if !ok {
 				child = gearScore{ID: GearScoreID(elementPath[0].id)}
 			}
-			engine.assembleGearScorePath(&child, elementPath, 0, includedElements)
+			engine.assembleGearScorePath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.GearScore[GearScoreID(elementPath[0].id)] = child
 		case itemIdentifier:
 			child, ok := engine.Tree.Item[ItemID(elementPath[0].id)]
 			if !ok {
 				child = item{ID: ItemID(elementPath[0].id)}
 			}
-			engine.assembleItemPath(&child, elementPath, 0, includedElements)
+			engine.assembleItemPath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.Item[ItemID(elementPath[0].id)] = child
 		case playerIdentifier:
 			child, ok := engine.Tree.Player[PlayerID(elementPath[0].id)]
 			if !ok {
 				child = player{ID: PlayerID(elementPath[0].id)}
 			}
-			engine.assemblePlayerPath(&child, elementPath, 0, includedElements)
+			engine.assemblePlayerPath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.Player[PlayerID(elementPath[0].id)] = child
 		case positionIdentifier:
 			child, ok := engine.Tree.Position[PositionID(elementPath[0].id)]
 			if !ok {
 				child = position{ID: PositionID(elementPath[0].id)}
 			}
-			engine.assemblePositionPath(&child, elementPath, 0, includedElements)
+			engine.assemblePositionPath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.Position[PositionID(elementPath[0].id)] = child
 		case zoneIdentifier:
 			child, ok := engine.Tree.Zone[ZoneID(elementPath[0].id)]
 			if !ok {
 				child = zone{ID: ZoneID(elementPath[0].id)}
 			}
-			engine.assembleZonePath(&child, elementPath, 0, includedElements)
+			engine.assembleZonePath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.Zone[ZoneID(elementPath[0].id)] = child
 		case zoneItemIdentifier:
 			child, ok := engine.Tree.ZoneItem[ZoneItemID(elementPath[0].id)]
 			if !ok {
 				child = zoneItem{ID: ZoneItemID(elementPath[0].id)}
 			}
-			engine.assembleZoneItemPath(&child, elementPath, 0, includedElements)
+			engine.assembleZoneItemPath(&child, elementPath, 0, engine.assembler.includedElements)
 			engine.Tree.ZoneItem[ZoneItemID(elementPath[0].id)] = child
 		}
 	}

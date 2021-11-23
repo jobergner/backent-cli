@@ -9,20 +9,36 @@ const (
 )
 
 type Engine struct {
-	State         State
-	Patch         State
-	Tree          Tree
-	assembleCache assembleCache
-	IDgen         int
+	State     State
+	Patch     State
+	Tree      Tree
+	assembler assembler
+	IDgen     int
+}
+
+type assembler struct {
+	updatedPaths          map[int]path
+	updatedReferencePaths map[int]path
+	updatedElementPaths   map[int]path
+	includedElements      map[int]bool
+}
+
+func newAssembler() assembler {
+	return assembler{
+		updatedPaths:          make(map[int]path),
+		updatedElementPaths:   make(map[int]path),
+		updatedReferencePaths: make(map[int]path),
+		includedElements:      make(map[int]bool),
+	}
 }
 
 func newEngine() *Engine {
 	return &Engine{
-		IDgen:         1,
-		Patch:         newState(),
-		State:         newState(),
-		Tree:          newTree(),
-		assembleCache: newAssembleCache(),
+		IDgen:     1,
+		Patch:     newState(),
+		State:     newState(),
+		Tree:      newTree(),
+		assembler: newAssembler(),
 	}
 }
 
