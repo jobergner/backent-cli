@@ -2,14 +2,27 @@ package state
 
 import "sync"
 
-// 1. get all basic elements and references out of patch, put their paths in updatedReferencePaths
-// 2. go through all paths and put ids in includedElements map, save len(includedElements)
-// 3. get all references out of STATE, check if they reference element in includedElements, if TRUE put reference path into updatedByReferecePaths
-// 4. if len(updatedByReferecePaths) != 0: go through all updatedByReferecePaths and put ids in includedElements map, ELSE continue with 6.
-// 5. back to step 3.
+func (engine *Engine) assembleUpdateTree() Tree {
 
-// TODO PROBLEM?? if a reference is Set and then Unset and Set again, does that mess with pathuilding, as referenceID might be 0 in patch or state
-// TODO what happens if you call SetPlayer? will the path be built with a player-update or a position-delete??
+	engine.clearAssembler()
+	engine.populateAssembler()
+
+	engine.clearTree()
+	var wg sync.WaitGroup
+	wg.Add(7)
+
+	go engine.assembleEquipmentSets(&wg)
+	go engine.assembleGearScores(&wg)
+	go engine.assembleItems(&wg)
+	go engine.assemblePlayers(&wg)
+	go engine.assemblePositions(&wg)
+	go engine.assembleZones(&wg)
+	go engine.assembleZoneItems(&wg)
+
+	wg.Wait()
+
+	return engine.Tree
+}
 
 func (engine *Engine) assembleEquipmentSets(wg *sync.WaitGroup) {
 	for id, p := range engine.assembler.equipmentSetPath {
@@ -95,30 +108,6 @@ func (engine *Engine) assembleZoneItems(wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-func (engine *Engine) assembleUpdateTree() Tree {
-
-	engine.clearAssembler()
-	engine.clearTree()
-
-	engine.populateAssembler()
-
-	var wg sync.WaitGroup
-
-	wg.Add(7)
-
-	go engine.assembleEquipmentSets(&wg)
-	go engine.assembleGearScores(&wg)
-	go engine.assembleItems(&wg)
-	go engine.assemblePlayers(&wg)
-	go engine.assemblePositions(&wg)
-	go engine.assembleZones(&wg)
-	go engine.assembleZoneItems(&wg)
-
-	wg.Wait()
-
-	return engine.Tree
-}
-
 func (engine *Engine) clearAssembler() {
 	for key := range engine.assembler.updatedPaths {
 		delete(engine.assembler.updatedPaths, key)
@@ -181,7 +170,9 @@ func (engine *Engine) clearTree() {
 }
 
 func (engine *Engine) populateAssembler() {
-	// TODO possibly big performance boost
+	// we want to find all lead nodes which have updated and collect their paths
+	// later we will basically loop over the paths we have collected, and "walk" them
+	// in order to assemble the tree from bottom to the top (leaf nodes)
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
 		engine.assembler.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
@@ -223,14 +214,31 @@ func (engine *Engine) populateAssembler() {
 	}
 
 	prevousLength := 0
+	// we'd be pretty much done collecting the required paths, but we also want to
+	// build all paths ending with a reference which references an updated element.
+	// this needs to happen recursively, consider this example (-> = reference):
+	// A -> B -> C -> ^D
+	// Since "D" has updated (^), but no other element, we'd only include "C".
+	// However, now that "C" is considered updated by reference, we also want
+	// to include "B". This is why recursiveness is required.
 	for {
+		// here we populate out includedElements with out newly collected paths segments
+		// so we can check if any of these  elements are referenced by any reference
+		// in the loop below
 		for _, p := range engine.assembler.updatedElementPaths {
 			for _, seg := range p {
 				engine.assembler.includedElements[seg.id] = true
 			}
 		}
+		// add all elements of the updated reference paths to the includedElements
 		for _, p := range engine.assembler.updatedReferencePaths {
 			for _, seg := range p {
+				// we know that the last segment of a reference path has a reference ID
+				// if i == len(p)-1 {
+				// 	engine.assembler.includedElements[seg.refID] = true
+				// } else {
+				// 	engine.assembler.includedElements[seg.id] = true
+				// }
 				if seg.refID != 0 {
 					engine.assembler.includedElements[seg.refID] = true
 				} else {
@@ -239,6 +247,8 @@ func (engine *Engine) populateAssembler() {
 			}
 		}
 
+		// we check if ant new elements are involved, which could
+		// mean that new paths containing references need to be looked at
 		if prevousLength == len(engine.assembler.includedElements) {
 			break
 		}
@@ -246,11 +256,14 @@ func (engine *Engine) populateAssembler() {
 		prevousLength = len(engine.assembler.includedElements)
 
 		for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
+			// if the reference references an element that has updated its path is collected
+			// so that all segments can later be added to includedElements
 			if _, ok := engine.assembler.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
 				engine.assembler.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
 			}
 		}
 		for _, equipmentSetEquipmentRef := range engine.State.EquipmentSetEquipmentRef {
+			// prioritize the ref from Patch
 			if _, ok := engine.assembler.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)]; ok {
 				continue
 			}
@@ -362,6 +375,7 @@ func (engine *Engine) populateAssembler() {
 		}
 	}
 
+	// merge paths into one map, for convencience (they are recycled anyway)
 	for id, path := range engine.assembler.updatedElementPaths {
 		engine.assembler.updatedPaths[id] = path
 	}
@@ -369,6 +383,7 @@ func (engine *Engine) populateAssembler() {
 		engine.assembler.updatedPaths[id] = path
 	}
 
+	// just to be a bit more organized
 	for _, p := range engine.assembler.updatedPaths {
 		switch p[0].identifier {
 		case equipmentSetIdentifier:
