@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jobergner/backent-cli/pkg/testutils"
@@ -1355,6 +1356,44 @@ func TestTree(t *testing.T) {
 						GearScore: &gearScore{
 							OperationKind: OperationKindUpdate,
 							ID:            player2.GearScore().ID(),
+							Level:         1,
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			false,
+		)
+	})
+	t.Run("do not include reference if reference got unset", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.CreatePlayer()
+				item1 := se.CreateItem()
+				item2 := se.CreateItem()
+
+				item1.SetBoundTo(player1.ID())
+
+				se.UpdateState()
+
+				item1.BoundTo().Unset()
+				item2.SetBoundTo(player1.ID())
+				item2.BoundTo().Unset()
+
+				player1.GearScore().SetLevel(1)
+				// TODO it actually does what I hoped it to do
+				fmt.Println(item1.ID())
+				fmt.Println(item2.ID())
+
+				expectedTree.Player = map[PlayerID]player{
+					player1.ID(): {
+						ID:            player1.ID(),
+						OperationKind: OperationKindUpdate,
+						GearScore: &gearScore{
+							OperationKind: OperationKindUpdate,
+							ID:            player1.GearScore().ID(),
 							Level:         1,
 						},
 					},
