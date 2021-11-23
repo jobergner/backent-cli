@@ -124,9 +124,9 @@ goos: linux
 goarch: amd64
 pkg: github.com/jobergner/backent-cli/examples/engine
 cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-BenchmarkAssembleTree-8   	     488	   2389882 ns/op	  664429 B/op	    6002 allocs/op
-BenchmarkEngine-8   	           816	   1359115 ns/op	  399988 B/op	    2987 allocs/op
-BenchmarkUpdateState-8   	      2144	    488670 ns/op	  245045 B/op	     808 allocs/op
+BenchmarkAssembleTree-8   	    5000	   2219510 ns/op	  649346 B/op	    5994 allocs/op
+BenchmarkEngine-8   	          5000	   1151401 ns/op	  391632 B/op	    2918 allocs/op
+BenchmarkUpdateState-8   	      5000	    434266 ns/op	  245823 B/op	     800 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	
 
@@ -136,21 +136,9 @@ goos: linux
 goarch: amd64
 pkg: github.com/jobergner/backent-cli/examples/engine
 cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-BenchmarkAssembleTree-8   	     704	   2758851 ns/op	 1001589 B/op	    1374 allocs/op
-BenchmarkEngine-8   	          1294	    802471 ns/op	  358969 B/op	    1154 allocs/op
-BenchmarkUpdateState-8   	      2034	    510387 ns/op	  263385 B/op	     874 allocs/op
-PASS
-ok  	github.com/jobergner/backent-cli/examples/engine	
-
-# recycling big maps in assembling
-Di 23. Nov 08:23:21 CET 2021
-goos: linux
-goarch: amd64
-pkg: github.com/jobergner/backent-cli/examples/engine
-cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-BenchmarkAssembleTree-8   	    1081	   1951530 ns/op	  314912 B/op	    1138 allocs/op
-BenchmarkEngine-8          	    1525	    670156 ns/op	  304975 B/op	    1098 allocs/op
-BenchmarkUpdateState-8     	    2280	    478485 ns/op	  264901 B/op	     873 allocs/op
+BenchmarkAssembleTree-8   	    5000	   1359503 ns/op	  208816 B/op	     869 allocs/op
+BenchmarkEngine-8   	          5000	    627554 ns/op	  303584 B/op	    1083 allocs/op
+BenchmarkUpdateState-8   	      5000	    450113 ns/op	  264166 B/op	     867 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	
 
