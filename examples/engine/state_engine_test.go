@@ -824,6 +824,52 @@ func TestTree(t *testing.T) {
 			false,
 		)
 	})
+	t.Run("updates reference in element if referenced element gets deleted", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				player1 := se.CreatePlayer()
+				itm := se.CreateItem()
+
+				itm.SetBoundTo(player1.ID())
+
+				se.UpdateState()
+
+				se.DeletePlayer(player1.ID())
+
+				expectedTree.Player = map[PlayerID]player{
+					player1.ID(): {
+						ID: player1.ID(),
+						GearScore: &gearScore{
+							ID:            player1.GearScore().ID(),
+							OperationKind: OperationKindDelete,
+						},
+						Position: &position{
+							ID:            player1.Position().ID(),
+							OperationKind: OperationKindDelete,
+						},
+						OperationKind: OperationKindDelete,
+					},
+				}
+				expectedTree.Item = map[ItemID]item{
+					itm.ID(): {
+						ID:            itm.ID(),
+						OperationKind: OperationKindUpdate,
+						BoundTo: &elementReference{
+							OperationKind:        OperationKindDelete,
+							ElementID:            int(player1.ID()),
+							ElementKind:          ElementKindPlayer,
+							ReferencedDataStatus: ReferencedDataModified,
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			false,
+		)
+	})
 	t.Run("considers downstream updated data even if reference got assigned after state update", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
