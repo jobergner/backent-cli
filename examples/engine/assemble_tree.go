@@ -4,6 +4,12 @@ import (
 	"sync"
 )
 
+type assembleJob struct {
+	id    int
+	kind  ElementKind
+	paths []path
+}
+
 func (engine *Engine) assembleUpdateTree() Tree {
 
 	engine.clearAssembler()
@@ -13,107 +19,345 @@ func (engine *Engine) assembleUpdateTree() Tree {
 	var wg sync.WaitGroup
 	wg.Add(7)
 
-	go engine.assembleEquipmentSets(&wg)
-	go engine.assembleGearScores(&wg)
-	go engine.assembleItems(&wg)
-	go engine.assemblePlayers(&wg)
-	go engine.assemblePositions(&wg)
-	go engine.assembleZones(&wg)
-	go engine.assembleZoneItems(&wg)
+	go engine.executeEquipmentSetsAssembling(&wg)
+	go engine.executeGearScoresAssembling(&wg)
+	go engine.executeItemsAssembling(&wg)
+	go engine.executePlayersAssembling(&wg)
+	go engine.executePositionsAssembling(&wg)
+	go engine.executeZonesAssembling(&wg)
+	go engine.executeZoneItemsAssembling(&wg)
 
 	wg.Wait()
 
 	return engine.Tree
 }
 
-func (engine *Engine) assembleEquipmentSets(wg *sync.WaitGroup) {
+func (engine *Engine) catchAssembledEquipmentSets(count int, done chan struct{}) {
+	equipmentSets := make([]equipmentSet, 0, count)
+
+	for i := 0; i < count; i++ {
+		equipmentSet := <-engine.assembler.equipmentSetChan
+		equipmentSets = append(equipmentSets, equipmentSet)
+	}
+
+	for _, equipmentSet := range equipmentSets {
+		engine.Tree.EquipmentSet[equipmentSet.ID] = equipmentSet
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executeEquipmentSetsAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
 	for _, p := range engine.assembler.equipmentSetPath {
-		id := EquipmentSetID(p[0].id)
-		child, ok := engine.Tree.EquipmentSet[id]
+		neutralID := p[0].id
+		id := EquipmentSetID(neutralID)
+
+		_, ok := engine.Tree.EquipmentSet[id]
 		if !ok {
-			child = equipmentSet{ID: id}
+			engine.Tree.EquipmentSet[id] = equipmentSet{ID: id}
 		}
-		engine.assembleEquipmentSetPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.EquipmentSet[id] = child
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindEquipmentSet
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
 	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledEquipmentSets(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
-func (engine *Engine) assembleGearScores(wg *sync.WaitGroup) {
+func (engine *Engine) catchAssembledGearScores(count int, done chan struct{}) {
+	gearScores := make([]gearScore, 0, count)
+
+	for i := 0; i < count; i++ {
+		gearScore := <-engine.assembler.gearScoreChan
+		gearScores = append(gearScores, gearScore)
+	}
+
+	for _, gearScore := range gearScores {
+		engine.Tree.GearScore[gearScore.ID] = gearScore
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executeGearScoresAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
 	for _, p := range engine.assembler.gearScorePath {
-		id := GearScoreID(p[0].id)
-		child, ok := engine.Tree.GearScore[id]
+		neutralID := p[0].id
+		id := GearScoreID(neutralID)
+
+		_, ok := engine.Tree.GearScore[id]
 		if !ok {
-			child = gearScore{ID: id}
+			engine.Tree.GearScore[id] = gearScore{ID: id}
 		}
-		engine.assembleGearScorePath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.GearScore[id] = child
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindGearScore
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
 	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledGearScores(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
-func (engine *Engine) assembleItems(wg *sync.WaitGroup) {
+func (engine *Engine) catchAssembledItems(count int, done chan struct{}) {
+	items := make([]item, 0, count)
+
+	for i := 0; i < count; i++ {
+		item := <-engine.assembler.itemChan
+		items = append(items, item)
+	}
+
+	for _, item := range items {
+		engine.Tree.Item[item.ID] = item
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executeItemsAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
 	for _, p := range engine.assembler.itemPath {
-		id := ItemID(p[0].id)
-		child, ok := engine.Tree.Item[id]
+		neutralID := p[0].id
+		id := ItemID(neutralID)
+
+		_, ok := engine.Tree.Item[id]
 		if !ok {
-			child = item{ID: id}
+			engine.Tree.Item[id] = item{ID: id}
 		}
-		engine.assembleItemPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Item[id] = child
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindItem
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
 	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledItems(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
-func (engine *Engine) assemblePlayers(wg *sync.WaitGroup) {
+func (engine *Engine) catchAssembledPlayers(count int, done chan struct{}) {
+	players := make([]player, 0, count)
+
+	for i := 0; i < count; i++ {
+		player := <-engine.assembler.playerChan
+		players = append(players, player)
+	}
+
+	for _, player := range players {
+		engine.Tree.Player[player.ID] = player
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executePlayersAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
 	for _, p := range engine.assembler.playerPath {
-		id := PlayerID(p[0].id)
-		child, ok := engine.Tree.Player[id]
+		neutralID := p[0].id
+		id := PlayerID(neutralID)
+
+		_, ok := engine.Tree.Player[id]
 		if !ok {
-			child = player{ID: id}
+			engine.Tree.Player[id] = player{ID: id}
 		}
-		engine.assemblePlayerPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Player[id] = child
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindPlayer
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
 	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledPlayers(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
-func (engine *Engine) assemblePositions(wg *sync.WaitGroup) {
+func (engine *Engine) catchAssembledPositions(count int, done chan struct{}) {
+	positions := make([]position, 0, count)
+
+	for i := 0; i < count; i++ {
+		position := <-engine.assembler.positionChan
+		positions = append(positions, position)
+	}
+
+	for _, position := range positions {
+		engine.Tree.Position[position.ID] = position
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executePositionsAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
 	for _, p := range engine.assembler.positionPath {
-		id := PositionID(p[0].id)
-		child, ok := engine.Tree.Position[id]
+		neutralID := p[0].id
+		id := PositionID(neutralID)
+
+		_, ok := engine.Tree.Position[id]
 		if !ok {
-			child = position{ID: id}
+			engine.Tree.Position[id] = position{ID: id}
 		}
-		engine.assemblePositionPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Position[id] = child
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindPosition
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
 	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledPositions(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
-func (engine *Engine) assembleZones(wg *sync.WaitGroup) {
+func (engine *Engine) catchAssembledZones(count int, done chan struct{}) {
+	zones := make([]zone, 0, count)
+
+	for i := 0; i < count; i++ {
+		zone := <-engine.assembler.zoneChan
+		zones = append(zones, zone)
+	}
+
+	for _, zone := range zones {
+		engine.Tree.Zone[zone.ID] = zone
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executeZonesAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
 	for _, p := range engine.assembler.zonePath {
-		id := ZoneID(p[0].id)
-		child, ok := engine.Tree.Zone[id]
+		neutralID := p[0].id
+		id := ZoneID(neutralID)
+
+		_, ok := engine.Tree.Zone[id]
 		if !ok {
-			child = zone{ID: id}
+			engine.Tree.Zone[id] = zone{ID: id}
 		}
-		engine.assembleZonePath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Zone[id] = child
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindZone
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
 	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledZones(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
-func (engine *Engine) assembleZoneItems(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.zoneItemPath {
-		id := ZoneItemID(p[0].id)
-		child, ok := engine.Tree.ZoneItem[id]
-		if !ok {
-			child = zoneItem{ID: id}
-		}
-		engine.assembleZoneItemPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.ZoneItem[id] = child
+func (engine *Engine) catchAssembledZoneItems(count int, done chan struct{}) {
+	zoneItems := make([]zoneItem, 0, count)
+
+	for i := 0; i < count; i++ {
+		zoneItem := <-engine.assembler.zoneItemChan
+		zoneItems = append(zoneItems, zoneItem)
 	}
+
+	for _, zoneItem := range zoneItems {
+		engine.Tree.ZoneItem[zoneItem.ID] = zoneItem
+	}
+
+	done <- struct{}{}
+}
+
+func (engine *Engine) executeZoneItemsAssembling(wg *sync.WaitGroup) {
+	jobs := make(map[int]assembleJob)
+
+	for _, p := range engine.assembler.zoneItemPath {
+		neutralID := p[0].id
+		id := ZoneItemID(neutralID)
+
+		_, ok := engine.Tree.ZoneItem[id]
+		if !ok {
+			engine.Tree.ZoneItem[id] = zoneItem{ID: id}
+		}
+
+		job := jobs[neutralID]
+		job.id = neutralID
+		job.kind = ElementKindZoneItem
+		job.paths = append(job.paths, p)
+		jobs[neutralID] = job
+	}
+
+	done := make(chan struct{}, 1)
+
+	go engine.catchAssembledZoneItems(len(jobs), done)
+
+	for _, job := range jobs {
+		engine.assembleJobChan <- job
+	}
+
+	<-done
+
 	wg.Done()
 }
 
