@@ -31,20 +31,45 @@ type assembler struct {
 	// contains all IDs of elements which have updated
 	// themselves or contain a reference of an updated element
 	includedElements map[int]bool
+	// contains paths where element is root
 	equipmentSetPath map[int]path
-	equipmentSetChan chan equipmentSet
-	gearScorePath    map[int]path
-	gearScoreChan    chan gearScore
-	itemPath         map[int]path
-	itemChan         chan item
-	playerPath       map[int]path
-	playerChan       chan player
-	positionPath     map[int]path
-	positionChan     chan position
-	zonePath         map[int]path
-	zoneChan         chan zone
-	zoneItemPath     map[int]path
-	zoneItemChan     chan zoneItem
+	// elements are stored while they are concurrently assembled
+	equipmentSetBuffer []equipmentSet
+	// jobs signaling workers which elements to assemble
+	equipmentSetJobs map[int]assembleJob
+	// waiting until all jobs are returned by workers
+	equipmentSetJobsDone chan struct{}
+	gearScorePath        map[int]path
+	gearScoreBuffer      []gearScore
+	gearScoreJobs        map[int]assembleJob
+	gearScoreJobsDone    chan struct{}
+	itemPath             map[int]path
+	itemBuffer           []item
+	itemJobs             map[int]assembleJob
+	itemJobsDone         chan struct{}
+	playerPath           map[int]path
+	playerBuffer         []player
+	playerJobs           map[int]assembleJob
+	playerJobsDone       chan struct{}
+	positionPath         map[int]path
+	positionBuffer       []position
+	positionJobs         map[int]assembleJob
+	positionJobsDone     chan struct{}
+	zonePath             map[int]path
+	zoneBuffer           []zone
+	zoneJobs             map[int]assembleJob
+	zoneJobsDone         chan struct{}
+	zoneItemPath         map[int]path
+	zoneItemBuffer       []zoneItem
+	zoneItemJobs         map[int]assembleJob
+	zoneItemJobsDone     chan struct{}
+	equipmentSetChan     chan equipmentSet
+	gearScoreChan        chan gearScore
+	itemChan             chan item
+	playerChan           chan player
+	positionChan         chan position
+	zoneChan             chan zone
+	zoneItemChan         chan zoneItem
 }
 
 func (engine *Engine) spawnAssembleWorkers() {
@@ -108,19 +133,40 @@ func newAssembler() assembler {
 		updatedReferencePaths: make(map[int]path),
 		includedElements:      make(map[int]bool),
 		equipmentSetPath:      make(map[int]path),
+		equipmentSetBuffer:    make([]equipmentSet, 0),
+		equipmentSetJobs:      make(map[int]assembleJob),
 		equipmentSetChan:      make(chan equipmentSet),
+		equipmentSetJobsDone:  make(chan struct{}, 1),
 		gearScorePath:         make(map[int]path),
+		gearScoreBuffer:       make([]gearScore, 0),
+		gearScoreJobs:         make(map[int]assembleJob),
 		gearScoreChan:         make(chan gearScore),
+		gearScoreJobsDone:     make(chan struct{}, 1),
 		itemPath:              make(map[int]path),
+		itemBuffer:            make([]item, 0),
+		itemJobs:              make(map[int]assembleJob),
 		itemChan:              make(chan item),
+		itemJobsDone:          make(chan struct{}, 1),
 		playerPath:            make(map[int]path),
+		playerBuffer:          make([]player, 0),
+		playerJobs:            make(map[int]assembleJob),
 		playerChan:            make(chan player),
+		playerJobsDone:        make(chan struct{}, 1),
 		positionPath:          make(map[int]path),
+		positionBuffer:        make([]position, 0),
+		positionJobs:          make(map[int]assembleJob),
 		positionChan:          make(chan position),
+		positionJobsDone:      make(chan struct{}, 1),
 		zonePath:              make(map[int]path),
+		zoneBuffer:            make([]zone, 0),
+		zoneJobs:              make(map[int]assembleJob),
 		zoneChan:              make(chan zone),
+		zoneJobsDone:          make(chan struct{}, 1),
 		zoneItemPath:          make(map[int]path),
+		zoneItemBuffer:        make([]zoneItem, 0),
+		zoneItemJobs:          make(map[int]assembleJob),
 		zoneItemChan:          make(chan zoneItem),
+		zoneItemJobsDone:      make(chan struct{}, 1),
 	}
 }
 
