@@ -579,7 +579,7 @@ func (engine *Engine) populateAssembler() {
 					engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
 					engine.assembler.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			}
@@ -593,7 +593,7 @@ func (engine *Engine) populateAssembler() {
 					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
 					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
@@ -609,7 +609,7 @@ func (engine *Engine) populateAssembler() {
 					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.assembler.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
 					engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
