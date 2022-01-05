@@ -167,12 +167,6 @@ func (engine *Engine) populateAssembler() {
 		// add all elements of the updated reference paths to the includedElements
 		for _, p := range engine.assembler.updatedReferencePaths {
 			for _, seg := range p {
-				// we know that the last segment of a reference path has a reference ID
-				// if i == len(p)-1 {
-				// 	engine.assembler.includedElements[seg.refID] = true
-				// } else {
-				// 	engine.assembler.includedElements[seg.id] = true
-				// }
 				if seg.refID != 0 {
 					engine.assembler.includedElements[seg.refID] = true
 				} else {
