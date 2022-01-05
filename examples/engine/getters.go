@@ -1,7 +1,12 @@
 package state
 
+import "sort"
+
 func (engine *Engine) EveryPlayer() []Player {
 	playerIDs := engine.allPlayerIDs()
+	sort.Slice(playerIDs, func(i, j int) bool {
+		return playerIDs[i] < playerIDs[j]
+	})
 	var players []Player
 	for _, playerID := range playerIDs {
 		player := engine.Player(playerID)
@@ -92,6 +97,9 @@ func (_player Player) Position() Position {
 
 func (engine *Engine) EveryGearScore() []GearScore {
 	gearScoreIDs := engine.allGearScoreIDs()
+	sort.Slice(gearScoreIDs, func(i, j int) bool {
+		return gearScoreIDs[i] < gearScoreIDs[j]
+	})
 	var gearScores []GearScore
 	for _, gearScoreID := range gearScoreIDs {
 		gearScore := engine.GearScore(gearScoreID)
@@ -141,6 +149,9 @@ func (_gearScore GearScore) Score() int {
 
 func (engine *Engine) EveryItem() []Item {
 	itemIDs := engine.allItemIDs()
+	sort.Slice(itemIDs, func(i, j int) bool {
+		return itemIDs[i] < itemIDs[j]
+	})
 	var items []Item
 	for _, itemID := range itemIDs {
 		item := engine.Item(itemID)
@@ -199,6 +210,9 @@ func (_item Item) Origin() AnyOfPlayer_Position {
 
 func (engine *Engine) EveryPosition() []Position {
 	positionIDs := engine.allPositionIDs()
+	sort.Slice(positionIDs, func(i, j int) bool {
+		return positionIDs[i] < positionIDs[j]
+	})
 	var positions []Position
 	for _, positionID := range positionIDs {
 		position := engine.Position(positionID)
@@ -248,6 +262,9 @@ func (_position Position) Y() float64 {
 
 func (engine *Engine) EveryZoneItem() []ZoneItem {
 	zoneItemIDs := engine.allZoneItemIDs()
+	sort.Slice(zoneItemIDs, func(i, j int) bool {
+		return zoneItemIDs[i] < zoneItemIDs[j]
+	})
 	var zoneItems []ZoneItem
 	for _, zoneItemID := range zoneItemIDs {
 		zoneItem := engine.ZoneItem(zoneItemID)
@@ -297,6 +314,9 @@ func (_zoneItem ZoneItem) Item() Item {
 
 func (engine *Engine) EveryZone() []Zone {
 	zoneIDs := engine.allZoneIDs()
+	sort.Slice(zoneIDs, func(i, j int) bool {
+		return zoneIDs[i] < zoneIDs[j]
+	})
 	var zones []Zone
 	for _, zoneID := range zoneIDs {
 		zone := engine.Zone(zoneID)
@@ -405,6 +425,9 @@ func (_playerEquipmentSetRef PlayerEquipmentSetRef) ID() EquipmentSetID {
 
 func (engine *Engine) EveryEquipmentSet() []EquipmentSet {
 	equipmentSetIDs := engine.allEquipmentSetIDs()
+	sort.Slice(equipmentSetIDs, func(i, j int) bool {
+		return equipmentSetIDs[i] < equipmentSetIDs[j]
+	})
 	var equipmentSets []EquipmentSet
 	for _, equipmentSetID := range equipmentSetIDs {
 		equipmentSet := engine.EquipmentSet(equipmentSetID)
