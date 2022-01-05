@@ -130,24 +130,15 @@ BenchmarkUpdateState-8   	      5000	    434266 ns/op	  245823 B/op	     800 all
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	
 
-# refactoring of tree assembling, top-down to bottom-up with paths <- __BIG ASSEMBLING REFACTORING__
-Di 23. Nov 07:37:50 CET 2021
-goos: linux
-goarch: amd64
-pkg: github.com/jobergner/backent-cli/examples/engine
-cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-BenchmarkAssembleTree-8   	    5000	   1359503 ns/op	  208816 B/op	     869 allocs/op
-BenchmarkEngine-8   	          5000	    627554 ns/op	  303584 B/op	    1083 allocs/op
-BenchmarkUpdateState-8   	      5000	    450113 ns/op	  264166 B/op	     867 allocs/op
-PASS
-ok  	github.com/jobergner/backent-cli/examples/engine	
-
 ______________________________________________________ actually make benchmarks reliable
+
+# refactoring of tree assembling, top-down to bottom-up with paths
 Mi 5. Jan 18:36:44 CET 2022
 goos: linux
 goarch: amd64
 pkg: github.com/jobergner/backent-cli/examples/engine
 cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-BenchmarkAssembleTree-8   	    5000	   1473017 ns/op	  282577 B/op	     939 allocs/op
+BEFORE: BenchmarkAssembleTree-8   	    5000	   2025145 ns/op	  570755 B/op	    5837 allocs/op
+AFTER : BenchmarkAssembleTree-8   	    5000	   1473017 ns/op	  282577 B/op	     939 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	9.779s
