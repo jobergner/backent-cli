@@ -309,33 +309,6 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assem
 }
 
 func TestTree(t *testing.T) {
-	t.Run("assembles element in a tree", func(t *testing.T) {
-		newTreeTest(
-			func(se *Engine, expectedTree *Tree) {
-				player1 := se.CreatePlayer()
-
-				expectedTree.Player = map[PlayerID]player{
-					player1.ID(): {
-
-						ID: player1.ID(),
-						GearScore: &gearScore{
-							ID:            player1.GearScore().ID(),
-							OperationKind: OperationKindUpdate,
-						},
-						OperationKind: OperationKindUpdate,
-						Position: &position{
-							ID:            player1.Position().ID(),
-							OperationKind: OperationKindUpdate,
-						},
-					},
-				}
-			},
-			func(errText string) {
-				t.Errorf(errText)
-			},
-			false,
-		)
-	})
 	t.Run("assembles elements in a tree", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {

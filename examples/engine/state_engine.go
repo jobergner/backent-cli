@@ -1,9 +1,5 @@
 package state
 
-import (
-	"runtime"
-)
-
 type OperationKind string
 
 const (
@@ -13,117 +9,25 @@ const (
 )
 
 type Engine struct {
-	State           State
-	Patch           State
-	Tree            Tree
-	assembler       assembler
-	IDgen           int
-	assembleJobChan chan assembleJob
+	State     State
+	Patch     State
+	Tree      Tree
+	assembler assembler
+	IDgen     int
 }
 
 type assembler struct {
-	// combines updatedElementPaths and updatedReferencePaths
-	updatedPaths map[int]path
-	// when populated contains all paths of references that have updated
+	updatedPaths          map[int]path
 	updatedReferencePaths map[int]path
-	// when populated contains all paths of elements that have updated
-	updatedElementPaths map[int]path
-	// contains all IDs of elements which have updated
-	// themselves or contain a reference of an updated element
-	includedElements map[int]bool
-	// contains paths where element is root
-	equipmentSetPath map[int]path
-	// elements are stored while they are concurrently assembled
-	equipmentSetBuffer []equipmentSet
-	// jobs signaling workers which elements to assemble
-	equipmentSetJobs map[int]assembleJob
-	// waiting until all jobs are returned by workers
-	equipmentSetJobsDone chan struct{}
-	gearScorePath        map[int]path
-	gearScoreBuffer      []gearScore
-	gearScoreJobs        map[int]assembleJob
-	gearScoreJobsDone    chan struct{}
-	itemPath             map[int]path
-	itemBuffer           []item
-	itemJobs             map[int]assembleJob
-	itemJobsDone         chan struct{}
-	playerPath           map[int]path
-	playerBuffer         []player
-	playerJobs           map[int]assembleJob
-	playerJobsDone       chan struct{}
-	positionPath         map[int]path
-	positionBuffer       []position
-	positionJobs         map[int]assembleJob
-	positionJobsDone     chan struct{}
-	zonePath             map[int]path
-	zoneBuffer           []zone
-	zoneJobs             map[int]assembleJob
-	zoneJobsDone         chan struct{}
-	zoneItemPath         map[int]path
-	zoneItemBuffer       []zoneItem
-	zoneItemJobs         map[int]assembleJob
-	zoneItemJobsDone     chan struct{}
-	equipmentSetChan     chan equipmentSet
-	gearScoreChan        chan gearScore
-	itemChan             chan item
-	playerChan           chan player
-	positionChan         chan position
-	zoneChan             chan zone
-	zoneItemChan         chan zoneItem
-}
-
-func (engine *Engine) spawnAssembleWorkers() {
-	for i := 0; i < runtime.NumCPU(); i++ {
-		go func() {
-			for {
-				job := <-engine.assembleJobChan
-				switch job.kind {
-				case ElementKindEquipmentSet:
-					child := engine.Tree.EquipmentSet[EquipmentSetID(job.id)]
-					for _, p := range job.paths {
-						engine.assembleEquipmentSetPath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.equipmentSetChan <- child
-				case ElementKindGearScore:
-					child := engine.Tree.GearScore[GearScoreID(job.id)]
-					for _, p := range job.paths {
-						engine.assembleGearScorePath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.gearScoreChan <- child
-				case ElementKindItem:
-					child := engine.Tree.Item[ItemID(job.id)]
-					for _, p := range job.paths {
-						engine.assembleItemPath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.itemChan <- child
-				case ElementKindPlayer:
-					child := engine.Tree.Player[PlayerID(job.id)]
-					for _, p := range job.paths {
-						engine.assemblePlayerPath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.playerChan <- child
-				case ElementKindPosition:
-					child := engine.Tree.Position[PositionID(job.id)]
-					for _, p := range job.paths {
-						engine.assemblePositionPath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.positionChan <- child
-				case ElementKindZone:
-					child := engine.Tree.Zone[ZoneID(job.id)]
-					for _, p := range job.paths {
-						engine.assembleZonePath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.zoneChan <- child
-				case ElementKindZoneItem:
-					child := engine.Tree.ZoneItem[ZoneItemID(job.id)]
-					for _, p := range job.paths {
-						engine.assembleZoneItemPath(&child, p, 0, engine.assembler.includedElements)
-					}
-					engine.assembler.zoneItemChan <- child
-				}
-			}
-		}()
-	}
+	updatedElementPaths   map[int]path
+	includedElements      map[int]bool
+	equipmentSetPath      map[int]path
+	gearScorePath         map[int]path
+	itemPath              map[int]path
+	playerPath            map[int]path
+	positionPath          map[int]path
+	zonePath              map[int]path
+	zoneItemPath          map[int]path
 }
 
 func newAssembler() assembler {
@@ -133,56 +37,23 @@ func newAssembler() assembler {
 		updatedReferencePaths: make(map[int]path),
 		includedElements:      make(map[int]bool),
 		equipmentSetPath:      make(map[int]path),
-		equipmentSetBuffer:    make([]equipmentSet, 0),
-		equipmentSetJobs:      make(map[int]assembleJob),
-		equipmentSetChan:      make(chan equipmentSet),
-		equipmentSetJobsDone:  make(chan struct{}, 1),
 		gearScorePath:         make(map[int]path),
-		gearScoreBuffer:       make([]gearScore, 0),
-		gearScoreJobs:         make(map[int]assembleJob),
-		gearScoreChan:         make(chan gearScore),
-		gearScoreJobsDone:     make(chan struct{}, 1),
 		itemPath:              make(map[int]path),
-		itemBuffer:            make([]item, 0),
-		itemJobs:              make(map[int]assembleJob),
-		itemChan:              make(chan item),
-		itemJobsDone:          make(chan struct{}, 1),
 		playerPath:            make(map[int]path),
-		playerBuffer:          make([]player, 0),
-		playerJobs:            make(map[int]assembleJob),
-		playerChan:            make(chan player),
-		playerJobsDone:        make(chan struct{}, 1),
 		positionPath:          make(map[int]path),
-		positionBuffer:        make([]position, 0),
-		positionJobs:          make(map[int]assembleJob),
-		positionChan:          make(chan position),
-		positionJobsDone:      make(chan struct{}, 1),
 		zonePath:              make(map[int]path),
-		zoneBuffer:            make([]zone, 0),
-		zoneJobs:              make(map[int]assembleJob),
-		zoneChan:              make(chan zone),
-		zoneJobsDone:          make(chan struct{}, 1),
 		zoneItemPath:          make(map[int]path),
-		zoneItemBuffer:        make([]zoneItem, 0),
-		zoneItemJobs:          make(map[int]assembleJob),
-		zoneItemChan:          make(chan zoneItem),
-		zoneItemJobsDone:      make(chan struct{}, 1),
 	}
 }
 
 func newEngine() *Engine {
-	engine := &Engine{
-		IDgen:           1,
-		Patch:           newState(),
-		State:           newState(),
-		Tree:            newTree(),
-		assembler:       newAssembler(),
-		assembleJobChan: make(chan assembleJob),
+	return &Engine{
+		IDgen:     1,
+		Patch:     newState(),
+		State:     newState(),
+		Tree:      newTree(),
+		assembler: newAssembler(),
 	}
-
-	engine.spawnAssembleWorkers()
-
-	return engine
 }
 
 func (engine *Engine) GenerateID() int {
