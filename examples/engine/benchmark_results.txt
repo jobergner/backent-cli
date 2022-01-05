@@ -171,3 +171,23 @@ cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 BenchmarkAssembleTree-8   	    5000	   1862350 ns/op	  283834 B/op	     951 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	9.371s
+
+Mi 5. Jan 18:35:38 CET 2022
+goos: linux
+goarch: amd64
+pkg: github.com/jobergner/backent-cli/examples/engine
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkAssembleTree-8   	    5000	   1561244 ns/op	  282602 B/op	     939 allocs/op
+BenchmarkUpdateState-8    	    5000	    472276 ns/op	  264896 B/op	     882 allocs/op
+PASS
+ok  	github.com/jobergner/backent-cli/examples/engine	10.248s
+
+Mi 5. Jan 18:36:44 CET 2022
+goos: linux
+goarch: amd64
+pkg: github.com/jobergner/backent-cli/examples/engine
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkAssembleTree-8   	    5000	   1473017 ns/op	  282577 B/op	     939 allocs/op
+BenchmarkUpdateState-8    	    5000	    465624 ns/op	  264923 B/op	     882 allocs/op
+PASS
+ok  	github.com/jobergner/backent-cli/examples/engine	9.779s

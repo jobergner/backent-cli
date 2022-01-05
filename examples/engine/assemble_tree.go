@@ -1,120 +1,67 @@
 package state
 
-import (
-	"sync"
-)
-
 func (engine *Engine) assembleUpdateTree() Tree {
 
 	engine.clearAssembler()
+	engine.clearTree()
+
 	engine.populateAssembler()
 
-	engine.clearTree()
-	var wg sync.WaitGroup
-	wg.Add(7)
-
-	go engine.assembleEquipmentSets(&wg)
-	go engine.assembleGearScores(&wg)
-	go engine.assembleItems(&wg)
-	go engine.assemblePlayers(&wg)
-	go engine.assemblePositions(&wg)
-	go engine.assembleZones(&wg)
-	go engine.assembleZoneItems(&wg)
-
-	wg.Wait()
+	for _, elementPath := range engine.assembler.updatedPaths {
+		switch elementPath[0].identifier {
+		case equipmentSetIdentifier:
+			child, ok := engine.Tree.EquipmentSet[EquipmentSetID(elementPath[0].id)]
+			if !ok {
+				child = equipmentSet{ID: EquipmentSetID(elementPath[0].id)}
+			}
+			engine.assembleEquipmentSetPath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.EquipmentSet[EquipmentSetID(elementPath[0].id)] = child
+		case gearScoreIdentifier:
+			child, ok := engine.Tree.GearScore[GearScoreID(elementPath[0].id)]
+			if !ok {
+				child = gearScore{ID: GearScoreID(elementPath[0].id)}
+			}
+			engine.assembleGearScorePath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.GearScore[GearScoreID(elementPath[0].id)] = child
+		case itemIdentifier:
+			child, ok := engine.Tree.Item[ItemID(elementPath[0].id)]
+			if !ok {
+				child = item{ID: ItemID(elementPath[0].id)}
+			}
+			engine.assembleItemPath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.Item[ItemID(elementPath[0].id)] = child
+		case playerIdentifier:
+			child, ok := engine.Tree.Player[PlayerID(elementPath[0].id)]
+			if !ok {
+				child = player{ID: PlayerID(elementPath[0].id)}
+			}
+			engine.assemblePlayerPath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.Player[PlayerID(elementPath[0].id)] = child
+		case positionIdentifier:
+			child, ok := engine.Tree.Position[PositionID(elementPath[0].id)]
+			if !ok {
+				child = position{ID: PositionID(elementPath[0].id)}
+			}
+			engine.assemblePositionPath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.Position[PositionID(elementPath[0].id)] = child
+		case zoneIdentifier:
+			child, ok := engine.Tree.Zone[ZoneID(elementPath[0].id)]
+			if !ok {
+				child = zone{ID: ZoneID(elementPath[0].id)}
+			}
+			engine.assembleZonePath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.Zone[ZoneID(elementPath[0].id)] = child
+		case zoneItemIdentifier:
+			child, ok := engine.Tree.ZoneItem[ZoneItemID(elementPath[0].id)]
+			if !ok {
+				child = zoneItem{ID: ZoneItemID(elementPath[0].id)}
+			}
+			engine.assembleZoneItemPath(&child, elementPath, 0, engine.assembler.includedElements)
+			engine.Tree.ZoneItem[ZoneItemID(elementPath[0].id)] = child
+		}
+	}
 
 	return engine.Tree
-}
-
-func (engine *Engine) assembleEquipmentSets(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.equipmentSetPath {
-		id := EquipmentSetID(p[0].id)
-		child, ok := engine.Tree.EquipmentSet[id]
-		if !ok {
-			child = equipmentSet{ID: id}
-		}
-		engine.assembleEquipmentSetPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.EquipmentSet[id] = child
-	}
-	wg.Done()
-}
-
-func (engine *Engine) assembleGearScores(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.gearScorePath {
-		id := GearScoreID(p[0].id)
-		child, ok := engine.Tree.GearScore[id]
-		if !ok {
-			child = gearScore{ID: id}
-		}
-		engine.assembleGearScorePath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.GearScore[id] = child
-	}
-	wg.Done()
-}
-
-func (engine *Engine) assembleItems(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.itemPath {
-		id := ItemID(p[0].id)
-		child, ok := engine.Tree.Item[id]
-		if !ok {
-			child = item{ID: id}
-		}
-		engine.assembleItemPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Item[id] = child
-	}
-	wg.Done()
-}
-
-func (engine *Engine) assemblePlayers(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.playerPath {
-		id := PlayerID(p[0].id)
-		child, ok := engine.Tree.Player[id]
-		if !ok {
-			child = player{ID: id}
-		}
-		engine.assemblePlayerPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Player[id] = child
-	}
-	wg.Done()
-}
-
-func (engine *Engine) assemblePositions(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.positionPath {
-		id := PositionID(p[0].id)
-		child, ok := engine.Tree.Position[id]
-		if !ok {
-			child = position{ID: id}
-		}
-		engine.assemblePositionPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Position[id] = child
-	}
-	wg.Done()
-}
-
-func (engine *Engine) assembleZones(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.zonePath {
-		id := ZoneID(p[0].id)
-		child, ok := engine.Tree.Zone[id]
-		if !ok {
-			child = zone{ID: id}
-		}
-		engine.assembleZonePath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.Zone[id] = child
-	}
-	wg.Done()
-}
-
-func (engine *Engine) assembleZoneItems(wg *sync.WaitGroup) {
-	for _, p := range engine.assembler.zoneItemPath {
-		id := ZoneItemID(p[0].id)
-		child, ok := engine.Tree.ZoneItem[id]
-		if !ok {
-			child = zoneItem{ID: id}
-		}
-		engine.assembleZoneItemPath(&child, p, 0, engine.assembler.includedElements)
-		engine.Tree.ZoneItem[id] = child
-	}
-	wg.Done()
 }
 
 func (engine *Engine) clearAssembler() {
@@ -129,28 +76,6 @@ func (engine *Engine) clearAssembler() {
 	}
 	for key := range engine.assembler.includedElements {
 		delete(engine.assembler.includedElements, key)
-	}
-
-	for key := range engine.assembler.equipmentSetPath {
-		delete(engine.assembler.equipmentSetPath, key)
-	}
-	for key := range engine.assembler.gearScorePath {
-		delete(engine.assembler.gearScorePath, key)
-	}
-	for key := range engine.assembler.itemPath {
-		delete(engine.assembler.itemPath, key)
-	}
-	for key := range engine.assembler.playerPath {
-		delete(engine.assembler.playerPath, key)
-	}
-	for key := range engine.assembler.positionPath {
-		delete(engine.assembler.positionPath, key)
-	}
-	for key := range engine.assembler.zoneItemPath {
-		delete(engine.assembler.zoneItemPath, key)
-	}
-	for key := range engine.assembler.zonePath {
-		delete(engine.assembler.zonePath, key)
 	}
 }
 
