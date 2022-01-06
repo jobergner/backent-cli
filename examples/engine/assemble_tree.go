@@ -104,9 +104,9 @@ func (engine *Engine) clearTree() {
 }
 
 func (engine *Engine) populateAssembler() {
-	// we want to find all lead nodes which have updated and collect their paths
-	// later we will basically loop over the paths we have collected, and "walk" them
-	// in order to assemble the tree from bottom to the top (leaf nodes)
+	// we want to find all nodes which have updated and collect their paths.
+	// later we will loop over the paths we have collected, and "walk" them (assembleBranch)
+	// in order to assemble the tree from top to bottom (leaf nodes to root nodes)
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
 		engine.assembler.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
@@ -150,13 +150,14 @@ func (engine *Engine) populateAssembler() {
 	previousLen := 0
 	// we'd be pretty much done collecting the required paths, but we also want to
 	// build all paths ending with a reference which references an updated element.
+	// (and want to populate includedElements map of course)
 	// this needs to happen recursively, consider this example (-> = reference):
 	// A -> B -> C -> ^D
 	// Since "D" has updated (^), but no other element, we'd only include "C".
 	// However, now that "C" is considered updated by reference, we also want
 	// to include "B". This is why recursiveness is required.
 	for {
-		// here we populate out includedElements with out newly collected paths segments
+		// here we populate out includedElements with all newly collected paths segments
 		// so we can check if any of these  elements are referenced by any reference
 		// in the loop below
 		for _, p := range engine.assembler.updatedElementPaths {
@@ -302,6 +303,24 @@ func (engine *Engine) populateAssembler() {
 			}
 		}
 	}
+
+	// TODO: might need this for full assembling
+	// for _, path := range engine.assembler.updatedElementPaths {
+	// 	if len(path) < 2 {
+	// 		continue
+	// 	}
+	// 	for _, seg := range path[:len(path)-1] {
+	// 		delete(engine.assembler.updatedElementPaths, seg.id)
+	// 	}
+	// }
+	// for _, path := range engine.assembler.updatedReferencePaths {
+	// 	if len(path) < 2 {
+	// 		continue
+	// 	}
+	// 	for _, seg := range path[:len(path)-1] {
+	// 		delete(engine.assembler.updatedReferencePaths, seg.id)
+	// 	}
+	// }
 
 	// merge paths into one map, for convencience (they are recycled anyway)
 	for id, path := range engine.assembler.updatedElementPaths {

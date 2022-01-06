@@ -132,7 +132,7 @@ ok  	github.com/jobergner/backent-cli/examples/engine
 
 ______________________________________________________ actually make benchmarks reliable
 
-# refactoring of tree assembling, top-down to bottom-up with paths
+# refactoring of tree assembling, bottom-up to top-down with paths
 Mi 5. Jan 18:36:44 CET 2022
 goos: linux
 goarch: amd64
