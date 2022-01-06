@@ -14,11 +14,11 @@ var benchTestNumberOfPlayersCounter = 0
 
 const benchTestNumberOfPlayerItems = 12
 
-var benchTestNumberOfPlayerItemsCounter = 0
+// var benchTestNumberOfPlayerItemsCounter = 0
 
 const benchTestNumberOfEquipmentSetItems = 10
 
-var benchTestNumberOfEquipmentSetItemsCounter = 0
+// var benchTestNumberOfEquipmentSetItemsCounter = 0
 
 const benchTestNumberOfEquipmentSets = 10
 
@@ -26,7 +26,7 @@ var benchTestNumberOfEquipmentSetsCounter = 0
 
 const benchTestNumberOfZoneTags = 16
 
-var benchTestNumberOfZoneTagsCounter = 0
+// var benchTestNumberOfZoneTagsCounter = 0
 
 const benchTestNumberOfInteractables = 24
 

@@ -147,7 +147,7 @@ func (engine *Engine) populateAssembler() {
 		engine.assembler.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 	}
 
-	prevousLength := 0
+	previousLen := 0
 	// we'd be pretty much done collecting the required paths, but we also want to
 	// build all paths ending with a reference which references an updated element.
 	// this needs to happen recursively, consider this example (-> = reference):
@@ -175,13 +175,13 @@ func (engine *Engine) populateAssembler() {
 			}
 		}
 
-		// we check if ant new elements are involved, which could
+		// we check if any new elements are involved, which could
 		// mean that new paths containing references need to be looked at
-		if prevousLength == len(engine.assembler.includedElements) {
+		if previousLen == len(engine.assembler.includedElements) {
 			break
 		}
 
-		prevousLength = len(engine.assembler.includedElements)
+		previousLen = len(engine.assembler.includedElements)
 
 		for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
 			// if the reference references an element that has updated its path is collected
