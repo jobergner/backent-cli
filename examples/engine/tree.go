@@ -29,8 +29,8 @@ type Tree struct {
 	ZoneItem     map[ZoneItemID]zoneItem         `json:"zoneItem"`
 }
 
-func newTree() Tree {
-	return Tree{
+func newTree() *Tree {
+	return &Tree{
 		EquipmentSet: make(map[EquipmentSetID]equipmentSet),
 		GearScore:    make(map[GearScoreID]gearScore),
 		Item:         make(map[ItemID]item),
@@ -38,6 +38,30 @@ func newTree() Tree {
 		Position:     make(map[PositionID]position),
 		Zone:         make(map[ZoneID]zone),
 		ZoneItem:     make(map[ZoneItemID]zoneItem),
+	}
+}
+
+func (t *Tree) clear() {
+	for key := range t.EquipmentSet {
+		delete(t.EquipmentSet, key)
+	}
+	for key := range t.GearScore {
+		delete(t.GearScore, key)
+	}
+	for key := range t.Item {
+		delete(t.Item, key)
+	}
+	for key := range t.Player {
+		delete(t.Player, key)
+	}
+	for key := range t.Position {
+		delete(t.Position, key)
+	}
+	for key := range t.Zone {
+		delete(t.Zone, key)
+	}
+	for key := range t.ZoneItem {
+		delete(t.ZoneItem, key)
 	}
 }
 

@@ -232,7 +232,7 @@ func TestUpdateState(t *testing.T) {
 		se.UpdateState()
 		_, ok := se.State.Item[item.ID()]
 		assert.True(t, ok)
-		_player, ok := se.State.Player[player.ID()]
+		_player := se.State.Player[player.ID()]
 		_itemID := _player.Items[0]
 		assert.NotZero(t, _itemID)
 	})
@@ -296,8 +296,9 @@ func TestActionsOnDeletedItems(t *testing.T) {
 func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assembleEntireTree bool) {
 	se := newEngine()
 	expectedTree := newTree()
-	define(se, &expectedTree)
-	actualTree := se.assembleUpdateTree()
+	define(se, expectedTree)
+	se.assembleUpdateTree()
+	actualTree := se.Tree
 
 	if !assert.ObjectsAreEqualValues(expectedTree, actualTree) {
 		actual, _ := actualTree.MarshalJSON()
