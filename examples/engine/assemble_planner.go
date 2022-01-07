@@ -274,22 +274,92 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 	}
 
 	// TODO: might need this for full assembling
-	// for _, path := range engine.assembler.updatedElementPaths {
-	// 	if len(path) < 2 {
+	// for _, path := range ap.updatedElementPaths {
+	// 	if len(path) == 1 {
 	// 		continue
 	// 	}
 	// 	for _, seg := range path[:len(path)-1] {
-	// 		delete(engine.assembler.updatedElementPaths, seg.id)
+	// 		delete(ap.updatedElementPaths, seg.id)
 	// 	}
 	// }
-	// for _, path := range engine.assembler.updatedReferencePaths {
-	// 	if len(path) < 2 {
+	// for _, path := range ap.updatedReferencePaths {
+	// 	if len(path) == 1 {
 	// 		continue
 	// 	}
 	// 	for _, seg := range path[:len(path)-1] {
-	// 		delete(engine.assembler.updatedReferencePaths, seg.id)
+	// 		delete(ap.updatedReferencePaths, seg.id)
 	// 	}
 	// }
+
+	// merge paths into one map, for convencience (they are recycled anyway)
+	for id, path := range ap.updatedElementPaths {
+		ap.updatedPaths[id] = path
+	}
+	for id, path := range ap.updatedReferencePaths {
+		ap.updatedPaths[id] = path
+	}
+
+	// just to be a bit more organized
+	for leafElementID, p := range ap.updatedPaths {
+		switch p[0].identifier {
+		case equipmentSetIdentifier:
+			ap.equipmentSetPath[leafElementID] = p
+		case gearScoreIdentifier:
+			ap.gearScorePath[leafElementID] = p
+		case itemIdentifier:
+			ap.itemPath[leafElementID] = p
+		case playerIdentifier:
+			ap.playerPath[leafElementID] = p
+		case positionIdentifier:
+			ap.positionPath[leafElementID] = p
+		case zoneIdentifier:
+			ap.zonePath[leafElementID] = p
+		case zoneItemIdentifier:
+			ap.zoneItemPath[leafElementID] = p
+		}
+	}
+}
+
+func (ap *assemblePlanner) fill(state *State) {
+	for _, equipmentSet := range state.EquipmentSet {
+		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
+	}
+	for _, gearScore := range state.GearScore {
+		ap.updatedElementPaths[int(gearScore.ID)] = gearScore.path
+	}
+	for _, item := range state.Item {
+		ap.updatedElementPaths[int(item.ID)] = item.path
+	}
+	for _, player := range state.Player {
+		ap.updatedElementPaths[int(player.ID)] = player.path
+	}
+	for _, position := range state.Position {
+		ap.updatedElementPaths[int(position.ID)] = position.path
+	}
+	for _, zone := range state.Zone {
+		ap.updatedElementPaths[int(zone.ID)] = zone.path
+	}
+	for _, zoneItem := range state.ZoneItem {
+		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+	}
+	for _, equipmentSetEquipmentRef := range state.EquipmentSetEquipmentRef {
+		ap.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+	}
+	for _, itemBoundToRef := range state.ItemBoundToRef {
+		ap.updatedReferencePaths[int(itemBoundToRef.ID)] = itemBoundToRef.path
+	}
+	for _, playerEquipmentSetRef := range state.PlayerEquipmentSetRef {
+		ap.updatedReferencePaths[int(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+	}
+	for _, playerGuildMemberRef := range state.PlayerGuildMemberRef {
+		ap.updatedReferencePaths[int(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+	}
+	for _, playerTargetRef := range state.PlayerTargetRef {
+		ap.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
+	}
+	for _, playerTargetedByRef := range state.PlayerTargetedByRef {
+		ap.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
+	}
 
 	// merge paths into one map, for convencience (they are recycled anyway)
 	for id, path := range ap.updatedElementPaths {

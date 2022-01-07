@@ -140,6 +140,7 @@ pkg: github.com/jobergner/backent-cli/examples/engine
 cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 BEFORE: BenchmarkAssembleTree-8   	    5000	   2025145 ns/op	  570755 B/op	    5837 allocs/op
 AFTER : BenchmarkAssembleTree-8   	    5000	   1473017 ns/op	  282577 B/op	     939 allocs/op
+BenchmarkAssembleFullTree-8   	        5000	   3618831 ns/op	  771952 B/op	    6056 allocs/op
 BenchmarkEngine-8                 	    5000	   1352844 ns/op	  275721 B/op	    1065 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	9.779s

@@ -297,7 +297,11 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assem
 	se := newEngine()
 	expectedTree := newTree()
 	define(se, expectedTree)
-	se.assembleUpdateTree()
+	if assembleEntireTree {
+		se.assembleFullTree()
+	} else {
+		se.assembleUpdateTree()
+	}
 	actualTree := se.Tree
 
 	if !assert.ObjectsAreEqualValues(expectedTree, actualTree) {
@@ -1465,63 +1469,62 @@ func TestTree(t *testing.T) {
 			false,
 		)
 	})
-	// TODO entire tree assembling
-	// t.Run("assembles entire tree correctly", func(t *testing.T) {
-	// 	newTreeTest(
-	// 		func(se *Engine, expectedTree *Tree) {
-	// 			plyr := se.CreatePlayer()
-	// 			itm := plyr.AddItem().SetName("item1").SetBoundTo(plyr.ID())
-	// 			se.UpdateState()
+	t.Run("assembles entire tree correctly", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				plyr := se.CreatePlayer()
+				itm := plyr.AddItem().SetName("item1").SetBoundTo(plyr.ID())
+				se.UpdateState()
 
-	// 			expectedTree.Player = map[PlayerID]player{
-	// 				plyr.ID(): {
-	// 					ID:            plyr.ID(),
-	// 					OperationKind: OperationKindUnchanged,
-	// 					GearScore: &gearScore{
-	// 						ID:            plyr.GearScore().ID(),
-	// 						OperationKind: OperationKindUnchanged,
-	// 					},
-	// 					Position: &position{
-	// 						ID:            plyr.Position().ID(),
-	// 						OperationKind: OperationKindUnchanged,
-	// 					},
-	// 					Items: map[ItemID]item{
-	// 						itm.ID(): {
-	// 							ID:            itm.ID(),
-	// 							Name:          "item1",
-	// 							OperationKind: OperationKindUnchanged,
-	// 							GearScore: &gearScore{
-	// 								ID:            itm.GearScore().ID(),
-	// 								OperationKind: OperationKindUnchanged,
-	// 							},
-	// 							BoundTo: &elementReference{
-	// 								OperationKind:        OperationKindUnchanged,
-	// 								ElementID:            int(plyr.ID()),
-	// 								ElementKind:          ElementKindPlayer,
-	// 								ReferencedDataStatus: ReferencedDataUnchanged,
-	// 								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, int(itm.BoundTo().itemBoundToRef.ID)).toJSONPath(),
-	// 							},
-	// 							Origin: &player{
-	// 								ID:            itm.Origin().Player().ID(),
-	// 								OperationKind: OperationKindUnchanged,
-	// 								Position: &position{
-	// 									ID:            itm.Origin().Player().Position().ID(),
-	// 									OperationKind: OperationKindUnchanged,
-	// 								},
-	// 								GearScore: &gearScore{
-	// 									ID:            itm.Origin().Player().GearScore().ID(),
-	// 									OperationKind: OperationKindUnchanged,
-	// 								},
-	// 							},
-	// 						},
-	// 					},
-	// 				},
-	// 			}
-	// 		},
-	// 		func(errText string) {
-	// 			t.Errorf(errText)
-	// 		},
-	// 		true,
-	// 	)
-	// })
+				expectedTree.Player = map[PlayerID]player{
+					plyr.ID(): {
+						ID:            plyr.ID(),
+						OperationKind: OperationKindUnchanged,
+						GearScore: &gearScore{
+							ID:            plyr.GearScore().ID(),
+							OperationKind: OperationKindUnchanged,
+						},
+						Position: &position{
+							ID:            plyr.Position().ID(),
+							OperationKind: OperationKindUnchanged,
+						},
+						Items: map[ItemID]item{
+							itm.ID(): {
+								ID:            itm.ID(),
+								Name:          "item1",
+								OperationKind: OperationKindUnchanged,
+								GearScore: &gearScore{
+									ID:            itm.GearScore().ID(),
+									OperationKind: OperationKindUnchanged,
+								},
+								BoundTo: &elementReference{
+									OperationKind:        OperationKindUnchanged,
+									ElementID:            int(plyr.ID()),
+									ElementKind:          ElementKindPlayer,
+									ReferencedDataStatus: ReferencedDataUnchanged,
+									ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, int(itm.BoundTo().itemBoundToRef.ID)).toJSONPath(),
+								},
+								Origin: &player{
+									ID:            itm.Origin().Player().ID(),
+									OperationKind: OperationKindUnchanged,
+									Position: &position{
+										ID:            itm.Origin().Player().Position().ID(),
+										OperationKind: OperationKindUnchanged,
+									},
+									GearScore: &gearScore{
+										ID:            itm.Origin().Player().GearScore().ID(),
+										OperationKind: OperationKindUnchanged,
+									},
+								},
+							},
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			true,
+		)
+	})
 }
