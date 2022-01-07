@@ -9,8 +9,8 @@ const (
 )
 
 type Engine struct {
-	State   State
-	Patch   State
+	State   *State
+	Patch   *State
 	Tree    *Tree
 	planner *assemblePlanner
 	IDgen   int

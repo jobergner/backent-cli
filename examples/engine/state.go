@@ -36,8 +36,8 @@ type State struct {
 	AnyOfItem_Player_ZoneItem map[AnyOfItem_Player_ZoneItemID]anyOfItem_Player_ZoneItemCore `json:"anyOfItem_Player_ZoneItem"`
 }
 
-func newState() State {
-	return State{
+func newState() *State {
+	return &State{
 		EquipmentSet:              make(map[EquipmentSetID]equipmentSetCore),
 		GearScore:                 make(map[GearScoreID]gearScoreCore),
 		Item:                      make(map[ItemID]itemCore),
