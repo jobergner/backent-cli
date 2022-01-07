@@ -150,9 +150,11 @@ func (engine *Engine) populateAssembler() {
 				engine.planner.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
 			}
 		}
+		// we also loop over all references in state because a reference which may not have updated
+		// itself may still reference an element which has updated
 		for _, equipmentSetEquipmentRef := range engine.State.EquipmentSetEquipmentRef {
-			// prioritize the ref from Patch
 			if _, ok := engine.planner.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)]; ok {
+				// we don't need to do the check if the reference is already included
 				continue
 			}
 			if _, ok := engine.planner.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
@@ -203,14 +205,16 @@ func (engine *Engine) populateAssembler() {
 		}
 
 		for _, playerTargetRef := range engine.Patch.PlayerTargetRef {
-			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID)
-			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
+			// if the reference exists in the patch, the anyContainer HAS to exist in patch as well
+			// as both are always created and destroyed on unison
+			anyContainer := engine.Patch.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
+			switch anyContainer.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.Player)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.ZoneItem)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			}
@@ -219,28 +223,30 @@ func (engine *Engine) populateAssembler() {
 			if _, ok := engine.planner.updatedReferencePaths[int(playerTargetRef.ID)]; ok {
 				continue
 			}
-			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID)
-			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
+			// if the reference exists in the state, the anyContainer HAS to exist in state as well
+			// as both are always created and destroyed on unison
+			anyContainer := engine.State.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
+			switch anyContainer.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.Player)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.ZoneItem)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetRef.ID)] = playerTargetRef.path
 				}
 			}
 		}
 
 		for _, playerTargetedByRef := range engine.Patch.PlayerTargetedByRef {
-			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID)
-			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
+			anyContainer := engine.Patch.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
+			switch anyContainer.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.Player)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.ZoneItem)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
@@ -249,14 +255,14 @@ func (engine *Engine) populateAssembler() {
 			if _, ok := engine.planner.updatedReferencePaths[int(playerTargetedByRef.ID)]; ok {
 				continue
 			}
-			anyContainer := engine.anyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID)
-			switch anyContainer.anyOfPlayer_ZoneItem.ElementKind {
+			anyContainer := engine.State.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
+			switch anyContainer.ElementKind {
 			case ElementKindPlayer:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.Player)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.Player)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			case ElementKindZoneItem:
-				if _, ok := engine.planner.includedElements[int(anyContainer.anyOfPlayer_ZoneItem.ZoneItem)]; ok {
+				if _, ok := engine.planner.includedElements[int(anyContainer.ZoneItem)]; ok {
 					engine.planner.updatedReferencePaths[int(playerTargetedByRef.ID)] = playerTargetedByRef.path
 				}
 			}
