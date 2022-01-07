@@ -1,12 +1,24 @@
 package state
 
 func (engine *Engine) assembleUpdateTree() {
-
 	engine.planner.clear()
 	engine.Tree.clear()
 
 	engine.planner.plan(engine.State, engine.Patch)
 
+	engine.assembleTree()
+}
+
+func (engine *Engine) assembleFullTree() {
+	engine.planner.clear()
+	engine.Tree.clear()
+
+	engine.planner.fill(engine.State)
+
+	engine.assembleTree()
+}
+
+func (engine *Engine) assembleTree() {
 	for _, elementPath := range engine.planner.updatedPaths {
 		switch elementPath[0].identifier {
 		case equipmentSetIdentifier:

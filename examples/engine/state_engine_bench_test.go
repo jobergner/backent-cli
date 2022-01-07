@@ -238,6 +238,19 @@ func BenchmarkAssembleTree(b *testing.B) {
 	}
 }
 
+func BenchmarkAssembleFullTree(b *testing.B) {
+	engine := newEngine()
+	for i := 0; i < benchTestNumberOfZones; i++ {
+		setUpRealisticZoneForBenchmarkExample(engine)
+	}
+	engine.UpdateState()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		engine.assembleFullTree()
+	}
+}
+
 func BenchmarkEngine(b *testing.B) {
 	engine := newEngine()
 	for i := 0; i < benchTestNumberOfZones; i++ {
