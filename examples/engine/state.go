@@ -60,8 +60,8 @@ func newState() *State {
 type zoneCore struct {
 	ID            ZoneID                        `json:"id"`
 	Interactables []AnyOfItem_Player_ZoneItemID `json:"interactables"`
-	Items         []ZoneItemID                  `json:"items"`
-	Players       []PlayerID                    `json:"players"`
+	Items         map[ZoneItemID]struct{}       `json:"items"`
+	Players       map[PlayerID]struct{}         `json:"players"`
 	Tags          []string                      `json:"tags"`
 	OperationKind OperationKind                 `json:"operationKind"`
 	HasParent     bool                          `json:"hasParent"`
