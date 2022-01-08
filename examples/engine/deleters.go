@@ -16,19 +16,19 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferencePlayerTargetRefsPlayer(playerID)
 	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
-	for equipmentSetID := range player.EquipmentSets {
+	for _, equipmentSetID := range player.EquipmentSets {
 		engine.deletePlayerEquipmentSetRef(equipmentSetID)
 	}
 	engine.deleteGearScore(player.GearScore)
-	for guildMemberID := range player.GuildMembers {
+	for _, guildMemberID := range player.GuildMembers {
 		engine.deletePlayerGuildMemberRef(guildMemberID)
 	}
-	for itemID := range player.Items {
+	for _, itemID := range player.Items {
 		engine.deleteItem(itemID)
 	}
 	engine.deletePosition(player.Position)
 	engine.deletePlayerTargetRef(player.Target)
-	for targetedByID := range player.TargetedBy {
+	for _, targetedByID := range player.TargetedBy {
 		engine.deletePlayerTargetedByRef(targetedByID)
 	}
 	if _, ok := engine.State.Player[playerID]; ok {
@@ -135,13 +135,13 @@ func (engine *Engine) deleteZone(zoneID ZoneID) {
 	if zone.OperationKind == OperationKindDelete {
 		return
 	}
-	for interactableID := range zone.Interactables {
+	for _, interactableID := range zone.Interactables {
 		engine.deleteAnyOfItem_Player_ZoneItem(interactableID, true)
 	}
-	for itemID := range zone.Items {
+	for _, itemID := range zone.Items {
 		engine.deleteZoneItem(itemID)
 	}
-	for playerID := range zone.Players {
+	for _, playerID := range zone.Players {
 		engine.deletePlayer(playerID)
 	}
 	if _, ok := engine.State.Zone[zoneID]; ok {
@@ -161,7 +161,7 @@ func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 		return
 	}
 	engine.dereferencePlayerEquipmentSetRefs(equipmentSetID)
-	for equipmentID := range equipmentSet.Equipment {
+	for _, equipmentID := range equipmentSet.Equipment {
 		engine.deleteEquipmentSetEquipmentRef(equipmentID)
 	}
 	if _, ok := engine.State.EquipmentSet[equipmentSetID]; ok {

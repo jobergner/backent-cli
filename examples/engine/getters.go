@@ -52,7 +52,7 @@ func (_player Player) Target() PlayerTargetRef {
 func (_player Player) TargetedBy() []PlayerTargetedByRef {
 	player := _player.player.engine.Player(_player.player.ID)
 	var targetedBy []PlayerTargetedByRef
-	for refID := range player.player.TargetedBy {
+	for _, refID := range player.player.TargetedBy {
 		targetedBy = append(targetedBy, player.player.engine.playerTargetedByRef(refID))
 	}
 	return targetedBy
@@ -61,7 +61,7 @@ func (_player Player) TargetedBy() []PlayerTargetedByRef {
 func (_player Player) Items() []Item {
 	player := _player.player.engine.Player(_player.player.ID)
 	var items []Item
-	for itemID := range player.player.Items {
+	for _, itemID := range player.player.Items {
 		items = append(items, player.player.engine.Item(itemID))
 	}
 	return items
@@ -75,7 +75,7 @@ func (_player Player) GearScore() GearScore {
 func (_player Player) GuildMembers() []PlayerGuildMemberRef {
 	player := _player.player.engine.Player(_player.player.ID)
 	var guildMembers []PlayerGuildMemberRef
-	for refID := range player.player.GuildMembers {
+	for _, refID := range player.player.GuildMembers {
 		guildMembers = append(guildMembers, player.player.engine.playerGuildMemberRef(refID))
 	}
 	return guildMembers
@@ -84,7 +84,7 @@ func (_player Player) GuildMembers() []PlayerGuildMemberRef {
 func (_player Player) EquipmentSets() []PlayerEquipmentSetRef {
 	player := _player.player.engine.Player(_player.player.ID)
 	var equipmentSets []PlayerEquipmentSetRef
-	for refID := range player.player.EquipmentSets {
+	for _, refID := range player.player.EquipmentSets {
 		equipmentSets = append(equipmentSets, player.player.engine.playerEquipmentSetRef(refID))
 	}
 	return equipmentSets
@@ -354,7 +354,7 @@ func (_zone Zone) Path() string {
 func (_zone Zone) Players() []Player {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var players []Player
-	for playerID := range zone.zone.Players {
+	for _, playerID := range zone.zone.Players {
 		players = append(players, zone.zone.engine.Player(playerID))
 	}
 	return players
@@ -363,7 +363,7 @@ func (_zone Zone) Players() []Player {
 func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var interactables []AnyOfItem_Player_ZoneItem
-	for anyOfItem_Player_ZoneItemID := range zone.zone.Interactables {
+	for _, anyOfItem_Player_ZoneItemID := range zone.zone.Interactables {
 		interactables = append(interactables, zone.zone.engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID))
 	}
 	return interactables
@@ -372,7 +372,7 @@ func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItem {
 func (_zone Zone) Items() []ZoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var items []ZoneItem
-	for zoneItemID := range zone.zone.Items {
+	for _, zoneItemID := range zone.zone.Items {
 		items = append(items, zone.zone.engine.ZoneItem(zoneItemID))
 	}
 	return items
@@ -381,7 +381,7 @@ func (_zone Zone) Items() []ZoneItem {
 func (_zone Zone) Tags() []string {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var tags []string
-	for element := range zone.zone.Tags {
+	for _, element := range zone.zone.Tags {
 		tags = append(tags, element)
 	}
 	return tags
@@ -470,7 +470,7 @@ func (_equipmentSet EquipmentSet) Name() string {
 func (_equipmentSet EquipmentSet) Equipment() []EquipmentSetEquipmentRef {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	var equipment []EquipmentSetEquipmentRef
-	for refID := range equipmentSet.equipmentSet.Equipment {
+	for _, refID := range equipmentSet.equipmentSet.Equipment {
 		equipment = append(equipment, equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refID))
 	}
 	return equipment
