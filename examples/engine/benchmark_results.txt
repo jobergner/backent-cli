@@ -144,3 +144,4 @@ BenchmarkAssembleFullTree-8   	        5000	   3618831 ns/op	  771952 B/op	    6
 BenchmarkEngine-8                 	    5000	   1352844 ns/op	  275721 B/op	    1065 allocs/op
 PASS
 ok  	github.com/jobergner/backent-cli/examples/engine	9.779s
+

@@ -5,13 +5,6 @@ type assemblePlanner struct {
 	updatedReferencePaths map[int]path
 	updatedElementPaths   map[int]path
 	includedElements      map[int]bool
-	equipmentSetPath      map[int]path
-	gearScorePath         map[int]path
-	itemPath              map[int]path
-	playerPath            map[int]path
-	positionPath          map[int]path
-	zonePath              map[int]path
-	zoneItemPath          map[int]path
 }
 
 func newAssemblePlanner() *assemblePlanner {
@@ -20,13 +13,6 @@ func newAssemblePlanner() *assemblePlanner {
 		updatedElementPaths:   make(map[int]path),
 		updatedReferencePaths: make(map[int]path),
 		includedElements:      make(map[int]bool),
-		equipmentSetPath:      make(map[int]path),
-		gearScorePath:         make(map[int]path),
-		itemPath:              make(map[int]path),
-		playerPath:            make(map[int]path),
-		positionPath:          make(map[int]path),
-		zonePath:              make(map[int]path),
-		zoneItemPath:          make(map[int]path),
 	}
 }
 
@@ -42,27 +28,6 @@ func (a *assemblePlanner) clear() {
 	}
 	for key := range a.includedElements {
 		delete(a.includedElements, key)
-	}
-	for key := range a.equipmentSetPath {
-		delete(a.equipmentSetPath, key)
-	}
-	for key := range a.gearScorePath {
-		delete(a.gearScorePath, key)
-	}
-	for key := range a.itemPath {
-		delete(a.itemPath, key)
-	}
-	for key := range a.playerPath {
-		delete(a.playerPath, key)
-	}
-	for key := range a.positionPath {
-		delete(a.positionPath, key)
-	}
-	for key := range a.zonePath {
-		delete(a.zonePath, key)
-	}
-	for key := range a.zoneItemPath {
-		delete(a.zoneItemPath, key)
 	}
 }
 
@@ -273,50 +238,12 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		}
 	}
 
-	// TODO: might need this for full assembling
-	// for _, path := range ap.updatedElementPaths {
-	// 	if len(path) == 1 {
-	// 		continue
-	// 	}
-	// 	for _, seg := range path[:len(path)-1] {
-	// 		delete(ap.updatedElementPaths, seg.id)
-	// 	}
-	// }
-	// for _, path := range ap.updatedReferencePaths {
-	// 	if len(path) == 1 {
-	// 		continue
-	// 	}
-	// 	for _, seg := range path[:len(path)-1] {
-	// 		delete(ap.updatedReferencePaths, seg.id)
-	// 	}
-	// }
-
 	// merge paths into one map, for convencience (they are recycled anyway)
-	for id, path := range ap.updatedElementPaths {
-		ap.updatedPaths[id] = path
+	for id, p := range ap.updatedElementPaths {
+		ap.updatedPaths[id] = p
 	}
-	for id, path := range ap.updatedReferencePaths {
-		ap.updatedPaths[id] = path
-	}
-
-	// just to be a bit more organized
-	for leafElementID, p := range ap.updatedPaths {
-		switch p[0].identifier {
-		case equipmentSetIdentifier:
-			ap.equipmentSetPath[leafElementID] = p
-		case gearScoreIdentifier:
-			ap.gearScorePath[leafElementID] = p
-		case itemIdentifier:
-			ap.itemPath[leafElementID] = p
-		case playerIdentifier:
-			ap.playerPath[leafElementID] = p
-		case positionIdentifier:
-			ap.positionPath[leafElementID] = p
-		case zoneIdentifier:
-			ap.zonePath[leafElementID] = p
-		case zoneItemIdentifier:
-			ap.zoneItemPath[leafElementID] = p
-		}
+	for id, p := range ap.updatedReferencePaths {
+		ap.updatedPaths[id] = p
 	}
 }
 
@@ -362,30 +289,10 @@ func (ap *assemblePlanner) fill(state *State) {
 	}
 
 	// merge paths into one map, for convencience (they are recycled anyway)
-	for id, path := range ap.updatedElementPaths {
-		ap.updatedPaths[id] = path
+	for id, p := range ap.updatedElementPaths {
+		ap.updatedPaths[id] = p
 	}
-	for id, path := range ap.updatedReferencePaths {
-		ap.updatedPaths[id] = path
-	}
-
-	// just to be a bit more organized
-	for leafElementID, p := range ap.updatedPaths {
-		switch p[0].identifier {
-		case equipmentSetIdentifier:
-			ap.equipmentSetPath[leafElementID] = p
-		case gearScoreIdentifier:
-			ap.gearScorePath[leafElementID] = p
-		case itemIdentifier:
-			ap.itemPath[leafElementID] = p
-		case playerIdentifier:
-			ap.playerPath[leafElementID] = p
-		case positionIdentifier:
-			ap.positionPath[leafElementID] = p
-		case zoneIdentifier:
-			ap.zonePath[leafElementID] = p
-		case zoneItemIdentifier:
-			ap.zoneItemPath[leafElementID] = p
-		}
+	for id, p := range ap.updatedReferencePaths {
+		ap.updatedPaths[id] = p
 	}
 }

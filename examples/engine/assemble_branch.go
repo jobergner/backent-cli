@@ -318,8 +318,10 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 	}
 
 	element.OperationKind = zoneData.OperationKind
-	element.Tags = make([]string, len(zoneData.Tags))
-	copy(element.Tags, zoneData.Tags)
+	if zoneData.Tags != nil {
+		element.Tags = make([]string, len(zoneData.Tags))
+		copy(element.Tags, zoneData.Tags)
+	}
 
 	if pIndex+1 == len(p) {
 		return
