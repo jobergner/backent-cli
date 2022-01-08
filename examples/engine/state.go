@@ -58,14 +58,14 @@ func newState() *State {
 }
 
 type zoneCore struct {
-	ID            ZoneID                                   `json:"id"`
-	Interactables map[AnyOfItem_Player_ZoneItemID]struct{} `json:"interactables"`
-	Items         map[ZoneItemID]struct{}                  `json:"items"`
-	Players       map[PlayerID]struct{}                    `json:"players"`
-	Tags          map[string]struct{}                      `json:"tags"`
-	OperationKind OperationKind                            `json:"operationKind"`
-	HasParent     bool                                     `json:"hasParent"`
-	Path          string                                   `json:"path"`
+	ID            ZoneID                        `json:"id"`
+	Interactables []AnyOfItem_Player_ZoneItemID `json:"interactables"`
+	Items         []ZoneItemID                  `json:"items"`
+	Players       []PlayerID                    `json:"players"`
+	Tags          []string                      `json:"tags"`
+	OperationKind OperationKind                 `json:"operationKind"`
+	HasParent     bool                          `json:"hasParent"`
+	Path          string                        `json:"path"`
 	path          path
 	engine        *Engine
 }
@@ -101,17 +101,17 @@ type itemCore struct {
 type Item struct{ item itemCore }
 
 type playerCore struct {
-	ID            PlayerID                             `json:"id"`
-	EquipmentSets map[PlayerEquipmentSetRefID]struct{} `json:"equipmentSets"`
-	GearScore     GearScoreID                          `json:"gearScore"`
-	GuildMembers  map[PlayerGuildMemberRefID]struct{}  `json:"guildMembers"`
-	Items         map[ItemID]struct{}                  `json:"items"`
-	Position      PositionID                           `json:"position"`
-	Target        PlayerTargetRefID                    `json:"target"`
-	TargetedBy    map[PlayerTargetedByRefID]struct{}   `json:"targetedBy"`
-	OperationKind OperationKind                        `json:"operationKind"`
-	HasParent     bool                                 `json:"hasParent"`
-	Path          string                               `json:"path"`
+	ID            PlayerID                  `json:"id"`
+	EquipmentSets []PlayerEquipmentSetRefID `json:"equipmentSets"`
+	GearScore     GearScoreID               `json:"gearScore"`
+	GuildMembers  []PlayerGuildMemberRefID  `json:"guildMembers"`
+	Items         []ItemID                  `json:"items"`
+	Position      PositionID                `json:"position"`
+	Target        PlayerTargetRefID         `json:"target"`
+	TargetedBy    []PlayerTargetedByRefID   `json:"targetedBy"`
+	OperationKind OperationKind             `json:"operationKind"`
+	HasParent     bool                      `json:"hasParent"`
+	Path          string                    `json:"path"`
 	path          path
 	engine        *Engine
 }
@@ -145,12 +145,12 @@ type positionCore struct {
 type Position struct{ position positionCore }
 
 type equipmentSetCore struct {
-	ID            EquipmentSetID                          `json:"id"`
-	Equipment     map[EquipmentSetEquipmentRefID]struct{} `json:"equipment"`
-	Name          string                                  `json:"name"`
-	OperationKind OperationKind                           `json:"operationKind"`
-	HasParent     bool                                    `json:"hasParent"`
-	Path          string                                  `json:"path"`
+	ID            EquipmentSetID               `json:"id"`
+	Equipment     []EquipmentSetEquipmentRefID `json:"equipment"`
+	Name          string                       `json:"name"`
+	OperationKind OperationKind                `json:"operationKind"`
+	HasParent     bool                         `json:"hasParent"`
+	Path          string                       `json:"path"`
 	path          path
 	engine        *Engine
 }
