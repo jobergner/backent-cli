@@ -45,94 +45,85 @@ func (_zone Zone) RemoveInteractablesItem(itemsToRemove ...ItemID) Zone {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
-	var wereElementsAltered bool
-	var newElements []AnyOfItem_Player_ZoneItemID
-	for _, anyContainerID := range zone.zone.Interactables {
-		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
-		element := anyContainer.Item().ID()
-		var toBeRemoved bool
-		for _, elementToRemove := range itemsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				zone.zone.engine.deleteItem(element)
-				break
-			}
+
+	wrappers := make(map[ItemID]AnyOfItem_Player_ZoneItemID)
+	for wrapperID := range zone.zone.Interactables {
+		wrapper := zone.zone.engine.anyOfItem_Player_ZoneItem(wrapperID)
+		if wrapper.Kind() != ElementKindItem {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, anyContainer.anyOfItem_Player_ZoneItem.ID)
+		wrappers[wrapper.Item().ID()] = wrapperID
+	}
+
+	for _, itemID := range itemsToRemove {
+		wrapperID, ok := wrappers[itemID]
+		if !ok {
+			continue
 		}
+		delete(zone.zone.Interactables, wrapperID)
+		zone.zone.engine.deleteItem(itemID)
+		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	}
-	if !wereElementsAltered {
-		return zone
-	}
-	zone.zone.Interactables = newElements
-	zone.zone.OperationKind = OperationKindUpdate
-	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+
 	return zone
 }
 
-func (_zone Zone) RemoveInteractablesPlayer(playersToRemove ...PlayerID) Zone {
+func (_zone Zone) RemoveInteractablesPlayer(itemsToRemove ...PlayerID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
-	var wereElementsAltered bool
-	var newElements []AnyOfItem_Player_ZoneItemID
-	for _, anyContainerID := range zone.zone.Interactables {
-		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
-		element := anyContainer.Player().ID()
-		var toBeRemoved bool
-		for _, elementToRemove := range playersToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				zone.zone.engine.deletePlayer(element)
-				break
-			}
+
+	wrappers := make(map[PlayerID]AnyOfItem_Player_ZoneItemID)
+	for wrapperID := range zone.zone.Interactables {
+		wrapper := zone.zone.engine.anyOfItem_Player_ZoneItem(wrapperID)
+		if wrapper.Kind() != ElementKindPlayer {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, anyContainer.anyOfItem_Player_ZoneItem.ID)
+		wrappers[wrapper.Player().ID()] = wrapperID
+	}
+
+	for _, playerID := range itemsToRemove {
+		wrapperID, ok := wrappers[playerID]
+		if !ok {
+			continue
 		}
+		delete(zone.zone.Interactables, wrapperID)
+		zone.zone.engine.deletePlayer(playerID)
+		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	}
-	if !wereElementsAltered {
-		return zone
-	}
-	zone.zone.Interactables = newElements
-	zone.zone.OperationKind = OperationKindUpdate
-	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+
 	return zone
 }
 
-func (_zone Zone) RemoveInteractablesZoneItem(zoneItemsToRemove ...ZoneItemID) Zone {
+func (_zone Zone) RemoveInteractablesZoneItem(itemsToRemove ...ZoneItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
-	var wereElementsAltered bool
-	var newElements []AnyOfItem_Player_ZoneItemID
-	for _, anyContainerID := range zone.zone.Interactables {
-		anyContainer := zone.zone.engine.anyOfItem_Player_ZoneItem(anyContainerID)
-		element := anyContainer.ZoneItem().ID()
-		var toBeRemoved bool
-		for _, elementToRemove := range zoneItemsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				zone.zone.engine.deleteZoneItem(element)
-				break
-			}
+
+	wrappers := make(map[ZoneItemID]AnyOfItem_Player_ZoneItemID)
+	for wrapperID := range zone.zone.Interactables {
+		wrapper := zone.zone.engine.anyOfItem_Player_ZoneItem(wrapperID)
+		if wrapper.Kind() != ElementKindZoneItem {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, anyContainer.anyOfItem_Player_ZoneItem.ID)
+		wrappers[wrapper.ZoneItem().ID()] = wrapperID
+	}
+
+	for _, zoneItemID := range itemsToRemove {
+		wrapperID, ok := wrappers[zoneItemID]
+		if !ok {
+			continue
 		}
+		delete(zone.zone.Interactables, wrapperID)
+		zone.zone.engine.deleteZoneItem(zoneItemID)
+		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	}
-	if !wereElementsAltered {
-		return zone
-	}
-	zone.zone.Interactables = newElements
-	zone.zone.OperationKind = OperationKindUpdate
-	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+
 	return zone
 }
 
@@ -141,28 +132,18 @@ func (_player Player) RemoveItems(itemsToRemove ...ItemID) Player {
 	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
-	var wereElementsAltered bool
-	var newElements []ItemID
-	for _, element := range player.player.Items {
-		var toBeRemoved bool
-		for _, elementToRemove := range itemsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				player.player.engine.deleteItem(element)
-				break
-			}
+
+	for _, itemID := range itemsToRemove {
+		_, ok := player.player.Items[itemID]
+		if !ok {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, element)
-		}
+		delete(player.player.Items, itemID)
+		player.player.engine.deleteItem(itemID)
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
 	}
-	if !wereElementsAltered {
-		return player
-	}
-	player.player.Items = newElements
-	player.player.OperationKind = OperationKindUpdate
-	player.player.engine.Patch.Player[player.player.ID] = player.player
+
 	return player
 }
 
@@ -171,29 +152,24 @@ func (_player Player) RemoveEquipmentSets(equipmentSetsToRemove ...EquipmentSetI
 	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
-	var wereElementsAltered bool
-	var newElements []PlayerEquipmentSetRefID
-	for _, refElement := range player.player.EquipmentSets {
-		element := player.player.engine.playerEquipmentSetRef(refElement).playerEquipmentSetRef.ReferencedElementID
-		var toBeRemoved bool
-		for _, elementToRemove := range equipmentSetsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				player.player.engine.deletePlayerEquipmentSetRef(refElement)
-				break
-			}
-		}
-		if !toBeRemoved {
-			newElements = append(newElements, refElement)
-		}
+
+	wrappers := make(map[EquipmentSetID]PlayerEquipmentSetRefID)
+	for wrapperID := range player.player.EquipmentSets {
+		wrapper := player.player.engine.playerEquipmentSetRef(wrapperID)
+		wrappers[wrapper.playerEquipmentSetRef.ReferencedElementID] = wrapperID
 	}
-	if !wereElementsAltered {
-		return player
+
+	for _, equipmentSetID := range equipmentSetsToRemove {
+		wrapperID, ok := wrappers[equipmentSetID]
+		if !ok {
+			continue
+		}
+		delete(player.player.EquipmentSets, wrapperID)
+		player.player.engine.deletePlayerEquipmentSetRef(wrapperID)
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
 	}
-	player.player.EquipmentSets = newElements
-	player.player.OperationKind = OperationKindUpdate
-	player.player.engine.Patch.Player[player.player.ID] = player.player
+
 	return player
 }
 
@@ -202,29 +178,24 @@ func (_player Player) RemoveGuildMembers(guildMembersToRemove ...PlayerID) Playe
 	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
-	var wereElementsAltered bool
-	var newElements []PlayerGuildMemberRefID
-	for _, refElement := range player.player.GuildMembers {
-		element := player.player.engine.playerGuildMemberRef(refElement).playerGuildMemberRef.ReferencedElementID
-		var toBeRemoved bool
-		for _, elementToRemove := range guildMembersToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				player.player.engine.deletePlayerGuildMemberRef(refElement)
-				break
-			}
-		}
-		if !toBeRemoved {
-			newElements = append(newElements, refElement)
-		}
+
+	wrappers := make(map[PlayerID]PlayerGuildMemberRefID)
+	for wrapperID := range player.player.GuildMembers {
+		wrapper := player.player.engine.playerGuildMemberRef(wrapperID)
+		wrappers[wrapper.playerGuildMemberRef.ReferencedElementID] = wrapperID
 	}
-	if !wereElementsAltered {
-		return player
+
+	for _, playerID := range guildMembersToRemove {
+		wrapperID, ok := wrappers[playerID]
+		if !ok {
+			continue
+		}
+		delete(player.player.GuildMembers, wrapperID)
+		player.player.engine.deletePlayerGuildMemberRef(wrapperID)
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
 	}
-	player.player.GuildMembers = newElements
-	player.player.OperationKind = OperationKindUpdate
-	player.player.engine.Patch.Player[player.player.ID] = player.player
+
 	return player
 }
 
@@ -233,30 +204,33 @@ func (_player Player) RemoveTargetedByZoneItem(zoneItemsToRemove ...ZoneItemID) 
 	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
-	var wereElementsAltered bool
-	var newElements []PlayerTargetedByRefID
-	for _, refElement := range player.player.TargetedBy {
-		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
-		element := anyContainer.ZoneItem().ID()
-		var toBeRemoved bool
-		for _, elementToRemove := range zoneItemsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				player.player.engine.deletePlayerTargetedByRef(refElement)
-				break
-			}
-		}
-		if !toBeRemoved {
-			newElements = append(newElements, refElement)
-		}
+
+	refs := make(map[AnyOfPlayer_ZoneItemID]PlayerTargetedByRefID)
+	for refID := range player.player.TargetedBy {
+		ref := player.player.engine.playerTargetedByRef(refID)
+		refs[ref.playerTargetedByRef.ReferencedElementID] = refID
 	}
-	if !wereElementsAltered {
-		return player
+
+	wrappers := make(map[ZoneItemID]PlayerTargetedByRefID)
+	for wrapperID, refID := range refs {
+		wrapper := player.player.engine.anyOfPlayer_ZoneItem(wrapperID)
+		if wrapper.Kind() != ElementKindZoneItem {
+			continue
+		}
+		wrappers[wrapper.ZoneItem().ID()] = refID
 	}
-	player.player.TargetedBy = newElements
-	player.player.OperationKind = OperationKindUpdate
-	player.player.engine.Patch.Player[player.player.ID] = player.player
+
+	for _, zoneItemID := range zoneItemsToRemove {
+		wrapperID, ok := wrappers[zoneItemID]
+		if !ok {
+			continue
+		}
+		delete(player.player.TargetedBy, wrapperID)
+		player.player.engine.deletePlayerTargetedByRef(wrapperID)
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
+	}
+
 	return player
 }
 
@@ -265,30 +239,33 @@ func (_player Player) RemoveTargetedByPlayer(playersToRemove ...PlayerID) Player
 	if player.player.OperationKind == OperationKindDelete {
 		return player
 	}
-	var wereElementsAltered bool
-	var newElements []PlayerTargetedByRefID
-	for _, refElement := range player.player.TargetedBy {
-		anyContainer := player.player.engine.playerTargetedByRef(refElement).Get()
-		element := anyContainer.Player().ID()
-		var toBeRemoved bool
-		for _, elementToRemove := range playersToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				player.player.engine.deletePlayerTargetedByRef(refElement)
-				break
-			}
-		}
-		if !toBeRemoved {
-			newElements = append(newElements, refElement)
-		}
+
+	refs := make(map[AnyOfPlayer_ZoneItemID]PlayerTargetedByRefID)
+	for refID := range player.player.TargetedBy {
+		ref := player.player.engine.playerTargetedByRef(refID)
+		refs[ref.playerTargetedByRef.ReferencedElementID] = refID
 	}
-	if !wereElementsAltered {
-		return player
+
+	wrappers := make(map[PlayerID]PlayerTargetedByRefID)
+	for wrapperID, refID := range refs {
+		wrapper := player.player.engine.anyOfPlayer_ZoneItem(wrapperID)
+		if wrapper.Kind() != ElementKindPlayer {
+			continue
+		}
+		wrappers[wrapper.Player().ID()] = refID
 	}
-	player.player.TargetedBy = newElements
-	player.player.OperationKind = OperationKindUpdate
-	player.player.engine.Patch.Player[player.player.ID] = player.player
+
+	for _, playerID := range playersToRemove {
+		wrapperID, ok := wrappers[playerID]
+		if !ok {
+			continue
+		}
+		delete(player.player.TargetedBy, wrapperID)
+		player.player.engine.deletePlayerTargetedByRef(wrapperID)
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
+	}
+
 	return player
 }
 
@@ -297,27 +274,17 @@ func (_zone Zone) RemoveTags(tagsToRemove ...string) Zone {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
-	var wereElementsAltered bool
-	var newElements []string
-	for _, element := range zone.zone.Tags {
-		var toBeRemoved bool
-		for _, elementToRemove := range tagsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				break
-			}
+
+	for _, tag := range tagsToRemove {
+		_, ok := zone.zone.Tags[tag]
+		if !ok {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, element)
-		}
+		delete(zone.zone.Tags, tag)
+		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	}
-	if !wereElementsAltered {
-		return zone
-	}
-	zone.zone.Tags = newElements
-	zone.zone.OperationKind = OperationKindUpdate
-	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+
 	return zone
 }
 
@@ -326,28 +293,23 @@ func (_equipmentSet EquipmentSet) RemoveEquipment(equipmentToRemove ...ItemID) E
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
 		return equipmentSet
 	}
-	var wereElementsAltered bool
-	var newElements []EquipmentSetEquipmentRefID
-	for _, refElement := range equipmentSet.equipmentSet.Equipment {
-		element := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refElement).equipmentSetEquipmentRef.ReferencedElementID
-		var toBeRemoved bool
-		for _, elementToRemove := range equipmentToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(refElement)
-				break
-			}
-		}
-		if !toBeRemoved {
-			newElements = append(newElements, refElement)
-		}
+
+	wrappers := make(map[ItemID]EquipmentSetEquipmentRefID)
+	for wrapperID := range equipmentSet.equipmentSet.Equipment {
+		wrapper := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(wrapperID)
+		wrappers[wrapper.equipmentSetEquipmentRef.ReferencedElementID] = wrapperID
 	}
-	if !wereElementsAltered {
-		return equipmentSet
+
+	for _, itemID := range equipmentToRemove {
+		wrapperID, ok := wrappers[itemID]
+		if !ok {
+			continue
+		}
+		delete(equipmentSet.equipmentSet.Equipment, wrapperID)
+		equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(wrapperID)
+		equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
+		equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 	}
-	equipmentSet.equipmentSet.Equipment = newElements
-	equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
-	equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
+
 	return equipmentSet
 }

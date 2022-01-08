@@ -233,8 +233,7 @@ func TestUpdateState(t *testing.T) {
 		_, ok := se.State.Item[item.ID()]
 		assert.True(t, ok)
 		_player := se.State.Player[player.ID()]
-		_itemID := _player.Items[0]
-		assert.NotZero(t, _itemID)
+		assert.NotZero(t, len(_player.Items))
 	})
 	t.Run("removes elements", func(t *testing.T) {
 		se := newEngine()
