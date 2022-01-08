@@ -138,10 +138,10 @@ func (engine *Engine) deleteZone(zoneID ZoneID) {
 	for _, interactableID := range zone.Interactables {
 		engine.deleteAnyOfItem_Player_ZoneItem(interactableID, true)
 	}
-	for _, itemID := range zone.Items {
+	for itemID := range zone.Items {
 		engine.deleteZoneItem(itemID)
 	}
-	for _, playerID := range zone.Players {
+	for playerID := range zone.Players {
 		engine.deletePlayer(playerID)
 	}
 	if _, ok := engine.State.Zone[zoneID]; ok {

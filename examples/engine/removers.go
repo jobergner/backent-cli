@@ -5,28 +5,18 @@ func (_zone Zone) RemovePlayers(playersToRemove ...PlayerID) Zone {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
-	var wereElementsAltered bool
-	var newElements []PlayerID
-	for _, element := range zone.zone.Players {
-		var toBeRemoved bool
-		for _, elementToRemove := range playersToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				zone.zone.engine.deletePlayer(element)
-				break
-			}
+
+	for _, playerID := range playersToRemove {
+		_, ok := zone.zone.Players[playerID]
+		if !ok {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, element)
-		}
+		delete(zone.zone.Players, playerID)
+		zone.zone.engine.deletePlayer(playerID)
+		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	}
-	if !wereElementsAltered {
-		return zone
-	}
-	zone.zone.Players = newElements
-	zone.zone.OperationKind = OperationKindUpdate
-	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+
 	return zone
 }
 
@@ -35,28 +25,18 @@ func (_zone Zone) RemoveItems(itemsToRemove ...ZoneItemID) Zone {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return zone
 	}
-	var wereElementsAltered bool
-	var newElements []ZoneItemID
-	for _, element := range zone.zone.Items {
-		var toBeRemoved bool
-		for _, elementToRemove := range itemsToRemove {
-			if element == elementToRemove {
-				toBeRemoved = true
-				wereElementsAltered = true
-				zone.zone.engine.deleteZoneItem(element)
-				break
-			}
+
+	for _, zoneItemID := range itemsToRemove {
+		_, ok := zone.zone.Items[zoneItemID]
+		if !ok {
+			continue
 		}
-		if !toBeRemoved {
-			newElements = append(newElements, element)
-		}
+		delete(zone.zone.Items, zoneItemID)
+		zone.zone.engine.deleteZoneItem(zoneItemID)
+		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	}
-	if !wereElementsAltered {
-		return zone
-	}
-	zone.zone.Items = newElements
-	zone.zone.OperationKind = OperationKindUpdate
-	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
+
 	return zone
 }
 

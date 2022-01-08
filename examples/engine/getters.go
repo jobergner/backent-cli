@@ -354,7 +354,7 @@ func (_zone Zone) Path() string {
 func (_zone Zone) Players() []Player {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var players []Player
-	for _, playerID := range zone.zone.Players {
+	for playerID := range zone.zone.Players {
 		players = append(players, zone.zone.engine.Player(playerID))
 	}
 	return players
@@ -372,7 +372,7 @@ func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItem {
 func (_zone Zone) Items() []ZoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var items []ZoneItem
-	for _, zoneItemID := range zone.zone.Items {
+	for zoneItemID := range zone.zone.Items {
 		items = append(items, zone.zone.engine.ZoneItem(zoneItemID))
 	}
 	return items

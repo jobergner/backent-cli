@@ -6,7 +6,7 @@ func (_zone Zone) AddPlayer() Player {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	player := zone.zone.engine.createPlayer(zone.zone.path, zone_playersIdentifier)
-	zone.zone.Players = append(zone.zone.Players, player.player.ID)
+	zone.zone.Players[player.player.ID] = struct{}{}
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return player
@@ -18,7 +18,7 @@ func (_zone Zone) AddItem() ZoneItem {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path, zone_itemsIdentifier)
-	zone.zone.Items = append(zone.zone.Items, zoneItem.zoneItem.ID)
+	zone.zone.Items[zoneItem.zoneItem.ID] = struct{}{}
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 	return zoneItem
