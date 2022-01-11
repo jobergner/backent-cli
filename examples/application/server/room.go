@@ -107,6 +107,7 @@ Exit:
 			if err != nil {
 				log.Println("error processing client message:", err)
 			}
+			// TODO: why?
 			if response.client == nil {
 				continue
 			}
