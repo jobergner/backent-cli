@@ -42,7 +42,6 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeGetters().
 		writeDeduplicate().
 		writeAllIDsMethod().
-		writeMergeIDs().
 		writeIdentifiers().
 		writePathSegments().
 		writePath().
@@ -61,8 +60,6 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeElementKinds().
 		writeTree().
 		writeTreeElements().
-		writeRecursionCheck().
-		writeAssembleCache().
 		writePools()
 
 	err := Format(s.buf)

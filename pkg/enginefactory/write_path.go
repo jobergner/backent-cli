@@ -86,25 +86,6 @@ func (s *EngineFactory) writePath() *EngineFactory {
 		Return(Id("[]int").Values(Id("elementIdentifier"))),
 	)
 
-	decls.File.Func().Params(Id("p").Id("path")).Id("id").Params(Id("id").Id("int")).Id("path").Block(
-		Id("newPath").Op(":=").Make(Id("[]int"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
-		Copy(Id("newPath"), Id("p")),
-		Id("newPath").Op("=").Append(Id("newPath"), Id("id")),
-		Return(Id("newPath")),
-	)
-
-	decls.File.Func().Params(Id("p").Id("path")).Id("equals").Params(Id("parentPath").Id("path")).Bool().Block(
-		If(Len(Id("p")).Op("!=").Len(Id("parentPath"))).Block(
-			Return(False()),
-		),
-		For(List(Id("i"), Id("segment")).Op(":=").Range().Id("parentPath")).Block(
-			If(Id("segment").Op("!=").Id("p").Index(Id("i"))).Block(
-				Return(False()),
-			),
-		),
-		Return(True()),
-	)
-
 	decls.File.Func().Params(Id("p").Id("path")).Id("toJSONPath").Params().String().Block(
 		Id("jsonPath").Op(":=").Lit("$"),
 		For(List(Id("i"), Id("seg")).Op(":=").Range().Id("p")).Block(

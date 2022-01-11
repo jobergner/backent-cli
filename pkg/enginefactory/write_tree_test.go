@@ -43,20 +43,12 @@ func TestWriteTree(t *testing.T) {
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
 			equipmentSet_type,
-			equipmentSetReference_type,
 			gearScore_type,
-			gearScoreReference_type,
 			item_type,
-			itemReference_type,
 			player_type,
-			playerReference_type,
 			position_type,
-			positionReference_type,
 			zone_type,
-			zoneReference_type,
 			zoneItem_type,
-			zoneItemReference_type,
-			anyOfPlayer_ZoneItemReference_type,
 		}, "\n"))
 
 		if expected != actual {
@@ -71,41 +63,6 @@ func TestWriteTree(t *testing.T) {
 		expected := testutils.FormatCode(strings.Join([]string{
 			_Tree_type,
 			newTree_func,
-		}, "\n"))
-
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
-		}
-	})
-	t.Run("writes recursionCheck", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
-		sf.writeRecursionCheck()
-
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
-			recursionCheck_type,
-			newRecursionCheck_func,
-		}, "\n"))
-
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
-		}
-	})
-	t.Run("writes assembleCache", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
-		sf.writeAssembleCache()
-
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
-			assembleCache_type,
-			newAssembleCache_func,
-			equipmentSetCacheElement_type,
-			gearScoreCacheElement_type,
-			itemCacheElement_type,
-			playerCacheElement_type,
-			positionCacheElement_type,
-			zoneCacheElement_type,
-			zoneItemCacheElement_type,
 		}, "\n"))
 
 		if expected != actual {

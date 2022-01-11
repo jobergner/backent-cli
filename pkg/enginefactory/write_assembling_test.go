@@ -14,45 +14,27 @@ func TestWriteAssembling(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			assembleConfig_type,
-			assembleTree_Engine_func,
+			assembleUpdateTree_Engine_func,
+			assembleFullTree_Engine_func,
 		}, "\n"))
 
 		if expected != actual {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
-	t.Run("writes assemble tree element", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
-		sf.writeAssembleTreeElement()
-
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
-			assembleEquipmentSet_Engine_func,
-			assembleGearScore_Engine_func,
-			assembleItem_Engine_func,
-			assemblePlayer_Engine_func,
-			assemblePosition_Engine_func,
-			assembleZone_Engine_func,
-			assembleZoneItem_Engine_func,
-		}, "\n"))
-
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
-		}
-	})
-	t.Run("writes assemble tree reference", func(t *testing.T) {
+	t.Run("writes assemble branch", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleTreeReference()
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			assembleEquipmentSetEquipmentRef_Engine_func,
-			assembleItemBoundToRef_Engine_func,
-			assemblePlayerEquipmentSetRef_Engine_func,
-			assemblePlayerGuildMemberRef_Engine_func,
-			assemblePlayerTargetRef_Engine_func,
-			assemblePlayerTargetedByRef_Engine_func,
+			assembleEquipmentSetPath_Engine_func,
+			assembleGearScorePath_Engine_func,
+			assembleItemPath_Engine_func,
+			assemblePlayerPath_Engine_func,
+			assemblePositionPath_Engine_func,
+			assembleZoneItemPath_Engine_func,
+			assembleZoneItemPath_Engine_func,
 		}, "\n"))
 
 		if expected != actual {
