@@ -3,6 +3,7 @@ package testutils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"go/format"
 	"go/parser"
 	"go/token"
@@ -14,8 +15,44 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 )
 
-// creates diff and makes whitespace visible
 func Diff(actual, expected string) string {
+	a := parseDecls(actual)
+	b := parseDecls(expected)
+
+	actualDelcs := make(map[string]string)
+	for _, decl := range a {
+		actualDelcs[evalDeclName(decl)] = stringifyDecl(decl)
+	}
+	expectedDelcs := make(map[string]string)
+	for _, decl := range b {
+		expectedDelcs[evalDeclName(decl)] = stringifyDecl(decl)
+	}
+
+	var buf bytes.Buffer
+	for name := range expectedDelcs {
+		if _, ok := actualDelcs[name]; !ok {
+			buf.WriteString(fmt.Sprintf("expected to find '%s' but did not\n\n", name))
+		}
+	}
+	for name := range actualDelcs {
+		if _, ok := expectedDelcs[name]; !ok {
+			buf.WriteString(fmt.Sprintf("found '%s' but should not have\n\n", name))
+		}
+	}
+
+	for name, def := range expectedDelcs {
+		want := actualDelcs[name]
+		got := def
+		if got != want {
+			buf.WriteString(diffDecl(got, want))
+		}
+	}
+
+	return buf.String()
+}
+
+// creates diff and makes whitespace visible
+func diffDecl(actual, expected string) string {
 	dmp := diffmatchpatch.New()
 	diffs := dmp.DiffMain(actual, expected, false)
 
@@ -35,11 +72,10 @@ func Diff(actual, expected string) string {
 	}
 
 	return `
-
+__________________________________
 DIFF:
 ` + dmp.DiffPrettyText(diffs) + `
 
-__________________________________
 
 WANT:
 ` + expected + `
