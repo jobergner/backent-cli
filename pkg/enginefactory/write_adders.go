@@ -16,14 +16,12 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 				return
 			}
 
-			a := adderWriter{
-				t: configType,
-				f: field,
-				v: nil,
-			}
-
 			field.RangeValueTypes(func(valueType *ast.ConfigType) {
-				a.v = valueType
+				a := adderWriter{
+					t: configType,
+					f: field,
+					v: valueType,
+				}
 				decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Id(a.returns()).Block(
 					a.reassignElement(),
 					If(a.isOperationKindDelete()).Block(
