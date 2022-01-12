@@ -18,13 +18,15 @@ func (a adderWriter) receiverParams() *Statement {
 }
 
 func (a adderWriter) name() string {
+	if a.f.ValueType().IsBasicType {
+		return "Add" + Title(a.f.Name)
+	}
+
 	var optionalSuffix string
 	if len(a.f.ValueTypes) > 1 {
 		optionalSuffix = Title(a.v.Name)
 	}
-	if a.f.ValueType().IsBasicType {
-		return "Add" + Title(a.f.Name)
-	}
+
 	return "Add" + Title(Singular(a.f.Name)) + optionalSuffix
 }
 
@@ -33,20 +35,23 @@ func (a adderWriter) idParam() string {
 }
 
 func (a adderWriter) params() *Statement {
-	if a.v.IsBasicType {
+	switch {
+	case a.v.IsBasicType:
 		return Id(a.f.Name).Id("..." + a.f.ValueType().Name)
-	}
-	if a.f.HasPointerValue {
+	case a.f.HasPointerValue:
 		return Id(a.idParam()).Id(Title(a.v.Name) + "ID")
+	default:
+		return Empty()
 	}
-	return Empty()
 }
 
 func (a adderWriter) returns() string {
-	if a.f.ValueType().IsBasicType || a.f.HasPointerValue {
+	switch {
+	case a.f.ValueType().IsBasicType || a.f.HasPointerValue:
 		return ""
+	default:
+		return Title(a.v.Name)
 	}
-	return Title(a.v.Name)
 }
 
 func (a adderWriter) reassignElement() *Statement {
@@ -57,98 +62,130 @@ func (a adderWriter) isOperationKindDelete() *Statement {
 	return Id(a.t.Name).Dot(a.t.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
+func (a adderWriter) elementCore() *Statement {
+	return Id(a.t.Name).Dot(a.t.Name)
+}
+
+func (a adderWriter) engine() *Statement {
+	return a.elementCore().Dot("engine")
+}
+
 func (a adderWriter) referencedElementDoesntExist() *Statement {
-	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(Title(a.v.Name)).Call(Id(a.idParam())).Dot(a.v.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
+	return a.engine().Dot(Title(a.v.Name)).Call(Id(a.idParam())).Dot(a.v.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
+}
+
+func (a adderWriter) returnIfReferencedElementIsAlreadyReferencedReturnCondition() *Statement {
+	switch {
+	case a.f.HasAnyValue:
+		return Id("anyContainer").Dot(anyNameByField(a.f)).Dot(Title(a.v.Name)).Op("==").Id(a.idParam())
+	default:
+		return Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(a.idParam())
+	}
 }
 
 func (a adderWriter) returnIfReferencedElementIsAlreadyReferenced() *Statement {
-	returnCondition := Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(a.idParam())
-	if a.f.HasAnyValue {
-		returnCondition = Id("anyContainer").Dot(anyNameByField(a.f)).Dot(Title(a.v.Name)).Op("==").Id(a.idParam())
-	}
-	return For(List(Id("_"), Id("currentRefID")).Op(":=").Range().Id(a.t.Name).Dot(a.t.Name).Dot(Title(a.f.Name))).Block(
-		Id("currentRef").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(a.f.ValueTypeName).Call(Id("currentRefID")),
-		OnlyIf(a.f.HasAnyValue, Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot(anyNameByField(a.f)).Call(Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID"))),
-		If(returnCondition).Block(
+	return For(List(Id("_"), Id("currentRefID")).Op(":=").Range().Add(a.elementCore()).Dot(Title(a.f.Name))).Block(
+		Id("currentRef").Op(":=").Add(a.engine()).Dot(a.f.ValueTypeName).Call(Id("currentRefID")),
+		OnlyIf(a.f.HasAnyValue, Id("anyContainer").Op(":=").Add(a.engine()).Dot(anyNameByField(a.f)).Call(Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID"))),
+		If(a.returnIfReferencedElementIsAlreadyReferencedReturnCondition()).Block(
 			Return(),
 		),
 	)
 }
 
 func (a adderWriter) returnDeletedElement() *Statement {
-	if a.v.IsBasicType || a.f.HasPointerValue {
+	switch {
+	case a.v.IsBasicType || a.f.HasPointerValue:
 		return Empty()
+
+	default:
+		return Id(Title(a.v.Name)).Values(Dict{
+			Id(a.v.Name): Id(a.v.Name + "Core").Values(Dict{
+				Id("OperationKind"): Id("OperationKindDelete"),
+				Id("engine"):        Add(a.engine()),
+			})})
 	}
-	return Id(Title(a.v.Name)).Values(Dict{
-		Id(a.v.Name): Id(a.v.Name + "Core").Values(Dict{
-			Id("OperationKind"): Id("OperationKindDelete"),
-			Id("engine"):        Id(a.t.Name).Dot(a.t.Name).Dot("engine"),
-		})})
 }
 
 func (a adderWriter) createNewElement() *Statement {
-	return Id(a.v.Name).Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id(a.t.Name).Dot(a.t.Name).Dot("path").Dot(a.f.Name).Call(), True())
+	return Id(a.v.Name).Op(":=").Add(a.engine()).Dot("create"+Title(a.v.Name)).
+		Call(Add(a.elementCore()).Dot("path").Dot(a.f.Name).Call(), True())
+}
+
+func (a adderWriter) createAnyContainerCallParams() *Statement {
+	switch {
+	case a.f.HasPointerValue:
+		return Call(False(), Nil())
+	default:
+		return Call(False(), Add(a.elementCore()).Dot("path").Dot(a.f.Name).Call())
+	}
 }
 
 func (a adderWriter) createAnyContainer() *Statement {
-	secondParam := Id(a.t.Name).Dot(a.t.Name).Dot("path").Dot(a.f.Name).Call()
-	if a.f.HasPointerValue {
-		secondParam = Nil()
+	return Id("anyContainer").Op(":=").Add(a.engine()).
+		Dot("create" + Title(anyNameByField(a.f))).
+		Add(a.createAnyContainerCallParams())
+}
+
+func (a adderWriter) setAnyContainerCallParams() *Statement {
+	switch {
+	case a.f.HasPointerValue:
+		return Call(Id(a.idParam()), False())
+	default:
+		return Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID"), False())
 	}
-	return Id("anyContainer").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create"+Title(anyNameByField(a.f))).Call(False(), secondParam).Dot(anyNameByField(a.f))
 }
 
 func (a adderWriter) setAnyContainer() *Statement {
-	statement := Id("anyContainer").Dot("set" + Title(a.v.Name))
-	if a.f.HasPointerValue {
-		return statement.Call(Id(a.idParam()), False())
+	return Id("anyContainer").Dot("set" + Title(a.v.Name)).Add(a.setAnyContainerCallParams())
+}
+
+func (a adderWriter) createRefCallParams() *Statement {
+	switch {
+	case a.f.HasAnyValue:
+		return Call(Add(a.elementCore()).Dot("path"), Id("anyContainer").Dot("ID"), Add(a.elementCore()).Dot("ID"))
+	default:
+		return Call(Id(a.idParam()), Add(a.elementCore()).Dot("ID"))
 	}
-	return statement.Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID"), False())
 }
 
 func (a adderWriter) createRef() *Statement {
-	statement := Id("ref").Op(":=").Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("create" + Title(a.f.ValueTypeName))
+	return Id("ref").Op(":=").Add(a.engine()).Dot("create" + Title(a.f.ValueTypeName)).Add(a.createRefCallParams())
+}
 
-	if a.f.HasAnyValue {
-		return statement.Call(Id("anyContainer").Dot("ID"), Id(a.t.Name).Dot(a.t.Name).Dot("ID"))
+func (a adderWriter) toAppend() *Statement {
+	switch {
+	case a.f.ValueType().IsBasicType:
+		return Id(a.f.Name + "...")
+
+	case a.f.HasPointerValue:
+		return Id("ref").Dot("ID")
+
+	case a.f.HasAnyValue:
+		return Id("anyContainer").Dot("ID")
+
+	default:
+		return Id(a.f.ValueType().Name).Dot(a.f.ValueType().Name).Dot("ID")
 	}
-
-	return statement.Call(Id(a.idParam()), Id(a.t.Name).Dot(a.t.Name).Dot("ID"))
 }
 
 func (a adderWriter) appendElement() *Statement {
-
-	var toAppend *Statement
-	if a.f.ValueType().IsBasicType {
-		toAppend = Id(a.f.Name + "...")
-	} else {
-		if a.f.HasPointerValue {
-			toAppend = Id("ref").Dot("ID")
-		} else if a.f.HasAnyValue {
-			toAppend = Id("anyContainer").Dot("ID")
-		} else {
-			toAppend = Id(a.f.ValueType().Name).Dot(a.f.ValueType().Name).Dot("ID")
-		}
-	}
-
-	appendStatement := Id(a.t.Name).Dot(a.t.Name).Dot(Title(a.f.Name)).Op("=").Append(
-		Id(a.t.Name).Dot(a.t.Name).Dot(Title(a.f.Name)),
-		toAppend,
+	return Add(a.elementCore()).Dot(Title(a.f.Name)).Op("=").Append(
+		Add(a.elementCore()).Dot(Title(a.f.Name)),
+		a.toAppend(),
 	)
-
-	return appendStatement
 }
 
 func (a adderWriter) setOperationKindUpdate() *Statement {
-	return Id(a.t.Name).Dot(a.t.Name).Dot("OperationKind").Op("=").Id("OperationKindUpdate")
+	return Add(a.elementCore()).Dot("OperationKind").Op("=").Id("OperationKindUpdate")
 }
 
 func (a adderWriter) updateElementInPatch() *Statement {
-	return Id(a.t.Name).Dot(a.t.Name).Dot("engine").Dot("Patch").Dot(Title(a.t.Name)).Index(a.elementID()).Op("=").Id(a.t.Name).Dot(a.t.Name)
+	return a.engine().Dot("Patch").Dot(Title(a.t.Name)).Index(a.elementID()).Op("=").Add(a.elementCore())
 }
 
 func (a adderWriter) elementID() *Statement {
-	return Id(a.t.Name).Dot(a.t.Name).Dot("ID")
+	return Add(a.elementCore()).Dot("ID")
 }
 
 func (a adderWriter) receiverName() string {

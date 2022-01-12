@@ -41,8 +41,8 @@ func Diff(actual, expected string) string {
 	}
 
 	for name, def := range expectedDelcs {
-		want := actualDelcs[name]
-		got := def
+		got := actualDelcs[name]
+		want := def
 		if got != want {
 			buf.WriteString(diffDecl(got, want))
 		}
