@@ -18,10 +18,6 @@ func (a adderWriter) receiverParams() *Statement {
 }
 
 func (a adderWriter) name() string {
-	if a.f.ValueType().IsBasicType {
-		return "Add" + Title(a.f.Name)
-	}
-
 	var optionalSuffix string
 	if len(a.f.ValueTypes) > 1 {
 		optionalSuffix = Title(a.v.Name)
@@ -37,7 +33,7 @@ func (a adderWriter) idParam() string {
 func (a adderWriter) params() *Statement {
 	switch {
 	case a.v.IsBasicType:
-		return Id(a.f.Name).Id("..." + a.f.ValueType().Name)
+		return Id(Singular(a.f.Name)).Id(a.f.ValueType().Name)
 	case a.f.HasPointerValue:
 		return Id(a.idParam()).Id(Title(a.v.Name) + "ID")
 	default:
@@ -109,15 +105,19 @@ func (a adderWriter) returnDeletedElement() *Statement {
 
 func (a adderWriter) createNewElement() *Statement {
 	return Id(a.v.Name).Op(":=").Add(a.engine()).Dot("create"+Title(a.v.Name)).
-		Call(Add(a.elementCore()).Dot("path").Dot(a.f.Name).Call(), True())
+		Call(Add(a.elementCore()).Dot("path"), Id(FieldPathIdentifier(a.f)))
 }
 
 func (a adderWriter) createAnyContainerCallParams() *Statement {
 	switch {
-	case a.f.HasPointerValue:
-		return Call(False(), Nil())
+	case a.f.HasPointerValue && !a.f.HasAnyValue:
+		return Call(False(), Nil(), Lit(""))
+	case a.f.HasPointerValue && a.f.HasAnyValue:
+		return Call(False(), Add(a.elementCore()).Dot("path"), Lit("")).Dot(anyNameByField(a.f))
+	case a.f.HasAnyValue:
+		return Call(False(), Add(a.elementCore()).Dot("path"), Id(FieldPathIdentifier(a.f))).Dot(anyNameByField(a.f))
 	default:
-		return Call(False(), Add(a.elementCore()).Dot("path").Dot(a.f.Name).Call())
+		return Call(False(), Add(a.elementCore()).Dot("path"), Lit(""))
 	}
 }
 
@@ -143,9 +143,9 @@ func (a adderWriter) setAnyContainer() *Statement {
 func (a adderWriter) createRefCallParams() *Statement {
 	switch {
 	case a.f.HasAnyValue:
-		return Call(Add(a.elementCore()).Dot("path"), Id("anyContainer").Dot("ID"), Add(a.elementCore()).Dot("ID"))
+		return Call(a.elementCore().Dot("path"), Id(FieldPathIdentifier(a.f)), Id("anyContainer").Dot("ID"), a.elementCore().Dot("ID"), Id("ElementKind"+Title(a.v.Name)), Int().Call(Id(a.idParam())))
 	default:
-		return Call(Id(a.idParam()), Add(a.elementCore()).Dot("ID"))
+		return Call(a.elementCore().Dot("path"), Id(FieldPathIdentifier(a.f)), Id(a.idParam()), Add(a.elementCore()).Dot("ID"))
 	}
 }
 
@@ -156,7 +156,7 @@ func (a adderWriter) createRef() *Statement {
 func (a adderWriter) toAppend() *Statement {
 	switch {
 	case a.f.ValueType().IsBasicType:
-		return Id(a.f.Name + "...")
+		return Id(Singular(a.f.Name))
 
 	case a.f.HasPointerValue:
 		return Id("ref").Dot("ID")

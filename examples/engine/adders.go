@@ -66,14 +66,12 @@ func (_zone Zone) AddInteractableItem() Item {
 	return item
 }
 
-func (_zone Zone) AddTags(tags ...string) {
+func (_zone Zone) AddTag(tag string) {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return
 	}
-	for _, tag := range tags {
-		zone.zone.Tags = append(zone.zone.Tags, tag)
-	}
+	zone.zone.Tags = append(zone.zone.Tags, tag)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 }

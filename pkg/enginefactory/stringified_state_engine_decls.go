@@ -68,14 +68,12 @@ const _AddInteractableItem_Zone_func string = `func (_zone Zone) AddInteractable
 	return item
 }`
 
-const _AddTags_Zone_func string = `func (_zone Zone) AddTags(tags ...string) {
+const _AddTag_Zone_func string = `func (_zone Zone) AddTag(tag string) {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	if zone.zone.OperationKind == OperationKindDelete {
 		return
 	}
-	for _, tag := range tags {
-		zone.zone.Tags = append(zone.zone.Tags, tag)
-	}
+	zone.zone.Tags = append(zone.zone.Tags, tag)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 }`

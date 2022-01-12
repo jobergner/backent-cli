@@ -2,6 +2,7 @@ package factoryutils
 
 import (
 	"bytes"
+	"fmt"
 	"go/format"
 	"go/parser"
 	"go/token"
@@ -117,6 +118,10 @@ func ForEachFieldValueComparison(field ast.Field, comparator jen.Statement, fn f
 		first = false
 	})
 	return &statements
+}
+
+func FieldPathIdentifier(f ast.Field) string {
+	return fmt.Sprintf("%s_%sIdentifier", Lower(f.Parent.Name), f.Name)
 }
 
 func Title(name string) string {

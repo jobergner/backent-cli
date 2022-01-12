@@ -25,7 +25,7 @@ func TestWriteAdders(t *testing.T) {
 			_AddInteractableZoneItem_Zone_func,
 			_AddItem_Zone_func,
 			_AddPlayer_Zone_func,
-			_AddTags_Zone_func,
+			_AddTag_Zone_func,
 		}, "\n"))
 
 		if expected != actual {
