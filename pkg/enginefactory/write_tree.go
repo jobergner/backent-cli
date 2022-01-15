@@ -45,8 +45,8 @@ func (s *EngineFactory) writeTree() *EngineFactory {
 		}),
 	)
 
-	decls.File.Func().Id("newTree").Params().Id("Tree").Block(
-		Return(Id("Tree").Values(
+	decls.File.Func().Id("newTree").Params().Id("*Tree").Block(
+		Return(Id("&Tree").Values(
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 				s := treeWriter{configType}
 				return Id(s.fieldName()).Id(":").Make(Map(s.mapKey()).Id(s.mapValue())).Id(",")
@@ -74,28 +74,6 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 				return Id(e.fieldName()).Add(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
 			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
-		)
-
-		decls.File.Type().Id(e.name()+"Reference").Struct(
-			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
-			Id("ElementID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
-			Id("ElementKind").Id("ElementKind").Id(e.metaFieldTag("elementKind")).Line(),
-			Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(e.metaFieldTag("referencedDataStatus")).Line(),
-			Id("ElementPath").Id("string").Id(e.metaFieldTag("elementPath")).Line(),
-		)
-
-	})
-
-	s.config.RangeAnyFields(func(field ast.Field) {
-		if !field.HasPointerValue {
-			return
-		}
-		decls.File.Type().Id(anyNameByField(field)+"Reference").Struct(
-			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
-			Id("ElementID").Int().Id(fieldTag("id")).Line(),
-			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
-			Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(fieldTag("referencedDataStatus")).Line(),
-			Id("ElementPath").Id("string").Id(fieldTag("elementPath")).Line(),
 		)
 	})
 
