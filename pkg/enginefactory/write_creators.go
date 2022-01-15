@@ -28,6 +28,8 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.declareElement(),
 			c.assignEngine(),
 			c.generateID(),
+			c.assignExtendedPath(),
+			c.assignJsonPath(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				c.f = &field
 				if field.HasSliceValue || field.ValueType().IsBasicType || field.HasPointerValue {
@@ -40,11 +42,6 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			}),
 			c.setOperationKind(),
 			c.setHasParent(),
-			c.setPath(),
-			If(Id("extendWithID")).Block(
-				c.extendPathWithID(),
-			),
-			c.setJSONPath(),
 			c.updateElementInPatch(),
 			Return(c.returnElement()),
 		)
@@ -62,6 +59,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.setReferencedElementID(),
 			c.setParentID(),
 			c.setID(),
+			c.assignPath(),
 			c.setOperationKind(),
 			c.assignElementToPatch(),
 			Return(Id("element")),
@@ -74,7 +72,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			typeName: anyNameByField(field),
 		}
 
-		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("childElementPath").Id("path")).Id(Title(anyNameByField(field))).Block(
+		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(anyNameByField(field))).Block(
 			c.declareElement(),
 			c.assignEngine(),
 			c.setID(),
@@ -85,6 +83,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			),
 			c.setOperationKind(),
 			c.setChildElementPath(),
+			c.setFieldIdentifier(),
 			c.assignElementToPatch(),
 			Return(c.returnElement()),
 		)
