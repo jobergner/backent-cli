@@ -7,6 +7,7 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
+	"sort"
 	"strings"
 	"unicode"
 
@@ -14,6 +15,12 @@ import (
 	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 )
+
+func caseInsensitiveSort(keys []string) func(i, j int) bool {
+	return func(i, j int) bool {
+		return strings.ToLower(keys[i]) < strings.ToLower(keys[j])
+	}
+}
 
 func Diff(actual, expected string) string {
 	a := parseDecls(actual)
@@ -40,9 +47,16 @@ func Diff(actual, expected string) string {
 		}
 	}
 
-	for name, def := range expectedDelcs {
+	var names []string
+	for name := range expectedDelcs {
+		names = append(names, name)
+	}
+
+	sort.Slice(names, caseInsensitiveSort(names))
+
+	for _, name := range names {
 		got := actualDelcs[name]
-		want := def
+		want := expectedDelcs[name]
 		if got != want {
 			buf.WriteString(diffDecl(got, want))
 		}
