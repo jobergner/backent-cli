@@ -47,6 +47,12 @@ func (t everyTypeGetterWriter) allIDs() *Statement {
 	return Id(t.t.Name + "IDs").Op(":=").Id("engine").Dot("all" + Title(t.t.Name) + "IDs").Call()
 }
 
+func (t everyTypeGetterWriter) sortIDs() *Statement {
+	return Id("sort").Dot("Slice").Params(Id(t.t.Name+"IDs"), Func().Params(Id("i"), Id("j").Int()).Bool().Block(
+		Return(Id(t.t.Name+"IDs").Index(Id("i")).Op("<").Id(t.t.Name+"IDs").Index(Id("j"))),
+	))
+}
+
 func (t everyTypeGetterWriter) sliceName() string {
 	return t.t.Name + "s"
 }

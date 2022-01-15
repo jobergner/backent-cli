@@ -136,6 +136,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 func writeEveryTypeGetter(decls *DeclSet, e everyTypeGetterWriter) {
 	decls.File.Func().Params(e.receiverParams()).Id("Every"+Title(e.t.Name)).Params().Add(e.returns()).Block(
 		e.allIDs(),
+		e.sortIDs(),
 		e.declareSlice(),
 		For(e.loopConditions()).Block(
 			e.declareElement(),
