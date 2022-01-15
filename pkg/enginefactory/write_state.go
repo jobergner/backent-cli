@@ -59,8 +59,8 @@ func (s *EngineFactory) writeState() *EngineFactory {
 		}),
 	)
 
-	decls.File.Func().Id("newState").Params().Id("State").Block(
-		Return(Id("State").Block(
+	decls.File.Func().Id("newState").Params().Id("*State").Block(
+		Return(Id("&State").Block(
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 
 				s := stateWriter{
@@ -133,6 +133,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("ParentID").Id(Title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
 			Id("ReferencedElementID").Id(Title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
+			Id("path").Id("path"),
 			Id("engine").Id("*Engine").Line(),
 		)
 		decls.File.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
@@ -142,7 +143,8 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 		decls.File.Type().Id(anyNameByField(field)+"Core").Struct(
 			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
-			Id("ChildElementPath").Id("path").Id(fieldTag("childElementPath")).Line(),
+			Id("ParentElementPath").Id("path").Id(fieldTag("parentElementPath")).Line(),
+			Id("FieldIdentifier").Id("treeFieldIdentifier").Id(fieldTag("fieldIdentifier")).Line(),
 			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
 				return Id(Title(configType.Name)).Id(Title(configType.Name) + "ID").Id(fieldTag(configType.Name)).Line()
 			}),
