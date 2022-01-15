@@ -129,19 +129,37 @@ func (s setRefFieldWeiter) deleteExistingRef() *Statement {
 }
 
 func (s setRefFieldWeiter) createAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create"+Title(anyNameByField(s.f))).Call(False(), Nil())
+	return Id("anyContainer").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create"+Title(anyNameByField(s.f))).Call(False(), Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("path"), Lit(""))
 }
 
 func (s setRefFieldWeiter) setAnyContainer() *Statement {
 	return Id("anyContainer").Dot(anyNameByField(s.f)).Dot("set"+Title(s.v.Name)).Call(Id(s.idParam()), False())
 }
 
-func (s setRefFieldWeiter) createNewRef() *Statement {
-	referencedElementStatement := Id(s.v.Name + "ID")
-	if s.f.HasAnyValue {
-		referencedElementStatement = Id("anyContainer").Dot(anyNameByField(s.f)).Dot("ID")
+func (s setRefFieldWeiter) referenceID() *Statement {
+	switch {
+	case s.f.HasAnyValue:
+		return Id("anyContainer").Dot(anyNameByField(s.f)).Dot("ID")
+	default:
+		return Id(s.v.Name + "ID")
 	}
-	return Id("ref").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create"+Title(s.f.ValueTypeName)).Call(referencedElementStatement, Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"))
+}
+
+func (s setRefFieldWeiter) createNewRefCall() *Statement {
+	return Call(
+		Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("path"),
+		Id(FieldPathIdentifier(s.f)),
+		(s.referenceID()),
+		Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"),
+		OnlyIf(s.f.HasAnyValue, List(
+			Id("ElementKind"+Title(s.v.Name)),
+			Int().Call(Id(s.idParam())),
+		)),
+	)
+}
+
+func (s setRefFieldWeiter) createNewRef() *Statement {
+	return Id("ref").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create" + Title(s.f.ValueTypeName)).Add(s.createNewRefCall())
 }
 
 func (s setRefFieldWeiter) setNewRef() *Statement {
