@@ -26,20 +26,20 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 	decls := NewDeclSet()
 
 	decls.File.Type().Id("Engine").Struct(
-		Id("State").Id("State"),
-		Id("Patch").Id("State"),
-		Id("Tree").Id("Tree"),
-		Id("assembleCache").Id("assembleCache"),
+		Id("State").Id("*State"),
+		Id("Patch").Id("*State"),
+		Id("Tree").Id("*Tree"),
+		Id("planner").Id("*assemblePlanner"),
 		Id("IDgen").Int(),
 	)
 
 	decls.File.Func().Id("newEngine").Params().Id("*Engine").Block(
 		Return(Id("&Engine").Values(Dict{
-			Id("State"):         Id("newState").Call(),
-			Id("Patch"):         Id("newState").Call(),
-			Id("Tree"):          Id("newTree").Call(),
-			Id("assembleCache"): Id("newAssembleCache").Call(),
-			Id("IDgen"):         Lit(1),
+			Id("State"):   Id("newState").Call(),
+			Id("Patch"):   Id("newState").Call(),
+			Id("Tree"):    Id("newTree").Call(),
+			Id("planner"): Id("newAssemblePlanner").Call(),
+			Id("IDgen"):   Lit(1),
 		})),
 	)
 
