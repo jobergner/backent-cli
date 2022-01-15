@@ -9,10 +9,10 @@ type assemblePlanner struct {
 
 func newAssemblePlanner() *assemblePlanner {
 	return &assemblePlanner{
-		updatedPaths:          make(map[int]path),
-		updatedElementPaths:   make(map[int]path),
-		updatedReferencePaths: make(map[int]path),
 		includedElements:      make(map[int]bool),
+		updatedElementPaths:   make(map[int]path),
+		updatedPaths:          make(map[int]path),
+		updatedReferencePaths: make(map[int]path),
 	}
 }
 
