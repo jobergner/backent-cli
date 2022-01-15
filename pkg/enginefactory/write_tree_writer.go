@@ -34,14 +34,8 @@ type treeElementWriter struct {
 
 func (e treeElementWriter) fieldValueMapDefinition() *Statement {
 	mapValueType := Id(e.f.ValueType().Name + "Reference")
-	if e.f.HasAnyValue && !e.f.HasPointerValue {
-		mapValueType = Id("interface{}")
-	}
-	if e.f.HasPointerValue && e.f.HasAnyValue {
-		mapValueType = Id(anyNameByField(*e.f) + "Reference")
-	}
-	if !e.f.HasPointerValue && !e.f.HasAnyValue {
-		mapValueType = Id(e.f.ValueType().Name)
+	if e.f.HasPointerValue {
+		mapValueType = Id("elementReference")
 	}
 	mapKeyType := Id(Title(e.f.ValueType().Name) + "ID")
 	if e.f.HasAnyValue {
@@ -51,38 +45,39 @@ func (e treeElementWriter) fieldValueMapDefinition() *Statement {
 }
 
 func (e treeElementWriter) fieldValue() *Statement {
-	var typeName string
-
-	if e.f.HasAnyValue && !e.f.HasPointerValue {
-		if !e.f.HasSliceValue {
-			return Id("interface{}")
-		}
-		return e.fieldValueMapDefinition()
-	}
 
 	if e.f.ValueType().IsBasicType {
-		typeName = e.f.ValueTypeName
-	} else if e.f.HasPointerValue {
-		if e.f.HasAnyValue {
-			typeName = anyNameByField(*e.f)
-		} else {
-			typeName = e.f.ValueType().Name
+		switch {
+		case e.f.HasSliceValue:
+			return Index().Id(e.f.ValueTypeName)
+		default:
+			return Id(e.f.ValueTypeName)
 		}
-		typeName = typeName + "Reference"
-	} else {
-		typeName = e.f.ValueTypeName
 	}
 
-	if e.f.HasSliceValue {
-		if e.f.ValueType().IsBasicType {
-			return Id("[]" + typeName)
+	if e.f.HasAnyValue {
+		switch {
+		case e.f.HasPointerValue && !e.f.HasSliceValue:
+			return Id("*elementReference")
+		case !e.f.HasPointerValue && e.f.HasSliceValue:
+			return Map(Int()).Interface()
+		case !e.f.HasPointerValue && !e.f.HasSliceValue:
+			return Interface()
+		default: // e.f.HasPointerValue && e.f.HasSliceValue:
+			return Map(Int()).Id("elementReference")
 		}
-		return e.fieldValueMapDefinition()
-	} else if !e.f.ValueType().IsBasicType {
-		return Id("*" + typeName)
 	}
 
-	return Id(typeName)
+	switch {
+	case e.f.HasPointerValue && e.f.HasSliceValue:
+		return Map(Id(Title(e.f.ValueType().Name) + "ID")).Id("elementReference")
+	case e.f.HasPointerValue && !e.f.HasSliceValue:
+		return Id("*elementReference")
+	case !e.f.HasPointerValue && e.f.HasSliceValue:
+		return Map(Id(Title(e.f.ValueType().Name) + "ID")).Id(e.f.ValueType().Name)
+	default: // !e.f.HasPointerValue && !e.f.HasSliceValue:
+		return Id("*" + e.f.ValueType().Name)
+	}
 }
 
 func (e treeElementWriter) fieldTag() string {
