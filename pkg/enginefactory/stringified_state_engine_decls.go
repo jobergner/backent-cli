@@ -777,7 +777,7 @@ const assemblePlanner_type string = `type assemblePlanner struct {
 }`
 
 const newAssemblePlanner_func string = `func newAssemblePlanner() *assemblePlanner {
-	return &assemblePlanner{updatedPaths: make(map[int]path), updatedElementPaths: make(map[int]path), updatedReferencePaths: make(map[int]path), includedElements: make(map[int]bool)}
+	return &assemblePlanner{includedElements: make(map[int]bool), updatedElementPaths: make(map[int]path), updatedPaths: make(map[int]path), updatedReferencePaths: make(map[int]path)}
 }`
 
 const clear_assemblePlanner_func string = `func (a *assemblePlanner) clear() {
