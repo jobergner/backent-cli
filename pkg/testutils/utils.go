@@ -59,6 +59,8 @@ func Diff(actual, expected string) string {
 		want := expectedDelcs[name]
 		if got != want {
 			buf.WriteString(diffDecl(got, want))
+		} else {
+			buf.WriteString("\n____\n\n CORRECT:\n" + want)
 		}
 	}
 
