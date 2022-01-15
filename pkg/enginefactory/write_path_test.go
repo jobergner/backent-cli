@@ -14,6 +14,7 @@ func TestWritePath(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
+			treeFieldIdentifier_type,
 			equipmentSetIdentifier_type,
 		}, "\n"))
 
@@ -31,6 +32,7 @@ func TestWritePath(t *testing.T) {
 			newPath_func,
 			toJSONPath_path_func,
 			pathIdentifierToString_func,
+			isSliceFieldIdentifier_func,
 		}, "\n"))
 
 		if expected != actual {

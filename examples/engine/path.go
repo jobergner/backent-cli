@@ -15,9 +15,9 @@ const (
 
 	equipmentSet_equipmentIdentifier = "equipmentSet_equipment"
 
+	item_boundToIdentifier   = "item_boundTo"
 	item_gearScoreIdentifier = "item_gearScore"
 	item_originIdentifier    = "item_origin"
-	item_boundToIdentifier   = "item_boundTo"
 
 	player_equipmentSetsIdentifier = "player_equipmentSets"
 	player_gearScoreIdentifier     = "player_gearScore"
@@ -27,8 +27,8 @@ const (
 	player_targetIdentifier        = "player_target"
 	player_targetedByIdentifier    = "player_targetedBy"
 
-	zone_itemsIdentifier         = "zone_items"
 	zone_interactablesIdentifier = "zone_interactables"
+	zone_itemsIdentifier         = "zone_items"
 	zone_playersIdentifier       = "zone_players"
 
 	zoneItem_itemIdentifier     = "zoneItem_item"
@@ -86,12 +86,12 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 		return "zoneItem"
 	case equipmentSet_equipmentIdentifier:
 		return "equipment"
+	case item_boundToIdentifier:
+		return "boundTo"
 	case item_gearScoreIdentifier:
 		return "gearScore"
 	case item_originIdentifier:
 		return "origin"
-	case item_boundToIdentifier:
-		return "boundTo"
 	case player_equipmentSetsIdentifier:
 		return "equipmentSets"
 	case player_gearScoreIdentifier:
@@ -106,10 +106,10 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 		return "target"
 	case player_targetedByIdentifier:
 		return "targetedBy"
-	case zone_itemsIdentifier:
-		return "items"
 	case zone_interactablesIdentifier:
 		return "interactables"
+	case zone_itemsIdentifier:
+		return "items"
 	case zone_playersIdentifier:
 		return "players"
 	case zoneItem_itemIdentifier:
@@ -146,9 +146,9 @@ func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
 		return true
 	case player_targetedByIdentifier:
 		return true
-	case zone_itemsIdentifier:
-		return true
 	case zone_interactablesIdentifier:
+		return true
+	case zone_itemsIdentifier:
 		return true
 	case zone_playersIdentifier:
 		return true
