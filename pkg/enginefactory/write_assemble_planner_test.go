@@ -48,17 +48,17 @@ func TestWriteAssemblePlanner(t *testing.T) {
 			t.Errorf(testutils.Diff(actual, expected))
 		}
 	})
-	// t.Run("writes assemble planner fill", func(t *testing.T) {
-	// 	sf := newStateFactory(newSimpleASTExample())
-	// 	sf.writeAssemblePlannerFill()
+	t.Run("writes assemble planner fill", func(t *testing.T) {
+		sf := newStateFactory(newSimpleASTExample())
+		sf.writeAssemblePlannerFill()
 
-	// 	actual := testutils.FormatCode(sf.buf.String())
-	// 	expected := testutils.FormatCode(strings.Join([]string{
-	// 		fill_assemblePlanner_func,
-	// 	}, "\n"))
+		actual := testutils.FormatCode(sf.buf.String())
+		expected := testutils.FormatCode(strings.Join([]string{
+			fill_assemblePlanner_func,
+		}, "\n"))
 
-	// 	if expected != actual {
-	// 		t.Errorf(testutils.Diff(actual, expected))
-	// 	}
-	// })
+		if expected != actual {
+			t.Errorf(testutils.Diff(actual, expected))
+		}
+	})
 }
