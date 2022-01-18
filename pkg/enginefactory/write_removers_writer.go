@@ -17,6 +17,10 @@ func (r remover) receiverParams() *Statement {
 	return Id(r.receiverName()).Id(Title(r.t.Name))
 }
 
+func (r remover) receiverName() string {
+	return "_" + r.t.Name
+}
+
 func (r remover) name() string {
 	var optionalSuffix string
 	if r.f.HasAnyValue {
@@ -26,22 +30,33 @@ func (r remover) name() string {
 }
 
 func (r remover) toRemoveParamName() string {
-	if r.f.HasAnyValue {
-		return r.v.Name + "sToRemove"
+	switch {
+	case r.f.HasAnyValue:
+		return r.v.Name + "ToRemove"
+	default:
+		return Singular(r.f.Name) + "ToRemove"
 	}
-	return r.f.Name + "ToRemove"
 }
 
 func (r remover) params() *Statement {
-	toRemoveParam := Id(r.toRemoveParamName())
-	if r.v.IsBasicType {
-		return toRemoveParam.Id("..." + r.v.Name)
+	switch {
+	case r.v.IsBasicType:
+		return Id(r.toRemoveParamName()).Id(r.v.Name)
+	default:
+		return Id(r.toRemoveParamName()).Id(Title(r.v.Name) + "ID")
 	}
-	return toRemoveParam.Id("..." + Title(r.v.Name) + "ID")
 }
 
 func (r remover) returns() string {
 	return Title(r.t.Name)
+}
+
+func (r remover) elementCore() *Statement {
+	return Id(r.t.Name).Dot(r.t.Name)
+}
+
+func (r remover) engine() *Statement {
+	return Id(r.t.Name).Dot(r.t.Name).Dot("engine")
 }
 
 func (r remover) reassignElement() *Statement {
@@ -52,107 +67,129 @@ func (r remover) isOperationKindDelete() *Statement {
 	return Id(r.t.Name).Dot(r.t.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
-func (r remover) declareWereElementsAltered() *Statement {
-	return Var().Id("wereElementsAltered").Bool()
+func (r remover) field() *Statement {
+	return r.elementCore().Dot(Title(r.f.Name))
 }
 
-func (r remover) declareNewElements() *Statement {
-	newElementsType := "[]"
-	if r.v.IsBasicType {
-		newElementsType = newElementsType + r.f.ValueTypeName
-	} else {
-		newElementsType = newElementsType + Title(r.f.ValueTypeName) + "ID"
+func (r remover) eachWrapperRangee() *Statement {
+	switch {
+	case !r.f.HasPointerValue || !r.f.HasAnyValue:
+		return r.field()
+	default:
+		return Id("refs")
 	}
-	return Var().Id("newElements").Id(newElementsType)
 }
 
-func (r remover) existingElementsLoopConditions() *Statement {
-	assignedVariableId := "element"
-	if r.f.HasPointerValue {
-		assignedVariableId = "refElement"
-	} else if r.f.HasAnyValue {
-		assignedVariableId = "anyContainerID"
+func (r remover) getWrapper() *Statement {
+	switch {
+	case r.f.HasAnyValue:
+		return r.engine().Dot(anyNameByField(r.f)).Call(Id("wrapperID"))
+	default:
+		return r.engine().Dot(r.f.ValueTypeName).Call(Id("wrapperID"))
 	}
-	return List(Id("_"), Id(assignedVariableId)).Op(":=").Range().Id(r.t.Name).Dot(r.t.Name).Dot(Title(r.f.Name))
 }
 
-func (r remover) declareToBeRemovedBool() *Statement {
-	return Var().Id("toBeRemoved").Bool()
+func (r remover) eachWrapperIndexLit() *Statement {
+	switch {
+	case !r.f.HasPointerValue || !r.f.HasAnyValue:
+		return Id("_")
+	default:
+		return Id("refID")
+	}
 }
 
-func (r remover) elementsToDeteleLoopConditions() *Statement {
-	return List(Id("_"), Id("elementToRemove")).Op(":=").Range().Id(r.toRemoveParamName())
+func (r remover) eachWrapper() *Statement {
+	return List(r.eachWrapperIndexLit(), Id("wrapperID")).Op(":=").Range().Add(r.eachWrapperRangee())
 }
 
-func (r remover) isElementMatching() *Statement {
-	return Id("element").Op("==").Id("elementToRemove")
+func (r remover) usedWrapperID() *Statement {
+	switch {
+	case r.f.HasPointerValue && r.f.HasAnyValue:
+		return Id("refID")
+	default:
+		return Id("wrapperID")
+	}
 }
 
-func (r remover) setToBeRemovedTrue() *Statement {
-	return Id("toBeRemoved").Op("=").True()
+func (r remover) getElementID() *Statement {
+	switch {
+	case r.f.HasAnyValue:
+		return Id("wrapper").Dot(Title(r.v.Name)).Call().Dot("ID").Call()
+	default:
+		return Id("wrapper").Dot(r.f.ValueTypeName).Dot("ReferencedElementID")
+	}
 }
 
-func (r remover) setWereElementAlteredTrue() *Statement {
-	return Id("wereElementsAltered").Op("=").True()
+func (r remover) toRemoveComparator() *Statement {
+	switch {
+	case r.v.IsBasicType:
+		return Id("val")
+	default:
+		return Id(r.v.Name + "ID")
+	}
+}
+
+func (r remover) eachElementLiteral() *Statement {
+	switch {
+	case r.v.IsBasicType:
+		return Id("val")
+	case !r.f.HasAnyValue && !r.f.HasPointerValue:
+		return Id(r.v.Name + "ID")
+	default:
+		return Id("wrapperID")
+	}
+}
+
+func (r remover) eachElement() *Statement {
+	return List(Id("i"), r.eachElementLiteral()).Op(":=").Range().Add(r.field())
+}
+
+func (r remover) defaultValueForBasicType(typeLiteral string) interface{} {
+	switch typeLiteral {
+	case "bool":
+		return bool(false)
+	case "string":
+		return string("")
+	case "int8":
+		return int8(0)
+	case "byte":
+		return byte(0)
+	case "int16":
+		return int16(0)
+	case "uint16":
+		return uint16(0)
+	case "rune":
+		return rune(0)
+	case "uint32":
+		return uint32(0)
+	case "int64":
+		return int64(0)
+	case "uint64":
+		return uint64(0)
+	case "int":
+		return int(0)
+	case "uint":
+		return uint(0)
+	case "uintptr":
+		return uintptr(0)
+	case "float32":
+		return float32(0)
+	case "float64":
+		return float64(0)
+	case "complex64":
+		return complex64(0)
+	case "complex128":
+		return complex128(0)
+	}
+
+	return 0
 }
 
 func (r remover) deleteElement() *Statement {
-	assignedVariableId := "element"
-	if r.f.HasPointerValue {
-		assignedVariableId = "refElement"
+	switch {
+	case r.f.HasAnyValue && !r.f.HasPointerValue:
+		return r.engine().Dot("delete"+Title(r.f.ValueTypeName)).Call(r.eachElementLiteral(), True())
+	default:
+		return r.engine().Dot("delete" + Title(r.f.ValueTypeName)).Call(r.eachElementLiteral())
 	}
-	deleteCall := "delete" + Title(r.f.ValueTypeName)
-	if r.f.HasAnyValue && !r.f.HasPointerValue {
-		deleteCall = "delete" + Title(r.v.Name)
-	}
-	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(deleteCall).Call(Id(assignedVariableId))
-}
-
-func (r remover) isElementRemoved() *Statement {
-	return Add(Id("!")).Id("toBeRemoved")
-}
-
-func (r remover) appendRemainingElement() *Statement {
-	assignedVariableId := Id("element")
-	if r.f.HasPointerValue {
-		assignedVariableId = Id("refElement")
-	} else if r.f.HasAnyValue {
-		assignedVariableId = Id("anyContainer").Dot(r.f.ValueTypeName).Dot("ID")
-	}
-	return Id("newElements").Op("=").Append(Id("newElements"), assignedVariableId)
-}
-
-func (r remover) isWereElementsAltered() *Statement {
-	return Add(Id("!")).Id("wereElementsAltered")
-}
-
-func (r remover) setNewElements() *Statement {
-	return Id(r.t.Name).Dot(r.t.Name).Dot(Title(r.f.Name)).Op("=").Id("newElements")
-}
-
-func (r remover) setOperationKind() *Statement {
-	return Id(r.t.Name).Dot(r.t.Name).Dot("OperationKind").Op("=").Id("OperationKindUpdate")
-}
-
-func (r remover) updateElementInPatch() *Statement {
-	return Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot("Patch").Dot(Title(r.t.Name)).Index(Id(r.t.Name).Dot(r.t.Name).Dot("ID")).Op("=").Id(r.t.Name).Dot(r.t.Name)
-}
-
-func (r remover) receiverName() string {
-	return "_" + r.t.Name
-}
-
-func (r remover) declareElementFromRef() *Statement {
-	if r.f.HasAnyValue {
-		return Id("element").Op(":=").Id("anyContainer").Dot(Title(r.v.Name)).Call().Dot("ID").Call()
-	}
-	return Id("element").Op(":=").Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(r.f.ValueTypeName).Call(Id("refElement")).Dot(r.f.ValueTypeName).Dot("ReferencedElementID")
-}
-
-func (r remover) declareAnyContainer() *Statement {
-	statement := Id("anyContainer").Op(":=").Id(r.t.Name).Dot(r.t.Name).Dot("engine").Dot(r.f.ValueTypeName)
-	if r.f.HasAnyValue && !r.f.HasPointerValue {
-		return statement.Call(Id("anyContainerID"))
-	}
-	return statement.Call(Id("refElement")).Dot("Get").Call()
 }

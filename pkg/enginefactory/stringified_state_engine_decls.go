@@ -3197,14 +3197,14 @@ const _RemoveInteractablesItem_Zone_func string = `func (_zone Zone) RemoveInter
 		wrappers[wrapperID] = wrapper.Item().ID()
 	}
 	for i, wrapperID := range zone.zone.Interactables {
-		zoneItemID := wrappers[wrapperID]
-		if zoneItemID != itemToRemove {
+		itemID := wrappers[wrapperID]
+		if itemID != itemToRemove {
 			continue
 		}
 		zone.zone.Interactables[i] = zone.zone.Interactables[len(zone.zone.Interactables)-1]
 		zone.zone.Interactables[len(zone.zone.Interactables)-1] = 0
 		zone.zone.Interactables = zone.zone.Interactables[:len(zone.zone.Interactables)-1]
-		zone.zone.engine.deleteItem(zoneItemID)
+		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(wrapperID, true)
 		zone.zone.OperationKind = OperationKindUpdate
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 		break
@@ -3233,7 +3233,7 @@ const _RemoveInteractablesPlayer_Zone_func string = `func (_zone Zone) RemoveInt
 		zone.zone.Interactables[i] = zone.zone.Interactables[len(zone.zone.Interactables)-1]
 		zone.zone.Interactables[len(zone.zone.Interactables)-1] = 0
 		zone.zone.Interactables = zone.zone.Interactables[:len(zone.zone.Interactables)-1]
-		zone.zone.engine.deletePlayer(playerID)
+		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(wrapperID, true)
 		zone.zone.OperationKind = OperationKindUpdate
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 		break
@@ -3262,7 +3262,7 @@ const _RemoveInteractablesZoneItem_Zone_func string = `func (_zone Zone) RemoveI
 		zone.zone.Interactables[i] = zone.zone.Interactables[len(zone.zone.Interactables)-1]
 		zone.zone.Interactables[len(zone.zone.Interactables)-1] = 0
 		zone.zone.Interactables = zone.zone.Interactables[:len(zone.zone.Interactables)-1]
-		zone.zone.engine.deleteZoneItem(zoneItemID)
+		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(wrapperID, true)
 		zone.zone.OperationKind = OperationKindUpdate
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 		break
