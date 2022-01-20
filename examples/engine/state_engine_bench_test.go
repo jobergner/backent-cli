@@ -91,7 +91,7 @@ func setUpRealisticZoneForBenchmarkExample(engine *Engine) {
 
 	// add tags to zone
 	for i := 0; i < benchTestNumberOfZoneTags; i++ {
-		zone.AddTags("foo")
+		zone.AddTag("foo")
 	}
 
 	// create equipmentSets
