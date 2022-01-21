@@ -34,9 +34,9 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeAdders().
 		writeAny().
 		writeAnyRefs().
+		writeAssemblePlanner().
+		writeAssembleBranch().
 		writeAssembleTree().
-		writeAssembleTreeElement().
-		writeAssembleTreeReference().
 		writeCreators().
 		writeDeleters().
 		writeGetters().
