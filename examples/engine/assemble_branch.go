@@ -299,7 +299,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 			treeRef := elementReference{
 				OperationKind:        ref.OperationKind,
 				ElementID:            nextSeg.id,
-				ElementKind:          ElementKindPlayer,
+				ElementKind:          ElementKindZoneItem,
 				ReferencedDataStatus: referencedDataStatus,
 				ElementPath:          referencedElement.Path,
 			}

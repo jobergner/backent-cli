@@ -696,7 +696,7 @@ const assemblePlayerPath_Engine_func string = `func (engine *Engine) assemblePla
 			element.TargetedBy[nextSeg.id] = treeRef
 		case ElementKindZoneItem:
 			referencedElement := engine.ZoneItem(ZoneItemID(nextSeg.id)).zoneItem
-			treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: nextSeg.id, ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.Path}
+			treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: nextSeg.id, ElementKind: ElementKindZoneItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.Path}
 			element.TargetedBy[nextSeg.id] = treeRef
 		}
 	}

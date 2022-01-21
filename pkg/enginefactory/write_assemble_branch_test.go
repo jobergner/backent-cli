@@ -8,13 +8,12 @@ import (
 )
 
 func TestWriteAssembleBranch(t *testing.T) {
-	t.Run("writes adders", func(t *testing.T) {
+	t.Run("writes assemblers", func(t *testing.T) {
 		sf := newStateFactory(newSimpleASTExample())
 		sf.writeAssembleBranch()
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
-			assembleGearScorePath_Engine_func,
 			assembleEquipmentSetPath_Engine_func,
 			assembleGearScorePath_Engine_func,
 			assembleItemPath_Engine_func,
