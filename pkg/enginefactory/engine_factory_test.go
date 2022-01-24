@@ -1,6 +1,10 @@
 package enginefactory
 
 import (
+	"bytes"
+	"io/ioutil"
+	"testing"
+
 	"github.com/jobergner/backent-cli/examples/configs"
 	"github.com/jobergner/backent-cli/pkg/ast"
 	// "github.com/jobergner/backent-cli/pkg/testutils"
@@ -8,20 +12,20 @@ import (
 	// "testing"
 )
 
-// DISABLED DUE TO NOT BEING VERY USEFUL ATM!!
-// func TestStateFactory(t *testing.T) {
-// 	t.Run("doesnt crash", func(t *testing.T) {
-// 		expected, err := ioutil.ReadFile("testdata/golden.go")
-// 		if err != nil {
-// 			t.Fatalf("Error loading golden file: %s", err)
-// 		}
-// 		actual := WriteEngineFrom(examples.StateConfig)
+func TestEngineFactory(t *testing.T) {
+	t.Run("builds successfully", func(t *testing.T) {
 
-// 		if string(expected) != string(actual) {
-// 			t.Errorf(testutils.Diff(string(actual), string(expected)))
-// 		}
-// 	})
-// }
+		buf := new(bytes.Buffer)
+		buf.WriteString("package foo\n")
+		WriteEngine(buf, configs.StateConfig)
+
+		err := ioutil.WriteFile("tmp/out.go", buf.Bytes(), 0644)
+		if err != nil {
+			panic(err)
+		}
+
+	})
+}
 
 func newSimpleASTExample() *ast.AST {
 	simpleAST := ast.Parse(configs.StateConfig, map[interface{}]interface{}{}, map[interface{}]interface{}{})

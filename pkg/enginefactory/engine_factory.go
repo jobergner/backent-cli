@@ -35,6 +35,9 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeAny().
 		writeAnyRefs().
 		writeAssemblePlanner().
+		writeAssemblePlannerClear().
+		writeAssemblePlannerPlan().
+		writeAssemblePlannerFill().
 		writeAssembleBranch().
 		writeAssembleTree().
 		writeCreators().
@@ -43,7 +46,6 @@ func WriteEngine(buf *bytes.Buffer, stateConfigData map[interface{}]interface{})
 		writeDeduplicate().
 		writeAllIDsMethod().
 		writeIdentifiers().
-		writePathSegments().
 		writePath().
 		writeReference().
 		writeDereference().

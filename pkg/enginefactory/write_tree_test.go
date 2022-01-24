@@ -49,6 +49,7 @@ func TestWriteTree(t *testing.T) {
 			position_type,
 			zone_type,
 			zoneItem_type,
+			elementReference_type,
 		}, "\n"))
 
 		if expected != actual {
@@ -63,6 +64,7 @@ func TestWriteTree(t *testing.T) {
 		expected := testutils.FormatCode(strings.Join([]string{
 			_Tree_type,
 			newTree_func,
+			clear_Tree_func,
 		}, "\n"))
 
 		if expected != actual {

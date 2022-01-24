@@ -54,6 +54,14 @@ func (s *EngineFactory) writeTree() *EngineFactory {
 		)),
 	)
 
+	decls.File.Func().Params(Id("t").Id("*" + "Tree")).Id("clear").Params().Block(
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			return For(Id("key").Op(":=").Range().Id("t").Dot(Title(configType.Name))).Block(
+				Delete(Id("t").Dot(Title(configType.Name)), Id("key")),
+			)
+		}),
+	)
+
 	decls.Render(s.buf)
 	return s
 }
@@ -76,6 +84,15 @@ func (s *EngineFactory) writeTreeElements() *EngineFactory {
 			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
 		)
 	})
+
+	e := treeElementWriter{}
+	decls.File.Type().Id("elementReference").Struct(
+		Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
+		Id("ElementID").Int().Id(e.metaFieldTag("id")).Line(),
+		Id("ElementKind").Id("ElementKind").Id(e.metaFieldTag("elementKind")).Line(),
+		Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(e.metaFieldTag("referencedDataStatus")).Line(),
+		Id("ElementPath").String().Id(e.metaFieldTag("elementPath")).Line(),
+	)
 
 	decls.Render(s.buf)
 	return s

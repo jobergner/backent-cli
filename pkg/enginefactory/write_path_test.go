@@ -28,8 +28,10 @@ func TestWritePath(t *testing.T) {
 
 		actual := testutils.FormatCode(sf.buf.String())
 		expected := testutils.FormatCode(strings.Join([]string{
+			segment_type,
 			path_type,
 			newPath_func,
+			extendAndCopy_path_func,
 			toJSONPath_path_func,
 			pathIdentifierToString_func,
 			isSliceFieldIdentifier_func,
