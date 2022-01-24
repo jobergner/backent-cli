@@ -39,41 +39,27 @@ func writePathSegmentMethod(decls DeclSet, name string) {
 	)
 }
 
-func (s *EngineFactory) writePathSegments() *EngineFactory {
-	decls := NewDeclSet()
-
-	alreadyWrittenCheck := make(map[string]bool)
-	s.config.RangeTypes(func(configType ast.ConfigType) {
-
-		if !alreadyWrittenCheck[configType.Name] {
-			writePathSegmentMethod(decls, configType.Name)
-			alreadyWrittenCheck[configType.Name] = true
-		}
-
-		configType.RangeFields(func(field ast.Field) {
-			if alreadyWrittenCheck[field.Name] {
-				return
-			}
-			if field.ValueType().IsBasicType || field.HasPointerValue {
-				return
-			}
-			alreadyWrittenCheck[field.Name] = true
-			writePathSegmentMethod(decls, field.Name)
-		})
-
-	})
-
-	decls.Render(s.buf)
-	return s
-}
-
 func (s *EngineFactory) writePath() *EngineFactory {
 	decls := NewDeclSet()
+
+	decls.File.Type().Id("segment").Struct(
+		Id("id").Int(),
+		Id("identifier").Id("treeFieldIdentifier"),
+		Id("kind").Id("ElementKind"),
+		Id("refID").Int(),
+	)
 
 	decls.File.Type().Id("path").Index().Id("segment")
 
 	decls.File.Func().Id("newPath").Params().Id("path").Block(
 		Return(Make(Id("path"), Lit(0))),
+	)
+
+	decls.File.Func().Params(Id("p").Id("path")).Id("extendAndCopy").Params(Id("fieldIdentifier").Id("treeFieldIdentifier"), Id("id").Int(), Id("kind").Id("ElementKind"), Id("refID").Int()).Id("path").Block(
+		Id("newPath").Op(":=").Make(Id("path"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
+		Copy(Id("newPath"), Id("p")),
+		Id("newPath").Op("=").Append(Id("newPath"), Id("segment").Values(Id("id"), Id("fieldIdentifier"), Id("kind"), Id("refID"))),
+		Return(Id("newPath")),
 	)
 
 	decls.File.Func().Params(Id("p").Id("path")).Id("toJSONPath").Params().String().Block(
