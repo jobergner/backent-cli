@@ -8,14 +8,13 @@ import (
 )
 
 func (s *EngineFactory) writeCreators() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		cw := creatorWrapperWriter{
 			t: configType,
 		}
 
-		decls.File.Func().Params(cw.receiverParams()).Id(cw.name()).Params().Id(cw.returns()).Block(
+		s.file.Func().Params(cw.receiverParams()).Id(cw.name()).Params().Id(cw.returns()).Block(
 			Return(cw.createElement()),
 		)
 
@@ -24,7 +23,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			f: nil,
 		}
 
-		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
+		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
 			c.declareElement(),
 			c.assignEngine(),
 			c.generateID(),
@@ -53,7 +52,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			typeName: field.ValueTypeName,
 		}
 
-		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
+		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
 			c.declareElement(),
 			c.assignEngine(),
 			c.setReferencedElementID(),
@@ -72,7 +71,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			typeName: anyNameByField(field),
 		}
 
-		decls.File.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(anyNameByField(field))).Block(
+		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(anyNameByField(field))).Block(
 			c.declareElement(),
 			c.assignEngine(),
 			c.setID(),
@@ -89,6 +88,5 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 		)
 	})
 
-	decls.Render(s.buf)
 	return s
 }

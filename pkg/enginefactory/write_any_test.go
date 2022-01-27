@@ -1,19 +1,24 @@
 package enginefactory
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
+	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/testutils"
 )
 
 func TestWriteAny(t *testing.T) {
 	t.Run("writes any", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAny()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_Kind_AnyOfPlayer_Position_func,
 			_SetPlayer_AnyOfPlayer_Position_func,
 			setPlayer_anyOfPlayer_PositionCore_func,
@@ -41,11 +46,14 @@ func TestWriteAny(t *testing.T) {
 		}
 	})
 	t.Run("writes anyRefs", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAnyRefs()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			anyOfPlayer_PositionRef_type,
 			_Kind_anyOfPlayer_PositionRef_func,
 			_Player_anyOfPlayer_PositionRef_func,

@@ -8,7 +8,6 @@ import (
 )
 
 func (s *EngineFactory) writeAdders() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
 
@@ -17,12 +16,14 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 			}
 
 			field.RangeValueTypes(func(valueType *ast.ConfigType) {
+
 				a := adderWriter{
 					t: configType,
 					f: field,
 					v: valueType,
 				}
-				decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Id(a.returns()).Block(
+
+				s.file.Func().Params(a.receiverParams()).Id(a.name()).Params(a.params()).Id(a.returns()).Block(
 					a.reassignElement(),
 					If(a.isOperationKindDelete()).Block(
 						Return(a.returnDeletedElement()),
@@ -43,10 +44,8 @@ func (s *EngineFactory) writeAdders() *EngineFactory {
 					OnlyIf(!valueType.IsBasicType && !field.HasPointerValue, Return(Id(valueType.Name))),
 				)
 			})
-
 		})
 	})
 
-	decls.Render(s.buf)
 	return s
 }

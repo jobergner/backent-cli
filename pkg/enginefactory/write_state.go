@@ -8,28 +8,25 @@ import (
 )
 
 func (s *EngineFactory) writeIDs() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
-		decls.File.Type().Id(Title(configType.Name) + "ID").Int()
+		s.file.Type().Id(Title(configType.Name) + "ID").Int()
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		decls.File.Type().Id(Title(field.ValueTypeName) + "ID").Int()
+		s.file.Type().Id(Title(field.ValueTypeName) + "ID").Int()
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
 
-		decls.File.Type().Id(Title(anyNameByField(field)) + "ID").Int()
+		s.file.Type().Id(Title(anyNameByField(field)) + "ID").Int()
 	})
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeState() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Type().Id("State").Struct(
+	s.file.Type().Id("State").Struct(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			s := stateWriter{
 				typeName: func() string {
@@ -59,7 +56,7 @@ func (s *EngineFactory) writeState() *EngineFactory {
 		}),
 	)
 
-	decls.File.Func().Id("newState").Params().Id("*State").Block(
+	s.file.Func().Id("newState").Params().Id("*State").Block(
 		Return(Id("&State").Block(
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 
@@ -92,12 +89,10 @@ func (s *EngineFactory) writeState() *EngineFactory {
 		)),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeElements() *EngineFactory {
-	decls := NewDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
@@ -105,7 +100,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			t: configType,
 		}
 
-		decls.File.Type().Id(e.name()).Struct(
+		s.file.Type().Id(e.name()).Struct(
 			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
@@ -118,7 +113,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("engine").Id("*Engine").Line(),
 		)
 
-		decls.File.Type().Id(Title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
+		s.file.Type().Id(Title(configType.Name)).Struct(Id(configType.Name).Id(e.name()))
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
@@ -128,7 +123,7 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			referencedElementName = anyNameByField(field)
 		}
 
-		decls.File.Type().Id(field.ValueTypeName+"Core").Struct(
+		s.file.Type().Id(field.ValueTypeName+"Core").Struct(
 			Id("ID").Id(Title(field.ValueTypeName)+"ID").Id(fieldTag("id")).Line(),
 			Id("ParentID").Id(Title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
 			Id("ReferencedElementID").Id(Title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
@@ -136,11 +131,11 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("path").Id("path"),
 			Id("engine").Id("*Engine").Line(),
 		)
-		decls.File.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
+		s.file.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
-		decls.File.Type().Id(anyNameByField(field)+"Core").Struct(
+		s.file.Type().Id(anyNameByField(field)+"Core").Struct(
 			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
 			Id("ParentElementPath").Id("path").Id(fieldTag("parentElementPath")).Line(),
@@ -151,9 +146,8 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("engine").Id("*Engine").Line(),
 		)
-		decls.File.Type().Id(Title(anyNameByField(field))).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
+		s.file.Type().Id(Title(anyNameByField(field))).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
 	})
 
-	decls.Render(s.buf)
 	return s
 }

@@ -1,19 +1,24 @@
 package enginefactory
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
+	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/testutils"
 )
 
 func TestWriteGetters(t *testing.T) {
 	t.Run("writes getters", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeGetters()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_Exists_EquipmentSet_func,
 			_EveryEquipmentSet_Engine_func,
 			_EquipmentSet_Engine_func,

@@ -8,7 +8,6 @@ import (
 )
 
 func (s *EngineFactory) writeSetters() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
 
@@ -16,22 +15,22 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 				return
 			}
 
-			s := setterWriter{
+			sw := setterWriter{
 				t: configType,
 				f: field,
 			}
 
-			decls.File.Func().Params(s.receiverParams()).Id(s.name()).Params(s.params()).Id(s.returns()).Block(
-				s.reassignElement(),
-				If(s.isOperationKindDelete()).Block(
+			s.file.Func().Params(sw.receiverParams()).Id(sw.name()).Params(sw.params()).Id(sw.returns()).Block(
+				sw.reassignElement(),
+				If(sw.isOperationKindDelete()).Block(
 					Return(Id(configType.Name)),
 				),
-				If(s.valueHasNotChanged()).Block(
+				If(sw.valueHasNotChanged()).Block(
 					Return(Id(configType.Name)),
 				),
-				s.setAttribute(),
-				s.setOperationKind(),
-				s.updateElementInPatch(),
+				sw.setAttribute(),
+				sw.setOperationKind(),
+				sw.updateElementInPatch(),
 				Return(Id(configType.Name)),
 			)
 		})
@@ -42,38 +41,37 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 			return
 		}
 
-		s := setRefFieldWeiter{
+		srfw := setRefFieldWeiter{
 			f: field,
 		}
 
 		field.RangeValueTypes(func(valueType *ast.ConfigType) {
-			s.v = valueType
-			decls.File.Func().Params(s.receiverParams()).Id(s.name()).Params(s.params()).Id(s.returns()).Block(
-				s.reassignElement(),
-				If(s.isOperationKindDelete()).Block(
+			srfw.v = valueType
+			s.file.Func().Params(srfw.receiverParams()).Id(srfw.name()).Params(srfw.params()).Id(srfw.returns()).Block(
+				srfw.reassignElement(),
+				If(srfw.isOperationKindDelete()).Block(
 					Return(Id(field.Parent.Name)),
 				),
-				If(s.isReferencedElementDeleted()).Block(
+				If(srfw.isReferencedElementDeleted()).Block(
 					Return(Id(field.Parent.Name)),
 				),
-				If(s.isSameID()).Block(
+				If(srfw.isSameID()).Block(
 					Return(Id(field.Parent.Name)),
 				),
-				If(s.isRefAlreadyAssigned()).Block(
-					s.deleteExistingRef(),
+				If(srfw.isRefAlreadyAssigned()).Block(
+					srfw.deleteExistingRef(),
 				),
-				OnlyIf(field.HasAnyValue, s.createAnyContainer()),
-				OnlyIf(field.HasAnyValue, s.setAnyContainer()),
-				s.createNewRef(),
-				s.setNewRef(),
-				s.setOperationKind(),
-				s.setItemInPatch(),
+				OnlyIf(field.HasAnyValue, srfw.createAnyContainer()),
+				OnlyIf(field.HasAnyValue, srfw.setAnyContainer()),
+				srfw.createNewRef(),
+				srfw.setNewRef(),
+				srfw.setOperationKind(),
+				srfw.setItemInPatch(),
 				Return(Id(field.Parent.Name)),
 			)
 		})
 
 	})
 
-	decls.Render(s.buf)
 	return s
 }

@@ -8,16 +8,15 @@ import (
 )
 
 func (s *EngineFactory) writeAssemblePlanner() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Type().Id("assemblePlanner").Struct(
+	s.file.Type().Id("assemblePlanner").Struct(
 		Id("updatedPaths").Map(Int()).Id("path"),
 		Id("updatedReferencePaths").Map(Int()).Id("path"),
 		Id("updatedElementPaths").Map(Int()).Id("path"),
 		Id("includedElements").Map(Int()).Bool(),
 	)
 
-	decls.File.Func().Id("newAssemblePlanner").Params().Id("*assemblePlanner").Block(
+	s.file.Func().Id("newAssemblePlanner").Params().Id("*assemblePlanner").Block(
 		Return(
 			Id("&assemblePlanner").Values(Dict{
 				Id("updatedPaths"):          Make(Map(Int()).Id("path")),
@@ -28,14 +27,12 @@ func (s *EngineFactory) writeAssemblePlanner() *EngineFactory {
 		),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeAssemblePlannerClear() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Func().Params(Id("a").Id("*assemblePlanner")).Id("clear").Params().Block(
+	s.file.Func().Params(Id("a").Id("*assemblePlanner")).Id("clear").Params().Block(
 		For(Id("key").Op(":=").Range().Id("a").Dot("updatedPaths")).Block(
 			Delete(Id("a").Dot("updatedPaths"), Id("key")),
 		),
@@ -50,18 +47,16 @@ func (s *EngineFactory) writeAssemblePlannerClear() *EngineFactory {
 		),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeAssemblePlannerPlan() *EngineFactory {
-	decls := NewDeclSet()
 
 	ap := assemblePlannerWriter{
 		f: nil,
 	}
 
-	decls.File.Func().Params(Id("ap").Id("*assemblePlanner")).Id("plan").Params(Id("state"), Id("patch").Id("*State")).Block(
+	s.file.Func().Params(Id("ap").Id("*assemblePlanner")).Id("plan").Params(Id("state"), Id("patch").Id("*State")).Block(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			return For(List(Id("_"), Id(configType.Name)).Op(":=").Range().Id("patch").Dot(Title(configType.Name))).Block(
 				Id("ap").Dot("updatedElementPaths").Index(Int().Call(Id(configType.Name).Dot("ID"))).Op("=").Id(configType.Name).Dot("path"),
@@ -149,14 +144,12 @@ func (s *EngineFactory) writeAssemblePlannerPlan() *EngineFactory {
 		),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeAssemblePlannerFill() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Func().Params(Id("ap").Id("*assemblePlanner")).Id("fill").Params(Id("state").Id("*State")).Block(
+	s.file.Func().Params(Id("ap").Id("*assemblePlanner")).Id("fill").Params(Id("state").Id("*State")).Block(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			return For(List(Id("_"), Id(configType.Name)).Op(":=").Range().Id("state").Dot(Title(configType.Name))).Block(
 				Id("ap").Dot("updatedElementPaths").Index(Int().Call(Id(configType.Name).Dot("ID"))).Op("=").Id(configType.Name).Dot("path"),
@@ -175,6 +168,5 @@ func (s *EngineFactory) writeAssemblePlannerFill() *EngineFactory {
 		),
 	)
 
-	decls.Render(s.buf)
 	return s
 }

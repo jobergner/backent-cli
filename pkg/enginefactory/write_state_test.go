@@ -1,19 +1,24 @@
 package enginefactory
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
+	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/testutils"
 )
 
 func TestWriteState(t *testing.T) {
 	t.Run("writes ids", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeIDs()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_EquipmentSetID_type,
 			_GearScoreID_type,
 			_ItemID_type,
@@ -37,11 +42,14 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeState()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_State_type,
 			newState_func,
 		}, "\n"))
@@ -51,11 +59,14 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes elements", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeElements()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			equipmentSetCore_type,
 			_EquipmentSet_type,
 			gearScoreCore_type,

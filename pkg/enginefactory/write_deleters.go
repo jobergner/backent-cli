@@ -8,14 +8,13 @@ import (
 )
 
 func (s *EngineFactory) writeDeleters() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		w := deleteTypeWrapperWriter{
 			t: configType,
 		}
 
-		decls.File.Func().Params(w.receiverParams()).Id(w.name()).Params(w.params()).Block(
+		s.file.Func().Params(w.receiverParams()).Id(w.name()).Params(w.params()).Block(
 			OnlyIf(!configType.IsRootType, w.getElement()),
 			OnlyIf(!configType.IsRootType, If(w.hasParent()).Block(
 				Return(),
@@ -28,7 +27,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			f: nil,
 		}
 
-		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 			d.getElement(),
 			If(d.isOperationKindDelete()).Block(
 				Return(),
@@ -63,7 +62,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			valueTypeName: func() string { return field.ValueTypeName },
 		}
 
-		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 			d.getElement(),
 			If(d.isOperationKindDelete()).Block(
 				Return(),
@@ -84,7 +83,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			valueTypeName: func() string { return anyNameByField(field) },
 		}
 
-		decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
+		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(
 			d.getElement(),
 			If(d.isOperationKindDelete()).Block(
 				Return(),
@@ -101,6 +100,5 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 		)
 	})
 
-	decls.Render(s.buf)
 	return s
 }
