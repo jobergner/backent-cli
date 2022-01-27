@@ -100,17 +100,30 @@ GOT:
 ` + actual
 }
 
-func FormatCode(code string) string {
-	packageClause := "package main\n"
+var (
+	PackageName   = "main"
+	PackageClause = fmt.Sprintf("package %s\n", PackageName)
+)
 
-	ast, err := parser.ParseFile(token.NewFileSet(), "", packageClause+code, parser.AllErrors)
+// FormatUnpackagedCode returns formatted code
+func FormatUnpackagedCode(code string) string {
+	return FormatCode(PackageClause + code)
+}
+
+// FormatUnpackagedCode returns formatted code without a package name
+func FormatCode(code string) string {
+	ast, err := parser.ParseFile(token.NewFileSet(), "", code, parser.AllErrors)
 	if err != nil {
 		panic(err)
 	}
 
 	var buf bytes.Buffer
 	err = format.Node(&buf, token.NewFileSet(), ast)
-	return strings.TrimPrefix(buf.String(), packageClause)
+	if err != nil {
+		panic(err)
+	}
+
+	return strings.TrimPrefix(buf.String(), PackageClause)
 }
 
 func DiffJSON(actual, expected string) string {
@@ -136,6 +149,7 @@ func DiffJSON(actual, expected string) string {
 		diffString, err := formatter.Format(d)
 		if err != nil {
 			// No error can occur
+			panic(err)
 		}
 		return diffString
 	}

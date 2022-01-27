@@ -8,24 +8,21 @@ import (
 )
 
 func (s *EngineFactory) writeOperationKind() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Type().Id("OperationKind").String()
+	s.file.Type().Id("OperationKind").String()
 
-	decls.File.Const().Defs(
+	s.file.Const().Defs(
 		Id("OperationKindDelete").Id("OperationKind").Op("=").Lit("DELETE"),
 		Id("OperationKindUpdate").Id("OperationKind").Op("=").Lit("UPDATE"),
 		Id("OperationKindUnchanged").Id("OperationKind").Op("=").Lit("UNCHANGED"),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeEngine() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Type().Id("Engine").Struct(
+	s.file.Type().Id("Engine").Struct(
 		Id("State").Id("*State"),
 		Id("Patch").Id("*State"),
 		Id("Tree").Id("*Tree"),
@@ -33,7 +30,7 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 		Id("IDgen").Int(),
 	)
 
-	decls.File.Func().Id("newEngine").Params().Id("*Engine").Block(
+	s.file.Func().Id("newEngine").Params().Id("*Engine").Block(
 		Return(Id("&Engine").Values(Dict{
 			Id("State"):   Id("newState").Call(),
 			Id("Patch"):   Id("newState").Call(),
@@ -43,29 +40,25 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 		})),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeGenerateID() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Func().Params(Id("engine").Id("*Engine")).Id("GenerateID").Params().Int().Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("GenerateID").Params().Int().Block(
 		Id("newID").Op(":=").Id("engine").Dot("IDgen"),
 		Id("engine").Dot("IDgen").Op("=").Id("engine").Dot("IDgen").Op("+").Lit(1),
 		Return(Id("newID")),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeUpdateState() *EngineFactory {
-	decls := NewDeclSet()
 
 	u := updateStateWriter{}
 
-	decls.File.Func().Params(u.receiverParams()).Id("UpdateState").Params().Block(
+	s.file.Func().Params(u.receiverParams()).Id("UpdateState").Params().Block(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.typeName = func() string {
 				return configType.Name
@@ -104,7 +97,6 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 		}),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 

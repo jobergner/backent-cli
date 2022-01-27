@@ -1,19 +1,24 @@
 package enginefactory
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
+	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/testutils"
 )
 
 func TestWriteHelpers(t *testing.T) {
 	t.Run("writes deduplicate", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeDeduplicate()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			deduplicateEquipmentSetIDs_func,
 			deduplicateGearScoreIDs_func,
 			deduplicateItemIDs_func,
@@ -34,11 +39,14 @@ func TestWriteHelpers(t *testing.T) {
 		}
 	})
 	t.Run("writes allIDs methods", func(t *testing.T) {
-		sf := newStateFactory(newSimpleASTExample())
+		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAllIDsMethod()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			allEquipmentSetIDs_Engine_func,
 			allGearScoreIDs_Engine_func,
 			allItemIDs_Engine_func,

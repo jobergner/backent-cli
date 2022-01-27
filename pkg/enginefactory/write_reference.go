@@ -8,7 +8,6 @@ import (
 )
 
 func (s *EngineFactory) writeReference() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeRefFields(func(field ast.Field) {
 
 		r := referenceWriter{
@@ -16,12 +15,13 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 		}
 
 		if !field.HasSliceValue {
-			decls.File.Func().Params(r.receiverParams()).Id("IsSet").Params().Params(r.returns()).Block(
+
+			s.file.Func().Params(r.receiverParams()).Id("IsSet").Params().Params(r.returns()).Block(
 				r.reassignRef(),
 				Return(Id("ref"), r.returnIsSet()),
 			)
 
-			decls.File.Func().Params(r.receiverParams()).Id("Unset").Params().Block(
+			s.file.Func().Params(r.receiverParams()).Id("Unset").Params().Block(
 				r.reassignRef(),
 				If(r.isOperationKindDelete()).Block(
 					Return(),
@@ -38,13 +38,13 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 		}
 
 		if field.HasAnyValue {
-			decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())+"Ref").Block(
+			s.file.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())+"Ref").Block(
 				r.reassignRef(),
 				Id("anyContainer").Op(":=").Add(r.getReferencedElement()),
 				Return(r.wrapIntoAnyRefWrapper()),
 			)
 		} else {
-			decls.File.Func().Params(r.receiverParams()).Id("Get").Params().Id(r.returnTypeOfGet()).Block(
+			s.file.Func().Params(r.receiverParams()).Id("Get").Params().Id(r.returnTypeOfGet()).Block(
 				r.reassignRef(),
 				Return(r.getReferencedElement()),
 			)
@@ -52,12 +52,10 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 
 	})
 
-	decls.Render(s.buf)
 	return s
 }
 
 func (s *EngineFactory) writeDereference() *EngineFactory {
-	decls := NewDeclSet()
 	s.config.RangeRefFields(func(field ast.Field) {
 		field.RangeValueTypes(func(valueType *ast.ConfigType) {
 
@@ -66,7 +64,7 @@ func (s *EngineFactory) writeDereference() *EngineFactory {
 				v: *valueType,
 			}
 
-			decls.File.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+			s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
 				d.declareAllIDs(),
 				For(d.allIDsLoopConditions()).Block(
 					d.declareRef(),
@@ -87,9 +85,7 @@ func (s *EngineFactory) writeDereference() *EngineFactory {
 				d.returnSliceToPool(),
 			)
 		})
-
 	})
 
-	decls.Render(s.buf)
 	return s
 }

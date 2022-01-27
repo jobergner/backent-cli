@@ -8,23 +8,22 @@ import (
 )
 
 func (s *EngineFactory) writeAssembleTree() *EngineFactory {
-	decls := NewDeclSet()
 
-	decls.File.Func().Params(Id("engine").Id("*Engine")).Id("assembleUpdateTree").Params().Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("assembleUpdateTree").Params().Block(
 		Id("engine").Dot("planner").Dot("clear").Call(),
 		Id("engine").Dot("Tree").Dot("clear").Call(),
 		Id("engine").Dot("planner").Dot("plan").Call(Id("engine").Dot("State"), Id("engine").Dot("Patch")),
 		Id("engine").Dot("assembleTree").Call(),
 	)
 
-	decls.File.Func().Params(Id("engine").Id("*Engine")).Id("assembleFullTree").Params().Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("assembleFullTree").Params().Block(
 		Id("engine").Dot("planner").Dot("clear").Call(),
 		Id("engine").Dot("Tree").Dot("clear").Call(),
 		Id("engine").Dot("planner").Dot("fill").Call(Id("engine").Dot("State")),
 		Id("engine").Dot("assembleTree").Call(),
 	)
 
-	decls.File.Func().Params(Id("engine").Id("*Engine")).Id("assembleTree").Params().Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("assembleTree").Params().Block(
 		For(List(Id("_"), Id("p")).Op(":=").Range().Id("engine").Dot("planner").Dot("updatedPaths")).Block(
 			Switch(Id("p").Index(Lit(0)).Dot("identifier")).Block(
 				ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
@@ -41,6 +40,5 @@ func (s *EngineFactory) writeAssembleTree() *EngineFactory {
 		),
 	)
 
-	decls.Render(s.buf)
 	return s
 }

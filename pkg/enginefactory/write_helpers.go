@@ -8,9 +8,9 @@ import (
 )
 
 func (s *EngineFactory) writeDeduplicate() *EngineFactory {
-	decls := NewDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
+
 		d := deduplicateWriter{
 			typeName: func() string {
 				return configType.Name
@@ -20,9 +20,11 @@ func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 			},
 		}
 
-		writeDeduplicate(&decls, d)
+		writeDeduplicate(s.file, d)
 	})
+
 	s.config.RangeRefFields(func(field ast.Field) {
+
 		d := deduplicateWriter{
 			typeName: func() string {
 				return field.ValueTypeName
@@ -32,15 +34,14 @@ func (s *EngineFactory) writeDeduplicate() *EngineFactory {
 			},
 		}
 
-		writeDeduplicate(&decls, d)
+		writeDeduplicate(s.file, d)
 	})
 
-	decls.Render(s.buf)
 	return s
 }
 
-func writeDeduplicate(decls *DeclSet, d deduplicateWriter) {
-	decls.File.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
+func writeDeduplicate(file *File, d deduplicateWriter) {
+	file.Func().Id(d.name()).Params(d.params()).Id(d.returns()).Block(
 		d.defineCheck(),
 		For(d.clearCheckLoopConditions()).Block(
 			d.clearCheckValue(),
@@ -59,7 +60,6 @@ func writeDeduplicate(decls *DeclSet, d deduplicateWriter) {
 }
 
 func (s *EngineFactory) writeAllIDsMethod() *EngineFactory {
-	decls := NewDeclSet()
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		a := allIDsMehtodWriter{
@@ -68,7 +68,7 @@ func (s *EngineFactory) writeAllIDsMethod() *EngineFactory {
 			},
 		}
 
-		writeAllIDsMethod(&decls, a)
+		writeAllIDsMethod(s.file, a)
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
@@ -78,15 +78,14 @@ func (s *EngineFactory) writeAllIDsMethod() *EngineFactory {
 			},
 		}
 
-		writeAllIDsMethod(&decls, a)
+		writeAllIDsMethod(s.file, a)
 	})
 
-	decls.Render(s.buf)
 	return s
 }
 
-func writeAllIDsMethod(decls *DeclSet, a allIDsMehtodWriter) {
-	decls.File.Func().Params(a.receiverParams()).Id(a.name()).Params().Id(a.returns()).Block(
+func writeAllIDsMethod(file *File, a allIDsMehtodWriter) {
+	file.Func().Params(a.receiverParams()).Id(a.name()).Params().Id(a.returns()).Block(
 		a.declareStateIDsSlice(),
 		For(a.stateIDsLoopConditions()).Block(
 			a.appendStateID(),
