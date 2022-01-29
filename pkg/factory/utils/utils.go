@@ -1,4 +1,4 @@
-package factoryutils
+package utils
 
 import (
 	"bytes"
