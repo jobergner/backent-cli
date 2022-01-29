@@ -8,7 +8,6 @@ import (
 )
 
 func (s *ServerFactory) writeResponses() *ServerFactory {
-	decls := NewDeclSet()
 	s.config.RangeActions(func(action ast.Action) {
 
 		if action.Response == nil {
@@ -19,13 +18,12 @@ func (s *ServerFactory) writeResponses() *ServerFactory {
 			a: action,
 		}
 
-		decls.File.Type().Id(r.name()).Struct(ForEachResponseValueInAction(action, func(value ast.Field) *Statement {
+		s.file.Type().Id(r.name()).Struct(ForEachResponseValueInAction(action, func(value ast.Field) *Statement {
 			r.v = &value
 			return Id(r.fieldName()).Id(r.paramType(s)).Id(r.fieldTag())
 		}))
 	})
 
-	decls.Render(s.buf)
 	return s
 }
 

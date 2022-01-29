@@ -8,20 +8,20 @@ import (
 )
 
 func (s *ServerFactory) writeParameters() *ServerFactory {
-	decls := NewDeclSet()
 	s.config.RangeActions(func(action ast.Action) {
 
 		p := paramsWriter{
 			a: action,
 		}
 
-		decls.File.Type().Id(p.name()).Struct(ForEachParamInAction(action, func(param ast.Field) *Statement {
-			p.p = &param
-			return Id(p.fieldName()).Id(p.paramType(s)).Id(p.fieldTag())
-		}))
+		s.file.Type().Id(p.name()).Struct(
+			ForEachParamInAction(action, func(param ast.Field) *Statement {
+				p.p = &param
+				return Id(p.fieldName()).Id(p.paramType(s)).Id(p.fieldTag())
+			}),
+		)
 	})
 
-	decls.Render(s.buf)
 	return s
 }
 

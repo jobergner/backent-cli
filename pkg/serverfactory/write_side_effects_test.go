@@ -1,19 +1,24 @@
 package serverfactory
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
+	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/testutils"
 )
 
 func TestWriteSideEffects(t *testing.T) {
-	t.Run("writes actions", func(t *testing.T) {
-		sf := newServerFactory(newSimpleASTExample())
+	t.Run("writes side effects", func(t *testing.T) {
+		sf := newServerFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeSideEffects()
 
-		actual := testutils.FormatCode(sf.buf.String())
-		expected := testutils.FormatCode(strings.Join([]string{
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			`type SideEffects struct {
 	OnDeploy    func(*Engine)
 	OnFrameTick func(*Engine)

@@ -8,10 +8,9 @@ import (
 )
 
 func (s *ServerFactory) writeActions() *ServerFactory {
-	decls := NewDeclSet()
 
-	decls.File.Comment("easyjson:skip")
-	decls.File.Type().Id("Actions").Struct(
+	s.file.Comment("easyjson:skip")
+	s.file.Type().Id("Actions").Struct(
 		ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 			responseName := Id(Title(action.Name) + "Response")
 			if action.Response == nil {
@@ -21,6 +20,5 @@ func (s *ServerFactory) writeActions() *ServerFactory {
 		}),
 	)
 
-	decls.Render(s.buf)
 	return s
 }

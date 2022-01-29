@@ -8,11 +8,10 @@ import (
 )
 
 func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
-	decls := NewDeclSet()
 
 	p := processClientMessageWriter{}
 
-	decls.File.Func().Params(p.receiverParams()).Id("processClientMessage").Params(p.params()).Params(Id("Message"), Id("error")).Block(
+	s.file.Func().Params(p.receiverParams()).Id("processClientMessage").Params(p.params()).Params(Id("Message"), Id("error")).Block(
 		Switch().Id("MessageKind").Call(Id("msg").Dot("Kind")).Block(
 			ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 				p.a = &action
@@ -38,7 +37,6 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 		Return(Id("Message").Values(), Nil()),
 	)
 
-	decls.Render(s.buf)
 	return s
 }
 

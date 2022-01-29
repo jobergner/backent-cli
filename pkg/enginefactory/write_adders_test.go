@@ -2,7 +2,6 @@ package enginefactory
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -18,7 +17,6 @@ func TestWriteAdders(t *testing.T) {
 		buf := new(bytes.Buffer)
 		sf.file.Render(buf)
 
-		fmt.Println(buf.String())
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_AddEquipment_EquipmentSet_func,
