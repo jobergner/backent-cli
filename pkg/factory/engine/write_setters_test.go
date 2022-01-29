@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/dave/jennifer/jen"
-	"github.com/jobergner/backent-cli/pkg/testutils"
+	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteSetters(t *testing.T) {

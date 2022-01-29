@@ -8,7 +8,7 @@ import (
 	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/examples/configs"
 	"github.com/jobergner/backent-cli/pkg/ast"
-	"github.com/jobergner/backent-cli/pkg/testutils"
+	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func newSimpleASTExample() *ast.AST {

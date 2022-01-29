@@ -3,7 +3,7 @@ package jumpstart
 import (
 	"bytes"
 
-	. "github.com/jobergner/backent-cli/pkg/factoryutils"
+	. "github.com/jobergner/backent-cli/pkg/factory/utils"
 
 	. "github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/ast"
