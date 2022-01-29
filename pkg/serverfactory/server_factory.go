@@ -1,16 +1,14 @@
 package serverfactory
 
 import (
-	"bytes"
-
-	. "github.com/jobergner/backent-cli/pkg/factoryutils"
+	"github.com/dave/jennifer/jen"
 
 	"github.com/jobergner/backent-cli/pkg/ast"
 )
 
 type ServerFactory struct {
 	config *ast.AST
-	buf    *bytes.Buffer
+	file   *jen.File
 }
 
 // isIDTypeOfType evaluates whether a given type name is the respective ID-Type
@@ -27,42 +25,28 @@ func (s ServerFactory) isIDTypeOfType(typeName string) bool {
 	return false
 }
 
-func newServerFactory(config *ast.AST) *ServerFactory {
+func newServerFactory(file *jen.File, config *ast.AST) *ServerFactory {
 	return &ServerFactory{
 		config: config,
-		buf:    &bytes.Buffer{},
+		file:   file,
 	}
 }
 
 // WriteServerFrom writes source code for a given ActionsConfig
 func WriteServer(
-	buf *bytes.Buffer,
+	file *jen.File,
 	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
 	configJson []byte,
 ) {
+
 	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
-	s := newServerFactory(config).
-		writePackageName(). // to be able to format the code without errors
+
+	newServerFactory(file, config).
 		writeMessageKinds().
 		writeParameters().
 		writeResponses().
 		writeProcessClientMessage().
-		writeInspectHandler(configJson)
-
-	err := Format(s.buf)
-	if err != nil {
-		// unexpected error
-		panic(err)
-	}
-
-	// TODO: comments were being swallowed during format. find out why
-	s.writeActions().
+		writeInspectHandler(configJson).
+		writeActions().
 		writeSideEffects()
-
-	buf.WriteString(TrimPackageName(s.buf.String()))
-}
-
-func (s *ServerFactory) writePackageName() *ServerFactory {
-	s.buf.WriteString("package state\n")
-	return s
 }
