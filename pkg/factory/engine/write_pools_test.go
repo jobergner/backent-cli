@@ -11,7 +11,7 @@ import (
 
 func TestWritePools(t *testing.T) {
 	t.Run("writes pools", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writePools()
 
 		buf := new(bytes.Buffer)

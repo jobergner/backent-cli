@@ -11,7 +11,7 @@ import (
 
 func TestWriteAdders(t *testing.T) {
 	t.Run("writes adders", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAdders()
 
 		buf := new(bytes.Buffer)

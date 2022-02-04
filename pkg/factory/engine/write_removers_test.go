@@ -11,7 +11,7 @@ import (
 
 func TestWriteRemovers(t *testing.T) {
 	t.Run("writes removers", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeRemovers()
 
 		buf := new(bytes.Buffer)

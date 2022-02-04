@@ -3,7 +3,7 @@ package state
 import (
 	"testing"
 
-	"github.com/jobergner/backent-cli/pkg/testutils"
+	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 
 	"github.com/stretchr/testify/assert"
 )

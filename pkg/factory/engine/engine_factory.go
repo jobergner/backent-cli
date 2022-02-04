@@ -34,7 +34,7 @@ func WriteEngine(file *jen.File, stateConfigData map[interface{}]interface{}) {
 		map[interface{}]interface{}{},
 	)
 
-	newStateFactory(file, config).
+	newEngineFactory(file, config).
 		writeAdders().
 		writeAny().
 		writeAnyRefs().
@@ -69,7 +69,7 @@ func WriteEngine(file *jen.File, stateConfigData map[interface{}]interface{}) {
 		writePools()
 }
 
-func newStateFactory(file *jen.File, config *ast.AST) *EngineFactory {
+func newEngineFactory(file *jen.File, config *ast.AST) *EngineFactory {
 	return &EngineFactory{
 		config: config,
 		file:   file,

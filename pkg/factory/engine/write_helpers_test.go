@@ -11,7 +11,7 @@ import (
 
 func TestWriteHelpers(t *testing.T) {
 	t.Run("writes deduplicate", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeDeduplicate()
 
 		buf := new(bytes.Buffer)
@@ -39,7 +39,7 @@ func TestWriteHelpers(t *testing.T) {
 		}
 	})
 	t.Run("writes allIDs methods", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAllIDsMethod()
 
 		buf := new(bytes.Buffer)

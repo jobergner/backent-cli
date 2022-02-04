@@ -11,7 +11,7 @@ import (
 
 func TestWriteSetters(t *testing.T) {
 	t.Run("writes setters", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeSetters()
 
 		buf := new(bytes.Buffer)
