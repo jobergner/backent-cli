@@ -11,7 +11,7 @@ import (
 
 func TestWriteState(t *testing.T) {
 	t.Run("writes ids", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeIDs()
 
 		buf := new(bytes.Buffer)
@@ -42,7 +42,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeState()
 
 		buf := new(bytes.Buffer)
@@ -59,7 +59,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes elements", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeElements()
 
 		buf := new(bytes.Buffer)

@@ -11,7 +11,7 @@ import (
 
 func TestWriteTree(t *testing.T) {
 	t.Run("writes ReferencedDataStatus", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeReferencedDataStatus()
 
 		buf := new(bytes.Buffer)
@@ -28,7 +28,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes elementKinds", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeElementKinds()
 
 		buf := new(bytes.Buffer)
@@ -45,7 +45,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes tree elements", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeTreeElements()
 
 		buf := new(bytes.Buffer)
@@ -68,7 +68,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes tree", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeTree()
 
 		buf := new(bytes.Buffer)

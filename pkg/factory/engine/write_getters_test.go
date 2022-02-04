@@ -11,7 +11,7 @@ import (
 
 func TestWriteGetters(t *testing.T) {
 	t.Run("writes getters", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeGetters()
 
 		buf := new(bytes.Buffer)

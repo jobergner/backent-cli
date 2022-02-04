@@ -11,7 +11,7 @@ import (
 
 func TestWriteAssembleBranch(t *testing.T) {
 	t.Run("writes assemblers", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAssembleBranch()
 
 		buf := new(bytes.Buffer)

@@ -11,7 +11,7 @@ import (
 
 func TestWriteAssembleTree(t *testing.T) {
 	t.Run("writes assembleTree", func(t *testing.T) {
-		sf := newStateFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAssembleTree()
 
 		buf := new(bytes.Buffer)
