@@ -8,6 +8,12 @@ import (
 	"nhooyr.io/websocket"
 )
 
+// NEED:
+// - rest API for room management (create/delete)
+// - loginHanlder, holds rooms, and client (clients need to be somehwere until a message arrives which assigns them to a room)
+// 	methods:
+// 		- func(message)
+
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
@@ -20,19 +26,20 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 		return
 	}
 
-	c, err := newClient(NewConnection(websocketConnection, r))
+	c, err := newClient(NewConnection(websocketConnection, r), newLoginHandler(room.sideEffects))
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	c.assignToRoom(room)
-	room.registerChannel <- c
+
+	room.registerClientSync(c)
 
 	go c.runReadMessages()
 	go c.runWriteMessages()
 
 	// wait until client disconnects
 	<-r.Context().Done()
+	// TODO: here I could remove clients from loginHandler
 }
 
 func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
