@@ -8,19 +8,21 @@ import (
 )
 
 type Client struct {
+	handler        *LoginHandler
 	room           *Room
 	conn           Connector
 	messageChannel chan []byte
 	id             uuid.UUID
 }
 
-func newClient(websocketConnector Connector) (*Client, error) {
+func newClient(websocketConnector Connector, handler *LoginHandler) (*Client, error) {
 	clientID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, fmt.Errorf("error generating client ID: %s", err)
 	}
 
 	c := Client{
+		handler:        handler,
 		conn:           websocketConnector,
 		messageChannel: make(chan []byte, 32),
 		id:             clientID,
@@ -29,35 +31,23 @@ func newClient(websocketConnector Connector) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) discontinue() {
-	c.room.unregisterChannel <- c
+func (c *Client) handleRoomKick() {
 	c.conn.Close()
 }
 
-func (c *Client) assignToRoom(room *Room) {
-	c.room = room
-}
-
-func (c *Client) forwardToRoom(msg Message) {
-	select {
-	case c.room.clientMessageChannel <- msg:
-	default:
-		log.Println("room's message buffer full -> message dropped:")
-		log.Println(printMessage(msg))
-	}
+func (c *Client) handleInernalError() {
+	c.room.unregisterClientSync(c)
+	c.conn.Close()
 }
 
 func (c *Client) runReadMessages() {
-	defer c.discontinue()
+	defer c.handleInernalError()
 
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 
 		if err != nil {
 			log.Printf("unregistering client due to error while reading connection: %s", err)
-
-			c.discontinue()
-
 			break
 		}
 
@@ -67,25 +57,37 @@ func (c *Client) runReadMessages() {
 		if err != nil {
 			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
 
-			c.room.pendingResponsesChannel <- Message{MessageKindError, messageUnmarshallingError(msgBytes, err), c}
+			errDescription := messageUnmarshallingError(msgBytes, err)
+			errMsg, err := Message{MessageKindError, errDescription, nil}.MarshalJSON()
+			if err != nil {
+				log.Printf("error marshalling error message \"%s\"", errDescription)
+				continue
+			}
+
+			c.messageChannel <- errMsg
 
 			continue
 		}
 
 		msg.client = c
 
-		c.forwardToRoom(msg)
+		if msg.Kind == MessageKindGlobal {
+			c.handler.processMessageSync(msg)
+		} else {
+			c.room.processMessageSync(msg)
+		}
 	}
 }
 
 func (c *Client) runWriteMessages() {
-	defer c.discontinue()
+	defer c.handleInernalError()
+
 	for {
 		msg, ok := <-c.messageChannel
 
 		if !ok {
 			log.Printf("messageChannel of client %s has been closed", c.id)
-			return
+			break
 		}
 
 		c.conn.WriteMessage(msg)

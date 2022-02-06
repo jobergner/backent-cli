@@ -7,9 +7,12 @@ import (
 type MessageKind string
 
 const (
+	// server -> client
 	MessageKindError        MessageKind = "error"
 	MessageKindCurrentState MessageKind = "currentState"
 	MessageKindUpdate       MessageKind = "update"
+	// client -> server
+	MessageKindGlobal MessageKind = "global"
 )
 
 type Message struct {

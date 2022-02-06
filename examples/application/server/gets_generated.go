@@ -45,6 +45,13 @@ type SideEffects struct {
 	OnFrameTick func(*Engine)
 }
 
+type LoginSignals struct {
+	// TODO needs to be syncronized with room because we manipulate engine
+	OnGlobalMessage func(Message, *Engine, *Client, *LoginHandler)
+	OnClientConnect func(*Client, *LoginHandler)
+}
+
+// TODO logging should happen here
 func (r *Room) processClientMessage(msg Message) (Message, error) {
 	switch MessageKind(msg.Kind) {
 	case MessageKindAction_addItemToPlayer:
