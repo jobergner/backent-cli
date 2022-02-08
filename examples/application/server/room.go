@@ -15,12 +15,37 @@ const (
 )
 
 type Room struct {
+	name            string
 	mu              *sync.Mutex
 	clients         map[*Client]struct{}
 	incomingClients map[*Client]struct{}
 	state           *Engine
 	actions         Actions
 	mode            RoomMode // TODO implement usage
+}
+
+func newRoom(actions Actions) *Room {
+	return &Room{
+		mu:              &sync.Mutex{},
+		clients:         make(map[*Client]struct{}),
+		incomingClients: make(map[*Client]struct{}),
+		state:           newEngine(),
+		actions:         actions,
+	}
+}
+
+func (r *Room) Name() string {
+	return r.name
+}
+
+func (r *Room) AlterState(fn func(*Room)) {
+	r.mu.Lock()
+	fn(r)
+	r.mu.Unlock()
+}
+
+func (r *Room) ReadState() *Engine {
+	return r.state
 }
 
 func (r *Room) processMessageSync(msg Message) {
