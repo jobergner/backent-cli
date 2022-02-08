@@ -106,8 +106,6 @@ func (r *Room) promoteClientAsync(client *Client) {
 }
 
 func (r *Room) unregisterClientAsync(client *Client) {
-	// we do not close channels here as sending to a closed
-	// channel always panics, even if default case is present
 	if _, ok := r.clients[client]; ok {
 
 		log.Printf("unregistering client %s", client.id)

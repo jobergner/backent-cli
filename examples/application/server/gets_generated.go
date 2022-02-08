@@ -35,9 +35,9 @@ type SpawnZoneItemsResponse struct {
 }
 
 type Actions struct {
-	AddItemToPlayer func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse
-	MovePlayer      func(MovePlayerParams, *Engine)
-	SpawnZoneItems  func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
+	AddItemToPlayer func(params AddItemToPlayerParams, engine *Engine, roomName, clientID string) AddItemToPlayerResponse
+	MovePlayer      func(params MovePlayerParams, engien *Engine, roomName, clientID string)
+	SpawnZoneItems  func(params SpawnZoneItemsParams, engine *Engine, roomName, clientID string) SpawnZoneItemsResponse
 }
 
 type SideEffects struct {
@@ -46,9 +46,9 @@ type SideEffects struct {
 }
 
 type LoginSignals struct {
-	// TODO needs to be syncronized with room because we manipulate engine
-	OnGlobalMessage func(Message, *Engine, *Client, *LoginHandler)
-	OnClientConnect func(*Client, *LoginHandler)
+	OnGlobalMessage    func(Message, *Engine, *Client, *LoginHandler)
+	OnClientConnect    func(*Client, *LoginHandler)
+	OnClientDisconnect func(*Engine, string, *LoginHandler)
 }
 
 // TODO logging should happen here
@@ -63,7 +63,7 @@ func (r *Room) processClientMessage(msg Message) (Message, error) {
 		if err != nil {
 			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		res := r.actions.AddItemToPlayer(params, r.state)
+		res := r.actions.AddItemToPlayer(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
@@ -78,7 +78,7 @@ func (r *Room) processClientMessage(msg Message) (Message, error) {
 		if err != nil {
 			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		r.actions.MovePlayer(params, r.state)
+		r.actions.MovePlayer(params, r.state, r.name, msg.client.id)
 		return Message{}, nil
 	case MessageKindAction_spawnZoneItems:
 		if r.actions.SpawnZoneItems == nil {
@@ -89,7 +89,7 @@ func (r *Room) processClientMessage(msg Message) (Message, error) {
 		if err != nil {
 			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		res := r.actions.SpawnZoneItems(params, r.state)
+		res := r.actions.SpawnZoneItems(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err

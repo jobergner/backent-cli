@@ -12,7 +12,7 @@ type Client struct {
 	room           *Room
 	conn           Connector
 	messageChannel chan []byte
-	id             uuid.UUID
+	id             string
 }
 
 func newClient(websocketConnector Connector, handler *LoginHandler) (*Client, error) {
@@ -25,14 +25,36 @@ func newClient(websocketConnector Connector, handler *LoginHandler) (*Client, er
 		handler:        handler,
 		conn:           websocketConnector,
 		messageChannel: make(chan []byte, 32),
-		id:             clientID,
+		id:             clientID.String(),
 	}
 
 	return &c, nil
 }
 
+func (c *Client) SendMessage(msg []byte) {
+	c.messageChannel <- msg
+}
+
+func (c *Client) ID() string {
+	return c.id
+}
+
+func (c *Client) LeaveRoom() {
+	c.room.unregisterClientSync(c)
+}
+
+func (c *Client) JoinRoom(room *Room) {
+	c.room.unregisterClientSync(c)
+	room.registerClientSync(c)
+}
+
+func (c *Client) Room() *Room {
+	return c.room
+}
+
 func (c *Client) handleRoomKick() {
 	c.conn.Close()
+	c.handler.handleClientDisconnect(c)
 }
 
 func (c *Client) handleInernalError() {
