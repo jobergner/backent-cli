@@ -46,7 +46,7 @@ type SideEffects struct {
 }
 
 type LoginSignals struct {
-	OnGlobalMessage    func(Message, *Engine, *Client, *LoginHandler)
+	OnSuperMessage     func(Message, *Engine, *Client, *LoginHandler)
 	OnClientConnect    func(*Client, *LoginHandler)
 	OnClientDisconnect func(*Engine, string, *LoginHandler)
 }

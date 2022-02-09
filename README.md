@@ -967,7 +967,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - set reference -> SetBoundTo()
 - unset reference -> BoundTo().Unset()
 - add reference -> AddGuildMember()
-- remove reference -> RemoveGuildMember()
+- remove reference -> RemoveGuildMember()S
 - set anyOf reference -> SetTargetPlayer()
 - unset anyOf reference -> Target().Unset()
 - switch anyOf type in slice -> Interactable.SetItem()
@@ -982,6 +982,15 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- there is currently no way of sending events (eg. sword swing)
+    - need to be able to send events as sending state like `hasSwung` will not suffice (user would have to set it to false manually after each tick)
+    - event may be triggered multiple times
+    - need event to be reset with each update state
+    - maybe an `_event` flag could let engine know that a certain type needs to be cleared with each update state (events would never have OperationKindUnchanged/OperationKindDelete)
+    - validaiton:
+        - events can only be non-pointer slice (any allowed)
+        - events cannot be references
+    - events won't have remove method
 - currently you can not reference the same element twice in a slice of references due to tree using referenced element ID as map keys 
 - what do I want to achieve?
     - (consistency) no dependency on previously emitted entities, which means:
