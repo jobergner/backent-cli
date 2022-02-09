@@ -53,9 +53,9 @@ func (l *LoginHandler) processMessageSync(msg Message) {
 	msg.client.room.mu.Lock()
 
 	if msg.client.room == nil {
-		l.signals.OnGlobalMessage(msg, nil, msg.client, l)
+		l.signals.OnSuperMessage(msg, nil, msg.client, l)
 	} else {
-		l.signals.OnGlobalMessage(msg, msg.client.room.state, msg.client, l)
+		l.signals.OnSuperMessage(msg, msg.client.room.state, msg.client, l)
 	}
 
 	msg.client.room.mu.Unlock()
@@ -85,13 +85,16 @@ func (l *LoginHandler) handleClientConnect(client *Client) {
 	client.room.mu.Unlock()
 }
 
-// TODO do clients live in rooms and loginHandler simultaneously? prob yes
-// what do we do when deleting room? notify handler of all clients losing their rooms
-// do clients of deleted room get their client.room removed?
+// ClientSwitch -> run multiple rooms on one server
+// Message HTTP endpoint with acces too all information. Find a way that is somewhat clean
+// 	- fetch information from all rooms (information for a eg. lobby)
+// 	- create/delete rooms
+//  - populate rooms with data
+//
 
-// loginHandler:
-// CreateRoom
-// DeleteRoom
+// OnSuperMessage:
+// client can leave room, join room
+// client can send message to itself/other clients cross room
 
 // Client:
 // LeaveRoom()
@@ -99,3 +102,7 @@ func (l *LoginHandler) handleClientConnect(client *Client) {
 // ID() Client.ID
 // SendMessage()
 // Room()
+
+// TODO do clients live in rooms and loginHandler simultaneously? prob yes
+// what do we do when deleting room? notify handler of all clients losing their rooms
+// do clients of deleted room get their client.room removed?
