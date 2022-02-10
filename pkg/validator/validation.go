@@ -142,6 +142,11 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 }
 
 func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
+	data, errs = prepareStateConfig(data)
+	if len(errs) != 0 {
+		return errs
+	}
+
 	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(data)
 	if len(prevalidationErrs) != 0 {
 		return prevalidationErrs
