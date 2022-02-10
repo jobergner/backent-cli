@@ -74,6 +74,7 @@ func extractTypes(typeDefinitionString string) (extractedTypes []string) {
 		}
 		extractedTypes = append(extractedTypes, match)
 	}
+
 	return
 }
 

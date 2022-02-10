@@ -165,3 +165,19 @@ func newValidationErrorResponseToUnknownAction(responseName string) error {
 		),
 	)
 }
+func newValidationErrorInvalidEventUsage(valueString string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrInvalidEventUsage: \"%s\" is not a valid usage of an event (events can only be slices of non-pointers)",
+			valueString,
+		),
+	)
+}
+func newValidationErrorUnpureEvent(valueString string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrUnpureEvent: \"%s\" contains event types and non-event types",
+			valueString,
+		),
+	)
+}

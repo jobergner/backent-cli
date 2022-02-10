@@ -32,12 +32,17 @@ func TestValidateInvalidEventUsage(t *testing.T) {
 				"__event__": "true",
 				"bar":       "string",
 			},
+			"barEvent": map[interface{}]interface{}{
+				"__event__": "true",
+				"bar":       "string",
+			},
 			"baz": map[interface{}]interface{}{
 				"nui": "*fooNonEvent",
 				"ban": "fooEvent",
 				"buf": "*fooEvent",
 				"bal": "[]*fooEvent",
 				"oof": "[]fooEvent",
+				"bun": "anyOf<barEvent,fooEvent>",
 			},
 		}
 
@@ -46,6 +51,32 @@ func TestValidateInvalidEventUsage(t *testing.T) {
 			newValidationErrorInvalidEventUsage("*fooEvent"),
 			newValidationErrorInvalidEventUsage("[]*fooEvent"),
 			newValidationErrorInvalidEventUsage("fooEvent"),
+			newValidationErrorInvalidEventUsage("anyOf<barEvent,fooEvent>"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+
+	t.Run("should fail when events and non-events are mixed in valueString", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"fooNonEvent": map[interface{}]interface{}{
+				"bar": "string",
+			},
+			"fooEvent": map[interface{}]interface{}{
+				"__event__": "true",
+				"bar":       "string",
+			},
+			"baz": map[interface{}]interface{}{
+				"ban": "[]anyOf<fooEvent,fooNonEvent>",
+			},
+		}
+
+		actualErrors := validateInvalidEventUsage(data)
+		expectedErrors := []error{
+			newValidationErrorUnpureEvent("[]anyOf<fooEvent,fooNonEvent>"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

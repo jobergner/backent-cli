@@ -31,26 +31,43 @@ func validateInvalidEventUsageObject(data, objectData map[interface{}]interface{
 		}
 
 		extractedTypes := extractTypes(valueString)
-		// only one type is expected at this point
-		if isBasicType(extractedTypes[0]) {
-			continue
+		if isAnyOfTypes(valueString) {
+			extractedTypes = extractedTypes[1:] // extractTypes considers anyOf identifier as type, so we cut it
 		}
 
-		typeFields := data[extractedTypes[0]]
+		var hasEventValue bool
+		var hasNonEventValue bool
 
-		if !isEvent(typeFields.(map[interface{}]interface{})) {
-			continue
+		for _, extractedType := range extractedTypes {
+			if isBasicType(extractedType) {
+				continue
+			}
+
+			typeFields := data[extractedType]
+
+			if !isEvent(typeFields.(map[interface{}]interface{})) {
+				hasNonEventValue = true
+				continue
+			}
+			hasEventValue = true
+
 		}
 
-		// at this point we know this field's valueString contains an event
-		if !hasSliceValue(valueString) {
-			errs = append(errs, newValidationErrorInvalidEventUsage(valueString))
-			continue
+		if hasEventValue && hasNonEventValue {
+			errs = append(errs, newValidationErrorUnpureEvent(valueString))
 		}
 
-		if hasPointerValue(valueString) {
-			errs = append(errs, newValidationErrorInvalidEventUsage(valueString))
+		if hasEventValue {
+			if !hasSliceValue(valueString) {
+				errs = append(errs, newValidationErrorInvalidEventUsage(valueString))
+				continue
+			}
+
+			if hasPointerValue(valueString) {
+				errs = append(errs, newValidationErrorInvalidEventUsage(valueString))
+			}
 		}
+
 	}
 
 	return
