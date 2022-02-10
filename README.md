@@ -990,7 +990,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
     - validaiton:
         - events can only be non-pointer slice (any allowed)
         - events cannot be references
-    - events won't have remove method
+    - events won't have remove method (or maybe they do idk, but removers cureently mess up slice order)
 - currently you can not reference the same element twice in a slice of references due to tree using referenced element ID as map keys 
 - what do I want to achieve?
     - (consistency) no dependency on previously emitted entities, which means:
