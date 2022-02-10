@@ -224,6 +224,22 @@ func TestGeneralValidation(t *testing.T) {
 }
 
 func TestValidateStateConfig(t *testing.T) {
+	t.Run("should procude no errors even with meta field included", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"bar": map[interface{}]interface{}{},
+			"baz": map[interface{}]interface{}{
+				"ban":       "int32",
+				"bam":       "bar",
+				"bunt":      "[]int",
+				"__event__": "true",
+			},
+		}
+
+		errs := ValidateStateConfig(data)
+
+		assert.Empty(t, errs)
+	})
+
 	t.Run("should procude no errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"bar": map[interface{}]interface{}{},
