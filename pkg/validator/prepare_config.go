@@ -7,12 +7,14 @@ type metaField struct {
 	value string
 }
 
+var eventMetaField = metaField{
+	name:  "__event__",
+	value: "true",
+}
+
 var (
 	metaFields = []metaField{
-		{
-			name:  "__event__",
-			value: "true",
-		},
+		eventMetaField,
 	}
 )
 

@@ -142,12 +142,12 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 }
 
 func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
-	data, errs = prepareStateConfig(data)
+	dataWithoutMetaFields, errs := prepareStateConfig(data)
 	if len(errs) != 0 {
 		return errs
 	}
 
-	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(data)
+	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(dataWithoutMetaFields)
 	if len(prevalidationErrs) != 0 {
 		return prevalidationErrs
 	}
@@ -156,6 +156,13 @@ func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
 		validationErrs := validateStateConfig(anyOfTypeCombination)
 		errs = append(errs, validationErrs...)
 	}
+
+	if len(errs) != 0 {
+		return errs
+	}
+
+	eventErrs := validateInvalidEventUsage(data)
+	errs = append(errs, eventErrs...)
 
 	return deduplicateErrs(errs)
 }
