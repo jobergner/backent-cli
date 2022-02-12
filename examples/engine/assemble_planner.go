@@ -59,7 +59,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 	for _, zoneItem := range patch.ZoneItem {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
 	}
-	for _, attackEventTargetRef := range patch.EquipmentSetEquipmentRef {
+	for _, attackEventTargetRef := range patch.AttackEventTargetRef {
 		ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
 	}
 	for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {

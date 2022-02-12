@@ -103,6 +103,14 @@ func (engine *Engine) UpdateState() {
 			engine.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
+	for _, attackEventTargetRef := range engine.Patch.AttackEventTargetRef {
+		if attackEventTargetRef.OperationKind == OperationKindDelete {
+			delete(engine.State.AttackEventTargetRef, attackEventTargetRef.ID)
+		} else {
+			attackEventTargetRef.OperationKind = OperationKindUnchanged
+			engine.State.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
+		}
+	}
 	for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
 		if equipmentSetEquipmentRef.OperationKind == OperationKindDelete {
 			delete(engine.State.EquipmentSetEquipmentRef, equipmentSetEquipmentRef.ID)

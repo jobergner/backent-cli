@@ -19,6 +19,8 @@ func TestWritePools(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			attackEventCheckPool_type,
+			attackEventIDSlicePool_type,
 			equipmentSetCheckPool_type,
 			equipmentSetIDSlicePool_type,
 			gearScoreCheckPool_type,
@@ -33,6 +35,8 @@ func TestWritePools(t *testing.T) {
 			zoneIDSlicePool_type,
 			zoneItemCheckPool_type,
 			zoneItemIDSlicePool_type,
+			attackEventTargetRefCheckPool_type,
+			attackEventTargetRefIDSlicePool_type,
 			equipmentSetEquipmentRefCheckPool_type,
 			equipmentSetEquipmentRefIDSlicePool_type,
 			itemBoundToRefCheckPool_type,

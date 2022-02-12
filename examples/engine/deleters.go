@@ -12,10 +12,14 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	if player.OperationKind == OperationKindDelete {
 		return
 	}
+	engine.dereferenceAttackEventTargetRefs(playerID)
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferencePlayerTargetRefsPlayer(playerID)
 	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
+	for _, actionID := range player.Action {
+		engine.deleteAttackEvent(actionID)
+	}
 	for _, equipmentSetID := range player.EquipmentSets {
 		engine.deletePlayerEquipmentSetRef(equipmentSetID)
 	}

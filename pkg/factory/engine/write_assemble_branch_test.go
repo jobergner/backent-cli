@@ -19,6 +19,7 @@ func TestWriteAssembleBranch(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			assembleAttackEventPath_Engine_func,
 			assembleEquipmentSetPath_Engine_func,
 			assembleGearScorePath_Engine_func,
 			assembleItemPath_Engine_func,

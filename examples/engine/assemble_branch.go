@@ -222,6 +222,16 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 	nextSeg := p[pIndex+1]
 
 	switch nextSeg.identifier {
+	case player_actionIdentifier:
+		if element.Action == nil {
+			element.Action = make(map[AttackEventID]attackEvent)
+		}
+		child, ok := element.Action[AttackEventID(nextSeg.id)]
+		if !ok {
+			child = attackEvent{ID: AttackEventID(nextSeg.id)}
+		}
+		engine.assembleAttackEventPath(&child, p, pIndex+1, includedElements)
+		element.Action[child.ID] = child
 	case player_equipmentSetsIdentifier:
 		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(nextSeg.refID)).playerEquipmentSetRef
 		referencedDataStatus := ReferencedDataUnchanged

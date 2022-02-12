@@ -19,6 +19,9 @@ func TestWriteReference(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_Get_AttackEventTargetRef_func,
+			_IsSet_AttackEventTargetRef_func,
+			_Unset_AttackEventTargetRef_func,
 			_Get_EquipmentSetEquipmentRef_func,
 			_IsSet_ItemBoundToRef_func,
 			_Unset_ItemBoundToRef_func,
@@ -44,6 +47,7 @@ func TestWriteReference(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			dereferenceAttackEventTargetRefs_Engine_func,
 			dereferenceEquipmentSetEquipmentRefs_Engine_func,
 			dereferenceItemBoundToRefs_Engine_func,
 			dereferencePlayerEquipmentSetRefs_Engine_func,

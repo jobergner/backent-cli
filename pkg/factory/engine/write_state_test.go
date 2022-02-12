@@ -19,6 +19,7 @@ func TestWriteState(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_AttackEventID_type,
 			_EquipmentSetID_type,
 			_GearScoreID_type,
 			_ItemID_type,
@@ -26,6 +27,7 @@ func TestWriteState(t *testing.T) {
 			_PositionID_type,
 			_ZoneID_type,
 			_ZoneItemID_type,
+			_AttackEventTargetRefID_type,
 			_EquipmentSetEquipmentRefID_type,
 			_ItemBoundToRefID_type,
 			_PlayerEquipmentSetRefID_type,
@@ -67,6 +69,8 @@ func TestWriteState(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			attackEventCore_type,
+			_AttackEvent_type,
 			equipmentSetCore_type,
 			_EquipmentSet_type,
 			gearScoreCore_type,
@@ -81,6 +85,8 @@ func TestWriteState(t *testing.T) {
 			_Zone_type,
 			zoneItemCore_type,
 			_ZoneItem_type,
+			attackEventTargetRefCore_type,
+			_AttackEventTargetRef_type,
 			equipmentSetEquipmentRefCore_type,
 			_EquipmentSetEquipmentRef_type,
 			itemBoundToRefCore_type,

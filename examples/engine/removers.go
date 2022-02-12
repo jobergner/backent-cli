@@ -166,9 +166,9 @@ func (_player Player) RemoveAction(actionToRemove AttackEventID) Player {
 			continue
 		}
 
-		player.player.Items[i] = player.player.Items[len(player.player.Items)-1]
-		player.player.Items[len(player.player.Items)-1] = 0
-		player.player.Items = player.player.Items[:len(player.player.Items)-1]
+		player.player.Action[i] = player.player.Action[len(player.player.Action)-1]
+		player.player.Action[len(player.player.Action)-1] = 0
+		player.player.Action = player.player.Action[:len(player.player.Action)-1]
 		player.player.engine.deleteAttackEvent(attackEventID)
 
 		player.player.OperationKind = OperationKindUpdate
