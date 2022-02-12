@@ -1,6 +1,8 @@
 package state
 
-import "sort"
+import (
+	"sort"
+)
 
 func (engine *Engine) EveryPlayer() []Player {
 	playerIDs := engine.allPlayerIDs()
