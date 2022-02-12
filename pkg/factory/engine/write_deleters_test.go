@@ -47,8 +47,9 @@ func TestWriteDeleters(t *testing.T) {
 			deleteAnyOfItem_Player_ZoneItem_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

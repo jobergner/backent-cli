@@ -23,8 +23,9 @@ func TestWritePath(t *testing.T) {
 			attackEventIdentifier_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes path", func(t *testing.T) {
@@ -45,8 +46,9 @@ func TestWritePath(t *testing.T) {
 			isSliceFieldIdentifier_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

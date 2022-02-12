@@ -36,8 +36,9 @@ func TestWriteHelpers(t *testing.T) {
 			deduplicatePlayerTargetedByRefIDs_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes allIDs methods", func(t *testing.T) {
@@ -66,8 +67,9 @@ func TestWriteHelpers(t *testing.T) {
 			allPlayerTargetedByRefIDs_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }
