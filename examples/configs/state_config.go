@@ -9,6 +9,11 @@ var StateConfig = map[interface{}]interface{}{
 		"guildMembers":  "[]*player",
 		"target":        "*anyOf<player,zoneItem>",
 		"targetedBy":    "[]*anyOf<player,zoneItem>",
+		"action":        "[]attackEvent",
+	},
+	"attackEvent": map[interface{}]interface{}{
+		"__event__": "true",
+		"target":    "*player",
 	},
 	"zone": map[interface{}]interface{}{
 		"items":         "[]zoneItem",

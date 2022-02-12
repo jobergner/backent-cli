@@ -5,6 +5,7 @@ import "strconv"
 type treeFieldIdentifier string
 
 const (
+	attackEventIdentifier  = "attackEvent"
 	equipmentSetIdentifier = "equipmentSet"
 	gearScoreIdentifier    = "gearScore"
 	itemIdentifier         = "item"
@@ -13,12 +14,15 @@ const (
 	zoneIdentifier         = "zone"
 	zoneItemIdentifier     = "zoneItem"
 
+	attackEvent_targetIdentifier = "attackEvent_target"
+
 	equipmentSet_equipmentIdentifier = "equipmentSet_equipment"
 
 	item_boundToIdentifier   = "item_boundTo"
 	item_gearScoreIdentifier = "item_gearScore"
 	item_originIdentifier    = "item_origin"
 
+	player_actionIdentifier        = "player_action"
 	player_equipmentSetsIdentifier = "player_equipmentSets"
 	player_gearScoreIdentifier     = "player_gearScore"
 	player_guildMembersIdentifier  = "player_guildMembers"

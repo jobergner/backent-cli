@@ -88,6 +88,18 @@ func (_player Player) AddItem() Item {
 	return item
 }
 
+func (_player Player) AddAction() AttackEvent {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return AttackEvent{attackEvent: attackEventCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+	}
+	attackEvent := player.player.engine.createAttackEvent(player.player.path, player_actionIdentifier)
+	player.player.Action = append(player.player.Action, attackEvent.attackEvent.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return attackEvent
+}
+
 func (_player Player) AddGuildMember(playerID PlayerID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {

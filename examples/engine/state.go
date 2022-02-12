@@ -1,5 +1,6 @@
 package state
 
+type AttackEventID int
 type EquipmentSetID int
 type GearScoreID int
 type ItemID int
@@ -7,6 +8,7 @@ type PlayerID int
 type PositionID int
 type ZoneID int
 type ZoneItemID int
+type AttackEventTargetRefID int
 type PlayerGuildMemberRefID int
 type ItemBoundToRefID int
 type EquipmentSetEquipmentRefID int
@@ -18,6 +20,7 @@ type PlayerTargetRefID int
 type PlayerTargetedByRefID int
 
 type State struct {
+	AttackEvent               map[AttackEventID]attackEventCore                             `json:"attackEvent"`
 	EquipmentSet              map[EquipmentSetID]equipmentSetCore                           `json:"equipmentSet"`
 	GearScore                 map[GearScoreID]gearScoreCore                                 `json:"gearScore"`
 	Item                      map[ItemID]itemCore                                           `json:"item"`
@@ -25,6 +28,7 @@ type State struct {
 	Position                  map[PositionID]positionCore                                   `json:"position"`
 	Zone                      map[ZoneID]zoneCore                                           `json:"zone"`
 	ZoneItem                  map[ZoneItemID]zoneItemCore                                   `json:"zoneItem"`
+	AttackEventTargetRef      map[AttackEventTargetRefID]attackEventTargetRefCore           `json:"attackEventTargetRef"`
 	EquipmentSetEquipmentRef  map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore   `json:"equipmentSetEquipmentRef"`
 	ItemBoundToRef            map[ItemBoundToRefID]itemBoundToRefCore                       `json:"itemBoundToRef"`
 	PlayerEquipmentSetRef     map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore         `json:"playerEquipmentSetRef"`
@@ -38,6 +42,7 @@ type State struct {
 
 func newState() *State {
 	return &State{
+		AttackEvent:               make(map[AttackEventID]attackEventCore),
 		EquipmentSet:              make(map[EquipmentSetID]equipmentSetCore),
 		GearScore:                 make(map[GearScoreID]gearScoreCore),
 		Item:                      make(map[ItemID]itemCore),
@@ -45,6 +50,7 @@ func newState() *State {
 		Position:                  make(map[PositionID]positionCore),
 		Zone:                      make(map[ZoneID]zoneCore),
 		ZoneItem:                  make(map[ZoneItemID]zoneItemCore),
+		AttackEventTargetRef:      make(map[AttackEventTargetRefID]attackEventTargetRefCore),
 		EquipmentSetEquipmentRef:  make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore),
 		ItemBoundToRef:            make(map[ItemBoundToRefID]itemBoundToRefCore),
 		PlayerEquipmentSetRef:     make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore),
@@ -56,6 +62,18 @@ func newState() *State {
 		AnyOfItem_Player_ZoneItem: make(map[AnyOfItem_Player_ZoneItemID]anyOfItem_Player_ZoneItemCore),
 	}
 }
+
+type attackEventCore struct {
+	ID            AttackEventID          `json:"id"`
+	Target        AttackEventTargetRefID `json:"target"`
+	OperationKind OperationKind          `json:"operationKind"`
+	HasParent     bool                   `json:"hasParent"`
+	Path          string                 `json:"path"`
+	path          path
+	engine        *Engine
+}
+
+type AttackEvent struct{ attackEvent attackEventCore }
 
 type zoneCore struct {
 	ID            ZoneID                        `json:"id"`
@@ -102,6 +120,7 @@ type Item struct{ item itemCore }
 
 type playerCore struct {
 	ID            PlayerID                  `json:"id"`
+	Action        []AttackEventID           `json:"action"`
 	EquipmentSets []PlayerEquipmentSetRefID `json:"equipmentSets"`
 	GearScore     GearScoreID               `json:"gearScore"`
 	GuildMembers  []PlayerGuildMemberRefID  `json:"guildMembers"`
@@ -167,6 +186,17 @@ type itemBoundToRefCore struct {
 }
 
 type ItemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }
+
+type attackEventTargetRefCore struct {
+	ID                  AttackEventTargetRefID `json:"id"`
+	ParentID            AttackEventID          `json:"parentID"`
+	ReferencedElementID PlayerID               `json:"referencedElementID"`
+	OperationKind       OperationKind          `json:"operationKind"`
+	path                path
+	engine              *Engine
+}
+
+type AttackEventTargetRef struct{ attackEventTargetRef attackEventTargetRefCore }
 
 type playerGuildMemberRefCore struct {
 	ID                  PlayerGuildMemberRefID `json:"id"`
