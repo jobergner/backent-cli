@@ -19,6 +19,7 @@ func TestWriteAdders(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_AddAction_Player_func,
 			_AddEquipment_EquipmentSet_func,
 			_AddEquipmentSet_Player_func,
 			_AddGuildMember_Player_func,

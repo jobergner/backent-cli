@@ -60,6 +60,15 @@ func (_player Player) TargetedBy() []PlayerTargetedByRef {
 	return targetedBy
 }
 
+func (_player Player) Action() []AttackEvent {
+	player := _player.player.engine.Player(_player.player.ID)
+	var action []AttackEvent
+	for _, attackEventID := range player.player.Action {
+		action = append(action, player.player.engine.AttackEvent(attackEventID))
+	}
+	return action
+}
+
 func (_player Player) Items() []Item {
 	player := _player.player.engine.Player(_player.player.ID)
 	var items []Item

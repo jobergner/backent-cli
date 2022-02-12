@@ -53,6 +53,7 @@ func TestWriteTree(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			attackEvent_type,
 			equipmentSet_type,
 			gearScore_type,
 			item_type,

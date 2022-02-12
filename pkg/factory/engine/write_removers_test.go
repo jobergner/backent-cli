@@ -19,6 +19,7 @@ func TestWriteRemovers(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_RemoveAction_Player_func,
 			_RemoveEquipment_EquipmentSet_func,
 			_RemoveEquipmentSets_Player_func,
 			_RemoveGuildMembers_Player_func,

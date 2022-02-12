@@ -19,6 +19,7 @@ func TestWriteHelpers(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			deduplicateAttackEventIDs_func,
 			deduplicateEquipmentSetIDs_func,
 			deduplicateGearScoreIDs_func,
 			deduplicateItemIDs_func,
@@ -26,6 +27,7 @@ func TestWriteHelpers(t *testing.T) {
 			deduplicatePositionIDs_func,
 			deduplicateZoneIDs_func,
 			deduplicateZoneItemIDs_func,
+			deduplicateAttackEventTargetRefIDs_func,
 			deduplicateEquipmentSetEquipmentRefIDs_func,
 			deduplicateItemBoundToRefIDs_func,
 			deduplicatePlayerEquipmentSetRefIDs_func,
@@ -47,6 +49,7 @@ func TestWriteHelpers(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			allAttackEventIDs_Engine_func,
 			allEquipmentSetIDs_Engine_func,
 			allGearScoreIDs_Engine_func,
 			allItemIDs_Engine_func,
@@ -54,6 +57,7 @@ func TestWriteHelpers(t *testing.T) {
 			allPositionIDs_Engine_func,
 			allZoneIDs_Engine_func,
 			allZoneItemIDs_Engine_func,
+			allAttackEventTargetRefIDs_Engine_func,
 			allEquipmentSetEquipmentRefIDs_Engine_func,
 			allItemBoundToRefIDs_Engine_func,
 			allPlayerEquipmentSetRefIDs_Engine_func,

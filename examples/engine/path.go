@@ -74,6 +74,8 @@ func (p path) toJSONPath() string {
 
 func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 	switch fieldIdentifier {
+	case attackEventIdentifier:
+		return "attackEvent"
 	case equipmentSetIdentifier:
 		return "equipmentSet"
 	case gearScoreIdentifier:
@@ -88,6 +90,8 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 		return "zone"
 	case zoneItemIdentifier:
 		return "zoneItem"
+	case attackEvent_targetIdentifier:
+		return "target"
 	case equipmentSet_equipmentIdentifier:
 		return "equipment"
 	case item_boundToIdentifier:
@@ -96,6 +100,8 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 		return "gearScore"
 	case item_originIdentifier:
 		return "origin"
+	case player_actionIdentifier:
+		return "action"
 	case player_equipmentSetsIdentifier:
 		return "equipmentSets"
 	case player_gearScoreIdentifier:
@@ -126,6 +132,8 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 
 func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
 	switch fieldIdentifier {
+	case attackEventIdentifier:
+		return true
 	case equipmentSetIdentifier:
 		return true
 	case gearScoreIdentifier:
@@ -141,6 +149,8 @@ func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
 	case zoneItemIdentifier:
 		return true
 	case equipmentSet_equipmentIdentifier:
+		return true
+	case player_actionIdentifier:
 		return true
 	case player_equipmentSetsIdentifier:
 		return true

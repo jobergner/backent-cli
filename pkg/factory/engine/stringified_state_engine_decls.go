@@ -652,6 +652,16 @@ const assemblePlayerPath_Engine_func string = `func (engine *Engine) assemblePla
 	}
 	nextSeg := p[pIndex+1]
 	switch nextSeg.identifier {
+	case player_actionIdentifier:
+		if element.Action == nil {
+			element.Action = make(map[AttackEventID]attackEvent)
+		}
+		child, ok := element.Action[AttackEventID(nextSeg.id)]
+		if !ok {
+			child = attackEvent{ID: AttackEventID(nextSeg.id)}
+		}
+		engine.assembleAttackEventPath(&child, p, pIndex+1, includedElements)
+		element.Action[child.ID] = child
 	case player_equipmentSetsIdentifier:
 		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(nextSeg.refID)).playerEquipmentSetRef
 		referencedDataStatus := ReferencedDataUnchanged
@@ -859,7 +869,7 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 	for _, zoneItem := range patch.ZoneItem {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
 	}
-	for _, attackEventTargetRef := range patch.EquipmentSetEquipmentRef {
+	for _, attackEventTargetRef := range patch.AttackEventTargetRef {
 		ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
 	}
 	for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
@@ -1219,7 +1229,7 @@ const createAttackEvent_Engine_func string = `func (engine *Engine) createAttack
 	var element attackEventCore
 	element.engine = engine
 	element.ID = AttackEventID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindAttackEvent, 0)
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
@@ -1448,10 +1458,14 @@ const deletePlayer_Engine_func string = `func (engine *Engine) deletePlayer(play
 	if player.OperationKind == OperationKindDelete {
 		return
 	}
+	engine.dereferenceAttackEventTargetRefs(playerID)
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferencePlayerTargetRefsPlayer(playerID)
 	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
+	for _, actionID := range player.Action {
+		engine.deleteAttackEvent(actionID)
+	}
 	for _, equipmentSetID := range player.EquipmentSets {
 		engine.deletePlayerEquipmentSetRef(equipmentSetID)
 	}
@@ -1835,6 +1849,15 @@ const _TargetedBy_Player_func string = `func (_player Player) TargetedBy() []Pla
 		targetedBy = append(targetedBy, player.player.engine.playerTargetedByRef(refID))
 	}
 	return targetedBy
+}`
+
+const _Action_Player_func string = `func (_player Player) Action() []AttackEvent {
+	player := _player.player.engine.Player(_player.player.ID)
+	var action []AttackEvent
+	for _, attackEventID := range player.player.Action {
+		action = append(action, player.player.engine.AttackEvent(attackEventID))
+	}
+	return action
 }`
 
 const _Items_Player_func string = `func (_player Player) Items() []Item {
@@ -3038,6 +3061,8 @@ const toJSONPath_path_func string = `func (p path) toJSONPath() string {
 
 const pathIdentifierToString_func string = `func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 	switch fieldIdentifier {
+	case attackEventIdentifier:
+		return "attackEvent"
 	case equipmentSetIdentifier:
 		return "equipmentSet"
 	case gearScoreIdentifier:
@@ -3052,6 +3077,8 @@ const pathIdentifierToString_func string = `func pathIdentifierToString(fieldIde
 		return "zone"
 	case zoneItemIdentifier:
 		return "zoneItem"
+	case attackEvent_targetIdentifier:
+		return "target"
 	case equipmentSet_equipmentIdentifier:
 		return "equipment"
 	case item_boundToIdentifier:
@@ -3060,6 +3087,8 @@ const pathIdentifierToString_func string = `func pathIdentifierToString(fieldIde
 		return "gearScore"
 	case item_originIdentifier:
 		return "origin"
+	case player_actionIdentifier:
+		return "action"
 	case player_equipmentSetsIdentifier:
 		return "equipmentSets"
 	case player_gearScoreIdentifier:
@@ -3090,6 +3119,8 @@ const pathIdentifierToString_func string = `func pathIdentifierToString(fieldIde
 
 const isSliceFieldIdentifier_func string = `func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
 	switch fieldIdentifier {
+	case attackEventIdentifier:
+		return true
 	case equipmentSetIdentifier:
 		return true
 	case gearScoreIdentifier:
@@ -3105,6 +3136,8 @@ const isSliceFieldIdentifier_func string = `func isSliceFieldIdentifier(fieldIde
 	case zoneItemIdentifier:
 		return true
 	case equipmentSet_equipmentIdentifier:
+		return true
+	case player_actionIdentifier:
 		return true
 	case player_equipmentSetsIdentifier:
 		return true
@@ -3601,9 +3634,9 @@ const _RemoveAction_Player_func string = `func (_player Player) RemoveAction(act
 		if attackEventID != actionToRemove {
 			continue
 		}
-		player.player.Items[i] = player.player.Items[len(player.player.Items)-1]
-		player.player.Items[len(player.player.Items)-1] = 0
-		player.player.Items = player.player.Items[:len(player.player.Items)-1]
+		player.player.Action[i] = player.player.Action[len(player.player.Action)-1]
+		player.player.Action[len(player.player.Action)-1] = 0
+		player.player.Action = player.player.Action[:len(player.player.Action)-1]
 		player.player.engine.deleteAttackEvent(attackEventID)
 		player.player.OperationKind = OperationKindUpdate
 		player.player.engine.Patch.Player[player.player.ID] = player.player
@@ -4572,7 +4605,6 @@ const item_type string = `type item struct {
 const attackEvent_type string = `type attackEvent struct {
 	ID		AttackEventID		` + "`" + `json:"id"` + "`" + `
 	Target		*elementReference	` + "`" + `json:"target"` + "`" + `
-	Name		string			` + "`" + `json:"name"` + "`" + `
 	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
 }`
 
@@ -4599,6 +4631,7 @@ const gearScore_type string = `type gearScore struct {
 
 const player_type string = `type player struct {
 	ID		PlayerID				` + "`" + `json:"id"` + "`" + `
+	Action		map[AttackEventID]attackEvent		` + "`" + `json:"action"` + "`" + `
 	EquipmentSets	map[EquipmentSetID]elementReference	` + "`" + `json:"equipmentSets"` + "`" + `
 	GearScore	*gearScore				` + "`" + `json:"gearScore"` + "`" + `
 	GuildMembers	map[PlayerID]elementReference		` + "`" + `json:"guildMembers"` + "`" + `

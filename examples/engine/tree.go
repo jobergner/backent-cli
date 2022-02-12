@@ -90,7 +90,6 @@ type item struct {
 type attackEvent struct {
 	ID            AttackEventID     `json:"id"`
 	Target        *elementReference `json:"target"`
-	Name          string            `json:"name"`
 	OperationKind OperationKind     `json:"operationKind"`
 }
 
@@ -117,6 +116,7 @@ type gearScore struct {
 
 type player struct {
 	ID            PlayerID                            `json:"id"`
+	Action        map[AttackEventID]attackEvent       `json:"action"`
 	EquipmentSets map[EquipmentSetID]elementReference `json:"equipmentSets"`
 	GearScore     *gearScore                          `json:"gearScore"`
 	GuildMembers  map[PlayerID]elementReference       `json:"guildMembers"`

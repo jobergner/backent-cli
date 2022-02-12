@@ -56,7 +56,7 @@ func (engine *Engine) createAttackEvent(p path, fieldIdentifier treeFieldIdentif
 	var element attackEventCore
 	element.engine = engine
 	element.ID = AttackEventID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindAttackEvent, 0)
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
