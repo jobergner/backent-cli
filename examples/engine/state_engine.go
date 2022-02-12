@@ -33,6 +33,9 @@ func (engine *Engine) GenerateID() int {
 }
 
 func (engine *Engine) UpdateState() {
+	for _, attackEvent := range engine.Patch.AttackEvent {
+		delete(engine.State.AttackEvent, attackEvent.ID)
+	}
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
 		if equipmentSet.OperationKind == OperationKindDelete {
 			delete(engine.State.EquipmentSet, equipmentSet.ID)
@@ -61,6 +64,7 @@ func (engine *Engine) UpdateState() {
 		if player.OperationKind == OperationKindDelete {
 			delete(engine.State.Player, player.ID)
 		} else {
+			player.Action = player.Action[:0]
 			player.OperationKind = OperationKindUnchanged
 			engine.State.Player[player.ID] = player
 		}
@@ -162,6 +166,9 @@ func (engine *Engine) UpdateState() {
 		}
 	}
 
+	for key := range engine.Patch.AttackEvent {
+		delete(engine.Patch.AttackEvent, key)
+	}
 	for key := range engine.Patch.EquipmentSet {
 		delete(engine.Patch.EquipmentSet, key)
 	}

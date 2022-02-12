@@ -21,6 +21,13 @@ func (engine *Engine) assembleFullTree() {
 func (engine *Engine) assembleTree() {
 	for _, p := range engine.planner.updatedPaths {
 		switch p[0].identifier {
+		case attackEventIdentifier:
+			child, ok := engine.Tree.AttackEvent[AttackEventID(p[0].id)]
+			if !ok {
+				child = attackEvent{ID: AttackEventID(p[0].id)}
+			}
+			engine.assembleAttackEventPath(&child, p, 0, engine.planner.includedElements)
+			engine.Tree.AttackEvent[AttackEventID(p[0].id)] = child
 		case equipmentSetIdentifier:
 			child, ok := engine.Tree.EquipmentSet[EquipmentSetID(p[0].id)]
 			if !ok {

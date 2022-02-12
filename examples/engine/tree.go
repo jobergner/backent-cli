@@ -10,6 +10,7 @@ const (
 type ElementKind string
 
 const (
+	ElementKindAttackEvent  ElementKind = "AttackEvent"
 	ElementKindEquipmentSet ElementKind = "EquipmentSet"
 	ElementKindGearScore    ElementKind = "GearScore"
 	ElementKindItem         ElementKind = "Item"
@@ -20,6 +21,7 @@ const (
 )
 
 type Tree struct {
+	AttackEvent  map[AttackEventID]attackEvent   `json:"attackEvent"`
 	EquipmentSet map[EquipmentSetID]equipmentSet `json:"equipmentSet"`
 	GearScore    map[GearScoreID]gearScore       `json:"gearScore"`
 	Item         map[ItemID]item                 `json:"item"`
@@ -31,6 +33,7 @@ type Tree struct {
 
 func newTree() *Tree {
 	return &Tree{
+		AttackEvent:  make(map[AttackEventID]attackEvent),
 		EquipmentSet: make(map[EquipmentSetID]equipmentSet),
 		GearScore:    make(map[GearScoreID]gearScore),
 		Item:         make(map[ItemID]item),
@@ -42,6 +45,9 @@ func newTree() *Tree {
 }
 
 func (t *Tree) clear() {
+	for key := range t.AttackEvent {
+		delete(t.AttackEvent, key)
+	}
 	for key := range t.EquipmentSet {
 		delete(t.EquipmentSet, key)
 	}
@@ -78,6 +84,13 @@ type item struct {
 	GearScore     *gearScore        `json:"gearScore"`
 	Name          string            `json:"name"`
 	Origin        interface{}       `json:"origin"`
+	OperationKind OperationKind     `json:"operationKind"`
+}
+
+type attackEvent struct {
+	ID            AttackEventID     `json:"id"`
+	Target        *elementReference `json:"target"`
+	Name          string            `json:"name"`
 	OperationKind OperationKind     `json:"operationKind"`
 }
 

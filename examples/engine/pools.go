@@ -46,6 +46,13 @@ var gearScoreIDSlicePool = sync.Pool{
 	New: func() interface{} { return make([]GearScoreID, 0) },
 }
 
+var attackEventCheckPool = sync.Pool{
+	New: func() interface{} { return make(map[AttackEventID]bool) },
+}
+var attackEventIDSlicePool = sync.Pool{
+	New: func() interface{} { return make([]AttackEventID, 0) },
+}
+
 var equipmentSetCheckPool = sync.Pool{
 	New: func() interface{} { return make(map[EquipmentSetID]bool) },
 }
@@ -65,6 +72,13 @@ var playerTargetRefCheckPool = sync.Pool{
 }
 var playerTargetRefIDSlicePool = sync.Pool{
 	New: func() interface{} { return make([]PlayerTargetRefID, 0) },
+}
+
+var attackEventTargetRefCheckPool = sync.Pool{
+	New: func() interface{} { return make(map[AttackEventTargetRefID]bool) },
+}
+var attackEventTargetRefIDSlicePool = sync.Pool{
+	New: func() interface{} { return make([]AttackEventTargetRefID, 0) },
 }
 
 var itemBoundToRefCheckPool = sync.Pool{

@@ -139,6 +139,29 @@ func deduplicateGearScoreIDs(a []GearScoreID, b []GearScoreID) []GearScoreID {
 	return deduped
 }
 
+func deduplicateAttackEventIDs(a []AttackEventID, b []AttackEventID) []AttackEventID {
+
+	check := attackEventCheckPool.Get().(map[AttackEventID]bool)
+	for k := range check {
+		delete(check, k)
+	}
+	deduped := attackEventIDSlicePool.Get().([]AttackEventID)[:0]
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	attackEventCheckPool.Put(check)
+
+	return deduped
+}
+
 func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []EquipmentSetID {
 
 	check := equipmentSetCheckPool.Get().(map[EquipmentSetID]bool)
@@ -204,6 +227,29 @@ func deduplicatePlayerTargetRefIDs(a []PlayerTargetRefID, b []PlayerTargetRefID)
 	}
 
 	playerTargetRefCheckPool.Put(check)
+
+	return deduped
+}
+
+func deduplicateAttackEventTargetRefIDs(a []AttackEventTargetRefID, b []AttackEventTargetRefID) []AttackEventTargetRefID {
+
+	check := attackEventTargetRefCheckPool.Get().(map[AttackEventTargetRefID]bool)
+	for k := range check {
+		delete(check, k)
+	}
+	deduped := attackEventTargetRefIDSlicePool.Get().([]AttackEventTargetRefID)[:0]
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+
+	attackEventTargetRefCheckPool.Put(check)
 
 	return deduped
 }
@@ -298,6 +344,23 @@ func deduplicateEquipmentSetEquipmentRefIDs(a []EquipmentSetEquipmentRefID, b []
 	equipmentSetEquipmentRefCheckPool.Put(check)
 
 	return deduped
+}
+
+func (engine Engine) allAttackEventIDs() []AttackEventID {
+	stateAttackEventIDs := attackEventIDSlicePool.Get().([]AttackEventID)[:0]
+	for attackEventID := range engine.State.AttackEvent {
+		stateAttackEventIDs = append(stateAttackEventIDs, attackEventID)
+	}
+	patchAttackEventIDs := attackEventIDSlicePool.Get().([]AttackEventID)[:0]
+	for attackEventID := range engine.Patch.AttackEvent {
+		patchAttackEventIDs = append(patchAttackEventIDs, attackEventID)
+	}
+	dedupedIDs := deduplicateAttackEventIDs(stateAttackEventIDs, patchAttackEventIDs)
+
+	attackEventIDSlicePool.Put(stateAttackEventIDs)
+	attackEventIDSlicePool.Put(patchAttackEventIDs)
+
+	return dedupedIDs
 }
 
 func (engine Engine) allEquipmentSetIDs() []EquipmentSetID {
@@ -466,6 +529,23 @@ func (engine Engine) allItemBoundToRefIDs() []ItemBoundToRefID {
 
 	itemBoundToRefIDSlicePool.Put(stateItemBoundToRefIDs)
 	itemBoundToRefIDSlicePool.Put(patchItemBoundToRefIDs)
+
+	return dedupedIDs
+}
+
+func (engine Engine) allAttackEventTargetRefIDs() []AttackEventTargetRefID {
+	stateAttackEventTargetRefIDs := attackEventTargetRefIDSlicePool.Get().([]AttackEventTargetRefID)[:0]
+	for attackEventTargetRefID := range engine.State.AttackEventTargetRef {
+		stateAttackEventTargetRefIDs = append(stateAttackEventTargetRefIDs, attackEventTargetRefID)
+	}
+	patchAttackEventTargetRefIDs := attackEventTargetRefIDSlicePool.Get().([]AttackEventTargetRefID)[:0]
+	for attackEventTargetRefID := range engine.Patch.AttackEventTargetRef {
+		patchAttackEventTargetRefIDs = append(patchAttackEventTargetRefIDs, attackEventTargetRefID)
+	}
+	dedupedIDs := deduplicateAttackEventTargetRefIDs(stateAttackEventTargetRefIDs, patchAttackEventTargetRefIDs)
+
+	attackEventTargetRefIDSlicePool.Put(stateAttackEventTargetRefIDs)
+	attackEventTargetRefIDSlicePool.Put(patchAttackEventTargetRefIDs)
 
 	return dedupedIDs
 }
