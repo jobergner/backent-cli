@@ -90,6 +90,18 @@ const _AddItem_Player_func string = `func (_player Player) AddItem() Item {
 	return item
 }`
 
+const _AddAction_Player_func string = `func (_player Player) AddAction() AttackEvent {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return AttackEvent{attackEvent: attackEventCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+	}
+	attackEvent := player.player.engine.createAttackEvent(player.player.path, player_actionIdentifier)
+	player.player.Action = append(player.player.Action, attackEvent.attackEvent.ID)
+	player.player.OperationKind = OperationKindUpdate
+	player.player.engine.Patch.Player[player.player.ID] = player.player
+	return attackEvent
+}`
+
 const _AddGuildMember_Player_func string = `func (_player Player) AddGuildMember(playerID PlayerID) {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {
@@ -521,6 +533,33 @@ const assembleEquipmentSetPath_Engine_func string = `func (engine *Engine) assem
 	_ = equipmentSetData
 }`
 
+const assembleAttackEventPath_Engine_func string = `func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pIndex int, includedElements map[int]bool) {
+	attackEventData, ok := engine.Patch.AttackEvent[element.ID]
+	if !ok {
+		attackEventData = engine.State.AttackEvent[element.ID]
+	}
+	element.OperationKind = attackEventData.OperationKind
+	if pIndex+1 == len(p) {
+		return
+	}
+	nextSeg := p[pIndex+1]
+	switch nextSeg.identifier {
+	case attackEvent_targetIdentifier:
+		ref := engine.attackEventTargetRef(AttackEventTargetRefID(nextSeg.id)).attackEventTargetRef
+		if element.Target != nil && ref.OperationKind == OperationKindDelete {
+			break
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
+			referencedDataStatus = ReferencedDataModified
+		}
+		referencedElement := engine.Player(ref.ReferencedElementID).player
+		treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.Path}
+		element.Target = &treeRef
+	}
+	_ = attackEventData
+}`
+
 const assembleItemPath_Engine_func string = `func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includedElements map[int]bool) {
 	itemData, ok := engine.Patch.Item[element.ID]
 	if !ok {
@@ -796,6 +835,9 @@ const clear_assemblePlanner_func string = `func (a *assemblePlanner) clear() {
 }`
 
 const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state, patch *State) {
+	for _, attackEvent := range patch.AttackEvent {
+		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
+	}
 	for _, equipmentSet := range patch.EquipmentSet {
 		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
@@ -816,6 +858,9 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 	}
 	for _, zoneItem := range patch.ZoneItem {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+	}
+	for _, attackEventTargetRef := range patch.EquipmentSetEquipmentRef {
+		ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
 	}
 	for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
 		ap.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
@@ -855,6 +900,19 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			break
 		}
 		previousLen = len(ap.includedElements)
+		for _, attackEventTargetRef := range patch.AttackEventTargetRef {
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+				ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
+			}
+		}
+		for _, attackEventTargetRef := range state.AttackEventTargetRef {
+			if _, ok := ap.updatedReferencePaths[int(attackEventTargetRef.ID)]; ok {
+				continue
+			}
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+				ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
+			}
+		}
 		for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
 			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
 				ap.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
@@ -975,6 +1033,9 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 }`
 
 const fill_assemblePlanner_func string = `func (ap *assemblePlanner) fill(state *State) {
+	for _, attackEvent := range state.AttackEvent {
+		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
+	}
 	for _, equipmentSet := range state.EquipmentSet {
 		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
@@ -995,6 +1056,9 @@ const fill_assemblePlanner_func string = `func (ap *assemblePlanner) fill(state 
 	}
 	for _, zoneItem := range state.ZoneItem {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+	}
+	for _, attackEventTargetRef := range state.AttackEventTargetRef {
+		ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
 	}
 	for _, equipmentSetEquipmentRef := range state.EquipmentSetEquipmentRef {
 		ap.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
@@ -1039,6 +1103,13 @@ const assembleFullTree_Engine_func string = `func (engine *Engine) assembleFullT
 const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() {
 	for _, p := range engine.planner.updatedPaths {
 		switch p[0].identifier {
+		case attackEventIdentifier:
+			child, ok := engine.Tree.AttackEvent[AttackEventID(p[0].id)]
+			if !ok {
+				child = attackEvent{ID: AttackEventID(p[0].id)}
+			}
+			engine.assembleAttackEventPath(&child, p, 0, engine.planner.includedElements)
+			engine.Tree.AttackEvent[AttackEventID(p[0].id)] = child
 		case equipmentSetIdentifier:
 			child, ok := engine.Tree.EquipmentSet[EquipmentSetID(p[0].id)]
 			if !ok {
@@ -1140,6 +1211,22 @@ const createPosition_Engine_func string = `func (engine *Engine) createPosition(
 	return Position{position: element}
 }`
 
+const _CreateAttackEvent_Engine_func string = `func (engine *Engine) CreateAttackEvent() AttackEvent {
+	return engine.createAttackEvent(newPath(), attackEventIdentifier)
+}`
+
+const createAttackEvent_Engine_func string = `func (engine *Engine) createAttackEvent(p path, fieldIdentifier treeFieldIdentifier) AttackEvent {
+	var element attackEventCore
+	element.engine = engine
+	element.ID = AttackEventID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, 0)
+	element.Path = element.path.toJSONPath()
+	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(element.path) > 1
+	engine.Patch.AttackEvent[element.ID] = element
+	return AttackEvent{attackEvent: element}
+}`
+
 const _CreateItem_Engine_func string = `func (engine *Engine) CreateItem() Item {
 	return engine.createItem(newPath(), itemIdentifier)
 }`
@@ -1214,6 +1301,18 @@ const createZone_Engine_func string = `func (engine *Engine) createZone(p path, 
 	element.HasParent = len(element.path) > 1
 	engine.Patch.Zone[element.ID] = element
 	return Zone{zone: element}
+}`
+
+const createAttackEventTargetRef_Engine_func string = `func (engine *Engine) createAttackEventTargetRef(p path, fieldIdentifier treeFieldIdentifier, referencedElementID PlayerID, parentID AttackEventID) attackEventTargetRefCore {
+	var element attackEventTargetRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = AttackEventTargetRefID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, int(element.ID))
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.AttackEventTargetRef[element.ID] = element
+	return element
 }`
 
 const createItemBoundToRef_Engine_func string = `func (engine *Engine) createItemBoundToRef(p path, fieldIdentifier treeFieldIdentifier, referencedElementID PlayerID, parentID ItemID) itemBoundToRefCore {
@@ -1418,6 +1517,28 @@ const deletePosition_Engine_func string = `func (engine *Engine) deletePosition(
 	}
 }`
 
+const _DeleteAttackEvent_Engine_func string = `func (engine *Engine) DeleteAttackEvent(attackEventID AttackEventID) {
+	attackEvent := engine.AttackEvent(attackEventID).attackEvent
+	if attackEvent.HasParent {
+		return
+	}
+	engine.deleteAttackEvent(attackEventID)
+}`
+
+const deleteAttackEvent_Engine_func string = `func (engine *Engine) deleteAttackEvent(attackEventID AttackEventID) {
+	attackEvent := engine.AttackEvent(attackEventID).attackEvent
+	if attackEvent.OperationKind == OperationKindDelete {
+		return
+	}
+	engine.deleteAttackEventTargetRef(attackEvent.Target)
+	if _, ok := engine.State.AttackEvent[attackEventID]; ok {
+		attackEvent.OperationKind = OperationKindDelete
+		engine.Patch.AttackEvent[attackEvent.ID] = attackEvent
+	} else {
+		delete(engine.Patch.AttackEvent, attackEventID)
+	}
+}`
+
 const _DeleteItem_Engine_func string = `func (engine *Engine) DeleteItem(itemID ItemID) {
 	item := engine.Item(itemID).item
 	if item.HasParent {
@@ -1554,6 +1675,19 @@ const deleteItemBoundToRef_Engine_func string = `func (engine *Engine) deleteIte
 	}
 }`
 
+const deleteAttackEventTargetRef_Engine_func string = `func (engine *Engine) deleteAttackEventTargetRef(attackEventTargetRefID AttackEventTargetRefID) {
+	attackEventTargetRef := engine.attackEventTargetRef(attackEventTargetRefID).attackEventTargetRef
+	if attackEventTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
+	if _, ok := engine.State.AttackEventTargetRef[attackEventTargetRefID]; ok {
+		attackEventTargetRef.OperationKind = OperationKindDelete
+		engine.Patch.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
+	} else {
+		delete(engine.Patch.AttackEventTargetRef, attackEventTargetRefID)
+	}
+}`
+
 const deleteEquipmentSetEquipmentRef_Engine_func string = `func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID EquipmentSetEquipmentRefID) {
 	equipmentSetEquipmentRef := engine.equipmentSetEquipmentRef(equipmentSetEquipmentRefID).equipmentSetEquipmentRef
 	if equipmentSetEquipmentRef.OperationKind == OperationKindDelete {
@@ -1643,7 +1777,9 @@ const deleteAnyOfItem_Player_ZoneItem_Engine_func string = `func (engine *Engine
 	}
 }`
 
-const getters_go_import string = `import "sort"`
+const getters_go_import string = `import (
+	"sort"
+)`
 
 const _EveryPlayer_Engine_func string = `func (engine *Engine) EveryPlayer() []Player {
 	playerIDs := engine.allPlayerIDs()
@@ -1852,6 +1988,53 @@ const _Origin_Item_func string = `func (_item Item) Origin() AnyOfPlayer_Positio
 	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
 }`
 
+const _EveryAttackEvent_Engine_func string = `func (engine *Engine) EveryAttackEvent() []AttackEvent {
+	attackEventIDs := engine.allAttackEventIDs()
+	sort.Slice(attackEventIDs, func(i, j int) bool {
+		return attackEventIDs[i] < attackEventIDs[j]
+	})
+	var attackEvents []AttackEvent
+	for _, attackEventID := range attackEventIDs {
+		attackEvent := engine.AttackEvent(attackEventID)
+		if attackEvent.attackEvent.HasParent {
+			continue
+		}
+		attackEvents = append(attackEvents, attackEvent)
+	}
+	attackEventIDSlicePool.Put(attackEventIDs)
+	return attackEvents
+}`
+
+const _AttackEvent_Engine_func string = `func (engine *Engine) AttackEvent(attackEventID AttackEventID) AttackEvent {
+	patchingAttackEvent, ok := engine.Patch.AttackEvent[attackEventID]
+	if ok {
+		return AttackEvent{attackEvent: patchingAttackEvent}
+	}
+	currentAttackEvent, ok := engine.State.AttackEvent[attackEventID]
+	if ok {
+		return AttackEvent{attackEvent: currentAttackEvent}
+	}
+	return AttackEvent{attackEvent: attackEventCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_AttackEvent_func string = `func (_attackEvent AttackEvent) ID() AttackEventID {
+	return _attackEvent.attackEvent.ID
+}`
+
+const _Exists_AttackEvent_func string = `func (_attackEvent AttackEvent) Exists() (AttackEvent, bool) {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	return attackEvent, attackEvent.attackEvent.OperationKind != OperationKindDelete
+}`
+
+const _Path_AttackEvent_func string = `func (_attackEvent AttackEvent) Path() string {
+	return _attackEvent.attackEvent.Path
+}`
+
+const _Target_AttackEvent_func string = `func (_attackEvent AttackEvent) Target() AttackEventTargetRef {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	return attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target)
+}`
+
 const _EveryPosition_Engine_func string = `func (engine *Engine) EveryPosition() []Position {
 	positionIDs := engine.allPositionIDs()
 	sort.Slice(positionIDs, func(i, j int) bool {
@@ -2045,6 +2228,22 @@ const itemBoundToRef_Engine_func string = `func (engine *Engine) itemBoundToRef(
 		return ItemBoundToRef{itemBoundToRef: currentItemBoundToRef}
 	}
 	return ItemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ID_AttackEventTargetRef_func string = `func (_attackEventTargetRef AttackEventTargetRef) ID() PlayerID {
+	return _attackEventTargetRef.attackEventTargetRef.ReferencedElementID
+}`
+
+const attackEventTargetRef_Engine_func string = `func (engine *Engine) attackEventTargetRef(attackEventTargetRefID AttackEventTargetRefID) AttackEventTargetRef {
+	patchingAttackEventTargetRef, ok := engine.Patch.AttackEventTargetRef[attackEventTargetRefID]
+	if ok {
+		return AttackEventTargetRef{attackEventTargetRef: patchingAttackEventTargetRef}
+	}
+	currentAttackEventTargetRef, ok := engine.State.AttackEventTargetRef[attackEventTargetRefID]
+	if ok {
+		return AttackEventTargetRef{attackEventTargetRef: currentAttackEventTargetRef}
+	}
+	return AttackEventTargetRef{attackEventTargetRef: attackEventTargetRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
 const _ID_PlayerGuildMemberRef_func string = `func (_playerGuildMemberRef PlayerGuildMemberRef) ID() PlayerID {
@@ -2377,6 +2576,25 @@ const deduplicateGearScoreIDs_func string = `func deduplicateGearScoreIDs(a []Ge
 	return deduped
 }`
 
+const deduplicateAttackEventIDs_func string = `func deduplicateAttackEventIDs(a []AttackEventID, b []AttackEventID) []AttackEventID {
+	check := attackEventCheckPool.Get().(map[AttackEventID]bool)
+	for k := range check {
+		delete(check, k)
+	}
+	deduped := attackEventIDSlicePool.Get().([]AttackEventID)[:0]
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	attackEventCheckPool.Put(check)
+	return deduped
+}`
+
 const deduplicateEquipmentSetIDs_func string = `func deduplicateEquipmentSetIDs(a []EquipmentSetID, b []EquipmentSetID) []EquipmentSetID {
 	check := equipmentSetCheckPool.Get().(map[EquipmentSetID]bool)
 	for k := range check {
@@ -2431,6 +2649,25 @@ const deduplicatePlayerTargetRefIDs_func string = `func deduplicatePlayerTargetR
 		deduped = append(deduped, val)
 	}
 	playerTargetRefCheckPool.Put(check)
+	return deduped
+}`
+
+const deduplicateAttackEventTargetRefIDs_func string = `func deduplicateAttackEventTargetRefIDs(a []AttackEventTargetRefID, b []AttackEventTargetRefID) []AttackEventTargetRefID {
+	check := attackEventTargetRefCheckPool.Get().(map[AttackEventTargetRefID]bool)
+	for k := range check {
+		delete(check, k)
+	}
+	deduped := attackEventTargetRefIDSlicePool.Get().([]AttackEventTargetRefID)[:0]
+	for _, val := range a {
+		check[val] = true
+	}
+	for _, val := range b {
+		check[val] = true
+	}
+	for val := range check {
+		deduped = append(deduped, val)
+	}
+	attackEventTargetRefCheckPool.Put(check)
 	return deduped
 }`
 
@@ -2508,6 +2745,21 @@ const deduplicateEquipmentSetEquipmentRefIDs_func string = `func deduplicateEqui
 	}
 	equipmentSetEquipmentRefCheckPool.Put(check)
 	return deduped
+}`
+
+const allAttackEventIDs_Engine_func string = `func (engine Engine) allAttackEventIDs() []AttackEventID {
+	stateAttackEventIDs := attackEventIDSlicePool.Get().([]AttackEventID)[:0]
+	for attackEventID := range engine.State.AttackEvent {
+		stateAttackEventIDs = append(stateAttackEventIDs, attackEventID)
+	}
+	patchAttackEventIDs := attackEventIDSlicePool.Get().([]AttackEventID)[:0]
+	for attackEventID := range engine.Patch.AttackEvent {
+		patchAttackEventIDs = append(patchAttackEventIDs, attackEventID)
+	}
+	dedupedIDs := deduplicateAttackEventIDs(stateAttackEventIDs, patchAttackEventIDs)
+	attackEventIDSlicePool.Put(stateAttackEventIDs)
+	attackEventIDSlicePool.Put(patchAttackEventIDs)
+	return dedupedIDs
 }`
 
 const allEquipmentSetIDs_Engine_func string = `func (engine Engine) allEquipmentSetIDs() []EquipmentSetID {
@@ -2660,6 +2912,21 @@ const allItemBoundToRefIDs_Engine_func string = `func (engine Engine) allItemBou
 	return dedupedIDs
 }`
 
+const allAttackEventTargetRefIDs_Engine_func string = `func (engine Engine) allAttackEventTargetRefIDs() []AttackEventTargetRefID {
+	stateAttackEventTargetRefIDs := attackEventTargetRefIDSlicePool.Get().([]AttackEventTargetRefID)[:0]
+	for attackEventTargetRefID := range engine.State.AttackEventTargetRef {
+		stateAttackEventTargetRefIDs = append(stateAttackEventTargetRefIDs, attackEventTargetRefID)
+	}
+	patchAttackEventTargetRefIDs := attackEventTargetRefIDSlicePool.Get().([]AttackEventTargetRefID)[:0]
+	for attackEventTargetRefID := range engine.Patch.AttackEventTargetRef {
+		patchAttackEventTargetRefIDs = append(patchAttackEventTargetRefIDs, attackEventTargetRefID)
+	}
+	dedupedIDs := deduplicateAttackEventTargetRefIDs(stateAttackEventTargetRefIDs, patchAttackEventTargetRefIDs)
+	attackEventTargetRefIDSlicePool.Put(stateAttackEventTargetRefIDs)
+	attackEventTargetRefIDSlicePool.Put(patchAttackEventTargetRefIDs)
+	return dedupedIDs
+}`
+
 const allPlayerGuildMemberRefIDs_Engine_func string = `func (engine Engine) allPlayerGuildMemberRefIDs() []PlayerGuildMemberRefID {
 	statePlayerGuildMemberRefIDs := playerGuildMemberRefIDSlicePool.Get().([]PlayerGuildMemberRefID)[:0]
 	for playerGuildMemberRefID := range engine.State.PlayerGuildMemberRef {
@@ -2709,7 +2976,8 @@ const path_go_import string = `import "strconv"`
 
 const treeFieldIdentifier_type string = `type treeFieldIdentifier string`
 
-const equipmentSetIdentifier_type string = `const (
+const attackEventIdentifier_type string = `const (
+	attackEventIdentifier			= "attackEvent"
 	equipmentSetIdentifier			= "equipmentSet"
 	gearScoreIdentifier			= "gearScore"
 	itemIdentifier				= "item"
@@ -2717,10 +2985,12 @@ const equipmentSetIdentifier_type string = `const (
 	positionIdentifier			= "position"
 	zoneIdentifier				= "zone"
 	zoneItemIdentifier			= "zoneItem"
+	attackEvent_targetIdentifier		= "attackEvent_target"
 	equipmentSet_equipmentIdentifier	= "equipmentSet_equipment"
 	item_boundToIdentifier			= "item_boundTo"
 	item_gearScoreIdentifier		= "item_gearScore"
 	item_originIdentifier			= "item_origin"
+	player_actionIdentifier			= "player_action"
 	player_equipmentSetsIdentifier		= "player_equipmentSets"
 	player_gearScoreIdentifier		= "player_gearScore"
 	player_guildMembersIdentifier		= "player_guildMembers"
@@ -2906,6 +3176,14 @@ const gearScoreIDSlicePool_type string = `var gearScoreIDSlicePool = sync.Pool{N
 	return make([]GearScoreID, 0)
 }}`
 
+const attackEventCheckPool_type string = `var attackEventCheckPool = sync.Pool{New: func() interface{} {
+	return make(map[AttackEventID]bool)
+}}`
+
+const attackEventIDSlicePool_type string = `var attackEventIDSlicePool = sync.Pool{New: func() interface{} {
+	return make([]AttackEventID, 0)
+}}`
+
 const equipmentSetCheckPool_type string = `var equipmentSetCheckPool = sync.Pool{New: func() interface{} {
 	return make(map[EquipmentSetID]bool)
 }}`
@@ -2928,6 +3206,14 @@ const playerTargetRefCheckPool_type string = `var playerTargetRefCheckPool = syn
 
 const playerTargetRefIDSlicePool_type string = `var playerTargetRefIDSlicePool = sync.Pool{New: func() interface{} {
 	return make([]PlayerTargetRefID, 0)
+}}`
+
+const attackEventTargetRefCheckPool_type string = `var attackEventTargetRefCheckPool = sync.Pool{New: func() interface{} {
+	return make(map[AttackEventTargetRefID]bool)
+}}`
+
+const attackEventTargetRefIDSlicePool_type string = `var attackEventTargetRefIDSlicePool = sync.Pool{New: func() interface{} {
+	return make([]AttackEventTargetRefID, 0)
 }}`
 
 const itemBoundToRefCheckPool_type string = `var itemBoundToRefCheckPool = sync.Pool{New: func() interface{} {
@@ -2987,6 +3273,31 @@ const _Get_ItemBoundToRef_func string = `func (_ref ItemBoundToRef) Get() Player
 	return ref.itemBoundToRef.engine.Player(ref.itemBoundToRef.ReferencedElementID)
 }`
 
+const _IsSet_AttackEventTargetRef_func string = `func (_ref AttackEventTargetRef) IsSet() (AttackEventTargetRef, bool) {
+	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
+	return ref, ref.attackEventTargetRef.ID != 0
+}`
+
+const _Unset_AttackEventTargetRef_func string = `func (_ref AttackEventTargetRef) Unset() {
+	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
+	if ref.attackEventTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
+	ref.attackEventTargetRef.engine.deleteAttackEventTargetRef(ref.attackEventTargetRef.ID)
+	parent := ref.attackEventTargetRef.engine.AttackEvent(ref.attackEventTargetRef.ParentID).attackEvent
+	if parent.OperationKind == OperationKindDelete {
+		return
+	}
+	parent.Target = 0
+	parent.OperationKind = OperationKindUpdate
+	ref.attackEventTargetRef.engine.Patch.AttackEvent[parent.ID] = parent
+}`
+
+const _Get_AttackEventTargetRef_func string = `func (_ref AttackEventTargetRef) Get() Player {
+	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
+	return ref.attackEventTargetRef.engine.Player(ref.attackEventTargetRef.ReferencedElementID)
+}`
+
 const _Get_PlayerGuildMemberRef_func string = `func (_ref PlayerGuildMemberRef) Get() Player {
 	ref := _ref.playerGuildMemberRef.engine.playerGuildMemberRef(_ref.playerGuildMemberRef.ID)
 	return ref.playerGuildMemberRef.engine.Player(ref.playerGuildMemberRef.ReferencedElementID)
@@ -3032,6 +3343,17 @@ const _Get_PlayerTargetedByRef_func string = `func (_ref PlayerTargetedByRef) Ge
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
 	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
+}`
+
+const dereferenceAttackEventTargetRefs_Engine_func string = `func (engine *Engine) dereferenceAttackEventTargetRefs(playerID PlayerID) {
+	allAttackEventTargetRefIDs := engine.allAttackEventTargetRefIDs()
+	for _, refID := range allAttackEventTargetRefIDs {
+		ref := engine.attackEventTargetRef(refID)
+		if ref.attackEventTargetRef.ReferencedElementID == playerID {
+			ref.Unset()
+		}
+	}
+	attackEventTargetRefIDSlicePool.Put(allAttackEventTargetRefIDs)
 }`
 
 const dereferenceItemBoundToRefs_Engine_func string = `func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {
@@ -3268,6 +3590,26 @@ const _RemoveInteractablesZoneItem_Zone_func string = `func (_zone Zone) RemoveI
 		break
 	}
 	return zone
+}`
+
+const _RemoveAction_Player_func string = `func (_player Player) RemoveAction(actionToRemove AttackEventID) Player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+	for i, attackEventID := range player.player.Action {
+		if attackEventID != actionToRemove {
+			continue
+		}
+		player.player.Items[i] = player.player.Items[len(player.player.Items)-1]
+		player.player.Items[len(player.player.Items)-1] = 0
+		player.player.Items = player.player.Items[:len(player.player.Items)-1]
+		player.player.engine.deleteAttackEvent(attackEventID)
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
+		break
+	}
+	return player
 }`
 
 const _RemoveItems_Player_func string = `func (_player Player) RemoveItems(itemToRemove ItemID) Player {
@@ -3546,6 +3888,27 @@ const _SetBoundTo_Item_func string = `func (_item Item) SetBoundTo(playerID Play
 	return item
 }`
 
+const _SetTarget_AttackEvent_func string = `func (_attackEvent AttackEvent) SetTarget(playerID PlayerID) AttackEvent {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	if attackEvent.attackEvent.OperationKind == OperationKindDelete {
+		return attackEvent
+	}
+	if attackEvent.attackEvent.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return attackEvent
+	}
+	if attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target).attackEventTargetRef.ReferencedElementID == playerID {
+		return attackEvent
+	}
+	if attackEvent.attackEvent.Target != 0 {
+		attackEvent.attackEvent.engine.deleteAttackEventTargetRef(attackEvent.attackEvent.Target)
+	}
+	ref := attackEvent.attackEvent.engine.createAttackEventTargetRef(attackEvent.attackEvent.path, attackEvent_targetIdentifier, playerID, attackEvent.attackEvent.ID)
+	attackEvent.attackEvent.Target = ref.ID
+	attackEvent.attackEvent.OperationKind = OperationKindUpdate
+	attackEvent.attackEvent.engine.Patch.AttackEvent[attackEvent.attackEvent.ID] = attackEvent.attackEvent
+	return attackEvent
+}`
+
 const _SetName_EquipmentSet_func string = `func (_equipmentSet EquipmentSet) SetName(newName string) EquipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {
@@ -3606,6 +3969,8 @@ const _SetTargetZoneItem_Player_func string = `func (_player Player) SetTargetZo
 	return player
 }`
 
+const _AttackEventID_type string = `type AttackEventID int`
+
 const _EquipmentSetID_type string = `type EquipmentSetID int`
 
 const _GearScoreID_type string = `type GearScoreID int`
@@ -3619,6 +3984,8 @@ const _PositionID_type string = `type PositionID int`
 const _ZoneID_type string = `type ZoneID int`
 
 const _ZoneItemID_type string = `type ZoneItemID int`
+
+const _AttackEventTargetRefID_type string = `type AttackEventTargetRefID int`
 
 const _PlayerGuildMemberRefID_type string = `type PlayerGuildMemberRefID int`
 
@@ -3639,6 +4006,7 @@ const _PlayerTargetRefID_type string = `type PlayerTargetRefID int`
 const _PlayerTargetedByRefID_type string = `type PlayerTargetedByRefID int`
 
 const _State_type string = `type State struct {
+	AttackEvent			map[AttackEventID]attackEventCore				` + "`" + `json:"attackEvent"` + "`" + `
 	EquipmentSet			map[EquipmentSetID]equipmentSetCore				` + "`" + `json:"equipmentSet"` + "`" + `
 	GearScore			map[GearScoreID]gearScoreCore					` + "`" + `json:"gearScore"` + "`" + `
 	Item				map[ItemID]itemCore						` + "`" + `json:"item"` + "`" + `
@@ -3646,6 +4014,7 @@ const _State_type string = `type State struct {
 	Position			map[PositionID]positionCore					` + "`" + `json:"position"` + "`" + `
 	Zone				map[ZoneID]zoneCore						` + "`" + `json:"zone"` + "`" + `
 	ZoneItem			map[ZoneItemID]zoneItemCore					` + "`" + `json:"zoneItem"` + "`" + `
+	AttackEventTargetRef		map[AttackEventTargetRefID]attackEventTargetRefCore		` + "`" + `json:"attackEventTargetRef"` + "`" + `
 	EquipmentSetEquipmentRef	map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore	` + "`" + `json:"equipmentSetEquipmentRef"` + "`" + `
 	ItemBoundToRef			map[ItemBoundToRefID]itemBoundToRefCore				` + "`" + `json:"itemBoundToRef"` + "`" + `
 	PlayerEquipmentSetRef		map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore		` + "`" + `json:"playerEquipmentSetRef"` + "`" + `
@@ -3658,8 +4027,20 @@ const _State_type string = `type State struct {
 }`
 
 const newState_func string = `func newState() *State {
-	return &State{EquipmentSet: make(map[EquipmentSetID]equipmentSetCore), GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), Player: make(map[PlayerID]playerCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore), EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore), ItemBoundToRef: make(map[ItemBoundToRefID]itemBoundToRefCore), PlayerEquipmentSetRef: make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore), PlayerGuildMemberRef: make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore), PlayerTargetRef: make(map[PlayerTargetRefID]playerTargetRefCore), PlayerTargetedByRef: make(map[PlayerTargetedByRefID]playerTargetedByRefCore), AnyOfPlayer_Position: make(map[AnyOfPlayer_PositionID]anyOfPlayer_PositionCore), AnyOfPlayer_ZoneItem: make(map[AnyOfPlayer_ZoneItemID]anyOfPlayer_ZoneItemCore), AnyOfItem_Player_ZoneItem: make(map[AnyOfItem_Player_ZoneItemID]anyOfItem_Player_ZoneItemCore)}
+	return &State{AttackEvent: make(map[AttackEventID]attackEventCore), EquipmentSet: make(map[EquipmentSetID]equipmentSetCore), GearScore: make(map[GearScoreID]gearScoreCore), Item: make(map[ItemID]itemCore), Player: make(map[PlayerID]playerCore), Position: make(map[PositionID]positionCore), Zone: make(map[ZoneID]zoneCore), ZoneItem: make(map[ZoneItemID]zoneItemCore), AttackEventTargetRef: make(map[AttackEventTargetRefID]attackEventTargetRefCore), EquipmentSetEquipmentRef: make(map[EquipmentSetEquipmentRefID]equipmentSetEquipmentRefCore), ItemBoundToRef: make(map[ItemBoundToRefID]itemBoundToRefCore), PlayerEquipmentSetRef: make(map[PlayerEquipmentSetRefID]playerEquipmentSetRefCore), PlayerGuildMemberRef: make(map[PlayerGuildMemberRefID]playerGuildMemberRefCore), PlayerTargetRef: make(map[PlayerTargetRefID]playerTargetRefCore), PlayerTargetedByRef: make(map[PlayerTargetedByRefID]playerTargetedByRefCore), AnyOfPlayer_Position: make(map[AnyOfPlayer_PositionID]anyOfPlayer_PositionCore), AnyOfPlayer_ZoneItem: make(map[AnyOfPlayer_ZoneItemID]anyOfPlayer_ZoneItemCore), AnyOfItem_Player_ZoneItem: make(map[AnyOfItem_Player_ZoneItemID]anyOfItem_Player_ZoneItemCore)}
 }`
+
+const attackEventCore_type string = `type attackEventCore struct {
+	ID		AttackEventID		` + "`" + `json:"id"` + "`" + `
+	Target		AttackEventTargetRefID	` + "`" + `json:"target"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	HasParent	bool			` + "`" + `json:"hasParent"` + "`" + `
+	Path		string			` + "`" + `json:"path"` + "`" + `
+	path		path
+	engine		*Engine
+}`
+
+const _AttackEvent_type string = `type AttackEvent struct{ attackEvent attackEventCore }`
 
 const zoneCore_type string = `type zoneCore struct {
 	ID		ZoneID				` + "`" + `json:"id"` + "`" + `
@@ -3706,6 +4087,7 @@ const _Item_type string = `type Item struct{ item itemCore }`
 
 const playerCore_type string = `type playerCore struct {
 	ID		PlayerID			` + "`" + `json:"id"` + "`" + `
+	Action		[]AttackEventID			` + "`" + `json:"action"` + "`" + `
 	EquipmentSets	[]PlayerEquipmentSetRefID	` + "`" + `json:"equipmentSets"` + "`" + `
 	GearScore	GearScoreID			` + "`" + `json:"gearScore"` + "`" + `
 	GuildMembers	[]PlayerGuildMemberRefID	` + "`" + `json:"guildMembers"` + "`" + `
@@ -3771,6 +4153,17 @@ const itemBoundToRefCore_type string = `type itemBoundToRefCore struct {
 }`
 
 const _ItemBoundToRef_type string = `type ItemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }`
+
+const attackEventTargetRefCore_type string = `type attackEventTargetRefCore struct {
+	ID			AttackEventTargetRefID	` + "`" + `json:"id"` + "`" + `
+	ParentID		AttackEventID		` + "`" + `json:"parentID"` + "`" + `
+	ReferencedElementID	PlayerID		` + "`" + `json:"referencedElementID"` + "`" + `
+	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+	path			path
+	engine			*Engine
+}`
+
+const _AttackEventTargetRef_type string = `type AttackEventTargetRef struct{ attackEventTargetRef attackEventTargetRefCore }`
 
 const playerGuildMemberRefCore_type string = `type playerGuildMemberRefCore struct {
 	ID			PlayerGuildMemberRefID	` + "`" + `json:"id"` + "`" + `
@@ -3894,6 +4287,17 @@ const _GenerateID_Engine_func string = `func (engine *Engine) GenerateID() int {
 }`
 
 const _UpdateState_Engine_func string = `func (engine *Engine) UpdateState() {
+	for _, attackEvent := range engine.Patch.AttackEvent {
+		engine.deleteAttackEvent(attackEvent.ID)
+	}
+	for _, attackEvent := range engine.Patch.AttackEvent {
+		if attackEvent.OperationKind == OperationKindDelete {
+			delete(engine.State.AttackEvent, attackEvent.ID)
+		} else {
+			attackEvent.OperationKind = OperationKindUnchanged
+			engine.State.AttackEvent[attackEvent.ID] = attackEvent
+		}
+	}
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
 		if equipmentSet.OperationKind == OperationKindDelete {
 			delete(engine.State.EquipmentSet, equipmentSet.ID)
@@ -3922,6 +4326,7 @@ const _UpdateState_Engine_func string = `func (engine *Engine) UpdateState() {
 		if player.OperationKind == OperationKindDelete {
 			delete(engine.State.Player, player.ID)
 		} else {
+			player.Action = player.Action[:0]
 			player.OperationKind = OperationKindUnchanged
 			engine.State.Player[player.ID] = player
 		}
@@ -3948,6 +4353,14 @@ const _UpdateState_Engine_func string = `func (engine *Engine) UpdateState() {
 		} else {
 			zoneItem.OperationKind = OperationKindUnchanged
 			engine.State.ZoneItem[zoneItem.ID] = zoneItem
+		}
+	}
+	for _, attackEventTargetRef := range engine.Patch.AttackEventTargetRef {
+		if attackEventTargetRef.OperationKind == OperationKindDelete {
+			delete(engine.State.AttackEventTargetRef, attackEventTargetRef.ID)
+		} else {
+			attackEventTargetRef.OperationKind = OperationKindUnchanged
+			engine.State.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
 		}
 	}
 	for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
@@ -4022,6 +4435,9 @@ const _UpdateState_Engine_func string = `func (engine *Engine) UpdateState() {
 			engine.State.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItem.ID] = anyOfItem_Player_ZoneItem
 		}
 	}
+	for key := range engine.Patch.AttackEvent {
+		delete(engine.Patch.AttackEvent, key)
+	}
 	for key := range engine.Patch.EquipmentSet {
 		delete(engine.Patch.EquipmentSet, key)
 	}
@@ -4042,6 +4458,9 @@ const _UpdateState_Engine_func string = `func (engine *Engine) UpdateState() {
 	}
 	for key := range engine.Patch.ZoneItem {
 		delete(engine.Patch.ZoneItem, key)
+	}
+	for key := range engine.Patch.AttackEventTargetRef {
+		delete(engine.Patch.AttackEventTargetRef, key)
 	}
 	for key := range engine.Patch.EquipmentSetEquipmentRef {
 		delete(engine.Patch.EquipmentSetEquipmentRef, key)
@@ -4081,7 +4500,8 @@ const _ReferencedDataModified_type string = `const (
 
 const _ElementKind_type string = `type ElementKind string`
 
-const _ElementKindEquipmentSet_type string = `const (
+const _ElementKindAttackEvent_type string = `const (
+	ElementKindAttackEvent	ElementKind	= "AttackEvent"
 	ElementKindEquipmentSet	ElementKind	= "EquipmentSet"
 	ElementKindGearScore	ElementKind	= "GearScore"
 	ElementKindItem		ElementKind	= "Item"
@@ -4092,6 +4512,7 @@ const _ElementKindEquipmentSet_type string = `const (
 )`
 
 const _Tree_type string = `type Tree struct {
+	AttackEvent	map[AttackEventID]attackEvent	` + "`" + `json:"attackEvent"` + "`" + `
 	EquipmentSet	map[EquipmentSetID]equipmentSet	` + "`" + `json:"equipmentSet"` + "`" + `
 	GearScore	map[GearScoreID]gearScore	` + "`" + `json:"gearScore"` + "`" + `
 	Item		map[ItemID]item			` + "`" + `json:"item"` + "`" + `
@@ -4102,10 +4523,13 @@ const _Tree_type string = `type Tree struct {
 }`
 
 const newTree_func string = `func newTree() *Tree {
-	return &Tree{EquipmentSet: make(map[EquipmentSetID]equipmentSet), GearScore: make(map[GearScoreID]gearScore), Item: make(map[ItemID]item), Player: make(map[PlayerID]player), Position: make(map[PositionID]position), Zone: make(map[ZoneID]zone), ZoneItem: make(map[ZoneItemID]zoneItem)}
+	return &Tree{AttackEvent: make(map[AttackEventID]attackEvent), EquipmentSet: make(map[EquipmentSetID]equipmentSet), GearScore: make(map[GearScoreID]gearScore), Item: make(map[ItemID]item), Player: make(map[PlayerID]player), Position: make(map[PositionID]position), Zone: make(map[ZoneID]zone), ZoneItem: make(map[ZoneItemID]zoneItem)}
 }`
 
 const clear_Tree_func string = `func (t *Tree) clear() {
+	for key := range t.AttackEvent {
+		delete(t.AttackEvent, key)
+	}
 	for key := range t.EquipmentSet {
 		delete(t.EquipmentSet, key)
 	}
@@ -4142,6 +4566,13 @@ const item_type string = `type item struct {
 	GearScore	*gearScore		` + "`" + `json:"gearScore"` + "`" + `
 	Name		string			` + "`" + `json:"name"` + "`" + `
 	Origin		interface{}		` + "`" + `json:"origin"` + "`" + `
+	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
+}`
+
+const attackEvent_type string = `type attackEvent struct {
+	ID		AttackEventID		` + "`" + `json:"id"` + "`" + `
+	Target		*elementReference	` + "`" + `json:"target"` + "`" + `
+	Name		string			` + "`" + `json:"name"` + "`" + `
 	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
 }`
 

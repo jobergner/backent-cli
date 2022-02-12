@@ -20,7 +20,7 @@ func TestWritePath(t *testing.T) {
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			treeFieldIdentifier_type,
-			equipmentSetIdentifier_type,
+			attackEventIdentifier_type,
 		}, "\n"))
 
 		if expected != actual {
