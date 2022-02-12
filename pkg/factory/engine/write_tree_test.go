@@ -37,7 +37,7 @@ func TestWriteTree(t *testing.T) {
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_ElementKind_type,
-			_ElementKindEquipmentSet_type,
+			_ElementKindAttackEvent_type,
 		}, "\n"))
 
 		if expected != actual {

@@ -200,6 +200,9 @@ func (engine *Engine) UpdateState() {
 	for key := range engine.Patch.ZoneItem {
 		delete(engine.Patch.ZoneItem, key)
 	}
+	for key := range engine.Patch.AttackEventTargetRef {
+		delete(engine.Patch.AttackEventTargetRef, key)
+	}
 	for key := range engine.Patch.EquipmentSetEquipmentRef {
 		delete(engine.Patch.EquipmentSetEquipmentRef, key)
 	}
