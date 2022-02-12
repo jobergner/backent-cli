@@ -22,9 +22,11 @@ func caseInsensitiveSort(keys []string) func(i, j int) bool {
 	}
 }
 
-func Diff(actual, expected string) string {
+func Diff(actual, expected string) (string, bool) {
 	a := parseDecls(actual)
 	b := parseDecls(expected)
+
+	var areDifferent bool
 
 	actualDelcs := make(map[string]string)
 	for _, decl := range a {
@@ -38,11 +40,13 @@ func Diff(actual, expected string) string {
 	var buf bytes.Buffer
 	for name := range expectedDelcs {
 		if _, ok := actualDelcs[name]; !ok {
+			areDifferent = true
 			buf.WriteString(fmt.Sprintf("expected to find '%s' but did not\n\n", name))
 		}
 	}
 	for name := range actualDelcs {
 		if _, ok := expectedDelcs[name]; !ok {
+			areDifferent = true
 			buf.WriteString(fmt.Sprintf("found '%s' but should not have\n\n", name))
 		}
 	}
@@ -58,13 +62,14 @@ func Diff(actual, expected string) string {
 		got := actualDelcs[name]
 		want := expectedDelcs[name]
 		if got != want {
+			areDifferent = true
 			buf.WriteString(diffDecl(got, want))
 		} else {
 			buf.WriteString("\n____\n\n CORRECT:\n" + want)
 		}
 	}
 
-	return buf.String()
+	return buf.String(), areDifferent
 }
 
 // creates diff and makes whitespace visible
