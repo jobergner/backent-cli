@@ -22,8 +22,9 @@ func TestWriteActions(t *testing.T) {
 			_Actions_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }
