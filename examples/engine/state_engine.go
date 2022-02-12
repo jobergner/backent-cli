@@ -34,7 +34,17 @@ func (engine *Engine) GenerateID() int {
 
 func (engine *Engine) UpdateState() {
 	for _, attackEvent := range engine.Patch.AttackEvent {
-		delete(engine.State.AttackEvent, attackEvent.ID)
+		// so event and children will be deleted
+		engine.deleteAttackEvent(attackEvent.ID)
+	}
+
+	for _, attackEvent := range engine.Patch.AttackEvent {
+		if attackEvent.OperationKind == OperationKindDelete {
+			delete(engine.State.AttackEvent, attackEvent.ID)
+		} else {
+			attackEvent.OperationKind = OperationKindUnchanged
+			engine.State.AttackEvent[attackEvent.ID] = attackEvent
+		}
 	}
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
 		if equipmentSet.OperationKind == OperationKindDelete {
