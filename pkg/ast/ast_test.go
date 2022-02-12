@@ -18,6 +18,10 @@ func TestStateConfigAST(t *testing.T) {
 			"houseNumber": "int",
 			"city":        "string",
 		},
+		"moveInEvent": map[interface{}]interface{}{
+			"__event__":   "true",
+			"destination": "*address",
+		},
 		"person": map[interface{}]interface{}{
 			"name":       "string",
 			"age":        "int",
@@ -28,6 +32,7 @@ func TestStateConfigAST(t *testing.T) {
 			"baz":        "[]anyOf<address,person>",
 			"ban":        "[]*anyOf<address,person>",
 			"residentOf": "*city",
+			"action":     "[]moveInEvent",
 		},
 		"city": map[interface{}]interface{}{
 			"name": "string",
@@ -158,6 +163,19 @@ func TestStateConfigAST(t *testing.T) {
 						},
 					},
 				},
+				"moveInEvent": {
+					Name:    "moveInEvent",
+					IsEvent: true,
+					Fields: map[string]Field{
+						"destination": {
+							Name:            "destination",
+							ValueString:     "*address",
+							HasSliceValue:   false,
+							HasPointerValue: true,
+							ValueTypes:      make(map[string]*ConfigType),
+						},
+					},
+				},
 				"address": {
 					Name: "address",
 					Fields: map[string]Field{
@@ -213,6 +231,13 @@ func TestStateConfigAST(t *testing.T) {
 							ValueString:     "*house",
 							HasSliceValue:   false,
 							HasPointerValue: true,
+							ValueTypes:      make(map[string]*ConfigType),
+						},
+						"action": {
+							Name:            "action",
+							ValueString:     "[]moveInEvent",
+							HasSliceValue:   true,
+							HasPointerValue: false,
 							ValueTypes:      make(map[string]*ConfigType),
 						},
 						"foo": {
@@ -315,6 +340,13 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, cityField.ValueTypes["string"].IsBasicType, true)
 		assert.Equal(t, cityField.ValueTypeName, "string")
 
+		moveInEventType := actual.Types["moveInEvent"]
+		destinationField := moveInEventType.Fields["destination"]
+		assert.Equal(t, destinationField.Parent.Name, "moveInEvent")
+		assert.Equal(t, destinationField.ValueTypes["address"].Name, "address")
+		assert.Equal(t, destinationField.ValueTypes["address"].IsBasicType, false)
+		assert.Equal(t, destinationField.ValueTypeName, "moveInEventDestinationRef")
+
 		personType := actual.Types["person"]
 		NameField := personType.Fields["name"]
 		assert.Equal(t, NameField.Parent.Name, "person")
@@ -369,6 +401,12 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, residentOfField.ValueTypes["city"].Name, "city")
 		assert.Equal(t, residentOfField.ValueTypes["city"].IsBasicType, false)
 		assert.Equal(t, residentOfField.ValueTypeName, "personResidentOfRef")
+		actionField := personType.Fields["action"]
+		assert.Equal(t, actionField.Parent.Name, "person")
+		assert.Equal(t, actionField.ValueTypes["moveInEvent"].Name, "moveInEvent")
+		assert.Equal(t, actionField.ValueTypes["moveInEvent"].IsBasicType, false)
+		assert.Equal(t, actionField.ValueTypeName, "moveInEvent")
+
 		cityType := actual.Types["city"]
 		nameField := cityType.Fields["name"]
 		assert.Equal(t, nameField.Parent.Name, "city")
@@ -398,10 +436,10 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, isValidAddressResponseValue.ValueTypes["bool"].Name, "bool")
 		assert.Equal(t, isValidAddressResponseValue.ValueTypes["bool"].IsBasicType, true)
 
-		assert.Equal(t, personType.ReferencedBy, []*Field{&banField, &barField, &friendsField})
-		assert.Equal(t, addressType.ReferencedBy, []*Field{&banField, &barField})
-		assert.Equal(t, houseType.ReferencedBy, []*Field{&secondHomeField})
-		assert.Equal(t, cityType.ReferencedBy, []*Field{&residentOfField})
+		assert.ElementsMatch(t, personType.ReferencedBy, []*Field{&banField, &barField, &friendsField})
+		assert.ElementsMatch(t, addressType.ReferencedBy, []*Field{&banField, &barField, &destinationField})
+		assert.ElementsMatch(t, houseType.ReferencedBy, []*Field{&secondHomeField})
+		assert.ElementsMatch(t, cityType.ReferencedBy, []*Field{&residentOfField})
 	})
 
 	t.Run("should fill in parentalInfo", func(t *testing.T) {
