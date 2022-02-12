@@ -9,6 +9,10 @@
       "target": "*anyOf<player,zoneItem>",
       "targetedBy": "[]*anyOf<player,zoneItem>"
     },
+    "attackEvent": {
+      "__event__": "true",
+      "target": "*player"
+    },
     "zone": {
       "items": "[]zoneItem",
       "players": "[]player",
@@ -52,7 +56,7 @@
       "items": "[]itemID"
     }
   },
-  "responses" : {
+  "responses": {
     "addItemToPlayer": {
       "playerPath": "string"
     },
