@@ -23,8 +23,9 @@ func TestWriteTree(t *testing.T) {
 			_ReferencedDataModified_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes elementKinds", func(t *testing.T) {
@@ -40,8 +41,9 @@ func TestWriteTree(t *testing.T) {
 			_ElementKindAttackEvent_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes tree elements", func(t *testing.T) {
@@ -64,8 +66,9 @@ func TestWriteTree(t *testing.T) {
 			elementReference_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes tree", func(t *testing.T) {
@@ -82,8 +85,9 @@ func TestWriteTree(t *testing.T) {
 			clear_Tree_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

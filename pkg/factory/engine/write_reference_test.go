@@ -34,8 +34,9 @@ func TestWriteReference(t *testing.T) {
 			_Get_PlayerTargetedByRef_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes dereference", func(t *testing.T) {
@@ -58,8 +59,9 @@ func TestWriteReference(t *testing.T) {
 			dereferencePlayerTargetedByRefsZoneItem_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

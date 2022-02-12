@@ -31,8 +31,9 @@ func TestWriteSetters(t *testing.T) {
 			_SetTargetZoneItem_Player_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

@@ -41,8 +41,9 @@ func TestWriteAny(t *testing.T) {
 			deleteChild_anyOfItem_Player_ZoneItemCore_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes anyRefs", func(t *testing.T) {
@@ -69,8 +70,9 @@ func TestWriteAny(t *testing.T) {
 			_ZoneItem_anyOfItem_Player_ZoneItemRef_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }
