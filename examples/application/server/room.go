@@ -44,12 +44,6 @@ func (r *Room) AlterState(fn func(*Room)) {
 	r.mu.Unlock()
 }
 
-func (r *Room) ReadState() *Engine {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.state
-}
-
 func (r *Room) processMessageSync(msg Message) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

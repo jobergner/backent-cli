@@ -54,6 +54,7 @@ func (c *Client) Room() *Room {
 
 func (c *Client) handleRoomKick() {
 	c.conn.Close()
+	// TODO: maybe better manage at http route level
 	c.handler.handleClientDisconnect(c)
 }
 
