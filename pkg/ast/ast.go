@@ -127,6 +127,11 @@ func buildTypeStructure(configTypeData map[interface{}]interface{}, typeName str
 		fieldName := getSring(key)
 		valueString := getSring(value)
 
+		if fieldName == "__event__" && valueString == "true" {
+			configType.IsEvent = true
+			continue
+		}
+
 		field := Field{
 			ValueTypes:      make(map[string]*ConfigType),
 			Name:            fieldName,

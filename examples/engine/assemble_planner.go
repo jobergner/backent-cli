@@ -35,6 +35,9 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 	// we want to find all nodes which have updated and collect their paths.
 	// later we will loop over the paths we have collected, and "walk" them (assembleBranch)
 	// in order to assemble the tree from top to bottom (leaf nodes to root nodes)
+	for _, attackEvent := range patch.AttackEvent {
+		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
+	}
 	for _, equipmentSet := range patch.EquipmentSet {
 		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
@@ -55,6 +58,9 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 	}
 	for _, zoneItem := range patch.ZoneItem {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+	}
+	for _, attackEventTargetRef := range patch.AttackEventTargetRef {
+		ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
 	}
 	for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
 		ap.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
@@ -111,6 +117,21 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		}
 
 		previousLen = len(ap.includedElements)
+
+		for _, attackEventTargetRef := range patch.AttackEventTargetRef {
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+				ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
+			}
+		}
+		// again, events can't ever be present in state, but well keep this for consistency
+		for _, attackEventTargetRef := range state.AttackEventTargetRef {
+			if _, ok := ap.updatedReferencePaths[int(attackEventTargetRef.ID)]; ok {
+				continue
+			}
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+				ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
+			}
+		}
 
 		for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
 			// if the reference references an element that has updated its path is collected
@@ -175,7 +196,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 
 		for _, playerTargetRef := range patch.PlayerTargetRef {
 			// if the reference exists in the patch, the anyContainer HAS to exist in patch as well
-			// as both are always created and destroyed on unison
+			// as both are always created and destroyed in unison
 			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
 			switch anyContainer.ElementKind {
 			case ElementKindPlayer:
@@ -193,7 +214,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				continue
 			}
 			// if the reference exists in the state, the anyContainer HAS to exist in state as well
-			// as both are always created and destroyed on unison
+			// as both are always created and destroyed in unison
 			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
 			switch anyContainer.ElementKind {
 			case ElementKindPlayer:
@@ -248,6 +269,9 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 }
 
 func (ap *assemblePlanner) fill(state *State) {
+	for _, attackEvent := range state.AttackEvent {
+		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
+	}
 	for _, equipmentSet := range state.EquipmentSet {
 		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
 	}
@@ -268,6 +292,9 @@ func (ap *assemblePlanner) fill(state *State) {
 	}
 	for _, zoneItem := range state.ZoneItem {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+	}
+	for _, attackEventTargetRef := range state.AttackEventTargetRef {
+		ap.updatedReferencePaths[int(attackEventTargetRef.ID)] = attackEventTargetRef.path
 	}
 	for _, equipmentSetEquipmentRef := range state.EquipmentSetEquipmentRef {
 		ap.updatedReferencePaths[int(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path

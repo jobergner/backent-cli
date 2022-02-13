@@ -68,6 +68,45 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 	_ = equipmentSetData
 }
 
+func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pIndex int, includedElements map[int]bool) {
+
+	attackEventData, ok := engine.Patch.AttackEvent[element.ID]
+	if !ok {
+		attackEventData = engine.State.AttackEvent[element.ID]
+	}
+
+	element.OperationKind = attackEventData.OperationKind
+
+	if pIndex+1 == len(p) {
+		return
+	}
+
+	nextSeg := p[pIndex+1]
+
+	switch nextSeg.identifier {
+	case attackEvent_targetIdentifier:
+		ref := engine.attackEventTargetRef(AttackEventTargetRefID(nextSeg.id)).attackEventTargetRef
+		if element.Target != nil && ref.OperationKind == OperationKindDelete {
+			break
+		}
+		referencedDataStatus := ReferencedDataUnchanged
+		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
+			referencedDataStatus = ReferencedDataModified
+		}
+		referencedElement := engine.Player(ref.ReferencedElementID).player
+		treeRef := elementReference{
+			OperationKind:        ref.OperationKind,
+			ElementID:            int(ref.ReferencedElementID),
+			ElementKind:          ElementKindPlayer,
+			ReferencedDataStatus: referencedDataStatus,
+			ElementPath:          referencedElement.Path,
+		}
+		element.Target = &treeRef
+	}
+
+	_ = attackEventData
+}
+
 func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includedElements map[int]bool) {
 
 	itemData, ok := engine.Patch.Item[element.ID]
@@ -183,6 +222,16 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 	nextSeg := p[pIndex+1]
 
 	switch nextSeg.identifier {
+	case player_actionIdentifier:
+		if element.Action == nil {
+			element.Action = make(map[AttackEventID]attackEvent)
+		}
+		child, ok := element.Action[AttackEventID(nextSeg.id)]
+		if !ok {
+			child = attackEvent{ID: AttackEventID(nextSeg.id)}
+		}
+		engine.assembleAttackEventPath(&child, p, pIndex+1, includedElements)
+		element.Action[child.ID] = child
 	case player_equipmentSetsIdentifier:
 		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(nextSeg.refID)).playerEquipmentSetRef
 		referencedDataStatus := ReferencedDataUnchanged

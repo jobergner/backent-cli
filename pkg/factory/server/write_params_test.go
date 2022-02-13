@@ -31,8 +31,9 @@ func TestWriteParameters(t *testing.T) {
 			_SpawnZoneItemsParams_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

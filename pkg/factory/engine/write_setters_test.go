@@ -25,13 +25,15 @@ func TestWriteSetters(t *testing.T) {
 			_SetName_Item_func,
 			_SetX_Position_func,
 			_SetY_Position_func,
+			_SetTarget_AttackEvent_func,
 			_SetBoundTo_Item_func,
 			_SetTargetPlayer_Player_func,
 			_SetTargetZoneItem_Player_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

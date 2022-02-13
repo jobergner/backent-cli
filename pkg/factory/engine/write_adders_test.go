@@ -19,6 +19,7 @@ func TestWriteAdders(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_AddAction_Player_func,
 			_AddEquipment_EquipmentSet_func,
 			_AddEquipmentSet_Player_func,
 			_AddGuildMember_Player_func,
@@ -33,8 +34,9 @@ func TestWriteAdders(t *testing.T) {
 			_AddTag_Zone_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

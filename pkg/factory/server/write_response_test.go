@@ -23,8 +23,9 @@ func TestWriteResponses(t *testing.T) {
 			_SpawnZoneItemsResponse_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

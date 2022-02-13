@@ -8,8 +8,8 @@ go run . -engine_only -out=examples/application/server/ generate;
 easyjson -all -output_filename examples/engine/tree_easyjson.go examples/engine/tree.go;
 
 # required for running unit tests
-decltostring -input ./examples/application/server/ -output ./pkg/serverfactory/stringified_server_decls.go -package serverfactory -only "gets_generated.go";
-decltostring -input ./examples/engine/ -output ./pkg/enginefactory/stringified_state_engine_decls.go -package enginefactory -exclude "test|easyjson";
+decltostring -input ./examples/application/server/ -output ./pkg/factory/server/stringified_server_decls.go -package serverfactory -only "gets_generated.go";
+decltostring -input ./examples/engine/ -output ./pkg/factory/engine/stringified_state_engine_decls.go -package engine -exclude "test|easyjson";
 
 # required for running integration tests
 go run . -out=integrationtest/state/ generate;

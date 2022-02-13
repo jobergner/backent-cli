@@ -155,6 +155,31 @@ func (_zone Zone) RemoveInteractablesZoneItem(zoneItemToRemove ZoneItemID) Zone 
 	return zone
 }
 
+func (_player Player) RemoveAction(actionToRemove AttackEventID) Player {
+	player := _player.player.engine.Player(_player.player.ID)
+	if player.player.OperationKind == OperationKindDelete {
+		return player
+	}
+
+	for i, attackEventID := range player.player.Action {
+		if attackEventID != actionToRemove {
+			continue
+		}
+
+		player.player.Action[i] = player.player.Action[len(player.player.Action)-1]
+		player.player.Action[len(player.player.Action)-1] = 0
+		player.player.Action = player.player.Action[:len(player.player.Action)-1]
+		player.player.engine.deleteAttackEvent(attackEventID)
+
+		player.player.OperationKind = OperationKindUpdate
+		player.player.engine.Patch.Player[player.player.ID] = player.player
+
+		break
+	}
+
+	return player
+}
+
 func (_player Player) RemoveItems(itemToRemove ItemID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 	if player.player.OperationKind == OperationKindDelete {

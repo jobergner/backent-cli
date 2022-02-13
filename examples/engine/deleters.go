@@ -12,10 +12,14 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	if player.OperationKind == OperationKindDelete {
 		return
 	}
+	engine.dereferenceAttackEventTargetRefs(playerID)
 	engine.dereferenceItemBoundToRefs(playerID)
 	engine.dereferencePlayerGuildMemberRefs(playerID)
 	engine.dereferencePlayerTargetRefsPlayer(playerID)
 	engine.dereferencePlayerTargetedByRefsPlayer(playerID)
+	for _, actionID := range player.Action {
+		engine.deleteAttackEvent(actionID)
+	}
 	for _, equipmentSetID := range player.EquipmentSets {
 		engine.deletePlayerEquipmentSetRef(equipmentSetID)
 	}
@@ -76,6 +80,27 @@ func (engine *Engine) deletePosition(positionID PositionID) {
 		engine.Patch.Position[position.ID] = position
 	} else {
 		delete(engine.Patch.Position, positionID)
+	}
+}
+
+func (engine *Engine) DeleteAttackEvent(attackEventID AttackEventID) {
+	attackEvent := engine.AttackEvent(attackEventID).attackEvent
+	if attackEvent.HasParent {
+		return
+	}
+	engine.deleteAttackEvent(attackEventID)
+}
+func (engine *Engine) deleteAttackEvent(attackEventID AttackEventID) {
+	attackEvent := engine.AttackEvent(attackEventID).attackEvent
+	if attackEvent.OperationKind == OperationKindDelete {
+		return
+	}
+	engine.deleteAttackEventTargetRef(attackEvent.Target)
+	if _, ok := engine.State.AttackEvent[attackEventID]; ok {
+		attackEvent.OperationKind = OperationKindDelete
+		engine.Patch.AttackEvent[attackEvent.ID] = attackEvent
+	} else {
+		delete(engine.Patch.AttackEvent, attackEventID)
 	}
 }
 
@@ -208,6 +233,19 @@ func (engine *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
 		engine.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
 	} else {
 		delete(engine.Patch.ItemBoundToRef, itemBoundToRefID)
+	}
+}
+
+func (engine *Engine) deleteAttackEventTargetRef(attackEventTargetRefID AttackEventTargetRefID) {
+	attackEventTargetRef := engine.attackEventTargetRef(attackEventTargetRefID).attackEventTargetRef
+	if attackEventTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
+	if _, ok := engine.State.AttackEventTargetRef[attackEventTargetRefID]; ok {
+		attackEventTargetRef.OperationKind = OperationKindDelete
+		engine.Patch.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
+	} else {
+		delete(engine.Patch.AttackEventTargetRef, attackEventTargetRefID)
 	}
 }
 

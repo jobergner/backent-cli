@@ -1,6 +1,8 @@
 package state
 
-import "sort"
+import (
+	"sort"
+)
 
 func (engine *Engine) EveryPlayer() []Player {
 	playerIDs := engine.allPlayerIDs()
@@ -56,6 +58,15 @@ func (_player Player) TargetedBy() []PlayerTargetedByRef {
 		targetedBy = append(targetedBy, player.player.engine.playerTargetedByRef(refID))
 	}
 	return targetedBy
+}
+
+func (_player Player) Action() []AttackEvent {
+	player := _player.player.engine.Player(_player.player.ID)
+	var action []AttackEvent
+	for _, attackEventID := range player.player.Action {
+		action = append(action, player.player.engine.AttackEvent(attackEventID))
+	}
+	return action
 }
 
 func (_player Player) Items() []Item {
@@ -206,6 +217,53 @@ func (_item Item) BoundTo() ItemBoundToRef {
 func (_item Item) Origin() AnyOfPlayer_Position {
 	item := _item.item.engine.Item(_item.item.ID)
 	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
+}
+
+func (engine *Engine) EveryAttackEvent() []AttackEvent {
+	attackEventIDs := engine.allAttackEventIDs()
+	sort.Slice(attackEventIDs, func(i, j int) bool {
+		return attackEventIDs[i] < attackEventIDs[j]
+	})
+	var attackEvents []AttackEvent
+	for _, attackEventID := range attackEventIDs {
+		attackEvent := engine.AttackEvent(attackEventID)
+		if attackEvent.attackEvent.HasParent {
+			continue
+		}
+		attackEvents = append(attackEvents, attackEvent)
+	}
+	attackEventIDSlicePool.Put(attackEventIDs)
+	return attackEvents
+}
+
+func (engine *Engine) AttackEvent(attackEventID AttackEventID) AttackEvent {
+	patchingAttackEvent, ok := engine.Patch.AttackEvent[attackEventID]
+	if ok {
+		return AttackEvent{attackEvent: patchingAttackEvent}
+	}
+	currentAttackEvent, ok := engine.State.AttackEvent[attackEventID]
+	if ok {
+		return AttackEvent{attackEvent: currentAttackEvent}
+	}
+	return AttackEvent{attackEvent: attackEventCore{OperationKind: OperationKindDelete, engine: engine}}
+}
+
+func (_attackEvent AttackEvent) ID() AttackEventID {
+	return _attackEvent.attackEvent.ID
+}
+
+func (_attackEvent AttackEvent) Exists() (AttackEvent, bool) {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	return attackEvent, attackEvent.attackEvent.OperationKind != OperationKindDelete
+}
+
+func (_attackEvent AttackEvent) Path() string {
+	return _attackEvent.attackEvent.Path
+}
+
+func (_attackEvent AttackEvent) Target() AttackEventTargetRef {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	return attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target)
 }
 
 func (engine *Engine) EveryPosition() []Position {
@@ -401,6 +459,22 @@ func (engine *Engine) itemBoundToRef(itemBoundToRefID ItemBoundToRefID) ItemBoun
 		return ItemBoundToRef{itemBoundToRef: currentItemBoundToRef}
 	}
 	return ItemBoundToRef{itemBoundToRef: itemBoundToRefCore{OperationKind: OperationKindDelete, engine: engine}}
+}
+
+func (_attackEventTargetRef AttackEventTargetRef) ID() PlayerID {
+	return _attackEventTargetRef.attackEventTargetRef.ReferencedElementID
+}
+
+func (engine *Engine) attackEventTargetRef(attackEventTargetRefID AttackEventTargetRefID) AttackEventTargetRef {
+	patchingAttackEventTargetRef, ok := engine.Patch.AttackEventTargetRef[attackEventTargetRefID]
+	if ok {
+		return AttackEventTargetRef{attackEventTargetRef: patchingAttackEventTargetRef}
+	}
+	currentAttackEventTargetRef, ok := engine.State.AttackEventTargetRef[attackEventTargetRefID]
+	if ok {
+		return AttackEventTargetRef{attackEventTargetRef: currentAttackEventTargetRef}
+	}
+	return AttackEventTargetRef{attackEventTargetRef: attackEventTargetRefCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
 func (_playerGuildMemberRef PlayerGuildMemberRef) ID() PlayerID {

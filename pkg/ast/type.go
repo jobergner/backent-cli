@@ -16,6 +16,7 @@ type ConfigType struct {
 	IsBasicType  bool // is of one of Go's basic types (string, rune, int etc.)
 	IsRootType   bool // is not implemented into any other types and thus can not have a parent
 	IsLeafType   bool // does not implement any other user-defined types in any of its fields
+	IsEvent      bool // contains an `"__event__": true,` fields
 }
 
 func (t *ConfigType) RangeFields(fn func(field Field)) {

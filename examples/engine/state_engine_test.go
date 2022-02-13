@@ -111,6 +111,17 @@ func TestEngine(t *testing.T) {
 		player1.RemoveTargetedByPlayer(player2.ID())
 		assert.Equal(t, len(player1.TargetedBy()), 1)
 	})
+	t.Run("removes events on update state", func(t *testing.T) {
+		se := newEngine()
+		player := se.CreatePlayer()
+		player2 := se.CreatePlayer()
+		player.AddAction().SetTarget(player2.ID())
+		assert.Equal(t, 0, len(se.State.AttackEventTargetRef))
+		assert.Equal(t, 1, len(se.Patch.AttackEventTargetRef))
+		se.UpdateState()
+		assert.Equal(t, 0, len(se.State.AttackEventTargetRef))
+		assert.Equal(t, 0, len(se.Patch.AttackEventTargetRef))
+	})
 }
 
 func TestReferences(t *testing.T) {

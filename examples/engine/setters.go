@@ -91,6 +91,27 @@ func (_item Item) SetBoundTo(playerID PlayerID) Item {
 	return item
 }
 
+func (_attackEvent AttackEvent) SetTarget(playerID PlayerID) AttackEvent {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	if attackEvent.attackEvent.OperationKind == OperationKindDelete {
+		return attackEvent
+	}
+	if attackEvent.attackEvent.engine.Player(playerID).player.OperationKind == OperationKindDelete {
+		return attackEvent
+	}
+	if attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target).attackEventTargetRef.ReferencedElementID == playerID {
+		return attackEvent
+	}
+	if attackEvent.attackEvent.Target != 0 {
+		attackEvent.attackEvent.engine.deleteAttackEventTargetRef(attackEvent.attackEvent.Target)
+	}
+	ref := attackEvent.attackEvent.engine.createAttackEventTargetRef(attackEvent.attackEvent.path, attackEvent_targetIdentifier, playerID, attackEvent.attackEvent.ID)
+	attackEvent.attackEvent.Target = ref.ID
+	attackEvent.attackEvent.OperationKind = OperationKindUpdate
+	attackEvent.attackEvent.engine.Patch.AttackEvent[attackEvent.attackEvent.ID] = attackEvent.attackEvent
+	return attackEvent
+}
+
 func (_equipmentSet EquipmentSet) SetName(newName string) EquipmentSet {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	if equipmentSet.equipmentSet.OperationKind == OperationKindDelete {

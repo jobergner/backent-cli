@@ -7,7 +7,8 @@ import (
 )
 
 type updateStateWriter struct {
-	typeName func() string
+	typeName    func() string
+	emptyEvents func() *Statement
 }
 
 func (u updateStateWriter) receiverParams() *Statement {
