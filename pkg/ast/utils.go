@@ -16,6 +16,12 @@ func caseInsensitiveSort(keys []string) func(i, j int) bool {
 	}
 }
 
+func typeNameSort(configTypes []*ConfigType) func(i, j int) bool {
+	return func(i, j int) bool {
+		return configTypes[i].Name < configTypes[j].Name
+	}
+}
+
 func valueTypeNameSort(fields []*Field) func(i, j int) bool {
 	return func(i, j int) bool {
 		return strings.ToLower(fields[i].Parent.Name+title(pluralizeClient.Singular(fields[i].Name))) < strings.ToLower(fields[j].Parent.Name+title(pluralizeClient.Singular(fields[j].Name)))

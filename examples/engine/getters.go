@@ -33,6 +33,24 @@ func (engine *Engine) Player(playerID PlayerID) Player {
 	return Player{player: playerCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
+func (_player Player) ParentItem() Item {
+	player := _player.player.engine.Player(_player.player.ID)
+	if !player.player.HasParent {
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+	}
+	parentSeg := player.player.path[len(player.player.path)-2]
+	return player.player.engine.Item(ItemID(parentSeg.id))
+}
+
+func (_player Player) ParentZone() Zone {
+	player := _player.player.engine.Player(_player.player.ID)
+	if !player.player.HasParent {
+		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+	}
+	parentSeg := player.player.path[len(player.player.path)-2]
+	return player.player.engine.Zone(ZoneID(parentSeg.id))
+}
+
 func (_player Player) ID() PlayerID {
 	return _player.player.ID
 }
@@ -135,6 +153,24 @@ func (engine *Engine) GearScore(gearScoreID GearScoreID) GearScore {
 	return GearScore{gearScore: gearScoreCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
+func (_gearScore GearScore) ParentItem() Item {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	if !gearScore.gearScore.HasParent {
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: gearScore.gearScore.engine}}
+	}
+	parentSeg := gearScore.gearScore.path[len(gearScore.gearScore.path)-2]
+	return gearScore.gearScore.engine.Item(ItemID(parentSeg.id))
+}
+
+func (_gearScore GearScore) ParentPlayer() Player {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	if !gearScore.gearScore.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: gearScore.gearScore.engine}}
+	}
+	parentSeg := gearScore.gearScore.path[len(gearScore.gearScore.path)-2]
+	return gearScore.gearScore.engine.Player(PlayerID(parentSeg.id))
+}
+
 func (_gearScore GearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }
@@ -185,6 +221,33 @@ func (engine *Engine) Item(itemID ItemID) Item {
 		return Item{item: currentItem}
 	}
 	return Item{item: itemCore{OperationKind: OperationKindDelete, engine: engine}}
+}
+
+func (_item Item) ParentPlayer() Player {
+	item := _item.item.engine.Item(_item.item.ID)
+	if !item.item.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
+	}
+	parentSeg := item.item.path[len(item.item.path)-2]
+	return item.item.engine.Player(PlayerID(parentSeg.id))
+}
+
+func (_item Item) ParentZone() Zone {
+	item := _item.item.engine.Item(_item.item.ID)
+	if !item.item.HasParent {
+		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
+	}
+	parentSeg := item.item.path[len(item.item.path)-2]
+	return item.item.engine.Zone(ZoneID(parentSeg.id))
+}
+
+func (_item Item) ParentZoneItem() ZoneItem {
+	item := _item.item.engine.Item(_item.item.ID)
+	if !item.item.HasParent {
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
+	}
+	parentSeg := item.item.path[len(item.item.path)-2]
+	return item.item.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }
 
 func (_item Item) ID() ItemID {
@@ -248,6 +311,15 @@ func (engine *Engine) AttackEvent(attackEventID AttackEventID) AttackEvent {
 	return AttackEvent{attackEvent: attackEventCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
+func (_attackEvent AttackEvent) ParentPlayer() Player {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	if !attackEvent.attackEvent.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: attackEvent.attackEvent.engine}}
+	}
+	parentSeg := attackEvent.attackEvent.path[len(attackEvent.attackEvent.path)-2]
+	return attackEvent.attackEvent.engine.Player(PlayerID(parentSeg.id))
+}
+
 func (_attackEvent AttackEvent) ID() AttackEventID {
 	return _attackEvent.attackEvent.ID
 }
@@ -295,13 +367,40 @@ func (engine *Engine) Position(positionID PositionID) Position {
 	return Position{position: positionCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
-func (_position Position) ID() PositionID {
-	return _position.position.ID
+func (_position Position) ParentItem() Item {
+	position := _position.position.engine.Position(_position.position.ID)
+	if !position.position.HasParent {
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
+	}
+	parentSeg := position.position.path[len(position.position.path)-2]
+	return position.position.engine.Item(ItemID(parentSeg.id))
+}
+
+func (_position Position) ParentPlayer() Player {
+	position := _position.position.engine.Position(_position.position.ID)
+	if !position.position.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
+	}
+	parentSeg := position.position.path[len(position.position.path)-2]
+	return position.position.engine.Player(PlayerID(parentSeg.id))
+}
+
+func (_position Position) ParentZoneItem() ZoneItem {
+	position := _position.position.engine.Position(_position.position.ID)
+	if !position.position.HasParent {
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
+	}
+	parentSeg := position.position.path[len(position.position.path)-2]
+	return position.position.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }
 
 func (_position Position) Exists() (Position, bool) {
 	position := _position.position.engine.Position(_position.position.ID)
 	return position, position.position.OperationKind != OperationKindDelete
+}
+
+func (_position Position) ID() PositionID {
+	return _position.position.ID
 }
 
 func (_position Position) Path() string {
@@ -345,6 +444,15 @@ func (engine *Engine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
 		return ZoneItem{zoneItem: currentZoneItem}
 	}
 	return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: engine}}
+}
+
+func (_zoneItem ZoneItem) ParentZone() Zone {
+	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
+	if !zoneItem.zoneItem.HasParent {
+		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: zoneItem.zoneItem.engine}}
+	}
+	parentSeg := zoneItem.zoneItem.path[len(zoneItem.zoneItem.path)-2]
+	return zoneItem.zoneItem.engine.Zone(ZoneID(parentSeg.id))
 }
 
 func (_zoneItem ZoneItem) ID() ZoneItemID {
