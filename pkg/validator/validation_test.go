@@ -223,6 +223,37 @@ func TestGeneralValidation(t *testing.T) {
 	})
 }
 
+func TestValidateEventHandling(t *testing.T) {
+	t.Run("should procude no errors even with meta field included", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"fooNonEvent": map[interface{}]interface{}{
+				"bar": "string",
+			},
+			"fooEvent": map[interface{}]interface{}{
+				"__event__": "true",
+				"bar":       "string",
+			},
+			"barEvent": map[interface{}]interface{}{
+				"__event__": "true",
+				"bar":       "string",
+			},
+			"baz": map[interface{}]interface{}{
+				"bun": "anyOf<barEvent,fooEvent>",
+			},
+		}
+
+		actualErrors := ValidateStateConfig(data)
+		expectedErrors := []error{
+			newValidationErrorInvalidEventUsage("anyOf<barEvent,fooEvent>"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
+}
+
 func TestValidateStateConfig(t *testing.T) {
 	t.Run("should procude no errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{

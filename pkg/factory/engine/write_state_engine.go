@@ -60,8 +60,25 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 
 	s.file.Func().Params(u.receiverParams()).Id("UpdateState").Params().Block(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			if !configType.IsEvent {
+				return Empty()
+			}
 			u.typeName = func() string {
 				return configType.Name
+			}
+			return writeDeleteEvent(u)
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			u.typeName = func() string {
+				return configType.Name
+			}
+			u.emptyEvents = func() *Statement {
+				return ForEachFieldInType(configType, func(field ast.Field) *Statement {
+					if !field.ValueType().IsEvent {
+						return Empty()
+					}
+					return Id(u.typeName()).Dot(Title(field.Name)).Op("=").Id(u.typeName()).Dot(Title(field.Name)).Index(Empty(), Lit(0))
+				})
 			}
 			return writeUpdateElement(u)
 		}),
@@ -105,6 +122,7 @@ func writeUpdateElement(u updateStateWriter) *Statement {
 		If(u.isOperationKindDelete()).Block(
 			u.deleteElement(),
 		).Else().Block(
+			u.emptyEvents(),
 			u.setOperationKindUnchanged(),
 			u.updateElement(),
 		),
@@ -114,5 +132,11 @@ func writeUpdateElement(u updateStateWriter) *Statement {
 func writeClearPatch(u updateStateWriter) *Statement {
 	return For(u.loopPatchKeysConditions()).Block(
 		u.clearElementFromPatch(),
+	)
+}
+
+func writeDeleteEvent(u updateStateWriter) *Statement {
+	return For(u.loopPatchElementsConditions()).Block(
+		Id("engine").Dot("delete" + Title(u.typeName())).Call(Id(u.typeName()).Dot("ID")),
 	)
 }

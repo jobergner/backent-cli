@@ -989,7 +989,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
     - maybe an `_event` flag could let engine know that a certain type needs to be cleared with each update state (events would never have OperationKindUnchanged/OperationKindDelete)
     - validaiton:
         - events can only be non-pointer slice (any allowed)
-        - events cannot be references
+        - events cannot be referenced
     - events won't have remove method (or maybe they do idk, but removers cureently mess up slice order)
 - currently you can not reference the same element twice in a slice of references due to tree using referenced element ID as map keys 
 - what do I want to achieve?

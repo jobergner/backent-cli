@@ -33,6 +33,19 @@ func (engine *Engine) GenerateID() int {
 }
 
 func (engine *Engine) UpdateState() {
+	for _, attackEvent := range engine.Patch.AttackEvent {
+		// so event and children will be deleted
+		engine.deleteAttackEvent(attackEvent.ID)
+	}
+
+	for _, attackEvent := range engine.Patch.AttackEvent {
+		if attackEvent.OperationKind == OperationKindDelete {
+			delete(engine.State.AttackEvent, attackEvent.ID)
+		} else {
+			attackEvent.OperationKind = OperationKindUnchanged
+			engine.State.AttackEvent[attackEvent.ID] = attackEvent
+		}
+	}
 	for _, equipmentSet := range engine.Patch.EquipmentSet {
 		if equipmentSet.OperationKind == OperationKindDelete {
 			delete(engine.State.EquipmentSet, equipmentSet.ID)
@@ -61,6 +74,7 @@ func (engine *Engine) UpdateState() {
 		if player.OperationKind == OperationKindDelete {
 			delete(engine.State.Player, player.ID)
 		} else {
+			player.Action = player.Action[:0]
 			player.OperationKind = OperationKindUnchanged
 			engine.State.Player[player.ID] = player
 		}
@@ -87,6 +101,14 @@ func (engine *Engine) UpdateState() {
 		} else {
 			zoneItem.OperationKind = OperationKindUnchanged
 			engine.State.ZoneItem[zoneItem.ID] = zoneItem
+		}
+	}
+	for _, attackEventTargetRef := range engine.Patch.AttackEventTargetRef {
+		if attackEventTargetRef.OperationKind == OperationKindDelete {
+			delete(engine.State.AttackEventTargetRef, attackEventTargetRef.ID)
+		} else {
+			attackEventTargetRef.OperationKind = OperationKindUnchanged
+			engine.State.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
 		}
 	}
 	for _, equipmentSetEquipmentRef := range engine.Patch.EquipmentSetEquipmentRef {
@@ -162,6 +184,9 @@ func (engine *Engine) UpdateState() {
 		}
 	}
 
+	for key := range engine.Patch.AttackEvent {
+		delete(engine.Patch.AttackEvent, key)
+	}
 	for key := range engine.Patch.EquipmentSet {
 		delete(engine.Patch.EquipmentSet, key)
 	}
@@ -182,6 +207,9 @@ func (engine *Engine) UpdateState() {
 	}
 	for key := range engine.Patch.ZoneItem {
 		delete(engine.Patch.ZoneItem, key)
+	}
+	for key := range engine.Patch.AttackEventTargetRef {
+		delete(engine.Patch.AttackEventTargetRef, key)
 	}
 	for key := range engine.Patch.EquipmentSetEquipmentRef {
 		delete(engine.Patch.EquipmentSetEquipmentRef, key)

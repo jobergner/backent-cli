@@ -48,6 +48,22 @@ func (engine *Engine) createPosition(p path, fieldIdentifier treeFieldIdentifier
 	return Position{position: element}
 }
 
+func (engine *Engine) CreateAttackEvent() AttackEvent {
+	return engine.createAttackEvent(newPath(), attackEventIdentifier)
+}
+
+func (engine *Engine) createAttackEvent(p path, fieldIdentifier treeFieldIdentifier) AttackEvent {
+	var element attackEventCore
+	element.engine = engine
+	element.ID = AttackEventID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindAttackEvent, 0)
+	element.Path = element.path.toJSONPath()
+	element.OperationKind = OperationKindUpdate
+	element.HasParent = len(element.path) > 1
+	engine.Patch.AttackEvent[element.ID] = element
+	return AttackEvent{attackEvent: element}
+}
+
 func (engine *Engine) CreateItem() Item {
 	return engine.createItem(newPath(), itemIdentifier)
 }
@@ -122,6 +138,18 @@ func (engine *Engine) createZone(p path, fieldIdentifier treeFieldIdentifier) Zo
 	element.HasParent = len(element.path) > 1
 	engine.Patch.Zone[element.ID] = element
 	return Zone{zone: element}
+}
+
+func (engine *Engine) createAttackEventTargetRef(p path, fieldIdentifier treeFieldIdentifier, referencedElementID PlayerID, parentID AttackEventID) attackEventTargetRefCore {
+	var element attackEventTargetRefCore
+	element.engine = engine
+	element.ReferencedElementID = referencedElementID
+	element.ParentID = parentID
+	element.ID = AttackEventTargetRefID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, int(element.ID))
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.AttackEventTargetRef[element.ID] = element
+	return element
 }
 
 func (engine *Engine) createItemBoundToRef(p path, fieldIdentifier treeFieldIdentifier, referencedElementID PlayerID, parentID ItemID) itemBoundToRefCore {

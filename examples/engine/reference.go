@@ -25,6 +25,31 @@ func (_ref ItemBoundToRef) Get() Player {
 	return ref.itemBoundToRef.engine.Player(ref.itemBoundToRef.ReferencedElementID)
 }
 
+func (_ref AttackEventTargetRef) IsSet() (AttackEventTargetRef, bool) {
+	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
+	return ref, ref.attackEventTargetRef.ID != 0
+}
+
+func (_ref AttackEventTargetRef) Unset() {
+	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
+	if ref.attackEventTargetRef.OperationKind == OperationKindDelete {
+		return
+	}
+	ref.attackEventTargetRef.engine.deleteAttackEventTargetRef(ref.attackEventTargetRef.ID)
+	parent := ref.attackEventTargetRef.engine.AttackEvent(ref.attackEventTargetRef.ParentID).attackEvent
+	if parent.OperationKind == OperationKindDelete {
+		return
+	}
+	parent.Target = 0
+	parent.OperationKind = OperationKindUpdate
+	ref.attackEventTargetRef.engine.Patch.AttackEvent[parent.ID] = parent
+}
+
+func (_ref AttackEventTargetRef) Get() Player {
+	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
+	return ref.attackEventTargetRef.engine.Player(ref.attackEventTargetRef.ReferencedElementID)
+}
+
 func (_ref PlayerGuildMemberRef) Get() Player {
 	ref := _ref.playerGuildMemberRef.engine.playerGuildMemberRef(_ref.playerGuildMemberRef.ID)
 	return ref.playerGuildMemberRef.engine.Player(ref.playerGuildMemberRef.ReferencedElementID)
@@ -70,6 +95,19 @@ func (_ref PlayerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
 	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
+}
+
+// this will never be used as events can't be referenced
+// however we'll keep it here just to have more consistency
+func (engine *Engine) dereferenceAttackEventTargetRefs(playerID PlayerID) {
+	allAttackEventTargetRefIDs := engine.allAttackEventTargetRefIDs()
+	for _, refID := range allAttackEventTargetRefIDs {
+		ref := engine.attackEventTargetRef(refID)
+		if ref.attackEventTargetRef.ReferencedElementID == playerID {
+			ref.Unset()
+		}
+	}
+	attackEventTargetRefIDSlicePool.Put(allAttackEventTargetRefIDs)
 }
 
 func (engine *Engine) dereferenceItemBoundToRefs(playerID PlayerID) {

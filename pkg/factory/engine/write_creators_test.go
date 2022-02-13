@@ -19,6 +19,8 @@ func TestWriteCreators(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_CreateAttackEvent_Engine_func,
+			createAttackEvent_Engine_func,
 			_CreateEquipmentSet_Engine_func,
 			createEquipmentSet_Engine_func,
 			_CreateGearScore_Engine_func,
@@ -33,6 +35,7 @@ func TestWriteCreators(t *testing.T) {
 			createZone_Engine_func,
 			_CreateZoneItem_Engine_func,
 			createZoneItem_Engine_func,
+			createAttackEventTargetRef_Engine_func,
 			createEquipmentSetEquipmentRef_Engine_func,
 			createItemBoundToRef_Engine_func,
 			createPlayerEquipmentSetRef_Engine_func,
@@ -44,8 +47,9 @@ func TestWriteCreators(t *testing.T) {
 			createAnyOfItem_Player_ZoneItem_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

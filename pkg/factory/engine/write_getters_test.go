@@ -19,6 +19,12 @@ func TestWriteGetters(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_Exists_AttackEvent_func,
+			_EveryAttackEvent_Engine_func,
+			_AttackEvent_Engine_func,
+			_ID_AttackEvent_func,
+			_Path_AttackEvent_func,
+			_Target_AttackEvent_func,
 			_Exists_EquipmentSet_func,
 			_EveryEquipmentSet_Engine_func,
 			_EquipmentSet_Engine_func,
@@ -47,6 +53,7 @@ func TestWriteGetters(t *testing.T) {
 			_Player_Engine_func,
 			_ID_Player_func,
 			_Path_Player_func,
+			_Action_Player_func,
 			_EquipmentSets_Player_func,
 			_GearScore_Player_func,
 			_GuildMembers_Player_func,
@@ -77,6 +84,8 @@ func TestWriteGetters(t *testing.T) {
 			_Path_ZoneItem_func,
 			_Item_ZoneItem_func,
 			_Position_ZoneItem_func,
+			attackEventTargetRef_Engine_func,
+			_ID_AttackEventTargetRef_func,
 			equipmentSetEquipmentRef_Engine_func,
 			_ID_EquipmentSetEquipmentRef_func,
 			itemBoundToRef_Engine_func,
@@ -104,8 +113,9 @@ func TestWriteGetters(t *testing.T) {
 			_ZoneItem_AnyOfItem_Player_ZoneItem_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

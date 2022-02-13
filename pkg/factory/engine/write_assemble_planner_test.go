@@ -23,8 +23,9 @@ func TestWriteAssemblePlanner(t *testing.T) {
 			newAssemblePlanner_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes assemble planner clear", func(t *testing.T) {
@@ -39,8 +40,9 @@ func TestWriteAssemblePlanner(t *testing.T) {
 			clear_assemblePlanner_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes assemble planner plan", func(t *testing.T) {
@@ -55,8 +57,9 @@ func TestWriteAssemblePlanner(t *testing.T) {
 			plan_assemblePlanner_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes assemble planner fill", func(t *testing.T) {
@@ -71,8 +74,9 @@ func TestWriteAssemblePlanner(t *testing.T) {
 			fill_assemblePlanner_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

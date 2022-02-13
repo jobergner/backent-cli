@@ -5,6 +5,7 @@ import "strconv"
 type treeFieldIdentifier string
 
 const (
+	attackEventIdentifier  = "attackEvent"
 	equipmentSetIdentifier = "equipmentSet"
 	gearScoreIdentifier    = "gearScore"
 	itemIdentifier         = "item"
@@ -13,12 +14,15 @@ const (
 	zoneIdentifier         = "zone"
 	zoneItemIdentifier     = "zoneItem"
 
+	attackEvent_targetIdentifier = "attackEvent_target"
+
 	equipmentSet_equipmentIdentifier = "equipmentSet_equipment"
 
 	item_boundToIdentifier   = "item_boundTo"
 	item_gearScoreIdentifier = "item_gearScore"
 	item_originIdentifier    = "item_origin"
 
+	player_actionIdentifier        = "player_action"
 	player_equipmentSetsIdentifier = "player_equipmentSets"
 	player_gearScoreIdentifier     = "player_gearScore"
 	player_guildMembersIdentifier  = "player_guildMembers"
@@ -70,6 +74,8 @@ func (p path) toJSONPath() string {
 
 func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 	switch fieldIdentifier {
+	case attackEventIdentifier:
+		return "attackEvent"
 	case equipmentSetIdentifier:
 		return "equipmentSet"
 	case gearScoreIdentifier:
@@ -84,6 +90,8 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 		return "zone"
 	case zoneItemIdentifier:
 		return "zoneItem"
+	case attackEvent_targetIdentifier:
+		return "target"
 	case equipmentSet_equipmentIdentifier:
 		return "equipment"
 	case item_boundToIdentifier:
@@ -92,6 +100,8 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 		return "gearScore"
 	case item_originIdentifier:
 		return "origin"
+	case player_actionIdentifier:
+		return "action"
 	case player_equipmentSetsIdentifier:
 		return "equipmentSets"
 	case player_gearScoreIdentifier:
@@ -122,6 +132,8 @@ func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
 
 func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
 	switch fieldIdentifier {
+	case attackEventIdentifier:
+		return true
 	case equipmentSetIdentifier:
 		return true
 	case gearScoreIdentifier:
@@ -137,6 +149,8 @@ func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {
 	case zoneItemIdentifier:
 		return true
 	case equipmentSet_equipmentIdentifier:
+		return true
+	case player_actionIdentifier:
 		return true
 	case player_equipmentSetsIdentifier:
 		return true

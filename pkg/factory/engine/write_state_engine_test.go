@@ -23,8 +23,9 @@ func TestWriteEngine(t *testing.T) {
 			_OperationKindDelete_type,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes Engine", func(t *testing.T) {
@@ -40,8 +41,9 @@ func TestWriteEngine(t *testing.T) {
 			newEngine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes generateID method", func(t *testing.T) {
@@ -56,8 +58,9 @@ func TestWriteEngine(t *testing.T) {
 			_GenerateID_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 	t.Run("writes updateState method", func(t *testing.T) {
@@ -72,8 +75,9 @@ func TestWriteEngine(t *testing.T) {
 			_UpdateState_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }

@@ -19,6 +19,8 @@ func TestWriteDeleters(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_DeleteAttackEvent_Engine_func,
+			deleteAttackEvent_Engine_func,
 			_DeleteEquipmentSet_Engine_func,
 			deleteEquipmentSet_Engine_func,
 			_DeleteGearScore_Engine_func,
@@ -33,6 +35,7 @@ func TestWriteDeleters(t *testing.T) {
 			deleteZone_Engine_func,
 			_DeleteZoneItem_Engine_func,
 			deleteZoneItem_Engine_func,
+			deleteAttackEventTargetRef_Engine_func,
 			deleteEquipmentSetEquipmentRef_Engine_func,
 			deleteItemBoundToRef_Engine_func,
 			deletePlayerEquipmentSetRef_Engine_func,
@@ -44,8 +47,9 @@ func TestWriteDeleters(t *testing.T) {
 			deleteAnyOfItem_Player_ZoneItem_Engine_func,
 		}, "\n"))
 
-		if expected != actual {
-			t.Errorf(testutils.Diff(actual, expected))
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
 		}
 	})
 }
