@@ -31,6 +31,19 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			},
 		}
 
+		if !configType.IsRootType {
+			p := parentKindGetter{
+				t: configType,
+			}
+
+			s.file.Func().Params(p.receiverParams()).Id("ParentKind").Params().Params(Id("ElementKind"), Bool()).Block(
+				If(p.hasNoParent()).Block(
+					Return(Lit(""), False()),
+				),
+				Return(p.parentKind(), True()),
+			)
+		}
+
 		writeTypeGetter(s.file, t)
 
 		configType.RangeImplementedBy(func(parentType *ast.ConfigType) {

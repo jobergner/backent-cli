@@ -1842,6 +1842,13 @@ const _ParentZone_Player_func string = `func (_player Player) ParentZone() Zone 
 	return player.player.engine.Zone(ZoneID(parentSeg.id))
 }`
 
+const _ParentKind_Player_func string = `func (_player Player) ParentKind() (ElementKind, bool) {
+	if !_player.player.HasParent {
+		return "", false
+	}
+	return _player.player.path[len(_player.player.path)-2].kind, true
+}`
+
 const _ID_Player_func string = `func (_player Player) ID() PlayerID {
 	return _player.player.ID
 }`
@@ -1962,6 +1969,13 @@ const _ParentPlayer_GearScore_func string = `func (_gearScore GearScore) ParentP
 	return gearScore.gearScore.engine.Player(PlayerID(parentSeg.id))
 }`
 
+const _ParentKind_GearScore_func string = `func (_gearScore GearScore) ParentKind() (ElementKind, bool) {
+	if !_gearScore.gearScore.HasParent {
+		return "", false
+	}
+	return _gearScore.gearScore.path[len(_gearScore.gearScore.path)-2].kind, true
+}`
+
 const _ID_GearScore_func string = `func (_gearScore GearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }`
@@ -2041,6 +2055,13 @@ const _ParentZoneItem_Item_func string = `func (_item Item) ParentZoneItem() Zon
 	return item.item.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }`
 
+const _ParentKind_Item_func string = `func (_item Item) ParentKind() (ElementKind, bool) {
+	if !_item.item.HasParent {
+		return "", false
+	}
+	return _item.item.path[len(_item.item.path)-2].kind, true
+}`
+
 const _ID_Item_func string = `func (_item Item) ID() ItemID {
 	return _item.item.ID
 }`
@@ -2110,6 +2131,13 @@ const _ParentPlayer_AttackEvent_func string = `func (_attackEvent AttackEvent) P
 	}
 	parentSeg := attackEvent.attackEvent.path[len(attackEvent.attackEvent.path)-2]
 	return attackEvent.attackEvent.engine.Player(PlayerID(parentSeg.id))
+}`
+
+const _ParentKind_AttackEvent_func string = `func (_attackEvent AttackEvent) ParentKind() (ElementKind, bool) {
+	if !_attackEvent.attackEvent.HasParent {
+		return "", false
+	}
+	return _attackEvent.attackEvent.path[len(_attackEvent.attackEvent.path)-2].kind, true
 }`
 
 const _ID_AttackEvent_func string = `func (_attackEvent AttackEvent) ID() AttackEventID {
@@ -2191,6 +2219,13 @@ const _Exists_Position_func string = `func (_position Position) Exists() (Positi
 	return position, position.position.OperationKind != OperationKindDelete
 }`
 
+const _ParentKind_Position_func string = `func (_position Position) ParentKind() (ElementKind, bool) {
+	if !_position.position.HasParent {
+		return "", false
+	}
+	return _position.position.path[len(_position.position.path)-2].kind, true
+}`
+
 const _ID_Position_func string = `func (_position Position) ID() PositionID {
 	return _position.position.ID
 }`
@@ -2245,6 +2280,13 @@ const _ParentZone_ZoneItem_func string = `func (_zoneItem ZoneItem) ParentZone()
 	}
 	parentSeg := zoneItem.zoneItem.path[len(zoneItem.zoneItem.path)-2]
 	return zoneItem.zoneItem.engine.Zone(ZoneID(parentSeg.id))
+}`
+
+const _ParentKind_ZoneItem_func string = `func (_zoneItem ZoneItem) ParentKind() (ElementKind, bool) {
+	if !_zoneItem.zoneItem.HasParent {
+		return "", false
+	}
+	return _zoneItem.zoneItem.path[len(_zoneItem.zoneItem.path)-2].kind, true
 }`
 
 const _ID_ZoneItem_func string = `func (_zoneItem ZoneItem) ID() ZoneItemID {
@@ -3108,32 +3150,32 @@ const path_go_import string = `import "strconv"`
 const treeFieldIdentifier_type string = `type treeFieldIdentifier string`
 
 const attackEventIdentifier_type string = `const (
-	attackEventIdentifier			= "attackEvent"
-	equipmentSetIdentifier			= "equipmentSet"
-	gearScoreIdentifier			= "gearScore"
-	itemIdentifier				= "item"
-	playerIdentifier			= "player"
-	positionIdentifier			= "position"
-	zoneIdentifier				= "zone"
-	zoneItemIdentifier			= "zoneItem"
-	attackEvent_targetIdentifier		= "attackEvent_target"
-	equipmentSet_equipmentIdentifier	= "equipmentSet_equipment"
-	item_boundToIdentifier			= "item_boundTo"
-	item_gearScoreIdentifier		= "item_gearScore"
-	item_originIdentifier			= "item_origin"
-	player_actionIdentifier			= "player_action"
-	player_equipmentSetsIdentifier		= "player_equipmentSets"
-	player_gearScoreIdentifier		= "player_gearScore"
-	player_guildMembersIdentifier		= "player_guildMembers"
-	player_itemsIdentifier			= "player_items"
-	player_positionIdentifier		= "player_position"
-	player_targetIdentifier			= "player_target"
-	player_targetedByIdentifier		= "player_targetedBy"
-	zone_interactablesIdentifier		= "zone_interactables"
-	zone_itemsIdentifier			= "zone_items"
-	zone_playersIdentifier			= "zone_players"
-	zoneItem_itemIdentifier			= "zoneItem_item"
-	zoneItem_positionIdentifier		= "zoneItem_position"
+	attackEventIdentifier			treeFieldIdentifier	= "attackEvent"
+	equipmentSetIdentifier			treeFieldIdentifier	= "equipmentSet"
+	gearScoreIdentifier			treeFieldIdentifier	= "gearScore"
+	itemIdentifier				treeFieldIdentifier	= "item"
+	playerIdentifier			treeFieldIdentifier	= "player"
+	positionIdentifier			treeFieldIdentifier	= "position"
+	zoneIdentifier				treeFieldIdentifier	= "zone"
+	zoneItemIdentifier			treeFieldIdentifier	= "zoneItem"
+	attackEvent_targetIdentifier		treeFieldIdentifier	= "attackEvent_target"
+	equipmentSet_equipmentIdentifier	treeFieldIdentifier	= "equipmentSet_equipment"
+	item_boundToIdentifier			treeFieldIdentifier	= "item_boundTo"
+	item_gearScoreIdentifier		treeFieldIdentifier	= "item_gearScore"
+	item_originIdentifier			treeFieldIdentifier	= "item_origin"
+	player_actionIdentifier			treeFieldIdentifier	= "player_action"
+	player_equipmentSetsIdentifier		treeFieldIdentifier	= "player_equipmentSets"
+	player_gearScoreIdentifier		treeFieldIdentifier	= "player_gearScore"
+	player_guildMembersIdentifier		treeFieldIdentifier	= "player_guildMembers"
+	player_itemsIdentifier			treeFieldIdentifier	= "player_items"
+	player_positionIdentifier		treeFieldIdentifier	= "player_position"
+	player_targetIdentifier			treeFieldIdentifier	= "player_target"
+	player_targetedByIdentifier		treeFieldIdentifier	= "player_targetedBy"
+	zone_interactablesIdentifier		treeFieldIdentifier	= "zone_interactables"
+	zone_itemsIdentifier			treeFieldIdentifier	= "zone_items"
+	zone_playersIdentifier			treeFieldIdentifier	= "zone_players"
+	zoneItem_itemIdentifier			treeFieldIdentifier	= "zoneItem_item"
+	zoneItem_positionIdentifier		treeFieldIdentifier	= "zoneItem_position"
 )`
 
 const segment_type string = `type segment struct {

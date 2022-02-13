@@ -51,6 +51,13 @@ func (_player Player) ParentZone() Zone {
 	return player.player.engine.Zone(ZoneID(parentSeg.id))
 }
 
+func (_player Player) ParentKind() (ElementKind, bool) {
+	if !_player.player.HasParent {
+		return "", false
+	}
+	return _player.player.path[len(_player.player.path)-2].kind, true
+}
+
 func (_player Player) ID() PlayerID {
 	return _player.player.ID
 }
@@ -171,6 +178,13 @@ func (_gearScore GearScore) ParentPlayer() Player {
 	return gearScore.gearScore.engine.Player(PlayerID(parentSeg.id))
 }
 
+func (_gearScore GearScore) ParentKind() (ElementKind, bool) {
+	if !_gearScore.gearScore.HasParent {
+		return "", false
+	}
+	return _gearScore.gearScore.path[len(_gearScore.gearScore.path)-2].kind, true
+}
+
 func (_gearScore GearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }
@@ -250,6 +264,13 @@ func (_item Item) ParentZoneItem() ZoneItem {
 	return item.item.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }
 
+func (_item Item) ParentKind() (ElementKind, bool) {
+	if !_item.item.HasParent {
+		return "", false
+	}
+	return _item.item.path[len(_item.item.path)-2].kind, true
+}
+
 func (_item Item) ID() ItemID {
 	return _item.item.ID
 }
@@ -318,6 +339,13 @@ func (_attackEvent AttackEvent) ParentPlayer() Player {
 	}
 	parentSeg := attackEvent.attackEvent.path[len(attackEvent.attackEvent.path)-2]
 	return attackEvent.attackEvent.engine.Player(PlayerID(parentSeg.id))
+}
+
+func (_attackEvent AttackEvent) ParentKind() (ElementKind, bool) {
+	if !_attackEvent.attackEvent.HasParent {
+		return "", false
+	}
+	return _attackEvent.attackEvent.path[len(_attackEvent.attackEvent.path)-2].kind, true
 }
 
 func (_attackEvent AttackEvent) ID() AttackEventID {
@@ -399,6 +427,13 @@ func (_position Position) Exists() (Position, bool) {
 	return position, position.position.OperationKind != OperationKindDelete
 }
 
+func (_position Position) ParentKind() (ElementKind, bool) {
+	if !_position.position.HasParent {
+		return "", false
+	}
+	return _position.position.path[len(_position.position.path)-2].kind, true
+}
+
 func (_position Position) ID() PositionID {
 	return _position.position.ID
 }
@@ -453,6 +488,13 @@ func (_zoneItem ZoneItem) ParentZone() Zone {
 	}
 	parentSeg := zoneItem.zoneItem.path[len(zoneItem.zoneItem.path)-2]
 	return zoneItem.zoneItem.engine.Zone(ZoneID(parentSeg.id))
+}
+
+func (_zoneItem ZoneItem) ParentKind() (ElementKind, bool) {
+	if !_zoneItem.zoneItem.HasParent {
+		return "", false
+	}
+	return _zoneItem.zoneItem.path[len(_zoneItem.zoneItem.path)-2].kind, true
 }
 
 func (_zoneItem ZoneItem) ID() ZoneItemID {
