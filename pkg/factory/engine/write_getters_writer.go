@@ -308,3 +308,31 @@ func (p parentGetter) declareParentSeg() *Statement {
 func (p parentGetter) getParent() *Statement {
 	return p.engine().Dot(Title(p.parent.Name)).Call(Id(Title(p.parent.Name) + "ID").Call(Id("parentSeg").Dot("id")))
 }
+
+type parentKindGetter struct {
+	t ast.ConfigType
+}
+
+func (p parentKindGetter) receiverName() string {
+	return "_" + p.t.Name
+}
+
+func (p parentKindGetter) receiverParams() *Statement {
+	return Id(p.receiverName()).Id(Title(p.t.Name))
+}
+
+func (p parentKindGetter) element() *Statement {
+	return Id(p.receiverName()).Dot(p.t.Name)
+}
+
+func (p parentKindGetter) path() *Statement {
+	return p.element().Dot("path")
+}
+
+func (p parentKindGetter) hasNoParent() *Statement {
+	return Op("!").Add(p.element()).Dot("HasParent")
+}
+
+func (p parentKindGetter) parentKind() *Statement {
+	return p.path().Index(Len(p.path()).Op("-").Lit(2)).Dot("kind")
+}

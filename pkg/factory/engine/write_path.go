@@ -13,14 +13,14 @@ func (s *EngineFactory) writeIdentifiers() *EngineFactory {
 
 	s.file.Const().Defs(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			return Id(configType.Name + "Identifier").Op("=").Lit(configType.Name)
+			return Id(configType.Name + "Identifier").Id("treeFieldIdentifier").Op("=").Lit(configType.Name)
 		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			return ForEachFieldInType(configType, func(f ast.Field) *Statement {
 				if f.ValueType().IsBasicType {
 					return Empty()
 				}
-				return Id(FieldPathIdentifier(f)).Op("=").Lit(configType.Name + "_" + f.Name)
+				return Id(FieldPathIdentifier(f)).Id("treeFieldIdentifier").Op("=").Lit(configType.Name + "_" + f.Name)
 			})
 		}),
 	)
