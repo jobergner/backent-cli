@@ -60,3 +60,4 @@ TODO:
 - consider not allowing types with ID suffix
 - do not allow _ in names
 - do not allow field names `Parent{TypeName}`
+- do not allow field names `Set{FieldName}`
