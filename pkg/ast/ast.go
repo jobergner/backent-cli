@@ -5,6 +5,7 @@ import (
 )
 
 // TODO clean up!!!
+// this implementation has grown too complex and needs refactoring
 
 func newAST() *AST {
 	return &AST{
@@ -203,6 +204,7 @@ func (a *AST) fillInReferences() *AST {
 		configType.RangeFields(func(field Field) {
 			field.Parent = &configType
 			a.assignFieldTypeReference(&field)
+			a.assignTypeImplementedBy(&field)
 			field.ValueTypeName = fieldValueTypeName(field)
 			if field.HasPointerValue {
 				field.RangeValueTypes(func(fieldValueType *ConfigType) {
@@ -232,6 +234,41 @@ func (a *AST) fillInReferences() *AST {
 	}
 
 	return a
+}
+
+func (a *AST) assignTypeImplementedBy(field *Field) {
+	if field.HasPointerValue {
+		return
+	}
+	if field.HasAnyValue {
+	Exit:
+		for _, typeName := range extractAnyTypes(field.ValueString) {
+			implementedType, _ := a.Types[typeName]
+			for _, t := range implementedType.ImplementedBy {
+				if t.Name == field.Parent.Name {
+					continue Exit
+				}
+			}
+			implementedType.ImplementedBy = append(implementedType.ImplementedBy, field.Parent)
+			a.Types[typeName] = implementedType
+		}
+	} else {
+		typeName := extractValueType(field.ValueString)
+		implementedType, isUserDefinedType := a.Types[typeName]
+
+		if !isUserDefinedType {
+			return
+		}
+
+		for _, t := range implementedType.ImplementedBy {
+			if t.Name == field.Parent.Name {
+				return
+			}
+		}
+
+		implementedType.ImplementedBy = append(implementedType.ImplementedBy, field.Parent)
+		a.Types[typeName] = implementedType
+	}
 }
 
 func (a *AST) assignFieldTypeReference(field *Field) {
