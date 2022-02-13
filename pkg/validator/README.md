@@ -58,3 +58,6 @@ Despite the fact that each of these errors would find a place in one of the abov
 TODO:
 - (no it does not. why would you use that in state, and it is not really useful in params as user shuld choose either or) needs to allow any IDs `anyOf<foo,bar>ID`
 - consider not allowing types with ID suffix
+- do not allow _ in names
+- do not allow field names `Parent{TypeName}`
+- do not allow field names `Set{FieldName}`

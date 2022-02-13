@@ -1824,6 +1824,24 @@ const _Player_Engine_func string = `func (engine *Engine) Player(playerID Player
 	return Player{player: playerCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
+const _ParentItem_Player_func string = `func (_player Player) ParentItem() Item {
+	player := _player.player.engine.Player(_player.player.ID)
+	if !player.player.HasParent {
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+	}
+	parentSeg := player.player.path[len(player.player.path)-2]
+	return player.player.engine.Item(ItemID(parentSeg.id))
+}`
+
+const _ParentZone_Player_func string = `func (_player Player) ParentZone() Zone {
+	player := _player.player.engine.Player(_player.player.ID)
+	if !player.player.HasParent {
+		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
+	}
+	parentSeg := player.player.path[len(player.player.path)-2]
+	return player.player.engine.Zone(ZoneID(parentSeg.id))
+}`
+
 const _ID_Player_func string = `func (_player Player) ID() PlayerID {
 	return _player.player.ID
 }`
@@ -1926,6 +1944,24 @@ const _GearScore_Engine_func string = `func (engine *Engine) GearScore(gearScore
 	return GearScore{gearScore: gearScoreCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
+const _ParentItem_GearScore_func string = `func (_gearScore GearScore) ParentItem() Item {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	if !gearScore.gearScore.HasParent {
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: gearScore.gearScore.engine}}
+	}
+	parentSeg := gearScore.gearScore.path[len(gearScore.gearScore.path)-2]
+	return gearScore.gearScore.engine.Item(ItemID(parentSeg.id))
+}`
+
+const _ParentPlayer_GearScore_func string = `func (_gearScore GearScore) ParentPlayer() Player {
+	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
+	if !gearScore.gearScore.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: gearScore.gearScore.engine}}
+	}
+	parentSeg := gearScore.gearScore.path[len(gearScore.gearScore.path)-2]
+	return gearScore.gearScore.engine.Player(PlayerID(parentSeg.id))
+}`
+
 const _ID_GearScore_func string = `func (_gearScore GearScore) ID() GearScoreID {
 	return _gearScore.gearScore.ID
 }`
@@ -1976,6 +2012,33 @@ const _Item_Engine_func string = `func (engine *Engine) Item(itemID ItemID) Item
 		return Item{item: currentItem}
 	}
 	return Item{item: itemCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ParentPlayer_Item_func string = `func (_item Item) ParentPlayer() Player {
+	item := _item.item.engine.Item(_item.item.ID)
+	if !item.item.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
+	}
+	parentSeg := item.item.path[len(item.item.path)-2]
+	return item.item.engine.Player(PlayerID(parentSeg.id))
+}`
+
+const _ParentZone_Item_func string = `func (_item Item) ParentZone() Zone {
+	item := _item.item.engine.Item(_item.item.ID)
+	if !item.item.HasParent {
+		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
+	}
+	parentSeg := item.item.path[len(item.item.path)-2]
+	return item.item.engine.Zone(ZoneID(parentSeg.id))
+}`
+
+const _ParentZoneItem_Item_func string = `func (_item Item) ParentZoneItem() ZoneItem {
+	item := _item.item.engine.Item(_item.item.ID)
+	if !item.item.HasParent {
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
+	}
+	parentSeg := item.item.path[len(item.item.path)-2]
+	return item.item.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }`
 
 const _ID_Item_func string = `func (_item Item) ID() ItemID {
@@ -2040,6 +2103,15 @@ const _AttackEvent_Engine_func string = `func (engine *Engine) AttackEvent(attac
 	return AttackEvent{attackEvent: attackEventCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
+const _ParentPlayer_AttackEvent_func string = `func (_attackEvent AttackEvent) ParentPlayer() Player {
+	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
+	if !attackEvent.attackEvent.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: attackEvent.attackEvent.engine}}
+	}
+	parentSeg := attackEvent.attackEvent.path[len(attackEvent.attackEvent.path)-2]
+	return attackEvent.attackEvent.engine.Player(PlayerID(parentSeg.id))
+}`
+
 const _ID_AttackEvent_func string = `func (_attackEvent AttackEvent) ID() AttackEventID {
 	return _attackEvent.attackEvent.ID
 }`
@@ -2087,13 +2159,40 @@ const _Position_Engine_func string = `func (engine *Engine) Position(positionID 
 	return Position{position: positionCore{OperationKind: OperationKindDelete, engine: engine}}
 }`
 
-const _ID_Position_func string = `func (_position Position) ID() PositionID {
-	return _position.position.ID
+const _ParentItem_Position_func string = `func (_position Position) ParentItem() Item {
+	position := _position.position.engine.Position(_position.position.ID)
+	if !position.position.HasParent {
+		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
+	}
+	parentSeg := position.position.path[len(position.position.path)-2]
+	return position.position.engine.Item(ItemID(parentSeg.id))
+}`
+
+const _ParentPlayer_Position_func string = `func (_position Position) ParentPlayer() Player {
+	position := _position.position.engine.Position(_position.position.ID)
+	if !position.position.HasParent {
+		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
+	}
+	parentSeg := position.position.path[len(position.position.path)-2]
+	return position.position.engine.Player(PlayerID(parentSeg.id))
+}`
+
+const _ParentZoneItem_Position_func string = `func (_position Position) ParentZoneItem() ZoneItem {
+	position := _position.position.engine.Position(_position.position.ID)
+	if !position.position.HasParent {
+		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
+	}
+	parentSeg := position.position.path[len(position.position.path)-2]
+	return position.position.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }`
 
 const _Exists_Position_func string = `func (_position Position) Exists() (Position, bool) {
 	position := _position.position.engine.Position(_position.position.ID)
 	return position, position.position.OperationKind != OperationKindDelete
+}`
+
+const _ID_Position_func string = `func (_position Position) ID() PositionID {
+	return _position.position.ID
 }`
 
 const _Path_Position_func string = `func (_position Position) Path() string {
@@ -2137,6 +2236,15 @@ const _ZoneItem_Engine_func string = `func (engine *Engine) ZoneItem(zoneItemID 
 		return ZoneItem{zoneItem: currentZoneItem}
 	}
 	return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: engine}}
+}`
+
+const _ParentZone_ZoneItem_func string = `func (_zoneItem ZoneItem) ParentZone() Zone {
+	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
+	if !zoneItem.zoneItem.HasParent {
+		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: zoneItem.zoneItem.engine}}
+	}
+	parentSeg := zoneItem.zoneItem.path[len(zoneItem.zoneItem.path)-2]
+	return zoneItem.zoneItem.engine.Zone(ZoneID(parentSeg.id))
 }`
 
 const _ID_ZoneItem_func string = `func (_zoneItem ZoneItem) ID() ZoneItemID {
