@@ -6,6 +6,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func mapTypeNames(types []*ConfigType) []string {
+	var names []string
+	for _, t := range types {
+		names = append(names, t.Name)
+	}
+
+	return names
+}
+
+func mapFieldNames(fields []*Field) []string {
+	var names []string
+	for _, f := range fields {
+		names = append(names, f.Name)
+	}
+
+	return names
+}
+
 func TestStateConfigAST(t *testing.T) {
 	stateData := map[interface{}]interface{}{
 		"house": map[interface{}]interface{}{
@@ -436,10 +454,16 @@ func TestStateConfigAST(t *testing.T) {
 		assert.Equal(t, isValidAddressResponseValue.ValueTypes["bool"].Name, "bool")
 		assert.Equal(t, isValidAddressResponseValue.ValueTypes["bool"].IsBasicType, true)
 
-		assert.ElementsMatch(t, personType.ReferencedBy, []*Field{&banField, &barField, &friendsField})
-		assert.ElementsMatch(t, addressType.ReferencedBy, []*Field{&banField, &barField, &destinationField})
-		assert.ElementsMatch(t, houseType.ReferencedBy, []*Field{&secondHomeField})
-		assert.ElementsMatch(t, cityType.ReferencedBy, []*Field{&residentOfField})
+		assert.ElementsMatch(t, mapTypeNames(personType.ImplementedBy), []string{"house"})
+		assert.ElementsMatch(t, mapTypeNames(addressType.ImplementedBy), []string{"house", "person"})
+		assert.ElementsMatch(t, mapTypeNames(moveInEventType.ImplementedBy), []string{"person"})
+		assert.ElementsMatch(t, mapTypeNames(houseType.ImplementedBy), []string{})
+		assert.ElementsMatch(t, mapTypeNames(cityType.ImplementedBy), []string{})
+
+		assert.ElementsMatch(t, mapFieldNames(personType.ReferencedBy), []string{"ban", "bar", "friends"})
+		assert.ElementsMatch(t, mapFieldNames(addressType.ReferencedBy), []string{"ban", "bar", "destination"})
+		assert.ElementsMatch(t, mapFieldNames(houseType.ReferencedBy), []string{"secondHome"})
+		assert.ElementsMatch(t, mapFieldNames(cityType.ReferencedBy), []string{"residentOf"})
 	})
 
 	t.Run("should fill in parentalInfo", func(t *testing.T) {
