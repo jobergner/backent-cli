@@ -267,3 +267,44 @@ func (p pathGetterWriter) receiverParams() *Statement {
 func (p pathGetterWriter) returnPath() *Statement {
 	return Id(p.receiverName()).Dot(p.t.Name).Dot("Path")
 }
+
+type parentGetter struct {
+	t      ast.ConfigType
+	parent ast.ConfigType
+}
+
+func (p parentGetter) receiverName() string {
+	return "_" + p.t.Name
+}
+
+func (p parentGetter) element() *Statement {
+	return Id(p.t.Name).Dot(p.t.Name)
+}
+
+func (p parentGetter) engine() *Statement {
+	return p.element().Dot("engine")
+}
+
+func (p parentGetter) receiverParams() *Statement {
+	return Id(p.receiverName()).Id(Title(p.t.Name))
+}
+
+func (p parentGetter) reassignElement() *Statement {
+	return Id(p.t.Name).Op(":=").Id(p.receiverName()).Dot(p.t.Name).Dot("engine").Dot(Title(p.t.Name)).Call(Id(p.receiverName()).Dot(p.t.Name).Dot("ID"))
+}
+
+func (p parentGetter) hasNoParent() *Statement {
+	return Op("!").Add(p.element()).Dot("HasParent")
+}
+
+func (p parentGetter) emptyReturn() *Statement {
+	return Id(Title(p.parent.Name)).Values(Dict{Id(p.parent.Name): Id(p.parent.Name + "Core").Values(Dict{Id("OperationKind"): Id("OperationKindDelete"), Id("engine"): p.engine()})})
+}
+
+func (p parentGetter) declareParentSeg() *Statement {
+	return Id("parentSeg").Op(":=").Add(p.element()).Dot("path").Index(Len(p.element().Dot("path")).Op("-").Lit(2))
+}
+
+func (p parentGetter) getParent() *Statement {
+	return p.engine().Dot(Title(p.parent.Name)).Call(Id(Title(p.parent.Name) + "ID").Call(Id("parentSeg").Dot("id")))
+}

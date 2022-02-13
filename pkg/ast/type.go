@@ -39,3 +39,12 @@ func (t *ConfigType) RangeReferencedBy(fn func(field *Field)) {
 		fn(field)
 	}
 }
+
+func (t *ConfigType) RangeImplementedBy(fn func(configType *ConfigType)) {
+	implementedBy := make([]*ConfigType, len(t.ImplementedBy))
+	copy(implementedBy, t.ImplementedBy)
+	sort.Slice(implementedBy, typeNameSort(implementedBy))
+	for _, t := range implementedBy {
+		fn(t)
+	}
+}

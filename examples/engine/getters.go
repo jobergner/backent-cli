@@ -446,15 +446,6 @@ func (engine *Engine) ZoneItem(zoneItemID ZoneItemID) ZoneItem {
 	return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: engine}}
 }
 
-func (_zoneItem ZoneItem) ParentPlayer() Player {
-	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
-	if !zoneItem.zoneItem.HasParent {
-		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zoneItem.zoneItem.engine}}
-	}
-	parentSeg := zoneItem.zoneItem.path[len(zoneItem.zoneItem.path)-2]
-	return zoneItem.zoneItem.engine.Player(PlayerID(parentSeg.id))
-}
-
 func (_zoneItem ZoneItem) ParentZone() Zone {
 	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
 	if !zoneItem.zoneItem.HasParent {
