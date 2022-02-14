@@ -1795,6 +1795,22 @@ const getters_go_import string = `import (
 	"sort"
 )`
 
+const _QueryPlayers_Engine_func string = `func (engine *Engine) QueryPlayers(matcher func(Player) bool) []Player {
+	playerIDs := engine.allPlayerIDs()
+	sort.Slice(playerIDs, func(i, j int) bool {
+		return playerIDs[i] < playerIDs[j]
+	})
+	var players []Player
+	for _, playerID := range playerIDs {
+		player := engine.Player(playerID)
+		if matcher(player) {
+			players = append(players, player)
+		}
+	}
+	playerIDSlicePool.Put(playerIDs)
+	return players
+}`
+
 const _EveryPlayer_Engine_func string = `func (engine *Engine) EveryPlayer() []Player {
 	playerIDs := engine.allPlayerIDs()
 	sort.Slice(playerIDs, func(i, j int) bool {
@@ -1922,6 +1938,22 @@ const _Position_Player_func string = `func (_player Player) Position() Position 
 	return player.player.engine.Position(player.player.Position)
 }`
 
+const _QueryGearScores_Engine_func string = `func (engine *Engine) QueryGearScores(matcher func(GearScore) bool) []GearScore {
+	gearScoreIDs := engine.allGearScoreIDs()
+	sort.Slice(gearScoreIDs, func(i, j int) bool {
+		return gearScoreIDs[i] < gearScoreIDs[j]
+	})
+	var gearScores []GearScore
+	for _, gearScoreID := range gearScoreIDs {
+		gearScore := engine.GearScore(gearScoreID)
+		if matcher(gearScore) {
+			gearScores = append(gearScores, gearScore)
+		}
+	}
+	gearScoreIDSlicePool.Put(gearScoreIDs)
+	return gearScores
+}`
+
 const _EveryGearScore_Engine_func string = `func (engine *Engine) EveryGearScore() []GearScore {
 	gearScoreIDs := engine.allGearScoreIDs()
 	sort.Slice(gearScoreIDs, func(i, j int) bool {
@@ -1997,6 +2029,22 @@ const _Level_GearScore_func string = `func (_gearScore GearScore) Level() int {
 const _Score_GearScore_func string = `func (_gearScore GearScore) Score() int {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
 	return gearScore.gearScore.Score
+}`
+
+const _QueryItems_Engine_func string = `func (engine *Engine) QueryItems(matcher func(Item) bool) []Item {
+	itemIDs := engine.allItemIDs()
+	sort.Slice(itemIDs, func(i, j int) bool {
+		return itemIDs[i] < itemIDs[j]
+	})
+	var items []Item
+	for _, itemID := range itemIDs {
+		item := engine.Item(itemID)
+		if matcher(item) {
+			items = append(items, item)
+		}
+	}
+	itemIDSlicePool.Put(itemIDs)
+	return items
 }`
 
 const _EveryItem_Engine_func string = `func (engine *Engine) EveryItem() []Item {
@@ -2095,6 +2143,22 @@ const _Origin_Item_func string = `func (_item Item) Origin() AnyOfPlayer_Positio
 	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
 }`
 
+const _QueryAttackEvents_Engine_func string = `func (engine *Engine) QueryAttackEvents(matcher func(AttackEvent) bool) []AttackEvent {
+	attackEventIDs := engine.allAttackEventIDs()
+	sort.Slice(attackEventIDs, func(i, j int) bool {
+		return attackEventIDs[i] < attackEventIDs[j]
+	})
+	var attackEvents []AttackEvent
+	for _, attackEventID := range attackEventIDs {
+		attackEvent := engine.AttackEvent(attackEventID)
+		if matcher(attackEvent) {
+			attackEvents = append(attackEvents, attackEvent)
+		}
+	}
+	attackEventIDSlicePool.Put(attackEventIDs)
+	return attackEvents
+}`
+
 const _EveryAttackEvent_Engine_func string = `func (engine *Engine) EveryAttackEvent() []AttackEvent {
 	attackEventIDs := engine.allAttackEventIDs()
 	sort.Slice(attackEventIDs, func(i, j int) bool {
@@ -2156,6 +2220,22 @@ const _Path_AttackEvent_func string = `func (_attackEvent AttackEvent) Path() st
 const _Target_AttackEvent_func string = `func (_attackEvent AttackEvent) Target() AttackEventTargetRef {
 	attackEvent := _attackEvent.attackEvent.engine.AttackEvent(_attackEvent.attackEvent.ID)
 	return attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target)
+}`
+
+const _QueryPositions_Engine_func string = `func (engine *Engine) QueryPositions(matcher func(Position) bool) []Position {
+	positionIDs := engine.allPositionIDs()
+	sort.Slice(positionIDs, func(i, j int) bool {
+		return positionIDs[i] < positionIDs[j]
+	})
+	var positions []Position
+	for _, positionID := range positionIDs {
+		position := engine.Position(positionID)
+		if matcher(position) {
+			positions = append(positions, position)
+		}
+	}
+	positionIDSlicePool.Put(positionIDs)
+	return positions
 }`
 
 const _EveryPosition_Engine_func string = `func (engine *Engine) EveryPosition() []Position {
@@ -2244,6 +2324,22 @@ const _Y_Position_func string = `func (_position Position) Y() float64 {
 	return position.position.Y
 }`
 
+const _QueryZoneItems_Engine_func string = `func (engine *Engine) QueryZoneItems(matcher func(ZoneItem) bool) []ZoneItem {
+	zoneItemIDs := engine.allZoneItemIDs()
+	sort.Slice(zoneItemIDs, func(i, j int) bool {
+		return zoneItemIDs[i] < zoneItemIDs[j]
+	})
+	var zoneItems []ZoneItem
+	for _, zoneItemID := range zoneItemIDs {
+		zoneItem := engine.ZoneItem(zoneItemID)
+		if matcher(zoneItem) {
+			zoneItems = append(zoneItems, zoneItem)
+		}
+	}
+	zoneItemIDSlicePool.Put(zoneItemIDs)
+	return zoneItems
+}`
+
 const _EveryZoneItem_Engine_func string = `func (engine *Engine) EveryZoneItem() []ZoneItem {
 	zoneItemIDs := engine.allZoneItemIDs()
 	sort.Slice(zoneItemIDs, func(i, j int) bool {
@@ -2310,6 +2406,22 @@ const _Position_ZoneItem_func string = `func (_zoneItem ZoneItem) Position() Pos
 const _Item_ZoneItem_func string = `func (_zoneItem ZoneItem) Item() Item {
 	zoneItem := _zoneItem.zoneItem.engine.ZoneItem(_zoneItem.zoneItem.ID)
 	return zoneItem.zoneItem.engine.Item(zoneItem.zoneItem.Item)
+}`
+
+const _QueryZones_Engine_func string = `func (engine *Engine) QueryZones(matcher func(Zone) bool) []Zone {
+	zoneIDs := engine.allZoneIDs()
+	sort.Slice(zoneIDs, func(i, j int) bool {
+		return zoneIDs[i] < zoneIDs[j]
+	})
+	var zones []Zone
+	for _, zoneID := range zoneIDs {
+		zone := engine.Zone(zoneID)
+		if matcher(zone) {
+			zones = append(zones, zone)
+		}
+	}
+	zoneIDSlicePool.Put(zoneIDs)
+	return zones
 }`
 
 const _EveryZone_Engine_func string = `func (engine *Engine) EveryZone() []Zone {
@@ -2437,6 +2549,22 @@ const playerGuildMemberRef_Engine_func string = `func (engine *Engine) playerGui
 
 const _ID_PlayerEquipmentSetRef_func string = `func (_playerEquipmentSetRef PlayerEquipmentSetRef) ID() EquipmentSetID {
 	return _playerEquipmentSetRef.playerEquipmentSetRef.ReferencedElementID
+}`
+
+const _QueryEquipmentSets_Engine_func string = `func (engine *Engine) QueryEquipmentSets(matcher func(EquipmentSet) bool) []EquipmentSet {
+	equipmentSetIDs := engine.allEquipmentSetIDs()
+	sort.Slice(equipmentSetIDs, func(i, j int) bool {
+		return equipmentSetIDs[i] < equipmentSetIDs[j]
+	})
+	var equipmentSets []EquipmentSet
+	for _, equipmentSetID := range equipmentSetIDs {
+		equipmentSet := engine.EquipmentSet(equipmentSetID)
+		if matcher(equipmentSet) {
+			equipmentSets = append(equipmentSets, equipmentSet)
+		}
+	}
+	equipmentSetIDSlicePool.Put(equipmentSetIDs)
+	return equipmentSets
 }`
 
 const _EveryEquipmentSet_Engine_func string = `func (engine *Engine) EveryEquipmentSet() []EquipmentSet {

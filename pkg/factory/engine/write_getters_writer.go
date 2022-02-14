@@ -73,6 +73,10 @@ func (t everyTypeGetterWriter) elementHasParent() *Statement {
 	return Id(t.t.Name).Dot(t.t.Name).Dot("HasParent")
 }
 
+func (t everyTypeGetterWriter) elementSatisfiesMatcher() *Statement {
+	return Id("matcher").Call(Id(t.t.Name))
+}
+
 func (t everyTypeGetterWriter) returnToIdsSliceToPool() *Statement {
 	return Id(t.t.Name + "IDSlicePool").Dot("Put").Call(Id(t.t.Name + "IDs"))
 }

@@ -20,6 +20,7 @@ import (
 // { pieces []piece }
 // can have the coherent adder method of "AddPiece"
 var Singular func(string) string = pluralize.NewClient().Singular
+var Plural func(string) string = pluralize.NewClient().Plural
 
 func ForEachParamInAction(action ast.Action, fn func(param ast.Field) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
