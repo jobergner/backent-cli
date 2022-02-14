@@ -63,3 +63,4 @@ TODO:
 - do not allow field names `Set{FieldName}`
 - do not allow `ParentKind`
 - do not allow `Kind`
+- do not allow `Query...`

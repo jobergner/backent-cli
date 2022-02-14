@@ -20,6 +20,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 			t: configType,
 		}
 
+		writeQueryTypeGetter(s.file, e)
 		writeEveryTypeGetter(s.file, e)
 
 		t := typeGetterWriter{
@@ -190,6 +191,22 @@ func writeEveryTypeGetter(file *File, e everyTypeGetterWriter) {
 				Continue(),
 			)),
 			e.appendElement(),
+		),
+		e.returnToIdsSliceToPool(),
+		Return(Id(e.sliceName())),
+	)
+}
+
+func writeQueryTypeGetter(file *File, e everyTypeGetterWriter) {
+	file.Func().Params(e.receiverParams()).Id("Query"+Plural(Title(e.t.Name))).Params(Id("matcher").Func().Params(Id(Title(e.t.Name))).Bool()).Add(e.returns()).Block(
+		e.allIDs(),
+		e.sortIDs(),
+		e.declareSlice(),
+		For(e.loopConditions()).Block(
+			e.declareElement(),
+			If(e.elementSatisfiesMatcher()).Block(
+				e.appendElement(),
+			),
 		),
 		e.returnToIdsSliceToPool(),
 		Return(Id(e.sliceName())),
