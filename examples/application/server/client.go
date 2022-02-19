@@ -15,14 +15,14 @@ type Client struct {
 	id             string
 }
 
-func newClient(websocketConnector Connector, handler *LoginHandler) (*Client, error) {
+func newClient(websocketConnector Connector) (*Client, error) {
 	clientID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, fmt.Errorf("error generating client ID: %s", err)
 	}
 
 	c := Client{
-		handler:        handler,
+		handler:        nil,
 		conn:           websocketConnector,
 		messageChannel: make(chan []byte, 32),
 		id:             clientID.String(),
@@ -52,14 +52,6 @@ func (c *Client) Room() *Room {
 	return c.room
 }
 
-func (c *Client) removeSelfFromSystem() {
-	if c.room != nil {
-		c.room.unregisterClientSync(c)
-	}
-	c.handler.deleteClient(c)
-	c.handler.handleClientDisconnect(c)
-}
-
 func (c *Client) handleInernalError() {
 	c.conn.Close()
 }
@@ -82,6 +74,7 @@ func (c *Client) runReadMessages() {
 			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
 
 			errDescription := messageUnmarshallingError(msgBytes, err)
+
 			errMsg, err := Message{MessageKindError, errDescription, nil}.MarshalJSON()
 			if err != nil {
 				log.Printf("error marshalling error message \"%s\"", errDescription)

@@ -36,7 +36,7 @@ type SpawnZoneItemsResponse struct {
 
 type Actions struct {
 	AddItemToPlayer func(params AddItemToPlayerParams, engine *Engine, roomName, clientID string) AddItemToPlayerResponse
-	MovePlayer      func(params MovePlayerParams, engien *Engine, roomName, clientID string)
+	MovePlayer      func(params MovePlayerParams, engine *Engine, roomName, clientID string)
 	SpawnZoneItems  func(params SpawnZoneItemsParams, engine *Engine, roomName, clientID string) SpawnZoneItemsResponse
 }
 
@@ -46,7 +46,7 @@ type SideEffects struct {
 }
 
 type LoginSignals struct {
-	OnSuperMessage     func(msg Message, engine *Engine, client *Client, loginHandler *LoginHandler)
+	OnSuperMessage     func(msg Message, room *Room, client *Client, loginHandler *LoginHandler)
 	OnClientConnect    func(client *Client, loginHandler *LoginHandler)
 	OnClientDisconnect func(engine *Engine, clientID string, loginHandler *LoginHandler)
 }
