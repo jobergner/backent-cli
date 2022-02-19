@@ -10,10 +10,13 @@ type LoginHandler struct {
 	clients        map[*Client]struct{}
 	Rooms          map[string]*Room
 	clientMessages chan Message
+	actions        Actions
 	signals        LoginSignals
+	sideEffects    SideEffects
+	fps            int
 }
 
-func newLoginHandler(signals LoginSignals) *LoginHandler {
+func newLoginHandler(signals LoginSignals, actions Actions, sideEffects SideEffects, fps int) *LoginHandler {
 	// TODO thread safe
 	return &LoginHandler{
 		mu:             &sync.Mutex{},
@@ -21,67 +24,73 @@ func newLoginHandler(signals LoginSignals) *LoginHandler {
 		Rooms:          make(map[string]*Room),
 		clientMessages: make(chan Message),
 		signals:        signals,
+		actions:        actions,
+		sideEffects:    sideEffects,
+		fps:            fps,
 	}
 }
 
-func (l *LoginHandler) createRoom(name string, actions Actions, sideEffects SideEffects, fps int) (*Room, error) {
+func (l *LoginHandler) CreateRoom(name string) (*Room, error) {
 	if _, ok := l.Rooms[name]; ok {
 		return nil, fmt.Errorf("room with name \"%s\" already exists", name)
 	}
 
-	room := newRoom(actions)
+	room := newRoom(l.actions)
 
 	l.Rooms[name] = room
 
-	room.Deploy(sideEffects, fps)
+	room.Deploy(l.sideEffects, l.fps)
 
 	return room, nil
 }
 
-func (l *LoginHandler) deleteRoom(name string) error {
+func (l *LoginHandler) DeleteRoom(name string) error {
 	room, ok := l.Rooms[name]
 	if !ok {
 		return fmt.Errorf("room with name \"%s\" does not exist", name)
 	}
 
+	room.mode = RoomModeTerminating
+
+	delete(l.Rooms, name)
+
 	return nil
+}
+
+func (l *LoginHandler) addClient(client *Client) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	l.clients[client] = struct{}{}
+}
+
+func (l *LoginHandler) deleteClient(client *Client) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	delete(l.clients, client)
 }
 
 func (l *LoginHandler) processMessageSync(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	if msg.client.room == nil {
-		l.signals.OnSuperMessage(msg, nil, msg.client, l)
-		return
-	}
-
-	msg.client.room.mu.Lock()
 	l.signals.OnSuperMessage(msg, msg.client.room.state, msg.client, l)
-	msg.client.room.mu.Unlock()
 }
 
+// TODO rename to signalClientDisconnect
 func (l *LoginHandler) handleClientDisconnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	if client.room == nil {
-		l.signals.OnClientDisconnect(nil, client.id, l)
-		return
-	}
-
-	client.room.mu.Lock()
 	l.signals.OnClientDisconnect(client.room.state, client.id, l)
-	client.room.mu.Unlock()
 }
 
 func (l *LoginHandler) handleClientConnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	client.room.mu.Lock()
 	l.signals.OnClientConnect(client, l)
-	client.room.mu.Unlock()
 }
 
 // NOTE: youll probably want to create the player data on connect WITH the client ID

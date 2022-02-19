@@ -112,13 +112,13 @@ func (r *Room) unregisterClientAsync(client *Client) {
 
 		delete(r.clients, client)
 
-		client.handleRoomKick()
+		client.conn.Close()
 	} else if _, ok := r.incomingClients[client]; ok {
 
 		log.Printf("unregistering incoming client %s", client.id)
 
 		delete(r.incomingClients, client)
 
-		client.handleRoomKick()
+		client.conn.Close()
 	}
 }

@@ -39,7 +39,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request, room *Room) {
 
 	// wait until client disconnects
 	<-r.Context().Done()
-	// TODO: here I could remove clients from loginHandler
+	c.removeSelfFromSystem()
 }
 
 func setupRoutes(actions Actions, sideEffects SideEffects, fps int) {
