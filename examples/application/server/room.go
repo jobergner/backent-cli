@@ -16,7 +16,7 @@ const (
 
 type Room struct {
 	name            string
-	mu              *sync.Mutex
+	mu              sync.Mutex
 	clients         map[*Client]struct{}
 	incomingClients map[*Client]struct{}
 	state           *Engine
@@ -26,7 +26,6 @@ type Room struct {
 
 func newRoom(actions Actions) *Room {
 	return &Room{
-		mu:              &sync.Mutex{},
 		clients:         make(map[*Client]struct{}),
 		incomingClients: make(map[*Client]struct{}),
 		state:           newEngine(),
@@ -110,7 +109,7 @@ func (r *Room) run(sideEffects SideEffects, fps int) {
 		<-ticker.C
 		r.tickSync(sideEffects)
 		if r.mode == RoomModeTerminating {
-			log.Println("shutting down room %s", r.name)
+			log.Printf("shutting down room %s", r.name)
 			return
 		}
 	}

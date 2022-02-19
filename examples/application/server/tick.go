@@ -27,9 +27,7 @@ func (r *Room) tickSync(sideEffects SideEffects) {
 }
 
 func (r *Room) publishPatch() error {
-	tree := r.state.assembleTree(false)
-
-	patchBytes, err := tree.MarshalJSON()
+	patchBytes, err := r.state.Patch.MarshalJSON()
 	if err != nil {
 		return fmt.Errorf("error marshalling tree for patch: %s", err)
 	}
@@ -70,9 +68,7 @@ func (r *Room) handleIncomingClients() error {
 		return nil
 	}
 
-	tree := r.state.assembleTree(true)
-
-	stateBytes, err := tree.MarshalJSON()
+	stateBytes, err := r.state.State.MarshalJSON()
 	if err != nil {
 		return fmt.Errorf("error marshalling tree for init request: %s", err)
 	}

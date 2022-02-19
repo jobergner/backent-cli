@@ -9,19 +9,19 @@ import (
 var playerID state.PlayerID
 
 var actions = state.Actions{
-	AddItemToPlayer: func(a state.AddItemToPlayerParams, e *state.Engine) state.AddItemToPlayerResponse {
+	AddItemToPlayer: func(params state.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) state.AddItemToPlayerResponse {
 		return state.AddItemToPlayerResponse{}
 	},
-	MovePlayer: func(p state.MovePlayerParams, e *state.Engine) {
+	MovePlayer: func(params state.MovePlayerParams, engine *state.Engine, roomName, clientID string) {
 		if playerID == 0 {
-			player := e.CreatePlayer()
+			player := engine.CreatePlayer()
 			log.Println(player.ID())
 			playerID = player.ID()
 		}
 		log.Println("moving player..")
-		e.Player(playerID).Position().SetX(p.ChangeX)
+		engine.Player(playerID).Position().SetX(params.ChangeX)
 	},
-	SpawnZoneItems: func(a state.SpawnZoneItemsParams, e *state.Engine) state.SpawnZoneItemsResponse {
+	SpawnZoneItems: func(params state.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) state.SpawnZoneItemsResponse {
 		return state.SpawnZoneItemsResponse{}
 	},
 }
@@ -31,8 +31,10 @@ var sideEffects = state.SideEffects{
 	OnFrameTick: func(*state.Engine) {},
 }
 
+var signals = state.LoginSignals{}
+
 func main() {
-	err := state.Start(actions, sideEffects, 1, 3496)
+	err := state.Start(signals, actions, sideEffects, 1, 3496)
 	if err != nil {
 		panic(err)
 	}
