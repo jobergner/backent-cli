@@ -52,14 +52,15 @@ func (c *Client) Room() *Room {
 	return c.room
 }
 
-func (c *Client) handleRoomKick() {
-	c.conn.Close()
-	// TODO: maybe better manage at http route level
+func (c *Client) removeSelfFromSystem() {
+	if c.room != nil {
+		c.room.unregisterClientSync(c)
+	}
+	c.handler.deleteClient(c)
 	c.handler.handleClientDisconnect(c)
 }
 
 func (c *Client) handleInernalError() {
-	c.room.unregisterClientSync(c)
 	c.conn.Close()
 }
 

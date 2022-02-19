@@ -41,14 +41,14 @@ type Actions struct {
 }
 
 type SideEffects struct {
-	OnDeploy    func(*Engine)
-	OnFrameTick func(*Engine)
+	OnDeploy    func(engine *Engine)
+	OnFrameTick func(engine *Engine)
 }
 
 type LoginSignals struct {
-	OnSuperMessage     func(Message, *Engine, *Client, *LoginHandler)
-	OnClientConnect    func(*Client, *LoginHandler)
-	OnClientDisconnect func(*Engine, string, *LoginHandler)
+	OnSuperMessage     func(msg Message, engine *Engine, client *Client, loginHandler *LoginHandler)
+	OnClientConnect    func(client *Client, loginHandler *LoginHandler)
+	OnClientDisconnect func(engine *Engine, clientID string, loginHandler *LoginHandler)
 }
 
 // TODO logging should happen here

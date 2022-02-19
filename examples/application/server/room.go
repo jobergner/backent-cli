@@ -21,7 +21,7 @@ type Room struct {
 	incomingClients map[*Client]struct{}
 	state           *Engine
 	actions         Actions
-	mode            RoomMode // TODO implement usage
+	mode            RoomMode
 }
 
 func newRoom(actions Actions) *Room {
@@ -38,10 +38,22 @@ func (r *Room) Name() string {
 	return r.name
 }
 
-func (r *Room) AlterState(fn func(*Room)) {
+func (r *Room) AlterState(fn func(*Engine)) {
 	r.mu.Lock()
-	fn(r)
-	r.mu.Unlock()
+	defer r.mu.Unlock()
+	fn(r.state)
+}
+
+func (r *Room) RangeClients(fn func(client *Client)) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	for c := range r.incomingClients {
+		fn(c)
+	}
+	for c := range r.clients {
+		fn(c)
+	}
 }
 
 func (r *Room) processMessageSync(msg Message) {
@@ -97,7 +109,10 @@ func (r *Room) run(sideEffects SideEffects, fps int) {
 	for {
 		<-ticker.C
 		r.tickSync(sideEffects)
-		// TODO gracefully shutting down?
+		if r.mode == RoomModeTerminating {
+			log.Println("shutting down room %s", r.name)
+			return
+		}
 	}
 }
 
