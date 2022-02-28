@@ -75,6 +75,8 @@ func (t *Tree) clear() {
 	}
 }
 
+// TODO need elementKind for all elements as nonRef any elements can not be identified otherwise
+
 type zoneItem struct {
 	ID            ZoneItemID    `json:"id"`
 	Item          *item         `json:"item"`
