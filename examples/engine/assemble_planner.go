@@ -35,6 +35,18 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 	// we want to find all nodes which have updated and collect their paths.
 	// later we will loop over the paths we have collected, and "walk" them (assembleBranch)
 	// in order to assemble the tree from top to bottom (leaf nodes to root nodes)
+	for _, boolValue := range patch.BoolValue {
+		ap.updatedElementPaths[int(boolValue.ID)] = boolValue.path
+	}
+	for _, floatValue := range patch.FloatValue {
+		ap.updatedElementPaths[int(floatValue.ID)] = floatValue.path
+	}
+	for _, intValue := range patch.IntValue {
+		ap.updatedElementPaths[int(intValue.ID)] = intValue.path
+	}
+	for _, stringValue := range patch.StringValue {
+		ap.updatedElementPaths[int(stringValue.ID)] = stringValue.path
+	}
 	for _, attackEvent := range patch.AttackEvent {
 		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
 	}
@@ -269,6 +281,18 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 }
 
 func (ap *assemblePlanner) fill(state *State) {
+	for _, boolValue := range state.BoolValue {
+		ap.updatedElementPaths[int(boolValue.ID)] = boolValue.path
+	}
+	for _, floatValue := range state.FloatValue {
+		ap.updatedElementPaths[int(floatValue.ID)] = floatValue.path
+	}
+	for _, intValue := range state.IntValue {
+		ap.updatedElementPaths[int(intValue.ID)] = intValue.path
+	}
+	for _, stringValue := range state.StringValue {
+		ap.updatedElementPaths[int(stringValue.ID)] = stringValue.path
+	}
 	for _, attackEvent := range state.AttackEvent {
 		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
 	}

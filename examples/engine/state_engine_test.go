@@ -60,11 +60,9 @@ func TestEngine(t *testing.T) {
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		_gearScore := se.Patch.GearScore[gearScore.ID()]
-		assert.Zero(t, _gearScore.Level)
 		gearScore.SetLevel(10)
-		_gearScore = se.Patch.GearScore[gearScore.ID()]
-		assert.NotZero(t, _gearScore.Level)
+		intValue := se.Patch.IntValue[gearScore.gearScore.Level]
+		assert.Equal(t, int64(10), intValue.Value)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
 		se := newEngine()
@@ -213,15 +211,15 @@ func TestUpdateState(t *testing.T) {
 		se.UpdateState()
 		assert.Zero(t, gearScore.Level())
 		gearScore.SetLevel(1)
-		assert.Equal(t, gearScore.Level(), 1)
+		assert.Equal(t, gearScore.Level(), int64(1))
 	})
 	t.Run("sets elements", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore().SetLevel(1)
 		se.UpdateState()
 		_gearScore := se.State.GearScore[gearScore.ID()]
-		assert.Equal(t, _gearScore.Level, 1)
-		_, ok := se.Patch.GearScore[gearScore.ID()]
+		assert.Equal(t, int64(1), se.State.IntValue[_gearScore.Level].Value)
+		_, ok := se.Patch.IntValue[gearScore.gearScore.Level]
 		assert.False(t, ok)
 	})
 	t.Run("does not set elements when value has not changed", func(t *testing.T) {
@@ -270,19 +268,19 @@ func TestActionsOnDeletedItems(t *testing.T) {
 	t.Run("does not set attribute on element which was deleted even before entering State", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		assert.Equal(t, 0, gearScore.Level())
+		assert.Equal(t, int64(0), gearScore.Level())
 		se.DeleteGearScore(gearScore.ID())
 		gearScore.SetLevel(1)
-		assert.Equal(t, 0, gearScore.Level())
+		assert.Equal(t, int64(0), gearScore.Level())
 	})
 	t.Run("does not set attribute on element which is set to be deleted", func(t *testing.T) {
 		se := newEngine()
 		gearScore := se.CreateGearScore()
-		assert.Equal(t, 0, gearScore.Level())
+		assert.Equal(t, int64(0), gearScore.Level())
 		se.UpdateState()
 		se.DeleteGearScore(gearScore.ID())
 		gearScore.SetLevel(1)
-		assert.Equal(t, 0, gearScore.Level())
+		assert.Equal(t, int64(0), gearScore.Level())
 	})
 	t.Run("does not add child on element which is set to be deleted", func(t *testing.T) {
 		se := newEngine()
@@ -332,6 +330,15 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assem
 }
 
 func TestTree(t *testing.T) {
+
+	stringPtr := func(s string) *string {
+		return &s
+	}
+
+	intPtr := func(i int64) *int64 {
+		return &i
+	}
+
 	t.Run("assembles elements in a tree", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
@@ -347,11 +354,15 @@ func TestTree(t *testing.T) {
 								ID: player1.ID(),
 								GearScore: &gearScore{
 									ID:            player1.GearScore().ID(),
+									Level:         new(int64),
+									Score:         new(int64),
 									OperationKind: OperationKindUpdate,
 								},
 								OperationKind: OperationKindUpdate,
 								Position: &position{
 									ID:            player1.Position().ID(),
+									X:             new(float64),
+									Y:             new(float64),
 									OperationKind: OperationKindUpdate,
 								},
 							},
@@ -359,11 +370,15 @@ func TestTree(t *testing.T) {
 								ID: player2.ID(),
 								GearScore: &gearScore{
 									ID:            player2.GearScore().ID(),
+									Level:         new(int64),
+									Score:         new(int64),
 									OperationKind: OperationKindUpdate,
 								},
 								OperationKind: OperationKindUpdate,
 								Position: &position{
 									ID:            player2.Position().ID(),
+									X:             new(float64),
+									Y:             new(float64),
 									OperationKind: OperationKindUpdate,
 								},
 							},
@@ -395,7 +410,7 @@ func TestTree(t *testing.T) {
 								ID: player1.ID(),
 								GearScore: &gearScore{
 									ID:            player1.GearScore().ID(),
-									Level:         1,
+									Level:         intPtr(1),
 									OperationKind: OperationKindUpdate,
 								},
 								OperationKind: OperationKindUnchanged,
@@ -430,9 +445,12 @@ func TestTree(t *testing.T) {
 								Items: map[ItemID]item{
 									player1item1.ID(): {
 										ID:            player1item1.ID(),
+										Name:          new(string),
 										OperationKind: OperationKindUpdate,
 										GearScore: &gearScore{
 											ID:            player1item1.GearScore().ID(),
+											Level:         new(int64),
+											Score:         new(int64),
 											OperationKind: OperationKindUpdate,
 										},
 										Origin: &player{
@@ -440,10 +458,14 @@ func TestTree(t *testing.T) {
 											OperationKind: OperationKindUpdate,
 											GearScore: &gearScore{
 												ID:            player1item1.Origin().Player().GearScore().ID(),
+												Level:         new(int64),
+												Score:         new(int64),
 												OperationKind: OperationKindUpdate,
 											},
 											Position: &position{
 												ID:            player1item1.Origin().Player().Position().ID(),
+												X:             new(float64),
+												Y:             new(float64),
 												OperationKind: OperationKindUpdate,
 											},
 										},
@@ -484,9 +506,12 @@ func TestTree(t *testing.T) {
 								Items: map[ItemID]item{
 									player1item2.ID(): {
 										ID:            player1item2.ID(),
+										Name:          new(string),
 										OperationKind: OperationKindDelete,
 										GearScore: &gearScore{
 											ID:            player1item2.item.GearScore,
+											Level:         new(int64),
+											Score:         new(int64),
 											OperationKind: OperationKindDelete,
 										},
 										Origin: &player{
@@ -494,10 +519,14 @@ func TestTree(t *testing.T) {
 											OperationKind: OperationKindDelete,
 											GearScore: &gearScore{
 												ID:            player1item2.Origin().Player().GearScore().ID(),
+												Level:         new(int64),
+												Score:         new(int64),
 												OperationKind: OperationKindDelete,
 											},
 											Position: &position{
 												ID:            player1item2.Origin().Player().Position().ID(),
+												X:             new(float64),
+												Y:             new(float64),
 												OperationKind: OperationKindDelete,
 											},
 										},
@@ -529,8 +558,7 @@ func TestTree(t *testing.T) {
 
 				expectedTree.Item = map[ItemID]item{
 					itm.ID(): {
-						ID:   itm.ID(),
-						Name: "myItem",
+						ID: itm.ID(),
 						BoundTo: &elementReference{
 							OperationKindUnchanged,
 							int(plyr.ID()),
@@ -547,8 +575,11 @@ func TestTree(t *testing.T) {
 							playerItem.ID(): {
 								ID:            playerItem.ID(),
 								OperationKind: OperationKindUpdate,
+								Name:          new(string),
 								GearScore: &gearScore{
 									ID:            playerItem.GearScore().ID(),
+									Level:         new(int64),
+									Score:         new(int64),
 									OperationKind: OperationKindUpdate,
 								},
 								Origin: &player{
@@ -556,10 +587,14 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUpdate,
 									GearScore: &gearScore{
 										ID:            playerItem.Origin().Player().GearScore().ID(),
+										Level:         new(int64),
+										Score:         new(int64),
 										OperationKind: OperationKindUpdate,
 									},
 									Position: &position{
 										ID:            playerItem.Origin().Player().Position().ID(),
+										X:             new(float64),
+										Y:             new(float64),
 										OperationKind: OperationKindUpdate,
 									},
 								},
@@ -596,18 +631,28 @@ func TestTree(t *testing.T) {
 						ID: player1.ID(),
 						Items: map[ItemID]item{
 							itm.ID(): {
-								ID:        itm.ID(),
-								BoundTo:   nil,
-								GearScore: &gearScore{ID: itm.GearScore().ID(), OperationKind: OperationKindUpdate},
+								ID:      itm.ID(),
+								Name:    new(string),
+								BoundTo: nil,
+								GearScore: &gearScore{
+									ID:            itm.GearScore().ID(),
+									Level:         new(int64),
+									Score:         new(int64),
+									OperationKind: OperationKindUpdate,
+								},
 								Origin: &player{
 									ID:            itm.Origin().Player().ID(),
 									OperationKind: OperationKindUpdate,
 									GearScore: &gearScore{
 										ID:            itm.Origin().Player().GearScore().ID(),
+										Level:         new(int64),
+										Score:         new(int64),
 										OperationKind: OperationKindUpdate,
 									},
 									Position: &position{
 										ID:            itm.Origin().Player().Position().ID(),
+										X:             new(float64),
+										Y:             new(float64),
 										OperationKind: OperationKindUpdate,
 									},
 								},
@@ -710,7 +755,7 @@ func TestTree(t *testing.T) {
 				expectedTree.Item = map[ItemID]item{
 					itm.ID(): {
 						ID:   itm.ID(),
-						Name: "myName",
+						Name: stringPtr("myName"),
 						BoundTo: &elementReference{
 							OperationKind:        OperationKindUnchanged,
 							ElementID:            int(plyr.ID()),
@@ -792,7 +837,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GearScore: &gearScore{
 							ID:            player1.GearScore().ID(),
-							Level:         1,
+							Level:         intPtr(1),
 							OperationKind: OperationKindUpdate,
 						},
 					},
@@ -834,7 +879,7 @@ func TestTree(t *testing.T) {
 						ID: itm.ID(),
 						GearScore: &gearScore{
 							ID:            itm.GearScore().ID(),
-							Level:         1,
+							Level:         intPtr(1),
 							OperationKind: OperationKindUpdate,
 						},
 						OperationKind: OperationKindUnchanged,
@@ -864,10 +909,14 @@ func TestTree(t *testing.T) {
 						ID: player1.ID(),
 						GearScore: &gearScore{
 							ID:            player1.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindDelete,
 						},
 						Position: &position{
 							ID:            player1.Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindDelete,
 						},
 						OperationKind: OperationKindDelete,
@@ -925,7 +974,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GearScore: &gearScore{
 							ID:            player1.GearScore().ID(),
-							Level:         1,
+							Level:         intPtr(1),
 							OperationKind: OperationKindUpdate,
 						},
 					},
@@ -973,8 +1022,7 @@ func TestTree(t *testing.T) {
 
 				expectedTree.Item = map[ItemID]item{
 					item1.ID(): {
-						ID:   item1.ID(),
-						Name: "item1",
+						ID: item1.ID(),
 						BoundTo: &elementReference{
 							OperationKind:        OperationKindDelete,
 							ElementID:            int(player1.ID()),
@@ -985,8 +1033,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 					},
 					item2.ID(): {
-						ID:   item2.ID(),
-						Name: "item2",
+						ID: item2.ID(),
 						BoundTo: &elementReference{
 							OperationKind:        OperationKindUpdate,
 							ElementID:            int(player1.ID()),
@@ -1029,9 +1076,12 @@ func TestTree(t *testing.T) {
 
 				expectedTree.Item = map[ItemID]item{
 					item1.ID(): {
-						ID: item1.ID(),
+						ID:   item1.ID(),
+						Name: new(string),
 						GearScore: &gearScore{
 							ID:            item1.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindUpdate,
 						},
 						Origin: &player{
@@ -1039,23 +1089,32 @@ func TestTree(t *testing.T) {
 							OperationKind: OperationKindUpdate,
 							GearScore: &gearScore{
 								ID:            item1.Origin().Player().GearScore().ID(),
+								Level:         new(int64),
+								Score:         new(int64),
 								OperationKind: OperationKindUpdate,
 							},
 							Position: &position{
 								ID:            item1.Origin().Player().Position().ID(),
+								X:             new(float64),
+								Y:             new(float64),
 								OperationKind: OperationKindUpdate,
 							},
 						},
 						OperationKind: OperationKindUpdate,
 					},
 					item2.ID(): {
-						ID: item2.ID(),
+						ID:   item2.ID(),
+						Name: new(string),
 						GearScore: &gearScore{
+							Level:         new(int64),
+							Score:         new(int64),
 							ID:            item2.GearScore().ID(),
 							OperationKind: OperationKindUpdate,
 						},
 						Origin: &position{
 							ID:            item2.Origin().Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUpdate,
 						},
 						OperationKind: OperationKindUpdate,
@@ -1081,9 +1140,12 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						Interactables: map[int]interface{}{
 							int(itm.ID()): item{
-								ID: itm.ID(),
+								ID:   itm.ID(),
+								Name: new(string),
 								GearScore: &gearScore{
 									ID:            itm.GearScore().ID(),
+									Level:         new(int64),
+									Score:         new(int64),
 									OperationKind: OperationKindUpdate,
 								},
 								Origin: &player{
@@ -1091,10 +1153,14 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUpdate,
 									GearScore: &gearScore{
 										ID:            itm.Origin().Player().GearScore().ID(),
+										Level:         new(int64),
+										Score:         new(int64),
 										OperationKind: OperationKindUpdate,
 									},
 									Position: &position{
 										ID:            itm.Origin().Player().Position().ID(),
+										X:             new(float64),
+										Y:             new(float64),
 										OperationKind: OperationKindUpdate,
 									},
 								},
@@ -1105,13 +1171,18 @@ func TestTree(t *testing.T) {
 								OperationKind: OperationKindUpdate,
 								Position: &position{
 									ID:            zi.Position().ID(),
+									X:             new(float64),
+									Y:             new(float64),
 									OperationKind: OperationKindUpdate,
 								},
 								Item: &item{
 									ID:            zi.Item().ID(),
+									Name:          new(string),
 									OperationKind: OperationKindUpdate,
 									GearScore: &gearScore{
 										ID:            zi.Item().GearScore().ID(),
+										Level:         new(int64),
+										Score:         new(int64),
 										OperationKind: OperationKindUpdate,
 									},
 									Origin: &player{
@@ -1119,10 +1190,14 @@ func TestTree(t *testing.T) {
 										OperationKind: OperationKindUpdate,
 										GearScore: &gearScore{
 											ID:            zi.Item().Origin().Player().GearScore().ID(),
+											Level:         new(int64),
+											Score:         new(int64),
 											OperationKind: OperationKindUpdate,
 										},
 										Position: &position{
 											ID:            zi.Item().Origin().Player().Position().ID(),
+											X:             new(float64),
+											Y:             new(float64),
 											OperationKind: OperationKindUpdate,
 										},
 									},
@@ -1151,10 +1226,14 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						GearScore: &gearScore{
 							ID:            player1.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindUpdate,
 						},
 						Position: &position{
 							ID:            player1.Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUpdate,
 						},
 						Target: &elementReference{
@@ -1170,10 +1249,14 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						GearScore: &gearScore{
 							ID:            player2.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindUpdate,
 						},
 						Position: &position{
 							ID:            player2.Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUpdate,
 						},
 					},
@@ -1198,10 +1281,14 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						GearScore: &gearScore{
 							ID:            player1.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindUpdate,
 						},
 						Position: &position{
 							ID:            player1.Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUpdate,
 						},
 						TargetedBy: map[int]elementReference{
@@ -1219,10 +1306,14 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						GearScore: &gearScore{
 							ID:            player2.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindUpdate,
 						},
 						Position: &position{
 							ID:            player2.Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUpdate,
 						},
 					},
@@ -1269,7 +1360,7 @@ func TestTree(t *testing.T) {
 								GearScore: &gearScore{
 									ID:            player1.GearScore().ID(),
 									OperationKind: OperationKindUpdate,
-									Level:         1,
+									Level:         intPtr(1),
 								},
 							},
 						},
@@ -1317,7 +1408,7 @@ func TestTree(t *testing.T) {
 								GearScore: &gearScore{
 									ID:            plyr.GearScore().ID(),
 									OperationKind: OperationKindUpdate,
-									Level:         1,
+									Level:         intPtr(1),
 								},
 							},
 						},
@@ -1424,7 +1515,7 @@ func TestTree(t *testing.T) {
 						GearScore: &gearScore{
 							OperationKind: OperationKindUpdate,
 							ID:            player2.GearScore().ID(),
-							Level:         1,
+							Level:         intPtr(1),
 						},
 					},
 				}
@@ -1476,7 +1567,7 @@ func TestTree(t *testing.T) {
 						GearScore: &gearScore{
 							OperationKind: OperationKindUpdate,
 							ID:            player1.GearScore().ID(),
-							Level:         1,
+							Level:         intPtr(1),
 						},
 					},
 				}
@@ -1491,7 +1582,7 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				plyr := se.CreatePlayer()
-				itm := plyr.AddItem().SetName("item1").SetBoundTo(plyr.ID())
+				itm := plyr.AddItem().SetName("item0").SetBoundTo(plyr.ID())
 				se.UpdateState()
 
 				expectedTree.Player = map[PlayerID]player{
@@ -1500,19 +1591,25 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GearScore: &gearScore{
 							ID:            plyr.GearScore().ID(),
+							Level:         new(int64),
+							Score:         new(int64),
 							OperationKind: OperationKindUnchanged,
 						},
 						Position: &position{
 							ID:            plyr.Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUnchanged,
 						},
 						Items: map[ItemID]item{
 							itm.ID(): {
 								ID:            itm.ID(),
-								Name:          "item1",
+								Name:          stringPtr("item0"),
 								OperationKind: OperationKindUnchanged,
 								GearScore: &gearScore{
 									ID:            itm.GearScore().ID(),
+									Level:         new(int64),
+									Score:         new(int64),
 									OperationKind: OperationKindUnchanged,
 								},
 								BoundTo: &elementReference{
@@ -1527,10 +1624,14 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUnchanged,
 									Position: &position{
 										ID:            itm.Origin().Player().Position().ID(),
+										X:             new(float64),
+										Y:             new(float64),
 										OperationKind: OperationKindUnchanged,
 									},
 									GearScore: &gearScore{
 										ID:            itm.Origin().Player().GearScore().ID(),
+										Level:         new(int64),
+										Score:         new(int64),
 										OperationKind: OperationKindUnchanged,
 									},
 								},

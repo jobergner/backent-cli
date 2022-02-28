@@ -14,20 +14,6 @@ func (engine *Engine) setBoolValue(id BoolValueID, val bool) bool {
 	return true
 }
 
-func (engine *Engine) setIntValue(id IntValueID, val int64) bool {
-	intValue := engine.intValue(id)
-	if intValue.OperationKind == OperationKindDelete {
-		return false
-	}
-	if intValue.Value == val {
-		return false
-	}
-	intValue.Value = val
-	intValue.OperationKind = OperationKindUpdate
-	engine.Patch.IntValue[id] = intValue
-	return true
-}
-
 func (engine *Engine) setFloatValue(id FloatValueID, val float64) bool {
 	floatValue := engine.floatValue(id)
 	if floatValue.OperationKind == OperationKindDelete {
@@ -39,6 +25,20 @@ func (engine *Engine) setFloatValue(id FloatValueID, val float64) bool {
 	floatValue.Value = val
 	floatValue.OperationKind = OperationKindUpdate
 	engine.Patch.FloatValue[id] = floatValue
+	return true
+}
+
+func (engine *Engine) setIntValue(id IntValueID, val int64) bool {
+	intValue := engine.intValue(id)
+	if intValue.OperationKind == OperationKindDelete {
+		return false
+	}
+	if intValue.Value == val {
+		return false
+	}
+	intValue.Value = val
+	intValue.OperationKind = OperationKindUpdate
+	engine.Patch.IntValue[id] = intValue
 	return true
 }
 

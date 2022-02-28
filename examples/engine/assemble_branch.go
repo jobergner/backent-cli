@@ -7,11 +7,28 @@ func (engine *Engine) assembleGearScorePath(element *gearScore, p path, pIndex i
 		gearScoreData = engine.State.GearScore[element.ID]
 	}
 
-	// TODO: write assemblePath methods for basic values and set OperationKindUpdate in switch statement of basic types
+	// to prevent element OperationKindUnchanged overwriting OperKindUpdate
+	// set by basic child elements
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = gearScoreData.OperationKind
+	}
 
-	element.OperationKind = gearScoreData.OperationKind
-	element.Level = gearScoreData.Level
-	element.Score = gearScoreData.Score
+	if pIndex+1 == len(p) {
+		return
+	}
+
+	nextSeg := p[pIndex+1]
+
+	switch nextSeg.identifier {
+	case gearScore_levelIdentifier:
+		child := engine.intValue(gearScoreData.Level)
+		element.OperationKind = child.OperationKind
+		element.Level = &child.Value
+	case gearScore_scoreIdentifier:
+		child := engine.intValue(gearScoreData.Score)
+		element.OperationKind = child.OperationKind
+		element.Score = &child.Value
+	}
 
 	_ = gearScoreData
 }
@@ -23,9 +40,26 @@ func (engine *Engine) assemblePositionPath(element *position, p path, pIndex int
 		positionData = engine.State.Position[element.ID]
 	}
 
-	element.OperationKind = positionData.OperationKind
-	element.X = positionData.X
-	element.Y = positionData.Y
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = positionData.OperationKind
+	}
+
+	if pIndex+1 == len(p) {
+		return
+	}
+
+	nextSeg := p[pIndex+1]
+
+	switch nextSeg.identifier {
+	case position_xIdentifier:
+		child := engine.floatValue(positionData.X)
+		element.OperationKind = child.OperationKind
+		element.X = &child.Value
+	case position_yIdentifier:
+		child := engine.floatValue(positionData.Y)
+		element.OperationKind = child.OperationKind
+		element.Y = &child.Value
+	}
 
 	_ = positionData
 }
@@ -37,8 +71,9 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 		equipmentSetData = engine.State.EquipmentSet[element.ID]
 	}
 
-	element.OperationKind = equipmentSetData.OperationKind
-	element.Name = equipmentSetData.Name
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = equipmentSetData.OperationKind
+	}
 
 	if pIndex+1 == len(p) {
 		return
@@ -65,6 +100,10 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 			element.Equipment = make(map[ItemID]elementReference)
 		}
 		element.Equipment[referencedElement.ID] = treeRef
+	case equipmentSet_nameIdentifier:
+		child := engine.stringValue(equipmentSetData.Name)
+		element.OperationKind = child.OperationKind
+		element.Name = &child.Value
 	}
 
 	_ = equipmentSetData
@@ -77,7 +116,9 @@ func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pInd
 		attackEventData = engine.State.AttackEvent[element.ID]
 	}
 
-	element.OperationKind = attackEventData.OperationKind
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = attackEventData.OperationKind
+	}
 
 	if pIndex+1 == len(p) {
 		return
@@ -116,8 +157,9 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 		itemData = engine.State.Item[element.ID]
 	}
 
-	element.OperationKind = itemData.OperationKind
-	element.Name = itemData.Name
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = itemData.OperationKind
+	}
 
 	if pIndex+1 == len(p) {
 		return
@@ -151,6 +193,10 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
+	case item_nameIdenfitier:
+		child := engine.stringValue(itemData.Name)
+		element.OperationKind = child.OperationKind
+		element.Name = &child.Value
 	case item_originIdentifier:
 		switch nextSeg.kind {
 		case ElementKindPlayer:
@@ -180,7 +226,9 @@ func (engine *Engine) assembleZoneItemPath(element *zoneItem, p path, pIndex int
 		zoneItemData = engine.State.ZoneItem[element.ID]
 	}
 
-	element.OperationKind = zoneItemData.OperationKind
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = zoneItemData.OperationKind
+	}
 
 	if pIndex+1 == len(p) {
 		return
@@ -215,7 +263,9 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		playerData = engine.State.Player[element.ID]
 	}
 
-	element.OperationKind = playerData.OperationKind
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = playerData.OperationKind
+	}
 
 	if pIndex+1 == len(p) {
 		return
@@ -368,10 +418,8 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 		zoneData = engine.State.Zone[element.ID]
 	}
 
-	element.OperationKind = zoneData.OperationKind
-	if zoneData.Tags != nil && element.Tags == nil {
-		element.Tags = make([]string, len(zoneData.Tags))
-		copy(element.Tags, zoneData.Tags)
+	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
+		element.OperationKind = zoneData.OperationKind
 	}
 
 	if pIndex+1 == len(p) {
@@ -428,6 +476,13 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 		}
 		engine.assemblePlayerPath(&child, p, pIndex+1, includedElements)
 		element.Players[child.ID] = child
+	case zone_tagsIdentifier:
+		if element.Tags == nil {
+			element.Tags = make([]string, 0, len(zoneData.Tags))
+		}
+		child := engine.stringValue(StringValueID(nextSeg.id))
+		element.OperationKind = child.OperationKind
+		element.Tags = append(element.Tags, child.Value)
 	}
 
 	_ = zoneData
