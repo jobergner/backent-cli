@@ -982,6 +982,17 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- basic types are currently treated differntly from all other types; they are sent regardless of wether they have uptadet or not
+    - solution:
+        - make basic types same as other types: own map in state
+        - represent them in tree as *type (eg. *int)
+        - setters fror them should remain the same
+- BROADCASTING:
+    - somehow there needs to be a way to send an action to the server but not receive the update for that values as it's changed client side
+        - lol has server side walking => change gets send to server, response is applied locally
+        - diablo 3 has client side walking => change gets applied locally, then broadcasted
+    - in the client I somehow need to be able to set certain fields to broadcast mode
+    - idea: 
 - there is currently no way of sending events (eg. sword swing)
     - need to be able to send events as sending state like `hasSwung` will not suffice (user would have to set it to false manually after each tick)
     - event may be triggered multiple times
