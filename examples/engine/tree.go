@@ -10,6 +10,10 @@ const (
 type ElementKind string
 
 const (
+	ElementKindBoolValue    ElementKind = "Bool"
+	ElementKindIntValue     ElementKind = "Int"
+	ElementKindFloatValue   ElementKind = "Float"
+	ElementKindStringValue  ElementKind = "String"
 	ElementKindAttackEvent  ElementKind = "AttackEvent"
 	ElementKindEquipmentSet ElementKind = "EquipmentSet"
 	ElementKindGearScore    ElementKind = "GearScore"
@@ -82,7 +86,7 @@ type item struct {
 	ID            ItemID            `json:"id"`
 	BoundTo       *elementReference `json:"boundTo"`
 	GearScore     *gearScore        `json:"gearScore"`
-	Name          string            `json:"name"`
+	Name          *string           `json:"name"`
 	Origin        interface{}       `json:"origin"`
 	OperationKind OperationKind     `json:"operationKind"`
 }
@@ -96,21 +100,21 @@ type attackEvent struct {
 type equipmentSet struct {
 	ID            EquipmentSetID              `json:"id"`
 	Equipment     map[ItemID]elementReference `json:"equipment"`
-	Name          string                      `json:"name"`
+	Name          *string                     `json:"name"`
 	OperationKind OperationKind               `json:"operationKind"`
 }
 
 type position struct {
 	ID            PositionID    `json:"id"`
-	X             float64       `json:"x"`
-	Y             float64       `json:"y"`
+	X             *float64      `json:"x"`
+	Y             *float64      `json:"y"`
 	OperationKind OperationKind `json:"operationKind"`
 }
 
 type gearScore struct {
 	ID            GearScoreID   `json:"id"`
-	Level         int           `json:"level"`
-	Score         int           `json:"score"`
+	Level         *int64        `json:"level"`
+	Score         *int64        `json:"score"`
 	OperationKind OperationKind `json:"operationKind"`
 }
 

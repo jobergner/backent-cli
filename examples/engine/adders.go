@@ -71,7 +71,8 @@ func (_zone Zone) AddTag(tag string) {
 	if zone.zone.OperationKind == OperationKindDelete {
 		return
 	}
-	zone.zone.Tags = append(zone.zone.Tags, tag)
+	tagValue := zone.zone.engine.createStringValue(zone.zone.path, zone_tagsIdentifier, tag)
+	zone.zone.Tags = append(zone.zone.Tags, tagValue.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 }

@@ -43,6 +43,58 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	}
 }
 
+func (engine *Engine) deleteBoolValue(boolValueID BoolValueID) {
+	boolValue := engine.boolValue(boolValueID)
+	if boolValue.OperationKind == OperationKindDelete {
+		return
+	}
+	if _, ok := engine.State.BoolValue[boolValueID]; ok {
+		boolValue.OperationKind = OperationKindDelete
+		engine.Patch.BoolValue[boolValue.ID] = boolValue
+	} else {
+		delete(engine.Patch.BoolValue, boolValueID)
+	}
+}
+
+func (engine *Engine) deleteIntValue(intValueID IntValueID) {
+	intValue := engine.intValue(intValueID)
+	if intValue.OperationKind == OperationKindDelete {
+		return
+	}
+	if _, ok := engine.State.IntValue[intValueID]; ok {
+		intValue.OperationKind = OperationKindDelete
+		engine.Patch.IntValue[intValue.ID] = intValue
+	} else {
+		delete(engine.Patch.IntValue, intValueID)
+	}
+}
+
+func (engine *Engine) deleteFloatValue(floatValueID FloatValueID) {
+	floatValue := engine.floatValue(floatValueID)
+	if floatValue.OperationKind == OperationKindDelete {
+		return
+	}
+	if _, ok := engine.State.FloatValue[floatValueID]; ok {
+		floatValue.OperationKind = OperationKindDelete
+		engine.Patch.FloatValue[floatValue.ID] = floatValue
+	} else {
+		delete(engine.Patch.FloatValue, floatValueID)
+	}
+}
+
+func (engine *Engine) deleteStringValue(stringValueID StringValueID) {
+	stringValue := engine.stringValue(stringValueID)
+	if stringValue.OperationKind == OperationKindDelete {
+		return
+	}
+	if _, ok := engine.State.StringValue[stringValueID]; ok {
+		stringValue.OperationKind = OperationKindDelete
+		engine.Patch.StringValue[stringValue.ID] = stringValue
+	} else {
+		delete(engine.Patch.StringValue, stringValueID)
+	}
+}
+
 func (engine *Engine) DeleteGearScore(gearScoreID GearScoreID) {
 	gearScore := engine.GearScore(gearScoreID).gearScore
 	if gearScore.HasParent {
@@ -55,6 +107,8 @@ func (engine *Engine) deleteGearScore(gearScoreID GearScoreID) {
 	if gearScore.OperationKind == OperationKindDelete {
 		return
 	}
+	engine.deleteIntValue(gearScore.Level)
+	engine.deleteIntValue(gearScore.Score)
 	if _, ok := engine.State.GearScore[gearScoreID]; ok {
 		gearScore.OperationKind = OperationKindDelete
 		engine.Patch.GearScore[gearScore.ID] = gearScore
@@ -75,6 +129,8 @@ func (engine *Engine) deletePosition(positionID PositionID) {
 	if position.OperationKind == OperationKindDelete {
 		return
 	}
+	engine.deleteFloatValue(position.X)
+	engine.deleteFloatValue(position.Y)
 	if _, ok := engine.State.Position[positionID]; ok {
 		position.OperationKind = OperationKindDelete
 		engine.Patch.Position[position.ID] = position
@@ -119,6 +175,7 @@ func (engine *Engine) deleteItem(itemID ItemID) {
 	engine.dereferenceEquipmentSetEquipmentRefs(itemID)
 	engine.deleteItemBoundToRef(item.BoundTo)
 	engine.deleteGearScore(item.GearScore)
+	engine.deleteStringValue(item.Name)
 	engine.deleteAnyOfPlayer_Position(item.Origin, true)
 	if _, ok := engine.State.Item[itemID]; ok {
 		item.OperationKind = OperationKindDelete
@@ -169,6 +226,9 @@ func (engine *Engine) deleteZone(zoneID ZoneID) {
 	for _, playerID := range zone.Players {
 		engine.deletePlayer(playerID)
 	}
+	for _, tagID := range zone.Tags {
+		engine.deleteStringValue(tagID)
+	}
 	if _, ok := engine.State.Zone[zoneID]; ok {
 		zone.OperationKind = OperationKindDelete
 		engine.Patch.Zone[zone.ID] = zone
@@ -189,6 +249,7 @@ func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	for _, equipmentID := range equipmentSet.Equipment {
 		engine.deleteEquipmentSetEquipmentRef(equipmentID)
 	}
+	engine.deleteStringValue(equipmentSet.Name)
 	if _, ok := engine.State.EquipmentSet[equipmentSetID]; ok {
 		equipmentSet.OperationKind = OperationKindDelete
 		engine.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
