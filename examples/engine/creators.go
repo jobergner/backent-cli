@@ -1,5 +1,53 @@
 package state
 
+func (engine *Engine) createBoolValue(p path, fieldIdentifier treeFieldIdentifier, value bool) boolValue {
+	var element boolValue
+	element.Value = value
+	element.engine = engine
+	element.ID = BoolValueID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindBoolValue, 0)
+	element.Path = element.path.toJSONPath()
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.BoolValue[element.ID] = element
+	return element
+}
+
+func (engine *Engine) createIntValue(p path, fieldIdentifier treeFieldIdentifier, value int64) intValue {
+	var element intValue
+	element.Value = value
+	element.engine = engine
+	element.ID = IntValueID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindIntValue, 0)
+	element.Path = element.path.toJSONPath()
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.IntValue[element.ID] = element
+	return element
+}
+
+func (engine *Engine) createFloatValue(p path, fieldIdentifier treeFieldIdentifier, value float64) floatValue {
+	var element floatValue
+	element.Value = value
+	element.engine = engine
+	element.ID = FloatValueID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindFloatValue, 0)
+	element.Path = element.path.toJSONPath()
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.FloatValue[element.ID] = element
+	return element
+}
+
+func (engine *Engine) createStringValue(p path, fieldIdentifier treeFieldIdentifier, value string) stringValue {
+	var element stringValue
+	element.Value = value
+	element.engine = engine
+	element.ID = StringValueID(engine.GenerateID())
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindStringValue, 0)
+	element.Path = element.path.toJSONPath()
+	element.OperationKind = OperationKindUpdate
+	engine.Patch.StringValue[element.ID] = element
+	return element
+}
+
 func (engine *Engine) CreateEquipmentSet() EquipmentSet {
 	return engine.createEquipmentSet(newPath(), equipmentSetIdentifier)
 }
@@ -10,6 +58,8 @@ func (engine *Engine) createEquipmentSet(p path, fieldIdentifier treeFieldIdenti
 	element.ID = EquipmentSetID(engine.GenerateID())
 	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindEquipmentSet, 0)
 	element.Path = element.path.toJSONPath()
+	elementName := engine.createStringValue(element.path, equipmentSet_nameIdentifier, "")
+	element.Name = elementName.ID
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
 	engine.Patch.EquipmentSet[element.ID] = element
@@ -26,6 +76,10 @@ func (engine *Engine) createGearScore(p path, fieldIdentifier treeFieldIdentifie
 	element.ID = GearScoreID(engine.GenerateID())
 	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindGearScore, 0)
 	element.Path = element.path.toJSONPath()
+	elementLevel := engine.createIntValue(element.path, gearScore_levelIdentifier, 0)
+	element.Level = elementLevel.ID
+	elementScore := engine.createIntValue(element.path, gearScore_scoreIdentifier, 0)
+	element.Score = elementScore.ID
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
 	engine.Patch.GearScore[element.ID] = element
@@ -42,6 +96,10 @@ func (engine *Engine) createPosition(p path, fieldIdentifier treeFieldIdentifier
 	element.ID = PositionID(engine.GenerateID())
 	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, 0)
 	element.Path = element.path.toJSONPath()
+	elementX := engine.createFloatValue(element.path, position_xIdentifier, 0)
+	element.X = elementX.ID
+	elementY := engine.createFloatValue(element.path, position_yIdentifier, 0)
+	element.Y = elementY.ID
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
 	engine.Patch.Position[element.ID] = element
@@ -76,6 +134,8 @@ func (engine *Engine) createItem(p path, fieldIdentifier treeFieldIdentifier) It
 	element.Path = element.path.toJSONPath()
 	elementGearScore := engine.createGearScore(element.path, item_gearScoreIdentifier)
 	element.GearScore = elementGearScore.gearScore.ID
+	elementName := engine.createStringValue(element.path, item_nameIdenfitier, "")
+	element.Name = elementName.ID
 	elementOrigin := engine.createAnyOfPlayer_Position(true, element.path, item_originIdentifier)
 	element.Origin = elementOrigin.anyOfPlayer_Position.ID
 	element.OperationKind = OperationKindUpdate

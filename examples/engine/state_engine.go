@@ -38,6 +38,39 @@ func (engine *Engine) UpdateState() {
 		engine.deleteAttackEvent(attackEvent.ID)
 	}
 
+	for _, boolValue := range engine.Patch.BoolValue {
+		if boolValue.OperationKind == OperationKindDelete {
+			delete(engine.State.BoolValue, boolValue.ID)
+		} else {
+			boolValue.OperationKind = OperationKindUnchanged
+			engine.State.BoolValue[boolValue.ID] = boolValue
+		}
+	}
+	for _, floatValue := range engine.Patch.FloatValue {
+		if floatValue.OperationKind == OperationKindDelete {
+			delete(engine.State.FloatValue, floatValue.ID)
+		} else {
+			floatValue.OperationKind = OperationKindUnchanged
+			engine.State.FloatValue[floatValue.ID] = floatValue
+		}
+	}
+	for _, intValue := range engine.Patch.IntValue {
+		if intValue.OperationKind == OperationKindDelete {
+			delete(engine.State.IntValue, intValue.ID)
+		} else {
+			intValue.OperationKind = OperationKindUnchanged
+			engine.State.IntValue[intValue.ID] = intValue
+		}
+	}
+	for _, stringValue := range engine.Patch.StringValue {
+		if stringValue.OperationKind == OperationKindDelete {
+			delete(engine.State.StringValue, stringValue.ID)
+		} else {
+			stringValue.OperationKind = OperationKindUnchanged
+			engine.State.StringValue[stringValue.ID] = stringValue
+		}
+	}
+
 	for _, attackEvent := range engine.Patch.AttackEvent {
 		if attackEvent.OperationKind == OperationKindDelete {
 			delete(engine.State.AttackEvent, attackEvent.ID)
@@ -182,6 +215,19 @@ func (engine *Engine) UpdateState() {
 			anyOfItem_Player_ZoneItem.OperationKind = OperationKindUnchanged
 			engine.State.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItem.ID] = anyOfItem_Player_ZoneItem
 		}
+	}
+
+	for key := range engine.Patch.BoolValue {
+		delete(engine.Patch.BoolValue, key)
+	}
+	for key := range engine.Patch.FloatValue {
+		delete(engine.Patch.FloatValue, key)
+	}
+	for key := range engine.Patch.IntValue {
+		delete(engine.Patch.IntValue, key)
+	}
+	for key := range engine.Patch.StringValue {
+		delete(engine.Patch.StringValue, key)
 	}
 
 	for key := range engine.Patch.AttackEvent {

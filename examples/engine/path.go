@@ -5,6 +5,11 @@ import "strconv"
 type treeFieldIdentifier string
 
 const (
+	boolValueIdentifier   treeFieldIdentifier = "boolValue"
+	intValueIdentifier    treeFieldIdentifier = "intValue"
+	floatValueIdentifier  treeFieldIdentifier = "floatValue"
+	stringValueIdentifier treeFieldIdentifier = "stringValue"
+
 	attackEventIdentifier  treeFieldIdentifier = "attackEvent"
 	equipmentSetIdentifier treeFieldIdentifier = "equipmentSet"
 	gearScoreIdentifier    treeFieldIdentifier = "gearScore"
@@ -17,9 +22,14 @@ const (
 	attackEvent_targetIdentifier treeFieldIdentifier = "attackEvent_target"
 
 	equipmentSet_equipmentIdentifier treeFieldIdentifier = "equipmentSet_equipment"
+	equipmentSet_nameIdentifier      treeFieldIdentifier = "equipmentSet_name"
+
+	gearScore_levelIdentifier treeFieldIdentifier = "gearScore_level"
+	gearScore_scoreIdentifier treeFieldIdentifier = "gearScore_score"
 
 	item_boundToIdentifier   treeFieldIdentifier = "item_boundTo"
 	item_gearScoreIdentifier treeFieldIdentifier = "item_gearScore"
+	item_nameIdenfitier      treeFieldIdentifier = "item_name"
 	item_originIdentifier    treeFieldIdentifier = "item_origin"
 
 	player_actionIdentifier        treeFieldIdentifier = "player_action"
@@ -31,9 +41,13 @@ const (
 	player_targetIdentifier        treeFieldIdentifier = "player_target"
 	player_targetedByIdentifier    treeFieldIdentifier = "player_targetedBy"
 
+	position_xIdentifier treeFieldIdentifier = "position_x"
+	position_yIdentifier treeFieldIdentifier = "position_y"
+
 	zone_interactablesIdentifier treeFieldIdentifier = "zone_interactables"
 	zone_itemsIdentifier         treeFieldIdentifier = "zone_items"
 	zone_playersIdentifier       treeFieldIdentifier = "zone_players"
+	zone_tagsIdentifier          treeFieldIdentifier = "zone_tags"
 
 	zoneItem_itemIdentifier     treeFieldIdentifier = "zoneItem_item"
 	zoneItem_positionIdentifier treeFieldIdentifier = "zoneItem_position"
@@ -63,71 +77,13 @@ func (p path) toJSONPath() string {
 	jsonPath := "$"
 
 	for _, seg := range p {
-		jsonPath += "." + pathIdentifierToString(seg.identifier)
+		jsonPath += "." + string(seg.identifier)
 		if isSliceFieldIdentifier(seg.identifier) {
 			jsonPath += "[" + strconv.Itoa(seg.id) + "]"
 		}
 	}
 
 	return jsonPath
-}
-
-func pathIdentifierToString(fieldIdentifier treeFieldIdentifier) string {
-	switch fieldIdentifier {
-	case attackEventIdentifier:
-		return "attackEvent"
-	case equipmentSetIdentifier:
-		return "equipmentSet"
-	case gearScoreIdentifier:
-		return "gearScore"
-	case itemIdentifier:
-		return "item"
-	case playerIdentifier:
-		return "player"
-	case positionIdentifier:
-		return "position"
-	case zoneIdentifier:
-		return "zone"
-	case zoneItemIdentifier:
-		return "zoneItem"
-	case attackEvent_targetIdentifier:
-		return "target"
-	case equipmentSet_equipmentIdentifier:
-		return "equipment"
-	case item_boundToIdentifier:
-		return "boundTo"
-	case item_gearScoreIdentifier:
-		return "gearScore"
-	case item_originIdentifier:
-		return "origin"
-	case player_actionIdentifier:
-		return "action"
-	case player_equipmentSetsIdentifier:
-		return "equipmentSets"
-	case player_gearScoreIdentifier:
-		return "gearScore"
-	case player_guildMembersIdentifier:
-		return "guildMembers"
-	case player_itemsIdentifier:
-		return "items"
-	case player_positionIdentifier:
-		return "position"
-	case player_targetIdentifier:
-		return "target"
-	case player_targetedByIdentifier:
-		return "targetedBy"
-	case zone_interactablesIdentifier:
-		return "interactables"
-	case zone_itemsIdentifier:
-		return "items"
-	case zone_playersIdentifier:
-		return "players"
-	case zoneItem_itemIdentifier:
-		return "item"
-	case zoneItem_positionIdentifier:
-		return "position"
-	}
-	return ""
 }
 
 func isSliceFieldIdentifier(fieldIdentifier treeFieldIdentifier) bool {

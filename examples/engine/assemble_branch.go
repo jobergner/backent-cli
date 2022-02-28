@@ -7,6 +7,8 @@ func (engine *Engine) assembleGearScorePath(element *gearScore, p path, pIndex i
 		gearScoreData = engine.State.GearScore[element.ID]
 	}
 
+	// TODO: write assemblePath methods for basic values and set OperationKindUpdate in switch statement of basic types
+
 	element.OperationKind = gearScoreData.OperationKind
 	element.Level = gearScoreData.Level
 	element.Score = gearScoreData.Score

@@ -357,13 +357,13 @@ func (_zone Zone) RemoveTags(tagToRemove string) Zone {
 		return zone
 	}
 
-	for i, val := range zone.zone.Tags {
-		if val != tagToRemove {
+	for i, valID := range zone.zone.Tags {
+		if zone.zone.engine.stringValue(valID).Value != tagToRemove {
 			continue
 		}
 
 		zone.zone.Tags[i] = zone.zone.Tags[len(zone.zone.Tags)-1]
-		zone.zone.Tags[len(zone.zone.Tags)-1] = ""
+		zone.zone.Tags[len(zone.zone.Tags)-1] = 0
 		zone.zone.Tags = zone.zone.Tags[:len(zone.zone.Tags)-1]
 
 		zone.zone.OperationKind = OperationKindUpdate

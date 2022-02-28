@@ -4,6 +4,38 @@ import (
 	"sort"
 )
 
+func (engine *Engine) boolValue(boolValueID BoolValueID) boolValue {
+	patchingBoolValue, ok := engine.Patch.BoolValue[boolValueID]
+	if ok {
+		return patchingBoolValue
+	}
+	return engine.State.BoolValue[boolValueID]
+}
+
+func (engine *Engine) intValue(intValueID IntValueID) intValue {
+	patchingIntValue, ok := engine.Patch.IntValue[intValueID]
+	if ok {
+		return patchingIntValue
+	}
+	return engine.State.IntValue[intValueID]
+}
+
+func (engine *Engine) floatValue(floatValueID FloatValueID) floatValue {
+	patchingFloatValue, ok := engine.Patch.FloatValue[floatValueID]
+	if ok {
+		return patchingFloatValue
+	}
+	return engine.State.FloatValue[floatValueID]
+}
+
+func (engine *Engine) stringValue(stringValueID StringValueID) stringValue {
+	patchingStringValue, ok := engine.Patch.StringValue[stringValueID]
+	if ok {
+		return patchingStringValue
+	}
+	return engine.State.StringValue[stringValueID]
+}
+
 func (engine *Engine) QueryPlayers(matcher func(Player) bool) []Player {
 	playerIDs := engine.allPlayerIDs()
 	sort.Slice(playerIDs, func(i, j int) bool {
@@ -230,14 +262,14 @@ func (_gearScore GearScore) Path() string {
 	return _gearScore.gearScore.Path
 }
 
-func (_gearScore GearScore) Level() int {
+func (_gearScore GearScore) Level() int64 {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
-	return gearScore.gearScore.Level
+	return gearScore.gearScore.engine.intValue(gearScore.gearScore.Level).Value
 }
 
-func (_gearScore GearScore) Score() int {
+func (_gearScore GearScore) Score() int64 {
 	gearScore := _gearScore.gearScore.engine.GearScore(_gearScore.gearScore.ID)
-	return gearScore.gearScore.Score
+	return gearScore.gearScore.engine.intValue(gearScore.gearScore.Score).Value
 }
 
 func (engine *Engine) QueryItems(matcher func(Item) bool) []Item {
@@ -333,7 +365,7 @@ func (_item Item) Path() string {
 }
 func (_item Item) Name() string {
 	item := _item.item.engine.Item(_item.item.ID)
-	return item.item.Name
+	return item.item.engine.stringValue(item.item.Name).Value
 }
 
 func (_item Item) GearScore() GearScore {
@@ -524,12 +556,12 @@ func (_position Position) Path() string {
 
 func (_position Position) X() float64 {
 	position := _position.position.engine.Position(_position.position.ID)
-	return position.position.X
+	return position.position.engine.floatValue(position.position.X).Value
 }
 
 func (_position Position) Y() float64 {
 	position := _position.position.engine.Position(_position.position.ID)
-	return position.position.Y
+	return position.position.engine.floatValue(position.position.Y).Value
 }
 
 func (engine *Engine) QueryZoneItems(matcher func(ZoneItem) bool) []ZoneItem {
@@ -701,8 +733,8 @@ func (_zone Zone) Items() []ZoneItem {
 func (_zone Zone) Tags() []string {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var tags []string
-	for _, element := range zone.zone.Tags {
-		tags = append(tags, element)
+	for _, stringValueID := range zone.zone.Tags {
+		tags = append(tags, zone.zone.engine.stringValue(stringValueID).Value)
 	}
 	return tags
 }
@@ -816,7 +848,7 @@ func (_equipmentSet EquipmentSet) Path() string {
 
 func (_equipmentSet EquipmentSet) Name() string {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
-	return equipmentSet.equipmentSet.Name
+	return equipmentSet.equipmentSet.engine.stringValue(equipmentSet.equipmentSet.Name).Value
 }
 
 func (_equipmentSet EquipmentSet) Equipment() []EquipmentSetEquipmentRef {

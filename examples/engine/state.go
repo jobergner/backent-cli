@@ -1,5 +1,10 @@
 package state
 
+type BoolValueID int
+type FloatValueID int
+type IntValueID int
+type StringValueID int
+
 type AttackEventID int
 type EquipmentSetID int
 type GearScoreID int
@@ -20,6 +25,10 @@ type PlayerTargetRefID int
 type PlayerTargetedByRefID int
 
 type State struct {
+	BoolValue                 map[BoolValueID]boolValue                                     `json:"boolValue"`
+	FloatValue                map[FloatValueID]floatValue                                   `json:"floatValue"`
+	IntValue                  map[IntValueID]intValue                                       `json:"intValue"`
+	StringValue               map[StringValueID]stringValue                                 `json:"stringValue"`
 	AttackEvent               map[AttackEventID]attackEventCore                             `json:"attackEvent"`
 	EquipmentSet              map[EquipmentSetID]equipmentSetCore                           `json:"equipmentSet"`
 	GearScore                 map[GearScoreID]gearScoreCore                                 `json:"gearScore"`
@@ -42,6 +51,10 @@ type State struct {
 
 func newState() *State {
 	return &State{
+		BoolValue:                 make(map[BoolValueID]boolValue),
+		FloatValue:                make(map[FloatValueID]floatValue),
+		IntValue:                  make(map[IntValueID]intValue),
+		StringValue:               make(map[StringValueID]stringValue),
 		AttackEvent:               make(map[AttackEventID]attackEventCore),
 		EquipmentSet:              make(map[EquipmentSetID]equipmentSetCore),
 		GearScore:                 make(map[GearScoreID]gearScoreCore),
@@ -63,6 +76,42 @@ func newState() *State {
 	}
 }
 
+type boolValue struct {
+	ID            BoolValueID   `json:"id"`
+	Value         bool          `json:"value"`
+	OperationKind OperationKind `json:"operationKind"`
+	Path          string        `json:"path"`
+	path          path
+	engine        *Engine
+}
+
+type intValue struct {
+	ID            IntValueID    `json:"id"`
+	Value         int64         `json:"value"`
+	OperationKind OperationKind `json:"operationKind"`
+	Path          string        `json:"path"`
+	path          path
+	engine        *Engine
+}
+
+type floatValue struct {
+	ID            FloatValueID  `json:"id"`
+	Value         float64       `json:"value"`
+	OperationKind OperationKind `json:"operationKind"`
+	Path          string        `json:"path"`
+	path          path
+	engine        *Engine
+}
+
+type stringValue struct {
+	ID            StringValueID `json:"id"`
+	Value         string        `json:"value"`
+	OperationKind OperationKind `json:"operationKind"`
+	Path          string        `json:"path"`
+	path          path
+	engine        *Engine
+}
+
 type attackEventCore struct {
 	ID            AttackEventID          `json:"id"`
 	Target        AttackEventTargetRefID `json:"target"`
@@ -80,7 +129,7 @@ type zoneCore struct {
 	Interactables []AnyOfItem_Player_ZoneItemID `json:"interactables"`
 	Items         []ZoneItemID                  `json:"items"`
 	Players       []PlayerID                    `json:"players"`
-	Tags          []string                      `json:"tags"`
+	Tags          []StringValueID               `json:"tags"`
 	OperationKind OperationKind                 `json:"operationKind"`
 	HasParent     bool                          `json:"hasParent"`
 	Path          string                        `json:"path"`
@@ -107,7 +156,7 @@ type itemCore struct {
 	ID            ItemID                 `json:"id"`
 	BoundTo       ItemBoundToRefID       `json:"boundTo"`
 	GearScore     GearScoreID            `json:"gearScore"`
-	Name          string                 `json:"name"`
+	Name          StringValueID          `json:"name"`
 	Origin        AnyOfPlayer_PositionID `json:"origin"`
 	OperationKind OperationKind          `json:"operationKind"`
 	HasParent     bool                   `json:"hasParent"`
@@ -139,8 +188,8 @@ type Player struct{ player playerCore }
 
 type gearScoreCore struct {
 	ID            GearScoreID   `json:"id"`
-	Level         int           `json:"level"`
-	Score         int           `json:"score"`
+	Level         IntValueID    `json:"level"`
+	Score         IntValueID    `json:"score"`
 	OperationKind OperationKind `json:"operationKind"`
 	HasParent     bool          `json:"hasParent"`
 	Path          string        `json:"path"`
@@ -152,8 +201,8 @@ type GearScore struct{ gearScore gearScoreCore }
 
 type positionCore struct {
 	ID            PositionID    `json:"id"`
-	X             float64       `json:"x"`
-	Y             float64       `json:"y"`
+	X             FloatValueID  `json:"x"`
+	Y             FloatValueID  `json:"y"`
 	OperationKind OperationKind `json:"operationKind"`
 	HasParent     bool          `json:"hasParent"`
 	Path          string        `json:"path"`
@@ -166,7 +215,7 @@ type Position struct{ position positionCore }
 type equipmentSetCore struct {
 	ID            EquipmentSetID               `json:"id"`
 	Equipment     []EquipmentSetEquipmentRefID `json:"equipment"`
-	Name          string                       `json:"name"`
+	Name          StringValueID                `json:"name"`
 	OperationKind OperationKind                `json:"operationKind"`
 	HasParent     bool                         `json:"hasParent"`
 	Path          string                       `json:"path"`
