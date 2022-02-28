@@ -40,17 +40,6 @@ type Actions struct {
 	SpawnZoneItems  func(params SpawnZoneItemsParams, engine *Engine, roomName, clientID string) SpawnZoneItemsResponse
 }
 
-type SideEffects struct {
-	OnDeploy    func(engine *Engine)
-	OnFrameTick func(engine *Engine)
-}
-
-type LoginSignals struct {
-	OnSuperMessage     func(msg Message, room *Room, client *Client, loginHandler *LoginHandler)
-	OnClientConnect    func(client *Client, loginHandler *LoginHandler)
-	OnClientDisconnect func(engine *Engine, clientID string, loginHandler *LoginHandler)
-}
-
 // TODO logging should happen here
 func (r *Room) processClientMessage(msg Message) (Message, error) {
 	switch MessageKind(msg.Kind) {

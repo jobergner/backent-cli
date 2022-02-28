@@ -15,6 +15,17 @@ type LoginHandler struct {
 	fps         int
 }
 
+type SideEffects struct {
+	OnDeploy    func(engine *Engine)
+	OnFrameTick func(engine *Engine)
+}
+
+type LoginSignals struct {
+	OnSuperMessage     func(msg Message, room *Room, client *Client, loginHandler *LoginHandler)
+	OnClientConnect    func(client *Client, loginHandler *LoginHandler)
+	OnClientDisconnect func(engine *Engine, clientID string, loginHandler *LoginHandler)
+}
+
 func newLoginHandler(signals LoginSignals, actions Actions, sideEffects SideEffects, fps int) *LoginHandler {
 	// TODO thread safe
 	return &LoginHandler{
