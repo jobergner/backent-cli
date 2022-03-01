@@ -987,12 +987,35 @@ the `examples/engine` has benchmark tests with their record and improvements mai
         - make basic types same as other types: own map in state
         - represent them in tree as *type (eg. *int)
         - setters fror them should remain the same
-- BROADCASTING:
+- BROADCASTING (modifications which do not require verification):
+    - EXAMPLES:
+        - client side walking
+        - attack events
+        - targeting (wow)
+    - AFFECTED METHODS:
+        - anything involving creation of entities is not viable (which basically ruins the whole concept because of reference/any wrappers)
+            -> it might not because wrappers are not real entities and their IDs are never exposed
+            ... but what if eg. a reference is created client and server side, but then deleted server side. the deletion object with ID x will not remove the
+            local reference of id y
+            SOLUTION: maybe wrappers should not have own IDs but their IDs should be composed of the underlying "real" elements
+            TODO: make sure this is REALLY necessary
+            -> this would make all `setters` broadcastable
     - somehow there needs to be a way to send an action to the server but not receive the update for that values as it's changed client side
         - lol has server side walking => change gets send to server, response is applied locally
         - diablo 3 has client side walking => change gets applied locally, then broadcasted
     - in the client I somehow need to be able to set certain fields to broadcast mode
-    - idea: 
+    - IDEA:
+        - every element can be signed with a clientID `{broadcastedBy: <clientID>}`
+        - the client application then filters out all elements which are signed with its `clientID`
+        - if multiple clients sign the same element, the signature gets removed (since the element contains data which no client is fully aware of)
+        - signing element can be done by `engine.startBroadcast()` and `engine.endBroadcast()` (running code `local first` and broadcasting is kind of the same idea, how to create clarity?)
+        - this way braodcasting does not happen action-based, but element-based (freedom for user)
+    - PROBLEM:
+        - how does it stay in sync? I can't be sure local state and remote state are the same at time of modification
+            - the idea of broadcasted events is that it does not require verification from the server
+        - what if an event does usually not require verification from server (walking in diablo3) but does in specific instances (a blockade suddenly appears)
+            - the user needs to program solutions for these types of events themselves, eg. when a blockade is being put up and the player has moved there client side
+            already, the player might have to be hard-reset to the next valid position
 - there is currently no way of sending events (eg. sword swing)
     - need to be able to send events as sending state like `hasSwung` will not suffice (user would have to set it to false manually after each tick)
     - event may be triggered multiple times

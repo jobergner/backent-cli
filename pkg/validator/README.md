@@ -64,3 +64,4 @@ TODO:
 - do not allow `ParentKind`
 - do not allow `Kind`
 - do not allow `Query...`
+- handle allowed types (int64, float64, bool, string)
