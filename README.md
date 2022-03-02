@@ -987,7 +987,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
         - make basic types same as other types: own map in state
         - represent them in tree as *type (eg. *int)
         - setters fror them should remain the same
-- BROADCASTING (modifications which do not require verification):
+- BROADCASTING (modifications which do not require verification): !!still need to figure out how to conveniently let user define actions with local-first effects
     - EXAMPLES:
         - client side walking
         - attack events
@@ -999,6 +999,7 @@ the `examples/engine` has benchmark tests with their record and improvements mai
             local reference of id y
             SOLUTION: maybe wrappers should not have own IDs but their IDs should be composed of the underlying "real" elements
             TODO: make sure this is REALLY necessary
+            .. non-ref setters of any types do still create elements maybe rename? nonRef=`Be<Type>` ref=remains `Set<Type>`
             -> this would make all `setters` broadcastable
     - somehow there needs to be a way to send an action to the server but not receive the update for that values as it's changed client side
         - lol has server side walking => change gets send to server, response is applied locally
