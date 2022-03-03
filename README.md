@@ -988,6 +988,9 @@ the `examples/engine` has benchmark tests with their record and improvements mai
         - represent them in tree as *type (eg. *int)
         - setters fror them should remain the same
 - BROADCASTING (modifications which do not require verification): !!still need to figure out how to conveniently let user define actions with local-first effects
+    - actions should consist of 2 methods: `emit` and `broadcast`. `emit` is run only on the server server, `broadcast` is run on the clinet & the server
+    - the `emit` method is the one which will return a response
+    - calling the action should return a channel which will receive the response
     - EXAMPLES:
         - client side walking
         - attack events
