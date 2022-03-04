@@ -5,6 +5,19 @@ type FloatValueID int
 type IntValueID int
 type StringValueID int
 
+type ComplexID struct {
+	// despite the fact that a slice of references cannot hold multiple references of the same element,
+	// we need the field identifier because otherwise an element with multiple reference fields
+	// may be able to contain references with the same ParentID-ChildID combination.
+	Field    treeFieldIdentifier
+	ParentID int
+	// ChildID describes the next true element => references of any-containers will not have the any-container ID as ChildID
+	ChildID int
+	// when a reference references an any-container both would have the same ParentID && ChildID
+	// IsMediator simply acts as a differentiation between the two, so each ID is guaranteed to be unique
+	IsMediator bool
+}
+
 type AttackEventID int
 type EquipmentSetID int
 type GearScoreID int
@@ -13,16 +26,16 @@ type PlayerID int
 type PositionID int
 type ZoneID int
 type ZoneItemID int
-type AttackEventTargetRefID int
-type PlayerGuildMemberRefID int
-type ItemBoundToRefID int
-type EquipmentSetEquipmentRefID int
-type PlayerEquipmentSetRefID int
-type AnyOfItem_Player_ZoneItemID int
-type AnyOfPlayer_ZoneItemID int
-type AnyOfPlayer_PositionID int
-type PlayerTargetRefID int
-type PlayerTargetedByRefID int
+type AttackEventTargetRefID ComplexID
+type PlayerGuildMemberRefID ComplexID
+type ItemBoundToRefID ComplexID
+type EquipmentSetEquipmentRefID ComplexID
+type PlayerEquipmentSetRefID ComplexID
+type AnyOfItem_Player_ZoneItemID ComplexID
+type AnyOfPlayer_ZoneItemID ComplexID
+type AnyOfPlayer_PositionID ComplexID
+type PlayerTargetRefID ComplexID
+type PlayerTargetedByRefID ComplexID
 
 type State struct {
 	BoolValue                 map[BoolValueID]boolValue                                     `json:"boolValue"`
@@ -283,10 +296,9 @@ type PlayerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCo
 type anyOfPlayer_PositionCore struct {
 	ID                AnyOfPlayer_PositionID `json:"id"`
 	ElementKind       ElementKind            `json:"elementKind"`
+	ChildID           int                    `json:"childID"`
 	ParentElementPath path                   `json:"parentElementPath"`
 	FieldIdentifier   treeFieldIdentifier    `json:"fieldIdentifier"`
-	Player            PlayerID               `json:"player"`
-	Position          PositionID             `json:"position"`
 	OperationKind     OperationKind          `json:"operationKind"`
 	engine            *Engine
 }
@@ -296,10 +308,9 @@ type AnyOfPlayer_Position struct{ anyOfPlayer_Position anyOfPlayer_PositionCore 
 type anyOfPlayer_ZoneItemCore struct {
 	ID                AnyOfPlayer_ZoneItemID `json:"id"`
 	ElementKind       ElementKind            `json:"elementKind"`
+	ChildID           int                    `json:"childID"`
 	ParentElementPath path                   `json:"parentElementPath"`
 	FieldIdentifier   treeFieldIdentifier    `json:"fieldIdentifier"`
-	Player            PlayerID               `json:"player"`
-	ZoneItem          ZoneItemID             `json:"zoneItem"`
 	OperationKind     OperationKind          `json:"operationKind"`
 	engine            *Engine
 }
@@ -309,11 +320,9 @@ type AnyOfPlayer_ZoneItem struct{ anyOfPlayer_ZoneItem anyOfPlayer_ZoneItemCore 
 type anyOfItem_Player_ZoneItemCore struct {
 	ID                AnyOfItem_Player_ZoneItemID `json:"id"`
 	ElementKind       ElementKind                 `json:"elementKind"`
+	ChildID           int                         `json:"childID"`
 	ParentElementPath path                        `json:"parentElementPath"`
 	FieldIdentifier   treeFieldIdentifier         `json:"fieldIdentifier"`
-	Item              ItemID                      `json:"item"`
-	Player            PlayerID                    `json:"player"`
-	ZoneItem          ZoneItemID                  `json:"zoneItem"`
 	OperationKind     OperationKind               `json:"operationKind"`
 	engine            *Engine
 }

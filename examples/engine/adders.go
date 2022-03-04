@@ -30,8 +30,7 @@ func (_zone Zone) AddInteractablePlayer() Player {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	player := zone.zone.engine.createPlayer(zone.zone.path, zone_interactablesIdentifier)
-	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
-	anyContainer.setPlayer(player.player.ID, false)
+	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(int(zone.zone.ID), int(player.player.ID), ElementKindPlayer, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
 	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
@@ -44,8 +43,7 @@ func (_zone Zone) AddInteractableZoneItem() ZoneItem {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	zoneItem := zone.zone.engine.createZoneItem(zone.zone.path, zone_interactablesIdentifier)
-	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
-	anyContainer.setZoneItem(zoneItem.zoneItem.ID, false)
+	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(int(zone.zone.ID), int(zoneItem.zoneItem.ID), ElementKindZoneItem, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
 	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
@@ -58,8 +56,7 @@ func (_zone Zone) AddInteractableItem() Item {
 		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: zone.zone.engine}}
 	}
 	item := zone.zone.engine.createItem(zone.zone.path, zone_interactablesIdentifier)
-	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(false, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
-	anyContainer.setItem(item.item.ID, false)
+	anyContainer := zone.zone.engine.createAnyOfItem_Player_ZoneItem(int(zone.zone.ID), int(item.item.ID), ElementKindItem, zone.zone.path, zone_interactablesIdentifier).anyOfItem_Player_ZoneItem
 	zone.zone.Interactables = append(zone.zone.Interactables, anyContainer.ID)
 	zone.zone.OperationKind = OperationKindUpdate
 	zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
@@ -132,12 +129,11 @@ func (_player Player) AddTargetedByPlayer(playerID PlayerID) {
 	for _, currentRefID := range player.player.TargetedBy {
 		currentRef := player.player.engine.playerTargetedByRef(currentRefID)
 		anyContainer := player.player.engine.anyOfPlayer_ZoneItem(currentRef.playerTargetedByRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
+		if PlayerID(anyContainer.anyOfPlayer_ZoneItem.ChildID) == playerID {
 			return
 		}
 	}
-	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, player.player.path, "").anyOfPlayer_ZoneItem
-	anyContainer.setPlayer(playerID, false)
+	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(playerID), ElementKindPlayer, player.player.path, player_targetedByIdentifier).anyOfPlayer_ZoneItem
 	ref := player.player.engine.createPlayerTargetedByRef(player.player.path, player_targetedByIdentifier, anyContainer.ID, player.player.ID, ElementKindPlayer, int(playerID))
 	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
 	player.player.OperationKind = OperationKindUpdate
@@ -155,12 +151,11 @@ func (_player Player) AddTargetedByZoneItem(zoneItemID ZoneItemID) {
 	for _, currentRefID := range player.player.TargetedBy {
 		currentRef := player.player.engine.playerTargetedByRef(currentRefID)
 		anyContainer := player.player.engine.anyOfPlayer_ZoneItem(currentRef.playerTargetedByRef.ReferencedElementID)
-		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
+		if ZoneItemID(anyContainer.anyOfPlayer_ZoneItem.ChildID) == zoneItemID {
 			return
 		}
 	}
-	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, player.player.path, "").anyOfPlayer_ZoneItem
-	anyContainer.setZoneItem(zoneItemID, false)
+	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(zoneItemID), ElementKindZoneItem, player.player.path, player_targetedByIdentifier).anyOfPlayer_ZoneItem
 	ref := player.player.engine.createPlayerTargetedByRef(player.player.path, player_targetedByIdentifier, anyContainer.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.TargetedBy = append(player.player.TargetedBy, ref.ID)
 	player.player.OperationKind = OperationKindUpdate

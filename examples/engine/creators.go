@@ -5,7 +5,7 @@ func (engine *Engine) createBoolValue(p path, fieldIdentifier treeFieldIdentifie
 	element.Value = value
 	element.engine = engine
 	element.ID = BoolValueID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindBoolValue, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindBoolValue, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.BoolValue[element.ID] = element
@@ -17,7 +17,7 @@ func (engine *Engine) createIntValue(p path, fieldIdentifier treeFieldIdentifier
 	element.Value = value
 	element.engine = engine
 	element.ID = IntValueID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindIntValue, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindIntValue, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.IntValue[element.ID] = element
@@ -29,7 +29,7 @@ func (engine *Engine) createFloatValue(p path, fieldIdentifier treeFieldIdentifi
 	element.Value = value
 	element.engine = engine
 	element.ID = FloatValueID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindFloatValue, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindFloatValue, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.FloatValue[element.ID] = element
@@ -41,7 +41,7 @@ func (engine *Engine) createStringValue(p path, fieldIdentifier treeFieldIdentif
 	element.Value = value
 	element.engine = engine
 	element.ID = StringValueID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindStringValue, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindStringValue, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.StringValue[element.ID] = element
@@ -56,7 +56,7 @@ func (engine *Engine) createEquipmentSet(p path, fieldIdentifier treeFieldIdenti
 	var element equipmentSetCore
 	element.engine = engine
 	element.ID = EquipmentSetID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindEquipmentSet, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindEquipmentSet, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	elementName := engine.createStringValue(element.path, equipmentSet_nameIdentifier, "")
 	element.Name = elementName.ID
@@ -74,7 +74,7 @@ func (engine *Engine) createGearScore(p path, fieldIdentifier treeFieldIdentifie
 	var element gearScoreCore
 	element.engine = engine
 	element.ID = GearScoreID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindGearScore, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindGearScore, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	elementLevel := engine.createIntValue(element.path, gearScore_levelIdentifier, 0)
 	element.Level = elementLevel.ID
@@ -94,7 +94,7 @@ func (engine *Engine) createPosition(p path, fieldIdentifier treeFieldIdentifier
 	var element positionCore
 	element.engine = engine
 	element.ID = PositionID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	elementX := engine.createFloatValue(element.path, position_xIdentifier, 0)
 	element.X = elementX.ID
@@ -114,7 +114,7 @@ func (engine *Engine) createAttackEvent(p path, fieldIdentifier treeFieldIdentif
 	var element attackEventCore
 	element.engine = engine
 	element.ID = AttackEventID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindAttackEvent, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindAttackEvent, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
@@ -130,13 +130,14 @@ func (engine *Engine) createItem(p path, fieldIdentifier treeFieldIdentifier) It
 	var element itemCore
 	element.engine = engine
 	element.ID = ItemID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindItem, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindItem, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	elementGearScore := engine.createGearScore(element.path, item_gearScoreIdentifier)
 	element.GearScore = elementGearScore.gearScore.ID
 	elementName := engine.createStringValue(element.path, item_nameIdenfitier, "")
 	element.Name = elementName.ID
-	elementOrigin := engine.createAnyOfPlayer_Position(true, element.path, item_originIdentifier)
+	originElement := engine.createPlayer(element.path, item_originIdentifier)
+	elementOrigin := engine.createAnyOfPlayer_Position(int(element.ID), int(originElement.player.ID), ElementKindPlayer, element.path, item_originIdentifier)
 	element.Origin = elementOrigin.anyOfPlayer_Position.ID
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
@@ -152,7 +153,7 @@ func (engine *Engine) createZoneItem(p path, fieldIdentifier treeFieldIdentifier
 	var element zoneItemCore
 	element.engine = engine
 	element.ID = ZoneItemID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindZoneItem, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindZoneItem, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	elementItem := engine.createItem(element.path, zoneItem_itemIdentifier)
 	element.Item = elementItem.item.ID
@@ -172,7 +173,7 @@ func (engine *Engine) createPlayer(p path, fieldIdentifier treeFieldIdentifier) 
 	var element playerCore
 	element.engine = engine
 	element.ID = PlayerID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	elementGearScore := engine.createGearScore(element.path, player_gearScoreIdentifier)
 	element.GearScore = elementGearScore.gearScore.ID
@@ -192,7 +193,7 @@ func (engine *Engine) createZone(p path, fieldIdentifier treeFieldIdentifier) Zo
 	var element zoneCore
 	element.engine = engine
 	element.ID = ZoneID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindZone, 0)
+	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindZone, ComplexID{})
 	element.Path = element.path.toJSONPath()
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.path) > 1
@@ -205,8 +206,8 @@ func (engine *Engine) createAttackEventTargetRef(p path, fieldIdentifier treeFie
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = AttackEventTargetRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, int(element.ID))
+	element.ID = AttackEventTargetRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.AttackEventTargetRef[element.ID] = element
 	return element
@@ -217,8 +218,8 @@ func (engine *Engine) createItemBoundToRef(p path, fieldIdentifier treeFieldIden
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = ItemBoundToRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, int(element.ID))
+	element.ID = ItemBoundToRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.ItemBoundToRef[element.ID] = element
 	return element
@@ -229,8 +230,8 @@ func (engine *Engine) createPlayerGuildMemberRef(p path, fieldIdentifier treeFie
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = PlayerGuildMemberRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPlayer, int(element.ID))
+	element.ID = PlayerGuildMemberRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerGuildMemberRef[element.ID] = element
 	return element
@@ -241,8 +242,8 @@ func (engine *Engine) createEquipmentSetEquipmentRef(p path, fieldIdentifier tre
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = EquipmentSetEquipmentRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindItem, int(element.ID))
+	element.ID = EquipmentSetEquipmentRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindItem, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.EquipmentSetEquipmentRef[element.ID] = element
 	return element
@@ -253,8 +254,8 @@ func (engine *Engine) createPlayerEquipmentSetRef(p path, fieldIdentifier treeFi
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = PlayerEquipmentSetRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindEquipmentSet, int(element.ID))
+	element.ID = PlayerEquipmentSetRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindEquipmentSet, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerEquipmentSetRef[element.ID] = element
 	return element
@@ -265,8 +266,8 @@ func (engine *Engine) createPlayerTargetRef(p path, fieldIdentifier treeFieldIde
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = PlayerTargetRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, childID, childKind, int(element.ID))
+	element.ID = PlayerTargetRefID{referencedElementID.Field, referencedElementID.ParentID, referencedElementID.ChildID, true}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, childKind, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerTargetRef[element.ID] = element
 	return element
@@ -277,22 +278,18 @@ func (engine *Engine) createPlayerTargetedByRef(p path, fieldIdentifier treeFiel
 	element.engine = engine
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
-	element.ID = PlayerTargetedByRefID(engine.GenerateID())
-	element.path = p.extendAndCopy(fieldIdentifier, childID, childKind, int(element.ID))
+	element.ID = PlayerTargetedByRefID{referencedElementID.Field, referencedElementID.ParentID, referencedElementID.ChildID, true}
+	element.path = p.extendAndCopy(fieldIdentifier, 0, childKind, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerTargetedByRef[element.ID] = element
 	return element
 }
 
-func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, p path, fieldIdentifier treeFieldIdentifier) AnyOfPlayer_ZoneItem {
+func (engine *Engine) createAnyOfPlayer_ZoneItem(parentID int, childID int, childKind ElementKind, p path, fieldIdentifier treeFieldIdentifier) AnyOfPlayer_ZoneItem {
 	var element anyOfPlayer_ZoneItemCore
 	element.engine = engine
-	element.ID = AnyOfPlayer_ZoneItemID(engine.GenerateID())
-	if setDefaultValue {
-		elementPlayer := engine.createPlayer(p, fieldIdentifier)
-		element.Player = elementPlayer.player.ID
-		element.ElementKind = ElementKindPlayer
-	}
+	element.ID = AnyOfPlayer_ZoneItemID{fieldIdentifier, parentID, childID, false}
+	element.ElementKind = childKind
 	element.OperationKind = OperationKindUpdate
 	element.ParentElementPath = p
 	element.FieldIdentifier = fieldIdentifier
@@ -300,15 +297,11 @@ func (engine *Engine) createAnyOfPlayer_ZoneItem(setDefaultValue bool, p path, f
 	return AnyOfPlayer_ZoneItem{anyOfPlayer_ZoneItem: element}
 }
 
-func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, p path, fieldIdentifier treeFieldIdentifier) AnyOfPlayer_Position {
+func (engine *Engine) createAnyOfPlayer_Position(parentID int, childID int, childKind ElementKind, p path, fieldIdentifier treeFieldIdentifier) AnyOfPlayer_Position {
 	var element anyOfPlayer_PositionCore
 	element.engine = engine
-	element.ID = AnyOfPlayer_PositionID(engine.GenerateID())
-	if setDefaultValue {
-		elementPlayer := engine.createPlayer(p, fieldIdentifier)
-		element.Player = elementPlayer.player.ID
-		element.ElementKind = ElementKindPlayer
-	}
+	element.ID = AnyOfPlayer_PositionID{fieldIdentifier, parentID, childID, false}
+	element.ElementKind = childKind
 	element.OperationKind = OperationKindUpdate
 	element.ParentElementPath = p
 	element.FieldIdentifier = fieldIdentifier
@@ -316,15 +309,11 @@ func (engine *Engine) createAnyOfPlayer_Position(setDefaultValue bool, p path, f
 	return AnyOfPlayer_Position{anyOfPlayer_Position: element}
 }
 
-func (engine *Engine) createAnyOfItem_Player_ZoneItem(setDefaultValue bool, p path, fieldIdentifier treeFieldIdentifier) AnyOfItem_Player_ZoneItem {
+func (engine *Engine) createAnyOfItem_Player_ZoneItem(parentID int, childID int, childKind ElementKind, p path, fieldIdentifier treeFieldIdentifier) AnyOfItem_Player_ZoneItem {
 	var element anyOfItem_Player_ZoneItemCore
 	element.engine = engine
-	element.ID = AnyOfItem_Player_ZoneItemID(engine.GenerateID())
-	if setDefaultValue {
-		elementItem := engine.createItem(p, fieldIdentifier)
-		element.Item = elementItem.item.ID
-		element.ElementKind = ElementKindItem
-	}
+	element.ID = AnyOfItem_Player_ZoneItemID{fieldIdentifier, parentID, childID, false}
+	element.ElementKind = childKind
 	element.OperationKind = OperationKindUpdate
 	element.ParentElementPath = p
 	element.FieldIdentifier = fieldIdentifier

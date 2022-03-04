@@ -564,7 +564,7 @@ func TestTree(t *testing.T) {
 							int(plyr.ID()),
 							ElementKindPlayer,
 							ReferencedDataModified,
-							newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, int(itm.item.BoundTo)).toJSONPath()},
+							newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, ComplexID(itm.item.BoundTo)).toJSONPath()},
 						OperationKind: OperationKindUnchanged,
 					},
 				}
@@ -665,7 +665,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUpdate,
@@ -679,7 +679,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -692,7 +692,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -723,7 +723,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(plyr.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUpdate,
@@ -761,7 +761,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(plyr.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -775,7 +775,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(eqSet.ID()),
 								ElementKind:          ElementKindEquipmentSet,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(equipmentSetIdentifier, int(eqSet.ID()), ElementKindEquipmentSet, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(equipmentSetIdentifier, int(eqSet.ID()), ElementKindEquipmentSet, ComplexID{}).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUnchanged,
@@ -790,7 +790,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(itm.ID()),
 								ElementKind:          ElementKindItem,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(itemIdentifier, int(itm.ID()), ElementKindItem, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(itemIdentifier, int(itm.ID()), ElementKindItem, ComplexID{}).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUnchanged,
@@ -826,7 +826,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 						OperationKind: OperationKindUnchanged,
 					},
@@ -850,7 +850,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -931,7 +931,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 					},
 				}
@@ -963,7 +963,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -986,7 +986,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 						OperationKind: OperationKindUpdate,
@@ -1028,7 +1028,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -1039,7 +1039,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 						OperationKind: OperationKindUpdate,
 					},
@@ -1054,7 +1054,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataUnchanged,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -1072,7 +1072,7 @@ func TestTree(t *testing.T) {
 				item1 := se.CreateItem()
 
 				item2 := se.CreateItem()
-				item2.Origin().SetPosition()
+				item2.Origin().BePosition()
 
 				expectedTree.Item = map[ItemID]item{
 					item1.ID(): {
@@ -1241,7 +1241,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player2.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 					},
 					player2.ID(): {
@@ -1297,7 +1297,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -1345,7 +1345,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(zoneIdentifier, int(zne.ID()), ElementKindZone, 0).extendAndCopy(zone_playersIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(zoneIdentifier, int(zne.ID()), ElementKindZone, ComplexID{}).extendAndCopy(zone_playersIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 					},
 				}
@@ -1393,7 +1393,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(plyr.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(zoneIdentifier, int(zne.ID()), ElementKindZone, 0).extendAndCopy(zone_interactablesIdentifier, int(plyr.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(zoneIdentifier, int(zne.ID()), ElementKindZone, ComplexID{}).extendAndCopy(zone_interactablesIdentifier, int(plyr.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 					},
 				}
@@ -1440,7 +1440,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player2.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataUnchanged,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, int(player1.Target().playerTargetRef.ID)).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, ComplexID(player1.Target().playerTargetRef.ID)).toJSONPath(),
 						},
 					},
 				}
@@ -1477,7 +1477,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(item1.ID()),
 								ElementKind:          ElementKindItem,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(itemIdentifier, int(item1.ID()), ElementKindItem, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(itemIdentifier, int(item1.ID()), ElementKindItem, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -1491,7 +1491,7 @@ func TestTree(t *testing.T) {
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
 							ReferencedDataStatus: ReferencedDataModified,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 						},
 					},
 				}
@@ -1505,7 +1505,7 @@ func TestTree(t *testing.T) {
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
 								ReferencedDataStatus: ReferencedDataModified,
-								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, 0).toJSONPath(),
+								ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player2.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							},
 						},
 					},
@@ -1537,6 +1537,7 @@ func TestTree(t *testing.T) {
 
 				se.UpdateState()
 
+				// TODO: now the same element cant be referenced by multiple references (BIG CRINGE)
 				item1.BoundTo().Unset()
 				item2.SetBoundTo(player1.ID())
 				item2.BoundTo().Unset()
@@ -1549,7 +1550,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						BoundTo: &elementReference{
 							ElementKind:          ElementKindPlayer,
-							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
+							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, ComplexID{}).toJSONPath(),
 							ElementID:            int(player1.ID()),
 							OperationKind:        OperationKindDelete,
 							ReferencedDataStatus: ReferencedDataModified,
@@ -1617,7 +1618,7 @@ func TestTree(t *testing.T) {
 									ElementID:            int(plyr.ID()),
 									ElementKind:          ElementKindPlayer,
 									ReferencedDataStatus: ReferencedDataUnchanged,
-									ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, int(itm.BoundTo().itemBoundToRef.ID)).toJSONPath(),
+									ElementPath:          newPath().extendAndCopy(playerIdentifier, int(plyr.ID()), ElementKindPlayer, ComplexID(itm.BoundTo().itemBoundToRef.ID)).toJSONPath(),
 								},
 								Origin: &player{
 									ID:            itm.Origin().Player().ID(),

@@ -2,7 +2,7 @@ package state
 
 func (_ref ItemBoundToRef) IsSet() (ItemBoundToRef, bool) {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
-	return ref, ref.itemBoundToRef.ID != 0
+	return ref, ref.itemBoundToRef.ID != ItemBoundToRefID{}
 }
 
 func (_ref ItemBoundToRef) Unset() {
@@ -15,7 +15,7 @@ func (_ref ItemBoundToRef) Unset() {
 	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	parent.BoundTo = 0
+	parent.BoundTo = ItemBoundToRefID{}
 	parent.OperationKind = OperationKindUpdate
 	ref.itemBoundToRef.engine.Patch.Item[parent.ID] = parent
 }
@@ -27,7 +27,7 @@ func (_ref ItemBoundToRef) Get() Player {
 
 func (_ref AttackEventTargetRef) IsSet() (AttackEventTargetRef, bool) {
 	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
-	return ref, ref.attackEventTargetRef.ID != 0
+	return ref, ref.attackEventTargetRef.ID != AttackEventTargetRefID{}
 }
 
 func (_ref AttackEventTargetRef) Unset() {
@@ -40,7 +40,7 @@ func (_ref AttackEventTargetRef) Unset() {
 	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	parent.Target = 0
+	parent.Target = AttackEventTargetRefID{}
 	parent.OperationKind = OperationKindUpdate
 	ref.attackEventTargetRef.engine.Patch.AttackEvent[parent.ID] = parent
 }
@@ -67,7 +67,7 @@ func (_ref EquipmentSetEquipmentRef) Get() Item {
 
 func (_ref PlayerTargetRef) IsSet() (PlayerTargetRef, bool) {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref, ref.playerTargetRef.ID != 0
+	return ref, ref.playerTargetRef.ID != PlayerTargetRefID{}
 }
 
 func (_ref PlayerTargetRef) Unset() {
@@ -80,7 +80,7 @@ func (_ref PlayerTargetRef) Unset() {
 	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	parent.Target = 0
+	parent.Target = PlayerTargetRefID{}
 	parent.OperationKind = OperationKindUpdate
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
@@ -165,7 +165,7 @@ func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
 			continue
 		}
-		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
+		if PlayerID(anyContainer.anyOfPlayer_ZoneItem.ChildID) == playerID {
 			ref.Unset()
 		}
 	}
@@ -180,7 +180,7 @@ func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
 			continue
 		}
-		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
+		if ZoneItemID(anyContainer.anyOfPlayer_ZoneItem.ChildID) == zoneItemID {
 			ref.Unset()
 		}
 	}
@@ -195,7 +195,7 @@ func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
 			continue
 		}
-		if anyContainer.anyOfPlayer_ZoneItem.Player == playerID {
+		if PlayerID(anyContainer.anyOfPlayer_ZoneItem.ChildID) == playerID {
 			parent := engine.Player(ref.playerTargetedByRef.ParentID)
 			parent.RemoveTargetedByPlayer(playerID)
 		}
@@ -211,7 +211,7 @@ func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneIte
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
 			continue
 		}
-		if anyContainer.anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
+		if ZoneItemID(anyContainer.anyOfPlayer_ZoneItem.ChildID) == zoneItemID {
 			parent := engine.Player(ref.playerTargetedByRef.ParentID)
 			parent.RemoveTargetedByZoneItem(zoneItemID)
 		}

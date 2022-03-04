@@ -926,12 +926,12 @@ func (_anyOfPlayer_Position AnyOfPlayer_Position) ID() AnyOfPlayer_PositionID {
 
 func (_anyOfPlayer_Position AnyOfPlayer_Position) Player() Player {
 	anyOfPlayer_Position := _anyOfPlayer_Position.anyOfPlayer_Position.engine.anyOfPlayer_Position(_anyOfPlayer_Position.anyOfPlayer_Position.ID)
-	return anyOfPlayer_Position.anyOfPlayer_Position.engine.Player(anyOfPlayer_Position.anyOfPlayer_Position.Player)
+	return anyOfPlayer_Position.anyOfPlayer_Position.engine.Player(PlayerID(anyOfPlayer_Position.anyOfPlayer_Position.ChildID))
 }
 
 func (_anyOfPlayer_Position AnyOfPlayer_Position) Position() Position {
 	anyOfPlayer_Position := _anyOfPlayer_Position.anyOfPlayer_Position.engine.anyOfPlayer_Position(_anyOfPlayer_Position.anyOfPlayer_Position.ID)
-	return anyOfPlayer_Position.anyOfPlayer_Position.engine.Position(anyOfPlayer_Position.anyOfPlayer_Position.Position)
+	return anyOfPlayer_Position.anyOfPlayer_Position.engine.Position(PositionID(anyOfPlayer_Position.anyOfPlayer_Position.ChildID))
 }
 
 func (engine *Engine) anyOfPlayer_Position(anyOfPlayer_PositionID AnyOfPlayer_PositionID) AnyOfPlayer_Position {
@@ -952,12 +952,12 @@ func (_anyOfPlayer_ZoneItem AnyOfPlayer_ZoneItem) ID() AnyOfPlayer_ZoneItemID {
 
 func (_anyOfPlayer_ZoneItem AnyOfPlayer_ZoneItem) Player() Player {
 	anyOfPlayer_ZoneItem := _anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.ID)
-	return anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.engine.Player(anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.Player)
+	return anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.engine.Player(PlayerID(anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.ChildID))
 }
 
 func (_anyOfPlayer_ZoneItem AnyOfPlayer_ZoneItem) ZoneItem() ZoneItem {
 	anyOfPlayer_ZoneItem := _anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.engine.anyOfPlayer_ZoneItem(_anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.ID)
-	return anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.engine.ZoneItem(anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.ZoneItem)
+	return anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.engine.ZoneItem(ZoneItemID(anyOfPlayer_ZoneItem.anyOfPlayer_ZoneItem.ChildID))
 }
 
 func (engine *Engine) anyOfPlayer_ZoneItem(anyOfPlayer_ZoneItemID AnyOfPlayer_ZoneItemID) AnyOfPlayer_ZoneItem {
@@ -990,15 +990,15 @@ func (_anyOfItem_Player_ZoneItem AnyOfItem_Player_ZoneItem) ID() AnyOfItem_Playe
 
 func (_anyOfItem_Player_ZoneItem AnyOfItem_Player_ZoneItem) Player() Player {
 	anyOfItem_Player_ZoneItem := _anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ID)
-	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.Player(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.Player)
+	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.Player(PlayerID(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ChildID))
 }
 
 func (_anyOfItem_Player_ZoneItem AnyOfItem_Player_ZoneItem) ZoneItem() ZoneItem {
 	anyOfItem_Player_ZoneItem := _anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ID)
-	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.ZoneItem(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ZoneItem)
+	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.ZoneItem(ZoneItemID(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ChildID))
 }
 
 func (_anyOfItem_Player_ZoneItem AnyOfItem_Player_ZoneItem) Item() Item {
 	anyOfItem_Player_ZoneItem := _anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.anyOfItem_Player_ZoneItem(_anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ID)
-	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.Item(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.Item)
+	return anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.engine.Item(ItemID(anyOfItem_Player_ZoneItem.anyOfItem_Player_ZoneItem.ChildID))
 }

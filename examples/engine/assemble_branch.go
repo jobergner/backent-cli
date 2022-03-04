@@ -128,7 +128,7 @@ func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pInd
 
 	switch nextSeg.identifier {
 	case attackEvent_targetIdentifier:
-		ref := engine.attackEventTargetRef(AttackEventTargetRefID(nextSeg.id)).attackEventTargetRef
+		ref := engine.attackEventTargetRef(AttackEventTargetRefID(nextSeg.refID)).attackEventTargetRef
 		if element.Target != nil && ref.OperationKind == OperationKindDelete {
 			break
 		}
@@ -169,7 +169,7 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 
 	switch nextSeg.identifier {
 	case item_boundToIdentifier:
-		ref := engine.itemBoundToRef(ItemBoundToRefID(nextSeg.id)).itemBoundToRef
+		ref := engine.itemBoundToRef(ItemBoundToRefID(nextSeg.refID)).itemBoundToRef
 		if element.BoundTo != nil && ref.OperationKind == OperationKindDelete {
 			break
 		}
