@@ -289,6 +289,7 @@ func (engine *Engine) createAnyOfPlayer_ZoneItem(parentID int, childID int, chil
 	var element anyOfPlayer_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_ZoneItemID{fieldIdentifier, parentID, childID, false}
+	element.ChildID = childID
 	element.ElementKind = childKind
 	element.OperationKind = OperationKindUpdate
 	element.ParentElementPath = p
@@ -301,6 +302,7 @@ func (engine *Engine) createAnyOfPlayer_Position(parentID int, childID int, chil
 	var element anyOfPlayer_PositionCore
 	element.engine = engine
 	element.ID = AnyOfPlayer_PositionID{fieldIdentifier, parentID, childID, false}
+	element.ChildID = childID
 	element.ElementKind = childKind
 	element.OperationKind = OperationKindUpdate
 	element.ParentElementPath = p
@@ -313,6 +315,7 @@ func (engine *Engine) createAnyOfItem_Player_ZoneItem(parentID int, childID int,
 	var element anyOfItem_Player_ZoneItemCore
 	element.engine = engine
 	element.ID = AnyOfItem_Player_ZoneItemID{fieldIdentifier, parentID, childID, false}
+	element.ChildID = childID
 	element.ElementKind = childKind
 	element.OperationKind = OperationKindUpdate
 	element.ParentElementPath = p

@@ -380,7 +380,8 @@ func (_item Item) BoundTo() ItemBoundToRef {
 
 func (_item Item) Origin() AnyOfPlayer_Position {
 	item := _item.item.engine.Item(_item.item.ID)
-	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
+	x := item.item.engine.anyOfPlayer_Position(item.item.Origin)
+	return x
 }
 
 func (engine *Engine) QueryAttackEvents(matcher func(AttackEvent) bool) []AttackEvent {
