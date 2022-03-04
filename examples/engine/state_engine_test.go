@@ -120,6 +120,21 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, 0, len(se.State.AttackEventTargetRef))
 		assert.Equal(t, 0, len(se.Patch.AttackEventTargetRef))
 	})
+	t.Run("creates origin, sets it from player to position", func(t *testing.T) {
+		se := newEngine()
+		item1 := se.CreateItem()
+		assert.Equal(t, ElementKindPlayer, item1.Origin().anyOfPlayer_Position.ElementKind)
+		item1.Origin().Player().Position().SetX(1)
+		assert.Equal(t, float64(1), item1.Origin().Player().Position().X())
+		item2 := se.CreateItem()
+		assert.Equal(t, 2, len(se.Patch.AnyOfPlayer_Position))
+		assert.Equal(t, 2, len(se.Patch.Player))
+		item2.Origin().BePosition()
+		item2.Origin().Position().SetY(2)
+		assert.Equal(t, 1, len(se.Patch.Player))
+		assert.Equal(t, 2, len(se.Patch.Position)) //position of item1.origin(player).position and this one
+		assert.Equal(t, float64(2), item2.Origin().Position().Y())
+	})
 }
 
 func TestReferences(t *testing.T) {
@@ -1537,7 +1552,6 @@ func TestTree(t *testing.T) {
 
 				se.UpdateState()
 
-				// TODO: now the same element cant be referenced by multiple references (BIG CRINGE)
 				item1.BoundTo().Unset()
 				item2.SetBoundTo(player1.ID())
 				item2.BoundTo().Unset()

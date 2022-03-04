@@ -7,7 +7,6 @@ import (
 
 type treeFieldIdentifier int
 
-// TODO: consider IOTA
 const (
 	attackEventIdentifier  treeFieldIdentifier = 1
 	equipmentSetIdentifier treeFieldIdentifier = 2

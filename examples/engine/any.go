@@ -74,7 +74,13 @@ func (_any anyOfPlayer_ZoneItemCore) beZoneItem(zoneItemID ZoneItemID, deleteCur
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	any.engine.deleteAnyOfPlayer_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_ZoneItem(any.ID.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
-	any.ElementKind = ElementKindZoneItem
+	switch any.FieldIdentifier {
+	case player_targetIdentifier:
+		player := any.engine.Player(PlayerID(any.ID.ParentID)).player
+		ref := any.engine.playerTargetRef(player.Target).playerTargetRef
+		ref.ReferencedElementID = any.ID
+		any.engine.Patch.PlayerTargetRef[ref.ID] = ref
+	}
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }
 
@@ -92,7 +98,6 @@ func (_any anyOfPlayer_ZoneItemCore) bePlayer(playerID PlayerID, deleteCurrentCh
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	any.engine.deleteAnyOfPlayer_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_ZoneItem(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
-	any.ElementKind = ElementKindPlayer
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }
 
@@ -125,7 +130,12 @@ func (_any anyOfPlayer_PositionCore) bePosition(positionID PositionID, deleteCur
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	any.engine.deleteAnyOfPlayer_Position(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_Position(any.ID.ParentID, int(positionID), ElementKindPosition, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
-	any.ElementKind = ElementKindPosition
+	switch any.FieldIdentifier {
+	case item_originIdentifier:
+		item := any.engine.Item(ItemID(any.ID.ParentID)).item
+		item.Origin = any.ID
+		any.engine.Patch.Item[item.ID] = item
+	}
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }
 
@@ -153,7 +163,6 @@ func (_any anyOfPlayer_PositionCore) bePlayer(playerID PlayerID, deleteCurrentCh
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	any.engine.deleteAnyOfPlayer_Position(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_Position(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
-	any.ElementKind = ElementKindPlayer
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }
 
@@ -176,7 +185,6 @@ func (_any anyOfItem_Player_ZoneItemCore) beZoneItem(zoneItemID ZoneItemID, dele
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
-	any.ElementKind = ElementKindZoneItem
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
@@ -194,7 +202,6 @@ func (_any anyOfItem_Player_ZoneItemCore) bePlayer(playerID PlayerID, deleteCurr
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
-	any.ElementKind = ElementKindPlayer
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
@@ -212,7 +219,6 @@ func (_any anyOfItem_Player_ZoneItemCore) beItem(itemID ItemID, deleteCurrentChi
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(itemID), ElementKindItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
-	any.ElementKind = ElementKindItem
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 

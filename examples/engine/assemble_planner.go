@@ -1,7 +1,7 @@
 package state
 
 type assemblePlanner struct {
-	updatedPaths          map[int]path
+	updatedPaths          []path
 	updatedReferencePaths map[ComplexID]path
 	updatedElementPaths   map[int]path
 	includedElements      map[int]bool // used to determine ReferencedDataStatus during assembling
@@ -11,15 +11,13 @@ func newAssemblePlanner() *assemblePlanner {
 	return &assemblePlanner{
 		includedElements:      make(map[int]bool),
 		updatedElementPaths:   make(map[int]path),
-		updatedPaths:          make(map[int]path),
+		updatedPaths:          make([]path, 0),
 		updatedReferencePaths: make(map[ComplexID]path),
 	}
 }
 
 func (a *assemblePlanner) clear() {
-	for key := range a.updatedPaths {
-		delete(a.updatedPaths, key)
-	}
+	a.updatedPaths = a.updatedPaths[:0]
 	for key := range a.updatedElementPaths {
 		delete(a.updatedElementPaths, key)
 	}
@@ -244,12 +242,12 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		}
 	}
 
-	// merge paths into one map, for convencience (they are recycled anyway)
+	// merge paths into one slice, for convencience (they are recycled anyway)
 	for _, p := range ap.updatedElementPaths {
-		ap.updatedPaths[p[len(p)-1].id] = p
+		ap.updatedPaths = append(ap.updatedPaths, p)
 	}
 	for _, p := range ap.updatedReferencePaths {
-		ap.updatedPaths[p[len(p)-1].id] = p
+		ap.updatedPaths = append(ap.updatedPaths, p)
 	}
 }
 
@@ -312,11 +310,11 @@ func (ap *assemblePlanner) fill(state *State) {
 		ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.path
 	}
 
-	// merge paths into one map, for convencience (they are recycled anyway)
+	// merge paths into one slice, for convencience (they are recycled anyway)
 	for _, p := range ap.updatedElementPaths {
-		ap.updatedPaths[p[len(p)-1].id] = p
+		ap.updatedPaths = append(ap.updatedPaths, p)
 	}
 	for _, p := range ap.updatedReferencePaths {
-		ap.updatedPaths[p[len(p)-1].id] = p
+		ap.updatedPaths = append(ap.updatedPaths, p)
 	}
 }
