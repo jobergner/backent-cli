@@ -109,10 +109,10 @@ func (_item Item) SetBoundTo(playerID PlayerID) Item {
 	if item.item.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return item
 	}
-	if item.item.engine.itemBoundToRef(item.item.BoundTo).itemBoundToRef.ReferencedElementID == playerID {
+	if PlayerID(item.item.BoundTo.ChildID) == playerID {
 		return item
 	}
-	if item.item.BoundTo != 0 {
+	if item.item.BoundTo != (ItemBoundToRefID{}) {
 		item.item.engine.deleteItemBoundToRef(item.item.BoundTo)
 	}
 	ref := item.item.engine.createItemBoundToRef(item.item.path, item_boundToIdentifier, playerID, item.item.ID)
@@ -130,10 +130,10 @@ func (_attackEvent AttackEvent) SetTarget(playerID PlayerID) AttackEvent {
 	if attackEvent.attackEvent.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return attackEvent
 	}
-	if attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target).attackEventTargetRef.ReferencedElementID == playerID {
+	if PlayerID(attackEvent.attackEvent.Target.ChildID) == playerID {
 		return attackEvent
 	}
-	if attackEvent.attackEvent.Target != 0 {
+	if attackEvent.attackEvent.Target != (AttackEventTargetRefID{}) {
 		attackEvent.attackEvent.engine.deleteAttackEventTargetRef(attackEvent.attackEvent.Target)
 	}
 	ref := attackEvent.attackEvent.engine.createAttackEventTargetRef(attackEvent.attackEvent.path, attackEvent_targetIdentifier, playerID, attackEvent.attackEvent.ID)
@@ -160,14 +160,13 @@ func (_player Player) SetTargetPlayer(playerID PlayerID) Player {
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return player
 	}
-	if player.player.engine.anyOfPlayer_ZoneItem(player.player.engine.playerTargetRef(player.player.Target).playerTargetRef.ReferencedElementID).anyOfPlayer_ZoneItem.Player == playerID {
+	if PlayerID(player.player.Target.ChildID) == playerID {
 		return player
 	}
-	if player.player.Target != 0 {
+	if player.player.Target != (PlayerTargetRefID{}) {
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
-	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, player.player.path, "")
-	anyContainer.anyOfPlayer_ZoneItem.setPlayer(playerID, false)
+	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(playerID), ElementKindPlayer, player.player.path, player_targetIdentifier)
 	ref := player.player.engine.createPlayerTargetRef(player.player.path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindPlayer, int(playerID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
@@ -183,14 +182,14 @@ func (_player Player) SetTargetZoneItem(zoneItemID ZoneItemID) Player {
 	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
 		return player
 	}
-	if player.player.engine.anyOfPlayer_ZoneItem(player.player.engine.playerTargetRef(player.player.Target).playerTargetRef.ReferencedElementID).anyOfPlayer_ZoneItem.ZoneItem == zoneItemID {
+	if ZoneItemID(player.player.Target.ChildID) == zoneItemID {
 		return player
 	}
-	if player.player.Target != 0 {
+	if player.player.Target != (PlayerTargetRefID{}) {
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
-	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(false, player.player.path, "")
-	anyContainer.anyOfPlayer_ZoneItem.setZoneItem(zoneItemID, false)
+	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(zoneItemID), ElementKindZoneItem, player.player.path, player_targetIdentifier)
+	anyContainer.anyOfPlayer_ZoneItem.beZoneItem(zoneItemID, false)
 	ref := player.player.engine.createPlayerTargetRef(player.player.path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
