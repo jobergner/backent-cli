@@ -14,6 +14,35 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
+type BasicType struct {
+	Name  string
+	Value string
+}
+
+var (
+	BasicTypes = map[string]string{
+		"bool":    "boolValue",
+		"float64": "floatValue",
+		"int64":   "intValue",
+		"string":  "stringValue",
+	}
+)
+
+func RangeBasicTypes(fn func(BasicType)) {
+	for _, name := range []string{"bool", "float64", "int64", "string"} {
+		fn(BasicType{Name: name, Value: BasicTypes[name]})
+	}
+}
+
+func ForEachBasicType(fn func(BasicType) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	RangeBasicTypes(func(basicType BasicType) {
+		statements = append(statements, fn(basicType))
+		statements = append(statements, jen.Line())
+	})
+	return &statements
+}
+
 // pluralizeClient.Singular is used to find the singular of field names
 // this is necessary for writing coherent method names, eg. in write_adders.go (toSingular)
 // with getting the singular form of a plural, this field:

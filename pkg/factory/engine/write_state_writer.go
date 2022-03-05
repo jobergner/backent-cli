@@ -7,6 +7,10 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
+func metaFieldTag(name string) string {
+	return "`json:\"" + name + "\"`"
+}
+
 type stateWriter struct {
 	typeName func() string
 }
@@ -44,7 +48,7 @@ func (e elementWriter) fieldValue() string {
 	}
 
 	if e.f.ValueType().IsBasicType {
-		value += e.f.ValueTypeName
+		value += Title(BasicTypes[e.f.ValueTypeName]) + "ID"
 	} else {
 		value += Title(e.f.ValueTypeName) + "ID"
 	}
