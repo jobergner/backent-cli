@@ -51,7 +51,7 @@ func (e treeElementWriter) fieldValue() *Statement {
 		case e.f.HasSliceValue:
 			return Index().Id(e.f.ValueTypeName)
 		default:
-			return Id(e.f.ValueTypeName)
+			return Id("*" + e.f.ValueTypeName)
 		}
 	}
 
