@@ -426,6 +426,44 @@ func TestTree(t *testing.T) {
 			false,
 		)
 	})
+	t.Run("assembles basic elements in a tree", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				zne := se.CreateZone()
+				zne.AddTag("foo")
+				zne.AddTag("bar")
+				itm := zne.AddItem()
+
+				se.UpdateState()
+				zne.RemoveTags("bar")
+				zne.AddTag("baz")
+				itm.Item().SetName("newName")
+
+				expectedTree.Zone = map[ZoneID]zone{
+					zne.ID(): {
+						ID:            zne.ID(),
+						OperationKind: OperationKindUpdate,
+						Tags:          []string{"baz"},
+						Items: map[ZoneItemID]zoneItem{
+							itm.ID(): {
+								ID:            itm.ID(),
+								OperationKind: OperationKindUnchanged,
+								Item: &item{
+									ID:            itm.Item().ID(),
+									OperationKind: OperationKindUpdate,
+									Name:          stringPtr("newName"),
+								},
+							},
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			false,
+		)
+	})
 	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
