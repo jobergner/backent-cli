@@ -34,8 +34,8 @@
       "origin": "anyOf<player,position>"
     },
     "gearScore": {
-      "level": "int",
-      "score": "int"
+      "level": "int64",
+      "score": "int64"
     },
     "equipmentSet": {
       "name": "string",
