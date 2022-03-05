@@ -292,12 +292,6 @@ const beZoneItem_anyOfPlayer_ZoneItemCore_func string = `func (_any anyOfPlayer_
 	any.engine.deleteAnyOfPlayer_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_ZoneItem(any.ID.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
 	switch any.FieldIdentifier {
-	case player_targetIdentifier:
-		player := any.engine.Player(PlayerID(any.ID.ParentID)).player
-		ref := any.engine.playerTargetRef(player.Target).playerTargetRef
-		ref.ReferencedElementID = any.ID
-		ref.Meta.sign(ref.engine.broadcastingClientID)
-		any.engine.Patch.PlayerTargetRef[ref.ID] = ref
 	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
@@ -317,6 +311,8 @@ const bePlayer_anyOfPlayer_ZoneItemCore_func string = `func (_any anyOfPlayer_Zo
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	any.engine.deleteAnyOfPlayer_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_ZoneItem(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
+	switch any.FieldIdentifier {
+	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }`
@@ -355,7 +351,7 @@ const bePosition_anyOfPlayer_PositionCore_func string = `func (_any anyOfPlayer_
 		item := any.engine.Item(ItemID(any.ID.ParentID)).item
 		item.Origin = any.ID
 		item.Meta.sign(item.engine.broadcastingClientID)
-		any.engine.Patch.Item[item.ID] = item
+		item.engine.Patch.Item[item.ID] = item
 	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
@@ -385,6 +381,13 @@ const bePlayer_anyOfPlayer_PositionCore_func string = `func (_any anyOfPlayer_Po
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	any.engine.deleteAnyOfPlayer_Position(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfPlayer_Position(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
+	switch any.FieldIdentifier {
+	case item_originIdentifier:
+		item := any.engine.Item(ItemID(any.ID.ParentID)).item
+		item.Origin = any.ID
+		item.Meta.sign(item.engine.broadcastingClientID)
+		item.engine.Patch.Item[item.ID] = item
+	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }`
@@ -408,6 +411,8 @@ const beZoneItem_anyOfItem_Player_ZoneItemCore_func string = `func (_any anyOfIt
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
+	switch any.FieldIdentifier {
+	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }`
@@ -426,6 +431,8 @@ const bePlayer_anyOfItem_Player_ZoneItemCore_func string = `func (_any anyOfItem
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
+	switch any.FieldIdentifier {
+	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }`
@@ -444,6 +451,8 @@ const beItem_anyOfItem_Player_ZoneItemCore_func string = `func (_any anyOfItem_P
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
 	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(itemID), ElementKindItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
+	switch any.FieldIdentifier {
+	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }`
@@ -604,7 +613,7 @@ const assembleItemPath_Engine_func string = `func (engine *Engine) assembleItemP
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
-	case item_nameIdenfitier:
+	case item_nameIdentifier:
 		child := engine.stringValue(itemData.Name)
 		element.OperationKind = child.OperationKind
 		element.Name = &child.Value
@@ -1288,9 +1297,9 @@ const createPosition_Engine_func string = `func (engine *Engine) createPosition(
 	element.ID = PositionID(engine.GenerateID())
 	element.Path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, ComplexID{})
 	element.JSONPath = element.Path.toJSONPath()
-	elementX := engine.createFloatValue(element.Path, position_xIdentifier, 0)
+	elementX := engine.createFloatValue(element.Path, position_xIdentifier, 0.0)
 	element.X = elementX.ID
-	elementY := engine.createFloatValue(element.Path, position_yIdentifier, 0)
+	elementY := engine.createFloatValue(element.Path, position_yIdentifier, 0.0)
 	element.Y = elementY.ID
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.Path) > 1
@@ -1326,7 +1335,7 @@ const createItem_Engine_func string = `func (engine *Engine) createItem(p path, 
 	element.JSONPath = element.Path.toJSONPath()
 	elementGearScore := engine.createGearScore(element.Path, item_gearScoreIdentifier)
 	element.GearScore = elementGearScore.gearScore.ID
-	elementName := engine.createStringValue(element.Path, item_nameIdenfitier, "")
+	elementName := engine.createStringValue(element.Path, item_nameIdentifier, "")
 	element.Name = elementName.ID
 	originElement := engine.createPlayer(element.Path, item_originIdentifier)
 	elementOrigin := engine.createAnyOfPlayer_Position(int(element.ID), int(originElement.player.ID), ElementKindPlayer, element.Path, item_originIdentifier)
@@ -3483,7 +3492,7 @@ const attackEventIdentifier_type string = `const (
 	gearScore_scoreIdentifier		treeFieldIdentifier	= 13
 	item_boundToIdentifier			treeFieldIdentifier	= 14
 	item_gearScoreIdentifier		treeFieldIdentifier	= 15
-	item_nameIdenfitier			treeFieldIdentifier	= 16
+	item_nameIdentifier			treeFieldIdentifier	= 16
 	item_originIdentifier			treeFieldIdentifier	= 17
 	player_actionIdentifier			treeFieldIdentifier	= 18
 	player_equipmentSetsIdentifier		treeFieldIdentifier	= 19
@@ -3535,7 +3544,7 @@ const toString_treeFieldIdentifier_func string = `func (t treeFieldIdentifier) t
 		return "boundTo"
 	case item_gearScoreIdentifier:
 		return "gearScore"
-	case item_nameIdenfitier:
+	case item_nameIdentifier:
 		return "name"
 	case item_originIdentifier:
 		return "origin"
@@ -4458,7 +4467,6 @@ const _SetTargetZoneItem_Player_func string = `func (_player Player) SetTargetZo
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(zoneItemID), ElementKindZoneItem, player.player.Path, player_targetIdentifier)
-	anyContainer.anyOfPlayer_ZoneItem.beZoneItem(zoneItemID, false)
 	ref := player.player.engine.createPlayerTargetRef(player.player.Path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate

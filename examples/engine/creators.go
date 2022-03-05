@@ -96,9 +96,9 @@ func (engine *Engine) createPosition(p path, fieldIdentifier treeFieldIdentifier
 	element.ID = PositionID(engine.GenerateID())
 	element.Path = p.extendAndCopy(fieldIdentifier, int(element.ID), ElementKindPosition, ComplexID{})
 	element.JSONPath = element.Path.toJSONPath()
-	elementX := engine.createFloatValue(element.Path, position_xIdentifier, 0)
+	elementX := engine.createFloatValue(element.Path, position_xIdentifier, 0.0)
 	element.X = elementX.ID
-	elementY := engine.createFloatValue(element.Path, position_yIdentifier, 0)
+	elementY := engine.createFloatValue(element.Path, position_yIdentifier, 0.0)
 	element.Y = elementY.ID
 	element.OperationKind = OperationKindUpdate
 	element.HasParent = len(element.Path) > 1
@@ -134,7 +134,7 @@ func (engine *Engine) createItem(p path, fieldIdentifier treeFieldIdentifier) It
 	element.JSONPath = element.Path.toJSONPath()
 	elementGearScore := engine.createGearScore(element.Path, item_gearScoreIdentifier)
 	element.GearScore = elementGearScore.gearScore.ID
-	elementName := engine.createStringValue(element.Path, item_nameIdenfitier, "")
+	elementName := engine.createStringValue(element.Path, item_nameIdentifier, "")
 	element.Name = elementName.ID
 	originElement := engine.createPlayer(element.Path, item_originIdentifier)
 	elementOrigin := engine.createAnyOfPlayer_Position(int(element.ID), int(originElement.player.ID), ElementKindPlayer, element.Path, item_originIdentifier)

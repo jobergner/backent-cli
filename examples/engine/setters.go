@@ -196,7 +196,6 @@ func (_player Player) SetTargetZoneItem(zoneItemID ZoneItemID) Player {
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(zoneItemID), ElementKindZoneItem, player.player.Path, player_targetIdentifier)
-	anyContainer.anyOfPlayer_ZoneItem.beZoneItem(zoneItemID, false)
 	ref := player.player.engine.createPlayerTargetRef(player.player.Path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate

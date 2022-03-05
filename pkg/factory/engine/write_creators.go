@@ -31,10 +31,11 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.assignJsonPath(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				c.f = &field
-				if field.HasSliceValue || field.ValueType().IsBasicType || field.HasPointerValue {
+				if field.HasSliceValue || field.HasPointerValue {
 					return Empty()
 				}
 				return &Statement{
+					OnlyIf(c.f.HasAnyValue, c.createChildSubElement()), Line(),
 					c.createChildElement(), Line(),
 					c.setChildElement(),
 				}
@@ -75,11 +76,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.declareElement(),
 			c.assignEngine(),
 			c.setID(),
-			If(Id("setDefaultValue")).Block(
-				c.createChildElement(),
-				c.assignChildElement(),
-				c.assignElementKind(),
-			),
+			c.assignElementKind(),
 			c.setOperationKind(),
 			c.setChildElementPath(),
 			c.setFieldIdentifier(),

@@ -78,6 +78,17 @@ func ForEachFieldInType(configType ast.ConfigType, fn func(field ast.Field) *jen
 	return &statements
 }
 
+func ForEachFieldInAST(a *ast.AST, fn func(field ast.Field) *jen.Statement) *jen.Statement {
+	var statements jen.Statement
+	a.RangeTypes(func(configType ast.ConfigType) {
+		configType.RangeFields(func(field ast.Field) {
+			statements = append(statements, fn(field))
+			statements = append(statements, jen.Line())
+		})
+	})
+	return &statements
+}
+
 func ForEachTypeImplementingType(configType ast.ConfigType, fn func(configType *ast.ConfigType) *jen.Statement) *jen.Statement {
 	var statements jen.Statement
 	configType.RangeImplementedBy(func(configType *ast.ConfigType) {

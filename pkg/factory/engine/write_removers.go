@@ -52,7 +52,7 @@ func (s *EngineFactory) writeRemovers() *EngineFactory {
 							Continue(),
 						),
 						r.field().Index(Id("i")).Op("=").Add(r.field()).Index(Len(r.field()).Lit(-1)),
-						r.field().Index(Len(r.field()).Lit(-1)).Op("=").Lit(r.defaultValueForBasicType(r.v.Name)),
+						r.field().Index(Len(r.field()).Lit(-1)).Op("=").Lit(defaultValueForBasicType(r.v.Name)),
 						r.field().Op("=").Add(r.field()).Index(Id(""), Len(r.field()).Lit(-1)),
 						OnlyIf(!r.v.IsBasicType, r.deleteElement()),
 						r.elementCore().Dot("OperationKind").Op("=").Id("OperationKindUpdate"),

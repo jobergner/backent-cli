@@ -144,47 +144,6 @@ func (r remover) eachElement() *Statement {
 	return List(Id("i"), r.eachElementLiteral()).Op(":=").Range().Add(r.field())
 }
 
-func (r remover) defaultValueForBasicType(typeLiteral string) interface{} {
-	switch typeLiteral {
-	case "bool":
-		return bool(false)
-	case "string":
-		return string("")
-	case "int8":
-		return int8(0)
-	case "byte":
-		return byte(0)
-	case "int16":
-		return int16(0)
-	case "uint16":
-		return uint16(0)
-	case "rune":
-		return rune(0)
-	case "uint32":
-		return uint32(0)
-	case "int64":
-		return int64(0)
-	case "uint64":
-		return uint64(0)
-	case "int":
-		return int(0)
-	case "uint":
-		return uint(0)
-	case "uintptr":
-		return uintptr(0)
-	case "float32":
-		return float32(0)
-	case "float64":
-		return float64(0)
-	case "complex64":
-		return complex64(0)
-	case "complex128":
-		return complex128(0)
-	}
-
-	return 0
-}
-
 func (r remover) deleteElement() *Statement {
 	switch {
 	case r.f.HasAnyValue && !r.f.HasPointerValue:
