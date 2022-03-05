@@ -73,7 +73,7 @@ func (a adderWriter) referencedElementDoesntExist() *Statement {
 func (a adderWriter) returnIfReferencedElementIsAlreadyReferencedReturnCondition() *Statement {
 	switch {
 	case a.f.HasAnyValue:
-		return Id("anyContainer").Dot(anyNameByField(a.f)).Dot(Title(a.v.Name)).Op("==").Id(a.idParam())
+		return Id(Title(a.v.Name) + "ID").Call(Id("anyContainer").Dot(anyNameByField(a.f)).Dot("ChildID")).Op("==").Id(a.idParam())
 	default:
 		return Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(a.idParam())
 	}
@@ -104,8 +104,12 @@ func (a adderWriter) returnDeletedElement() *Statement {
 }
 
 func (a adderWriter) createNewElement() *Statement {
-	return Id(a.v.Name).Op(":=").Add(a.engine()).Dot("create"+Title(a.v.Name)).
-		Call(Add(a.elementCore()).Dot("path"), Id(FieldPathIdentifier(a.f)))
+	switch {
+	case a.v.IsBasicType:
+		return Id(Singular(a.f.Name)+"Value").Op(":=").Add(a.engine()).Dot("create"+Title(a.v.Name)+"Value").Call(Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f)), Id(Singular(a.f.Name)))
+	default:
+		return Id(a.v.Name).Op(":=").Add(a.engine()).Dot("create"+Title(a.v.Name)).Call(Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f)))
+	}
 }
 
 func (a adderWriter) createAnyContainerCallParams() *Statement {
@@ -113,9 +117,9 @@ func (a adderWriter) createAnyContainerCallParams() *Statement {
 	case a.f.HasPointerValue && !a.f.HasAnyValue:
 		return Call(False(), Nil(), Lit(""))
 	case a.f.HasPointerValue && a.f.HasAnyValue:
-		return Call(False(), Add(a.elementCore()).Dot("path"), Lit("")).Dot(anyNameByField(a.f))
+		return Call(Int().Call(a.elementID()), Int().Call(Id(a.idParam())), Id("ElementKind"+Title(a.v.Name)), Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f))).Dot(anyNameByField(a.f))
 	case a.f.HasAnyValue:
-		return Call(False(), Add(a.elementCore()).Dot("path"), Id(FieldPathIdentifier(a.f))).Dot(anyNameByField(a.f))
+		return Call(Int().Call(a.elementID()), Int().Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID")), Id("ElementKind"+Title(a.v.Name)), Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f))).Dot(anyNameByField(a.f))
 	default:
 		return Call(False(), Add(a.elementCore()).Dot("path"), Lit(""))
 	}
@@ -143,9 +147,9 @@ func (a adderWriter) setAnyContainer() *Statement {
 func (a adderWriter) createRefCallParams() *Statement {
 	switch {
 	case a.f.HasAnyValue:
-		return Call(a.elementCore().Dot("path"), Id(FieldPathIdentifier(a.f)), Id("anyContainer").Dot("ID"), a.elementCore().Dot("ID"), Id("ElementKind"+Title(a.v.Name)), Int().Call(Id(a.idParam())))
+		return Call(a.elementCore().Dot("Path"), Id(FieldPathIdentifier(a.f)), Id("anyContainer").Dot("ID"), a.elementCore().Dot("ID"), Id("ElementKind"+Title(a.v.Name)), Int().Call(Id(a.idParam())))
 	default:
-		return Call(a.elementCore().Dot("path"), Id(FieldPathIdentifier(a.f)), Id(a.idParam()), Add(a.elementCore()).Dot("ID"))
+		return Call(a.elementCore().Dot("Path"), Id(FieldPathIdentifier(a.f)), Id(a.idParam()), Add(a.elementCore()).Dot("ID"))
 	}
 }
 
@@ -156,7 +160,7 @@ func (a adderWriter) createRef() *Statement {
 func (a adderWriter) toAppend() *Statement {
 	switch {
 	case a.f.ValueType().IsBasicType:
-		return Id(Singular(a.f.Name))
+		return Id(Singular(a.f.Name) + "Value").Dot("ID")
 
 	case a.f.HasPointerValue:
 		return Id("ref").Dot("ID")
@@ -178,6 +182,10 @@ func (a adderWriter) appendElement() *Statement {
 
 func (a adderWriter) setOperationKindUpdate() *Statement {
 	return Add(a.elementCore()).Dot("OperationKind").Op("=").Id("OperationKindUpdate")
+}
+
+func (a adderWriter) signElement() *Statement {
+	return a.elementCore().Dot("Meta").Dot("sign").Call(a.engine().Dot("broadcastingClientID"))
 }
 
 func (a adderWriter) updateElementInPatch() *Statement {

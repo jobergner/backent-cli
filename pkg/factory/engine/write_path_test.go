@@ -42,7 +42,7 @@ func TestWritePath(t *testing.T) {
 			newPath_func,
 			extendAndCopy_path_func,
 			toJSONPath_path_func,
-			pathIdentifierToString_func,
+			toString_treeFieldIdentifier_func,
 			isSliceFieldIdentifier_func,
 		}, "\n"))
 
