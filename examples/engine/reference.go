@@ -17,6 +17,7 @@ func (_ref ItemBoundToRef) Unset() {
 	}
 	parent.BoundTo = ItemBoundToRefID{}
 	parent.OperationKind = OperationKindUpdate
+	parent.Meta.sign(parent.engine.broadcastingClientID)
 	ref.itemBoundToRef.engine.Patch.Item[parent.ID] = parent
 }
 
@@ -42,6 +43,7 @@ func (_ref AttackEventTargetRef) Unset() {
 	}
 	parent.Target = AttackEventTargetRefID{}
 	parent.OperationKind = OperationKindUpdate
+	parent.Meta.sign(parent.engine.broadcastingClientID)
 	ref.attackEventTargetRef.engine.Patch.AttackEvent[parent.ID] = parent
 }
 
@@ -82,6 +84,7 @@ func (_ref PlayerTargetRef) Unset() {
 	}
 	parent.Target = PlayerTargetRefID{}
 	parent.OperationKind = OperationKindUpdate
+	parent.Meta.sign(parent.engine.broadcastingClientID)
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
 

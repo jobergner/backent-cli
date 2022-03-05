@@ -19,7 +19,7 @@ func (engine *Engine) assembleGearScorePath(element *gearScore, p path, pIndex i
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case gearScore_levelIdentifier:
 		child := engine.intValue(gearScoreData.Level)
 		element.OperationKind = child.OperationKind
@@ -50,7 +50,7 @@ func (engine *Engine) assemblePositionPath(element *position, p path, pIndex int
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case position_xIdentifier:
 		child := engine.floatValue(positionData.X)
 		element.OperationKind = child.OperationKind
@@ -81,9 +81,9 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case equipmentSet_equipmentIdentifier:
-		ref := engine.equipmentSetEquipmentRef(EquipmentSetEquipmentRefID(nextSeg.refID)).equipmentSetEquipmentRef
+		ref := engine.equipmentSetEquipmentRef(EquipmentSetEquipmentRefID(nextSeg.RefID)).equipmentSetEquipmentRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -126,9 +126,9 @@ func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pInd
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case attackEvent_targetIdentifier:
-		ref := engine.attackEventTargetRef(AttackEventTargetRefID(nextSeg.refID)).attackEventTargetRef
+		ref := engine.attackEventTargetRef(AttackEventTargetRefID(nextSeg.RefID)).attackEventTargetRef
 		if element.Target != nil && ref.OperationKind == OperationKindDelete {
 			break
 		}
@@ -167,9 +167,9 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case item_boundToIdentifier:
-		ref := engine.itemBoundToRef(ItemBoundToRefID(nextSeg.refID)).itemBoundToRef
+		ref := engine.itemBoundToRef(ItemBoundToRefID(nextSeg.RefID)).itemBoundToRef
 		if element.BoundTo != nil && ref.OperationKind == OperationKindDelete {
 			break
 		}
@@ -189,7 +189,7 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 	case item_gearScoreIdentifier:
 		child := element.GearScore
 		if child == nil {
-			child = &gearScore{ID: GearScoreID(nextSeg.id)}
+			child = &gearScore{ID: GearScoreID(nextSeg.ID)}
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
@@ -198,18 +198,18 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 		element.OperationKind = child.OperationKind
 		element.Name = &child.Value
 	case item_originIdentifier:
-		switch nextSeg.kind {
+		switch nextSeg.Kind {
 		case ElementKindPlayer:
 			child, ok := element.Origin.(*player)
 			if !ok || child == nil {
-				child = &player{ID: PlayerID(nextSeg.id)}
+				child = &player{ID: PlayerID(nextSeg.ID)}
 			}
 			engine.assemblePlayerPath(child, p, pIndex+1, includedElements)
 			element.Origin = child
 		case ElementKindPosition:
 			child, ok := element.Origin.(*position)
 			if !ok || child == nil {
-				child = &position{ID: PositionID(nextSeg.id)}
+				child = &position{ID: PositionID(nextSeg.ID)}
 			}
 			engine.assemblePositionPath(child, p, pIndex+1, includedElements)
 			element.Origin = child
@@ -236,18 +236,18 @@ func (engine *Engine) assembleZoneItemPath(element *zoneItem, p path, pIndex int
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case zoneItem_itemIdentifier:
 		child := element.Item
 		if child == nil {
-			child = &item{ID: ItemID(nextSeg.id)}
+			child = &item{ID: ItemID(nextSeg.ID)}
 		}
 		engine.assembleItemPath(child, p, pIndex+1, includedElements)
 		element.Item = child
 	case zoneItem_positionIdentifier:
 		child := element.Position
 		if child == nil {
-			child = &position{ID: PositionID(nextSeg.id)}
+			child = &position{ID: PositionID(nextSeg.ID)}
 		}
 		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
 		element.Position = child
@@ -273,19 +273,19 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case player_actionIdentifier:
 		if element.Action == nil {
 			element.Action = make(map[AttackEventID]attackEvent)
 		}
-		child, ok := element.Action[AttackEventID(nextSeg.id)]
+		child, ok := element.Action[AttackEventID(nextSeg.ID)]
 		if !ok {
-			child = attackEvent{ID: AttackEventID(nextSeg.id)}
+			child = attackEvent{ID: AttackEventID(nextSeg.ID)}
 		}
 		engine.assembleAttackEventPath(&child, p, pIndex+1, includedElements)
 		element.Action[child.ID] = child
 	case player_equipmentSetsIdentifier:
-		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(nextSeg.refID)).playerEquipmentSetRef
+		ref := engine.playerEquipmentSetRef(PlayerEquipmentSetRefID(nextSeg.RefID)).playerEquipmentSetRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -305,12 +305,12 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 	case player_gearScoreIdentifier:
 		child := element.GearScore
 		if child == nil {
-			child = &gearScore{ID: GearScoreID(nextSeg.id)}
+			child = &gearScore{ID: GearScoreID(nextSeg.ID)}
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
 	case player_guildMembersIdentifier:
-		ref := engine.playerGuildMemberRef(PlayerGuildMemberRefID(nextSeg.refID)).playerGuildMemberRef
+		ref := engine.playerGuildMemberRef(PlayerGuildMemberRefID(nextSeg.RefID)).playerGuildMemberRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[int(ref.ReferencedElementID)]; ok {
 			referencedDataStatus = ReferencedDataModified
@@ -331,21 +331,21 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		if element.Items == nil {
 			element.Items = make(map[ItemID]item)
 		}
-		child, ok := element.Items[ItemID(nextSeg.id)]
+		child, ok := element.Items[ItemID(nextSeg.ID)]
 		if !ok {
-			child = item{ID: ItemID(nextSeg.id)}
+			child = item{ID: ItemID(nextSeg.ID)}
 		}
 		engine.assembleItemPath(&child, p, pIndex+1, includedElements)
 		element.Items[child.ID] = child
 	case player_positionIdentifier:
 		child := element.Position
 		if child == nil {
-			child = &position{ID: PositionID(nextSeg.id)}
+			child = &position{ID: PositionID(nextSeg.ID)}
 		}
 		engine.assemblePositionPath(child, p, pIndex+1, includedElements)
 		element.Position = child
 	case player_targetIdentifier:
-		ref := engine.playerTargetRef(PlayerTargetRefID(nextSeg.refID)).playerTargetRef
+		ref := engine.playerTargetRef(PlayerTargetRefID(nextSeg.RefID)).playerTargetRef
 		if element.Target != nil && ref.OperationKind == OperationKindDelete {
 			break
 		}
@@ -353,7 +353,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		if _, ok := includedElements[ref.ReferencedElementID.ChildID]; ok {
 			referencedDataStatus = ReferencedDataModified
 		}
-		switch nextSeg.kind {
+		switch nextSeg.Kind {
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(ref.ReferencedElementID.ChildID)).player
 			treeRef := elementReference{
@@ -379,12 +379,12 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		if element.TargetedBy == nil {
 			element.TargetedBy = make(map[int]elementReference)
 		}
-		ref := engine.playerTargetedByRef(PlayerTargetedByRefID(nextSeg.refID)).playerTargetedByRef
+		ref := engine.playerTargetedByRef(PlayerTargetedByRefID(nextSeg.RefID)).playerTargetedByRef
 		referencedDataStatus := ReferencedDataUnchanged
 		if _, ok := includedElements[ref.ReferencedElementID.ChildID]; ok {
 			referencedDataStatus = ReferencedDataModified
 		}
-		switch nextSeg.kind {
+		switch nextSeg.Kind {
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(ref.ReferencedElementID.ChildID)).player
 			treeRef := elementReference{
@@ -428,41 +428,41 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 
 	nextSeg := p[pIndex+1]
 
-	switch nextSeg.identifier {
+	switch nextSeg.Identifier {
 	case zone_interactablesIdentifier:
 		if element.Interactables == nil {
 			element.Interactables = make(map[int]interface{})
 		}
-		switch nextSeg.kind {
+		switch nextSeg.Kind {
 		case ElementKindItem:
-			child, ok := element.Interactables[nextSeg.id].(item)
+			child, ok := element.Interactables[nextSeg.ID].(item)
 			if !ok {
-				child = item{ID: ItemID(nextSeg.id)}
+				child = item{ID: ItemID(nextSeg.ID)}
 			}
 			engine.assembleItemPath(&child, p, pIndex+1, includedElements)
-			element.Interactables[nextSeg.id] = child
+			element.Interactables[nextSeg.ID] = child
 		case ElementKindPlayer:
-			child, ok := element.Interactables[nextSeg.id].(player)
+			child, ok := element.Interactables[nextSeg.ID].(player)
 			if !ok {
-				child = player{ID: PlayerID(nextSeg.id)}
+				child = player{ID: PlayerID(nextSeg.ID)}
 			}
 			engine.assemblePlayerPath(&child, p, pIndex+1, includedElements)
-			element.Interactables[nextSeg.id] = child
+			element.Interactables[nextSeg.ID] = child
 		case ElementKindZoneItem:
-			child, ok := element.Interactables[nextSeg.id].(zoneItem)
+			child, ok := element.Interactables[nextSeg.ID].(zoneItem)
 			if !ok {
-				child = zoneItem{ID: ZoneItemID(nextSeg.id)}
+				child = zoneItem{ID: ZoneItemID(nextSeg.ID)}
 			}
 			engine.assembleZoneItemPath(&child, p, pIndex+1, includedElements)
-			element.Interactables[nextSeg.id] = child
+			element.Interactables[nextSeg.ID] = child
 		}
 	case zone_itemsIdentifier:
 		if element.Items == nil {
 			element.Items = make(map[ZoneItemID]zoneItem)
 		}
-		child, ok := element.Items[ZoneItemID(nextSeg.id)]
+		child, ok := element.Items[ZoneItemID(nextSeg.ID)]
 		if !ok {
-			child = zoneItem{ID: ZoneItemID(nextSeg.id)}
+			child = zoneItem{ID: ZoneItemID(nextSeg.ID)}
 		}
 		engine.assembleZoneItemPath(&child, p, pIndex+1, includedElements)
 		element.Items[child.ID] = child
@@ -470,9 +470,9 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 		if element.Players == nil {
 			element.Players = make(map[PlayerID]player)
 		}
-		child, ok := element.Players[PlayerID(nextSeg.id)]
+		child, ok := element.Players[PlayerID(nextSeg.ID)]
 		if !ok {
-			child = player{ID: PlayerID(nextSeg.id)}
+			child = player{ID: PlayerID(nextSeg.ID)}
 		}
 		engine.assemblePlayerPath(&child, p, pIndex+1, includedElements)
 		element.Players[child.ID] = child
@@ -480,7 +480,7 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 		if element.Tags == nil {
 			element.Tags = make([]string, 0, len(zoneData.Tags))
 		}
-		child := engine.stringValue(StringValueID(nextSeg.id))
+		child := engine.stringValue(StringValueID(nextSeg.ID))
 		element.OperationKind = child.OperationKind
 		element.Tags = append(element.Tags, child.Value)
 	}

@@ -9,11 +9,12 @@ const (
 )
 
 type Engine struct {
-	State   *State
-	Patch   *State
-	Tree    *Tree
-	planner *assemblePlanner
-	IDgen   int
+	State                *State
+	Patch                *State
+	Tree                 *Tree
+	broadcastingClientID string
+	planner              *assemblePlanner
+	IDgen                int
 }
 
 func newEngine() *Engine {
@@ -43,6 +44,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.BoolValue, boolValue.ID)
 		} else {
 			boolValue.OperationKind = OperationKindUnchanged
+			boolValue.Meta.unsign()
 			engine.State.BoolValue[boolValue.ID] = boolValue
 		}
 	}
@@ -51,6 +53,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.FloatValue, floatValue.ID)
 		} else {
 			floatValue.OperationKind = OperationKindUnchanged
+			floatValue.Meta.unsign()
 			engine.State.FloatValue[floatValue.ID] = floatValue
 		}
 	}
@@ -59,6 +62,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.IntValue, intValue.ID)
 		} else {
 			intValue.OperationKind = OperationKindUnchanged
+			intValue.Meta.unsign()
 			engine.State.IntValue[intValue.ID] = intValue
 		}
 	}
@@ -67,6 +71,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.StringValue, stringValue.ID)
 		} else {
 			stringValue.OperationKind = OperationKindUnchanged
+			stringValue.Meta.unsign()
 			engine.State.StringValue[stringValue.ID] = stringValue
 		}
 	}
@@ -76,6 +81,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.AttackEvent, attackEvent.ID)
 		} else {
 			attackEvent.OperationKind = OperationKindUnchanged
+			attackEvent.Meta.unsign()
 			engine.State.AttackEvent[attackEvent.ID] = attackEvent
 		}
 	}
@@ -84,6 +90,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.EquipmentSet, equipmentSet.ID)
 		} else {
 			equipmentSet.OperationKind = OperationKindUnchanged
+			equipmentSet.Meta.unsign()
 			engine.State.EquipmentSet[equipmentSet.ID] = equipmentSet
 		}
 	}
@@ -92,6 +99,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.GearScore, gearScore.ID)
 		} else {
 			gearScore.OperationKind = OperationKindUnchanged
+			gearScore.Meta.unsign()
 			engine.State.GearScore[gearScore.ID] = gearScore
 		}
 	}
@@ -100,6 +108,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.Item, item.ID)
 		} else {
 			item.OperationKind = OperationKindUnchanged
+			item.Meta.unsign()
 			engine.State.Item[item.ID] = item
 		}
 	}
@@ -109,6 +118,7 @@ func (engine *Engine) UpdateState() {
 		} else {
 			player.Action = player.Action[:0]
 			player.OperationKind = OperationKindUnchanged
+			player.Meta.unsign()
 			engine.State.Player[player.ID] = player
 		}
 	}
@@ -117,6 +127,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.Position, position.ID)
 		} else {
 			position.OperationKind = OperationKindUnchanged
+			position.Meta.unsign()
 			engine.State.Position[position.ID] = position
 		}
 	}
@@ -125,6 +136,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.Zone, zone.ID)
 		} else {
 			zone.OperationKind = OperationKindUnchanged
+			zone.Meta.unsign()
 			engine.State.Zone[zone.ID] = zone
 		}
 	}
@@ -133,6 +145,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.ZoneItem, zoneItem.ID)
 		} else {
 			zoneItem.OperationKind = OperationKindUnchanged
+			zoneItem.Meta.unsign()
 			engine.State.ZoneItem[zoneItem.ID] = zoneItem
 		}
 	}
@@ -141,6 +154,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.AttackEventTargetRef, attackEventTargetRef.ID)
 		} else {
 			attackEventTargetRef.OperationKind = OperationKindUnchanged
+			attackEventTargetRef.Meta.unsign()
 			engine.State.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
 		}
 	}
@@ -149,6 +163,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.EquipmentSetEquipmentRef, equipmentSetEquipmentRef.ID)
 		} else {
 			equipmentSetEquipmentRef.OperationKind = OperationKindUnchanged
+			equipmentSetEquipmentRef.Meta.unsign()
 			engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
 		}
 	}
@@ -157,6 +172,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.ItemBoundToRef, itemBoundToRef.ID)
 		} else {
 			itemBoundToRef.OperationKind = OperationKindUnchanged
+			itemBoundToRef.Meta.unsign()
 			engine.State.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
 		}
 	}
@@ -165,6 +181,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.PlayerEquipmentSetRef, playerEquipmentSetRef.ID)
 		} else {
 			playerEquipmentSetRef.OperationKind = OperationKindUnchanged
+			playerEquipmentSetRef.Meta.unsign()
 			engine.State.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
 		}
 	}
@@ -173,6 +190,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.PlayerGuildMemberRef, playerGuildMemberRef.ID)
 		} else {
 			playerGuildMemberRef.OperationKind = OperationKindUnchanged
+			playerGuildMemberRef.Meta.unsign()
 			engine.State.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
 		}
 	}
@@ -181,6 +199,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.PlayerTargetRef, playerTargetRef.ID)
 		} else {
 			playerTargetRef.OperationKind = OperationKindUnchanged
+			playerTargetRef.Meta.unsign()
 			engine.State.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
 		}
 	}
@@ -189,6 +208,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.PlayerTargetedByRef, playerTargetedByRef.ID)
 		} else {
 			playerTargetedByRef.OperationKind = OperationKindUnchanged
+			playerTargetedByRef.Meta.unsign()
 			engine.State.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
 		}
 	}
@@ -197,6 +217,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.AnyOfPlayer_Position, anyOfPlayer_Position.ID)
 		} else {
 			anyOfPlayer_Position.OperationKind = OperationKindUnchanged
+			anyOfPlayer_Position.Meta.unsign()
 			engine.State.AnyOfPlayer_Position[anyOfPlayer_Position.ID] = anyOfPlayer_Position
 		}
 	}
@@ -205,6 +226,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.AnyOfPlayer_ZoneItem, anyOfPlayer_ZoneItem.ID)
 		} else {
 			anyOfPlayer_ZoneItem.OperationKind = OperationKindUnchanged
+			anyOfPlayer_ZoneItem.Meta.unsign()
 			engine.State.AnyOfPlayer_ZoneItem[anyOfPlayer_ZoneItem.ID] = anyOfPlayer_ZoneItem
 		}
 	}
@@ -213,6 +235,7 @@ func (engine *Engine) UpdateState() {
 			delete(engine.State.AnyOfItem_Player_ZoneItem, anyOfItem_Player_ZoneItem.ID)
 		} else {
 			anyOfItem_Player_ZoneItem.OperationKind = OperationKindUnchanged
+			anyOfItem_Player_ZoneItem.Meta.unsign()
 			engine.State.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItem.ID] = anyOfItem_Player_ZoneItem
 		}
 	}
