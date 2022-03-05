@@ -86,7 +86,7 @@ func (_player Player) ParentItem() Item {
 	if !player.player.HasParent {
 		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
 	}
-	parentSeg := player.player.path[len(player.player.path)-2]
+	parentSeg := player.player.Path[len(player.player.Path)-2]
 	return player.player.engine.Item(ItemID(parentSeg.id))
 }
 
@@ -95,7 +95,7 @@ func (_player Player) ParentZone() Zone {
 	if !player.player.HasParent {
 		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: player.player.engine}}
 	}
-	parentSeg := player.player.path[len(player.player.path)-2]
+	parentSeg := player.player.Path[len(player.player.Path)-2]
 	return player.player.engine.Zone(ZoneID(parentSeg.id))
 }
 
@@ -103,7 +103,7 @@ func (_player Player) ParentKind() (ElementKind, bool) {
 	if !_player.player.HasParent {
 		return "", false
 	}
-	return _player.player.path[len(_player.player.path)-2].kind, true
+	return _player.player.Path[len(_player.player.Path)-2].kind, true
 }
 
 func (_player Player) ID() PlayerID {
@@ -116,7 +116,7 @@ func (_player Player) Exists() (Player, bool) {
 }
 
 func (_player Player) Path() string {
-	return _player.player.Path
+	return _player.player.JSONPath
 }
 
 func (_player Player) Target() PlayerTargetRef {
@@ -229,7 +229,7 @@ func (_gearScore GearScore) ParentItem() Item {
 	if !gearScore.gearScore.HasParent {
 		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: gearScore.gearScore.engine}}
 	}
-	parentSeg := gearScore.gearScore.path[len(gearScore.gearScore.path)-2]
+	parentSeg := gearScore.gearScore.Path[len(gearScore.gearScore.Path)-2]
 	return gearScore.gearScore.engine.Item(ItemID(parentSeg.id))
 }
 
@@ -238,7 +238,7 @@ func (_gearScore GearScore) ParentPlayer() Player {
 	if !gearScore.gearScore.HasParent {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: gearScore.gearScore.engine}}
 	}
-	parentSeg := gearScore.gearScore.path[len(gearScore.gearScore.path)-2]
+	parentSeg := gearScore.gearScore.Path[len(gearScore.gearScore.Path)-2]
 	return gearScore.gearScore.engine.Player(PlayerID(parentSeg.id))
 }
 
@@ -246,7 +246,7 @@ func (_gearScore GearScore) ParentKind() (ElementKind, bool) {
 	if !_gearScore.gearScore.HasParent {
 		return "", false
 	}
-	return _gearScore.gearScore.path[len(_gearScore.gearScore.path)-2].kind, true
+	return _gearScore.gearScore.Path[len(_gearScore.gearScore.Path)-2].kind, true
 }
 
 func (_gearScore GearScore) ID() GearScoreID {
@@ -259,7 +259,7 @@ func (_gearScore GearScore) Exists() (GearScore, bool) {
 }
 
 func (_gearScore GearScore) Path() string {
-	return _gearScore.gearScore.Path
+	return _gearScore.gearScore.JSONPath
 }
 
 func (_gearScore GearScore) Level() int64 {
@@ -322,7 +322,7 @@ func (_item Item) ParentPlayer() Player {
 	if !item.item.HasParent {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
 	}
-	parentSeg := item.item.path[len(item.item.path)-2]
+	parentSeg := item.item.Path[len(item.item.Path)-2]
 	return item.item.engine.Player(PlayerID(parentSeg.id))
 }
 
@@ -331,7 +331,7 @@ func (_item Item) ParentZone() Zone {
 	if !item.item.HasParent {
 		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
 	}
-	parentSeg := item.item.path[len(item.item.path)-2]
+	parentSeg := item.item.Path[len(item.item.Path)-2]
 	return item.item.engine.Zone(ZoneID(parentSeg.id))
 }
 
@@ -340,7 +340,7 @@ func (_item Item) ParentZoneItem() ZoneItem {
 	if !item.item.HasParent {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: item.item.engine}}
 	}
-	parentSeg := item.item.path[len(item.item.path)-2]
+	parentSeg := item.item.Path[len(item.item.Path)-2]
 	return item.item.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }
 
@@ -348,7 +348,7 @@ func (_item Item) ParentKind() (ElementKind, bool) {
 	if !_item.item.HasParent {
 		return "", false
 	}
-	return _item.item.path[len(_item.item.path)-2].kind, true
+	return _item.item.Path[len(_item.item.Path)-2].kind, true
 }
 
 func (_item Item) ID() ItemID {
@@ -361,7 +361,7 @@ func (_item Item) Exists() (Item, bool) {
 }
 
 func (_item Item) Path() string {
-	return _item.item.Path
+	return _item.item.JSONPath
 }
 func (_item Item) Name() string {
 	item := _item.item.engine.Item(_item.item.ID)
@@ -434,7 +434,7 @@ func (_attackEvent AttackEvent) ParentPlayer() Player {
 	if !attackEvent.attackEvent.HasParent {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: attackEvent.attackEvent.engine}}
 	}
-	parentSeg := attackEvent.attackEvent.path[len(attackEvent.attackEvent.path)-2]
+	parentSeg := attackEvent.attackEvent.Path[len(attackEvent.attackEvent.Path)-2]
 	return attackEvent.attackEvent.engine.Player(PlayerID(parentSeg.id))
 }
 
@@ -442,7 +442,7 @@ func (_attackEvent AttackEvent) ParentKind() (ElementKind, bool) {
 	if !_attackEvent.attackEvent.HasParent {
 		return "", false
 	}
-	return _attackEvent.attackEvent.path[len(_attackEvent.attackEvent.path)-2].kind, true
+	return _attackEvent.attackEvent.Path[len(_attackEvent.attackEvent.Path)-2].kind, true
 }
 
 func (_attackEvent AttackEvent) ID() AttackEventID {
@@ -455,7 +455,7 @@ func (_attackEvent AttackEvent) Exists() (AttackEvent, bool) {
 }
 
 func (_attackEvent AttackEvent) Path() string {
-	return _attackEvent.attackEvent.Path
+	return _attackEvent.attackEvent.JSONPath
 }
 
 func (_attackEvent AttackEvent) Target() AttackEventTargetRef {
@@ -513,7 +513,7 @@ func (_position Position) ParentItem() Item {
 	if !position.position.HasParent {
 		return Item{item: itemCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
 	}
-	parentSeg := position.position.path[len(position.position.path)-2]
+	parentSeg := position.position.Path[len(position.position.Path)-2]
 	return position.position.engine.Item(ItemID(parentSeg.id))
 }
 
@@ -522,7 +522,7 @@ func (_position Position) ParentPlayer() Player {
 	if !position.position.HasParent {
 		return Player{player: playerCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
 	}
-	parentSeg := position.position.path[len(position.position.path)-2]
+	parentSeg := position.position.Path[len(position.position.Path)-2]
 	return position.position.engine.Player(PlayerID(parentSeg.id))
 }
 
@@ -531,7 +531,7 @@ func (_position Position) ParentZoneItem() ZoneItem {
 	if !position.position.HasParent {
 		return ZoneItem{zoneItem: zoneItemCore{OperationKind: OperationKindDelete, engine: position.position.engine}}
 	}
-	parentSeg := position.position.path[len(position.position.path)-2]
+	parentSeg := position.position.Path[len(position.position.Path)-2]
 	return position.position.engine.ZoneItem(ZoneItemID(parentSeg.id))
 }
 
@@ -544,7 +544,7 @@ func (_position Position) ParentKind() (ElementKind, bool) {
 	if !_position.position.HasParent {
 		return "", false
 	}
-	return _position.position.path[len(_position.position.path)-2].kind, true
+	return _position.position.Path[len(_position.position.Path)-2].kind, true
 }
 
 func (_position Position) ID() PositionID {
@@ -552,7 +552,7 @@ func (_position Position) ID() PositionID {
 }
 
 func (_position Position) Path() string {
-	return _position.position.Path
+	return _position.position.JSONPath
 }
 
 func (_position Position) X() float64 {
@@ -615,7 +615,7 @@ func (_zoneItem ZoneItem) ParentZone() Zone {
 	if !zoneItem.zoneItem.HasParent {
 		return Zone{zone: zoneCore{OperationKind: OperationKindDelete, engine: zoneItem.zoneItem.engine}}
 	}
-	parentSeg := zoneItem.zoneItem.path[len(zoneItem.zoneItem.path)-2]
+	parentSeg := zoneItem.zoneItem.Path[len(zoneItem.zoneItem.Path)-2]
 	return zoneItem.zoneItem.engine.Zone(ZoneID(parentSeg.id))
 }
 
@@ -623,7 +623,7 @@ func (_zoneItem ZoneItem) ParentKind() (ElementKind, bool) {
 	if !_zoneItem.zoneItem.HasParent {
 		return "", false
 	}
-	return _zoneItem.zoneItem.path[len(_zoneItem.zoneItem.path)-2].kind, true
+	return _zoneItem.zoneItem.Path[len(_zoneItem.zoneItem.Path)-2].kind, true
 }
 
 func (_zoneItem ZoneItem) ID() ZoneItemID {
@@ -636,7 +636,7 @@ func (_zoneItem ZoneItem) Exists() (ZoneItem, bool) {
 }
 
 func (_zoneItem ZoneItem) Path() string {
-	return _zoneItem.zoneItem.Path
+	return _zoneItem.zoneItem.JSONPath
 }
 
 func (_zoneItem ZoneItem) Position() Position {
@@ -701,7 +701,7 @@ func (_zone Zone) Exists() (Zone, bool) {
 }
 
 func (_zone Zone) Path() string {
-	return _zone.zone.Path
+	return _zone.zone.JSONPath
 }
 
 func (_zone Zone) Players() []Player {
@@ -844,7 +844,7 @@ func (_equipmentSet EquipmentSet) Exists() (EquipmentSet, bool) {
 }
 
 func (_equipmentSet EquipmentSet) Path() string {
-	return _equipmentSet.equipmentSet.Path
+	return _equipmentSet.equipmentSet.JSONPath
 }
 
 func (_equipmentSet EquipmentSet) Name() string {

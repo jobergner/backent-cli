@@ -5,6 +5,10 @@ type FloatValueID int
 type IntValueID int
 type StringValueID int
 
+// ComplexID is used for entities which are not real elements
+// like references and any-containers. This way we do not have
+// to generate IDs for these entities, which would require
+// the server to do it. This makes more methods available for broadcasting.
 type ComplexID struct {
 	// despite the fact that a slice of references cannot hold multiple references of the same element,
 	// we need the field identifier because otherwise an element with multiple reference fields
@@ -93,8 +97,8 @@ type boolValue struct {
 	ID            BoolValueID   `json:"id"`
 	Value         bool          `json:"value"`
 	OperationKind OperationKind `json:"operationKind"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -102,8 +106,8 @@ type intValue struct {
 	ID            IntValueID    `json:"id"`
 	Value         int64         `json:"value"`
 	OperationKind OperationKind `json:"operationKind"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -111,8 +115,8 @@ type floatValue struct {
 	ID            FloatValueID  `json:"id"`
 	Value         float64       `json:"value"`
 	OperationKind OperationKind `json:"operationKind"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -120,8 +124,8 @@ type stringValue struct {
 	ID            StringValueID `json:"id"`
 	Value         string        `json:"value"`
 	OperationKind OperationKind `json:"operationKind"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -130,8 +134,8 @@ type attackEventCore struct {
 	Target        AttackEventTargetRefID `json:"target"`
 	OperationKind OperationKind          `json:"operationKind"`
 	HasParent     bool                   `json:"hasParent"`
-	Path          string                 `json:"path"`
-	path          path
+	JSONPath      string                 `json:"jsonPath"`
+	Path          path                   `json:"path"`
 	engine        *Engine
 }
 
@@ -145,8 +149,8 @@ type zoneCore struct {
 	Tags          []StringValueID               `json:"tags"`
 	OperationKind OperationKind                 `json:"operationKind"`
 	HasParent     bool                          `json:"hasParent"`
-	Path          string                        `json:"path"`
-	path          path
+	JSONPath      string                        `json:"jsonPath"`
+	Path          path                          `json:"path"`
 	engine        *Engine
 }
 
@@ -158,8 +162,8 @@ type zoneItemCore struct {
 	Position      PositionID    `json:"position"`
 	OperationKind OperationKind `json:"operationKind"`
 	HasParent     bool          `json:"hasParent"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -173,8 +177,8 @@ type itemCore struct {
 	Origin        AnyOfPlayer_PositionID `json:"origin"`
 	OperationKind OperationKind          `json:"operationKind"`
 	HasParent     bool                   `json:"hasParent"`
-	Path          string                 `json:"path"`
-	path          path
+	JSONPath      string                 `json:"jsonPath"`
+	Path          path                   `json:"path"`
 	engine        *Engine
 }
 
@@ -192,8 +196,8 @@ type playerCore struct {
 	TargetedBy    []PlayerTargetedByRefID   `json:"targetedBy"`
 	OperationKind OperationKind             `json:"operationKind"`
 	HasParent     bool                      `json:"hasParent"`
-	Path          string                    `json:"path"`
-	path          path
+	JSONPath      string                    `json:"jsonPath"`
+	Path          path                      `json:"path"`
 	engine        *Engine
 }
 
@@ -205,8 +209,8 @@ type gearScoreCore struct {
 	Score         IntValueID    `json:"score"`
 	OperationKind OperationKind `json:"operationKind"`
 	HasParent     bool          `json:"hasParent"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -218,8 +222,8 @@ type positionCore struct {
 	Y             FloatValueID  `json:"y"`
 	OperationKind OperationKind `json:"operationKind"`
 	HasParent     bool          `json:"hasParent"`
-	Path          string        `json:"path"`
-	path          path
+	JSONPath      string        `json:"jsonPath"`
+	Path          path          `json:"path"`
 	engine        *Engine
 }
 
@@ -231,8 +235,8 @@ type equipmentSetCore struct {
 	Name          StringValueID                `json:"name"`
 	OperationKind OperationKind                `json:"operationKind"`
 	HasParent     bool                         `json:"hasParent"`
-	Path          string                       `json:"path"`
-	path          path
+	JSONPath      string                       `json:"jsonPath"`
+	Path          path                         `json:"path"`
 	engine        *Engine
 }
 
