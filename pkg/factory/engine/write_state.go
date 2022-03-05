@@ -8,17 +8,28 @@ import (
 )
 
 func (s *EngineFactory) writeIDs() *EngineFactory {
+	s.file.Type().Id("ComplexID").Struct(
+		Id("Field").Id("treeFieldIdentifier").Id(metaFieldTag("field")),
+		Id("ParentID").Int().Id(metaFieldTag("parentID")),
+		Id("ChildID").Int().Id(metaFieldTag("childID")),
+		Id("IsMediator").Bool().Id(metaFieldTag("isMediator")),
+	)
+
+	RangeBasicTypes(func(b BasicType) {
+		s.file.Type().Id(Title(b.Value) + "ID").Int()
+	})
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		s.file.Type().Id(Title(configType.Name) + "ID").Int()
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		s.file.Type().Id(Title(field.ValueTypeName) + "ID").Int()
+		s.file.Type().Id(Title(field.ValueTypeName) + "ID").Id("ComplexID")
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
 
-		s.file.Type().Id(Title(anyNameByField(field)) + "ID").Int()
+		s.file.Type().Id(Title(anyNameByField(field)) + "ID").Id("ComplexID")
 	})
 
 	return s
@@ -27,6 +38,11 @@ func (s *EngineFactory) writeIDs() *EngineFactory {
 func (s *EngineFactory) writeState() *EngineFactory {
 
 	s.file.Type().Id("State").Struct(
+
+		ForEachBasicType(func(basicType BasicType) *Statement {
+			return Id(Title(basicType.Value)).Map(Id(Title(basicType.Value) + "ID")).Id(basicType.Value).Id(metaFieldTag(basicType.Value))
+		}),
+
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			s := stateWriter{
 				typeName: func() string {
@@ -58,6 +74,10 @@ func (s *EngineFactory) writeState() *EngineFactory {
 
 	s.file.Func().Id("newState").Params().Id("*State").Block(
 		Return(Id("&State").Block(
+			ForEachBasicType(func(basicType BasicType) *Statement {
+				return Id(Title(basicType.Value)).Id(":").Make(Map(Id(Title(basicType.Value) + "ID")).Id(basicType.Value)).Id(",")
+			}),
+
 			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 
 				s := stateWriter{
@@ -108,8 +128,9 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			}),
 			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
 			Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line(),
-			Id("Path").String().Id(e.metaFieldTag("path")),
-			Id("path").Id("path"),
+			Id("JSONPath").String().Id(e.metaFieldTag("jsonPath")),
+			Id("Path").Id("path").Id(e.metaFieldTag("path")),
+			Id("Meta").Id("metaData").Id(e.metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 
@@ -128,7 +149,8 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 			Id("ParentID").Id(Title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
 			Id("ReferencedElementID").Id(Title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
-			Id("path").Id("path"),
+			Id("Path").Id("path").Id(metaFieldTag("path")),
+			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 		s.file.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
@@ -138,12 +160,11 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 		s.file.Type().Id(anyNameByField(field)+"Core").Struct(
 			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
+			Id("ChildID").Int().Id(fieldTag("childID")).Line(),
 			Id("ParentElementPath").Id("path").Id(fieldTag("parentElementPath")).Line(),
 			Id("FieldIdentifier").Id("treeFieldIdentifier").Id(fieldTag("fieldIdentifier")).Line(),
-			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
-				return Id(Title(configType.Name)).Id(Title(configType.Name) + "ID").Id(fieldTag(configType.Name)).Line()
-			}),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
+			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 		s.file.Type().Id(Title(anyNameByField(field))).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
