@@ -38,7 +38,7 @@ func TestWriteTree(t *testing.T) {
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_ElementKind_type,
-			_ElementKindAttackEvent_type,
+			_ElementKindBoolValue_type,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)
