@@ -36,8 +36,8 @@ var StateConfig = map[interface{}]interface{}{
 		"origin":    "anyOf<player,position>",
 	},
 	"gearScore": map[interface{}]interface{}{
-		"level": "int",
-		"score": "int",
+		"level": "int64",
+		"score": "int64",
 	},
 	"equipmentSet": map[interface{}]interface{}{
 		"name":      "string",
