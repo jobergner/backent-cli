@@ -70,25 +70,25 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.Path
 	}
 	for _, attackEventTargetRef := range patch.AttackEventTargetRef {
-		ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.path
+		ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 	}
 	for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
-		ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+		ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 	}
 	for _, itemBoundToRef := range patch.ItemBoundToRef {
-		ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.path
+		ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 	}
 	for _, playerEquipmentSetRef := range patch.PlayerEquipmentSetRef {
-		ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+		ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 	}
 	for _, playerGuildMemberRef := range patch.PlayerGuildMemberRef {
-		ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+		ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 	}
 	for _, playerTargetRef := range patch.PlayerTargetRef {
-		ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.path
+		ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 	}
 	for _, playerTargetedByRef := range patch.PlayerTargetedByRef {
-		ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.path
+		ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 	}
 
 	previousLen := 0
@@ -106,17 +106,17 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		// in the loop below
 		for _, p := range ap.updatedElementPaths {
 			for _, seg := range p {
-				ap.includedElements[seg.id] = true
+				ap.includedElements[seg.ID] = true
 			}
 		}
 		// add all elements of the updated reference paths to the includedElements
 		for _, p := range ap.updatedReferencePaths {
 			for _, seg := range p {
-				if seg.refID != (ComplexID{}) {
+				if seg.RefID != (ComplexID{}) {
 					// ommitting ref segments as the actual element is already included by
 					// the previous segment.
 				} else {
-					ap.includedElements[seg.id] = true
+					ap.includedElements[seg.ID] = true
 				}
 			}
 		}
@@ -131,7 +131,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 
 		for _, attackEventTargetRef := range patch.AttackEventTargetRef {
 			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.path
+				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 			}
 		}
 		// again, events can't ever be present in state, but well keep this for consistency
@@ -140,7 +140,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				continue
 			}
 			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.path
+				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 			}
 		}
 
@@ -148,7 +148,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			// if the reference references an element that has updated its path is collected
 			// so that all segments can later be added to includedElements
 			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 			}
 		}
 		// we also loop over all references in state because a reference which may not have updated
@@ -159,13 +159,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				continue
 			}
 			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 			}
 		}
 
 		for _, itemBoundToRef := range patch.ItemBoundToRef {
 			if _, ok := ap.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.path
+				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 			}
 		}
 		for _, itemBoundToRef := range state.ItemBoundToRef {
@@ -173,13 +173,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				continue
 			}
 			if _, ok := ap.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.path
+				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 			}
 		}
 
 		for _, playerEquipmentSetRef := range patch.PlayerEquipmentSetRef {
 			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 			}
 		}
 		for _, playerEquipmentSetRef := range state.PlayerEquipmentSetRef {
@@ -187,13 +187,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				continue
 			}
 			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 			}
 		}
 
 		for _, playerGuildMemberRef := range patch.PlayerGuildMemberRef {
 			if _, ok := ap.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 			}
 		}
 		for _, playerGuildMemberRef := range state.PlayerGuildMemberRef {
@@ -201,7 +201,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				continue
 			}
 			if _, ok := ap.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 			}
 		}
 
@@ -210,7 +210,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			// as both are always created and destroyed in unison
 			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
 			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.path
+				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 			}
 		}
 		for _, playerTargetRef := range state.PlayerTargetRef {
@@ -221,14 +221,14 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			// as both are always created and destroyed in unison
 			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
 			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.path
+				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 			}
 		}
 
 		for _, playerTargetedByRef := range patch.PlayerTargetedByRef {
 			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
 			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 			}
 		}
 		for _, playerTargetedByRef := range state.PlayerTargetedByRef {
@@ -237,7 +237,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			}
 			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
 			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
-				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.path
+				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 			}
 		}
 	}
@@ -289,25 +289,25 @@ func (ap *assemblePlanner) fill(state *State) {
 		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.Path
 	}
 	for _, attackEventTargetRef := range state.AttackEventTargetRef {
-		ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.path
+		ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 	}
 	for _, equipmentSetEquipmentRef := range state.EquipmentSetEquipmentRef {
-		ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.path
+		ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 	}
 	for _, itemBoundToRef := range state.ItemBoundToRef {
-		ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.path
+		ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 	}
 	for _, playerEquipmentSetRef := range state.PlayerEquipmentSetRef {
-		ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.path
+		ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 	}
 	for _, playerGuildMemberRef := range state.PlayerGuildMemberRef {
-		ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.path
+		ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 	}
 	for _, playerTargetRef := range state.PlayerTargetRef {
-		ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.path
+		ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 	}
 	for _, playerTargetedByRef := range state.PlayerTargetedByRef {
-		ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.path
+		ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 	}
 
 	// merge paths into one slice, for convencience (they are recycled anyway)

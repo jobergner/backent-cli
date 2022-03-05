@@ -135,6 +135,24 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, 2, len(se.Patch.Position)) //position of item1.origin(player).position and this one
 		assert.Equal(t, float64(2), item2.Origin().Position().Y())
 	})
+	t.Run("signs elements as exoected", func(t *testing.T) {
+		se := newEngine()
+		item := se.CreateItem()
+		se.broadcastingClientID = "foo"
+		item.SetName("newname0")
+		assert.Equal(t, "foo", se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
+		assert.Equal(t, false, se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
+		item.SetName("newname2")
+		assert.Equal(t, "foo", se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
+		assert.Equal(t, false, se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
+		se.broadcastingClientID = "bar"
+		item.SetName("newname3")
+		assert.Equal(t, "", se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
+		assert.Equal(t, true, se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
+		se.UpdateState()
+		assert.Equal(t, "", se.State.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
+		assert.Equal(t, false, se.State.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
+	})
 }
 
 func TestReferences(t *testing.T) {

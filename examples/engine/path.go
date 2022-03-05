@@ -125,10 +125,10 @@ func (t treeFieldIdentifier) toString() string {
 }
 
 type segment struct {
-	id         int // is 0 when segment is of reference
-	identifier treeFieldIdentifier
-	kind       ElementKind
-	refID      ComplexID // is ComplexID{} if segment is of non-reference
+	ID         int                 `json:"id"` // is 0 when segment is of reference
+	Identifier treeFieldIdentifier `json:"identifier"`
+	Kind       ElementKind         `json:"kind"`
+	RefID      ComplexID           `json:"refID"` // is ComplexID{} if segment is of non-reference
 }
 
 type path []segment
@@ -149,9 +149,9 @@ func (p path) toJSONPath() string {
 
 	for _, seg := range p {
 		// first segment is always a name of a type
-		jsonPath += "." + seg.identifier.toString()
-		if isSliceFieldIdentifier(seg.identifier) {
-			jsonPath += "[" + strconv.Itoa(seg.id) + "]"
+		jsonPath += "." + seg.Identifier.toString()
+		if isSliceFieldIdentifier(seg.Identifier) {
+			jsonPath += "[" + strconv.Itoa(seg.ID) + "]"
 		}
 	}
 

@@ -10,6 +10,7 @@ func (engine *Engine) setBoolValue(id BoolValueID, val bool) bool {
 	}
 	boolValue.Value = val
 	boolValue.OperationKind = OperationKindUpdate
+	boolValue.Meta.sign(boolValue.engine.broadcastingClientID)
 	engine.Patch.BoolValue[id] = boolValue
 	return true
 }
@@ -24,6 +25,7 @@ func (engine *Engine) setFloatValue(id FloatValueID, val float64) bool {
 	}
 	floatValue.Value = val
 	floatValue.OperationKind = OperationKindUpdate
+	floatValue.Meta.sign(floatValue.engine.broadcastingClientID)
 	engine.Patch.FloatValue[id] = floatValue
 	return true
 }
@@ -38,6 +40,7 @@ func (engine *Engine) setIntValue(id IntValueID, val int64) bool {
 	}
 	intValue.Value = val
 	intValue.OperationKind = OperationKindUpdate
+	intValue.Meta.sign(intValue.engine.broadcastingClientID)
 	engine.Patch.IntValue[id] = intValue
 	return true
 }
@@ -52,6 +55,7 @@ func (engine *Engine) setStringValue(id StringValueID, val string) bool {
 	}
 	stringValue.Value = val
 	stringValue.OperationKind = OperationKindUpdate
+	stringValue.Meta.sign(stringValue.engine.broadcastingClientID)
 	engine.Patch.StringValue[id] = stringValue
 	return true
 }
@@ -118,6 +122,7 @@ func (_item Item) SetBoundTo(playerID PlayerID) Item {
 	ref := item.item.engine.createItemBoundToRef(item.item.Path, item_boundToIdentifier, playerID, item.item.ID)
 	item.item.BoundTo = ref.ID
 	item.item.OperationKind = OperationKindUpdate
+	item.item.Meta.sign(item.item.engine.broadcastingClientID)
 	item.item.engine.Patch.Item[item.item.ID] = item.item
 	return item
 }
@@ -139,6 +144,7 @@ func (_attackEvent AttackEvent) SetTarget(playerID PlayerID) AttackEvent {
 	ref := attackEvent.attackEvent.engine.createAttackEventTargetRef(attackEvent.attackEvent.Path, attackEvent_targetIdentifier, playerID, attackEvent.attackEvent.ID)
 	attackEvent.attackEvent.Target = ref.ID
 	attackEvent.attackEvent.OperationKind = OperationKindUpdate
+	attackEvent.attackEvent.Meta.sign(attackEvent.attackEvent.engine.broadcastingClientID)
 	attackEvent.attackEvent.engine.Patch.AttackEvent[attackEvent.attackEvent.ID] = attackEvent.attackEvent
 	return attackEvent
 }
@@ -170,6 +176,7 @@ func (_player Player) SetTargetPlayer(playerID PlayerID) Player {
 	ref := player.player.engine.createPlayerTargetRef(player.player.Path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindPlayer, int(playerID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
+	player.player.Meta.sign(player.player.engine.broadcastingClientID)
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
@@ -193,6 +200,7 @@ func (_player Player) SetTargetZoneItem(zoneItemID ZoneItemID) Player {
 	ref := player.player.engine.createPlayerTargetRef(player.player.Path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
+	player.player.Meta.sign(player.player.engine.broadcastingClientID)
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }

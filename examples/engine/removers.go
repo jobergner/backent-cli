@@ -17,6 +17,7 @@ func (_zone Zone) RemovePlayers(playerToRemove PlayerID) Zone {
 		zone.zone.engine.deletePlayer(playerID)
 
 		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.Meta.sign(zone.zone.engine.broadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -42,6 +43,7 @@ func (_zone Zone) RemoveItems(itemToRemove ZoneItemID) Zone {
 		zone.zone.engine.deleteZoneItem(zoneItemID)
 
 		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.Meta.sign(zone.zone.engine.broadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -67,6 +69,7 @@ func (_zone Zone) RemoveInteractablesItem(itemToRemove ItemID) Zone {
 		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(complexID, true)
 
 		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.Meta.sign(zone.zone.engine.broadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -92,6 +95,7 @@ func (_zone Zone) RemoveInteractablesPlayer(playerToRemove PlayerID) Zone {
 		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(complexID, true)
 
 		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.Meta.sign(zone.zone.engine.broadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -117,6 +121,7 @@ func (_zone Zone) RemoveInteractablesZoneItem(zoneItemToRemove ZoneItemID) Zone 
 		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(complexID, true)
 
 		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.Meta.sign(zone.zone.engine.broadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -142,6 +147,7 @@ func (_player Player) RemoveAction(actionToRemove AttackEventID) Player {
 		player.player.engine.deleteAttackEvent(attackEventID)
 
 		player.player.OperationKind = OperationKindUpdate
+		player.player.Meta.sign(player.player.engine.broadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -167,6 +173,7 @@ func (_player Player) RemoveItems(itemToRemove ItemID) Player {
 		player.player.engine.deleteItem(itemID)
 
 		player.player.OperationKind = OperationKindUpdate
+		player.player.Meta.sign(player.player.engine.broadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -192,6 +199,7 @@ func (_player Player) RemoveEquipmentSets(equipmentSetToRemove EquipmentSetID) P
 		player.player.engine.deletePlayerEquipmentSetRef(complexID)
 
 		player.player.OperationKind = OperationKindUpdate
+		player.player.Meta.sign(player.player.engine.broadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -217,6 +225,7 @@ func (_player Player) RemoveGuildMembers(guildMemberToRemove PlayerID) Player {
 		player.player.engine.deletePlayerGuildMemberRef(complexID)
 
 		player.player.OperationKind = OperationKindUpdate
+		player.player.Meta.sign(player.player.engine.broadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -242,6 +251,7 @@ func (_player Player) RemoveTargetedByZoneItem(zoneItemToRemove ZoneItemID) Play
 		player.player.engine.deletePlayerTargetedByRef(complexID)
 
 		player.player.OperationKind = OperationKindUpdate
+		player.player.Meta.sign(player.player.engine.broadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -267,6 +277,7 @@ func (_player Player) RemoveTargetedByPlayer(playerToRemove PlayerID) Player {
 		player.player.engine.deletePlayerTargetedByRef(complexID)
 
 		player.player.OperationKind = OperationKindUpdate
+		player.player.Meta.sign(player.player.engine.broadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -291,6 +302,7 @@ func (_zone Zone) RemoveTags(tagToRemove string) Zone {
 		zone.zone.Tags = zone.zone.Tags[:len(zone.zone.Tags)-1]
 
 		zone.zone.OperationKind = OperationKindUpdate
+		zone.zone.Meta.sign(zone.zone.engine.broadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -316,6 +328,7 @@ func (_equipmentSet EquipmentSet) RemoveEquipment(equipmentToRemove ItemID) Equi
 		equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(complexID)
 
 		equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
+		equipmentSet.equipmentSet.Meta.sign(equipmentSet.equipmentSet.engine.broadcastingClientID)
 		equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 
 		break

@@ -207,7 +207,7 @@ func (engine *Engine) createAttackEventTargetRef(p path, fieldIdentifier treeFie
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = AttackEventTargetRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.AttackEventTargetRef[element.ID] = element
 	return element
@@ -219,7 +219,7 @@ func (engine *Engine) createItemBoundToRef(p path, fieldIdentifier treeFieldIden
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = ItemBoundToRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.ItemBoundToRef[element.ID] = element
 	return element
@@ -231,7 +231,7 @@ func (engine *Engine) createPlayerGuildMemberRef(p path, fieldIdentifier treeFie
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerGuildMemberRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, ElementKindPlayer, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerGuildMemberRef[element.ID] = element
 	return element
@@ -243,7 +243,7 @@ func (engine *Engine) createEquipmentSetEquipmentRef(p path, fieldIdentifier tre
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = EquipmentSetEquipmentRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindItem, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, ElementKindItem, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.EquipmentSetEquipmentRef[element.ID] = element
 	return element
@@ -255,7 +255,7 @@ func (engine *Engine) createPlayerEquipmentSetRef(p path, fieldIdentifier treeFi
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerEquipmentSetRefID{fieldIdentifier, int(parentID), int(referencedElementID), false}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, ElementKindEquipmentSet, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, ElementKindEquipmentSet, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerEquipmentSetRef[element.ID] = element
 	return element
@@ -267,7 +267,7 @@ func (engine *Engine) createPlayerTargetRef(p path, fieldIdentifier treeFieldIde
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerTargetRefID{referencedElementID.Field, referencedElementID.ParentID, referencedElementID.ChildID, true}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, childKind, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, childKind, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerTargetRef[element.ID] = element
 	return element
@@ -279,7 +279,7 @@ func (engine *Engine) createPlayerTargetedByRef(p path, fieldIdentifier treeFiel
 	element.ReferencedElementID = referencedElementID
 	element.ParentID = parentID
 	element.ID = PlayerTargetedByRefID{referencedElementID.Field, referencedElementID.ParentID, referencedElementID.ChildID, true}
-	element.path = p.extendAndCopy(fieldIdentifier, 0, childKind, ComplexID(element.ID))
+	element.Path = p.extendAndCopy(fieldIdentifier, 0, childKind, ComplexID(element.ID))
 	element.OperationKind = OperationKindUpdate
 	engine.Patch.PlayerTargetedByRef[element.ID] = element
 	return element
