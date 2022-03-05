@@ -10,10 +10,10 @@ const (
 type ElementKind string
 
 const (
-	ElementKindBoolValue    ElementKind = "Bool"
-	ElementKindIntValue     ElementKind = "Int"
-	ElementKindFloatValue   ElementKind = "Float"
-	ElementKindStringValue  ElementKind = "String"
+	ElementKindBoolValue    ElementKind = "bool"
+	ElementKindFloatValue   ElementKind = "float64"
+	ElementKindIntValue     ElementKind = "int64"
+	ElementKindStringValue  ElementKind = "string"
 	ElementKindAttackEvent  ElementKind = "AttackEvent"
 	ElementKindEquipmentSet ElementKind = "EquipmentSet"
 	ElementKindGearScore    ElementKind = "GearScore"

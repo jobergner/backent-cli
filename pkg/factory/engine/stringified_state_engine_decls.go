@@ -5175,10 +5175,10 @@ const _ReferencedDataModified_type string = `const (
 const _ElementKind_type string = `type ElementKind string`
 
 const _ElementKindBoolValue_type string = `const (
-	ElementKindBoolValue	ElementKind	= "Bool"
-	ElementKindIntValue	ElementKind	= "Int"
-	ElementKindFloatValue	ElementKind	= "Float"
-	ElementKindStringValue	ElementKind	= "String"
+	ElementKindBoolValue	ElementKind	= "bool"
+	ElementKindFloatValue	ElementKind	= "float64"
+	ElementKindIntValue	ElementKind	= "int64"
+	ElementKindStringValue	ElementKind	= "string"
 	ElementKindAttackEvent	ElementKind	= "AttackEvent"
 	ElementKindEquipmentSet	ElementKind	= "EquipmentSet"
 	ElementKindGearScore	ElementKind	= "GearScore"

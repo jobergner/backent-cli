@@ -24,6 +24,9 @@ func (s *EngineFactory) writeElementKinds() *EngineFactory {
 	s.file.Type().Id("ElementKind").String()
 
 	s.file.Const().Defs(
+		ForEachBasicType(func(b BasicType) *Statement {
+			return Id("ElementKind" + Title(b.Value)).Id("ElementKind").Op("=").Lit(b.Name)
+		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			return Id("ElementKind" + Title(configType.Name)).Id("ElementKind").Op("=").Lit(Title(configType.Name))
 		}),
