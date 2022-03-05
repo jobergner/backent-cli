@@ -54,7 +54,7 @@ func (a anySetterWriter) createChild() *Statement {
 }
 
 func (a anySetterWriter) callSetter() *Statement {
-	return Id("any").Dot(anyNameByField(a.f)).Dot("set"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
+	return Id("any").Dot(anyNameByField(a.f)).Dot("be"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
 }
 
 func (a anySetterWriter) receiverParams() *Statement {
@@ -67,18 +67,6 @@ func (a anySetterWriter) params() (*Statement, *Statement) {
 
 func (a anySetterWriter) reassignAnyContainer() *Statement {
 	return Id("any").Op(":=").Id("_any").Dot("engine").Dot(anyNameByField(a.f)).Call(Id("_any").Dot("ID")).Dot(anyNameByField(a.f))
-}
-
-func (a anySetterWriter) otherValueIsSet() *Statement {
-	return Id("any").Dot(Title(a._v.Name)).Op("!=").Lit(0)
-}
-
-func (a anySetterWriter) deleteOtherValue() *Statement {
-	return Id("any").Dot("engine").Dot("delete" + Title(a._v.Name)).Call(Id("any").Dot(Title(a._v.Name)))
-}
-
-func (a anySetterWriter) unsetIDInContainer() *Statement {
-	return Id("any").Dot(Title(a._v.Name)).Op("=").Lit(0)
 }
 
 func (a anySetterWriter) setElementKind() *Statement {
@@ -107,7 +95,7 @@ func (d anyDeleteChildWriter) reassignAnyContainer() *Statement {
 }
 
 func (d anyDeleteChildWriter) deleteChild() *Statement {
-	return Id("any").Dot("engine").Dot("delete" + Title(d.v.Name)).Call(Id("any").Dot(Title(d.v.Name)))
+	return Id("any").Dot("engine").Dot("delete" + Title(d.v.Name)).Call(Id(Title(d.v.Name) + "ID").Call(Id("any").Dot("ChildID")))
 }
 
 type anyRefWriter struct {

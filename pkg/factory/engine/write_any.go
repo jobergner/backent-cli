@@ -25,7 +25,7 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 				v: *valueType,
 			}
 
-			s.file.Func().Params(asw.wrapperReceiverParams()).Id("Set"+Title(valueType.Name)).Params().Id(Title(valueType.Name)).Block(
+			s.file.Func().Params(asw.wrapperReceiverParams()).Id("Be"+Title(valueType.Name)).Params().Id(Title(valueType.Name)).Block(
 				asw.reassignAnyContainerWrapper(),
 				If(asw.isAlreadyRequestedElement().Op("||").Add(asw.isOperationKindDelete())).Block(
 					Return(asw.currentElement()),
@@ -35,22 +35,27 @@ func (s *EngineFactory) writeAny() *EngineFactory {
 				Return(Id(valueType.Name)),
 			)
 
-			s.file.Func().Params(asw.receiverParams()).Id("set"+Title(valueType.Name)).Params(asw.params()).Block(
+			s.file.Func().Params(asw.receiverParams()).Id("be"+Title(valueType.Name)).Params(asw.params()).Block(
 				asw.reassignAnyContainer(),
-				If(Id("deleteCurrentChild")).Block(
-					ForEachValueOfField(field, func(_valueType *ast.ConfigType) *Statement {
-						if _valueType.Name == valueType.Name {
+				Id("any").Dot("engine").Dot("delete"+Title(anyNameByField(field))).Call(Id("any").Dot("ID"), Id("deleteCurrentChild")),
+				Id("any").Op("=").Id("any").Dot("engine").Dot("create"+Title(anyNameByField(field))).Call(Id("any").Dot("ID").Dot("ParentID"), Int().Call(Id(asw.v.Name+"ID")), Id("ElementKind"+Title(asw.v.Name)), Id("any").Dot("ParentElementPath"), Id("any").Dot("FieldIdentifier")).Dot(anyNameByField(field)),
+				Switch(Id("any").Dot("FieldIdentifier")).Block(
+					ForEachFieldInAST(s.config, func(_field ast.Field) *Statement {
+						if _field.HasSliceValue || _field.HasPointerValue {
 							return Empty()
 						}
-						asw._v = _valueType
-						return If(asw.otherValueIsSet()).Block(
-							asw.deleteOtherValue(),
-							asw.unsetIDInContainer(),
+						if anyNameByField(field) != anyNameByField(_field) {
+							return Empty()
+						}
+						return Case(Id(FieldPathIdentifier(_field))).Block(
+							Id(field.Parent.Name).Op(":=").Id("any").Dot("engine").Dot(Title(field.Parent.Name)).Call(Id(Title(field.Parent.Name)+"ID").Call(Id("any").Dot("ID").Dot("ParentID"))).Dot(field.Parent.Name),
+							Id(field.Parent.Name).Dot(Title(field.Name)).Op("=").Id("any").Dot("ID"),
+							Id(field.Parent.Name).Dot("Meta").Dot("sign").Call(Id(field.Parent.Name).Dot("engine").Dot("broadcastingClientID")),
+							Id(field.Parent.Name).Dot("engine").Dot("Patch").Dot("Item").Index(Id(field.Parent.Name).Dot("ID")).Op("=").Id(field.Parent.Name),
 						)
 					}),
 				),
-				asw.setElementKind(),
-				asw.setChildID(),
+				Id("any").Dot("Meta").Dot("sign").Call(Id("any").Dot("engine").Dot("broadcastingClientID")),
 				asw.updateContainerInPatch(),
 			)
 		})

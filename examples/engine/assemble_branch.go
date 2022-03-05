@@ -193,7 +193,7 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 		}
 		engine.assembleGearScorePath(child, p, pIndex+1, includedElements)
 		element.GearScore = child
-	case item_nameIdenfitier:
+	case item_nameIdentifier:
 		child := engine.stringValue(itemData.Name)
 		element.OperationKind = child.OperationKind
 		element.Name = &child.Value

@@ -27,7 +27,7 @@ const (
 
 	item_boundToIdentifier   treeFieldIdentifier = 14
 	item_gearScoreIdentifier treeFieldIdentifier = 15
-	item_nameIdenfitier      treeFieldIdentifier = 16
+	item_nameIdentifier      treeFieldIdentifier = 16
 	item_originIdentifier    treeFieldIdentifier = 17
 
 	player_actionIdentifier        treeFieldIdentifier = 18
@@ -83,7 +83,7 @@ func (t treeFieldIdentifier) toString() string {
 		return "boundTo"
 	case item_gearScoreIdentifier:
 		return "gearScore"
-	case item_nameIdenfitier:
+	case item_nameIdentifier:
 		return "name"
 	case item_originIdentifier:
 		return "origin"

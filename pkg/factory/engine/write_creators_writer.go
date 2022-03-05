@@ -61,15 +61,15 @@ func (c creatorWriter) generateID() *Statement {
 }
 
 func (c creatorWriter) assignExtendedPath() *Statement {
-	return Id("element").Dot("path").Op("=").Id("p").Dot("extendAndCopy").Call(Id("fieldIdentifier"), Int().Call(Id("element").Dot("ID")), Id("ElementKind"+Title(c.t.Name)), Lit(0))
+	return Id("element").Dot("Path").Op("=").Id("p").Dot("extendAndCopy").Call(Id("fieldIdentifier"), Int().Call(Id("element").Dot("ID")), Id("ElementKind"+Title(c.t.Name)), Id("ComplexID").Values())
 }
 
 func (c creatorWriter) assignJsonPath() *Statement {
-	return Id("element").Dot("Path").Op("=").Id("element").Dot("path").Dot("toJSONPath").Call()
+	return Id("element").Dot("JSONPath").Op("=").Id("element").Dot("Path").Dot("toJSONPath").Call()
 }
 
 func (c creatorWriter) setHasParent() *Statement {
-	return Id("element").Dot("HasParent").Op("=").Len(Id("element").Dot("path")).Op(">").Lit(1)
+	return Id("element").Dot("HasParent").Op("=").Len(Id("element").Dot("Path")).Op(">").Lit(1)
 }
 
 func (c creatorWriter) createChildElementCall() *Statement {
@@ -77,17 +77,33 @@ func (c creatorWriter) createChildElementCall() *Statement {
 	case c.f.HasAnyValue && c.f.HasPointerValue:
 		return Call(True(), Id("p").Dot(c.f.Name).Call())
 	case c.f.HasAnyValue:
-		return Call(True(), Id("element").Dot("path"), Id(FieldPathIdentifier(*c.f)))
+		return Call(True(), Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)))
+	case c.f.ValueType().IsBasicType:
+		return Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)), Lit(defaultValueForBasicType(c.f.ValueTypeName)))
 	default:
-		return Call(Id("element").Dot("path"), Id(FieldPathIdentifier(*c.f)))
+		return Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)))
 	}
 }
 
+func (c creatorWriter) createChildSubElement() *Statement {
+	return Id(c.f.Name+"Element").Op(":=").Id("engine").Dot("create"+Title(c.f.ValueType().Name)).Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)))
+}
+
 func (c creatorWriter) createChildElement() *Statement {
-	return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueTypeName)).Add(c.createChildElementCall())
+	switch {
+	case c.f.ValueType().IsBasicType:
+		return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(BasicTypes[c.f.ValueTypeName])).Add(c.createChildElementCall())
+	default:
+		return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueTypeName)).Add(c.createChildElementCall())
+	}
 }
 func (c creatorWriter) setChildElement() *Statement {
-	return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot(c.f.ValueTypeName).Dot("ID")
+	switch {
+	case c.f.ValueType().IsBasicType:
+		return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot("ID")
+	default:
+		return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot(c.f.ValueTypeName).Dot("ID")
+	}
 }
 
 func (c creatorWriter) setOperationKind() *Statement {
@@ -156,20 +172,25 @@ func (c generatedTypeCreatorWriter) setParentID() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) setID() *Statement {
-	return Id("element").Dot("ID").Op("=").Id(Title(c.typeName) + "ID").Call(Id("engine").Dot("GenerateID").Call())
+	switch {
+	case c.f.HasAnyValue && c.f.HasPointerValue:
+		return Id("element").Dot("ID").Op("=").Id(Title(c.typeName)+"ID").Values(Id("referencedElementID").Dot("Field"), Id("referencedElementID").Dot("ParentID"), Id("referencedElementID").Dot("ChildID"), True())
+	default:
+		return Id("element").Dot("ID").Op("=").Id(Title(c.typeName)+"ID").Values(Id("fieldIdentifier"), Int().Call(Id("parentID")), Int().Call(Id("referencedElementID")), False())
+	}
 }
 
 func (c generatedTypeCreatorWriter) assignPathCall() *Statement {
 	switch {
 	case c.f.HasAnyValue:
-		return Call(Id("fieldIdentifier"), Id("childID"), Id("childKind"), Int().Call(Id("element").Dot("ID")))
+		return Call(Id("fieldIdentifier"), Lit(0), Id("childKind"), Id("ComplexID").Call(Id("element").Dot("ID")))
 	default:
-		return Call(Id("fieldIdentifier"), Int().Call(Id("element").Dot("ID")), Id("ElementKind"+Title(c.f.ValueType().Name)), Int().Call(Id("element").Dot("ID")))
+		return Call(Id("fieldIdentifier"), Lit(0), Id("ElementKind"+Title(c.f.ValueType().Name)), Id("ComplexID").Call(Id("element").Dot("ID")))
 	}
 }
 
 func (c generatedTypeCreatorWriter) assignPath() *Statement {
-	return Id("element").Dot("path").Op("=").Id("p").Dot("extendAndCopy").Add(c.assignPathCall())
+	return Id("element").Dot("Path").Op("=").Id("p").Dot("extendAndCopy").Add(c.assignPathCall())
 }
 
 func (c generatedTypeCreatorWriter) setOperationKind() *Statement {
@@ -184,9 +205,9 @@ func (c generatedTypeCreatorWriter) createChildElement() *Statement {
 	return Id("element"+Title(c.f.ValueType().Name)).Op(":=").Id("engine").Dot("create"+Title(c.f.ValueType().Name)).Call(Id("p"), Id("fieldIdentifier"))
 }
 
-func (c generatedTypeCreatorWriter) assignChildElement() *Statement {
-	return Id("element").Dot(Title(c.f.ValueType().Name)).Op("=").Id("element" + Title(c.f.ValueType().Name)).Dot(c.f.ValueType().Name).Dot("ID")
-}
+// func (c generatedTypeCreatorWriter) assignChildElement() *Statement {
+// 	return Id("element").Dot(Title(c.f.ValueType().Name)).Op("=").Id("element" + Title(c.f.ValueType().Name)).Dot(c.f.ValueType().Name).Dot("ID")
+// }
 
 func (c generatedTypeCreatorWriter) assignElementKind() *Statement {
 	return Id("element").Dot("ElementKind").Op("=").Id("ElementKind" + Title(c.f.ValueType().Name))
