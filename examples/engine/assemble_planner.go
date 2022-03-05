@@ -34,40 +34,40 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 	// later we will loop over the paths we have collected, and "walk" them (assembleBranch)
 	// in order to assemble the tree from top to bottom (leaf nodes to root nodes)
 	for _, boolValue := range patch.BoolValue {
-		ap.updatedElementPaths[int(boolValue.ID)] = boolValue.path
+		ap.updatedElementPaths[int(boolValue.ID)] = boolValue.Path
 	}
 	for _, floatValue := range patch.FloatValue {
-		ap.updatedElementPaths[int(floatValue.ID)] = floatValue.path
+		ap.updatedElementPaths[int(floatValue.ID)] = floatValue.Path
 	}
 	for _, intValue := range patch.IntValue {
-		ap.updatedElementPaths[int(intValue.ID)] = intValue.path
+		ap.updatedElementPaths[int(intValue.ID)] = intValue.Path
 	}
 	for _, stringValue := range patch.StringValue {
-		ap.updatedElementPaths[int(stringValue.ID)] = stringValue.path
+		ap.updatedElementPaths[int(stringValue.ID)] = stringValue.Path
 	}
 	for _, attackEvent := range patch.AttackEvent {
-		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
+		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.Path
 	}
 	for _, equipmentSet := range patch.EquipmentSet {
-		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
+		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.Path
 	}
 	for _, gearScore := range patch.GearScore {
-		ap.updatedElementPaths[int(gearScore.ID)] = gearScore.path
+		ap.updatedElementPaths[int(gearScore.ID)] = gearScore.Path
 	}
 	for _, item := range patch.Item {
-		ap.updatedElementPaths[int(item.ID)] = item.path
+		ap.updatedElementPaths[int(item.ID)] = item.Path
 	}
 	for _, player := range patch.Player {
-		ap.updatedElementPaths[int(player.ID)] = player.path
+		ap.updatedElementPaths[int(player.ID)] = player.Path
 	}
 	for _, position := range patch.Position {
-		ap.updatedElementPaths[int(position.ID)] = position.path
+		ap.updatedElementPaths[int(position.ID)] = position.Path
 	}
 	for _, zone := range patch.Zone {
-		ap.updatedElementPaths[int(zone.ID)] = zone.path
+		ap.updatedElementPaths[int(zone.ID)] = zone.Path
 	}
 	for _, zoneItem := range patch.ZoneItem {
-		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.Path
 	}
 	for _, attackEventTargetRef := range patch.AttackEventTargetRef {
 		ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.path
@@ -253,40 +253,40 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 
 func (ap *assemblePlanner) fill(state *State) {
 	for _, boolValue := range state.BoolValue {
-		ap.updatedElementPaths[int(boolValue.ID)] = boolValue.path
+		ap.updatedElementPaths[int(boolValue.ID)] = boolValue.Path
 	}
 	for _, floatValue := range state.FloatValue {
-		ap.updatedElementPaths[int(floatValue.ID)] = floatValue.path
+		ap.updatedElementPaths[int(floatValue.ID)] = floatValue.Path
 	}
 	for _, intValue := range state.IntValue {
-		ap.updatedElementPaths[int(intValue.ID)] = intValue.path
+		ap.updatedElementPaths[int(intValue.ID)] = intValue.Path
 	}
 	for _, stringValue := range state.StringValue {
-		ap.updatedElementPaths[int(stringValue.ID)] = stringValue.path
+		ap.updatedElementPaths[int(stringValue.ID)] = stringValue.Path
 	}
 	for _, attackEvent := range state.AttackEvent {
-		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.path
+		ap.updatedElementPaths[int(attackEvent.ID)] = attackEvent.Path
 	}
 	for _, equipmentSet := range state.EquipmentSet {
-		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.path
+		ap.updatedElementPaths[int(equipmentSet.ID)] = equipmentSet.Path
 	}
 	for _, gearScore := range state.GearScore {
-		ap.updatedElementPaths[int(gearScore.ID)] = gearScore.path
+		ap.updatedElementPaths[int(gearScore.ID)] = gearScore.Path
 	}
 	for _, item := range state.Item {
-		ap.updatedElementPaths[int(item.ID)] = item.path
+		ap.updatedElementPaths[int(item.ID)] = item.Path
 	}
 	for _, player := range state.Player {
-		ap.updatedElementPaths[int(player.ID)] = player.path
+		ap.updatedElementPaths[int(player.ID)] = player.Path
 	}
 	for _, position := range state.Position {
-		ap.updatedElementPaths[int(position.ID)] = position.path
+		ap.updatedElementPaths[int(position.ID)] = position.Path
 	}
 	for _, zone := range state.Zone {
-		ap.updatedElementPaths[int(zone.ID)] = zone.path
+		ap.updatedElementPaths[int(zone.ID)] = zone.Path
 	}
 	for _, zoneItem := range state.ZoneItem {
-		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.path
+		ap.updatedElementPaths[int(zoneItem.ID)] = zoneItem.Path
 	}
 	for _, attackEventTargetRef := range state.AttackEventTargetRef {
 		ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.path

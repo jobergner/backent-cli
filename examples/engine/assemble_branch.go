@@ -94,7 +94,7 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindItem,
 			ReferencedDataStatus: referencedDataStatus,
-			ElementPath:          referencedElement.Path,
+			ElementPath:          referencedElement.JSONPath,
 		}
 		if element.Equipment == nil {
 			element.Equipment = make(map[ItemID]elementReference)
@@ -142,7 +142,7 @@ func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pInd
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindPlayer,
 			ReferencedDataStatus: referencedDataStatus,
-			ElementPath:          referencedElement.Path,
+			ElementPath:          referencedElement.JSONPath,
 		}
 		element.Target = &treeRef
 	}
@@ -183,7 +183,7 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindPlayer,
 			ReferencedDataStatus: referencedDataStatus,
-			ElementPath:          referencedElement.Path,
+			ElementPath:          referencedElement.JSONPath,
 		}
 		element.BoundTo = &treeRef
 	case item_gearScoreIdentifier:
@@ -296,7 +296,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindEquipmentSet,
 			ReferencedDataStatus: referencedDataStatus,
-			ElementPath:          referencedElement.Path,
+			ElementPath:          referencedElement.JSONPath,
 		}
 		if element.EquipmentSets == nil {
 			element.EquipmentSets = make(map[EquipmentSetID]elementReference)
@@ -321,7 +321,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindPlayer,
 			ReferencedDataStatus: referencedDataStatus,
-			ElementPath:          referencedElement.Path,
+			ElementPath:          referencedElement.JSONPath,
 		}
 		if element.GuildMembers == nil {
 			element.GuildMembers = make(map[PlayerID]elementReference)
@@ -361,7 +361,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 				ElementID:            ref.ReferencedElementID.ChildID,
 				ElementKind:          ElementKindPlayer,
 				ReferencedDataStatus: referencedDataStatus,
-				ElementPath:          referencedElement.Path,
+				ElementPath:          referencedElement.JSONPath,
 			}
 			element.Target = &treeRef
 		case ElementKindZoneItem:
@@ -371,7 +371,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 				ElementID:            ref.ReferencedElementID.ChildID,
 				ElementKind:          ElementKindZoneItem,
 				ReferencedDataStatus: referencedDataStatus,
-				ElementPath:          referencedElement.Path,
+				ElementPath:          referencedElement.JSONPath,
 			}
 			element.Target = &treeRef
 		}
@@ -392,7 +392,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 				ElementID:            ref.ReferencedElementID.ChildID,
 				ElementKind:          ElementKindPlayer,
 				ReferencedDataStatus: referencedDataStatus,
-				ElementPath:          referencedElement.Path,
+				ElementPath:          referencedElement.JSONPath,
 			}
 			element.TargetedBy[ref.ReferencedElementID.ChildID] = treeRef
 		case ElementKindZoneItem:
@@ -402,7 +402,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 				ElementID:            ref.ReferencedElementID.ChildID,
 				ElementKind:          ElementKindZoneItem,
 				ReferencedDataStatus: referencedDataStatus,
-				ElementPath:          referencedElement.Path,
+				ElementPath:          referencedElement.JSONPath,
 			}
 			element.TargetedBy[ref.ReferencedElementID.ChildID] = treeRef
 		}
