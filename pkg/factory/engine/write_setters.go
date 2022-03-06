@@ -8,6 +8,23 @@ import (
 )
 
 func (s *EngineFactory) writeSetters() *EngineFactory {
+
+	RangeBasicTypes(func(b BasicType) {
+		s.file.Func().Params(Id("engine").Id("*Engine")).Id("set"+Title(b.Value)).Params(Id("id").Id(Title(b.Value)+"ID"), Id("val").Id(b.Name)).Block(
+			Id(b.Value).Op(":=").Id("engine").Dot(b.Value).Call(Id("id")),
+			If(Id(b.Value).Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
+				Return(Lit(defaultValueForBasicType(b.Name))),
+			),
+			If(Id(b.Value).Dot("Value").Op("==").Id("val")).Block(
+				Return(Lit(defaultValueForBasicType(b.Name))),
+			),
+			Id(b.Value).Dot("Value").Op("=").Id("val"),
+			Id(b.Value).Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
+			Id(b.Value).Dot("Meta").Dot("sign").Call(Id(b.Value).Dot("engine").Dot("broadcastingClientID")),
+			Id("engine").Dot("Patch").Dot(Title(b.Value)).Index(Id("id")).Op("=").Id(b.Value),
+		)
+	})
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 		configType.RangeFields(func(field ast.Field) {
 
@@ -25,12 +42,7 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 				If(sw.isOperationKindDelete()).Block(
 					Return(Id(configType.Name)),
 				),
-				If(sw.valueHasNotChanged()).Block(
-					Return(Id(configType.Name)),
-				),
 				sw.setAttribute(),
-				sw.setOperationKind(),
-				sw.updateElementInPatch(),
 				Return(Id(configType.Name)),
 			)
 		})

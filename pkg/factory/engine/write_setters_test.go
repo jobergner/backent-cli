@@ -19,6 +19,10 @@ func TestWriteSetters(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			setBoolValue_Engine_func,
+			setFloatValue_Engine_func,
+			setIntValue_Engine_func,
+			setStringValue_Engine_func,
 			_SetName_EquipmentSet_func,
 			_SetLevel_GearScore_func,
 			_SetScore_GearScore_func,
