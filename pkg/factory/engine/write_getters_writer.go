@@ -166,25 +166,27 @@ func (f fieldGetterWriter) name() string {
 }
 
 func (f fieldGetterWriter) returnedType() string {
-
-	if f.f.ValueType().IsBasicType {
+	switch {
+	case f.f.ValueType().IsBasicType:
+		return f.f.ValueType().Name
+	case f.f.HasPointerValue:
+		return f.f.Parent.Name + Title(Singular(f.f.Name)) + "Ref"
+	case f.f.HasAnyValue && !f.f.HasPointerValue:
+		return anyNameByField(f.f)
+	default:
 		return f.f.ValueType().Name
 	}
-	if f.f.HasPointerValue {
-		return Title(f.f.Parent.Name) + Title(Singular(f.f.Name)) + "Ref"
-	}
-	if f.f.HasAnyValue {
-		return Title(anyNameByField(f.f))
-	}
-	return Title(f.f.ValueType().Name)
 }
 
 func (f fieldGetterWriter) returns() string {
-	returnedLiteral := f.returnedType()
-	if f.f.HasSliceValue {
-		return "[]" + returnedLiteral
+	switch {
+	case f.f.ValueType().IsBasicType:
+		return f.f.ValueString
+	case f.f.HasSliceValue:
+		return "[]" + Title(f.returnedType())
+	default:
+		return Title(f.returnedType())
 	}
-	return returnedLiteral
 }
 
 func (f fieldGetterWriter) reassignElement() *Statement {
@@ -192,24 +194,20 @@ func (f fieldGetterWriter) reassignElement() *Statement {
 }
 
 func (f fieldGetterWriter) declareSliceOfElements() *Statement {
-	returnedType := f.returnedType()
-	if f.f.HasSliceValue {
-		returnedType = "[]" + returnedType
-	}
-	return Var().Id(f.f.Name).Id(returnedType)
+	return Var().Id(f.f.Name).Id(f.returns())
 }
 
 func (f fieldGetterWriter) loopedElementIdentifier() string {
-	if f.f.ValueType().IsBasicType {
-		return "element"
-	}
-	if f.f.HasPointerValue {
+	switch {
+	case f.f.ValueType().IsBasicType:
+		return BasicTypes[f.f.ValueTypeName] + "ID"
+	case f.f.HasPointerValue:
 		return "refID"
-	}
-	if f.f.HasAnyValue {
+	case f.f.HasAnyValue && !f.f.HasPointerValue:
 		return anyNameByField(f.f) + "ID"
+	default:
+		return f.f.ValueType().Name + "ID"
 	}
-	return f.f.ValueType().Name + "ID"
 }
 
 func (f fieldGetterWriter) loopConditions() *Statement {
@@ -218,14 +216,14 @@ func (f fieldGetterWriter) loopConditions() *Statement {
 }
 
 func (f fieldGetterWriter) appendedItem() *Statement {
-	if f.f.ValueType().IsBasicType {
-		return Id(f.loopedElementIdentifier())
+	switch {
+	case f.f.ValueType().IsBasicType:
+		return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(BasicTypes[f.f.ValueTypeName]).Call(Id(f.loopedElementIdentifier())).Dot("Value")
+	case f.f.HasAnyValue || f.f.HasPointerValue:
+		return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(f.returnedType()).Call(Id(f.loopedElementIdentifier()))
+	default:
+		return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(Title(f.returnedType())).Call(Id(f.loopedElementIdentifier()))
 	}
-	returnedType := Lower(f.returnedType())
-	if !f.f.HasPointerValue && !f.f.HasAnyValue {
-		returnedType = Title(returnedType)
-	}
-	return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(returnedType).Call(Id(f.loopedElementIdentifier()))
 }
 
 func (f fieldGetterWriter) appendElement() *Statement {
@@ -236,8 +234,12 @@ func (f fieldGetterWriter) returnSliceOfType() *Statement {
 	return Id(f.f.Name)
 }
 
+func (f fieldGetterWriter) element() *Statement {
+	return Id(f.f.Parent.Name).Dot(f.f.Parent.Name)
+}
+
 func (f fieldGetterWriter) returnBasicType() *Statement {
-	return Id(f.t.Name).Dot(f.t.Name).Dot(Title(f.f.Name))
+	return f.element().Dot("engine").Dot(BasicTypes[f.f.ValueTypeName]).Call(f.element().Dot(Title(f.f.Name))).Dot("Value")
 }
 
 func (f fieldGetterWriter) returnNamedType() *Statement {
@@ -250,10 +252,12 @@ func (f fieldGetterWriter) returnNamedType() *Statement {
 }
 
 func (f fieldGetterWriter) returnSingleType() *Statement {
-	if f.f.ValueType().IsBasicType {
+	switch {
+	case f.f.ValueType().IsBasicType:
 		return f.returnBasicType()
+	default:
+		return f.returnNamedType()
 	}
-	return f.returnNamedType()
 }
 
 type pathGetterWriter struct {
@@ -269,7 +273,7 @@ func (p pathGetterWriter) receiverParams() *Statement {
 }
 
 func (p pathGetterWriter) returnPath() *Statement {
-	return Id(p.receiverName()).Dot(p.t.Name).Dot("Path")
+	return Id(p.receiverName()).Dot(p.t.Name).Dot("JSONPath")
 }
 
 type parentGetter struct {
@@ -306,11 +310,11 @@ func (p parentGetter) emptyReturn() *Statement {
 }
 
 func (p parentGetter) declareParentSeg() *Statement {
-	return Id("parentSeg").Op(":=").Add(p.element()).Dot("path").Index(Len(p.element().Dot("path")).Op("-").Lit(2))
+	return Id("parentSeg").Op(":=").Add(p.element()).Dot("Path").Index(Len(p.element().Dot("Path")).Op("-").Lit(2))
 }
 
 func (p parentGetter) getParent() *Statement {
-	return p.engine().Dot(Title(p.parent.Name)).Call(Id(Title(p.parent.Name) + "ID").Call(Id("parentSeg").Dot("id")))
+	return p.engine().Dot(Title(p.parent.Name)).Call(Id(Title(p.parent.Name) + "ID").Call(Id("parentSeg").Dot("ID")))
 }
 
 type parentKindGetter struct {
@@ -330,7 +334,7 @@ func (p parentKindGetter) element() *Statement {
 }
 
 func (p parentKindGetter) path() *Statement {
-	return p.element().Dot("path")
+	return p.element().Dot("Path")
 }
 
 func (p parentKindGetter) hasNoParent() *Statement {
@@ -338,5 +342,5 @@ func (p parentKindGetter) hasNoParent() *Statement {
 }
 
 func (p parentKindGetter) parentKind() *Statement {
-	return p.path().Index(Len(p.path()).Op("-").Lit(2)).Dot("kind")
+	return p.path().Index(Len(p.path()).Op("-").Lit(2)).Dot("Kind")
 }

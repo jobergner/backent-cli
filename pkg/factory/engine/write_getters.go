@@ -8,6 +8,17 @@ import (
 )
 
 func (s *EngineFactory) writeGetters() *EngineFactory {
+
+	RangeBasicTypes(func(b BasicType) {
+		s.file.Func().Params(Id("engine").Id("*Engine")).Id(b.Value).Params(Id(b.Value+"ID").Id(Title(b.Value)+"ID")).Id(b.Value).Block(
+			List(Id("patching"+Title(b.Value)), Id("ok")).Op(":=").Id("engine").Dot("Patch").Dot(Title(b.Value)).Index(Id(b.Value+"ID")),
+			If(Id("ok")).Block(
+				Return(Id("patching"+Title(b.Value))),
+			),
+			Return(Id("engine").Dot("State").Dot(Title(b.Value)).Index(Id(b.Value+"ID"))),
+		)
+	})
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		ex := existsGetterWriter{
@@ -172,7 +183,7 @@ func (s *EngineFactory) writeGetters() *EngineFactory {
 		field.RangeValueTypes(func(valueType *ast.ConfigType) {
 			s.file.Func().Params(Id("_"+t.name()).Id(Title(t.name()))).Id(Title(valueType.Name)).Params().Id(Title(valueType.Name)).Block(
 				Id(t.name()).Op(":=").Id("_"+t.name()).Dot(t.name()).Dot("engine").Dot(t.name()).Call(Id("_"+t.name()).Dot(t.name()).Dot("ID")),
-				Return(Id(t.name()).Dot(t.name()).Dot("engine").Dot(Title(valueType.Name)).Call(Id(t.name()).Dot(t.name()).Dot(Title(valueType.Name)))),
+				Return(Id(t.name()).Dot(t.name()).Dot("engine").Dot(Title(valueType.Name)).Call(Id(Title(valueType.Name+"ID")).Call(Id(t.name()).Dot(t.name()).Dot("ChildID")))),
 			)
 		})
 	})

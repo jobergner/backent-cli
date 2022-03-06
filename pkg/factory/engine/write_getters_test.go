@@ -19,6 +19,10 @@ func TestWriteGetters(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			boolValue_Engine_func,
+			floatValue_Engine_func,
+			intValue_Engine_func,
+			stringValue_Engine_func,
 			_Exists_AttackEvent_func,
 			_QueryAttackEvents_Engine_func,
 			_EveryAttackEvent_Engine_func,

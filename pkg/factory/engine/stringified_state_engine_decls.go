@@ -2335,8 +2335,7 @@ const _BoundTo_Item_func string = `func (_item Item) BoundTo() ItemBoundToRef {
 
 const _Origin_Item_func string = `func (_item Item) Origin() AnyOfPlayer_Position {
 	item := _item.item.engine.Item(_item.item.ID)
-	x := item.item.engine.anyOfPlayer_Position(item.item.Origin)
-	return x
+	return item.item.engine.anyOfPlayer_Position(item.item.Origin)
 }`
 
 const _QueryAttackEvents_Engine_func string = `func (engine *Engine) QueryAttackEvents(matcher func(AttackEvent) bool) []AttackEvent {
