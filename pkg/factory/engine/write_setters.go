@@ -13,10 +13,10 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 		s.file.Func().Params(Id("engine").Id("*Engine")).Id("set"+Title(b.Value)).Params(Id("id").Id(Title(b.Value)+"ID"), Id("val").Id(b.Name)).Block(
 			Id(b.Value).Op(":=").Id("engine").Dot(b.Value).Call(Id("id")),
 			If(Id(b.Value).Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
-				Return(Lit(defaultValueForBasicType(b.Name))),
+				Return(),
 			),
 			If(Id(b.Value).Dot("Value").Op("==").Id("val")).Block(
-				Return(Lit(defaultValueForBasicType(b.Name))),
+				Return(),
 			),
 			Id(b.Value).Dot("Value").Op("=").Id("val"),
 			Id(b.Value).Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
@@ -74,10 +74,10 @@ func (s *EngineFactory) writeSetters() *EngineFactory {
 					srfw.deleteExistingRef(),
 				),
 				OnlyIf(field.HasAnyValue, srfw.createAnyContainer()),
-				OnlyIf(field.HasAnyValue, srfw.setAnyContainer()),
 				srfw.createNewRef(),
 				srfw.setNewRef(),
 				srfw.setOperationKind(),
+				srfw.signElement(),
 				srfw.setItemInPatch(),
 				Return(Id(field.Parent.Name)),
 			)

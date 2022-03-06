@@ -625,6 +625,9 @@ const assembleItemPath_Engine_func string = `func (engine *Engine) assembleItemP
 				child = &player{ID: PlayerID(nextSeg.ID)}
 			}
 			engine.assemblePlayerPath(child, p, pIndex+1, includedElements)
+			if child.OperationKind == OperationKindDelete && element.Origin != nil {
+				break
+			}
 			element.Origin = child
 		case ElementKindPosition:
 			child, ok := element.Origin.(*position)
@@ -632,6 +635,9 @@ const assembleItemPath_Engine_func string = `func (engine *Engine) assembleItemP
 				child = &position{ID: PositionID(nextSeg.ID)}
 			}
 			engine.assemblePositionPath(child, p, pIndex+1, includedElements)
+			if child.OperationKind == OperationKindDelete && element.Origin != nil {
+				break
+			}
 			element.Origin = child
 		}
 	}
@@ -4270,64 +4276,60 @@ const _RemoveEquipment_EquipmentSet_func string = `func (_equipmentSet Equipment
 	return equipmentSet
 }`
 
-const setBoolValue_Engine_func string = `func (engine *Engine) setBoolValue(id BoolValueID, val bool) bool {
+const setBoolValue_Engine_func string = `func (engine *Engine) setBoolValue(id BoolValueID, val bool) {
 	boolValue := engine.boolValue(id)
 	if boolValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if boolValue.Value == val {
-		return false
+		return
 	}
 	boolValue.Value = val
 	boolValue.OperationKind = OperationKindUpdate
 	boolValue.Meta.sign(boolValue.engine.broadcastingClientID)
 	engine.Patch.BoolValue[id] = boolValue
-	return true
 }`
 
-const setFloatValue_Engine_func string = `func (engine *Engine) setFloatValue(id FloatValueID, val float64) bool {
+const setFloatValue_Engine_func string = `func (engine *Engine) setFloatValue(id FloatValueID, val float64) {
 	floatValue := engine.floatValue(id)
 	if floatValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if floatValue.Value == val {
-		return false
+		return
 	}
 	floatValue.Value = val
 	floatValue.OperationKind = OperationKindUpdate
 	floatValue.Meta.sign(floatValue.engine.broadcastingClientID)
 	engine.Patch.FloatValue[id] = floatValue
-	return true
 }`
 
-const setIntValue_Engine_func string = `func (engine *Engine) setIntValue(id IntValueID, val int64) bool {
+const setIntValue_Engine_func string = `func (engine *Engine) setIntValue(id IntValueID, val int64) {
 	intValue := engine.intValue(id)
 	if intValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if intValue.Value == val {
-		return false
+		return
 	}
 	intValue.Value = val
 	intValue.OperationKind = OperationKindUpdate
 	intValue.Meta.sign(intValue.engine.broadcastingClientID)
 	engine.Patch.IntValue[id] = intValue
-	return true
 }`
 
-const setStringValue_Engine_func string = `func (engine *Engine) setStringValue(id StringValueID, val string) bool {
+const setStringValue_Engine_func string = `func (engine *Engine) setStringValue(id StringValueID, val string) {
 	stringValue := engine.stringValue(id)
 	if stringValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if stringValue.Value == val {
-		return false
+		return
 	}
 	stringValue.Value = val
 	stringValue.OperationKind = OperationKindUpdate
 	stringValue.Meta.sign(stringValue.engine.broadcastingClientID)
 	engine.Patch.StringValue[id] = stringValue
-	return true
 }`
 
 const _SetLevel_GearScore_func string = `func (_gearScore GearScore) SetLevel(newLevel int64) GearScore {
