@@ -135,6 +135,8 @@ func (_any anyOfPlayer_PositionCore) bePosition(positionID PositionID, deleteCur
 		item.Origin = any.ID
 		item.Meta.sign(item.engine.broadcastingClientID)
 		item.engine.Patch.Item[item.ID] = item
+		// we do not set OperationKindUpdate on purpose as it technicaly has not any updated values
+		// however it still has to be put in patch
 	}
 	any.Meta.sign(any.engine.broadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
