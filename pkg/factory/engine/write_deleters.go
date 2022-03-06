@@ -37,18 +37,16 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			}),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				d.f = &field
-				if field.ValueType().IsBasicType {
-					return Empty()
-				}
 				if field.HasSliceValue {
 					return For(d.loopConditions().Block(
 						d.deleteElementInLoop(),
 					))
 				}
-				return d.deleteElement()
+				return d.deleteChild()
 			}),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
+				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),
@@ -70,6 +68,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			OnlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
+				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),
@@ -93,6 +92,7 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 			),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
+				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),

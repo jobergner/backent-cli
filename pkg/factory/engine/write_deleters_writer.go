@@ -72,6 +72,10 @@ func (d deleteTypeWriter) setOperationKind() *Statement {
 	return Id(d.t.Name).Dot("OperationKind").Op("=").Id("OperationKindDelete")
 }
 
+func (d deleteTypeWriter) signElement() *Statement {
+	return Id(d.t.Name).Dot("Meta").Dot("sign").Call(Id(d.t.Name).Dot("engine").Dot("broadcastingClientID"))
+}
+
 func (d deleteTypeWriter) updateElementInPatch() *Statement {
 	return Id("engine").Dot("Patch").Dot(Title(d.t.Name)).Index(Id(d.t.Name).Dot("ID")).Op("=").Id(d.t.Name)
 }
@@ -85,19 +89,33 @@ func (d deleteTypeWriter) loopConditions() *Statement {
 }
 
 func (d deleteTypeWriter) deleteElementInLoop() *Statement {
-	deleteFunc := Id("engine").Dot("delete" + Title(d.f.ValueTypeName))
+	deleteFunc := Id("engine").Dot(d.deleteChildMethodName())
 	if !d.f.HasPointerValue && d.f.HasAnyValue {
 		return deleteFunc.Call(Id(d.loopedElementIdentifier()), True())
 	}
 	return deleteFunc.Call(Id(d.loopedElementIdentifier()))
 }
 
-func (d deleteTypeWriter) deleteElement() *Statement {
-	deleteFunc := Id("engine").Dot("delete" + Title(d.f.ValueTypeName))
-	if !d.f.HasPointerValue && d.f.HasAnyValue {
-		return deleteFunc.Call(Id(d.t.Name).Dot(Title(d.f.Name)), True())
+func (d deleteTypeWriter) deleteChildCall() *Statement {
+	switch {
+	case !d.f.HasPointerValue && d.f.HasAnyValue:
+		return Call(Id(d.t.Name).Dot(Title(d.f.Name)), True())
+	default:
+		return Call(Id(d.t.Name).Dot(Title(d.f.Name)))
 	}
-	return deleteFunc.Call(Id(d.t.Name).Dot(Title(d.f.Name)))
+}
+
+func (d deleteTypeWriter) deleteChildMethodName() string {
+	switch {
+	case d.f.ValueType().IsBasicType:
+		return "delete" + Title(BasicTypes[d.f.ValueTypeName])
+	default:
+		return "delete" + Title(d.f.ValueTypeName)
+	}
+}
+
+func (d deleteTypeWriter) deleteChild() *Statement {
+	return Id("engine").Dot(d.deleteChildMethodName()).Add(d.deleteChildCall())
 }
 
 func (d deleteTypeWriter) existsInState() *Statement {
@@ -155,6 +173,10 @@ func (d deleteGeneratedTypeWriter) deleteAnyContainer() *Statement {
 
 func (d deleteGeneratedTypeWriter) setOperationKind() *Statement {
 	return Id(d.valueTypeName()).Dot("OperationKind").Op("=").Id("OperationKindDelete")
+}
+
+func (d deleteGeneratedTypeWriter) signElement() *Statement {
+	return Id(d.valueTypeName()).Dot("Meta").Dot("sign").Call(Id(d.valueTypeName()).Dot("engine").Dot("broadcastingClientID"))
 }
 
 func (d deleteGeneratedTypeWriter) updateElementInPatch() *Statement {
