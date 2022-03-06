@@ -43,12 +43,8 @@ func (s setterWriter) isOperationKindDelete() *Statement {
 	return Id(s.t.Name).Dot(s.t.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
-func (s setterWriter) valueHasNotChanged() *Statement {
-	return Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)).Op("==").Id(s.newValueParam())
-}
-
 func (s setterWriter) setAttribute() *Statement {
-	return Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)).Op("=").Id(s.newValueParam())
+	return Id(s.t.Name).Dot(s.t.Name).Dot("engine").Dot("set"+Title(BasicTypes[s.f.ValueTypeName])).Call(Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)), Id(s.newValueParam()))
 }
 
 func (s setterWriter) setOperationKind() *Statement {
