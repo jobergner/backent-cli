@@ -74,12 +74,13 @@ func (c creatorWriter) setHasParent() *Statement {
 
 func (c creatorWriter) createChildElementCall() *Statement {
 	switch {
-	case c.f.HasAnyValue && c.f.HasPointerValue:
-		return Call(True(), Id("p").Dot(c.f.Name).Call())
-	case c.f.HasAnyValue:
-		return Call(True(), Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)))
 	case c.f.ValueType().IsBasicType:
 		return Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)), Lit(defaultValueForBasicType(c.f.ValueTypeName)))
+	case c.f.HasAnyValue && c.f.HasPointerValue:
+		return Call(True(), Id("p").Dot(c.f.Name).Call())
+	case c.f.HasAnyValue && !c.f.HasPointerValue:
+		// (int(element.ID), int(originElement.player.ID), ElementKindPlayer, element.Path, item_originIdentifier)
+		return Call(Int().Call(Id("element").Dot("ID")), Int().Call(Id(c.f.Name+"Element").Dot(c.f.ValueType().Name).Dot("ID")), Id("ElementKind"+Title(c.f.ValueType().Name)), Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)))
 	default:
 		return Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)))
 	}
@@ -171,13 +172,21 @@ func (c generatedTypeCreatorWriter) setParentID() *Statement {
 	return Id("element").Dot("ParentID").Op("=").Id("parentID")
 }
 
-func (c generatedTypeCreatorWriter) setID() *Statement {
+func (c generatedTypeCreatorWriter) setIDRef() *Statement {
 	switch {
-	case c.f.HasAnyValue && c.f.HasPointerValue:
+	case c.f.HasAnyValue:
 		return Id("element").Dot("ID").Op("=").Id(Title(c.typeName)+"ID").Values(Id("referencedElementID").Dot("Field"), Id("referencedElementID").Dot("ParentID"), Id("referencedElementID").Dot("ChildID"), True())
 	default:
 		return Id("element").Dot("ID").Op("=").Id(Title(c.typeName)+"ID").Values(Id("fieldIdentifier"), Int().Call(Id("parentID")), Int().Call(Id("referencedElementID")), False())
 	}
+}
+
+func (c generatedTypeCreatorWriter) setIDAny() *Statement {
+	return Id("element").Dot("ID").Op("=").Id(Title(c.typeName)+"ID").Values(Id("fieldIdentifier"), Id("parentID"), Id("childID"), False())
+}
+
+func (c generatedTypeCreatorWriter) setChildID() *Statement {
+	return Id("element").Dot("ChildID").Op("=").Id("childID")
 }
 
 func (c generatedTypeCreatorWriter) assignPathCall() *Statement {
@@ -210,7 +219,7 @@ func (c generatedTypeCreatorWriter) createChildElement() *Statement {
 // }
 
 func (c generatedTypeCreatorWriter) assignElementKind() *Statement {
-	return Id("element").Dot("ElementKind").Op("=").Id("ElementKind" + Title(c.f.ValueType().Name))
+	return Id("element").Dot("ElementKind").Op("=").Id("childKind")
 }
 
 func (c generatedTypeCreatorWriter) setChildElementPath() *Statement {
