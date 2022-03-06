@@ -177,6 +177,9 @@ func (a assembleBranchWriter) assembleNonPointerNonSliceAnyValue() *Statement {
 						Id("child").Op("=").Id("&"+a.v.Name).Values(Dict{Id("ID"): a.valueTypeID().Call(Id("nextSeg").Dot("ID"))}),
 					),
 					Id("engine").Dot("assemble"+Title(a.v.Name)+"Path").Call(Id("child"), Id("p"), Id("pIndex").Op("+").Lit(1), Id("includedElements")),
+					If(Id("child").Dot("OperationKind").Op("==").Id("OperationKindDelete").Op("&&").Id("element").Dot(Title(a.f.Name)).Op("!=").Nil()).Block(
+						Break(),
+					),
 					a.field().Op("=").Id("child"),
 				)
 			}),
