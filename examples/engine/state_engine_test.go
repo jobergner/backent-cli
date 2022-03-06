@@ -469,6 +469,44 @@ func TestTree(t *testing.T) {
 			false,
 		)
 	})
+	t.Run("assembles correctly when using be<Type> method after state update", func(t *testing.T) {
+		newTreeTest(
+			func(se *Engine, expectedTree *Tree) {
+				itm := se.CreateItem()
+				se.UpdateState()
+
+				// TODO: how do I solve this?
+				itm.Origin().BePosition()
+
+				expectedTree.Item = map[ItemID]item{
+					itm.ID(): {
+						ID:            itm.ID(),
+						OperationKind: OperationKindUnchanged,
+						Origin: &player{
+							ID:            itm.Origin().Player().ID(),
+							OperationKind: OperationKindUpdate,
+							GearScore: &gearScore{
+								ID:            itm.Origin().Player().GearScore().ID(),
+								Level:         new(int64),
+								Score:         new(int64),
+								OperationKind: OperationKindUpdate,
+							},
+							Position: &position{
+								ID:            itm.Origin().Player().Position().ID(),
+								X:             new(float64),
+								Y:             new(float64),
+								OperationKind: OperationKindUpdate,
+							},
+						},
+					},
+				}
+			},
+			func(errText string) {
+				t.Errorf(errText)
+			},
+			false,
+		)
+	})
 	t.Run("assembles tree based on changed GearScore", func(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
