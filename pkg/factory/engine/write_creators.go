@@ -58,7 +58,7 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			c.assignEngine(),
 			c.setReferencedElementID(),
 			c.setParentID(),
-			c.setID(),
+			c.setIDRef(),
 			c.assignPath(),
 			c.setOperationKind(),
 			c.assignElementToPatch(),
@@ -72,10 +72,11 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 			typeName: anyNameByField(field),
 		}
 
-		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("setDefaultValue").Bool(), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(anyNameByField(field))).Block(
+		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("parentID").Int(), Id("childID").Int(), Id("childKind").Id("ElementKind"), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(anyNameByField(field))).Block(
 			c.declareElement(),
 			c.assignEngine(),
-			c.setID(),
+			c.setIDAny(),
+			c.setChildID(),
 			c.assignElementKind(),
 			c.setOperationKind(),
 			c.setChildElementPath(),
