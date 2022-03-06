@@ -1,63 +1,59 @@
 package state
 
-func (engine *Engine) setBoolValue(id BoolValueID, val bool) bool {
+func (engine *Engine) setBoolValue(id BoolValueID, val bool) {
 	boolValue := engine.boolValue(id)
 	if boolValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if boolValue.Value == val {
-		return false
+		return
 	}
 	boolValue.Value = val
 	boolValue.OperationKind = OperationKindUpdate
 	boolValue.Meta.sign(boolValue.engine.broadcastingClientID)
 	engine.Patch.BoolValue[id] = boolValue
-	return true
 }
 
-func (engine *Engine) setFloatValue(id FloatValueID, val float64) bool {
+func (engine *Engine) setFloatValue(id FloatValueID, val float64) {
 	floatValue := engine.floatValue(id)
 	if floatValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if floatValue.Value == val {
-		return false
+		return
 	}
 	floatValue.Value = val
 	floatValue.OperationKind = OperationKindUpdate
 	floatValue.Meta.sign(floatValue.engine.broadcastingClientID)
 	engine.Patch.FloatValue[id] = floatValue
-	return true
 }
 
-func (engine *Engine) setIntValue(id IntValueID, val int64) bool {
+func (engine *Engine) setIntValue(id IntValueID, val int64) {
 	intValue := engine.intValue(id)
 	if intValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if intValue.Value == val {
-		return false
+		return
 	}
 	intValue.Value = val
 	intValue.OperationKind = OperationKindUpdate
 	intValue.Meta.sign(intValue.engine.broadcastingClientID)
 	engine.Patch.IntValue[id] = intValue
-	return true
 }
 
-func (engine *Engine) setStringValue(id StringValueID, val string) bool {
+func (engine *Engine) setStringValue(id StringValueID, val string) {
 	stringValue := engine.stringValue(id)
 	if stringValue.OperationKind == OperationKindDelete {
-		return false
+		return
 	}
 	if stringValue.Value == val {
-		return false
+		return
 	}
 	stringValue.Value = val
 	stringValue.OperationKind = OperationKindUpdate
 	stringValue.Meta.sign(stringValue.engine.broadcastingClientID)
 	engine.Patch.StringValue[id] = stringValue
-	return true
 }
 
 func (_gearScore GearScore) SetLevel(newLevel int64) GearScore {
