@@ -475,28 +475,17 @@ func TestTree(t *testing.T) {
 				itm := se.CreateItem()
 				se.UpdateState()
 
-				// TODO: how do I solve this?
 				itm.Origin().BePosition()
 
 				expectedTree.Item = map[ItemID]item{
 					itm.ID(): {
 						ID:            itm.ID(),
 						OperationKind: OperationKindUnchanged,
-						Origin: &player{
-							ID:            itm.Origin().Player().ID(),
+						Origin: &position{
+							ID:            itm.Origin().Position().ID(),
+							X:             new(float64),
+							Y:             new(float64),
 							OperationKind: OperationKindUpdate,
-							GearScore: &gearScore{
-								ID:            itm.Origin().Player().GearScore().ID(),
-								Level:         new(int64),
-								Score:         new(int64),
-								OperationKind: OperationKindUpdate,
-							},
-							Position: &position{
-								ID:            itm.Origin().Player().Position().ID(),
-								X:             new(float64),
-								Y:             new(float64),
-								OperationKind: OperationKindUpdate,
-							},
 						},
 					},
 				}

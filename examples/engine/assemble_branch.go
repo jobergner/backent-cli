@@ -205,6 +205,9 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 				child = &player{ID: PlayerID(nextSeg.ID)}
 			}
 			engine.assemblePlayerPath(child, p, pIndex+1, includedElements)
+			if child.OperationKind == OperationKindDelete && element.Origin != nil {
+				break
+			}
 			element.Origin = child
 		case ElementKindPosition:
 			child, ok := element.Origin.(*position)
@@ -212,6 +215,9 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 				child = &position{ID: PositionID(nextSeg.ID)}
 			}
 			engine.assemblePositionPath(child, p, pIndex+1, includedElements)
+			if child.OperationKind == OperationKindDelete && element.Origin != nil {
+				break
+			}
 			element.Origin = child
 		}
 	}
