@@ -153,6 +153,11 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, "", se.State.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
 		assert.Equal(t, false, se.State.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
 	})
+	t.Run("does not panic when getting parent of element without parent", func(t *testing.T) {
+		se := newEngine()
+		itm := se.CreateItem()
+		itm.ParentPlayer()
+	})
 }
 
 func TestReferences(t *testing.T) {
