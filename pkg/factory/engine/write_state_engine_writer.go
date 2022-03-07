@@ -1,14 +1,15 @@
 package engine
 
 import (
+	"github.com/jobergner/backent-cli/pkg/ast"
 	. "github.com/jobergner/backent-cli/pkg/factory/utils"
 
 	. "github.com/dave/jennifer/jen"
 )
 
 type updateStateWriter struct {
-	typeName    func() string
-	emptyEvents func() *Statement
+	typeName func() string
+	t        *ast.ConfigType
 }
 
 func (u updateStateWriter) receiverParams() *Statement {
@@ -29,6 +30,23 @@ func (u updateStateWriter) deleteElement() *Statement {
 
 func (u updateStateWriter) setOperationKindUnchanged() *Statement {
 	return Id(u.typeName()).Dot("OperationKind").Op("=").Id("OperationKindUnchanged")
+}
+
+func (u updateStateWriter) unsignElement() *Statement {
+	return Id(u.typeName()).Dot("Meta").Dot("unsign").Call()
+}
+
+func (u updateStateWriter) emptyEvents() *Statement {
+	if u.t == nil {
+		return Empty()
+	}
+
+	return ForEachFieldInType(*u.t, func(field ast.Field) *Statement {
+		if !field.ValueType().IsEvent {
+			return Empty()
+		}
+		return Id(u.typeName()).Dot(Title(field.Name)).Op("=").Id(u.typeName()).Dot(Title(field.Name)).Index(Empty(), Lit(0))
+	})
 }
 
 func (u updateStateWriter) updateElement() *Statement {
