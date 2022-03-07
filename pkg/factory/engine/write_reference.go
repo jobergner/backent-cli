@@ -33,6 +33,7 @@ func (s *EngineFactory) writeReference() *EngineFactory {
 				),
 				r.setRefIDInParent(),
 				r.setParentOperationKind(),
+				r.signParent(),
 				r.updateParentInPatch(),
 			)
 		}

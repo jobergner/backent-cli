@@ -28,7 +28,7 @@ func (r referenceWriter) isOperationKindDelete() *Statement {
 }
 
 func (r referenceWriter) returnIsSet() *Statement {
-	return Id("ref").Dot(r.f.ValueTypeName).Dot("ID").Op("!=").Lit(0)
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("ID").Op("!=").Id(Title(r.f.ValueTypeName) + "ID").Values()
 }
 
 func (r referenceWriter) deleteSelf() *Statement {
@@ -44,11 +44,15 @@ func (r referenceWriter) parentIsDeleted() *Statement {
 }
 
 func (r referenceWriter) setRefIDInParent() *Statement {
-	return Id("parent").Dot(Title(r.f.Name)).Op("=").Lit(0)
+	return Id("parent").Dot(Title(r.f.Name)).Op("=").Id(Title(r.f.ValueTypeName) + "ID").Values()
 }
 
 func (r referenceWriter) setParentOperationKind() *Statement {
 	return Id("parent").Dot("OperationKind").Op("=").Id("OperationKindUpdate")
+}
+
+func (r referenceWriter) signParent() *Statement {
+	return Id("parent").Dot("Meta").Dot("sign").Call(Id("parent").Dot("engine").Dot("broadcastingClientID"))
 }
 
 func (r referenceWriter) updateParentInPatch() *Statement {
@@ -106,10 +110,12 @@ func (d dereferenceWriter) params() *Statement {
 }
 
 func (d dereferenceWriter) dereferenceCondition() *Statement {
-	if d.f.HasAnyValue {
-		return Id("anyContainer").Dot(anyNameByField(d.f)).Dot(Title(d.v.Name)).Op("==").Id(d.v.Name + "ID")
+	switch {
+	case d.f.HasAnyValue:
+		return Id(Title(d.v.Name) + "ID").Call(Id("anyContainer").Dot(anyNameByField(d.f)).Dot("ChildID")).Op("==").Id(d.v.Name + "ID")
+	default:
+		return Id("ref").Dot(d.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(d.v.Name + "ID")
 	}
-	return Id("ref").Dot(d.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(d.v.Name + "ID")
 }
 
 func (d dereferenceWriter) allIdsSliceName() string {
