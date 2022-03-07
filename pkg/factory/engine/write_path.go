@@ -9,20 +9,39 @@ import (
 
 func (s *EngineFactory) writeIdentifiers() *EngineFactory {
 
-	s.file.Type().Id("treeFieldIdentifier").String()
+	s.file.Type().Id("treeFieldIdentifier").Int()
+
+	var identifierValue = 0
 
 	s.file.Const().Defs(
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-			return Id(configType.Name + "Identifier").Id("treeFieldIdentifier").Op("=").Lit(configType.Name)
+			identifierValue = identifierValue + 1
+			return Id(configType.Name + "Identifier").Id("treeFieldIdentifier").Op("=").Lit(identifierValue)
 		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			return ForEachFieldInType(configType, func(f ast.Field) *Statement {
-				if f.ValueType().IsBasicType {
-					return Empty()
-				}
-				return Id(FieldPathIdentifier(f)).Id("treeFieldIdentifier").Op("=").Lit(configType.Name + "_" + f.Name)
+				identifierValue = identifierValue + 1
+				return Id(FieldPathIdentifier(f)).Id("treeFieldIdentifier").Op("=").Lit(identifierValue)
 			})
 		}),
+	)
+
+	s.file.Func().Params(Id("t").Id("treeFieldIdentifier")).Id("toString").Params().String().Block(
+		Switch(Id("t")).Block(
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				return Case(Id(configType.Name + "Identifier")).Block(
+					Return(Lit(configType.Name)),
+				)
+			}),
+			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+				return ForEachFieldInType(configType, func(f ast.Field) *Statement {
+					return Case(Id(FieldPathIdentifier(f))).Block(
+						Return(Lit(f.Name)),
+					)
+				})
+			}),
+		),
+		Panic(Id("fmt.Sprintf(\"no string found for identifier <%d>\", t)")),
 	)
 
 	return s
@@ -40,10 +59,10 @@ func writePathSegmentMethod(file *File, name string) {
 func (s *EngineFactory) writePath() *EngineFactory {
 
 	s.file.Type().Id("segment").Struct(
-		Id("id").Int(),
-		Id("identifier").Id("treeFieldIdentifier"),
-		Id("kind").Id("ElementKind"),
-		Id("refID").Int(),
+		Id("ID").Int().Add(Id(metaFieldTag("id"))),
+		Id("Identifier").Id("treeFieldIdentifier").Add(Id(metaFieldTag("identifier"))),
+		Id("Kind").Id("ElementKind").Add(Id(metaFieldTag("kind"))),
+		Id("RefID").Id("ComplexID").Add(Id(metaFieldTag("refID"))),
 	)
 
 	s.file.Type().Id("path").Index().Id("segment")
@@ -52,7 +71,7 @@ func (s *EngineFactory) writePath() *EngineFactory {
 		Return(Make(Id("path"), Lit(0))),
 	)
 
-	s.file.Func().Params(Id("p").Id("path")).Id("extendAndCopy").Params(Id("fieldIdentifier").Id("treeFieldIdentifier"), Id("id").Int(), Id("kind").Id("ElementKind"), Id("refID").Int()).Id("path").Block(
+	s.file.Func().Params(Id("p").Id("path")).Id("extendAndCopy").Params(Id("fieldIdentifier").Id("treeFieldIdentifier"), Id("id").Int(), Id("kind").Id("ElementKind"), Id("refID").Id("ComplexID")).Id("path").Block(
 		Id("newPath").Op(":=").Make(Id("path"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
 		Copy(Id("newPath"), Id("p")),
 		Id("newPath").Op("=").Append(Id("newPath"), Id("segment").Values(Id("id"), Id("fieldIdentifier"), Id("kind"), Id("refID"))),
@@ -62,33 +81,12 @@ func (s *EngineFactory) writePath() *EngineFactory {
 	s.file.Func().Params(Id("p").Id("path")).Id("toJSONPath").Params().String().Block(
 		Id("jsonPath").Op(":=").Lit("$"),
 		For(List(Id("_"), Id("seg")).Op(":=").Range().Id("p")).Block(
-			Id("jsonPath").Op("+=").Lit(".").Op("+").Id("pathIdentifierToString").Call(Id("seg").Dot("identifier")),
-			If(Id("isSliceFieldIdentifier").Call(Id("seg").Dot("identifier"))).Block(
-				Id("jsonPath").Op("+=").Lit("[").Op("+").Id("strconv").Dot("Itoa").Call(Id("seg").Dot("id")).Op("+").Lit("]"),
+			Id("jsonPath").Op("+=").Lit(".").Op("+").Id("seg").Dot("Identifier").Dot("toString").Call(),
+			If(Id("isSliceFieldIdentifier").Call(Id("seg").Dot("Identifier"))).Block(
+				Id("jsonPath").Op("+=").Lit("[").Op("+").Id("strconv").Dot("Itoa").Call(Id("seg").Dot("ID")).Op("+").Lit("]"),
 			),
 		),
 		Return(Id("jsonPath")),
-	)
-
-	s.file.Func().Id("pathIdentifierToString").Params(Id("fieldIdentifier").Id("treeFieldIdentifier")).String().Block(
-		Switch(Id("fieldIdentifier")).Block(
-			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				return Case(Id(configType.Name + "Identifier")).Block(
-					Return(Lit(configType.Name)),
-				)
-			}),
-			ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
-				return ForEachFieldInType(configType, func(f ast.Field) *Statement {
-					if f.ValueType().IsBasicType {
-						return Empty()
-					}
-					return Case(Id(FieldPathIdentifier(f))).Block(
-						Return(Lit(f.Name)),
-					)
-				})
-			}),
-		),
-		Return(Lit("")),
 	)
 
 	s.file.Func().Id("isSliceFieldIdentifier").Params(Id("fieldIdentifier").Id("treeFieldIdentifier")).Bool().Block(
