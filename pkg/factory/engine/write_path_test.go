@@ -21,6 +21,7 @@ func TestWritePath(t *testing.T) {
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			treeFieldIdentifier_type,
 			attackEventIdentifier_type,
+			toString_treeFieldIdentifier_func,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)
@@ -42,7 +43,6 @@ func TestWritePath(t *testing.T) {
 			newPath_func,
 			extendAndCopy_path_func,
 			toJSONPath_path_func,
-			toString_treeFieldIdentifier_func,
 			isSliceFieldIdentifier_func,
 		}, "\n"))
 
