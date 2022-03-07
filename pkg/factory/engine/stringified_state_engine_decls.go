@@ -3581,8 +3581,9 @@ const toString_treeFieldIdentifier_func string = `func (t treeFieldIdentifier) t
 		return "item"
 	case zoneItem_positionIdentifier:
 		return "position"
+	default:
+		panic(fmt.Sprintf("no string found for identifier <%d>", t))
 	}
-	panic(fmt.Sprintf("no string found for identifier <%d>", t))
 }`
 
 const segment_type string = `type segment struct {
