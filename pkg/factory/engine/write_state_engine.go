@@ -26,6 +26,7 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 		Id("State").Id("*State"),
 		Id("Patch").Id("*State"),
 		Id("Tree").Id("*Tree"),
+		Id("broadcastingClientID").Id("string"),
 		Id("planner").Id("*assemblePlanner"),
 		Id("IDgen").Int(),
 	)
@@ -68,18 +69,18 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 			}
 			return writeDeleteEvent(u)
 		}),
+		ForEachBasicType(func(b BasicType) *Statement {
+			u.typeName = func() string {
+				return b.Value
+			}
+			return writeUpdateElement(u)
+		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.typeName = func() string {
 				return configType.Name
 			}
-			u.emptyEvents = func() *Statement {
-				return ForEachFieldInType(configType, func(field ast.Field) *Statement {
-					if !field.ValueType().IsEvent {
-						return Empty()
-					}
-					return Id(u.typeName()).Dot(Title(field.Name)).Op("=").Id(u.typeName()).Dot(Title(field.Name)).Index(Empty(), Lit(0))
-				})
-			}
+			u.t = &configType
+			defer func() { u.t = nil }()
 			return writeUpdateElement(u)
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
@@ -93,6 +94,12 @@ func (s *EngineFactory) writeUpdateState() *EngineFactory {
 				return anyNameByField(field)
 			}
 			return writeUpdateElement(u)
+		}),
+		ForEachBasicType(func(b BasicType) *Statement {
+			u.typeName = func() string {
+				return b.Value
+			}
+			return writeClearPatch(u)
 		}),
 		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
 			u.typeName = func() string {
@@ -122,8 +129,9 @@ func writeUpdateElement(u updateStateWriter) *Statement {
 		If(u.isOperationKindDelete()).Block(
 			u.deleteElement(),
 		).Else().Block(
-			u.emptyEvents(),
+			OnlyIf(u.t != nil, u.emptyEvents()),
 			u.setOperationKindUnchanged(),
+			u.unsignElement(),
 			u.updateElement(),
 		),
 	)
