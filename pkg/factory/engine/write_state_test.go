@@ -67,6 +67,25 @@ func TestWriteState(t *testing.T) {
 			t.Errorf(diff)
 		}
 	})
+	t.Run("writes metaData", func(t *testing.T) {
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf.writeMetaData()
+
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			metaData_type,
+			unsign_metaData_func,
+			sign_metaData_func,
+		}, "\n"))
+
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
+		}
+	})
 	t.Run("writes elements", func(t *testing.T) {
 		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeElements()
@@ -76,6 +95,10 @@ func TestWriteState(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			boolValue_type,
+			floatValue_type,
+			intValue_type,
+			stringValue_type,
 			attackEventCore_type,
 			_AttackEvent_type,
 			equipmentSetCore_type,
