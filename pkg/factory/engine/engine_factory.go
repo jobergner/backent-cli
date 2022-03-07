@@ -57,6 +57,7 @@ func WriteEngine(file *jen.File, stateConfigData map[interface{}]interface{}) {
 		writeSetters().
 		writeIDs().
 		writeState().
+		writeMetaData().
 		writeElements().
 		writeOperationKind().
 		writeEngine().

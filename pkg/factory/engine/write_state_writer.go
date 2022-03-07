@@ -60,10 +60,6 @@ func (e elementWriter) fieldTag() string {
 	return "`json:\"" + e.f.Name + "\"`"
 }
 
-func (e elementWriter) metaFieldTag(name string) string {
-	return "`json:\"" + name + "\"`"
-}
-
 func (e elementWriter) fieldName() string {
 	return Title(e.f.Name)
 }

@@ -112,7 +112,51 @@ func (s *EngineFactory) writeState() *EngineFactory {
 	return s
 }
 
+func (s *EngineFactory) writeMetaData() *EngineFactory {
+	s.file.Type().Id("metaData").Struct(
+		Id("BroadcastedBy").String().Add(Id(metaFieldTag("broadcastedBy"))),
+		Id("TouchedByMany").Bool().Add(Id(metaFieldTag("touchedByMany"))),
+	)
+
+	s.file.Func().Params(Id("m").Id("*metaData")).Id("unsign").Params().Block(
+		Id("m").Dot("BroadcastedBy").Op("=").Lit(""),
+		Id("m").Dot("TouchedByMany").Op("=").False(),
+	)
+
+	s.file.Func().Params(Id("m").Id("*metaData")).Id("sign").Params(Id("clientID").String()).Block(
+		If(Id("clientID").Op("==").Lit("")).Block(
+			Return(),
+		),
+		If(Id("m").Dot("TouchedByMany")).Block(
+			Return(),
+		),
+		If(Id("m").Dot("BroadcastedBy").Op("==").Lit("")).Block(
+			Id("m").Dot("BroadcastedBy").Op("=").Id("clientID"),
+			Return(),
+		),
+		If(Id("m").Dot("BroadcastedBy").Op("==").Id("clientID")).Block(
+			Return(),
+		),
+		Id("m").Dot("BroadcastedBy").Op("=").Lit(""),
+		Id("m").Dot("TouchedByMany").Op("=").True(),
+	)
+
+	return s
+}
+
 func (s *EngineFactory) writeElements() *EngineFactory {
+
+	RangeBasicTypes(func(b BasicType) {
+		s.file.Type().Id(b.Value).Struct(
+			Id("ID").Id(Title(b.Value)+"ID").Id(metaFieldTag("id")).Line(),
+			Id("Value").Id(b.Name).Id(metaFieldTag("value")).Line(),
+			Id("OperationKind").Id("OperationKind").Id(metaFieldTag("operationKind")).Line(),
+			Id("JSONPath").String().Id(metaFieldTag("jsonPath")),
+			Id("Path").Id("path").Id(metaFieldTag("path")),
+			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
+			Id("engine").Id("*Engine").Line(),
+		)
+	})
 
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
@@ -121,16 +165,16 @@ func (s *EngineFactory) writeElements() *EngineFactory {
 		}
 
 		s.file.Type().Id(e.name()).Struct(
-			Id("ID").Id(e.idType()).Id(e.metaFieldTag("id")).Line(),
+			Id("ID").Id(e.idType()).Id(metaFieldTag("id")).Line(),
 			ForEachFieldInType(configType, func(field ast.Field) *Statement {
 				e.f = &field
 				return Id(e.fieldName()).Id(e.fieldValue()).Id(e.fieldTag()).Line()
 			}),
-			Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
-			Id("HasParent").Bool().Id(e.metaFieldTag("hasParent")).Line(),
-			Id("JSONPath").String().Id(e.metaFieldTag("jsonPath")),
-			Id("Path").Id("path").Id(e.metaFieldTag("path")),
-			Id("Meta").Id("metaData").Id(e.metaFieldTag("meta")),
+			Id("OperationKind").Id("OperationKind").Id(metaFieldTag("operationKind")).Line(),
+			Id("HasParent").Bool().Id(metaFieldTag("hasParent")).Line(),
+			Id("JSONPath").String().Id(metaFieldTag("jsonPath")),
+			Id("Path").Id("path").Id(metaFieldTag("path")),
+			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 
