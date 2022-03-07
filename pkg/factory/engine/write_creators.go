@@ -8,6 +8,26 @@ import (
 )
 
 func (s *EngineFactory) writeCreators() *EngineFactory {
+
+	RangeBasicTypes(func(b BasicType) {
+		c := creatorWriter{
+			typeName: b.Value,
+			f:        nil,
+		}
+
+		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier"), Id("value").Id(b.Name)).Id(b.Value).Block(
+			Var().Id("element").Id(b.Value),
+			Id("element").Dot("Value").Op("=").Id("value"),
+			c.assignEngine(),
+			c.generateID(),
+			c.assignExtendedPath(),
+			c.assignJsonPath(),
+			c.setOperationKind(),
+			c.updateElementInPatch(),
+			Return(Id("element")),
+		)
+	})
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		cw := creatorWrapperWriter{
@@ -19,8 +39,8 @@ func (s *EngineFactory) writeCreators() *EngineFactory {
 		)
 
 		c := creatorWriter{
-			t: configType,
-			f: nil,
+			typeName: configType.Name,
+			f:        nil,
 		}
 
 		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(

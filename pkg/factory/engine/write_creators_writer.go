@@ -28,8 +28,8 @@ func (cw creatorWrapperWriter) createElement() *Statement {
 }
 
 type creatorWriter struct {
-	t ast.ConfigType
-	f *ast.Field
+	typeName string
+	f        *ast.Field
 }
 
 func (c creatorWriter) receiverParams() *Statement {
@@ -37,11 +37,11 @@ func (c creatorWriter) receiverParams() *Statement {
 }
 
 func (c creatorWriter) name() string {
-	return "create" + Title(c.t.Name)
+	return "create" + Title(c.typeName)
 }
 
 func (c creatorWriter) returns() string {
-	return Title(c.t.Name)
+	return Title(c.typeName)
 }
 
 func (c creatorWriter) params() (*Statement, *Statement) {
@@ -49,7 +49,7 @@ func (c creatorWriter) params() (*Statement, *Statement) {
 }
 
 func (c creatorWriter) declareElement() *Statement {
-	return Var().Id("element").Id(c.t.Name + "Core")
+	return Var().Id("element").Id(c.typeName + "Core")
 }
 
 func (c creatorWriter) assignEngine() *Statement {
@@ -57,11 +57,11 @@ func (c creatorWriter) assignEngine() *Statement {
 }
 
 func (c creatorWriter) generateID() *Statement {
-	return Id("element").Dot("ID").Op("=").Id(Title(c.t.Name) + "ID").Call(Id("engine").Dot("GenerateID").Call())
+	return Id("element").Dot("ID").Op("=").Id(Title(c.typeName) + "ID").Call(Id("engine").Dot("GenerateID").Call())
 }
 
 func (c creatorWriter) assignExtendedPath() *Statement {
-	return Id("element").Dot("Path").Op("=").Id("p").Dot("extendAndCopy").Call(Id("fieldIdentifier"), Int().Call(Id("element").Dot("ID")), Id("ElementKind"+Title(c.t.Name)), Id("ComplexID").Values())
+	return Id("element").Dot("Path").Op("=").Id("p").Dot("extendAndCopy").Call(Id("fieldIdentifier"), Int().Call(Id("element").Dot("ID")), Id("ElementKind"+Title(c.typeName)), Id("ComplexID").Values())
 }
 
 func (c creatorWriter) assignJsonPath() *Statement {
@@ -112,12 +112,12 @@ func (c creatorWriter) setOperationKind() *Statement {
 }
 
 func (c creatorWriter) updateElementInPatch() *Statement {
-	return Id("engine").Dot("Patch").Dot(Title(c.t.Name)).Index(Id("element").Dot("ID")).Op("=").Id("element")
+	return Id("engine").Dot("Patch").Dot(Title(c.typeName)).Index(Id("element").Dot("ID")).Op("=").Id("element")
 }
 
 func (c creatorWriter) returnElement() *Statement {
-	return Id(Title(c.t.Name)).Values(Dict{
-		Id(c.t.Name): Id("element"),
+	return Id(Title(c.typeName)).Values(Dict{
+		Id(c.typeName): Id("element"),
 	})
 }
 

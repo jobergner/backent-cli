@@ -8,6 +8,28 @@ import (
 )
 
 func (s *EngineFactory) writeDeleters() *EngineFactory {
+
+	RangeBasicTypes(func(b BasicType) {
+		d := deleteTypeWriter{
+			typeName: b.Value,
+			f:        nil,
+		}
+
+		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
+			Id(b.Value).Op(":=").Id("engine").Dot(b.Value).Call(Id(b.Value+"ID")),
+			If(d.isOperationKindDelete()).Block(
+				Return(),
+			),
+			If(d.existsInState()).Block(
+				d.setOperationKind(),
+				d.signElement(),
+				d.updateElementInPatch(),
+			).Else().Block(
+				d.deleteFromPatch(),
+			),
+		)
+	})
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		w := deleteTypeWrapperWriter{
@@ -23,8 +45,8 @@ func (s *EngineFactory) writeDeleters() *EngineFactory {
 		)
 
 		d := deleteTypeWriter{
-			t: configType,
-			f: nil,
+			typeName: configType.Name,
+			f:        nil,
 		}
 
 		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(

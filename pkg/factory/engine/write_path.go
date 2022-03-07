@@ -40,8 +40,10 @@ func (s *EngineFactory) writeIdentifiers() *EngineFactory {
 					)
 				})
 			}),
+			Default().Block(
+				Panic(Id("fmt.Sprintf(\"no string found for identifier <%d>\", t)")),
+			),
 		),
-		Panic(Id("fmt.Sprintf(\"no string found for identifier <%d>\", t)")),
 	)
 
 	return s

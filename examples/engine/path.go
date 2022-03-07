@@ -119,9 +119,9 @@ func (t treeFieldIdentifier) toString() string {
 		return "item"
 	case zoneItem_positionIdentifier:
 		return "position"
+	default:
+		panic(fmt.Sprintf("no string found for identifier <%d>", t))
 	}
-
-	panic(fmt.Sprintf("no string found for identifier <%d>", t))
 }
 
 type segment struct {
