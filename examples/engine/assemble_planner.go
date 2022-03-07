@@ -206,10 +206,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		}
 
 		for _, playerTargetRef := range patch.PlayerTargetRef {
-			// if the reference exists in the patch, the anyContainer HAS to exist in patch as well
-			// as both are always created and destroyed in unison
-			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 			}
 		}
@@ -217,17 +214,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)]; ok {
 				continue
 			}
-			// if the reference exists in the state, the anyContainer HAS to exist in state as well
-			// as both are always created and destroyed in unison
-			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 			}
 		}
 
 		for _, playerTargetedByRef := range patch.PlayerTargetedByRef {
-			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetedByRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 			}
 		}
@@ -235,8 +228,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)]; ok {
 				continue
 			}
-			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetedByRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 			}
 		}
