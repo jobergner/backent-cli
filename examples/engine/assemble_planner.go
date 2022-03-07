@@ -130,7 +130,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		previousLen = len(ap.includedElements)
 
 		for _, attackEventTargetRef := range patch.AttackEventTargetRef {
-			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 			}
 		}
@@ -139,7 +139,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			if _, ok := ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 			}
 		}
@@ -147,7 +147,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 		for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
 			// if the reference references an element that has updated its path is collected
 			// so that all segments can later be added to includedElements
-			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 			}
 		}
@@ -158,13 +158,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 				// we don't need to do the check if the reference is already included
 				continue
 			}
-			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 			}
 		}
 
 		for _, itemBoundToRef := range patch.ItemBoundToRef {
-			if _, ok := ap.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(itemBoundToRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 			}
 		}
@@ -172,13 +172,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			if _, ok := ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(itemBoundToRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 			}
 		}
 
 		for _, playerEquipmentSetRef := range patch.PlayerEquipmentSetRef {
-			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 			}
 		}
@@ -186,13 +186,13 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 			}
 		}
 
 		for _, playerGuildMemberRef := range patch.PlayerGuildMemberRef {
-			if _, ok := ap.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerGuildMemberRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 			}
 		}
@@ -200,7 +200,7 @@ func (ap *assemblePlanner) plan(state, patch *State) {
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerGuildMemberRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 			}
 		}

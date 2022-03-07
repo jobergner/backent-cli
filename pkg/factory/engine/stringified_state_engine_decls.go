@@ -961,7 +961,7 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 		}
 		previousLen = len(ap.includedElements)
 		for _, attackEventTargetRef := range patch.AttackEventTargetRef {
-			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 			}
 		}
@@ -969,12 +969,12 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(attackEventTargetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(attackEventTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(attackEventTargetRef.ID)] = attackEventTargetRef.Path
 			}
 		}
 		for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
-			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 			}
 		}
@@ -982,12 +982,12 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(equipmentSetEquipmentRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(equipmentSetEquipmentRef.ID)] = equipmentSetEquipmentRef.Path
 			}
 		}
 		for _, itemBoundToRef := range patch.ItemBoundToRef {
-			if _, ok := ap.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(itemBoundToRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 			}
 		}
@@ -995,12 +995,12 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(itemBoundToRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(itemBoundToRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(itemBoundToRef.ID)] = itemBoundToRef.Path
 			}
 		}
 		for _, playerEquipmentSetRef := range patch.PlayerEquipmentSetRef {
-			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 			}
 		}
@@ -1008,12 +1008,12 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerEquipmentSetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerEquipmentSetRef.ID)] = playerEquipmentSetRef.Path
 			}
 		}
 		for _, playerGuildMemberRef := range patch.PlayerGuildMemberRef {
-			if _, ok := ap.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerGuildMemberRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 			}
 		}
@@ -1021,13 +1021,12 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)]; ok {
 				continue
 			}
-			if _, ok := ap.includedElements[int(playerGuildMemberRef.ReferencedElementID)]; ok {
+			if _, ok := ap.includedElements[int(playerGuildMemberRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerGuildMemberRef.ID)] = playerGuildMemberRef.Path
 			}
 		}
 		for _, playerTargetRef := range patch.PlayerTargetRef {
-			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 			}
 		}
@@ -1035,14 +1034,12 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)]; ok {
 				continue
 			}
-			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetRef.ID)] = playerTargetRef.Path
 			}
 		}
 		for _, playerTargetedByRef := range patch.PlayerTargetedByRef {
-			anyContainer := patch.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetedByRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 			}
 		}
@@ -1050,8 +1047,7 @@ const plan_assemblePlanner_func string = `func (ap *assemblePlanner) plan(state,
 			if _, ok := ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)]; ok {
 				continue
 			}
-			anyContainer := state.AnyOfPlayer_ZoneItem[playerTargetedByRef.ReferencedElementID]
-			if _, ok := ap.includedElements[int(anyContainer.ChildID)]; ok {
+			if _, ok := ap.includedElements[int(playerTargetedByRef.ID.ChildID)]; ok {
 				ap.updatedReferencePaths[ComplexID(playerTargetedByRef.ID)] = playerTargetedByRef.Path
 			}
 		}
