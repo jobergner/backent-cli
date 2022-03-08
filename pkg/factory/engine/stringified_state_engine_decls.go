@@ -1203,6 +1203,173 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() {
 	}
 }`
 
+const complex_id_go_import string = `import (
+	"bytes"
+	"fmt"
+	"strconv"
+)`
+
+const _ComplexID_type string = `type ComplexID struct {
+	Field		treeFieldIdentifier	` + "`" + `json:"field"` + "`" + `
+	ParentID	int			` + "`" + `json:"parentID"` + "`" + `
+	ChildID		int			` + "`" + `json:"childID"` + "`" + `
+	IsMediator	bool			` + "`" + `json:"isMediator"` + "`" + `
+}`
+
+const complexIDStructCache_type string = `var (
+	complexIDStructCache	= make(map[string]ComplexID)
+	ComplexIDStringCache	= make(map[ComplexID][]byte)
+	complexIDZeroString	= []byte("0-0-0-0")
+)`
+
+const _MarshalJSON_ComplexID_func string = `func (c ComplexID) MarshalJSON() ([]byte, error) {
+	if cachedString, ok := ComplexIDStringCache[c]; ok {
+		return cachedString, nil
+	}
+	var isMediatorBin int
+	if c.IsMediator {
+		isMediatorBin = 1
+	}
+	newS := []byte(fmt.Sprintf("\"%d-%d-%d-%d\"", c.Field, c.ParentID, c.ChildID, isMediatorBin))
+	ComplexIDStringCache[c] = newS
+	return newS, nil
+}`
+
+const _UnmarshalJSON_ComplexID_func string = `func (c *ComplexID) UnmarshalJSON(s []byte) error {
+	if bytes.Equal(s, complexIDZeroString) {
+		return nil
+	}
+	asString := string(s)
+	if cachedID, ok := complexIDStructCache[asString]; ok {
+		c.Field = cachedID.Field
+		c.ParentID = cachedID.ParentID
+		c.ChildID = cachedID.ChildID
+		c.IsMediator = cachedID.IsMediator
+		return nil
+	}
+	idSegments := bytes.Split(s[1:len(s)-1], []byte{'-'})
+	ident, _ := strconv.Atoi(string(idSegments[0]))
+	c.Field = treeFieldIdentifier(ident)
+	c.ParentID, _ = strconv.Atoi(string(idSegments[1]))
+	c.ChildID, _ = strconv.Atoi(string(idSegments[2]))
+	isMediatorBin, _ := strconv.Atoi(string(idSegments[3]))
+	if isMediatorBin == 1 {
+		c.IsMediator = true
+	}
+	complexIDStructCache[asString] = *c
+	return nil
+}`
+
+const _MarshalJSON_AttackEventTargetRefID_func string = `func (x AttackEventTargetRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_AttackEventTargetRefID_func string = `func (x *AttackEventTargetRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = AttackEventTargetRefID(temp)
+	return nil
+}`
+
+const _MarshalJSON_PlayerGuildMemberRefID_func string = `func (x PlayerGuildMemberRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_PlayerGuildMemberRefID_func string = `func (x *PlayerGuildMemberRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = PlayerGuildMemberRefID(temp)
+	return nil
+}`
+
+const _MarshalJSON_ItemBoundToRefID_func string = `func (x ItemBoundToRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_ItemBoundToRefID_func string = `func (x *ItemBoundToRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = ItemBoundToRefID(temp)
+	return nil
+}`
+
+const _MarshalJSON_EquipmentSetEquipmentRefID_func string = `func (x EquipmentSetEquipmentRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_EquipmentSetEquipmentRefID_func string = `func (x *EquipmentSetEquipmentRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = EquipmentSetEquipmentRefID(temp)
+	return nil
+}`
+
+const _MarshalJSON_PlayerEquipmentSetRefID_func string = `func (x PlayerEquipmentSetRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_PlayerEquipmentSetRefID_func string = `func (x *PlayerEquipmentSetRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = PlayerEquipmentSetRefID(temp)
+	return nil
+}`
+
+const _MarshalJSON_AnyOfItem_Player_ZoneItemID_func string = `func (x AnyOfItem_Player_ZoneItemID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_AnyOfItem_Player_ZoneItemID_func string = `func (x *AnyOfItem_Player_ZoneItemID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = AnyOfItem_Player_ZoneItemID(temp)
+	return nil
+}`
+
+const _MarshalJSON_AnyOfPlayer_ZoneItemID_func string = `func (x AnyOfPlayer_ZoneItemID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_AnyOfPlayer_ZoneItemID_func string = `func (x *AnyOfPlayer_ZoneItemID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = AnyOfPlayer_ZoneItemID(temp)
+	return nil
+}`
+
+const _MarshalJSON_AnyOfPlayer_PositionID_func string = `func (x AnyOfPlayer_PositionID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_AnyOfPlayer_PositionID_func string = `func (x *AnyOfPlayer_PositionID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = AnyOfPlayer_PositionID(temp)
+	return nil
+}`
+
+const _MarshalJSON_PlayerTargetRefID_func string = `func (x PlayerTargetRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_PlayerTargetRefID_func string = `func (x *PlayerTargetRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = PlayerTargetRefID(temp)
+	return nil
+}`
+
+const _MarshalJSON_PlayerTargetedByRefID_func string = `func (x PlayerTargetedByRefID) MarshalJSON() ([]byte, error) {
+	return ComplexID(x).MarshalJSON()
+}`
+
+const _UnmarshalJSON_PlayerTargetedByRefID_func string = `func (x *PlayerTargetedByRefID) UnmarshalJSON(s []byte) error {
+	temp := ComplexID(*x)
+	temp.UnmarshalJSON(s)
+	*x = PlayerTargetedByRefID(temp)
+	return nil
+}`
+
 const createBoolValue_Engine_func string = `func (engine *Engine) createBoolValue(p path, fieldIdentifier treeFieldIdentifier, value bool) boolValue {
 	var element boolValue
 	element.Value = value
@@ -4480,13 +4647,6 @@ const _FloatValueID_type string = `type FloatValueID int`
 const _IntValueID_type string = `type IntValueID int`
 
 const _StringValueID_type string = `type StringValueID int`
-
-const _ComplexID_type string = `type ComplexID struct {
-	Field		treeFieldIdentifier	` + "`" + `json:"field"` + "`" + `
-	ParentID	int			` + "`" + `json:"parentID"` + "`" + `
-	ChildID		int			` + "`" + `json:"childID"` + "`" + `
-	IsMediator	bool			` + "`" + `json:"isMediator"` + "`" + `
-}`
 
 const _AttackEventID_type string = `type AttackEventID int`
 

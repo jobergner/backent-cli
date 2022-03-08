@@ -8,13 +8,6 @@ import (
 )
 
 func (s *EngineFactory) writeIDs() *EngineFactory {
-	s.file.Type().Id("ComplexID").Struct(
-		Id("Field").Id("treeFieldIdentifier").Id(metaFieldTag("field")),
-		Id("ParentID").Int().Id(metaFieldTag("parentID")),
-		Id("ChildID").Int().Id(metaFieldTag("childID")),
-		Id("IsMediator").Bool().Id(metaFieldTag("isMediator")),
-	)
-
 	RangeBasicTypes(func(b BasicType) {
 		s.file.Type().Id(Title(b.Value) + "ID").Int()
 	})
