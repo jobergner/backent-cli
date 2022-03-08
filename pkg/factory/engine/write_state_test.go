@@ -19,7 +19,6 @@ func TestWriteState(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			_ComplexID_type,
 			_BoolValueID_type,
 			_FloatValueID_type,
 			_IntValueID_type,

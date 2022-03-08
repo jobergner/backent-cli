@@ -5,23 +5,6 @@ type FloatValueID int
 type IntValueID int
 type StringValueID int
 
-// ComplexID is used for entities which are not real elements
-// like references and any-containers. This way we do not have
-// to generate IDs for these entities, which would require
-// the server to do it. This makes more methods available for broadcasting.
-type ComplexID struct {
-	// despite the fact that a slice of references cannot hold multiple references of the same element,
-	// we need the field identifier because otherwise an element with multiple reference fields
-	// may be able to contain references with the same ParentID-ChildID combination.
-	Field    treeFieldIdentifier `json:"field"`
-	ParentID int                 `json:"parentID"`
-	// ChildID describes the next true element => references of any-containers will not have the any-container ID as ChildID
-	ChildID int `json:"childID"`
-	// when a reference references an any-container both would have the same ParentID && ChildID
-	// IsMediator simply acts as a differentiation between the two, so each ID is guaranteed to be unique
-	IsMediator bool `json:"isMediator"`
-}
-
 type AttackEventID int
 type EquipmentSetID int
 type GearScoreID int
