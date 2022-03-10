@@ -4,7 +4,6 @@ package server
 
 const gets_generated_go_import string = `import (
 	"fmt"
-	"net/http"
 )`
 
 const _MessageKindAction_addItemToPlayer_type string = `const (
@@ -36,129 +35,81 @@ const _SpawnZoneItemsResponse_type string = `type SpawnZoneItemsResponse struct 
 	NewZoneItemPaths []string ` + "`" + `json:"newZoneItemPaths"` + "`" + `
 }`
 
-const _Actions_type string = `type Actions struct {
-	AddItemToPlayer	func(AddItemToPlayerParams, *Engine) AddItemToPlayerResponse
-	MovePlayer	func(MovePlayerParams, *Engine)
-	SpawnZoneItems	func(SpawnZoneItemsParams, *Engine) SpawnZoneItemsResponse
+const _AddItemToPlayerAction_type string = `type AddItemToPlayerAction struct {
+	Broadcast	func(params AddItemToPlayerParams, engine *Engine, roomName, clientID string)
+	Emit		func(params AddItemToPlayerParams, engine *Engine, roomName, clientID string) AddItemToPlayerResponse
 }`
 
-const _SideEffects_type string = `type SideEffects struct {
-	OnDeploy	func(*Engine)
-	OnFrameTick	func(*Engine)
+const _MovePlayerAction_type string = `type MovePlayerAction struct {
+	Broadcast	func(params MovePlayerParams, engine *Engine, roomName, clientID string)
+	Emit		func(params MovePlayerParams, engine *Engine, roomName, clientID string)
+}`
+
+const _SpawnZoneItemsAction_type string = `type SpawnZoneItemsAction struct {
+	Broadcast	func(params SpawnZoneItemsParams, engine *Engine, roomName, clientID string)
+	Emit		func(params SpawnZoneItemsParams, engine *Engine, roomName, clientID string) SpawnZoneItemsResponse
+}`
+
+const _Actions_type string = `type Actions struct {
+	AddItemToPlayer	AddItemToPlayerAction
+	MovePlayer	MovePlayerAction
+	SpawnZoneItems	SpawnZoneItemsAction
 }`
 
 const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) (Message, error) {
 	switch MessageKind(msg.Kind) {
 	case MessageKindAction_addItemToPlayer:
-		if r.actions.AddItemToPlayer == nil {
-			break
-		}
 		var params AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
+			return Message{msg.ID, MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		res := r.actions.AddItemToPlayer(params, r.state)
-		resContent, err := res.MarshalJSON()
-		if err != nil {
-			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
+		if r.actions.AddItemToPlayer.Broadcast != nil {
+			r.actions.AddItemToPlayer.Broadcast(params, r.state, r.name, msg.client.id)
 		}
-		return Message{msg.Kind, resContent, msg.client}, nil
-	case MessageKindAction_movePlayer:
-		if r.actions.MovePlayer == nil {
+		if r.actions.AddItemToPlayer.Emit == nil {
 			break
 		}
+		res := r.actions.AddItemToPlayer.Emit(params, r.state, r.name, msg.client.id)
+		resContent, err := res.MarshalJSON()
+		if err != nil {
+			return Message{msg.ID, MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
+		}
+		return Message{msg.ID, msg.Kind, resContent, msg.client}, nil
+	case MessageKindAction_movePlayer:
 		var params MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
+			return Message{msg.ID, MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		r.actions.MovePlayer(params, r.state)
-		return Message{}, nil
-	case MessageKindAction_spawnZoneItems:
-		if r.actions.SpawnZoneItems == nil {
+		if r.actions.MovePlayer.Broadcast != nil {
+			r.actions.MovePlayer.Broadcast(params, r.state, r.name, msg.client.id)
+		}
+		if r.actions.MovePlayer.Emit == nil {
 			break
 		}
+		r.actions.MovePlayer.Emit(params, r.state, r.name, msg.client.id)
+		return Message{ID: msg.ID}, nil
+	case MessageKindAction_spawnZoneItems:
 		var params SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
-			return Message{MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
+			return Message{msg.ID, MessageKindError, messageUnmarshallingError(msg.Content, err), msg.client}, err
 		}
-		res := r.actions.SpawnZoneItems(params, r.state)
+		if r.actions.SpawnZoneItems.Broadcast != nil {
+			r.actions.SpawnZoneItems.Broadcast(params, r.state, r.name, msg.client.id)
+		}
+		if r.actions.SpawnZoneItems.Emit == nil {
+			break
+		}
+		res := r.actions.SpawnZoneItems.Emit(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
-			return Message{MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
+			return Message{msg.ID, MessageKindError, responseMarshallingError(msg.Content, err), msg.client}, err
 		}
-		return Message{msg.Kind, resContent, msg.client}, nil
+		return Message{msg.ID, msg.Kind, resContent, msg.client}, nil
 	default:
-		return Message{MessageKindError, []byte("unknown message kind " + msg.Kind), msg.client}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
+		return Message{msg.ID, MessageKindError, []byte("unknown message kind " + msg.Kind), msg.client}, fmt.Errorf("unknown message kind in: %s", printMessage(msg))
 	}
-	return Message{}, nil
-}`
-
-const inspectHandler_func string = `func inspectHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Fprintf(w, ` + "`" + `{
-  "state": {
-    "player": {
-      "items": "[]item",
-      "equipmentSets": "[]*equipmentSet",
-      "gearScore": "gearScore",
-      "position": "position",
-      "guildMembers": "[]*player",
-      "target": "*anyOf<player,zoneItem>",
-      "targetedBy": "[]*anyOf<player,zoneItem>"
-    },
-    "zone": {
-      "items": "[]zoneItem",
-      "players": "[]player",
-      "tags": "[]string",
-      "interactables": "[]anyOf<item,player,zoneItem>"
-    },
-    "zoneItem": {
-      "position": "position",
-      "item": "item"
-    },
-    "position": {
-      "x": "float64",
-      "y": "float64"
-    },
-    "item": {
-      "name": "string",
-      "gearScore": "gearScore",
-      "boundTo": "*player",
-      "origin": "anyOf<player,position>"
-    },
-    "gearScore": {
-      "level": "int",
-      "score": "int"
-    },
-    "equipmentSet": {
-      "name": "string",
-      "equipment": "[]*item"
-    }
-  },
-  "actions": {
-    "movePlayer": {
-      "player": "playerID",
-      "changeX": "float64",
-      "changeY": "float64"
-    },
-    "addItemToPlayer": {
-      "item": "itemID",
-      "newName": "string"
-    },
-    "spawnZoneItems": {
-      "items": "[]itemID"
-    }
-  },
-  "responses" : {
-    "addItemToPlayer": {
-      "playerPath": "string"
-    },
-    "spawnZoneItems": {
-      "newZoneItemPaths": "string"
-    }
-  }
-}` + "`" + `)
+	return Message{ID: msg.ID}, nil
 }`

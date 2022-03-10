@@ -16,15 +16,18 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 			ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 				p.a = &action
 				return Case(Id(p.actionMessageKind())).Block(
-					If(p.actionIsUndefined()).Block(
-						Break(),
-					),
 					p.declareParams(),
 					p.unmarshalMessageContent(),
 					If(Id("err").Op("!=").Nil()).Block(
 						Return(p.returnErrorMessage()),
 					),
-					p.callAction(),
+					If(p.actionBroadcastIsDefined()).Block(
+						p.callActionBroadcast(),
+					),
+					If(p.actionEmitIsUndefined()).Block(
+						Break(),
+					),
+					p.callActionEmit(),
 					OnlyIf(action.Response != nil, p.marshalResponseContent()),
 					OnlyIf(action.Response != nil, p.returnMarshallingError()),
 					p.returnResponse(),
@@ -34,7 +37,7 @@ func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
 				Return(p.unknownMessageKindResponse(), Id("fmt").Dot("Errorf").Call(Lit("unknown message kind in: %s"), Id("printMessage").Call(Id("msg")))),
 			),
 		),
-		Return(Id("Message").Values(), Nil()),
+		Return(Id("Message").Values(Id("ID").Op(":").Id("msg").Dot("ID")), Nil()),
 	)
 
 	return s
@@ -57,8 +60,16 @@ func (p processClientMessageWriter) actionMessageKind() string {
 	return "MessageKindAction_" + p.a.Name
 }
 
-func (p processClientMessageWriter) actionIsUndefined() *Statement {
-	return Id("r").Dot("actions").Dot(Title(p.a.Name)).Op("==").Nil()
+func (p processClientMessageWriter) callActionBroadcast() *Statement {
+	return Id("r").Dot("actions").Dot(Title(p.a.Name)).Dot("Broadcast").Add(p.actionCall())
+}
+
+func (p processClientMessageWriter) actionBroadcastIsDefined() *Statement {
+	return Id("r").Dot("actions").Dot(Title(p.a.Name)).Dot("Broadcast").Op("!=").Nil()
+}
+
+func (p processClientMessageWriter) actionEmitIsUndefined() *Statement {
+	return Id("r").Dot("actions").Dot(Title(p.a.Name)).Dot("Emit").Op("==").Nil()
 }
 
 func (p processClientMessageWriter) declareParams() *Statement {
@@ -70,11 +81,15 @@ func (p processClientMessageWriter) unmarshalMessageContent() *Statement {
 }
 
 func (p processClientMessageWriter) returnErrorMessage() (*Statement, *Statement) {
-	return Id("Message").Values(List(Id("MessageKindError"), Id("messageUnmarshallingError").Call(Id("msg").Dot("Content"), Id("err")), Id("msg").Dot("client"))), Id("err")
+	return Id("Message").Values(List(Id("msg").Dot("ID"), Id("MessageKindError"), Id("messageUnmarshallingError").Call(Id("msg").Dot("Content"), Id("err")), Id("msg").Dot("client"))), Id("err")
 }
 
-func (p processClientMessageWriter) callAction() *Statement {
-	call := Id("r").Dot("actions").Dot(Title(p.a.Name)).Call(Id("params"), Id("r").Dot("state"))
+func (p processClientMessageWriter) actionCall() *Statement {
+	return Call(Id("params"), Id("r").Dot("state"), Id("r").Dot("name"), Id("msg").Dot("client").Dot("id"))
+}
+
+func (p processClientMessageWriter) callActionEmit() *Statement {
+	call := Id("r").Dot("actions").Dot(Title(p.a.Name)).Dot("Emit").Add(p.actionCall())
 	if p.a.Response != nil {
 		return Id("res").Op(":=").Add(call)
 	}
@@ -87,17 +102,17 @@ func (p processClientMessageWriter) marshalResponseContent() *Statement {
 
 func (p processClientMessageWriter) returnMarshallingError() *Statement {
 	return If(Id("err").Op("!=").Nil()).Block(
-		Return(Id("Message").Values(List(Id("MessageKindError"), Id("responseMarshallingError").Call(Id("msg").Dot("Content"), Id("err")), Id("msg").Dot("client"))), Id("err")),
+		Return(Id("Message").Values(List(Id("msg").Dot("ID"), Id("MessageKindError"), Id("responseMarshallingError").Call(Id("msg").Dot("Content"), Id("err")), Id("msg").Dot("client"))), Id("err")),
 	)
 }
 
 func (p processClientMessageWriter) returnResponse() *Statement {
 	if p.a.Response == nil {
-		return Return(Id("Message").Values(), Nil())
+		return Return(Id("Message").Values(Id("ID").Op(":").Id("msg").Dot("ID")), Nil())
 	}
-	return Return(Id("Message").Values(Id("msg").Dot("Kind"), Id("resContent"), Id("msg").Dot("client")), Nil())
+	return Return(Id("Message").Values(Id("msg").Dot("ID"), Id("msg").Dot("Kind"), Id("resContent"), Id("msg").Dot("client")), Nil())
 }
 
 func (p processClientMessageWriter) unknownMessageKindResponse() *Statement {
-	return Id("Message").Values(List(Id("MessageKindError"), Index().Byte().Call(Lit("unknown message kind ").Op("+").Id("msg").Dot("Kind")), Id("msg").Dot("client")))
+	return Id("Message").Values(List(Id("msg").Dot("ID"), Id("MessageKindError"), Index().Byte().Call(Lit("unknown message kind ").Op("+").Id("msg").Dot("Kind")), Id("msg").Dot("client")))
 }
