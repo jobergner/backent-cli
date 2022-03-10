@@ -39,17 +39,8 @@ func (c *Client) ID() string {
 	return c.id
 }
 
-func (c *Client) LeaveRoom() {
-	c.room.unregisterClientSync(c)
-}
-
-func (c *Client) JoinRoom(room *Room) {
-	c.room.unregisterClientSync(c)
-	room.registerClientSync(c)
-}
-
-func (c *Client) Room() *Room {
-	return c.room
+func (c *Client) RoomName() string {
+	return c.room.name
 }
 
 func (c *Client) handleInernalError() {
@@ -75,7 +66,7 @@ func (c *Client) runReadMessages() {
 
 			errDescription := messageUnmarshallingError(msgBytes, err)
 
-			errMsg, err := Message{MessageKindError, errDescription, nil}.MarshalJSON()
+			errMsg, err := Message{MessageIDUnknown, MessageKindError, errDescription, nil}.MarshalJSON()
 			if err != nil {
 				log.Printf("error marshalling error message \"%s\"", errDescription)
 				continue

@@ -23,11 +23,10 @@ type SideEffects struct {
 type LoginSignals struct {
 	OnSuperMessage     func(msg Message, room *Room, client *Client, loginHandler *LoginHandler)
 	OnClientConnect    func(client *Client, loginHandler *LoginHandler)
-	OnClientDisconnect func(engine *Engine, clientID string, loginHandler *LoginHandler)
+	OnClientDisconnect func(room *Room, clientID string, loginHandler *LoginHandler)
 }
 
 func newLoginHandler(signals LoginSignals, actions Actions, sideEffects SideEffects, fps int) *LoginHandler {
-	// TODO thread safe
 	return &LoginHandler{
 		clients:     make(map[*Client]struct{}),
 		Rooms:       make(map[string]*Room),
@@ -89,35 +88,34 @@ func (l *LoginHandler) deleteClient(client *Client) {
 }
 
 func (l *LoginHandler) processMessageSync(msg Message) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-
 	if l.signals.OnSuperMessage == nil {
 		return
 	}
 
-	l.signals.OnSuperMessage(msg, msg.client.room, msg.client, l)
-}
-
-// TODO rename to signalClientDisconnect
-func (l *LoginHandler) signalClientDisconnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
+	l.signals.OnSuperMessage(msg, msg.client.room, msg.client, l)
+}
+
+func (l *LoginHandler) signalClientDisconnect(client *Client) {
 	if l.signals.OnClientDisconnect == nil {
 		return
 	}
 
-	l.signals.OnClientDisconnect(client.room.state, client.id, l)
-}
-
-func (l *LoginHandler) signalClientConnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
+	l.signals.OnClientDisconnect(client.room, client.id, l)
+}
+
+func (l *LoginHandler) signalClientConnect(client *Client) {
 	if l.signals.OnClientConnect == nil {
 		return
 	}
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
 
 	l.signals.OnClientConnect(client, l)
 }

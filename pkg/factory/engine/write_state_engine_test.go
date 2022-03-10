@@ -80,4 +80,21 @@ func TestWriteEngine(t *testing.T) {
 			t.Errorf(diff)
 		}
 	})
+	t.Run("writes importPatch method", func(t *testing.T) {
+		sf := newEngineFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf.writeImportPatch()
+
+		buf := new(bytes.Buffer)
+		sf.file.Render(buf)
+
+		actual := testutils.FormatCode(buf.String())
+		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			importPatch_Engine_func,
+		}, "\n"))
+
+		diff, hasDiff := testutils.Diff(actual, expected)
+		if hasDiff {
+			t.Errorf(diff)
+		}
+	})
 }
