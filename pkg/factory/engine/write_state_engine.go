@@ -27,6 +27,7 @@ func (s *EngineFactory) writeEngine() *EngineFactory {
 		Id("Patch").Id("*State"),
 		Id("Tree").Id("*Tree"),
 		Id("broadcastingClientID").Id("string"),
+		Id("thisClientID").Id("string"),
 		Id("planner").Id("*assemblePlanner"),
 		Id("IDgen").Int(),
 	)
@@ -55,7 +56,32 @@ func (s *EngineFactory) writeGenerateID() *EngineFactory {
 	return s
 }
 
+func writeImportPatchElement(typeName string) *Statement {
+	return For(List(Id("_"), Id(typeName)).Op(":=").Range().Id("patch").Dot(Title(typeName))).Block(
+		If(Id(typeName).Dot("Meta").Dot("BroadcastedBy").Op("==").Id("engine").Dot("thisClientID")).Block(
+			Continue(),
+		),
+		Id(typeName).Dot("Meta").Dot("unsign").Call(),
+		Id("engine").Dot("State").Dot(Title(typeName)).Index(Id(typeName).Dot("ID")).Op("=").Id(typeName),
+	)
+}
+
 func (s *EngineFactory) writeImportPatch() *EngineFactory {
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("importPatch").Params(Id("patch").Id("*State")).Block(
+		ForEachBasicType(func(b BasicType) *Statement {
+			return writeImportPatchElement(b.Value)
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			return writeImportPatchElement(configType.Name)
+		}),
+		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
+			return writeImportPatchElement(field.ValueTypeName)
+		}),
+		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
+			return writeImportPatchElement(anyNameByField(field))
+		}),
+	)
+
 	return s
 }
 

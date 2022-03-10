@@ -372,7 +372,6 @@ func (engine *Engine) importPatch(patch *State) {
 		if player.Meta.BroadcastedBy == engine.thisClientID {
 			continue
 		}
-		player.Action = player.Action[:0]
 		player.Meta.unsign()
 	}
 	for _, position := range patch.Position {
