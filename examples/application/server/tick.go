@@ -29,7 +29,7 @@ func (r *Room) tickSync(sideEffects SideEffects) {
 func (r *Room) publishPatch() error {
 	patchBytes, err := r.state.Patch.MarshalJSON()
 	if err != nil {
-		return fmt.Errorf("error marshalling tree for patch: %s", err)
+		return fmt.Errorf("error marshalling patch: %s", err)
 	}
 
 	// TODO: if patch is empty -> find better way for evaluation

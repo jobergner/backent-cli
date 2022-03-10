@@ -5038,6 +5038,7 @@ const _Engine_type string = `type Engine struct {
 	Patch			*State
 	Tree			*Tree
 	broadcastingClientID	string
+	thisClientID		string
 	planner			*assemblePlanner
 	IDgen			int
 }`
@@ -5320,6 +5321,163 @@ const _UpdateState_Engine_func string = `func (engine *Engine) UpdateState() {
 	}
 	for key := range engine.Patch.AnyOfItem_Player_ZoneItem {
 		delete(engine.Patch.AnyOfItem_Player_ZoneItem, key)
+	}
+}`
+
+const importPatch_Engine_func string = `func (engine *Engine) importPatch(patch *State) {
+	for _, boolValue := range patch.BoolValue {
+		if boolValue.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		boolValue.Meta.unsign()
+		engine.State.BoolValue[boolValue.ID] = boolValue
+	}
+	for _, floatValue := range patch.FloatValue {
+		if floatValue.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		floatValue.Meta.unsign()
+		engine.State.FloatValue[floatValue.ID] = floatValue
+	}
+	for _, intValue := range patch.IntValue {
+		if intValue.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		intValue.Meta.unsign()
+		engine.State.IntValue[intValue.ID] = intValue
+	}
+	for _, stringValue := range patch.StringValue {
+		if stringValue.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		stringValue.Meta.unsign()
+		engine.State.StringValue[stringValue.ID] = stringValue
+	}
+	for _, attackEvent := range patch.AttackEvent {
+		if attackEvent.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		attackEvent.Meta.unsign()
+		engine.State.AttackEvent[attackEvent.ID] = attackEvent
+	}
+	for _, equipmentSet := range patch.EquipmentSet {
+		if equipmentSet.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		equipmentSet.Meta.unsign()
+		engine.State.EquipmentSet[equipmentSet.ID] = equipmentSet
+	}
+	for _, gearScore := range patch.GearScore {
+		if gearScore.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		gearScore.Meta.unsign()
+		engine.State.GearScore[gearScore.ID] = gearScore
+	}
+	for _, item := range patch.Item {
+		if item.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		item.Meta.unsign()
+		engine.State.Item[item.ID] = item
+	}
+	for _, player := range patch.Player {
+		if player.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		player.Action = player.Action[:0]
+		player.Meta.unsign()
+	}
+	for _, position := range patch.Position {
+		if position.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		position.Meta.unsign()
+		engine.State.Position[position.ID] = position
+	}
+	for _, zone := range patch.Zone {
+		if zone.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		zone.Meta.unsign()
+		engine.State.Zone[zone.ID] = zone
+	}
+	for _, zoneItem := range patch.ZoneItem {
+		if zoneItem.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		zoneItem.Meta.unsign()
+		engine.State.ZoneItem[zoneItem.ID] = zoneItem
+	}
+	for _, attackEventTargetRef := range patch.AttackEventTargetRef {
+		if attackEventTargetRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		attackEventTargetRef.Meta.unsign()
+		engine.State.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
+	}
+	for _, equipmentSetEquipmentRef := range patch.EquipmentSetEquipmentRef {
+		if equipmentSetEquipmentRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		equipmentSetEquipmentRef.Meta.unsign()
+		engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
+	}
+	for _, itemBoundToRef := range patch.ItemBoundToRef {
+		if itemBoundToRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		itemBoundToRef.Meta.unsign()
+		engine.State.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
+	}
+	for _, playerEquipmentSetRef := range patch.PlayerEquipmentSetRef {
+		if playerEquipmentSetRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		playerEquipmentSetRef.Meta.unsign()
+		engine.State.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
+	}
+	for _, playerGuildMemberRef := range patch.PlayerGuildMemberRef {
+		if playerGuildMemberRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		playerGuildMemberRef.Meta.unsign()
+		engine.State.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
+	}
+	for _, playerTargetRef := range patch.PlayerTargetRef {
+		if playerTargetRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		playerTargetRef.Meta.unsign()
+		engine.State.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
+	}
+	for _, playerTargetedByRef := range patch.PlayerTargetedByRef {
+		if playerTargetedByRef.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		playerTargetedByRef.Meta.unsign()
+		engine.State.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
+	}
+	for _, anyOfPlayer_Position := range patch.AnyOfPlayer_Position {
+		if anyOfPlayer_Position.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		anyOfPlayer_Position.Meta.unsign()
+		engine.State.AnyOfPlayer_Position[anyOfPlayer_Position.ID] = anyOfPlayer_Position
+	}
+	for _, anyOfPlayer_ZoneItem := range patch.AnyOfPlayer_ZoneItem {
+		if anyOfPlayer_ZoneItem.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		anyOfPlayer_ZoneItem.Meta.unsign()
+		engine.State.AnyOfPlayer_ZoneItem[anyOfPlayer_ZoneItem.ID] = anyOfPlayer_ZoneItem
+	}
+	for _, anyOfItem_Player_ZoneItem := range patch.AnyOfItem_Player_ZoneItem {
+		if anyOfItem_Player_ZoneItem.Meta.BroadcastedBy == engine.thisClientID {
+			continue
+		}
+		anyOfItem_Player_ZoneItem.Meta.unsign()
+		engine.State.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItem.ID] = anyOfItem_Player_ZoneItem
 	}
 }`
 

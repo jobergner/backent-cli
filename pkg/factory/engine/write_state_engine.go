@@ -55,6 +55,10 @@ func (s *EngineFactory) writeGenerateID() *EngineFactory {
 	return s
 }
 
+func (s *EngineFactory) writeImportPatch() *EngineFactory {
+	return s
+}
+
 func (s *EngineFactory) writeUpdateState() *EngineFactory {
 
 	u := updateStateWriter{}

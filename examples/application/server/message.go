@@ -11,11 +11,14 @@ const (
 	MessageKindError        MessageKind = "error"
 	MessageKindCurrentState MessageKind = "currentState"
 	MessageKindUpdate       MessageKind = "update"
+	// responses to messages which fail to unmarshal
+	MessageIDUnknown string = "unknown"
 	// client -> server
 	MessageKindGlobal MessageKind = "global"
 )
 
 type Message struct {
+	ID      string      `json:"id"`
 	Kind    MessageKind `json:"kind"`
 	Content []byte      `json:"content"`
 	client  *Client

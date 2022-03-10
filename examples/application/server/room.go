@@ -37,6 +37,14 @@ func (r *Room) Name() string {
 	return r.name
 }
 
+func (r *Room) RemoveClient(client *Client) {
+	r.removeClient(client)
+}
+
+func (r *Room) AddClient(client *Client) {
+	r.addClient(client)
+}
+
 func (r *Room) AlterState(fn func(*Engine)) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -81,13 +89,11 @@ func (r *Room) processMessageSync(msg Message) {
 	case response.client.messageChannel <- responseBytes:
 	default:
 		log.Printf("client's message buffer full -> dropping client %s", response.client.id)
-		// TODO need other solution for this. client sould probably also be kicked from login server
-		// response.client.conn.Close()
 		r.unregisterClientAsync(response.client)
 	}
 }
 
-func (r *Room) registerClientSync(client *Client) {
+func (r *Room) addClient(client *Client) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -95,6 +101,15 @@ func (r *Room) registerClientSync(client *Client) {
 	r.incomingClients[client] = struct{}{}
 }
 
+func (r *Room) removeClient(client *Client) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	delete(r.clients, client)
+	delete(r.incomingClients, client)
+}
+
+// removes a client from a room and closes the connection
 func (r *Room) unregisterClientSync(client *Client) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
