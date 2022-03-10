@@ -5385,8 +5385,8 @@ const importPatch_Engine_func string = `func (engine *Engine) importPatch(patch 
 		if player.Meta.BroadcastedBy == engine.thisClientID {
 			continue
 		}
-		player.Action = player.Action[:0]
 		player.Meta.unsign()
+		engine.State.Player[player.ID] = player
 	}
 	for _, position := range patch.Position {
 		if position.Meta.BroadcastedBy == engine.thisClientID {
