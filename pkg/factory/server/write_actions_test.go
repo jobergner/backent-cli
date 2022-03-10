@@ -19,6 +19,9 @@ func TestWriteActions(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
+			_AddItemToPlayerAction_type,
+			_MovePlayerAction_type,
+			_SpawnZoneItemsAction_type,
 			_Actions_type,
 		}, "\n"))
 
