@@ -217,7 +217,7 @@ func benchTestRemoveInteractables(engine *Engine, zone Zone) {
 // }
 
 func BenchmarkAssembleTree(b *testing.B) {
-	engine := newEngine()
+	engine := NewEngine()
 	for i := 0; i < benchTestNumberOfZones; i++ {
 		setUpRealisticZoneForBenchmarkExample(engine)
 	}
@@ -239,7 +239,7 @@ func BenchmarkAssembleTree(b *testing.B) {
 }
 
 func BenchmarkAssembleFullTree(b *testing.B) {
-	engine := newEngine()
+	engine := NewEngine()
 	for i := 0; i < benchTestNumberOfZones; i++ {
 		setUpRealisticZoneForBenchmarkExample(engine)
 	}
@@ -252,7 +252,7 @@ func BenchmarkAssembleFullTree(b *testing.B) {
 }
 
 func BenchmarkEngine(b *testing.B) {
-	engine := newEngine()
+	engine := NewEngine()
 	for i := 0; i < benchTestNumberOfZones; i++ {
 		setUpRealisticZoneForBenchmarkExample(engine)
 	}
