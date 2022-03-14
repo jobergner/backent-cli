@@ -1,55 +1,58 @@
-package state
+package server
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
+	"github.com/jobergner/backent-cli/examples/action"
+	"github.com/jobergner/backent-cli/examples/connect"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"nhooyr.io/websocket"
 )
+
+func init() {
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+}
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
 
-func wsEndpoint(w http.ResponseWriter, r *http.Request, loginHandler *LoginHandler) {
+func wsEndpoint(w http.ResponseWriter, r *http.Request, lobby *Lobby) {
 
 	websocketConnection, err := websocket.Accept(w, r, &websocket.AcceptOptions{InsecureSkipVerify: true})
 	if err != nil {
-		log.Println(err)
+		log.Err(err).Msg("failed creating websocket connection")
 		return
 	}
 
-	client, err := newClient(NewConnection(websocketConnection, r))
+	client, err := newClient(connect.NewConnection(websocketConnection, r.Context()), lobby)
 	if err != nil {
-		log.Println(err)
 		return
 	}
 
-	loginHandler.addClient(client)
+	lobby.addClient(client)
 
 	go client.runReadMessages()
 	go client.runWriteMessages()
 
 	// wait until connection closes
 	<-r.Context().Done()
-	loginHandler.deleteClient(client)
+	lobby.deleteClient(client)
 }
 
-func setupRoutes(loginHandler *LoginHandler) {
+func setupRoutes(loginHandler *Lobby) {
 	http.HandleFunc("/", homePageHandler)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { wsEndpoint(w, r, loginHandler) })
 }
 
-func Start(signals LoginSignals, actions Actions, sideEffects SideEffects, fps int, port int) error {
-	// TODO: what does this even do??
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
+func Start(signals LobbySignals, actions action.Actions, sideEffects SideEffects, fps int, port int) error {
 	loginHandler := newLoginHandler(signals, actions, sideEffects, fps)
 
 	setupRoutes(loginHandler)
 
-	fmt.Printf("backent running on port %d\n", port)
+	log.Info().Msgf("backent running on port %d\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return err
 }

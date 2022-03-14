@@ -1,43 +1,51 @@
-package state
+package client
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
 
+	"github.com/jobergner/backent-cli/examples/action"
+	"github.com/jobergner/backent-cli/examples/connect"
+	"github.com/jobergner/backent-cli/examples/message"
+	"github.com/jobergner/backent-cli/examples/state"
 	"nhooyr.io/websocket"
 )
 
+// easyjson:skip
 type Client struct {
 	id             string
 	mu             sync.Mutex
-	actions        Actions
-	engine         *Engine
-	conn           Connector
+	actions        action.Actions
+	engine         *state.Engine
+	conn           connect.Connector
 	router         *responseRouter
 	idSignal       chan string
 	messageChannel chan []byte
+	patchChannel   chan []byte
 }
 
-func NewClient(actions Actions) (*Client, context.CancelFunc, error) {
+func NewClient(actions action.Actions) (*Client, context.CancelFunc, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*3)
 
-	c, _, err := websocket.Dial(ctx, "ws://localhost:8080", nil)
+	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
 	if err != nil {
 		return nil, cancel, err
 	}
 
 	client := Client{
 		actions: actions,
-		engine:  newEngine(),
-		conn:    NewConnection(ctx, c),
+		engine:  state.NewEngine(),
+		conn:    connect.NewConnection(c, ctx),
 		router: &responseRouter{
 			pending: make(map[string]chan []byte),
 		},
 		idSignal:       make(chan string, 1),
 		messageChannel: make(chan []byte),
+		patchChannel:   make(chan []byte),
 	}
 
 	go client.runReadMessages()
@@ -46,6 +54,36 @@ func NewClient(actions Actions) (*Client, context.CancelFunc, error) {
 	client.id = <-client.idSignal
 
 	return &client, cancel, nil
+}
+
+func (c *Client) tickSync() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.engine.Patch.IsEmpty() {
+		return
+	}
+
+	patchBytes, err := c.engine.Patch.MarshalJSON()
+	if err != nil {
+		log.Printf("error marshalling patch: %s", err)
+	}
+
+	c.patchChannel <- patchBytes
+}
+
+func (c *Client) ReadUpdate() []byte {
+	return <-c.patchChannel
+}
+
+func (c *Client) emitPatches() {
+	ticker := time.NewTicker(time.Second)
+
+	for {
+		<-ticker.C
+
+		c.tickSync()
+	}
 }
 
 func (c *Client) ID() string {
@@ -69,6 +107,8 @@ func (c *Client) runReadMessages() {
 
 		var msg Message
 		err = msg.UnmarshalJSON(msgBytes)
+
+		fmt.Println(string(msg.Content))
 
 		if err != nil {
 			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
@@ -95,20 +135,21 @@ func (c *Client) runWriteMessages() {
 }
 
 func (c *Client) processMessageSync(msg Message) error {
-	switch msg.Kind {
-	case MessageKindID:
-		c.idSignal <- msg.ID
-	case MessageKindUpdate, MessageKindCurrentState:
-		var state State
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-		err := state.UnmarshalJSON(msg.Content)
+	switch msg.Kind {
+	case message.MessageKindID:
+		c.idSignal <- string(msg.Content)
+	case message.MessageKindUpdate, message.MessageKindCurrentState:
+		var patch state.State
+		err := patch.UnmarshalJSON(msg.Content)
 		if err != nil {
 			return err
 		}
-
-		c.engine.importPatch(&state)
+		c.engine.ImportPatch(&patch)
 	default:
-		panic("DA")
+		c.router.route(msg)
 	}
 
 	return nil

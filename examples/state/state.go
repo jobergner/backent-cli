@@ -391,3 +391,74 @@ type playerTargetedByRefCore struct {
 }
 
 type PlayerTargetedByRef struct{ playerTargetedByRef playerTargetedByRefCore }
+
+func (s State) IsEmpty() bool {
+	if len(s.BoolValue) != 0 {
+		return false
+	}
+	if len(s.FloatValue) != 0 {
+		return false
+	}
+	if len(s.IntValue) != 0 {
+		return false
+	}
+	if len(s.StringValue) != 0 {
+		return false
+	}
+	if len(s.AttackEvent) != 0 {
+		return false
+	}
+	if len(s.EquipmentSet) != 0 {
+		return false
+	}
+	if len(s.GearScore) != 0 {
+		return false
+	}
+	if len(s.Item) != 0 {
+		return false
+	}
+	if len(s.Player) != 0 {
+		return false
+	}
+	if len(s.Position) != 0 {
+		return false
+	}
+	if len(s.Zone) != 0 {
+		return false
+	}
+	if len(s.ZoneItem) != 0 {
+		return false
+	}
+	if len(s.AttackEventTargetRef) != 0 {
+		return false
+	}
+	if len(s.EquipmentSetEquipmentRef) != 0 {
+		return false
+	}
+	if len(s.ItemBoundToRef) != 0 {
+		return false
+	}
+	if len(s.PlayerEquipmentSetRef) != 0 {
+		return false
+	}
+	if len(s.PlayerGuildMemberRef) != 0 {
+		return false
+	}
+	if len(s.PlayerTargetRef) != 0 {
+		return false
+	}
+	if len(s.PlayerTargetedByRef) != 0 {
+		return false
+	}
+	if len(s.AnyOfPlayer_Position) != 0 {
+		return false
+	}
+	if len(s.AnyOfPlayer_ZoneItem) != 0 {
+		return false
+	}
+	if len(s.AnyOfItem_Player_ZoneItem) != 0 {
+		return false
+	}
+
+	return true
+}

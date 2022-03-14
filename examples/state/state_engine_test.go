@@ -10,19 +10,19 @@ import (
 
 func TestEngine(t *testing.T) {
 	t.Run("creates elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		_, ok := se.Patch.GearScore[gearScore.ID()]
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		_gearScore := se.GearScore(gearScore.ID())
 		assert.NotZero(t, _gearScore.ID())
 	})
 	t.Run("gets element and checks of they exist", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		_, gearScoreExists := se.GearScore(gearScore.ID()).Exists()
 		assert.True(t, gearScoreExists)
@@ -36,21 +36,21 @@ func TestEngine(t *testing.T) {
 		assert.False(t, playerExists)
 	})
 	t.Run("gets every element", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		se.CreateGearScore()
 		se.CreateGearScore()
 		se.CreatePlayer()
 		assert.Equal(t, 2, len(se.EveryGearScore()))
 	})
 	t.Run("gets slice of elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		player.AddItem()
 		player.AddItem()
 		assert.Equal(t, 2, len(player.Items()))
 	})
 	t.Run("gets slice of elements excluding elements which have OperationKindDelete", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item1 := player.AddItem()
 		player.AddItem()
@@ -58,14 +58,14 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, 1, len(player.Items()))
 	})
 	t.Run("sets elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		gearScore.SetLevel(10)
 		intValue := se.Patch.IntValue[gearScore.gearScore.Level]
 		assert.Equal(t, int64(10), intValue.Value)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
 		se.deleteGearScore(gearScore.ID())
@@ -73,7 +73,7 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, OperationKindDelete, _gearScore.OperationKind)
 	})
 	t.Run("adds elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
 		playerItem := player.Items()[0]
@@ -82,7 +82,7 @@ func TestEngine(t *testing.T) {
 		assert.True(t, ok)
 	})
 	t.Run("removes elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
 		se.UpdateState()
@@ -91,7 +91,7 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, OperationKindDelete, _item.OperationKind)
 	})
 	t.Run("removes elements of any type", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		zone := se.CreateZone()
 		zone.AddInteractableItem()
 		zone.AddInteractablePlayer()
@@ -100,7 +100,7 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, len(zone.Interactables()), 2)
 	})
 	t.Run("removes elements of any type reference", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player1 := se.CreatePlayer()
 		zoneItem1 := se.CreateZoneItem()
 		player2 := se.CreatePlayer()
@@ -110,7 +110,7 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, len(player1.TargetedBy()), 1)
 	})
 	t.Run("removes events on update state", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		player2 := se.CreatePlayer()
 		player.AddAction().SetTarget(player2.ID())
@@ -121,7 +121,7 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, 0, len(se.Patch.AttackEventTargetRef))
 	})
 	t.Run("creates origin, sets it from player to position", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		item1 := se.CreateItem()
 		assert.Equal(t, ElementKindPlayer, item1.Origin().anyOfPlayer_Position.ElementKind)
 		item1.Origin().Player().Position().SetX(1)
@@ -136,16 +136,16 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, float64(2), item2.Origin().Position().Y())
 	})
 	t.Run("signs elements as exoected", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		item := se.CreateItem()
-		se.broadcastingClientID = "foo"
+		se.BroadcastingClientID = "foo"
 		item.SetName("newname0")
 		assert.Equal(t, "foo", se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
 		assert.Equal(t, false, se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
 		item.SetName("newname2")
 		assert.Equal(t, "foo", se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
 		assert.Equal(t, false, se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
-		se.broadcastingClientID = "bar"
+		se.BroadcastingClientID = "bar"
 		item.SetName("newname3")
 		assert.Equal(t, "", se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.BroadcastedBy)
 		assert.Equal(t, true, se.Patch.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
@@ -154,7 +154,7 @@ func TestEngine(t *testing.T) {
 		assert.Equal(t, false, se.State.StringValue[se.Item(item.ID()).item.Name].Meta.TouchedByMany)
 	})
 	t.Run("does not panic when getting parent of element without parent", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		itm := se.CreateItem()
 		itm.ParentPlayer()
 	})
@@ -162,7 +162,7 @@ func TestEngine(t *testing.T) {
 
 func TestReferences(t *testing.T) {
 	t.Run("deletes reference off element if referenced element gets deleted (1/3)", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player1 := se.CreatePlayer()
 		player2 := se.CreatePlayer()
 		player1.AddGuildMember(player2.ID())
@@ -174,7 +174,7 @@ func TestReferences(t *testing.T) {
 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
 	})
 	t.Run("deletes reference off element if referenced element gets deleted (2/3)", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := se.CreateItem()
 		item.SetBoundTo(player.ID())
@@ -187,7 +187,7 @@ func TestReferences(t *testing.T) {
 		assert.False(t, isSet)
 	})
 	t.Run("deletes reference off element if referenced element gets deleted (3/3)", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		zone := se.CreateZone()
 		player1 := se.CreatePlayer()
 		player2 := zone.AddPlayer()
@@ -200,7 +200,7 @@ func TestReferences(t *testing.T) {
 		assert.Equal(t, 0, len(player1_updated.GuildMembers))
 	})
 	t.Run("deletes reference when Set is called on field which already has reference", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		item := se.CreateItem()
 		player := se.CreatePlayer()
 		player2 := se.CreatePlayer()
@@ -209,7 +209,7 @@ func TestReferences(t *testing.T) {
 		assert.Equal(t, 1, len(se.Patch.ItemBoundToRef))
 	})
 	t.Run("does not add reference to slice when element is already referenced", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player1 := se.CreatePlayer()
 		player2 := se.CreatePlayer()
 		player1.AddGuildMember(player2.ID())
@@ -218,7 +218,7 @@ func TestReferences(t *testing.T) {
 		assert.Equal(t, 1, len(player1.GuildMembers()))
 	})
 	t.Run("does not add reference to slice when element is already referenced", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player1 := se.CreatePlayer()
 		player1.Position().SetX(2)
 		se.CreatePlayer()
@@ -229,13 +229,13 @@ func TestReferences(t *testing.T) {
 
 func TestUpdateState(t *testing.T) {
 	t.Run("clears patch", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		se.CreateGearScore()
 		se.UpdateState()
 		assert.Equal(t, len(se.Patch.GearScore), 0)
 	})
 	t.Run("creates elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
 		_, ok := se.Patch.GearScore[gearScore.ID()]
@@ -244,7 +244,7 @@ func TestUpdateState(t *testing.T) {
 		assert.True(t, ok)
 	})
 	t.Run("gets elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
 		assert.Zero(t, gearScore.Level())
@@ -252,7 +252,7 @@ func TestUpdateState(t *testing.T) {
 		assert.Equal(t, gearScore.Level(), int64(1))
 	})
 	t.Run("sets elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore().SetLevel(1)
 		se.UpdateState()
 		_gearScore := se.State.GearScore[gearScore.ID()]
@@ -261,7 +261,7 @@ func TestUpdateState(t *testing.T) {
 		assert.False(t, ok)
 	})
 	t.Run("does not set elements when value has not changed", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore().SetLevel(1)
 		se.UpdateState()
 		gearScore.SetLevel(1)
@@ -269,7 +269,7 @@ func TestUpdateState(t *testing.T) {
 		assert.False(t, ok)
 	})
 	t.Run("deletes elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		se.UpdateState()
 		se.deleteGearScore(gearScore.ID())
@@ -281,7 +281,7 @@ func TestUpdateState(t *testing.T) {
 		// todo
 	})
 	t.Run("adds elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
 		se.UpdateState()
@@ -291,7 +291,7 @@ func TestUpdateState(t *testing.T) {
 		assert.NotZero(t, len(_player.Items))
 	})
 	t.Run("removes elements", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
 		se.UpdateState()
@@ -304,7 +304,7 @@ func TestUpdateState(t *testing.T) {
 
 func TestActionsOnDeletedItems(t *testing.T) {
 	t.Run("does not set attribute on element which was deleted even before entering State", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		assert.Equal(t, int64(0), gearScore.Level())
 		se.DeleteGearScore(gearScore.ID())
@@ -312,7 +312,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, int64(0), gearScore.Level())
 	})
 	t.Run("does not set attribute on element which is set to be deleted", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		gearScore := se.CreateGearScore()
 		assert.Equal(t, int64(0), gearScore.Level())
 		se.UpdateState()
@@ -321,7 +321,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, int64(0), gearScore.Level())
 	})
 	t.Run("does not add child on element which is set to be deleted", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		se.DeletePlayer(player.ID())
 		item := player.AddItem()
@@ -329,7 +329,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, 0, len(se.Player(player.ID()).Items()))
 	})
 	t.Run("does not remove child on element which is set to be deleted", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
 		se.UpdateState()
@@ -339,7 +339,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 		assert.Equal(t, 1, len(se.Player(player.ID()).Items()))
 	})
 	t.Run("does not delete element which is a child of another element", func(t *testing.T) {
-		se := newEngine()
+		se := NewEngine()
 		player := se.CreatePlayer()
 		item := player.AddItem()
 		se.DeleteItem(item.ID())
@@ -348,7 +348,7 @@ func TestActionsOnDeletedItems(t *testing.T) {
 }
 
 func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assembleEntireTree bool) {
-	se := newEngine()
+	se := NewEngine()
 	expectedTree := newTree()
 	define(se, expectedTree)
 	if assembleEntireTree {
