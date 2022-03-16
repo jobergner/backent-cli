@@ -10,8 +10,8 @@
 # required for running unit tests
 decltostring -input ./examples/server/ -output ./pkg/factory/server/stringified_server_decls.go -package server -exclude "test|easyjson";
 decltostring -input ./examples/state/ -output ./pkg/factory/state/stringified_state_decls.go -package state -exclude "test|easyjson";
-decltostring -input ./examples/action/ -output ./pkg/factory/action/stringified_action_decls.go -package action -only "actions.generated.go";
-decltostring -input ./examples/client/ -output ./pkg/factory/client/stringified_client_decls.go -package client -only "actions.generated.go"; 
+decltostring -input ./examples/message/ -output ./pkg/factory/message/stringified_message_decls.go -package message -exclude "test|easyjson";
+decltostring -input ./examples/client/ -output ./pkg/factory/client/stringified_client_decls.go -package client -exclude "test|easyjson"; 
 
 # required for running integration tests
 # go run . -out=integrationtest/state/ generate;

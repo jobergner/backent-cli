@@ -59,7 +59,7 @@ func (c *Client) RoomName() string {
 }
 
 // closeConnection closes the client's connection
-// this does not do anything else at its own, but triggers
+// this does not do anything else on its own, but triggers
 // the removal of the client from the system in the
 // http handler
 func (c *Client) closeConnection() {

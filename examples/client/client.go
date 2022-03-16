@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/connect"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
@@ -18,7 +17,7 @@ import (
 type Client struct {
 	id             string
 	mu             sync.Mutex
-	actions        action.Actions
+	controller     Controller
 	engine         *state.Engine
 	conn           connect.Connector
 	router         *responseRouter
@@ -27,7 +26,7 @@ type Client struct {
 	patchChannel   chan []byte
 }
 
-func NewClient(actions action.Actions) (*Client, context.CancelFunc, error) {
+func NewClient(controller Controller) (*Client, context.CancelFunc, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*3)
 
@@ -38,9 +37,9 @@ func NewClient(actions action.Actions) (*Client, context.CancelFunc, error) {
 	}
 
 	client := Client{
-		actions: actions,
-		engine:  state.NewEngine(),
-		conn:    connect.NewConnection(c, ctx),
+		controller: controller,
+		engine:     state.NewEngine(),
+		conn:       connect.NewConnection(c, ctx),
 		router: &responseRouter{
 			pending: make(map[string]chan []byte),
 		},

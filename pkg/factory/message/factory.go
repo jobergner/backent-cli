@@ -1,4 +1,4 @@
-package action
+package message
 
 import (
 	"github.com/dave/jennifer/jen"
@@ -49,6 +49,5 @@ func Write(
 	newFactory(file, config).
 		writeMessageKinds().
 		writeParameters().
-		writeResponses().
-		writeActions()
+		writeResponses()
 }

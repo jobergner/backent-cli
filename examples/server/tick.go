@@ -6,14 +6,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (r *Room) tickSync(sideEffects SideEffects) {
+func (r *Room) tickSync(controller Controller) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if sideEffects.OnFrameTick != nil {
-		log.Debug().Str(logging.RoomName, r.name).Msg("onFrameTick")
-		sideEffects.OnFrameTick(r.state)
-	}
+	log.Debug().Str(logging.RoomName, r.name).Msg("onFrameTick")
+	controller.OnFrameTick(r.state)
 
 	err := r.publishPatch()
 	if err != nil {
