@@ -1,4 +1,4 @@
-package server
+package action
 
 import (
 	"github.com/dave/jennifer/jen"
@@ -17,6 +17,20 @@ type Factory struct {
 	file   *jen.File
 }
 
+// isIDTypeOfType evaluates whether a given type name is the respective ID-Type
+// of a user-defined type.
+// Background:
+// Every user-defined type has a generated ID type.
+// E.g. a defined type "person" has its ID-Type "PersonID" generated automatically
+func (s Factory) isIDTypeOfType(typeName string) bool {
+	for _, configType := range s.config.Types {
+		if configType.Name+"ID" == typeName {
+			return true
+		}
+	}
+	return false
+}
+
 func newFactory(file *jen.File, config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
@@ -28,10 +42,13 @@ func newFactory(file *jen.File, config *ast.AST) *Factory {
 func Write(
 	file *jen.File,
 	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
-	configJson []byte,
 ) {
 
 	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 
-	newFactory(file, config).writeProcessClientMessage()
+	newFactory(file, config).
+		writeMessageKinds().
+		writeParameters().
+		writeResponses().
+		writeActions()
 }

@@ -1,4 +1,4 @@
-package server
+package client
 
 import (
 	"bytes"
@@ -9,17 +9,19 @@ import (
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
-func TestWriteProcessClientMessage(t *testing.T) {
-	t.Run("writes processClientMessage", func(t *testing.T) {
+func TestWriteActions(t *testing.T) {
+	t.Run("writes actions", func(t *testing.T) {
 		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
-		sf.writeProcessClientMessage()
+		sf.writeActions()
 
 		buf := new(bytes.Buffer)
 		sf.file.Render(buf)
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			processClientMessage_Room_func,
+			_AddItemToPlayer_Client_func,
+			_MovePlayer_Client_func,
+			_SpawnZoneItems_Client_func,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)

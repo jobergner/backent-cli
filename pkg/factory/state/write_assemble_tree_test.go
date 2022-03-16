@@ -1,4 +1,4 @@
-package server
+package state
 
 import (
 	"bytes"
@@ -9,17 +9,19 @@ import (
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
-func TestWriteProcessClientMessage(t *testing.T) {
-	t.Run("writes processClientMessage", func(t *testing.T) {
+func TestWriteAssembleTree(t *testing.T) {
+	t.Run("writes assembleTree", func(t *testing.T) {
 		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
-		sf.writeProcessClientMessage()
+		sf.writeAssembleTree()
 
 		buf := new(bytes.Buffer)
 		sf.file.Render(buf)
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			processClientMessage_Room_func,
+			assembleUpdateTree_Engine_func,
+			assembleFullTree_Engine_func,
+			assembleTree_Engine_func,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)
