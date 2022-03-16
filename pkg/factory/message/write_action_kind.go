@@ -1,4 +1,4 @@
-package action
+package message
 
 import (
 	"github.com/jobergner/backent-cli/pkg/ast"

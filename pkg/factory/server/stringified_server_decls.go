@@ -2,29 +2,6 @@
 
 package server
 
-const application_config_go_import string = `import (
-	"github.com/jobergner/backent-cli/examples/action"
-	"github.com/jobergner/backent-cli/examples/state"
-)`
-
-const applicationConfig_type string = `type applicationConfig struct {
-	actions		action.Actions
-	signals		LobbySignals
-	sideEffects	SideEffects
-	fps		int
-}`
-
-const _SideEffects_type string = `type SideEffects struct {
-	OnDeploy	func(engine *state.Engine)
-	OnFrameTick	func(engine *state.Engine)
-}`
-
-const _LobbySignals_type string = `type LobbySignals struct {
-	OnSuperMessage		func(msg Message, room *Room, client *Client, loginHandler *Lobby)
-	OnClientConnect		func(client *Client, loginHandler *Lobby)
-	OnClientDisconnect	func(room *Room, clientID string, loginHandler *Lobby)
-}`
-
 const client_go_import string = `import (
 	"github.com/google/uuid"
 	"github.com/jobergner/backent-cli/examples/connect"
@@ -157,21 +134,40 @@ const promote_clientRegistrar_func string = `func (c *clientRegistrar) promote(c
 	delete(c.incomingClients, client)
 }`
 
+const controller_generated_go_import string = `import (
+	"github.com/jobergner/backent-cli/examples/message"
+	"github.com/jobergner/backent-cli/examples/state"
+)`
+
+const _Controller_type string = `type Controller interface {
+	OnSuperMessage(msg Message, room *Room, client *Client, loginHandler *Lobby)
+	OnClientConnect(client *Client, loginHandler *Lobby)
+	OnClientDisconnect(room *Room, clientID string, loginHandler *Lobby)
+	OnDeploy(engine *state.Engine)
+	OnFrameTick(engine *state.Engine)
+	AddItemToPlayerBroadcast(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string)
+	AddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
+	MovePlayerBroadcast(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
+	MovePlayerEmit(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
+	SpawnZoneItemsBroadcast(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string)
+	SpawnZoneItemsEmit(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) message.SpawnZoneItemsResponse
+}`
+
 const lobby_go_import string = `import (
 	"sync"
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/rs/zerolog/log"
 )`
 
 const _Lobby_type string = `type Lobby struct {
-	mu	sync.Mutex
-	Rooms	map[string]*Room
-	config	applicationConfig
+	mu		sync.Mutex
+	Rooms		map[string]*Room
+	controller	Controller
+	fps		int
 }`
 
-const newLoginHandler_func string = `func newLoginHandler(signals LobbySignals, actions action.Actions, sideEffects SideEffects, fps int) *Lobby {
-	return &Lobby{Rooms: make(map[string]*Room), config: applicationConfig{signals: signals, actions: actions, sideEffects: sideEffects, fps: fps}}
+const newLoginHandler_func string = `func newLoginHandler(controller Controller, fps int) *Lobby {
+	return &Lobby{Rooms: make(map[string]*Room), controller: controller, fps: fps}
 }`
 
 const _CreateRoom_Lobby_func string = `func (l *Lobby) CreateRoom(name string) *Room {
@@ -179,9 +175,9 @@ const _CreateRoom_Lobby_func string = `func (l *Lobby) CreateRoom(name string) *
 		log.Warn().Str(logging.RoomName, name).Msg("attempted to create room which already exists")
 		return room
 	}
-	room := newRoom(l.config.actions, name)
+	room := newRoom(l.controller, name)
 	l.Rooms[name] = room
-	room.Deploy(l.config.sideEffects, l.config.fps)
+	room.Deploy(l.controller, l.fps)
 	return room
 }`
 
@@ -207,39 +203,29 @@ const deleteClient_Lobby_func string = `func (l *Lobby) deleteClient(client *Cli
 }`
 
 const processMessageSync_Lobby_func string = `func (l *Lobby) processMessageSync(msg Message) {
-	if l.config.signals.OnSuperMessage == nil {
-		return
-	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	log.Debug().Str(logging.ClientID, msg.client.id).Msg("OnSuperMessage")
-	l.config.signals.OnSuperMessage(msg, msg.client.room, msg.client, l)
+	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
 }`
 
 const signalClientDisconnect_Lobby_func string = `func (l *Lobby) signalClientDisconnect(client *Client) {
-	if l.config.signals.OnClientDisconnect == nil {
-		return
-	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientDisconnect")
-	l.config.signals.OnClientDisconnect(client.room, client.id, l)
+	l.controller.OnClientDisconnect(client.room, client.id, l)
 }`
 
 const signalClientConnect_Lobby_func string = `func (l *Lobby) signalClientConnect(client *Client) {
-	if l.config.signals.OnClientConnect == nil {
-		return
-	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientConnect")
-	l.config.signals.OnClientConnect(client, l)
+	l.controller.OnClientConnect(client, l)
 }`
 
 const main_go_import string = `import (
 	"fmt"
 	"net/http"
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/connect"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -278,8 +264,8 @@ const setupRoutes_func string = `func setupRoutes(loginHandler *Lobby) {
 	})
 }`
 
-const _Start_func string = `func Start(signals LobbySignals, actions action.Actions, sideEffects SideEffects, fps int, port int) error {
-	loginHandler := newLoginHandler(signals, actions, sideEffects, fps)
+const _Start_func string = `func Start(controller Controller, fps int, port int) error {
+	loginHandler := newLoginHandler(controller, fps)
 	setupRoutes(loginHandler)
 	log.Info().Msgf("backent running on port %d\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
@@ -296,7 +282,6 @@ const _Message_type string = `type Message struct {
 }`
 
 const process_message_generated_go_import string = `import (
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/rs/zerolog/log"
@@ -304,61 +289,46 @@ const process_message_generated_go_import string = `import (
 
 const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) (response Message) {
 	switch msg.Kind {
-	case action.MessageKindAction_addItemToPlayer:
-		var params action.AddItemToPlayerParams
+	case message.MessageKindAction_addItemToPlayer:
+		var params message.AddItemToPlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Str(logging.MessageContent, string(msg.Content)).Msg("failed unmarshalling params")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
-		if r.actions.AddItemToPlayer.Broadcast != nil {
-			r.state.BroadcastingClientID = msg.client.id
-			r.actions.AddItemToPlayer.Broadcast(params, r.state, r.name, msg.client.id)
-			r.state.BroadcastingClientID = ""
-		}
-		if r.actions.AddItemToPlayer.Emit == nil {
-			return Message{ID: msg.ID, Kind: message.MessageKindNoResponse}
-		}
-		res := r.actions.AddItemToPlayer.Emit(params, r.state, r.name, msg.client.id)
+		r.state.BroadcastingClientID = msg.client.id
+		r.controller.AddItemToPlayerBroadcast(params, r.state, r.name, msg.client.id)
+		r.state.BroadcastingClientID = ""
+		res := r.controller.AddItemToPlayerEmit(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling response content")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
 		return Message{msg.ID, msg.Kind, resContent, msg.client}
-	case action.MessageKindAction_movePlayer:
-		var params action.MovePlayerParams
+	case message.MessageKindAction_movePlayer:
+		var params message.MovePlayerParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Str(logging.MessageContent, string(msg.Content)).Msg("failed unmarshalling params")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
-		if r.actions.MovePlayer.Broadcast != nil {
-			r.state.BroadcastingClientID = msg.client.id
-			r.actions.MovePlayer.Broadcast(params, r.state, r.name, msg.client.id)
-			r.state.BroadcastingClientID = ""
-		}
-		if r.actions.MovePlayer.Emit == nil {
-			return Message{ID: msg.ID, Kind: message.MessageKindNoResponse}
-		}
-		r.actions.MovePlayer.Emit(params, r.state, r.name, msg.client.id)
+		r.state.BroadcastingClientID = msg.client.id
+		r.controller.MovePlayerBroadcast(params, r.state, r.name, msg.client.id)
+		r.state.BroadcastingClientID = ""
+		r.controller.MovePlayerEmit(params, r.state, r.name, msg.client.id)
 		return Message{ID: msg.ID, Kind: message.MessageKindNoResponse}
-	case action.MessageKindAction_spawnZoneItems:
-		var params action.SpawnZoneItemsParams
+	case message.MessageKindAction_spawnZoneItems:
+		var params message.SpawnZoneItemsParams
 		err := params.UnmarshalJSON(msg.Content)
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Str(logging.MessageContent, string(msg.Content)).Msg("failed unmarshalling params")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
-		if r.actions.SpawnZoneItems.Broadcast != nil {
-			r.state.BroadcastingClientID = msg.client.id
-			r.actions.SpawnZoneItems.Broadcast(params, r.state, r.name, msg.client.id)
-			r.state.BroadcastingClientID = ""
-		}
-		if r.actions.SpawnZoneItems.Emit == nil {
-			return Message{ID: msg.ID, Kind: message.MessageKindNoResponse}
-		}
-		res := r.actions.SpawnZoneItems.Emit(params, r.state, r.name, msg.client.id)
+		r.state.BroadcastingClientID = msg.client.id
+		r.controller.SpawnZoneItemsBroadcast(params, r.state, r.name, msg.client.id)
+		r.state.BroadcastingClientID = ""
+		res := r.controller.SpawnZoneItemsEmit(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling response content")
@@ -374,7 +344,6 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 const room_go_import string = `import (
 	"sync"
 	"time"
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/jobergner/backent-cli/examples/state"
@@ -390,16 +359,16 @@ const _RoomModeIdle_type string = `const (
 )`
 
 const _Room_type string = `type Room struct {
-	name	string
-	mu	sync.Mutex
-	clients	*clientRegistrar
-	state	*state.Engine
-	actions	action.Actions
-	mode	RoomMode
+	name		string
+	mu		sync.Mutex
+	clients		*clientRegistrar
+	state		*state.Engine
+	controller	Controller
+	mode		RoomMode
 }`
 
-const newRoom_func string = `func newRoom(actions action.Actions, name string) *Room {
-	return &Room{name: name, clients: newClientRegistar(), state: state.NewEngine(), actions: actions}
+const newRoom_func string = `func newRoom(controller Controller, name string) *Room {
+	return &Room{name: name, clients: newClientRegistar(), state: state.NewEngine(), controller: controller}
 }`
 
 const _Name_Room_func string = `func (r *Room) Name() string {
@@ -450,11 +419,11 @@ const processMessageSync_Room_func string = `func (r *Room) processMessageSync(m
 	}
 }`
 
-const run_Room_func string = `func (r *Room) run(sideEffects SideEffects, fps int) {
+const run_Room_func string = `func (r *Room) run(controller Controller, fps int) {
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
 	for {
 		<-ticker.C
-		r.tickSync(sideEffects)
+		r.tickSync(controller)
 		if r.mode == RoomModeTerminating {
 			break
 		}
@@ -462,14 +431,12 @@ const run_Room_func string = `func (r *Room) run(sideEffects SideEffects, fps in
 	log.Debug().Str(logging.RoomName, r.name).Msg("terminating room")
 }`
 
-const _Deploy_Room_func string = `func (r *Room) Deploy(sideEffects SideEffects, fps int) {
-	if sideEffects.OnDeploy != nil {
-		r.mu.Lock()
-		log.Debug().Str(logging.RoomName, r.name).Msg("onDeploy")
-		sideEffects.OnDeploy(r.state)
-		r.mu.Unlock()
-	}
-	go r.run(sideEffects, fps)
+const _Deploy_Room_func string = `func (r *Room) Deploy(controller Controller, fps int) {
+	r.mu.Lock()
+	log.Debug().Str(logging.RoomName, r.name).Msg("onDeploy")
+	controller.OnDeploy(r.state)
+	r.mu.Unlock()
+	go r.run(controller, fps)
 }`
 
 const tick_go_import string = `import (
@@ -478,13 +445,11 @@ const tick_go_import string = `import (
 	"github.com/rs/zerolog/log"
 )`
 
-const tickSync_Room_func string = `func (r *Room) tickSync(sideEffects SideEffects) {
+const tickSync_Room_func string = `func (r *Room) tickSync(controller Controller) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if sideEffects.OnFrameTick != nil {
-		log.Debug().Str(logging.RoomName, r.name).Msg("onFrameTick")
-		sideEffects.OnFrameTick(r.state)
-	}
+	log.Debug().Str(logging.RoomName, r.name).Msg("onFrameTick")
+	controller.OnFrameTick(r.state)
 	err := r.publishPatch()
 	if err != nil {
 		return

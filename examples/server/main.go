@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/connect"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -47,8 +46,8 @@ func setupRoutes(loginHandler *Lobby) {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { wsEndpoint(w, r, loginHandler) })
 }
 
-func Start(signals LobbySignals, actions action.Actions, sideEffects SideEffects, fps int, port int) error {
-	loginHandler := newLoginHandler(signals, actions, sideEffects, fps)
+func Start(controller Controller, fps int, port int) error {
+	loginHandler := newLoginHandler(controller, fps)
 
 	setupRoutes(loginHandler)
 

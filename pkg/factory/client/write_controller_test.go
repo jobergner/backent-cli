@@ -1,4 +1,4 @@
-package action
+package client
 
 import (
 	"bytes"
@@ -9,17 +9,17 @@ import (
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
-func TestWriteMessageKinds(t *testing.T) {
-	t.Run("writes message kinds", func(t *testing.T) {
+func TestWriteController(t *testing.T) {
+	t.Run("writes controller", func(t *testing.T) {
 		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
-		sf.writeMessageKinds()
+		sf.writeController()
 
 		buf := new(bytes.Buffer)
 		sf.file.Render(buf)
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			_MessageKindAction_addItemToPlayer_type,
+			_Controller_type,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)

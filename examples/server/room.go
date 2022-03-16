@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/jobergner/backent-cli/examples/state"
@@ -20,20 +19,20 @@ const (
 )
 
 type Room struct {
-	name    string
-	mu      sync.Mutex
-	clients *clientRegistrar
-	state   *state.Engine
-	actions action.Actions
-	mode    RoomMode
+	name       string
+	mu         sync.Mutex
+	clients    *clientRegistrar
+	state      *state.Engine
+	controller Controller
+	mode       RoomMode
 }
 
-func newRoom(actions action.Actions, name string) *Room {
+func newRoom(controller Controller, name string) *Room {
 	return &Room{
-		name:    name,
-		clients: newClientRegistar(),
-		state:   state.NewEngine(),
-		actions: actions,
+		name:       name,
+		clients:    newClientRegistar(),
+		state:      state.NewEngine(),
+		controller: controller,
 	}
 }
 
@@ -89,13 +88,13 @@ func (r *Room) processMessageSync(msg Message) {
 	}
 }
 
-func (r *Room) run(sideEffects SideEffects, fps int) {
+func (r *Room) run(controller Controller, fps int) {
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
 
 	for {
 		<-ticker.C
 
-		r.tickSync(sideEffects)
+		r.tickSync(controller)
 
 		if r.mode == RoomModeTerminating {
 			break
@@ -105,13 +104,11 @@ func (r *Room) run(sideEffects SideEffects, fps int) {
 	log.Debug().Str(logging.RoomName, r.name).Msg("terminating room")
 }
 
-func (r *Room) Deploy(sideEffects SideEffects, fps int) {
-	if sideEffects.OnDeploy != nil {
-		r.mu.Lock()
-		log.Debug().Str(logging.RoomName, r.name).Msg("onDeploy")
-		sideEffects.OnDeploy(r.state)
-		r.mu.Unlock()
-	}
+func (r *Room) Deploy(controller Controller, fps int) {
+	r.mu.Lock()
+	log.Debug().Str(logging.RoomName, r.name).Msg("onDeploy")
+	controller.OnDeploy(r.state)
+	r.mu.Unlock()
 
-	go r.run(sideEffects, fps)
+	go r.run(controller, fps)
 }
