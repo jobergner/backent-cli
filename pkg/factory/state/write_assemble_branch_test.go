@@ -1,4 +1,4 @@
-package server
+package state
 
 import (
 	"bytes"
@@ -9,17 +9,24 @@ import (
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
-func TestWriteProcessClientMessage(t *testing.T) {
-	t.Run("writes processClientMessage", func(t *testing.T) {
+func TestWriteAssembleBranch(t *testing.T) {
+	t.Run("writes assemblers", func(t *testing.T) {
 		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
-		sf.writeProcessClientMessage()
+		sf.writeAssembleBranch()
 
 		buf := new(bytes.Buffer)
 		sf.file.Render(buf)
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			processClientMessage_Room_func,
+			assembleAttackEventPath_Engine_func,
+			assembleEquipmentSetPath_Engine_func,
+			assembleGearScorePath_Engine_func,
+			assembleItemPath_Engine_func,
+			assemblePlayerPath_Engine_func,
+			assemblePositionPath_Engine_func,
+			assembleZonePath_Engine_func,
+			assembleZoneItemPath_Engine_func,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)

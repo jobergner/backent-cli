@@ -2,15 +2,15 @@ package client
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"sync"
 	"time"
 
 	"github.com/jobergner/backent-cli/examples/action"
 	"github.com/jobergner/backent-cli/examples/connect"
+	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/jobergner/backent-cli/examples/state"
+	"github.com/rs/zerolog/log"
 	"nhooyr.io/websocket"
 )
 
@@ -33,6 +33,7 @@ func NewClient(actions action.Actions) (*Client, context.CancelFunc, error) {
 
 	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
 	if err != nil {
+		log.Err(err).Msg("failed creating client while dialing server")
 		return nil, cancel, err
 	}
 
@@ -66,7 +67,8 @@ func (c *Client) tickSync() {
 
 	patchBytes, err := c.engine.Patch.MarshalJSON()
 	if err != nil {
-		log.Printf("error marshalling patch: %s", err)
+		log.Err(err).Msg("failed marshalling patch")
+		return
 	}
 
 	c.patchChannel <- patchBytes
@@ -99,19 +101,15 @@ func (c *Client) runReadMessages() {
 
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
-
 		if err != nil {
-			log.Printf("unregistering client due to error while reading connection: %s", err)
+			log.Err(err).Msg("failed reading message")
 			break
 		}
 
 		var msg Message
 		err = msg.UnmarshalJSON(msgBytes)
-
-		fmt.Println(string(msg.Content))
-
 		if err != nil {
-			log.Printf("error parsing message \"%s\" with error %s", string(msgBytes), err)
+			log.Err(err).Str(logging.Message, string(msgBytes)).Msg("failed unmarshalling message")
 			continue
 		}
 
@@ -126,7 +124,7 @@ func (c *Client) runWriteMessages() {
 		msg, ok := <-c.messageChannel
 
 		if !ok {
-			log.Printf("messageChannel of client %s has been closed", c.id)
+			log.Warn().Msg("failed while attempted sending to closed client message channel")
 			break
 		}
 
@@ -135,20 +133,27 @@ func (c *Client) runWriteMessages() {
 }
 
 func (c *Client) processMessageSync(msg Message) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	switch msg.Kind {
 	case message.MessageKindID:
+
 		c.idSignal <- string(msg.Content)
 	case message.MessageKindUpdate, message.MessageKindCurrentState:
+
 		var patch state.State
+
 		err := patch.UnmarshalJSON(msg.Content)
 		if err != nil {
+			log.Warn().Msg("failed unmarshalling patch")
 			return err
 		}
+
+		c.mu.Lock()
+
 		c.engine.ImportPatch(&patch)
+
+		c.mu.Unlock()
 	default:
+
 		c.router.route(msg)
 	}
 

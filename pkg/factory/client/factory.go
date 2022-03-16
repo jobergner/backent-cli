@@ -1,4 +1,4 @@
-package server
+package client
 
 import (
 	"github.com/dave/jennifer/jen"
@@ -28,10 +28,9 @@ func newFactory(file *jen.File, config *ast.AST) *Factory {
 func Write(
 	file *jen.File,
 	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
-	configJson []byte,
 ) {
 
 	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 
-	newFactory(file, config).writeProcessClientMessage()
+	newFactory(file, config).writeActions()
 }

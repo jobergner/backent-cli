@@ -7,7 +7,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func (s *ServerFactory) writeProcessClientMessage() *ServerFactory {
+func (s *Factory) writeProcessClientMessage() *Factory {
 
 	p := processClientMessageWriter{}
 
