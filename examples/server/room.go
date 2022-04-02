@@ -105,10 +105,5 @@ func (r *Room) run(controller Controller, fps int) {
 }
 
 func (r *Room) Deploy(controller Controller, fps int) {
-	r.mu.Lock()
-	log.Debug().Str(logging.RoomName, r.name).Msg("onDeploy")
-	controller.OnDeploy(r.state)
-	r.mu.Unlock()
-
 	go r.run(controller, fps)
 }

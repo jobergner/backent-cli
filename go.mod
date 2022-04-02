@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.17.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/zerolog v1.26.1 // indirect
 	github.com/sergi/go-diff v1.2.0
 	github.com/stretchr/testify v1.7.0
