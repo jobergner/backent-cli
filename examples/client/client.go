@@ -15,48 +15,56 @@ import (
 
 // easyjson:skip
 type Client struct {
+	fps            int
 	id             string
 	mu             sync.Mutex
 	controller     Controller
 	engine         *state.Engine
 	conn           connect.Connector
 	router         *responseRouter
-	idSignal       chan string
+	receiveID      chan string
 	messageChannel chan []byte
 	patchChannel   chan []byte
 }
 
-func NewClient(controller Controller) (*Client, context.CancelFunc, error) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*3)
+func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
 
 	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
 	if err != nil {
 		log.Err(err).Msg("failed creating client while dialing server")
-		return nil, cancel, err
+		return nil, err
 	}
 
 	client := Client{
+		fps:        fps,
 		controller: controller,
-		engine:     state.NewEngine(),
-		conn:       connect.NewConnection(c, ctx),
+		conn:       connect.NewConnection(c, context.Background()),
 		router: &responseRouter{
 			pending: make(map[string]chan []byte),
 		},
-		idSignal:       make(chan string, 1),
+		receiveID:      make(chan string, 1),
 		messageChannel: make(chan []byte),
 		patchChannel:   make(chan []byte),
 	}
 
 	go client.runReadMessages()
 	go client.runWriteMessages()
+	go client.emitPatches()
 
-	client.id = <-client.idSignal
+	select {
+	case <-ctx.Done():
+		return nil, ErrResponseTimeout
+	case clientID := <-client.receiveID:
+		client.id = clientID
+		client.engine = state.NewEngine()
+		client.engine.ThisClientID = clientID
+		break
+	}
 
-	return &client, cancel, nil
+	return &client, nil
 }
 
-func (c *Client) tickSync() {
+func (c *Client) tick() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -70,6 +78,8 @@ func (c *Client) tickSync() {
 		return
 	}
 
+	c.engine.UpdateState()
+
 	c.patchChannel <- patchBytes
 }
 
@@ -78,12 +88,12 @@ func (c *Client) ReadUpdate() []byte {
 }
 
 func (c *Client) emitPatches() {
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Second / time.Duration(c.fps))
 
 	for {
 		<-ticker.C
 
-		c.tickSync()
+		c.tick()
 	}
 }
 
@@ -112,7 +122,7 @@ func (c *Client) runReadMessages() {
 			continue
 		}
 
-		c.processMessageSync(msg)
+		c.processMessage(msg)
 	}
 }
 
@@ -131,23 +141,22 @@ func (c *Client) runWriteMessages() {
 	}
 }
 
-func (c *Client) processMessageSync(msg Message) error {
+func (c *Client) processMessage(msg Message) error {
 	switch msg.Kind {
 	case message.MessageKindID:
-
-		c.idSignal <- string(msg.Content)
+		c.receiveID <- string(msg.Content)
 	case message.MessageKindUpdate, message.MessageKindCurrentState:
-
 		var patch state.State
 
 		err := patch.UnmarshalJSON(msg.Content)
 		if err != nil {
-			log.Warn().Msg("failed unmarshalling patch")
+			log.Err(err).Msg("failed unmarshalling patch")
 			return err
 		}
 
 		c.mu.Lock()
 
+		log.Debug().Msg("importing patch")
 		c.engine.ImportPatch(&patch)
 
 		c.mu.Unlock()

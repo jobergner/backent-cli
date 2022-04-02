@@ -65,8 +65,8 @@ func (r *Room) broadcastPatchToClients(stateUpdateBytes []byte) {
 }
 
 func (r *Room) handleIncomingClients() {
+	log.Debug().Int("clients", len(r.clients.incomingClients)).Msg("handling incoming clients")
 	if len(r.clients.incomingClients) == 0 {
-		log.Debug().Msg("no incoming clients to handle")
 		return
 	}
 

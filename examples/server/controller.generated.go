@@ -6,10 +6,10 @@ import (
 )
 
 type Controller interface {
-	OnSuperMessage(msg Message, room *Room, client *Client, loginHandler *Lobby)
-	OnClientConnect(client *Client, loginHandler *Lobby)
-	OnClientDisconnect(room *Room, clientID string, loginHandler *Lobby)
-	OnDeploy(engine *state.Engine)
+	OnSuperMessage(msg Message, room *Room, client *Client, lobby *Lobby)
+	OnClientConnect(client *Client, lobby *Lobby)
+	OnClientDisconnect(room *Room, clientID string, lobby *Lobby)
+	OnCreation(lobby *Lobby)
 	OnFrameTick(engine *state.Engine)
 	AddItemToPlayerBroadcast(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string)
 	AddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse

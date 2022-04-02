@@ -14,12 +14,16 @@ type Lobby struct {
 	fps        int
 }
 
-func newLoginHandler(controller Controller, fps int) *Lobby {
-	return &Lobby{
+func newLobby(controller Controller, fps int) *Lobby {
+	l := &Lobby{
 		Rooms:      make(map[string]*Room),
 		controller: controller,
 		fps:        fps,
 	}
+
+	l.signalCreation()
+
+	return l
 }
 
 func (l *Lobby) CreateRoom(name string) *Room {
@@ -84,4 +88,12 @@ func (l *Lobby) signalClientConnect(client *Client) {
 
 	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientConnect")
 	l.controller.OnClientConnect(client, l)
+}
+
+func (l *Lobby) signalCreation() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	log.Debug().Msg("OnCreation")
+	l.controller.OnCreation(l)
 }
