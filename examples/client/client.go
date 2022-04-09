@@ -27,18 +27,20 @@ type Client struct {
 	patchChannel   chan []byte
 }
 
-func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
+func NewClient(connectCTX context.Context, controller Controller, fps int) (*Client, error) {
 
-	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
+	c, _, err := websocket.Dial(connectCTX, "http://localhost:8080/ws", nil)
 	if err != nil {
 		log.Err(err).Msg("failed creating client while dialing server")
 		return nil, err
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	client := Client{
 		fps:        fps,
 		controller: controller,
-		conn:       connect.NewConnection(c, context.Background()),
+		conn:       connect.NewConnection(c, ctx, cancel),
 		router: &responseRouter{
 			pending: make(map[string]chan []byte),
 		},
@@ -53,7 +55,7 @@ func NewClient(ctx context.Context, controller Controller, fps int) (*Client, er
 	go client.emitPatches()
 
 	select {
-	case <-ctx.Done():
+	case <-connectCTX.Done():
 		return nil, ErrResponseTimeout
 	case clientID := <-client.receiveID:
 		client.id = clientID
@@ -103,12 +105,12 @@ func (c *Client) ID() string {
 	return c.id
 }
 
-func (c *Client) handleInernalError() {
-	c.conn.Close()
+func (c *Client) closeConnection(reason string) {
+	c.conn.Close(reason)
 }
 
 func (c *Client) runReadMessages() {
-	defer c.handleInernalError()
+	defer c.closeConnection("failed reading messages")
 
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
@@ -129,7 +131,7 @@ func (c *Client) runReadMessages() {
 }
 
 func (c *Client) runWriteMessages() {
-	defer c.handleInernalError()
+	defer c.closeConnection("failed writing messages")
 
 	for {
 		msg, ok := <-c.messageChannel

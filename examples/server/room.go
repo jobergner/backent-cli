@@ -84,7 +84,7 @@ func (r *Room) processMessageSync(msg Message) {
 	case response.client.messageChannel <- responseBytes:
 	default:
 		log.Warn().Str(logging.ClientID, response.client.id).Msg(logging.ClientBufferFull)
-		response.client.closeConnection()
+		response.client.closeConnection(logging.ClientBufferFull)
 	}
 }
 

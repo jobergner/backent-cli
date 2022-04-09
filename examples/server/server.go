@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -50,7 +51,9 @@ func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := newClient(connect.NewConnection(websocketConnection, r.Context()), s.Lobby)
+	ctx, cancel := context.WithCancel(r.Context())
+
+	client, err := newClient(connect.NewConnection(websocketConnection, ctx, cancel), s.Lobby)
 	if err != nil {
 		return
 	}
@@ -60,9 +63,11 @@ func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	go client.runReadMessages()
 	go client.runWriteMessages()
 
+	// TODO I dont think this works as I think it should work
 	// wait until connection closes
-	<-r.Context().Done()
+	<-ctx.Done()
 
+	log.Debug().Msg("client context done")
 	s.Lobby.deleteClient(client)
 }
 
