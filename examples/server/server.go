@@ -33,6 +33,8 @@ func NewServer(controller Controller, fps int, configs ...func(*http.Server, *ht
 	handler.HandleFunc("/", homePageHandler)
 	handler.HandleFunc("/ws", server.wsEndpoint)
 
+	server.HttpServer.Handler = handler
+
 	return &server
 }
 
@@ -60,11 +62,12 @@ func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	// wait until connection closes
 	<-r.Context().Done()
+
 	s.Lobby.deleteClient(client)
 }
 
-func (s *Server) Start(controller Controller, fps int, port int) chan error {
-	log.Info().Msgf("backent running on port %d\n", port)
+func (s *Server) Start() chan error {
+	log.Info().Msgf("backent running on port %s\n", s.HttpServer.Addr)
 
 	serverError := make(chan error, 1)
 
