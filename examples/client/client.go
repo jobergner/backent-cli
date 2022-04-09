@@ -45,6 +45,7 @@ func NewClient(ctx context.Context, controller Controller, fps int) (*Client, er
 		receiveID:      make(chan string, 1),
 		messageChannel: make(chan []byte),
 		patchChannel:   make(chan []byte),
+		engine:         state.NewEngine(),
 	}
 
 	go client.runReadMessages()
@@ -56,7 +57,6 @@ func NewClient(ctx context.Context, controller Controller, fps int) (*Client, er
 		return nil, ErrResponseTimeout
 	case clientID := <-client.receiveID:
 		client.id = clientID
-		client.engine = state.NewEngine()
 		client.engine.ThisClientID = clientID
 		break
 	}
@@ -83,6 +83,8 @@ func (c *Client) tick() {
 	c.patchChannel <- patchBytes
 }
 
+// TODO maybe return error that signals when anything critical happens
+// switch of patchChannel and errorChannel
 func (c *Client) ReadUpdate() []byte {
 	return <-c.patchChannel
 }

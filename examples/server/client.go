@@ -104,13 +104,13 @@ func (c *Client) runWriteMessages() {
 	defer c.closeConnection()
 
 	for {
-		msg, ok := <-c.messageChannel
+		msgBytes, ok := <-c.messageChannel
 
 		if !ok {
 			log.Warn().Str(logging.ClientID, c.id).Msg("client message channel was closed")
 			break
 		}
 
-		c.conn.WriteMessage(msg)
+		c.conn.WriteMessage(msgBytes)
 	}
 }

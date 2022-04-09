@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/dave/jennifer v1.4.1
 	github.com/gertd/go-pluralize v0.1.7
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/mailru/easyjson v0.7.7

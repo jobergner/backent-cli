@@ -1,4 +1,4 @@
-//go:generate bash ./generate.sh
+//go:generat bash ./generate.sh
 package main
 
 import (
