@@ -58,7 +58,7 @@ func (r *Room) broadcastPatchToClients(stateUpdateBytes []byte) {
 		case client.messageChannel <- stateUpdateBytes:
 		default:
 			log.Warn().Str(logging.ClientID, client.id).Msg(logging.ClientBufferFull)
-			client.closeConnection()
+			client.closeConnection(logging.ClientBufferFull)
 		}
 
 	}
@@ -93,7 +93,7 @@ func (r *Room) handleIncomingClients() {
 			r.clients.promote(client)
 		default:
 			log.Warn().Str(logging.ClientID, client.id).Msg(logging.ClientBufferFull)
-			client.closeConnection()
+			client.closeConnection(logging.ClientBufferFull)
 		}
 	}
 }

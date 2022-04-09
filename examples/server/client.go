@@ -62,13 +62,13 @@ func (c *Client) RoomName() string {
 // this does not do anything else on its own, but triggers
 // the removal of the client from the system in the
 // http handler
-func (c *Client) closeConnection() {
+func (c *Client) closeConnection(reason string) {
 	log.Debug().Str(logging.ClientID, c.id).Msg("closing client connection")
-	c.conn.Close()
+	c.conn.Close(reason)
 }
 
 func (c *Client) runReadMessages() {
-	defer c.closeConnection()
+	defer c.closeConnection("failed reading messages")
 
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
@@ -97,11 +97,12 @@ func (c *Client) runReadMessages() {
 				c.room.processMessageSync(msg)
 			}
 		}
+
 	}
 }
 
 func (c *Client) runWriteMessages() {
-	defer c.closeConnection()
+	defer c.closeConnection("failed writing messages")
 
 	for {
 		msgBytes, ok := <-c.messageChannel

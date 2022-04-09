@@ -9,28 +9,31 @@ import (
 )
 
 type Connector interface {
-	Close()
+	Close(reason string)
 	ReadMessage() (messageType int, p []byte, err error)
 	WriteMessage(messageType []byte) error
 }
 
 type Connection struct {
-	Conn *websocket.Conn
-	ctx  context.Context
+	Conn     *websocket.Conn
+	ctx      context.Context
+	cancelFn func()
 }
 
-func NewConnection(conn *websocket.Conn, ctx context.Context) *Connection {
+func NewConnection(conn *websocket.Conn, ctx context.Context, cancel func()) *Connection {
 	return &Connection{
-		Conn: conn,
-		ctx:  ctx,
+		Conn:     conn,
+		ctx:      ctx,
+		cancelFn: cancel,
 	}
 }
 
-func (c *Connection) Close() {
-	err := c.Conn.Close(websocket.StatusNormalClosure, "")
+func (c *Connection) Close(reason string) {
+	err := c.Conn.Close(websocket.StatusNormalClosure, reason)
 	if err != nil {
-		log.Err(err).Msg("failed closing connection")
+		log.Warn().Msg("failed closing connection")
 	}
+	c.cancelFn()
 }
 
 func (c *Connection) ReadMessage() (int, []byte, error) {

@@ -6,15 +6,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	gomock "github.com/golang/mock/gomock"
 	"github.com/jobergner/backent-cli/examples/client"
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/jobergner/backent-cli/examples/server"
 )
 
-const fps = 1
+const fps = 3
 
-func startServer(m *MockController, configs ...func(s *server.Server)) chan struct{} {
+func startServer(m *MockController, configs ...func(s *server.Server)) func() {
 	s := server.NewServer(m, fps)
 
 	for _, c := range configs {
@@ -37,7 +39,10 @@ func startServer(m *MockController, configs ...func(s *server.Server)) chan stru
 	}()
 
 	time.Sleep(time.Microsecond * 100)
-	return kill
+	return func() {
+		kill <- struct{}{}
+		time.Sleep(time.Millisecond * 50)
+	}
 }
 
 func connectClient(m *MockController) *client.Client {
@@ -55,46 +60,48 @@ func connectClient(m *MockController) *client.Client {
 }
 
 func TestEndToEnd(t *testing.T) {
-	// t.Run("Lobby calls OnCreation when server gets created", func(t *testing.T) {
-	// 	ctrl := gomock.NewController(t)
-	// 	m := NewMockController(ctrl)
+	log.Logger = log.Logger.Hook(SeverityHook{})
 
-	// 	m.EXPECT().OnCreation(gomock.Any())
+	t.Run("Lobby calls OnCreation when server gets created", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		m := NewMockController(ctrl)
 
-	// 	kill := startServer(m)
-	// 	kill <- struct{}{}
-	// })
-	// t.Run("Lobby calls OnClientConnect when client connects", func(t *testing.T) {
-	// 	ctrl := gomock.NewController(t)
-	// 	m := NewMockController(ctrl)
+		m.EXPECT().OnCreation(gomock.Any())
 
-	// 	m.EXPECT().OnCreation(gomock.Any())
-	// 	m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any())
+		kill := startServer(m)
+		kill()
+	})
+	t.Run("Lobby calls OnClientConnect when client connects", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		m := NewMockController(ctrl)
 
-	// 	kill := startServer(m)
+		m.EXPECT().OnCreation(gomock.Any())
+		m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any())
 
-	// 	connectClient(m)
+		kill := startServer(m)
 
-	// 	kill <- struct{}{}
-	// })
-	// t.Run("Rooms calls OnFrameTick every fps", func(t *testing.T) {
-	// 	ctrl := gomock.NewController(t)
-	// 	m := NewMockController(ctrl)
+		connectClient(m)
 
-	// 	m.EXPECT().OnCreation(gomock.Any())
-	// 	m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any())
-	// 	m.EXPECT().OnFrameTick(gomock.Any()).Times(3)
+		kill()
+	})
+	t.Run("Rooms calls OnFrameTick every fps", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		m := NewMockController(ctrl)
 
-	// 	kill := startServer(m, func(s *server.Server) {
-	// 		s.Lobby.CreateRoom("foo")
-	// 	})
+		m.EXPECT().OnCreation(gomock.Any())
+		m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any())
+		m.EXPECT().OnFrameTick(gomock.Any()).MinTimes(2)
 
-	// 	connectClient(m)
+		kill := startServer(m, func(s *server.Server) {
+			s.Lobby.CreateRoom("foo")
+		})
 
-	// 	time.Sleep(time.Second / fps * 3)
-	// 	kill <- struct{}{}
-	// })
-	t.Run("Lobby calls actions when triggered by client", func(t *testing.T) {
+		connectClient(m)
+
+		time.Sleep(time.Second / fps * 3)
+		kill()
+	})
+	t.Run("Room calls actions when triggered by client", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		m := NewMockController(ctrl)
 
@@ -109,10 +116,10 @@ func TestEndToEnd(t *testing.T) {
 		})
 		m.EXPECT().OnFrameTick(gomock.Any()).AnyTimes()
 		m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), "", gomock.Any())
-		// m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), "foo", gomock.Any())
-		// m.EXPECT().AddItemToPlayerEmit(params, gomock.Any(), "foo", gomock.Any())
+		m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), "foo", gomock.Any())
+		m.EXPECT().AddItemToPlayerEmit(params, gomock.Any(), "foo", gomock.Any())
 
-		_ = startServer(m, func(s *server.Server) {
+		kill := startServer(m, func(s *server.Server) {
 			s.Lobby.CreateRoom("foo")
 		})
 
@@ -122,8 +129,6 @@ func TestEndToEnd(t *testing.T) {
 			panic(err)
 		}
 
-		// time.Sleep(time.Second / fps * 3)
-		// time.Sleep(time.Second * 10)
-		// kill <- struct{}{}
+		kill()
 	})
 }

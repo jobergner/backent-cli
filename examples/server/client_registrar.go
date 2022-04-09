@@ -37,9 +37,10 @@ func (c *clientRegistrar) remove(client *Client) {
 	delete(c.incomingClients, client)
 }
 
-func (c *clientRegistrar) kick(client *Client) {
+// TODO unused
+func (c *clientRegistrar) kick(client *Client, reason string) {
 	log.Debug().Str(logging.ClientID, client.id).Msg("kicking client")
-	client.closeConnection()
+	client.closeConnection(reason)
 }
 
 func (c *clientRegistrar) promote(client *Client) {
