@@ -22,20 +22,22 @@ func TestEndToEnd(t *testing.T) {
 		kill := startServer(m)
 		kill()
 	})
-	t.Run("Lobby calls OnClientConnect when client connects", func(t *testing.T) {
+	t.Run("Client receives correct ID", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		m := NewMockController(ctrl)
 
+		var clientID string
 		m.EXPECT().OnCreation(gomock.Any())
 		m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any()).Do(func(client *server.Client, lobby *server.Lobby) {
-			if len(client.ID()) == 0 {
-				panic("empty client ID")
-			}
+			clientID = client.ID()
 		})
 
 		kill := startServer(m)
 
-		connectClient(m, nil)
+		c, _ := connectClient(m, nil)
+		if clientID != c.ID() {
+			panic(fmt.Sprintf("client IDs of server and client do not match: %s != %s", clientID, c.ID()))
+		}
 
 		kill()
 	})
@@ -51,6 +53,60 @@ func TestEndToEnd(t *testing.T) {
 		})
 
 		time.Sleep(time.Second / fps * 3)
+		kill()
+	})
+	t.Run("Client does not receive update of broadcasted event", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		m := NewMockController(ctrl)
+
+		params := message.MovePlayerParams{
+			ChangeX: 1,
+		}
+
+		m.EXPECT().OnCreation(gomock.Any())
+		m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any()).Do(func(client *server.Client, lobby *server.Lobby) {
+			r, _ := lobby.Rooms["foo"]
+			r.AddClient(client)
+		})
+		m.EXPECT().OnFrameTick(gomock.Any()).AnyTimes()
+		m.EXPECT().MovePlayerBroadcast(params, gomock.Any(), "", gomock.Any())
+		m.EXPECT().MovePlayerBroadcast(params, gomock.Any(), "foo", gomock.Any()).Do(
+			func(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string) {
+				p := engine.QueryPositions(func(state.Position) bool { return true })[0]
+				p.SetX(p.X() + params.ChangeX)
+			},
+		)
+		m.EXPECT().MovePlayerEmit(params, gomock.Any(), "foo", gomock.Any())
+
+		kill := startServer(m, func(s *server.Server) {
+			s.Lobby.CreateRoom("foo").AlterState(func(engine *state.Engine) {
+				engine.CreatePosition()
+			})
+		})
+
+		var i int
+		onUpdateTreeReceived := func(b []byte) {
+			var t state.Tree
+			err := t.UnmarshalJSON(b)
+			if err != nil {
+				panic(err)
+			}
+			i++
+		}
+
+		c, _ := connectClient(m, onUpdateTreeReceived)
+		// we wait until currentState is sent
+		time.Sleep(time.Second / fps * 2)
+		err := c.MovePlayer(params)
+		if err != nil {
+			panic(err)
+		}
+		time.Sleep(time.Second / fps * 2)
+
+		if i != 1 {
+			panic(fmt.Sprintf("did not receive exactly 1 update: %d", i))
+		}
+
 		kill()
 	})
 	t.Run("Room calls actions when triggered by client", func(t *testing.T) {
@@ -71,9 +127,11 @@ func TestEndToEnd(t *testing.T) {
 		m.EXPECT().OnFrameTick(gomock.Any()).AnyTimes()
 		m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), "", gomock.Any())
 		m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), "foo", gomock.Any())
-		m.EXPECT().AddItemToPlayerEmit(params, gomock.Any(), "foo", gomock.Any()).DoAndReturn(func(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse {
-			return expectedResponse
-		})
+		m.EXPECT().AddItemToPlayerEmit(params, gomock.Any(), "foo", gomock.Any()).DoAndReturn(
+			func(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse {
+				return expectedResponse
+			},
+		)
 
 		kill := startServer(m, func(s *server.Server) {
 			s.Lobby.CreateRoom("foo")
@@ -112,7 +170,7 @@ func TestEndToEnd(t *testing.T) {
 			// TODO this is not very clean
 			var lastXValue float64
 			var i int
-			onMessageReceived := func(b []byte) {
+			onUpdateTreeReceived := func(b []byte) {
 				var t state.Tree
 				err := t.UnmarshalJSON(b)
 				if err != nil {
@@ -129,7 +187,7 @@ func TestEndToEnd(t *testing.T) {
 				i++
 			}
 
-			connectClient(m, onMessageReceived)
+			connectClient(m, onUpdateTreeReceived)
 
 			// add some extra ms se we can be sure the last tick passes
 			time.Sleep(time.Second/fps*5 + time.Millisecond*30)
