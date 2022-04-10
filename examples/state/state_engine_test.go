@@ -352,9 +352,9 @@ func newTreeTest(define func(*Engine, *Tree), onFail func(errText string), assem
 	expectedTree := newTree()
 	define(se, expectedTree)
 	if assembleEntireTree {
-		se.assembleFullTree()
+		se.AssembleFullTree()
 	} else {
-		se.assembleUpdateTree()
+		se.AssembleUpdateTree()
 	}
 	actualTree := se.Tree
 

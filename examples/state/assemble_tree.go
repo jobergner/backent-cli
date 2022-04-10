@@ -1,6 +1,6 @@
 package state
 
-func (engine *Engine) assembleUpdateTree() {
+func (engine *Engine) AssembleUpdateTree() {
 	engine.planner.clear()
 	engine.Tree.clear()
 
@@ -9,7 +9,7 @@ func (engine *Engine) assembleUpdateTree() {
 	engine.assembleTree()
 }
 
-func (engine *Engine) assembleFullTree() {
+func (engine *Engine) AssembleFullTree() {
 	engine.planner.clear()
 	engine.Tree.clear()
 

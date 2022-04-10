@@ -234,7 +234,7 @@ func BenchmarkAssembleTree(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		engine.assembleUpdateTree()
+		engine.AssembleUpdateTree()
 	}
 }
 
@@ -247,7 +247,7 @@ func BenchmarkAssembleFullTree(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		engine.assembleFullTree()
+		engine.AssembleFullTree()
 	}
 }
 
