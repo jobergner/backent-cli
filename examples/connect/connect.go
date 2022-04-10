@@ -12,6 +12,7 @@ type Connector interface {
 	Close(reason string)
 	ReadMessage() (messageType int, p []byte, err error)
 	WriteMessage(messageType []byte) error
+	Context() context.Context
 }
 
 type Connection struct {
@@ -20,12 +21,18 @@ type Connection struct {
 	cancelFn func()
 }
 
-func NewConnection(conn *websocket.Conn, ctx context.Context, cancel func()) *Connection {
+func NewConnection(conn *websocket.Conn, ctx context.Context) *Connection {
+	ctx, cancel := context.WithCancel(ctx)
+
 	return &Connection{
 		Conn:     conn,
 		ctx:      ctx,
 		cancelFn: cancel,
 	}
+}
+
+func (c *Connection) Context() context.Context {
+	return c.ctx
 }
 
 func (c *Connection) Close(reason string) {
