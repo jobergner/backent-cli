@@ -70,7 +70,7 @@ func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 func (s *Server) Start() chan error {
 	log.Info().Msgf("backent running on port %s\n", s.HttpServer.Addr)
 
-	serverError := make(chan error, 1)
+	serverError := make(chan error)
 
 	go func() {
 		err := s.HttpServer.ListenAndServe()
