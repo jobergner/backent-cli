@@ -10,7 +10,6 @@ func (r *Room) tickSync(controller Controller) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	log.Debug().Str(logging.RoomName, r.name).Msg("onFrameTick")
 	controller.OnFrameTick(r.state)
 
 	err := r.publishPatch()
@@ -25,7 +24,6 @@ func (r *Room) tickSync(controller Controller) {
 
 func (r *Room) publishPatch() error {
 	if r.state.Patch.IsEmpty() {
-		log.Debug().Msg("returning early due to empty patch")
 		return nil
 	}
 
@@ -65,7 +63,6 @@ func (r *Room) broadcastPatchToClients(stateUpdateBytes []byte) {
 }
 
 func (r *Room) handleIncomingClients() {
-	log.Debug().Int("clients", len(r.clients.incomingClients)).Msg("handling incoming clients")
 	if len(r.clients.incomingClients) == 0 {
 		return
 	}

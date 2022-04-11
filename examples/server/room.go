@@ -101,7 +101,6 @@ func (r *Room) run(controller Controller, fps int) {
 		}
 	}
 
-	log.Debug().Str(logging.RoomName, r.name).Msg("terminating room")
 }
 
 func (r *Room) Deploy(controller Controller, fps int) {
