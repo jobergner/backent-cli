@@ -70,7 +70,6 @@ func (l *Lobby) processMessageSync(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	log.Debug().Str(logging.ClientID, msg.client.id).Msg("OnSuperMessage")
 	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
 }
 
@@ -78,7 +77,6 @@ func (l *Lobby) signalClientDisconnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientDisconnect")
 	l.controller.OnClientDisconnect(client.room, client.id, l)
 }
 
@@ -86,7 +84,6 @@ func (l *Lobby) signalClientConnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientConnect")
 	l.controller.OnClientConnect(client, l)
 }
 
@@ -94,6 +91,5 @@ func (l *Lobby) signalCreation() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	log.Debug().Msg("OnCreation")
 	l.controller.OnCreation(l)
 }

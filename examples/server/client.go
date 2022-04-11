@@ -72,7 +72,6 @@ func (c *Client) RoomName() string {
 // the removal of the client from the system in the
 // http handler
 func (c *Client) closeConnection(reason string) {
-	log.Debug().Str(logging.ClientID, c.id).Msg("closing client connection")
 	c.conn.Close(reason)
 }
 
