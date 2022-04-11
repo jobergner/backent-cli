@@ -37,6 +37,7 @@ func (c *Client) AddItemToPlayer(params message.AddItemToPlayerParams) (message.
 	}
 
 	responseChan := make(chan []byte)
+
 	c.router.add(idString, responseChan)
 	defer c.router.remove(idString)
 
@@ -46,9 +47,9 @@ func (c *Client) AddItemToPlayer(params message.AddItemToPlayerParams) (message.
 	case <-time.After(2 * time.Second):
 		log.Err(ErrResponseTimeout).Str(logging.MessageID, msg.ID).Msg("timed out waiting for response")
 		return message.AddItemToPlayerResponse{}, ErrResponseTimeout
+
 	case responseBytes := <-responseChan:
 		var res message.AddItemToPlayerResponse
-
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
 			log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed unmarshalling response")
@@ -119,6 +120,7 @@ func (c *Client) SpawnZoneItems(params message.SpawnZoneItemsParams) (message.Sp
 	}
 
 	responseChan := make(chan []byte)
+
 	c.router.add(idString, responseChan)
 	defer c.router.remove(idString)
 
@@ -128,9 +130,9 @@ func (c *Client) SpawnZoneItems(params message.SpawnZoneItemsParams) (message.Sp
 	case <-time.After(2 * time.Second):
 		log.Err(ErrResponseTimeout).Str(logging.MessageID, msg.ID).Msg("timed out waiting for response")
 		return message.SpawnZoneItemsResponse{}, ErrResponseTimeout
+
 	case responseBytes := <-responseChan:
 		var res message.SpawnZoneItemsResponse
-
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
 			log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed unmarshalling response")

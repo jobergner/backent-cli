@@ -31,23 +31,21 @@ type Client struct {
 func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
 
 	// TODO i dont know about all this
-	connectCTX, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	dialCTX, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	c, _, err := websocket.Dial(connectCTX, "http://localhost:8080/ws", nil)
+	c, _, err := websocket.Dial(dialCTX, "http://localhost:8080/ws", nil)
 	if err != nil {
 		log.Err(err).Msg("failed creating client while dialing server")
 		return nil, err
 	}
 
 	client := Client{
-		fps:        fps,
-		controller: controller,
-		conn:       connect.NewConnection(c, ctx),
-		router: &responseRouter{
-			pending: make(map[string]chan []byte),
-		},
-		receiveID:      make(chan string, 1),
+		fps:            fps,
+		controller:     controller,
+		conn:           connect.NewConnection(c, ctx),
+		router:         newReponseRouter(),
+		receiveID:      make(chan string),
 		messageChannel: make(chan []byte),
 		patchChannel:   make(chan []byte),
 		engine:         state.NewEngine(),
@@ -58,12 +56,15 @@ func NewClient(ctx context.Context, controller Controller, fps int) (*Client, er
 	go client.runEmitPatches()
 
 	select {
-	case <-connectCTX.Done():
-		return nil, connectCTX.Err()
+	case <-time.After(2 * time.Second):
+		cancel()
+		return nil, dialCTX.Err()
+
 	case clientID := <-client.receiveID:
 		client.id = clientID
 		client.engine.ThisClientID = clientID
 		break
+
 	}
 
 	return &client, nil
@@ -100,7 +101,6 @@ func (c *Client) runEmitPatches() {
 
 	for {
 		<-ticker.C
-
 		c.tick()
 	}
 }
@@ -153,6 +153,7 @@ func (c *Client) processMessage(msg Message) error {
 	switch msg.Kind {
 	case message.MessageKindID:
 		c.receiveID <- string(msg.Content)
+
 	case message.MessageKindUpdate, message.MessageKindCurrentState:
 		var patch state.State
 
@@ -163,13 +164,10 @@ func (c *Client) processMessage(msg Message) error {
 		}
 
 		c.mu.Lock()
-
-		log.Debug().Msg("importing patch")
 		c.engine.ImportPatch(&patch)
-
 		c.mu.Unlock()
-	default:
 
+	default:
 		c.router.route(msg)
 	}
 

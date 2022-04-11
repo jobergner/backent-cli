@@ -11,12 +11,8 @@ import (
 
 const fps = 20
 
-func startServer(m *MockController, configs ...func(s *server.Server)) func() {
+func startServer(m *MockController) func() {
 	s := server.NewServer(m, fps)
-
-	for _, c := range configs {
-		c(s)
-	}
 
 	signalFail := s.Start()
 	go func() {
@@ -27,13 +23,13 @@ func startServer(m *MockController, configs ...func(s *server.Server)) func() {
 	}()
 
 	kill := make(chan struct{})
-
 	go func() {
 		<-kill
 		s.HttpServer.Shutdown(context.Background())
 	}()
 
 	time.Sleep(time.Microsecond * 100)
+
 	return func() {
 		kill <- struct{}{}
 		time.Sleep(time.Millisecond * 50)
@@ -41,7 +37,9 @@ func startServer(m *MockController, configs ...func(s *server.Server)) func() {
 }
 
 func connectClient(m *MockController, onMessageReceived func(b []byte)) (*client.Client, func()) {
+
 	ctx, cancel := context.WithCancel(context.Background())
+
 	c, err := client.NewClient(ctx, m, fps)
 	if err != nil {
 		panic(err)
@@ -49,10 +47,13 @@ func connectClient(m *MockController, onMessageReceived func(b []byte)) (*client
 
 	go func() {
 		for {
+
 			b := c.ReadUpdate()
+
 			if onMessageReceived != nil {
 				onMessageReceived(b)
 			}
+
 		}
 	}()
 

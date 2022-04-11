@@ -7,6 +7,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func newReponseRouter() *responseRouter {
+	return &responseRouter{
+		pending: make(map[string]chan []byte),
+	}
+}
+
 // easyjson:skip
 type responseRouter struct {
 	pending map[string]chan []byte
@@ -15,18 +21,23 @@ type responseRouter struct {
 
 func (r *responseRouter) add(id string, ch chan []byte) {
 	r.mu.Lock()
-	log.Debug().Str(logging.MessageID, id).Msg("adding channel to router")
+
 	r.pending[id] = ch
+
 	r.mu.Unlock()
 }
 
 func (r *responseRouter) remove(id string) {
 	r.mu.Lock()
-	log.Debug().Str(logging.MessageID, id).Msg("removing channel to router")
-	ch := r.pending[id]
+	defer r.mu.Unlock()
+
+	ch, ok := r.pending[id]
+	if !ok {
+		return
+	}
+
 	delete(r.pending, id)
 	close(ch)
-	r.mu.Unlock()
 }
 
 func (r *responseRouter) route(response Message) {
@@ -37,6 +48,5 @@ func (r *responseRouter) route(response Message) {
 		return
 	}
 
-	log.Debug().Str(logging.MessageID, response.ID).Msg("routing response")
 	ch <- response.Content
 }

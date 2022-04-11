@@ -30,6 +30,15 @@ func newClient(websocketConnector connect.Connector, lobby *Lobby) (*Client, err
 		id:             clientID.String(),
 	}
 
+	err = c.sendIdentifyingMessage()
+	if err != nil {
+		return nil, err
+	}
+
+	return &c, nil
+}
+
+func (c *Client) sendIdentifyingMessage() error {
 	msg := Message{
 		Kind:    message.MessageKindID,
 		Content: []byte(c.id),
@@ -38,12 +47,12 @@ func newClient(websocketConnector connect.Connector, lobby *Lobby) (*Client, err
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
 		log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling message")
-		return nil, err
+		return err
 	}
 
 	c.messageChannel <- msgBytes
 
-	return &c, nil
+	return nil
 }
 
 func (c *Client) SendMessage(msg []byte) {
