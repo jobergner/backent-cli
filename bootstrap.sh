@@ -1,3 +1,3 @@
-go get -u github.com/mailru/easyjson/...;
-go get -u github.com/jobergner/decltostring;
+go install github.com/mailru/easyjson/...;
+go install github.com/jobergner/decltostring;
 

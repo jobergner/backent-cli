@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (r *Room) processClientMessage(msg Message) (response Message) {
+func (r *Room) processClientMessage(msg Message) Message {
 	switch msg.Kind {
 	case message.MessageKindAction_addItemToPlayer:
 		var params message.AddItemToPlayerParams
@@ -63,7 +63,8 @@ func (r *Room) processClientMessage(msg Message) (response Message) {
 
 		return Message{msg.ID, msg.Kind, resContent, msg.client}
 	default:
-		log.Warn().Str(logging.MessageKind, string(msg.Kind)).Msg("unknown message kind")
+		err := ErrMessageKindUnknown
+		log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("unknown message kind")
 		return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 	}
 }

@@ -185,7 +185,7 @@ func (a adderWriter) setOperationKindUpdate() *Statement {
 }
 
 func (a adderWriter) signElement() *Statement {
-	return a.elementCore().Dot("Meta").Dot("sign").Call(a.engine().Dot("broadcastingClientID"))
+	return a.elementCore().Dot("Meta").Dot("sign").Call(a.engine().Dot("BroadcastingClientID"))
 }
 
 func (a adderWriter) updateElementInPatch() *Statement {

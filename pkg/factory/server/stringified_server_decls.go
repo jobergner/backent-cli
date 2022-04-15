@@ -25,14 +25,22 @@ const newClient_func string = `func newClient(websocketConnector connect.Connect
 		return nil, err
 	}
 	c := Client{lobby: lobby, conn: websocketConnector, messageChannel: make(chan []byte, 32), id: clientID.String()}
+	err = c.sendIdentifyingMessage()
+	if err != nil {
+		return nil, err
+	}
+	return &c, nil
+}`
+
+const sendIdentifyingMessage_Client_func string = `func (c *Client) sendIdentifyingMessage() error {
 	msg := Message{Kind: message.MessageKindID, Content: []byte(c.id)}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
 		log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling message")
-		return nil, err
+		return err
 	}
 	c.messageChannel <- msgBytes
-	return &c, nil
+	return nil
 }`
 
 const _SendMessage_Client_func string = `func (c *Client) SendMessage(msg []byte) {
@@ -47,13 +55,12 @@ const _RoomName_Client_func string = `func (c *Client) RoomName() string {
 	return c.room.name
 }`
 
-const closeConnection_Client_func string = `func (c *Client) closeConnection() {
-	log.Debug().Str(logging.ClientID, c.id).Msg("closing client connection")
-	c.conn.Close()
+const closeConnection_Client_func string = `func (c *Client) closeConnection(reason string) {
+	c.conn.Close(reason)
 }`
 
 const runReadMessages_Client_func string = `func (c *Client) runReadMessages() {
-	defer c.closeConnection()
+	defer c.closeConnection("failed reading messages")
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
@@ -79,14 +86,14 @@ const runReadMessages_Client_func string = `func (c *Client) runReadMessages() {
 }`
 
 const runWriteMessages_Client_func string = `func (c *Client) runWriteMessages() {
-	defer c.closeConnection()
+	defer c.closeConnection("failed writing messages")
 	for {
-		msg, ok := <-c.messageChannel
+		msgBytes, ok := <-c.messageChannel
 		if !ok {
 			log.Warn().Str(logging.ClientID, c.id).Msg("client message channel was closed")
 			break
 		}
-		c.conn.WriteMessage(msg)
+		c.conn.WriteMessage(msgBytes)
 	}
 }`
 
@@ -121,9 +128,9 @@ const remove_clientRegistrar_func string = `func (c *clientRegistrar) remove(cli
 	delete(c.incomingClients, client)
 }`
 
-const kick_clientRegistrar_func string = `func (c *clientRegistrar) kick(client *Client) {
+const kick_clientRegistrar_func string = `func (c *clientRegistrar) kick(client *Client, reason string) {
 	log.Debug().Str(logging.ClientID, client.id).Msg("kicking client")
-	client.closeConnection()
+	client.closeConnection(reason)
 }`
 
 const promote_clientRegistrar_func string = `func (c *clientRegistrar) promote(client *Client) {
@@ -140,10 +147,10 @@ const controller_generated_go_import string = `import (
 )`
 
 const _Controller_type string = `type Controller interface {
-	OnSuperMessage(msg Message, room *Room, client *Client, loginHandler *Lobby)
-	OnClientConnect(client *Client, loginHandler *Lobby)
-	OnClientDisconnect(room *Room, clientID string, loginHandler *Lobby)
-	OnDeploy(engine *state.Engine)
+	OnSuperMessage(msg Message, room *Room, client *Client, lobby *Lobby)
+	OnClientConnect(client *Client, lobby *Lobby)
+	OnClientDisconnect(room *Room, clientID string, lobby *Lobby)
+	OnCreation(lobby *Lobby)
 	OnFrameTick(engine *state.Engine)
 	AddItemToPlayerBroadcast(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string)
 	AddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
@@ -152,6 +159,12 @@ const _Controller_type string = `type Controller interface {
 	SpawnZoneItemsBroadcast(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string)
 	SpawnZoneItemsEmit(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) message.SpawnZoneItemsResponse
 }`
+
+const error_go_import string = `import "errors"`
+
+const _ErrMessageKindUnknown_type string = `var (
+	ErrMessageKindUnknown = errors.New("message kind unknown")
+)`
 
 const lobby_go_import string = `import (
 	"sync"
@@ -166,8 +179,10 @@ const _Lobby_type string = `type Lobby struct {
 	fps		int
 }`
 
-const newLoginHandler_func string = `func newLoginHandler(controller Controller, fps int) *Lobby {
-	return &Lobby{Rooms: make(map[string]*Room), controller: controller, fps: fps}
+const newLobby_func string = `func newLobby(controller Controller, fps int) *Lobby {
+	l := &Lobby{Rooms: make(map[string]*Room), controller: controller, fps: fps}
+	l.signalCreation()
+	return l
 }`
 
 const _CreateRoom_Lobby_func string = `func (l *Lobby) CreateRoom(name string) *Room {
@@ -205,71 +220,25 @@ const deleteClient_Lobby_func string = `func (l *Lobby) deleteClient(client *Cli
 const processMessageSync_Lobby_func string = `func (l *Lobby) processMessageSync(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	log.Debug().Str(logging.ClientID, msg.client.id).Msg("OnSuperMessage")
 	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
 }`
 
 const signalClientDisconnect_Lobby_func string = `func (l *Lobby) signalClientDisconnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientDisconnect")
 	l.controller.OnClientDisconnect(client.room, client.id, l)
 }`
 
 const signalClientConnect_Lobby_func string = `func (l *Lobby) signalClientConnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	log.Debug().Str(logging.ClientID, client.id).Msg("OnClientConnect")
 	l.controller.OnClientConnect(client, l)
 }`
 
-const main_go_import string = `import (
-	"fmt"
-	"net/http"
-	"github.com/jobergner/backent-cli/examples/connect"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"nhooyr.io/websocket"
-)`
-
-const init_func string = `func init() {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-}`
-
-const homePageHandler_func string = `func homePageHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Home Page")
-}`
-
-const wsEndpoint_func string = `func wsEndpoint(w http.ResponseWriter, r *http.Request, lobby *Lobby) {
-	websocketConnection, err := websocket.Accept(w, r, &websocket.AcceptOptions{InsecureSkipVerify: true})
-	if err != nil {
-		log.Err(err).Msg("failed creating websocket connection")
-		return
-	}
-	client, err := newClient(connect.NewConnection(websocketConnection, r.Context()), lobby)
-	if err != nil {
-		return
-	}
-	lobby.addClient(client)
-	go client.runReadMessages()
-	go client.runWriteMessages()
-	<-r.Context().Done()
-	lobby.deleteClient(client)
-}`
-
-const setupRoutes_func string = `func setupRoutes(loginHandler *Lobby) {
-	http.HandleFunc("/", homePageHandler)
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		wsEndpoint(w, r, loginHandler)
-	})
-}`
-
-const _Start_func string = `func Start(controller Controller, fps int, port int) error {
-	loginHandler := newLoginHandler(controller, fps)
-	setupRoutes(loginHandler)
-	log.Info().Msgf("backent running on port %d\n", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-	return err
+const signalCreation_Lobby_func string = `func (l *Lobby) signalCreation() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.controller.OnCreation(l)
 }`
 
 const message_go_import string = `import "github.com/jobergner/backent-cli/examples/message"`
@@ -287,7 +256,7 @@ const process_message_generated_go_import string = `import (
 	"github.com/rs/zerolog/log"
 )`
 
-const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) (response Message) {
+const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) Message {
 	switch msg.Kind {
 	case message.MessageKindAction_addItemToPlayer:
 		var params message.AddItemToPlayerParams
@@ -336,7 +305,8 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 		}
 		return Message{msg.ID, msg.Kind, resContent, msg.client}
 	default:
-		log.Warn().Str(logging.MessageKind, string(msg.Kind)).Msg("unknown message kind")
+		err := ErrMessageKindUnknown
+		log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("unknown message kind")
 		return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 	}
 }`
@@ -415,7 +385,7 @@ const processMessageSync_Room_func string = `func (r *Room) processMessageSync(m
 	case response.client.messageChannel <- responseBytes:
 	default:
 		log.Warn().Str(logging.ClientID, response.client.id).Msg(logging.ClientBufferFull)
-		response.client.closeConnection()
+		response.client.closeConnection(logging.ClientBufferFull)
 	}
 }`
 
@@ -428,15 +398,70 @@ const run_Room_func string = `func (r *Room) run(controller Controller, fps int)
 			break
 		}
 	}
-	log.Debug().Str(logging.RoomName, r.name).Msg("terminating room")
 }`
 
 const _Deploy_Room_func string = `func (r *Room) Deploy(controller Controller, fps int) {
-	r.mu.Lock()
-	log.Debug().Str(logging.RoomName, r.name).Msg("onDeploy")
-	controller.OnDeploy(r.state)
-	r.mu.Unlock()
 	go r.run(controller, fps)
+}`
+
+const server_go_import string = `import (
+	"fmt"
+	"net/http"
+	"github.com/jobergner/backent-cli/examples/connect"
+	"github.com/rs/zerolog/log"
+	"nhooyr.io/websocket"
+)`
+
+const _Server_type string = `type Server struct {
+	HttpServer	*http.Server
+	Lobby		*Lobby
+}`
+
+const _NewServer_func string = `func NewServer(controller Controller, fps int, configs ...func(*http.Server, *http.ServeMux)) *Server {
+	server := Server{HttpServer: new(http.Server), Lobby: newLobby(controller, fps)}
+	handler := http.NewServeMux()
+	for _, c := range configs {
+		c(server.HttpServer, handler)
+	}
+	if server.HttpServer.Addr == "" {
+		server.HttpServer.Addr = fmt.Sprintf(":%d", 8080)
+	}
+	handler.HandleFunc("/", homePageHandler)
+	handler.HandleFunc("/ws", server.wsEndpoint)
+	server.HttpServer.Handler = handler
+	return &server
+}`
+
+const homePageHandler_func string = `func homePageHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Home Page")
+}`
+
+const wsEndpoint_Server_func string = `func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
+	websocketConnection, err := websocket.Accept(w, r, &websocket.AcceptOptions{InsecureSkipVerify: true})
+	if err != nil {
+		log.Err(err).Msg("failed creating websocket connection")
+		return
+	}
+	client, err := newClient(connect.NewConnection(websocketConnection, r.Context()), s.Lobby)
+	if err != nil {
+		return
+	}
+	s.Lobby.addClient(client)
+	go client.runReadMessages()
+	go client.runWriteMessages()
+	<-client.conn.Context().Done()
+	log.Debug().Msg("client context done")
+	s.Lobby.deleteClient(client)
+}`
+
+const _Start_Server_func string = `func (s *Server) Start() chan error {
+	log.Info().Msgf("backent running on port %s\n", s.HttpServer.Addr)
+	serverError := make(chan error)
+	go func() {
+		err := s.HttpServer.ListenAndServe()
+		serverError <- err
+	}()
+	return serverError
 }`
 
 const tick_go_import string = `import (
@@ -448,7 +473,6 @@ const tick_go_import string = `import (
 const tickSync_Room_func string = `func (r *Room) tickSync(controller Controller) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	log.Debug().Str(logging.RoomName, r.name).Msg("onFrameTick")
 	controller.OnFrameTick(r.state)
 	err := r.publishPatch()
 	if err != nil {
@@ -460,7 +484,6 @@ const tickSync_Room_func string = `func (r *Room) tickSync(controller Controller
 
 const publishPatch_Room_func string = `func (r *Room) publishPatch() error {
 	if r.state.Patch.IsEmpty() {
-		log.Debug().Msg("returning early due to empty patch")
 		return nil
 	}
 	patchBytes, err := r.state.Patch.MarshalJSON()
@@ -484,14 +507,13 @@ const broadcastPatchToClients_Room_func string = `func (r *Room) broadcastPatchT
 		case client.messageChannel <- stateUpdateBytes:
 		default:
 			log.Warn().Str(logging.ClientID, client.id).Msg(logging.ClientBufferFull)
-			client.closeConnection()
+			client.closeConnection(logging.ClientBufferFull)
 		}
 	}
 }`
 
 const handleIncomingClients_Room_func string = `func (r *Room) handleIncomingClients() {
 	if len(r.clients.incomingClients) == 0 {
-		log.Debug().Msg("no incoming clients to handle")
 		return
 	}
 	stateBytes, err := r.state.State.MarshalJSON()
@@ -511,7 +533,7 @@ const handleIncomingClients_Room_func string = `func (r *Room) handleIncomingCli
 			r.clients.promote(client)
 		default:
 			log.Warn().Str(logging.ClientID, client.id).Msg(logging.ClientBufferFull)
-			client.closeConnection()
+			client.closeConnection(logging.ClientBufferFull)
 		}
 	}
 }`

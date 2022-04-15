@@ -20,7 +20,7 @@ func (s *Factory) writeSetters() *Factory {
 			),
 			Id(b.Value).Dot("Value").Op("=").Id("val"),
 			Id(b.Value).Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
-			Id(b.Value).Dot("Meta").Dot("sign").Call(Id(b.Value).Dot("engine").Dot("broadcastingClientID")),
+			Id(b.Value).Dot("Meta").Dot("sign").Call(Id(b.Value).Dot("engine").Dot("BroadcastingClientID")),
 			Id("engine").Dot("Patch").Dot(Title(b.Value)).Index(Id("id")).Op("=").Id(b.Value),
 		)
 	})

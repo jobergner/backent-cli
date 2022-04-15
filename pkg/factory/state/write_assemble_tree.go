@@ -9,14 +9,14 @@ import (
 
 func (s *Factory) writeAssembleTree() *Factory {
 
-	s.file.Func().Params(Id("engine").Id("*Engine")).Id("assembleUpdateTree").Params().Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("AssembleUpdateTree").Params().Block(
 		Id("engine").Dot("planner").Dot("clear").Call(),
 		Id("engine").Dot("Tree").Dot("clear").Call(),
 		Id("engine").Dot("planner").Dot("plan").Call(Id("engine").Dot("State"), Id("engine").Dot("Patch")),
 		Id("engine").Dot("assembleTree").Call(),
 	)
 
-	s.file.Func().Params(Id("engine").Id("*Engine")).Id("assembleFullTree").Params().Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("AssembleFullTree").Params().Block(
 		Id("engine").Dot("planner").Dot("clear").Call(),
 		Id("engine").Dot("Tree").Dot("clear").Call(),
 		Id("engine").Dot("planner").Dot("fill").Call(Id("engine").Dot("State")),

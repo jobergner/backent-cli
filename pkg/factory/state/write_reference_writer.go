@@ -52,7 +52,7 @@ func (r referenceWriter) setParentOperationKind() *Statement {
 }
 
 func (r referenceWriter) signParent() *Statement {
-	return Id("parent").Dot("Meta").Dot("sign").Call(Id("parent").Dot("engine").Dot("broadcastingClientID"))
+	return Id("parent").Dot("Meta").Dot("sign").Call(Id("parent").Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (r referenceWriter) updateParentInPatch() *Statement {
