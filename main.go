@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 )
 
 const outFile = "state.go"
@@ -26,17 +27,19 @@ func main() {
 		}
 	}
 
-	if len(args) < 2 {
-		fmt.Println("available commands: `generate`, `inspect`")
-		os.Exit(1)
-	}
+	// if len(args) < 2 {
+	// 	fmt.Println("available commands: `generate`, `inspect`")
+	// 	os.Exit(1)
+	// }
 
-	switch args[1] {
-	case "inspect":
-		inspect()
-	case "generate":
-		generate()
-	default:
-		panic("unknown command: " + args[1])
-	}
+	fmt.Println(debug.ReadBuildInfo())
+
+	// switch args[1] {
+	// case "inspect":
+	// 	inspect()
+	// case "generate":
+	// 	generate()
+	// default:
+	// 	panic("unknown command: " + args[1])
+	// }
 }
