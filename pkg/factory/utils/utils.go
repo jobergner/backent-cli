@@ -14,6 +14,8 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
+const PackageClause = "package main\n"
+
 type BasicType struct {
 	Name  string
 	Value string
@@ -205,12 +207,12 @@ func (d DeclSet) Render(buf *bytes.Buffer) {
 	if err != nil {
 		panic(err)
 	}
-	code := TrimPackageName(_buf.String())
+	code := TrimPackageClause(_buf.String())
 	buf.WriteString("\n" + code + "\n")
 }
 
-func TrimPackageName(sourceCode string) string {
-	return strings.TrimPrefix(sourceCode, "package state")
+func TrimPackageClause(sourceCode string) string {
+	return strings.TrimPrefix(sourceCode, PackageClause)
 }
 
 func Format(buf *bytes.Buffer) error {

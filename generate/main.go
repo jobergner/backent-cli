@@ -8,53 +8,41 @@ import (
 	"go/token"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"strings"
 
-	"github.com/jobergner/backent-cli/pkg/factoryutils"
+	"github.com/jobergner/backent-cli/pkg/factory/utils"
 )
 
-var importedDirs = []string{
-	"./examples/application/server",
-	"./examples/engine",
+var generatedFileMatcher = regexp.MustCompile(`\.generated`)
+var testFileMatcher = regexp.MustCompile(`_test`)
+
+type sourceDir struct {
+	name string
+	path string
 }
 
-var excludedFiles = []string{
-	"examples/application/server/gets_generated.go",
-	"examples/application/server/gets_generated_easyjson.go",
-	"examples/application/server/message_easyjson.go",
-	"examples/application/server/state.go",
-	"examples/application/server/state_easyjson.go",
-	"examples/engine/state_engine_test.go",
-	"examples/engine/state_engine_bench_test.go",
-	"examples/engine/tree_easyjson.go",
+var sourceDirs = []sourceDir{
+	{path: "./examples/server", name: "server"},
+	{path: "./examples/client", name: "client"},
+	{path: "./examples/connect", name: "connect"},
+	{path: "./examples/logging", name: "logging"},
+	{path: "./examples/message", name: "message"},
+	{path: "./examples/state", name: "state"},
 }
 
-func isExcludedFileName(filePath string) bool {
-	for _, excludedFile := range excludedFiles {
-		if filePath == excludedFile {
-			return true
-		}
-	}
-	return false
+type importedFile struct {
+	importDecl  string
+	decls       string
+	packageName string
 }
 
-func isForceIncludeFileName(filePath string, forceIncludeFileNames []string) bool {
-	for _, forceIncludeFileName := range forceIncludeFileNames {
-		if filePath == forceIncludeFileName {
-			return true
-		}
-	}
-	return false
-}
-
-func scanDeclsInDir(directoryPath string, forceIncludeFileNames ...string) ([]ast.Decl, error) {
+func scanDeclsInDir(directoryPath string) (decls []ast.Decl, importDecls []ast.Decl, err error) {
 
 	fileInfos, err := ioutil.ReadDir(directoryPath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-
-	var decls []ast.Decl
 
 	for _, fileInfo := range fileInfos {
 		if fileInfo.IsDir() {
@@ -68,85 +56,91 @@ func scanDeclsInDir(directoryPath string, forceIncludeFileNames ...string) ([]as
 			continue
 		}
 
-		if isExcludedFileName(filePath) && !isForceIncludeFileName(filePath, forceIncludeFileNames) {
+		if testFileMatcher.MatchString(fileName) {
 			continue
 		}
 
 		content, err := ioutil.ReadFile(filePath)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		f, err := parser.ParseFile(token.NewFileSet(), "", content, 0)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
-		decls = append(decls, f.Decls...)
+		if generatedFileMatcher.MatchString(fileName) {
+
+			for _, decl := range f.Decls {
+				if _, ok := isImportDecl(decl); ok {
+					decls = append(importDecls, decl)
+				}
+			}
+
+		} else {
+
+			for _, decl := range f.Decls {
+				if _, ok := isImportDecl(decl); ok {
+					decls = append(importDecls, decl)
+				} else {
+					decls = append(decls, decl)
+				}
+			}
+
+		}
 	}
 
-	return decls, nil
+	return decls, nil, nil
 }
 
-func readImportedServerExampleFiles() string {
+func newImportedFile(dir sourceDir) importedFile {
 
-	dirDecls, err := scanDeclsInDir(importedDirs[0])
+	decls, importDecls, err := scanDeclsInDir(dir.path)
 	if err != nil {
 		panic(err)
 	}
 
-	var decls []ast.Decl
-	for _, decl := range dirDecls {
-		if _, ok := isImportDecl(decl); !ok {
-			decls = append(decls, decl)
-		}
-	}
-
 	buf := bytes.Buffer{}
 	printer.Fprint(&buf, token.NewFileSet(), decls)
-	return buf.String()
+
+	f := importedFile{
+		packageName: dir.name,
+		decls:       buf.String(),
+		importDecl:  newImportDecl(importDecls),
+	}
+
+	return f
 }
 
-func generateImportDecl(engineOnly bool) string {
+func newImportDecl(importDecls []ast.Decl) string {
 	importDecl := &ast.GenDecl{
 		Tok: token.IMPORT,
 	}
 
-	var decls []ast.Decl
-	if engineOnly {
-		dirDecls, err := scanDeclsInDir(importedDirs[1])
-		if err != nil {
-			panic(err)
-		}
-		decls = append(decls, dirDecls...)
-	} else {
-		for _, importedDir := range importedDirs {
-			dirDecls, err := scanDeclsInDir(importedDir, "examples/application/server/gets_generated.go")
-			if err != nil {
-				panic(err)
-			}
-			decls = append(decls, dirDecls...)
-		}
-	}
-
-	for _, decl := range decls {
+	for _, decl := range importDecls {
 		if genDecl, ok := isImportDecl(decl); ok {
 			importDecl.Specs = append(importDecl.Specs, genDecl.Specs...)
 		}
 	}
 
-	importBuf := bytes.NewBufferString("package state\n")
+	importBuf := bytes.NewBufferString(utils.PackageClause)
+
 	printer.Fprint(importBuf, token.NewFileSet(), importDecl)
-	factoryutils.Format(importBuf)
-	return factoryutils.TrimPackageName(importBuf.String())
+	utils.Format(importBuf)
+
+	return utils.TrimPackageClause(importBuf.String())
 }
 
 func isImportDecl(decl ast.Decl) (*ast.GenDecl, bool) {
 	if genDecl, ok := decl.(*ast.GenDecl); ok {
+
 		if genDecl.Tok == token.IMPORT {
 			return genDecl, true
 		}
+
 	}
+
 	return nil, false
 }
 
@@ -163,14 +157,11 @@ func main() {
 
 	buf.WriteString("package main\n")
 
-	engineOnlyImportDecl := generateImportDecl(true)
-	writeDecl(buf, "engine_only_import_decl", engineOnlyImportDecl)
+	var files []importedFile
 
-	importDecl := generateImportDecl(false)
-	writeDecl(buf, "import_decl", importDecl)
-
-	importedServerExampleFiles := readImportedServerExampleFiles()
-	writeDecl(buf, "imported_server_example_files", importedServerExampleFiles)
+	for _, dir := range sourceDirs {
+		files = append(files, newImportedFile(dir))
+	}
 
 	if err := ioutil.WriteFile("./copied_from_examples.go", buf.Bytes(), 0644); err != nil {
 		panic(err)

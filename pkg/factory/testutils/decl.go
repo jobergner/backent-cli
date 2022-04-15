@@ -68,9 +68,7 @@ func ensureLowerCase(s string) string {
 }
 
 func parseDecls(code string) []ast.Decl {
-	packageClause := "package main\n"
-
-	ast, err := parser.ParseFile(token.NewFileSet(), "", packageClause+code, parser.AllErrors)
+	ast, err := parser.ParseFile(token.NewFileSet(), "", PackageClause+code, parser.AllErrors)
 	if err != nil {
 		panic(err)
 	}
