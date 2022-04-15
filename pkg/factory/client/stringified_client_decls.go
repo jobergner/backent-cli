@@ -28,7 +28,7 @@ const _AddItemToPlayer_Client_func string = `func (c *Client) AddItemToPlayer(pa
 	msg := Message{idString, message.MessageKindAction_addItemToPlayer, msgContent}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return message.AddItemToPlayerResponse{}, err
 	}
 	responseChan := make(chan []byte)
@@ -43,7 +43,7 @@ const _AddItemToPlayer_Client_func string = `func (c *Client) AddItemToPlayer(pa
 		var res message.AddItemToPlayerResponse
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
-			log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed unmarshalling response")
+			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Str(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
 			return message.AddItemToPlayerResponse{}, err
 		}
 		return res, nil
@@ -68,7 +68,7 @@ const _MovePlayer_Client_func string = `func (c *Client) MovePlayer(params messa
 	msg := Message{idString, message.MessageKindAction_movePlayer, msgContent}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return err
 	}
 	c.messageChannel <- msgBytes
@@ -93,7 +93,7 @@ const _SpawnZoneItems_Client_func string = `func (c *Client) SpawnZoneItems(para
 	msg := Message{idString, message.MessageKindAction_spawnZoneItems, msgContent}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return message.SpawnZoneItemsResponse{}, err
 	}
 	responseChan := make(chan []byte)
@@ -108,7 +108,7 @@ const _SpawnZoneItems_Client_func string = `func (c *Client) SpawnZoneItems(para
 		var res message.SpawnZoneItemsResponse
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
-			log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed unmarshalling response")
+			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Str(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
 			return message.SpawnZoneItemsResponse{}, err
 		}
 		return res, nil
@@ -119,6 +119,7 @@ const client_go_import string = `import (
 	"context"
 	"sync"
 	"time"
+	"github.com/google/uuid"
 	"github.com/jobergner/backent-cli/examples/connect"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
@@ -128,54 +129,67 @@ const client_go_import string = `import (
 )`
 
 const _Client_type string = `type Client struct {
+	fps		int
 	id		string
 	mu		sync.Mutex
 	controller	Controller
 	engine		*state.Engine
 	conn		connect.Connector
 	router		*responseRouter
-	idSignal	chan string
+	receiveID	chan string
 	messageChannel	chan []byte
 	patchChannel	chan []byte
 }`
 
-const _NewClient_func string = `func NewClient(controller Controller) (*Client, context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*3)
-	c, _, err := websocket.Dial(ctx, "http://localhost:8080/ws", nil)
+const _NewClient_func string = `func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
+	dialCTX, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	c, _, err := websocket.Dial(dialCTX, "http://localhost:8080/ws", nil)
 	if err != nil {
 		log.Err(err).Msg("failed creating client while dialing server")
-		return nil, cancel, err
+		return nil, err
 	}
-	client := Client{controller: controller, engine: state.NewEngine(), conn: connect.NewConnection(c, ctx), router: &responseRouter{pending: make(map[string]chan []byte)}, idSignal: make(chan string, 1), messageChannel: make(chan []byte), patchChannel: make(chan []byte)}
+	client := Client{fps: fps, controller: controller, conn: connect.NewConnection(c, ctx), router: newReponseRouter(), receiveID: make(chan string), messageChannel: make(chan []byte), patchChannel: make(chan []byte), engine: state.NewEngine()}
 	go client.runReadMessages()
 	go client.runWriteMessages()
-	client.id = <-client.idSignal
-	return &client, cancel, nil
+	go client.runEmitPatches()
+	select {
+	case <-time.After(2 * time.Second):
+		cancel()
+		return nil, dialCTX.Err()
+	case clientID := <-client.receiveID:
+		client.id = clientID
+		client.engine.ThisClientID = clientID
+		break
+	}
+	return &client, nil
 }`
 
-const tickSync_Client_func string = `func (c *Client) tickSync() {
+const tick_Client_func string = `func (c *Client) tick() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.engine.Patch.IsEmpty() {
 		return
 	}
-	patchBytes, err := c.engine.Patch.MarshalJSON()
+	c.engine.AssembleUpdateTree()
+	updateTreeBytes, err := c.engine.Tree.MarshalJSON()
 	if err != nil {
 		log.Err(err).Msg("failed marshalling patch")
 		return
 	}
-	c.patchChannel <- patchBytes
+	c.engine.UpdateState()
+	c.patchChannel <- updateTreeBytes
 }`
 
 const _ReadUpdate_Client_func string = `func (c *Client) ReadUpdate() []byte {
 	return <-c.patchChannel
 }`
 
-const emitPatches_Client_func string = `func (c *Client) emitPatches() {
-	ticker := time.NewTicker(time.Second)
+const runEmitPatches_Client_func string = `func (c *Client) runEmitPatches() {
+	ticker := time.NewTicker(time.Second / time.Duration(c.fps))
 	for {
 		<-ticker.C
-		c.tickSync()
+		c.tick()
 	}
 }`
 
@@ -183,12 +197,12 @@ const _ID_Client_func string = `func (c *Client) ID() string {
 	return c.id
 }`
 
-const handleInernalError_Client_func string = `func (c *Client) handleInernalError() {
-	c.conn.Close()
+const closeConnection_Client_func string = `func (c *Client) closeConnection(reason string) {
+	c.conn.Close(reason)
 }`
 
 const runReadMessages_Client_func string = `func (c *Client) runReadMessages() {
-	defer c.handleInernalError()
+	defer c.closeConnection("failed reading messages")
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
@@ -201,12 +215,12 @@ const runReadMessages_Client_func string = `func (c *Client) runReadMessages() {
 			log.Err(err).Str(logging.Message, string(msgBytes)).Msg("failed unmarshalling message")
 			continue
 		}
-		c.processMessageSync(msg)
+		c.processMessage(msg)
 	}
 }`
 
 const runWriteMessages_Client_func string = `func (c *Client) runWriteMessages() {
-	defer c.handleInernalError()
+	defer c.closeConnection("failed writing messages")
 	for {
 		msg, ok := <-c.messageChannel
 		if !ok {
@@ -217,15 +231,15 @@ const runWriteMessages_Client_func string = `func (c *Client) runWriteMessages()
 	}
 }`
 
-const processMessageSync_Client_func string = `func (c *Client) processMessageSync(msg Message) error {
+const processMessage_Client_func string = `func (c *Client) processMessage(msg Message) error {
 	switch msg.Kind {
 	case message.MessageKindID:
-		c.idSignal <- string(msg.Content)
+		c.receiveID <- string(msg.Content)
 	case message.MessageKindUpdate, message.MessageKindCurrentState:
 		var patch state.State
 		err := patch.UnmarshalJSON(msg.Content)
 		if err != nil {
-			log.Warn().Msg("failed unmarshalling patch")
+			log.Err(err).Msg("failed unmarshalling patch")
 			return err
 		}
 		c.mu.Lock()
@@ -237,6 +251,23 @@ const processMessageSync_Client_func string = `func (c *Client) processMessageSy
 	return nil
 }`
 
+const _SuperMessage_Client_func string = `func (c *Client) SuperMessage(b []byte) error {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindGlobal)).Msg("failed generating message ID")
+		return err
+	}
+	idString := id.String()
+	msg := Message{idString, message.MessageKindGlobal, b}
+	msgBytes, err := msg.MarshalJSON()
+	if err != nil {
+		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindGlobal)).Msg("failed marshalling message")
+		return err
+	}
+	c.messageChannel <- msgBytes
+	return nil
+}`
+
 const controller_generated_go_import string = `import (
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/jobergner/backent-cli/examples/state"
@@ -244,7 +275,7 @@ const controller_generated_go_import string = `import (
 
 const _Controller_type string = `type Controller interface {
 	AddItemToPlayerBroadcast(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string)
-	EAddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
+	AddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
 	MovePlayerBroadcast(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
 	MovePlayerEmit(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
 	SpawnZoneItemsBroadcast(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string)
@@ -271,6 +302,10 @@ const response_router_go_import string = `import (
 	"github.com/rs/zerolog/log"
 )`
 
+const newReponseRouter_func string = `func newReponseRouter() *responseRouter {
+	return &responseRouter{pending: make(map[string]chan []byte)}
+}`
+
 const responseRouter_type string = `type responseRouter struct {
 	pending	map[string]chan []byte
 	mu	sync.Mutex
@@ -278,18 +313,19 @@ const responseRouter_type string = `type responseRouter struct {
 
 const add_responseRouter_func string = `func (r *responseRouter) add(id string, ch chan []byte) {
 	r.mu.Lock()
-	log.Debug().Str(logging.MessageID, id).Msg("adding channel to router")
 	r.pending[id] = ch
 	r.mu.Unlock()
 }`
 
 const remove_responseRouter_func string = `func (r *responseRouter) remove(id string) {
 	r.mu.Lock()
-	log.Debug().Str(logging.MessageID, id).Msg("removing channel to router")
-	ch := r.pending[id]
+	defer r.mu.Unlock()
+	ch, ok := r.pending[id]
+	if !ok {
+		return
+	}
 	delete(r.pending, id)
 	close(ch)
-	r.mu.Unlock()
 }`
 
 const route_responseRouter_func string = `func (r *responseRouter) route(response Message) {
@@ -298,6 +334,5 @@ const route_responseRouter_func string = `func (r *responseRouter) route(respons
 		log.Warn().Str(logging.MessageID, response.ID).Msg("cannot find channel for routing response")
 		return
 	}
-	log.Debug().Str(logging.MessageID, response.ID).Msg("routing response")
 	ch <- response.Content
 }`

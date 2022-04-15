@@ -3,8 +3,8 @@ package client
 import (
 	"github.com/dave/jennifer/jen"
 
-	"github.com/jobergner/backent-cli/examples/configs"
 	"github.com/jobergner/backent-cli/pkg/ast"
+	"github.com/jobergner/backent-cli/pkg/factory/configs"
 )
 
 func newSimpleASTExample() *ast.AST {
@@ -32,5 +32,5 @@ func Write(
 
 	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
 
-	newFactory(file, config).writeActions()
+	newFactory(file, config).writeActions().writeController()
 }

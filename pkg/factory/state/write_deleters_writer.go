@@ -73,7 +73,7 @@ func (d deleteTypeWriter) setOperationKind() *Statement {
 }
 
 func (d deleteTypeWriter) signElement() *Statement {
-	return Id(d.typeName).Dot("Meta").Dot("sign").Call(Id(d.typeName).Dot("engine").Dot("broadcastingClientID"))
+	return Id(d.typeName).Dot("Meta").Dot("sign").Call(Id(d.typeName).Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (d deleteTypeWriter) updateElementInPatch() *Statement {
@@ -176,7 +176,7 @@ func (d deleteGeneratedTypeWriter) setOperationKind() *Statement {
 }
 
 func (d deleteGeneratedTypeWriter) signElement() *Statement {
-	return Id(d.valueTypeName()).Dot("Meta").Dot("sign").Call(Id(d.valueTypeName()).Dot("engine").Dot("broadcastingClientID"))
+	return Id(d.valueTypeName()).Dot("Meta").Dot("sign").Call(Id(d.valueTypeName()).Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (d deleteGeneratedTypeWriter) updateElementInPatch() *Statement {

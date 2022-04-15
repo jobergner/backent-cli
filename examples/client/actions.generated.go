@@ -32,7 +32,7 @@ func (c *Client) AddItemToPlayer(params message.AddItemToPlayerParams) (message.
 
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return message.AddItemToPlayerResponse{}, err
 	}
 
@@ -52,7 +52,7 @@ func (c *Client) AddItemToPlayer(params message.AddItemToPlayerParams) (message.
 		var res message.AddItemToPlayerResponse
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
-			log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed unmarshalling response")
+			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Str(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
 			return message.AddItemToPlayerResponse{}, err
 		}
 
@@ -83,7 +83,7 @@ func (c *Client) MovePlayer(params message.MovePlayerParams) error {
 
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return err
 	}
 
@@ -115,7 +115,7 @@ func (c *Client) SpawnZoneItems(params message.SpawnZoneItemsParams) (message.Sp
 
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return message.SpawnZoneItemsResponse{}, err
 	}
 
@@ -135,7 +135,7 @@ func (c *Client) SpawnZoneItems(params message.SpawnZoneItemsParams) (message.Sp
 		var res message.SpawnZoneItemsResponse
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
-			log.Err(err).Str(logging.MessageID, msg.ID).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed unmarshalling response")
+			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Str(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
 			return message.SpawnZoneItemsResponse{}, err
 		}
 

@@ -50,12 +50,12 @@ func (s *Factory) writeAny() *Factory {
 						return Case(Id(FieldPathIdentifier(_field))).Block(
 							Id(field.Parent.Name).Op(":=").Id("any").Dot("engine").Dot(Title(field.Parent.Name)).Call(Id(Title(field.Parent.Name)+"ID").Call(Id("any").Dot("ID").Dot("ParentID"))).Dot(field.Parent.Name),
 							Id(field.Parent.Name).Dot(Title(field.Name)).Op("=").Id("any").Dot("ID"),
-							Id(field.Parent.Name).Dot("Meta").Dot("sign").Call(Id(field.Parent.Name).Dot("engine").Dot("broadcastingClientID")),
+							Id(field.Parent.Name).Dot("Meta").Dot("sign").Call(Id(field.Parent.Name).Dot("engine").Dot("BroadcastingClientID")),
 							Id(field.Parent.Name).Dot("engine").Dot("Patch").Dot("Item").Index(Id(field.Parent.Name).Dot("ID")).Op("=").Id(field.Parent.Name),
 						)
 					}),
 				),
-				Id("any").Dot("Meta").Dot("sign").Call(Id("any").Dot("engine").Dot("broadcastingClientID")),
+				Id("any").Dot("Meta").Dot("sign").Call(Id("any").Dot("engine").Dot("BroadcastingClientID")),
 				asw.updateContainerInPatch(),
 			)
 		})

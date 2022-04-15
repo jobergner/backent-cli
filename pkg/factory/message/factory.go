@@ -3,8 +3,8 @@ package message
 import (
 	"github.com/dave/jennifer/jen"
 
-	"github.com/jobergner/backent-cli/examples/configs"
 	"github.com/jobergner/backent-cli/pkg/ast"
+	"github.com/jobergner/backent-cli/pkg/factory/configs"
 )
 
 func newSimpleASTExample() *ast.AST {

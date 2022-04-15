@@ -26,13 +26,13 @@ func (s *Factory) writeEngine() *Factory {
 		Id("State").Id("*State"),
 		Id("Patch").Id("*State"),
 		Id("Tree").Id("*Tree"),
-		Id("broadcastingClientID").Id("string"),
-		Id("thisClientID").Id("string"),
+		Id("BroadcastingClientID").Id("string"),
+		Id("ThisClientID").Id("string"),
 		Id("planner").Id("*assemblePlanner"),
 		Id("IDgen").Int(),
 	)
 
-	s.file.Func().Id("newEngine").Params().Id("*Engine").Block(
+	s.file.Func().Id("NewEngine").Params().Id("*Engine").Block(
 		Return(Id("&Engine").Values(Dict{
 			Id("State"):   Id("newState").Call(),
 			Id("Patch"):   Id("newState").Call(),
@@ -58,16 +58,16 @@ func (s *Factory) writeGenerateID() *Factory {
 
 func writeImportPatchElement(typeName string) *Statement {
 	return For(List(Id("_"), Id(typeName)).Op(":=").Range().Id("patch").Dot(Title(typeName))).Block(
-		If(Id(typeName).Dot("Meta").Dot("BroadcastedBy").Op("==").Id("engine").Dot("thisClientID")).Block(
+		If(Id(typeName).Dot("Meta").Dot("BroadcastedBy").Op("==").Id("engine").Dot("ThisClientID")).Block(
 			Continue(),
 		),
 		Id(typeName).Dot("Meta").Dot("unsign").Call(),
-		Id("engine").Dot("State").Dot(Title(typeName)).Index(Id(typeName).Dot("ID")).Op("=").Id(typeName),
+		Id("engine").Dot("Patch").Dot(Title(typeName)).Index(Id(typeName).Dot("ID")).Op("=").Id(typeName),
 	)
 }
 
 func (s *Factory) writeImportPatch() *Factory {
-	s.file.Func().Params(Id("engine").Id("*Engine")).Id("importPatch").Params(Id("patch").Id("*State")).Block(
+	s.file.Func().Params(Id("engine").Id("*Engine")).Id("ImportPatch").Params(Id("patch").Id("*State")).Block(
 		ForEachBasicType(func(b BasicType) *Statement {
 			return writeImportPatchElement(b.Value)
 		}),

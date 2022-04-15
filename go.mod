@@ -7,6 +7,7 @@ require (
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/uuid v1.2.0
+	github.com/jobergner/decltostring v0.0.0-20210711170806-ba13ff58f174 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/mailru/easyjson v0.7.7
 	github.com/mattn/go-colorable v0.1.11 // indirect

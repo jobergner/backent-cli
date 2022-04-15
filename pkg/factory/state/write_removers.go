@@ -38,7 +38,7 @@ func (s *Factory) writeRemovers() *Factory {
 						r.field().Op("=").Add(r.field()).Index(Id(""), Len(r.field()).Lit(-1)),
 						OnlyIf(!r.v.IsBasicType, r.deleteElement()),
 						r.elementCore().Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
-						r.elementCore().Dot("Meta").Dot("sign").Call(r.engine().Dot("broadcastingClientID")),
+						r.elementCore().Dot("Meta").Dot("sign").Call(r.engine().Dot("BroadcastingClientID")),
 						r.engine().Dot("Patch").Dot(Title(r.t.Name)).Index(r.elementCore().Dot("ID")).Op("=").Add(r.elementCore()),
 						Break(),
 					),

@@ -163,7 +163,7 @@ func (s setRefFieldWeiter) setOperationKind() *Statement {
 }
 
 func (s setRefFieldWeiter) signElement() *Statement {
-	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("Meta").Dot("sign").Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("broadcastingClientID"))
+	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("Meta").Dot("sign").Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (s setRefFieldWeiter) setItemInPatch() *Statement {

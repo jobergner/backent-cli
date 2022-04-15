@@ -19,8 +19,8 @@ func TestWriteAssembleTree(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			assembleUpdateTree_Engine_func,
-			assembleFullTree_Engine_func,
+			_AssembleUpdateTree_Engine_func,
+			_AssembleFullTree_Engine_func,
 			assembleTree_Engine_func,
 		}, "\n"))
 
