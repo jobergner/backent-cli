@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -42,12 +43,12 @@ func scanDeclsInDir(directoryPath string) (decls []ast.Decl, importDecls []ast.D
 			continue
 		}
 
-		content, err := ioutil.ReadFile(filePath)
+		content, err := os.ReadFile(filePath)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		f, err := parser.ParseFile(token.NewFileSet(), "", content, 0)
+		f, err := parser.ParseFile(token.NewFileSet(), "", content, parser.ParseComments)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -89,7 +90,9 @@ func writeCodeFromDir(path string) string {
 		buf.WriteString("\n")
 	}
 
-	printer.Fprint(buf, token.NewFileSet(), decls)
+	for _, decl := range decls {
+		printer.Fprint(buf, token.NewFileSet(), decl)
+	}
 
 	return buf.String()
 }
@@ -105,7 +108,7 @@ func newImportDecl(importDecls []ast.Decl) (ast.Decl, bool) {
 		if genDecl, ok := isImportDecl(decl); ok {
 
 			for _, spec := range genDecl.Specs {
-				buf := bytes.NewBufferString("")
+				buf := bytes.NewBuffer(nil)
 				printer.Fprint(buf, token.NewFileSet(), spec)
 				specString := buf.String()
 
@@ -145,7 +148,7 @@ func main() {
 
 	mapContent := make(jen.Dict)
 	for _, pkg := range packages.Packages(nil) {
-		code := writeCodeFromDir(pkg.SourcePath)
+		code := fmt.Sprintf("package %s \n%s", pkg.Name, writeCodeFromDir(pkg.SourcePath))
 		mapContent[jen.Lit(pkg.StaticCodeIdentifier)] = jen.Id("`" + escapeBackticks(code) + "`")
 	}
 

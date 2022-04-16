@@ -7,15 +7,14 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/jobergner/backent-cli/pkg/packages"
 )
 
 var configNameFlag = flag.String("config", "./example.config.json", "path of config")
-var outDirName = flag.String("out", "./tmp", "where to write the files to")
-var exampleFlag = flag.Bool("example", false, "when enabled starts example")
+var outDirPath = flag.String("out", "./tmp", "where to write the files to")
 var devModeFlag = flag.Bool("dev", false, "start in dev mode")
 var portFlag = flag.String("port", "3100", "start in dev mode")
 
@@ -32,7 +31,7 @@ func main() {
 		panic("\nthe above errors have occured while validating " + *configNameFlag)
 	}
 
-	ensureDir(*outDirName)
+	ensureDir(*outDirPath)
 
 	validateOutDir()
 
@@ -44,23 +43,21 @@ func main() {
 }
 
 func writePackage(pkg packages.PackageInfo, modName string) {
-	dirPath := path.Join(*outDirName, pkg.Name)
+	dirPath := filepath.Join(*outDirPath, pkg.Name)
 
 	ensureDir(dirPath)
 
 	buf := bytes.NewBuffer(nil)
 
-	if pkg.DynamicCodeFactory != nil {
-		pkg.DynamicCodeFactory.Write(buf)
-	} else {
-		buf.WriteString(fmt.Sprintf("package %s\n", pkg.Name))
-	}
-
 	moduleName := getModuleName()
 	code := strings.ReplaceAll(staticCode[pkg.StaticCodeIdentifier], "{{path}}", moduleName)
 	buf.WriteString(code)
 
-	filePath := path.Join(dirPath, fmt.Sprintf("%s.go", pkg.Name))
+	if pkg.DynamicCodeFactory != nil {
+		buf.WriteString(pkg.DynamicCodeFactory.Write())
+	}
+
+	filePath := filepath.Join(dirPath, fmt.Sprintf("%s.go", pkg.Name))
 
 	err := os.WriteFile(filePath, buf.Bytes(), 0644)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/ast"
+	"github.com/jobergner/backent-cli/pkg/factory/utils"
 	. "github.com/jobergner/backent-cli/pkg/factory/utils"
 )
 
@@ -28,7 +29,7 @@ type Factory struct {
 }
 
 // Write writes source code for a given StateConfig
-func (f *Factory) Write(buf *bytes.Buffer) {
+func (f *Factory) Write() string {
 	f.writeAdders().
 		writeAny().
 		writeAnyRefs().
@@ -65,13 +66,16 @@ func (f *Factory) Write(buf *bytes.Buffer) {
 		writeTreeElements().
 		writePools()
 
+	buf := bytes.NewBuffer(nil)
 	f.file.Render(buf)
+
+	return utils.TrimPackageClause(buf.String())
 }
 
 func NewFactory(config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
-		file:   jen.NewFile("state"),
+		file:   jen.NewFile(utils.PackageName),
 	}
 }
 

@@ -181,8 +181,13 @@ func validateStateConfig(data map[interface{}]interface{}) (errs []error) {
 }
 
 func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) (errs []error) {
+	stateConfigDataWithoutEvents, errs := prepareStateConfig(stateConfigData)
+	if len(errs) != 0 {
+		return errs
+	}
+
 	// responses and action share the same restrictions/requirements
-	responsesAsActionsValidationErrs := ValidateActionsConfig(stateConfigData, responsesConfigData)
+	responsesAsActionsValidationErrs := ValidateActionsConfig(stateConfigDataWithoutEvents, responsesConfigData)
 	errs = append(errs, responsesAsActionsValidationErrs...)
 
 	responseToUnknownActionErrs := validateResponseToUnknownAction(actionsConfigData, responsesConfigData)
@@ -192,7 +197,12 @@ func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfig
 }
 
 func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
-	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(stateConfigData)
+	stateConfigDataWithoutMetaFields, errs := prepareStateConfig(stateConfigData)
+	if len(errs) != 0 {
+		return errs
+	}
+
+	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(stateConfigDataWithoutMetaFields)
 	if len(prevalidationErrs) != 0 {
 		return prevalidationErrs
 	}
