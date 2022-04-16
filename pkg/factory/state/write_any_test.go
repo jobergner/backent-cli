@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteAny(t *testing.T) {
 	t.Run("writes any", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeAny()
 
 		buf := new(bytes.Buffer)
@@ -47,7 +46,7 @@ func TestWriteAny(t *testing.T) {
 		}
 	})
 	t.Run("writes anyRefs", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeAnyRefs()
 
 		buf := new(bytes.Buffer)

@@ -41,8 +41,10 @@ func (r *responseRouter) remove(id string) {
 }
 
 func (r *responseRouter) route(response Message) {
-	ch, ok := r.pending[response.ID]
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
+	ch, ok := r.pending[response.ID]
 	if !ok {
 		log.Warn().Str(logging.MessageID, response.ID).Msg("cannot find channel for routing response")
 		return

@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteTree(t *testing.T) {
 	t.Run("writes ReferencedDataStatus", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeReferencedDataStatus()
 
 		buf := new(bytes.Buffer)
@@ -29,7 +28,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes elementKinds", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeElementKinds()
 
 		buf := new(bytes.Buffer)
@@ -47,7 +46,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes tree elements", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeTreeElements()
 
 		buf := new(bytes.Buffer)
@@ -72,7 +71,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes tree", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeTree()
 
 		buf := new(bytes.Buffer)

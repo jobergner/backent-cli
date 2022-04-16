@@ -1,6 +1,8 @@
 package state
 
 import (
+	"bytes"
+
 	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/ast"
 	. "github.com/jobergner/backent-cli/pkg/factory/utils"
@@ -26,16 +28,8 @@ type Factory struct {
 }
 
 // Write writes source code for a given StateConfig
-func Write(file *jen.File, stateConfigData map[interface{}]interface{}) {
-
-	config := ast.Parse(
-		stateConfigData,
-		map[interface{}]interface{}{},
-		map[interface{}]interface{}{},
-	)
-
-	newFactory(file, config).
-		writeAdders().
+func (f *Factory) Write(buf *bytes.Buffer) {
+	f.writeAdders().
 		writeAny().
 		writeAnyRefs().
 		writeAssemblePlanner().
@@ -70,12 +64,14 @@ func Write(file *jen.File, stateConfigData map[interface{}]interface{}) {
 		writeTree().
 		writeTreeElements().
 		writePools()
+
+	f.file.Render(buf)
 }
 
-func newFactory(file *jen.File, config *ast.AST) *Factory {
+func NewFactory(config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
-		file:   file,
+		file:   jen.NewFile("state"),
 	}
 }
 

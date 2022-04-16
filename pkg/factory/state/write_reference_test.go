@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteReference(t *testing.T) {
 	t.Run("writes reference", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeReference()
 
 		buf := new(bytes.Buffer)
@@ -40,7 +39,7 @@ func TestWriteReference(t *testing.T) {
 		}
 	})
 	t.Run("writes dereference", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeDereference()
 
 		buf := new(bytes.Buffer)
