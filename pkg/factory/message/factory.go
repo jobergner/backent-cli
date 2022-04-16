@@ -7,6 +7,7 @@ import (
 
 	"github.com/jobergner/backent-cli/pkg/ast"
 	"github.com/jobergner/backent-cli/pkg/factory/configs"
+	"github.com/jobergner/backent-cli/pkg/factory/utils"
 )
 
 func newSimpleASTExample() *ast.AST {
@@ -36,15 +37,18 @@ func (s Factory) isIDTypeOfType(typeName string) bool {
 func NewFactory(config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
-		file:   jen.NewFile("message"),
+		file:   jen.NewFile(utils.PackageName),
 	}
 }
 
 // Write writes source code for a given ActionsConfig
-func (f *Factory) Write(buf *bytes.Buffer) {
+func (f *Factory) Write() string {
 	f.writeMessageKinds().
 		writeParameters().
 		writeResponses()
 
+	buf := bytes.NewBuffer(nil)
 	f.file.Render(buf)
+
+	return utils.TrimPackageClause(buf.String())
 }

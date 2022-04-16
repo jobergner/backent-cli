@@ -1,8 +1,6 @@
 package packages
 
 import (
-	"bytes"
-
 	"github.com/jobergner/backent-cli/pkg/ast"
 	"github.com/jobergner/backent-cli/pkg/factory/client"
 	"github.com/jobergner/backent-cli/pkg/factory/message"
@@ -11,7 +9,7 @@ import (
 )
 
 type Factory interface {
-	Write(*bytes.Buffer)
+	Write() string
 }
 
 type PackageInfo struct {

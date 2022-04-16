@@ -7,6 +7,7 @@ import (
 
 	"github.com/jobergner/backent-cli/pkg/ast"
 	"github.com/jobergner/backent-cli/pkg/factory/configs"
+	"github.com/jobergner/backent-cli/pkg/factory/utils"
 )
 
 func newSimpleASTExample() *ast.AST {
@@ -22,12 +23,16 @@ type Factory struct {
 func NewFactory(config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
-		file:   jen.NewFile("client"),
+		file:   jen.NewFile(utils.PackageName),
 	}
 }
 
 // Write writes source code for a given ActionsConfig
-func (f *Factory) Write(buf *bytes.Buffer) {
+func (f *Factory) Write() string {
 	f.writeActions().writeController()
+
+	buf := bytes.NewBuffer(nil)
 	f.file.Render(buf)
+
+	return utils.TrimPackageClause(buf.String())
 }

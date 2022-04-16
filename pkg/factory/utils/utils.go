@@ -14,7 +14,10 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
-const PackageClause = "package main\n"
+var (
+	PackageName   = "main"
+	PackageClause = fmt.Sprintf("package %s\n", PackageName)
+)
 
 type BasicType struct {
 	Name  string

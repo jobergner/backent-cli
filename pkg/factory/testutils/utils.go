@@ -16,6 +16,11 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 )
 
+var (
+	PackageName   = "main"
+	PackageClause = fmt.Sprintf("package %s\n", PackageName)
+)
+
 func caseInsensitiveSort(keys []string) func(i, j int) bool {
 	return func(i, j int) bool {
 		return strings.ToLower(keys[i]) < strings.ToLower(keys[j])
@@ -104,11 +109,6 @@ WANT:
 GOT:
 ` + actual
 }
-
-var (
-	PackageName   = "main"
-	PackageClause = fmt.Sprintf("package %s\n", PackageName)
-)
 
 // FormatUnpackagedCode returns formatted code
 func FormatUnpackagedCode(code string) string {
