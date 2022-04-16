@@ -11,7 +11,7 @@ import (
 
 func TestWriteAssemblePlanner(t *testing.T) {
 	t.Run("writes assemble planner", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeAssemblePlanner()
 
 		buf := new(bytes.Buffer)
@@ -29,7 +29,7 @@ func TestWriteAssemblePlanner(t *testing.T) {
 		}
 	})
 	t.Run("writes assemble planner clear", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeAssemblePlannerClear()
 
 		buf := new(bytes.Buffer)
@@ -46,7 +46,7 @@ func TestWriteAssemblePlanner(t *testing.T) {
 		}
 	})
 	t.Run("writes assemble planner plan", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAssemblePlannerPlan()
 
 		buf := new(bytes.Buffer)
@@ -63,7 +63,7 @@ func TestWriteAssemblePlanner(t *testing.T) {
 		}
 	})
 	t.Run("writes assemble planner fill", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
 		sf.writeAssemblePlannerFill()
 
 		buf := new(bytes.Buffer)

@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteEngine(t *testing.T) {
 	t.Run("writes operationKind", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeOperationKind()
 
 		buf := new(bytes.Buffer)
@@ -29,7 +28,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes Engine", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeEngine()
 
 		buf := new(bytes.Buffer)
@@ -47,7 +46,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes generateID method", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeGenerateID()
 
 		buf := new(bytes.Buffer)
@@ -64,7 +63,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes updateState method", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeUpdateState()
 
 		buf := new(bytes.Buffer)
@@ -81,7 +80,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes importPatch method", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeImportPatch()
 
 		buf := new(bytes.Buffer)

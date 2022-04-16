@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteAssembleTree(t *testing.T) {
 	t.Run("writes assembleTree", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeAssembleTree()
 
 		buf := new(bytes.Buffer)

@@ -1,6 +1,8 @@
 package message
 
 import (
+	"bytes"
+
 	"github.com/dave/jennifer/jen"
 
 	"github.com/jobergner/backent-cli/pkg/ast"
@@ -31,23 +33,18 @@ func (s Factory) isIDTypeOfType(typeName string) bool {
 	return false
 }
 
-func newFactory(file *jen.File, config *ast.AST) *Factory {
+func NewFactory(config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
-		file:   file,
+		file:   jen.NewFile("message"),
 	}
 }
 
 // Write writes source code for a given ActionsConfig
-func Write(
-	file *jen.File,
-	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
-) {
-
-	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
-
-	newFactory(file, config).
-		writeMessageKinds().
+func (f *Factory) Write(buf *bytes.Buffer) {
+	f.writeMessageKinds().
 		writeParameters().
 		writeResponses()
+
+	f.file.Render(buf)
 }

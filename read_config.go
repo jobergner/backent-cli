@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
+
+	"github.com/jobergner/backent-cli/pkg/ast"
+	"github.com/jobergner/backent-cli/pkg/validator"
 )
 
-type config struct {
-	State     map[interface{}]interface{} `json:"state"`
-	Actions   map[interface{}]interface{} `json:"actions"`
-	Responses map[interface{}]interface{} `json:"responses"`
-}
 type jsonConfig struct {
 	State     map[string]interface{} `json:"state"`
 	Actions   map[string]interface{} `json:"actions"`
@@ -71,48 +69,36 @@ func validateJSONConfig(jc jsonConfig) error {
 	return nil
 }
 
-func useExampleConfig() (*config, []byte, error) {
-	b, err := json.Marshal(exampleConfig)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	c := &config{
-		State:     makeAmbiguous(exampleConfig.State),
-		Actions:   makeAmbiguous(exampleConfig.Actions),
-		Responses: makeAmbiguous(exampleConfig.Responses),
-	}
-
-	return c, b, nil
-}
-
-func readConfig() (*config, []byte, error) {
-
-	if *exampleFlag {
-		return useExampleConfig()
-	}
-
+func newAST() (*ast.AST, []error) {
 	configFile, err := ioutil.ReadFile(*configNameFlag)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error reading config file: %s", err)
+		panic(err)
 	}
 
 	jc := jsonConfig{}
 	err = json.Unmarshal(configFile, &jc)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error parsing config: %s", err)
+		panic(err)
 	}
 
 	err = validateJSONConfig(jc)
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
-	c := &config{
-		State:     makeAmbiguous(jc.State),
-		Actions:   makeAmbiguous(jc.Actions),
-		Responses: makeAmbiguous(jc.Responses),
+	state := makeAmbiguous(jc.State)
+	actions := makeAmbiguous(jc.Actions)
+	responses := makeAmbiguous(jc.Responses)
+
+	if errs := validator.ValidateStateConfig(state); len(errs) != 0 {
+		return nil, errs
+	}
+	if errs := validator.ValidateActionsConfig(state, actions); len(errs) != 0 {
+		return nil, errs
+	}
+	if errs := validator.ValidateResponsesConfig(state, actions, responses); len(errs) != 0 {
+		return nil, errs
 	}
 
-	return c, configFile, nil
+	return ast.Parse(state, actions, responses), nil
 }

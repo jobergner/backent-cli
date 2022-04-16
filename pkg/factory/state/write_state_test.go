@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWriteState(t *testing.T) {
 	t.Run("writes ids", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeIDs()
 
 		buf := new(bytes.Buffer)
@@ -49,7 +48,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeState()
 
 		buf := new(bytes.Buffer)
@@ -67,7 +66,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes metaData", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeMetaData()
 
 		buf := new(bytes.Buffer)
@@ -86,7 +85,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes elements", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeElements()
 
 		buf := new(bytes.Buffer)

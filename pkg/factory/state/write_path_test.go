@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWritePath(t *testing.T) {
 	t.Run("writes path identifiers", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writeIdentifiers()
 
 		buf := new(bytes.Buffer)
@@ -30,7 +29,7 @@ func TestWritePath(t *testing.T) {
 		}
 	})
 	t.Run("writes path", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writePath()
 
 		buf := new(bytes.Buffer)

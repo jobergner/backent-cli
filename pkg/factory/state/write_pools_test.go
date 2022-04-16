@@ -5,13 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestWritePools(t *testing.T) {
 	t.Run("writes pools", func(t *testing.T) {
-		sf := newFactory(jen.NewFile(testutils.PackageName), newSimpleASTExample())
+		sf := NewFactory(newSimpleASTExample())
 		sf.writePools()
 
 		buf := new(bytes.Buffer)

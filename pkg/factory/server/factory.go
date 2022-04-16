@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+
 	"github.com/dave/jennifer/jen"
 
 	"github.com/jobergner/backent-cli/pkg/ast"
@@ -17,21 +19,17 @@ type Factory struct {
 	file   *jen.File
 }
 
-func newFactory(file *jen.File, config *ast.AST) *Factory {
+func NewFactory(config *ast.AST) *Factory {
 	return &Factory{
 		config: config,
-		file:   file,
+		file:   jen.NewFile("server"),
 	}
 }
 
 // Write writes source code for a given ActionsConfig
-func Write(
-	file *jen.File,
-	stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{},
-	configJson []byte,
-) {
+func (f *Factory) Write(buf *bytes.Buffer) {
+	f.writeProcessClientMessage().
+		writeController()
 
-	config := ast.Parse(stateConfigData, actionsConfigData, responsesConfigData)
-
-	newFactory(file, config).writeProcessClientMessage().writeController()
+	f.file.Render(buf)
 }
