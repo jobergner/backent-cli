@@ -94,6 +94,7 @@ func writeCodeFromDir(path string) string {
 		if needsSkipMarshallerComment(decl) {
 			buf.WriteString("// easyjson:skip\n")
 		}
+		purgeSkipMarshallerComment(decl)
 		printer.Fprint(buf, token.NewFileSet(), decl)
 		buf.WriteString("\n")
 	}
@@ -127,6 +128,22 @@ func newImportDecl(importDecls []ast.Decl) (ast.Decl, bool) {
 	}
 
 	return importDecl, len(dedupSpecs) > 0
+}
+
+func purgeSkipMarshallerComment(decl ast.Decl) {
+	if genDecl, ok := decl.(*ast.FuncDecl); ok {
+		genDecl.Doc = nil
+	}
+	if genDecl, ok := decl.(*ast.GenDecl); ok {
+		genDecl.Doc = nil
+		// TODO: figure out how to maintain comments as intended in the future
+		// if genDecl.Doc == nil {
+		// 	return
+		// }
+		// for _, c := range genDecl.Doc.List {
+		// 	c.Text = strings.ReplaceAll(c.Text, "easyjson:skip", "")
+		// }
+	}
 }
 
 func needsSkipMarshallerComment(decl ast.Decl) bool {

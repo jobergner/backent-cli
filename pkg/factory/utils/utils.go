@@ -219,12 +219,13 @@ func TrimPackageClause(sourceCode string) string {
 }
 
 func Format(buf *bytes.Buffer) error {
-	f, err := parser.ParseFile(token.NewFileSet(), "", buf.String(), parser.AllErrors)
+	fs := token.NewFileSet()
+	f, err := parser.ParseFile(fs, "", buf.String(), parser.AllErrors|parser.ParseComments)
 	if err != nil {
 		return err
 	}
 
 	buf.Reset()
-	err = format.Node(buf, token.NewFileSet(), f)
+	err = format.Node(buf, fs, f)
 	return nil
 }
