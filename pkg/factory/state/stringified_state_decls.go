@@ -1203,7 +1203,7 @@ const assembleTree_Engine_func string = `func (engine *Engine) assembleTree() {
 	}
 }`
 
-const complex_id_go_import string = `import (
+const complex_id_generated_go_import string = `import (
 	"bytes"
 	"fmt"
 	"strconv"
@@ -2123,7 +2123,7 @@ const deleteAnyOfItem_Player_ZoneItem_Engine_func string = `func (engine *Engine
 	}
 }`
 
-const getters_go_import string = `import (
+const getters_generated_go_import string = `import (
 	"sort"
 )`
 
@@ -3637,7 +3637,7 @@ const allEquipmentSetEquipmentRefIDs_Engine_func string = `func (engine Engine) 
 	return dedupedIDs
 }`
 
-const path_go_import string = `import (
+const path_generated_go_import string = `import (
 	"fmt"
 	"strconv"
 )`
@@ -3824,7 +3824,7 @@ const isSliceFieldIdentifier_func string = `func isSliceFieldIdentifier(fieldIde
 	return false
 }`
 
-const pools_go_import string = `import (
+const pools_generated_go_import string = `import (
 	"sync"
 )`
 

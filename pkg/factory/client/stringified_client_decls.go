@@ -329,6 +329,8 @@ const remove_responseRouter_func string = `func (r *responseRouter) remove(id st
 }`
 
 const route_responseRouter_func string = `func (r *responseRouter) route(response Message) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	ch, ok := r.pending[response.ID]
 	if !ok {
 		log.Warn().Str(logging.MessageID, response.ID).Msg("cannot find channel for routing response")
