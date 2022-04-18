@@ -4,17 +4,17 @@ package main
 var staticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"context"
 	"sync"
 	"{{path}}/examples/connect"
-	"nhooyr.io/websocket"
-	"time"
-	"{{path}}/examples/logging"
-	"{{path}}/examples/message"
-	"github.com/rs/zerolog/log"
-	"{{path}}/examples/state"
 	"errors"
+	"time"
+	"{{path}}/examples/message"
+	"context"
+	"{{path}}/examples/state"
+	"nhooyr.io/websocket"
 	"github.com/google/uuid"
+	"{{path}}/examples/logging"
+	"github.com/rs/zerolog/log"
 )
 // easyjson:skip
 type Client struct {
@@ -26,8 +26,7 @@ type Client struct {
 	conn		connect.Connector
 	router		*responseRouter
 	receiveID	chan string
-	messageChannel	chan [ // easyjson:skip
-	]byte
+	messageChannel	chan []byte
 	patchChannel	chan []byte
 }
 func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
@@ -68,9 +67,7 @@ func (c *Client) tick() {
 	c.engine.UpdateState()
 	c.patchChannel <- updateTreeBytes
 }
-func (c *Client) ReadUpdate() [ // TODO maybe return error that signals when anything critical happens
-// switch of patchChannel and errorChannel
-]byte {
+func (c *Client) ReadUpdate() []byte {
 	return <-c.patchChannel
 }
 func (c *Client) runEmitPatches() {
@@ -162,8 +159,7 @@ func newReponseRouter() *responseRouter {
 }
 // easyjson:skip
 type responseRouter struct {
-	pending	map // easyjson:skip
-	[string]chan []byte
+	pending	map[string]chan []byte
 	mu	sync.Mutex
 }
 func (r *responseRouter) add(id string, ch chan []byte) {
@@ -194,10 +190,10 @@ func (r *responseRouter) route(response Message) {
 `,
 	"importedCode_connect": `package connect 
 import (
-	"nhooyr.io/websocket"
 	"context"
 	"{{path}}/examples/logging"
 	"github.com/rs/zerolog/log"
+	"nhooyr.io/websocket"
 )
 type Connector interface {
 	Close(reason string)
@@ -210,8 +206,7 @@ type Connection struct {
 	Conn		*websocket.Conn
 	ctx		context.Context
 	cancelFn	func()
-}// easyjson:skip
-
+}
 func NewConnection(conn *websocket.Conn, ctx context.Context) *Connection {
 	ctx, cancel := context.WithCancel(ctx)
 	return &Connection{Conn: conn, ctx: ctx, cancelFn: cancel}
@@ -272,27 +267,26 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
-	"{{path}}/examples/message"
-	"github.com/rs/zerolog/log"
-	"sync"
+	"{{path}}/examples/state"
 	"errors"
 	"fmt"
 	"net/http"
+	"{{path}}/examples/connect"
+	"github.com/rs/zerolog/log"
+	"{{path}}/examples/message"
+	"sync"
+	"time"
 	"nhooyr.io/websocket"
 	"github.com/google/uuid"
 	"{{path}}/examples/logging"
-	"{{path}}/examples/state"
-	"time"
-	"{{path}}/examples/connect"
 )
 // easyjson:skip
 type Client struct {
 	lobby		*Lobby
 	room		*Room
 	conn		connect.Connector
-	messageChannel	chan [ // easyjson:skip
-	]byte
-	id	string
+	messageChannel	chan []byte
+	id		string
 }
 func newClient(websocketConnector connect.Connector, lobby *Lobby) (*Client, error) {
 	clientID, err := uuid.NewRandom()
@@ -328,11 +322,7 @@ func (c *Client) RoomName() string {
 }
 func (c *Client) closeConnection(reason string) {
 	c.conn.Close(reason)
-}// closeConnection closes the client's connection
-// this does not do anything else on its own, but triggers
-// the removal of the client from the system in the
-// http handler
-
+}
 func (c *Client) runReadMessages() {
 	defer c.closeConnection("failed reading messages")
 	for {
@@ -371,8 +361,7 @@ func (c *Client) runWriteMessages() {
 }
 // easyjson:skip
 type clientRegistrar struct {
-	clients	map // easyjson:skip
-	[*Client]struct{}
+	clients		map[*Client]struct{}
 	incomingClients	map[*Client]struct{}
 	mu		sync.Mutex
 }
@@ -395,8 +384,7 @@ func (c *clientRegistrar) remove(client *Client) {
 func (c *clientRegistrar) kick(client *Client, reason string) {
 	log.Debug().Str(logging.ClientID, client.id).Msg("kicking client")
 	client.closeConnection(reason)
-}// TODO unused
-
+}
 func (c *clientRegistrar) promote(client *Client) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -409,9 +397,8 @@ var (
 )
 // easyjson:skip
 type Lobby struct {
-	mu	sync.Mutex
-	Rooms	map // easyjson:skip
-	[string]*Room
+	mu		sync.Mutex
+	Rooms		map[string]*Room
 	controller	Controller
 	fps		int
 }
@@ -488,8 +475,7 @@ type Room struct {
 	state		*state.Engine
 	controller	Controller
 	mode		RoomMode
-}// easyjson:skip
-
+}
 func newRoom(controller Controller, name string) *Room {
 	return &Room{name: name, clients: newClientRegistar(), state: state.NewEngine(), controller: controller}
 }
@@ -552,8 +538,7 @@ func (r *Room) Deploy(controller Controller, fps int) {
 type Server struct {
 	HttpServer	*http.Server
 	Lobby		*Lobby
-}// easyjson:skip
-
+}
 func NewServer(controller Controller, fps int, configs ...func(*http.Server, *http.ServeMux)) *Server {
 	server := Server{HttpServer: new(http.Server), Lobby: newLobby(controller, fps)}
 	handler := http.NewServeMux()
@@ -664,11 +649,11 @@ func (r *Room) handleIncomingClients() {
 `,
 	"importedCode_state": `package state 
 import (
+	"sync"
 	"bytes"
 	"fmt"
 	"strconv"
 	"sort"
-	"sync"
 )
 `,
 }

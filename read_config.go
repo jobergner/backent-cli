@@ -70,7 +70,7 @@ func validateJSONConfig(jc jsonConfig) error {
 }
 
 func newAST() (*ast.AST, []error) {
-	configFile, err := ioutil.ReadFile(*configNameFlag)
+	configFile, err := ioutil.ReadFile(*configPath)
 	if err != nil {
 		panic(err)
 	}

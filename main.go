@@ -10,13 +10,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jobergner/backent-cli/pkg/factory/utils"
 	"github.com/jobergner/backent-cli/pkg/packages"
 )
 
-var configNameFlag = flag.String("config", "./example.config.json", "path of config")
+var configPath = flag.String("config", "./example.config.json", "path of config")
 var outDirPath = flag.String("out", "./tmp", "where to write the files to")
-var devModeFlag = flag.Bool("dev", false, "start in dev mode")
-var portFlag = flag.String("port", "3100", "start in dev mode")
 
 func main() {
 	flag.Parse()
@@ -28,7 +27,7 @@ func main() {
 			fmt.Println(validationErr)
 		}
 
-		panic("\nthe above errors have occured while validating " + *configNameFlag)
+		panic("\nthe above errors have occured while validating " + *configPath)
 	}
 
 	ensureDir(*outDirPath)
@@ -59,7 +58,12 @@ func writePackage(pkg packages.PackageInfo, modName string) {
 
 	filePath := filepath.Join(dirPath, fmt.Sprintf("%s.go", pkg.Name))
 
-	err := os.WriteFile(filePath, buf.Bytes(), 0644)
+	err := utils.Format(buf)
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.WriteFile(filePath, buf.Bytes(), 0644)
 	if err != nil {
 		panic(err)
 	}
