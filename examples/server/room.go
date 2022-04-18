@@ -18,6 +18,7 @@ const (
 	RoomModeTerminating
 )
 
+// easyjson:skip
 type Room struct {
 	name       string
 	mu         sync.Mutex

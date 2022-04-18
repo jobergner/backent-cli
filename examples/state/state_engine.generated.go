@@ -8,6 +8,7 @@ const (
 	OperationKindUnchanged OperationKind = "UNCHANGED"
 )
 
+// easyjson:skip
 type Engine struct {
 	State                *State
 	Patch                *State

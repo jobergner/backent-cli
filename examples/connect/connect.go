@@ -15,6 +15,7 @@ type Connector interface {
 	Context() context.Context
 }
 
+// easyjson:skip
 type Connection struct {
 	Conn     *websocket.Conn
 	ctx      context.Context

@@ -1,5 +1,6 @@
 package state
 
+// easyjson:skip
 type assemblePlanner struct {
 	updatedPaths          []path
 	updatedReferencePaths map[ComplexID]path

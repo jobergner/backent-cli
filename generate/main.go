@@ -91,7 +91,11 @@ func writeCodeFromDir(path string) string {
 	}
 
 	for _, decl := range decls {
+		if needsSkipMarshallerComment(decl) {
+			buf.WriteString("// easyjson:skip\n")
+		}
 		printer.Fprint(buf, token.NewFileSet(), decl)
+		buf.WriteString("\n")
 	}
 
 	return buf.String()
@@ -123,6 +127,14 @@ func newImportDecl(importDecls []ast.Decl) (ast.Decl, bool) {
 	}
 
 	return importDecl, len(dedupSpecs) > 0
+}
+
+func needsSkipMarshallerComment(decl ast.Decl) bool {
+	if genDecl, ok := decl.(*ast.GenDecl); ok {
+		return strings.Contains(genDecl.Doc.Text(), "easyjson:skip")
+	}
+
+	return false
 }
 
 func isImportDecl(decl ast.Decl) (*ast.GenDecl, bool) {
