@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// easyjson:skip
 type clientRegistrar struct {
 	clients         map[*Client]struct{}
 	incomingClients map[*Client]struct{}

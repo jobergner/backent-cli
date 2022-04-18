@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// easyjson:skip
 type Lobby struct {
 	mu         sync.Mutex
 	Rooms      map[string]*Room

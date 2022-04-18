@@ -4,18 +4,19 @@ package main
 var staticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"github.com/google/uuid"
-	"{{path}}/examples/message"
-	"github.com/rs/zerolog/log"
+	"context"
 	"sync"
 	"{{path}}/examples/connect"
+	"nhooyr.io/websocket"
+	"time"
+	"{{path}}/examples/logging"
+	"{{path}}/examples/message"
+	"github.com/rs/zerolog/log"
 	"{{path}}/examples/state"
 	"errors"
-	"time"
-	"context"
-	"nhooyr.io/websocket"
-	"{{path}}/examples/logging"
+	"github.com/google/uuid"
 )
+// easyjson:skip
 type Client struct {
 	fps		int
 	id		string
@@ -28,7 +29,8 @@ type Client struct {
 	messageChannel	chan [ // easyjson:skip
 	]byte
 	patchChannel	chan []byte
-}func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
+}
+func NewClient(ctx context.Context, controller Controller, fps int) (*Client, error) {
 	dialCTX, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	c, _, err := websocket.Dial(dialCTX, "http://localhost:8080/ws", nil)
@@ -50,7 +52,8 @@ type Client struct {
 		break
 	}
 	return &client, nil
-}func (c *Client) tick() {
+}
+func (c *Client) tick() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.engine.Patch.IsEmpty() {
@@ -64,21 +67,26 @@ type Client struct {
 	}
 	c.engine.UpdateState()
 	c.patchChannel <- updateTreeBytes
-}func (c *Client) ReadUpdate() [ // TODO maybe return error that signals when anything critical happens
+}
+func (c *Client) ReadUpdate() [ // TODO maybe return error that signals when anything critical happens
 // switch of patchChannel and errorChannel
 ]byte {
 	return <-c.patchChannel
-}func (c *Client) runEmitPatches() {
+}
+func (c *Client) runEmitPatches() {
 	ticker := time.NewTicker(time.Second / time.Duration(c.fps))
 	for {
 		<-ticker.C
 		c.tick()
 	}
-}func (c *Client) ID() string {
+}
+func (c *Client) ID() string {
 	return c.id
-}func (c *Client) closeConnection(reason string) {
+}
+func (c *Client) closeConnection(reason string) {
 	c.conn.Close(reason)
-}func (c *Client) runReadMessages() {
+}
+func (c *Client) runReadMessages() {
 	defer c.closeConnection("failed reading messages")
 	for {
 		_, msgBytes, err := c.conn.ReadMessage()
@@ -94,7 +102,8 @@ type Client struct {
 		}
 		c.processMessage(msg)
 	}
-}func (c *Client) runWriteMessages() {
+}
+func (c *Client) runWriteMessages() {
 	defer c.closeConnection("failed writing messages")
 	for {
 		msg, ok := <-c.messageChannel
@@ -104,7 +113,8 @@ type Client struct {
 		}
 		c.conn.WriteMessage(msg)
 	}
-}func (c *Client) processMessage(msg Message) error {
+}
+func (c *Client) processMessage(msg Message) error {
 	switch msg.Kind {
 	case message.MessageKindID:
 		c.receiveID <- string(msg.Content)
@@ -122,7 +132,8 @@ type Client struct {
 		c.router.route(msg)
 	}
 	return nil
-}func (c *Client) SuperMessage(b []byte) error {
+}
+func (c *Client) SuperMessage(b []byte) error {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		log.Err(err).Str(logging.MessageKind, string(message.MessageKindGlobal)).Msg("failed generating message ID")
@@ -137,23 +148,30 @@ type Client struct {
 	}
 	c.messageChannel <- msgBytes
 	return nil
-}var (
+}
+var (
 	ErrResponseTimeout = errors.New("timeout")
-)type Message struct {
+)
+type Message struct {
 	ID	string		` + "`" + `json:"id"` + "`" + `
 	Kind	message.Kind	` + "`" + `json:"kind"` + "`" + `
 	Content	[]byte		` + "`" + `json:"content"` + "`" + `
-}func newReponseRouter() *responseRouter {
+}
+func newReponseRouter() *responseRouter {
 	return &responseRouter{pending: make(map[string]chan []byte)}
-}type responseRouter struct {
+}
+// easyjson:skip
+type responseRouter struct {
 	pending	map // easyjson:skip
 	[string]chan []byte
 	mu	sync.Mutex
-}func (r *responseRouter) add(id string, ch chan []byte) {
+}
+func (r *responseRouter) add(id string, ch chan []byte) {
 	r.mu.Lock()
 	r.pending[id] = ch
 	r.mu.Unlock()
-}func (r *responseRouter) remove(id string) {
+}
+func (r *responseRouter) remove(id string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	ch, ok := r.pending[id]
@@ -162,7 +180,8 @@ type Client struct {
 	}
 	delete(r.pending, id)
 	close(ch)
-}func (r *responseRouter) route(response Message) {
+}
+func (r *responseRouter) route(response Message) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	ch, ok := r.pending[response.ID]
@@ -171,49 +190,59 @@ type Client struct {
 		return
 	}
 	ch <- response.Content
-}`,
+}
+`,
 	"importedCode_connect": `package connect 
 import (
+	"nhooyr.io/websocket"
 	"context"
 	"{{path}}/examples/logging"
 	"github.com/rs/zerolog/log"
-	"nhooyr.io/websocket"
 )
 type Connector interface {
 	Close(reason string)
 	ReadMessage() (messageType int, p []byte, err error)
 	WriteMessage(messageType []byte) error
 	Context() context.Context
-}type Connection struct {
+}
+// easyjson:skip
+type Connection struct {
 	Conn		*websocket.Conn
 	ctx		context.Context
 	cancelFn	func()
-}func NewConnection(conn *websocket.Conn, ctx context.Context) *Connection {
+}// easyjson:skip
+
+func NewConnection(conn *websocket.Conn, ctx context.Context) *Connection {
 	ctx, cancel := context.WithCancel(ctx)
 	return &Connection{Conn: conn, ctx: ctx, cancelFn: cancel}
-}func (c *Connection) Context() context.Context {
+}
+func (c *Connection) Context() context.Context {
 	return c.ctx
-}func (c *Connection) Close(reason string) {
+}
+func (c *Connection) Close(reason string) {
 	err := c.Conn.Close(websocket.StatusNormalClosure, reason)
 	if err != nil {
 		log.Warn().Msg("failed closing connection")
 	}
 	c.cancelFn()
-}func (c *Connection) ReadMessage() (int, []byte, error) {
+}
+func (c *Connection) ReadMessage() (int, []byte, error) {
 	msgType, msg, err := c.Conn.Read(c.ctx)
 	if err != nil {
 		log.Err(err).Msg("failed reading from connection")
 		return 0, nil, err
 	}
 	return int(msgType), msg, nil
-}func (c *Connection) WriteMessage(msg []byte) error {
+}
+func (c *Connection) WriteMessage(msg []byte) error {
 	err := c.Conn.Write(c.ctx, websocket.MessageText, msg)
 	if err != nil {
 		log.Err(err).Str(logging.Message, string(msg)).Msg("failed writing to connection")
 		return err
 	}
 	return nil
-}`,
+}
+`,
 	"importedCode_logging": `package logging 
 const (
 	RoomName		= "roomName"
@@ -223,10 +252,12 @@ const (
 	Message			= "message"
 	MessageID		= "messageID"
 	ClientBufferFull	= "client message buffer full"
-)`,
+)
+`,
 	"importedCode_message": `package message 
 import "{{path}}/examples/state"
-type Kind stringconst (
+type Kind string
+const (
 	MessageKindError	Kind	= "error"
 	MessageKindCurrentState	Kind	= "currentState"
 	MessageKindUpdate	Kind	= "update"
@@ -237,29 +268,33 @@ type Kind stringconst (
 )// server -> client
 // responses to messages which fail to unmarshal
 // client -> server
+
 `,
 	"importedCode_server": `package server 
 import (
-	"{{path}}/examples/connect"
-	"github.com/rs/zerolog/log"
-	"net/http"
-	"github.com/google/uuid"
 	"{{path}}/examples/message"
+	"github.com/rs/zerolog/log"
 	"sync"
-	"{{path}}/examples/state"
 	"errors"
-	"time"
 	"fmt"
+	"net/http"
 	"nhooyr.io/websocket"
+	"github.com/google/uuid"
 	"{{path}}/examples/logging"
+	"{{path}}/examples/state"
+	"time"
+	"{{path}}/examples/connect"
 )
+// easyjson:skip
 type Client struct {
 	lobby		*Lobby
 	room		*Room
 	conn		connect.Connector
-	messageChannel	chan []byte
-	id		string
-}func newClient(websocketConnector connect.Connector, lobby *Lobby) (*Client, error) {
+	messageChannel	chan [ // easyjson:skip
+	]byte
+	id	string
+}
+func newClient(websocketConnector connect.Connector, lobby *Lobby) (*Client, error) {
 	clientID, err := uuid.NewRandom()
 	if err != nil {
 		log.Err(err).Msg("failed generating client ID")
@@ -271,7 +306,8 @@ type Client struct {
 		return nil, err
 	}
 	return &c, nil
-}func (c *Client) sendIdentifyingMessage() error {
+}
+func (c *Client) sendIdentifyingMessage() error {
 	msg := Message{Kind: message.MessageKindID, Content: []byte(c.id)}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
@@ -280,18 +316,23 @@ type Client struct {
 	}
 	c.messageChannel <- msgBytes
 	return nil
-}func (c *Client) SendMessage(msg []byte) {
+}
+func (c *Client) SendMessage(msg []byte) {
 	c.messageChannel <- msg
-}func (c *Client) ID() string {
+}
+func (c *Client) ID() string {
 	return c.id
-}func (c *Client) RoomName() string {
+}
+func (c *Client) RoomName() string {
 	return c.room.name
-}func (c *Client) closeConnection(reason string) {
+}
+func (c *Client) closeConnection(reason string) {
 	c.conn.Close(reason)
 }// closeConnection closes the client's connection
 // this does not do anything else on its own, but triggers
 // the removal of the client from the system in the
 // http handler
+
 func (c *Client) runReadMessages() {
 	defer c.closeConnection("failed reading messages")
 	for {
@@ -316,7 +357,8 @@ func (c *Client) runReadMessages() {
 			}
 		}
 	}
-}func (c *Client) runWriteMessages() {
+}
+func (c *Client) runWriteMessages() {
 	defer c.closeConnection("failed writing messages")
 	for {
 		msgBytes, ok := <-c.messageChannel
@@ -326,45 +368,59 @@ func (c *Client) runReadMessages() {
 		}
 		c.conn.WriteMessage(msgBytes)
 	}
-}type clientRegistrar struct {
-	clients		map[*Client]struct{}
+}
+// easyjson:skip
+type clientRegistrar struct {
+	clients	map // easyjson:skip
+	[*Client]struct{}
 	incomingClients	map[*Client]struct{}
 	mu		sync.Mutex
-}func newClientRegistar() *clientRegistrar {
+}
+func newClientRegistar() *clientRegistrar {
 	return &clientRegistrar{clients: make(map[*Client]struct{}), incomingClients: make(map[*Client]struct{})}
-}func (c *clientRegistrar) add(client *Client) {
+}
+func (c *clientRegistrar) add(client *Client) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	log.Debug().Str(logging.ClientID, client.id).Msg("adding client")
 	c.incomingClients[client] = struct{}{}
-}func (c *clientRegistrar) remove(client *Client) {
+}
+func (c *clientRegistrar) remove(client *Client) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	log.Debug().Str(logging.ClientID, client.id).Msg("removing client")
 	delete(c.clients, client)
 	delete(c.incomingClients, client)
-}func (c *clientRegistrar) kick(client *Client, reason string) {
+}
+func (c *clientRegistrar) kick(client *Client, reason string) {
 	log.Debug().Str(logging.ClientID, client.id).Msg("kicking client")
 	client.closeConnection(reason)
 }// TODO unused
+
 func (c *clientRegistrar) promote(client *Client) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	log.Debug().Str(logging.ClientID, client.id).Msg("promoting client")
 	c.clients[client] = struct{}{}
 	delete(c.incomingClients, client)
-}var (
+}
+var (
 	ErrMessageKindUnknown = errors.New("message kind unknown")
-)type Lobby struct {
-	mu		sync.Mutex
-	Rooms		map[string]*Room
+)
+// easyjson:skip
+type Lobby struct {
+	mu	sync.Mutex
+	Rooms	map // easyjson:skip
+	[string]*Room
 	controller	Controller
 	fps		int
-}func newLobby(controller Controller, fps int) *Lobby {
+}
+func newLobby(controller Controller, fps int) *Lobby {
 	l := &Lobby{Rooms: make(map[string]*Room), controller: controller, fps: fps}
 	l.signalCreation()
 	return l
-}func (l *Lobby) CreateRoom(name string) *Room {
+}
+func (l *Lobby) CreateRoom(name string) *Room {
 	if room, ok := l.Rooms[name]; ok {
 		log.Warn().Str(logging.RoomName, name).Msg("attempted to create room which already exists")
 		return room
@@ -373,7 +429,8 @@ func (c *clientRegistrar) promote(client *Client) {
 	l.Rooms[name] = room
 	room.Deploy(l.controller, l.fps)
 	return room
-}func (l *Lobby) DeleteRoom(name string) {
+}
+func (l *Lobby) DeleteRoom(name string) {
 	room, ok := l.Rooms[name]
 	if !ok {
 		log.Warn().Str(logging.RoomName, name).Msg("attempted to delete room which does not exists")
@@ -381,66 +438,85 @@ func (c *clientRegistrar) promote(client *Client) {
 	}
 	room.mode = RoomModeTerminating
 	delete(l.Rooms, name)
-}func (l *Lobby) addClient(client *Client) {
+}
+func (l *Lobby) addClient(client *Client) {
 	l.signalClientConnect(client)
-}func (l *Lobby) deleteClient(client *Client) {
+}
+func (l *Lobby) deleteClient(client *Client) {
 	if client.room != nil {
 		client.room.clients.remove(client)
 	}
 	l.signalClientDisconnect(client)
-}func (l *Lobby) processMessageSync(msg Message) {
+}
+func (l *Lobby) processMessageSync(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
-}func (l *Lobby) signalClientDisconnect(client *Client) {
+}
+func (l *Lobby) signalClientDisconnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.controller.OnClientDisconnect(client.room, client.id, l)
-}func (l *Lobby) signalClientConnect(client *Client) {
+}
+func (l *Lobby) signalClientConnect(client *Client) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.controller.OnClientConnect(client, l)
-}func (l *Lobby) signalCreation() {
+}
+func (l *Lobby) signalCreation() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.controller.OnCreation(l)
-}type Message struct {
+}
+type Message struct {
 	ID	string		` + "`" + `json:"id"` + "`" + `
 	Kind	message.Kind	` + "`" + `json:"kind"` + "`" + `
 	Content	[]byte		` + "`" + `json:"content"` + "`" + `
 	client	*Client
-}type RoomMode intconst (
+}
+type RoomMode int
+const (
 	RoomModeIdle	RoomMode	= iota
 	RoomModeRunning
 	RoomModeTerminating
-)type Room struct {
+)
+// easyjson:skip
+type Room struct {
 	name		string
 	mu		sync.Mutex
 	clients		*clientRegistrar
 	state		*state.Engine
 	controller	Controller
 	mode		RoomMode
-}func newRoom(controller Controller, name string) *Room {
+}// easyjson:skip
+
+func newRoom(controller Controller, name string) *Room {
 	return &Room{name: name, clients: newClientRegistar(), state: state.NewEngine(), controller: controller}
-}func (r *Room) Name() string {
+}
+func (r *Room) Name() string {
 	return r.name
-}func (r *Room) RemoveClient(client *Client) {
+}
+func (r *Room) RemoveClient(client *Client) {
 	r.clients.remove(client)
-}func (r *Room) AddClient(client *Client) {
+}
+func (r *Room) AddClient(client *Client) {
 	client.room = r
 	r.clients.add(client)
-}func (r *Room) AlterState(fn func(*state.Engine)) {
+}
+func (r *Room) AlterState(fn func(*state.Engine)) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	fn(r.state)
-}func (r *Room) RangeClients(fn func(client *Client)) {
+}
+func (r *Room) RangeClients(fn func(client *Client)) {
 	for c := range r.clients.incomingClients {
 		fn(c)
 	}
 	for c := range r.clients.clients {
 		fn(c)
 	}
-}func (r *Room) processMessageSync(msg Message) {
+}
+func (r *Room) processMessageSync(msg Message) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	response := r.processClientMessage(msg)
@@ -458,7 +534,8 @@ func (c *clientRegistrar) promote(client *Client) {
 		log.Warn().Str(logging.ClientID, response.client.id).Msg(logging.ClientBufferFull)
 		response.client.closeConnection(logging.ClientBufferFull)
 	}
-}func (r *Room) run(controller Controller, fps int) {
+}
+func (r *Room) run(controller Controller, fps int) {
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
 	for {
 		<-ticker.C
@@ -467,12 +544,17 @@ func (c *clientRegistrar) promote(client *Client) {
 			break
 		}
 	}
-}func (r *Room) Deploy(controller Controller, fps int) {
+}
+func (r *Room) Deploy(controller Controller, fps int) {
 	go r.run(controller, fps)
-}type Server struct {
+}
+// easyjson:skip
+type Server struct {
 	HttpServer	*http.Server
 	Lobby		*Lobby
-}func NewServer(controller Controller, fps int, configs ...func(*http.Server, *http.ServeMux)) *Server {
+}// easyjson:skip
+
+func NewServer(controller Controller, fps int, configs ...func(*http.Server, *http.ServeMux)) *Server {
 	server := Server{HttpServer: new(http.Server), Lobby: newLobby(controller, fps)}
 	handler := http.NewServeMux()
 	for _, c := range configs {
@@ -485,9 +567,11 @@ func (c *clientRegistrar) promote(client *Client) {
 	handler.HandleFunc("/ws", server.wsEndpoint)
 	server.HttpServer.Handler = handler
 	return &server
-}func homePageHandler(w http.ResponseWriter, r *http.Request) {
+}
+func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
-}func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
+}
+func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	websocketConnection, err := websocket.Accept(w, r, &websocket.AcceptOptions{InsecureSkipVerify: true})
 	if err != nil {
 		log.Err(err).Msg("failed creating websocket connection")
@@ -503,7 +587,8 @@ func (c *clientRegistrar) promote(client *Client) {
 	<-client.conn.Context().Done()
 	log.Debug().Msg("client context done")
 	s.Lobby.deleteClient(client)
-}func (s *Server) Start() chan error {
+}
+func (s *Server) Start() chan error {
 	log.Info().Msgf("backent running on port %s\n", s.HttpServer.Addr)
 	serverError := make(chan error)
 	go func() {
@@ -511,7 +596,8 @@ func (c *clientRegistrar) promote(client *Client) {
 		serverError <- err
 	}()
 	return serverError
-}func (r *Room) tickSync(controller Controller) {
+}
+func (r *Room) tickSync(controller Controller) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	controller.OnFrameTick(r.state)
@@ -521,7 +607,8 @@ func (c *clientRegistrar) promote(client *Client) {
 	}
 	r.state.UpdateState()
 	r.handleIncomingClients()
-}func (r *Room) publishPatch() error {
+}
+func (r *Room) publishPatch() error {
 	if r.state.Patch.IsEmpty() {
 		return nil
 	}
@@ -538,7 +625,8 @@ func (c *clientRegistrar) promote(client *Client) {
 	}
 	r.broadcastPatchToClients(stateUpdateBytes)
 	return nil
-}func (r *Room) broadcastPatchToClients(stateUpdateBytes []byte) {
+}
+func (r *Room) broadcastPatchToClients(stateUpdateBytes []byte) {
 	for client := range r.clients.clients {
 		select {
 		case client.messageChannel <- stateUpdateBytes:
@@ -547,7 +635,8 @@ func (c *clientRegistrar) promote(client *Client) {
 			client.closeConnection(logging.ClientBufferFull)
 		}
 	}
-}func (r *Room) handleIncomingClients() {
+}
+func (r *Room) handleIncomingClients() {
 	if len(r.clients.incomingClients) == 0 {
 		return
 	}
@@ -571,7 +660,8 @@ func (c *clientRegistrar) promote(client *Client) {
 			client.closeConnection(logging.ClientBufferFull)
 		}
 	}
-}`,
+}
+`,
 	"importedCode_state": `package state 
 import (
 	"bytes"

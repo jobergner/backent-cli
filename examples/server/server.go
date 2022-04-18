@@ -9,6 +9,7 @@ import (
 	"nhooyr.io/websocket"
 )
 
+// easyjson:skip
 type Server struct {
 	HttpServer *http.Server
 	Lobby      *Lobby

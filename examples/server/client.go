@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// easyjson:skip
 type Client struct {
 	lobby          *Lobby
 	room           *Room
