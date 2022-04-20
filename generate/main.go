@@ -189,7 +189,7 @@ func main() {
 
 	content := buf.Bytes()
 	// TODO find better way to read own path
-	content = bytes.ReplaceAll(content, []byte("github.com/jobergner/backent-cli"), []byte("{{path}}"))
+	content = bytes.ReplaceAll(content, []byte("github.com/jobergner/backent-cli/examples"), []byte("{{path}}"))
 
 	if err := os.WriteFile("./static_code.pregenerated.go", content, 0644); err != nil {
 		panic(err)

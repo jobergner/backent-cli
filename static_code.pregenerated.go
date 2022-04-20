@@ -4,17 +4,17 @@ package main
 var staticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"sync"
-	"{{path}}/examples/connect"
-	"errors"
-	"time"
-	"{{path}}/examples/message"
-	"context"
-	"{{path}}/examples/state"
-	"nhooyr.io/websocket"
-	"github.com/google/uuid"
-	"{{path}}/examples/logging"
+	"{{path}}/message"
 	"github.com/rs/zerolog/log"
+	"context"
+	"sync"
+	"{{path}}/connect"
+	"time"
+	"github.com/google/uuid"
+	"{{path}}/logging"
+	"{{path}}/state"
+	"nhooyr.io/websocket"
+	"errors"
 )
 // easyjson:skip
 type Client struct {
@@ -191,7 +191,7 @@ func (r *responseRouter) route(response Message) {
 	"importedCode_connect": `package connect 
 import (
 	"context"
-	"{{path}}/examples/logging"
+	"{{path}}/logging"
 	"github.com/rs/zerolog/log"
 	"nhooyr.io/websocket"
 )
@@ -250,7 +250,7 @@ const (
 )
 `,
 	"importedCode_message": `package message 
-import "{{path}}/examples/state"
+import "{{path}}/state"
 type Kind string
 const (
 	MessageKindError	Kind	= "error"
@@ -267,18 +267,18 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
-	"{{path}}/examples/state"
+	"github.com/google/uuid"
+	"{{path}}/logging"
+	"{{path}}/state"
 	"errors"
 	"fmt"
 	"net/http"
-	"{{path}}/examples/connect"
+	"{{path}}/connect"
+	"{{path}}/message"
 	"github.com/rs/zerolog/log"
-	"{{path}}/examples/message"
 	"sync"
 	"time"
 	"nhooyr.io/websocket"
-	"github.com/google/uuid"
-	"{{path}}/examples/logging"
 )
 // easyjson:skip
 type Client struct {
@@ -649,11 +649,11 @@ func (r *Room) handleIncomingClients() {
 `,
 	"importedCode_state": `package state 
 import (
-	"sync"
 	"bytes"
 	"fmt"
 	"strconv"
 	"sort"
+	"sync"
 )
 `,
 }
