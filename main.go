@@ -34,22 +34,29 @@ func main() {
 
 	validateOutDir()
 
-	modName := getModuleName()
+	absOutDirPath, err := filepath.Abs(*outDirPath)
+
+	modName, modDirPath := getModuleName()
+	pathToLibrary, err := filepath.Rel(modDirPath, absOutDirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	libPath := filepath.Join(modName, pathToLibrary)
 
 	for _, pkg := range packages.Packages(config) {
-		writePackage(pkg, modName)
+		writePackage(pkg, libPath)
 	}
 }
 
-func writePackage(pkg packages.PackageInfo, modName string) {
+func writePackage(pkg packages.PackageInfo, libPath string) {
 	dirPath := filepath.Join(*outDirPath, pkg.Name)
 
 	ensureDir(dirPath)
 
 	buf := bytes.NewBuffer(nil)
 
-	moduleName := getModuleName()
-	code := strings.ReplaceAll(staticCode[pkg.StaticCodeIdentifier], "{{path}}", moduleName)
+	code := strings.ReplaceAll(staticCode[pkg.StaticCodeIdentifier], "{{path}}", libPath)
 	buf.WriteString(code)
 
 	if pkg.DynamicCodeFactory != nil {
@@ -89,9 +96,7 @@ func generateMarshallers(fileName string, firstAttempt bool) {
 	if err != nil {
 		if firstAttempt {
 
-			if err := tidyModules(); err != nil {
-				panic(fmt.Errorf("something went wrong while tidying modules: %s", err))
-			}
+			tidyModules()
 
 			generateMarshallers(fileName, false)
 
