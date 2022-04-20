@@ -41,18 +41,18 @@ func validateOutDir() {
 	}
 }
 
-func tidyModules() error {
+func tidyModules() {
 	cmd := exec.Command("go", "mod", "tidy")
 	cmd.Dir = *outDirPath
 
 	if err := cmd.Run(); err != nil {
-		return err
+		panic(err)
 	}
-
-	return nil
 }
 
-func getModuleName() string {
+// getModuleName returns the module name and the abolute path of the directory file
+// where the go.mod file is located
+func getModuleName() (string, string) {
 
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -76,7 +76,11 @@ func getModuleName() string {
 		writtenLines := strings.Split(string(out), "\n")
 
 		if len(writtenLines) == 3 {
-			return writtenLines[1]
+			abs, err := filepath.Abs(p)
+			if err != nil {
+				panic(err)
+			}
+			return writtenLines[1], abs
 		}
 
 		p, err = filepath.Abs(filepath.Join(p, "../"))
