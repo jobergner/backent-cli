@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jobergner/backent-cli/pkg/build"
 	"github.com/jobergner/backent-cli/pkg/factory/utils"
 	"github.com/jobergner/backent-cli/pkg/packages"
 )
@@ -34,18 +35,13 @@ func main() {
 
 	validateOutDir()
 
-	absOutDirPath, err := filepath.Abs(*outDirPath)
-
-	modName, modDirPath := getModuleName()
-	pathToLibrary, err := filepath.Rel(modDirPath, absOutDirPath)
+	importPath, err := build.ImportPath(*outDirPath)
 	if err != nil {
 		panic(err)
 	}
 
-	libPath := filepath.Join(modName, pathToLibrary)
-
 	for _, pkg := range packages.Packages(config) {
-		writePackage(pkg, libPath)
+		writePackage(pkg, importPath)
 	}
 }
 
