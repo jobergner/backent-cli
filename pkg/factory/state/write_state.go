@@ -28,6 +28,34 @@ func (s *Factory) writeIDs() *Factory {
 	return s
 }
 
+func (s *Factory) writeIsEmpty() *Factory {
+	s.file.Func().Params(Id("s").Id("State")).Id("IsEmpty").Call().Bool().Block(
+		ForEachBasicType(func(b BasicType) *Statement {
+			return If(Len(Id("s").Dot(Title(b.Value))).Op("!=").Lit(0)).Block(
+				Return(False()),
+			)
+		}),
+		ForEachTypeInAST(s.config, func(configType ast.ConfigType) *Statement {
+			return If(Len(Id("s").Dot(Title(configType.Name))).Op("!=").Lit(0)).Block(
+				Return(False()),
+			)
+		}),
+		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
+			return If(Len(Id("s").Dot(Title(field.ValueTypeName))).Op("!=").Lit(0)).Block(
+				Return(False()),
+			)
+		}),
+		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
+			return If(Len(Id("s").Dot(Title(anyNameByField(field)))).Op("!=").Lit(0)).Block(
+				Return(False()),
+			)
+		}),
+		Return(True()),
+	)
+
+	return s
+}
+
 func (s *Factory) writeState() *Factory {
 
 	s.file.Type().Id("State").Struct(

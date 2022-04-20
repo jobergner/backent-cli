@@ -22,16 +22,10 @@ type PackageInfo struct {
 func Packages(ast *ast.AST) []PackageInfo {
 	return []PackageInfo{
 		{
-			SourcePath:           "./examples/server",
-			Name:                 "server",
-			StaticCodeIdentifier: "importedCode_server",
-			DynamicCodeFactory:   server.NewFactory(ast),
-		},
-		{
-			SourcePath:           "./examples/client",
-			Name:                 "client",
-			StaticCodeIdentifier: "importedCode_client",
-			DynamicCodeFactory:   client.NewFactory(ast),
+			SourcePath:           "./examples/message",
+			Name:                 "message",
+			StaticCodeIdentifier: "importedCode_message",
+			DynamicCodeFactory:   message.NewFactory(ast),
 		},
 		{
 			SourcePath:           "./examples/connect",
@@ -46,16 +40,22 @@ func Packages(ast *ast.AST) []PackageInfo {
 			DynamicCodeFactory:   nil,
 		},
 		{
-			SourcePath:           "./examples/message",
-			Name:                 "message",
-			StaticCodeIdentifier: "importedCode_message",
-			DynamicCodeFactory:   message.NewFactory(ast),
-		},
-		{
 			SourcePath:           "./examples/state",
 			Name:                 "state",
 			StaticCodeIdentifier: "importedCode_state",
 			DynamicCodeFactory:   state.NewFactory(ast),
+		},
+		{
+			SourcePath:           "./examples/server",
+			Name:                 "server",
+			StaticCodeIdentifier: "importedCode_server",
+			DynamicCodeFactory:   server.NewFactory(ast),
+		},
+		{
+			SourcePath:           "./examples/client",
+			Name:                 "client",
+			StaticCodeIdentifier: "importedCode_client",
+			DynamicCodeFactory:   client.NewFactory(ast),
 		},
 	}
 }

@@ -53,6 +53,7 @@ func (f *Factory) Write() string {
 		writeComplexID().
 		writeIDs().
 		writeState().
+		writeIsEmpty().
 		writeMetaData().
 		writeElements().
 		writeOperationKind().
