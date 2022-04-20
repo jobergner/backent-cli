@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strings"
 )
 
 func ensureDir(path string) {
@@ -47,49 +45,5 @@ func tidyModules() {
 
 	if err := cmd.Run(); err != nil {
 		panic(err)
-	}
-}
-
-// getModuleName returns the module name and the abolute path of the directory file
-// where the go.mod file is located
-func getModuleName() (string, string) {
-
-	userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-
-	p, err := filepath.Abs(filepath.Join(*outDirPath))
-	if err != nil {
-		panic(err)
-	}
-
-	for {
-		cmd := exec.Command("go", "mod", "why")
-		cmd.Dir = p
-
-		out, err := cmd.Output()
-		if err != nil {
-			panic(err)
-		}
-
-		writtenLines := strings.Split(string(out), "\n")
-
-		if len(writtenLines) == 3 {
-			abs, err := filepath.Abs(p)
-			if err != nil {
-				panic(err)
-			}
-			return writtenLines[1], abs
-		}
-
-		p, err = filepath.Abs(filepath.Join(p, "../"))
-		if err != nil {
-			panic(err)
-		}
-
-		if userHomeDir == p {
-			panic("could not find module name")
-		}
 	}
 }
