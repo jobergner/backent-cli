@@ -6,12 +6,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"github.com/jobergner/backent-cli/pkg/build"
+	"github.com/jobergner/backent-cli/pkg/env"
 	"github.com/jobergner/backent-cli/pkg/factory/utils"
+	"github.com/jobergner/backent-cli/pkg/marshallers"
+	"github.com/jobergner/backent-cli/pkg/module"
 	"github.com/jobergner/backent-cli/pkg/packages"
 )
 
@@ -31,78 +32,75 @@ func main() {
 		panic("\nthe above errors have occured while validating " + *configPath)
 	}
 
-	ensureDir(*outDirPath)
+	err := env.EnsureDir(*outDirPath)
+	if err != nil {
+		panic(err)
+	}
 
-	validateOutDir()
-
-	importPath, err := build.ImportPath(*outDirPath)
+	importPath, err := evalImportPath(*outDirPath)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, pkg := range packages.Packages(config) {
-		writePackage(pkg, importPath)
-	}
-}
 
-func writePackage(pkg packages.PackageInfo, libPath string) {
-	dirPath := filepath.Join(*outDirPath, pkg.Name)
+		dirPath := filepath.Join(*outDirPath, pkg.Name)
 
-	ensureDir(dirPath)
-
-	buf := bytes.NewBuffer(nil)
-
-	code := strings.ReplaceAll(staticCode[pkg.StaticCodeIdentifier], "{{path}}", libPath)
-	buf.WriteString(code)
-
-	if pkg.DynamicCodeFactory != nil {
-		buf.WriteString(pkg.DynamicCodeFactory.Write())
-	}
-
-	filePath := filepath.Join(dirPath, fmt.Sprintf("%s.go", pkg.Name))
-
-	err := utils.Format(buf)
-	if err != nil {
-		panic(err)
-	}
-
-	err = os.WriteFile(filePath, buf.Bytes(), 0644)
-	if err != nil {
-		panic(err)
-	}
-
-	generateMarshallers(filePath, true)
-}
-
-func generateMarshallers(fileName string, firstAttempt bool) {
-	if ok := commandExists("easyjson"); !ok {
-
-		cmd := exec.Command("go", "install", "github.com/mailru/easyjson/...")
-
-		out, err := cmd.Output()
+		err := env.EnsureDir(dirPath)
 		if err != nil {
-			panic(fmt.Sprintf("error installing mailru/easyjson: %s \n %s", string(out), err))
+			panic(err)
 		}
-	}
 
-	cmd := exec.Command("easyjson", "-all", "-byte", "-omit_empty", fileName)
-	// error is being printed as a warning as easyjson throws errors while actually functioning properly
-	// all underlying requirements have already been checked with `validateOutDir` at this point
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		if firstAttempt {
+		staticCodeTemplate := packages.StaticCode[pkg.StaticCodeIdentifier]
+		staticCode := strings.ReplaceAll(staticCodeTemplate, "{{path}}", importPath)
 
-			tidyModules()
+		buf := bytes.NewBufferString(staticCode)
 
-			generateMarshallers(fileName, false)
+		if pkg.DynamicCodeFactory != nil {
+			customCode := pkg.DynamicCodeFactory.Write()
 
-		} else {
-			panic(fmt.Sprintf("generating marshallers caused issues:\n %s %s", err, string(output)))
+			buf.WriteString(customCode)
 		}
+
+		filePath := filepath.Join(dirPath, fmt.Sprintf("%s.go", pkg.Name))
+
+		err = utils.Format(buf)
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile(filePath, buf.Bytes(), 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		err = marshallers.Generate(filePath)
+		if err != nil {
+			panic(err)
+		}
+
 	}
 }
 
-func commandExists(cmd string) bool {
-	_, err := exec.LookPath(cmd)
-	return err == nil
+// evalImportPath evaluates the base path that can be used to import
+// the individual packages: `{module_name}/path/to/out`
+func evalImportPath(outPath string) (string, error) {
+	absOut, err := filepath.Abs(outPath)
+	if err != nil {
+		return "", err
+	}
+
+	modName, modPath, err := module.Find(absOut)
+	if err != nil {
+		return "", err
+	}
+
+	modToOut, err := filepath.Rel(modPath, absOut)
+	if err != nil {
+		return "", err
+	}
+
+	importPath := filepath.Join(modName, modToOut)
+
+	return importPath, nil
 }
