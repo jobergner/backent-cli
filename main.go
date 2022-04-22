@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jobergner/backent-cli/pkg/ast"
+	"github.com/jobergner/backent-cli/pkg/config"
 	"github.com/jobergner/backent-cli/pkg/env"
 	"github.com/jobergner/backent-cli/pkg/factory/utils"
 	"github.com/jobergner/backent-cli/pkg/marshallers"
@@ -17,20 +19,10 @@ import (
 )
 
 var configPath = flag.String("config", "./example.config.json", "path of config")
-var outDirPath = flag.String("out", "./tmp", "where to write the files to")
+var outDirPath = flag.String("out", "./tmp", "where to place packages")
 
 func main() {
 	flag.Parse()
-
-	config, errs := newAST()
-	if len(errs) != 0 {
-
-		for _, validationErr := range errs {
-			fmt.Println(validationErr)
-		}
-
-		panic("\nthe above errors have occured while validating " + *configPath)
-	}
 
 	err := env.EnsureDir(*outDirPath)
 	if err != nil {
@@ -42,7 +34,14 @@ func main() {
 		panic(err)
 	}
 
-	for _, pkg := range packages.Packages(config) {
+	state, actions, responses, err := config.Read(*configPath)
+	if err != nil {
+		panic(err)
+	}
+
+	syntaxTree := ast.Parse(state, actions, responses)
+
+	for _, pkg := range packages.Packages(syntaxTree) {
 
 		dirPath := filepath.Join(*outDirPath, pkg.Name)
 
