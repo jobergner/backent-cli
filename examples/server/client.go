@@ -56,9 +56,10 @@ func (c *Client) sendIdentifyingMessage() error {
 	return nil
 }
 
-func (c *Client) SendMessage(msg []byte) {
-	c.messageChannel <- msg
-}
+// DEPRECATED
+// func (c *Client) SendMessage(msg []byte) {
+// 	c.messageChannel <- msg
+// }
 
 func (c *Client) ID() string {
 	return c.id
@@ -80,6 +81,7 @@ func (c *Client) runReadMessages() {
 	defer c.closeConnection("failed reading messages")
 
 	for {
+
 		_, msgBytes, err := c.conn.ReadMessage()
 		if err != nil {
 			break
@@ -89,11 +91,6 @@ func (c *Client) runReadMessages() {
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
 			log.Err(err).Str(logging.Message, string(msgBytes)).Msg("failed unmarshalling message")
-
-			errMsg, _ := Message{message.MessageIDUnknown, message.MessageKindError, []byte("invalid message"), nil}.MarshalJSON()
-
-			c.messageChannel <- errMsg
-
 			continue
 		}
 
@@ -114,6 +111,7 @@ func (c *Client) runWriteMessages() {
 	defer c.closeConnection("failed writing messages")
 
 	for {
+
 		msgBytes, ok := <-c.messageChannel
 
 		if !ok {
@@ -122,5 +120,6 @@ func (c *Client) runWriteMessages() {
 		}
 
 		c.conn.WriteMessage(msgBytes)
+
 	}
 }
