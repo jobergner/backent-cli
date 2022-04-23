@@ -17,7 +17,7 @@ func TestPrepareConfig(t *testing.T) {
 		}
 
 		// we ignore errors here as it's just the structural validation
-		actualPreparedConfig, _ := prepareStateConfig(data)
+		actualPreparedConfig := prepareStateConfig(data)
 
 		expectedPrepareConfig := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{

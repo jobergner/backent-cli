@@ -49,9 +49,11 @@ func isEmptyString(unknown interface{}) bool {
 func structuralValidation(data map[interface{}]interface{}) (errs []error) {
 
 	valueErrors := validateIllegalValue(data)
-	errs = append(errs, valueErrors...)
+	if len(valueErrors) != 0 {
+		return valueErrors
+	}
 
-	return
+	return nil
 }
 
 func syntacticalValidation(data map[interface{}]interface{}) (errs []error) {
@@ -142,10 +144,18 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 }
 
 func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
-	dataWithoutMetaFields, errs := prepareStateConfig(data)
-	if len(errs) != 0 {
-		return errs
+	// prevalidate structure so we can make our assumptions about how the data looks
+	structuralErrs := structuralValidation(data)
+	if len(structuralErrs) != 0 {
+		return structuralErrs
 	}
+
+	nonObjectTypeErrs := validateNonObjectType(data)
+	if len(nonObjectTypeErrs) != 0 {
+		return nonObjectTypeErrs
+	}
+
+	dataWithoutMetaFields := prepareStateConfig(data)
 
 	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(dataWithoutMetaFields)
 	if len(prevalidationErrs) != 0 {
@@ -181,10 +191,18 @@ func validateStateConfig(data map[interface{}]interface{}) (errs []error) {
 }
 
 func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) (errs []error) {
-	stateConfigDataWithoutEvents, errs := prepareStateConfig(stateConfigData)
-	if len(errs) != 0 {
-		return errs
+	// prevalidate structure so we can make our assumptions about how the data looks
+	structuralErrs := structuralValidation(stateConfigData)
+	if len(structuralErrs) != 0 {
+		return structuralErrs
 	}
+
+	nonObjectTypeErrs := validateNonObjectType(stateConfigData)
+	if len(nonObjectTypeErrs) != 0 {
+		return nonObjectTypeErrs
+	}
+
+	stateConfigDataWithoutEvents := prepareStateConfig(stateConfigData)
 
 	// responses and action share the same restrictions/requirements
 	responsesAsActionsValidationErrs := ValidateActionsConfig(stateConfigDataWithoutEvents, responsesConfigData)
@@ -197,10 +215,12 @@ func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfig
 }
 
 func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
-	stateConfigDataWithoutMetaFields, errs := prepareStateConfig(stateConfigData)
+	errs = ValidateStateConfig(stateConfigData)
 	if len(errs) != 0 {
 		return errs
 	}
+
+	stateConfigDataWithoutMetaFields := prepareStateConfig(stateConfigData)
 
 	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(stateConfigDataWithoutMetaFields)
 	if len(prevalidationErrs) != 0 {
@@ -208,45 +228,43 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 	}
 
 	// use first combination as it does not matter which types of anyOf<> definitions are taken as value
-	stateConfigDataDerivative := dataCombinations[0]
+	stateConfigDataVariant := dataCombinations[0]
 
-	sameNameErrs := validateTypeAndActionWithSameName(stateConfigDataDerivative, actionsConfigData)
+	sameNameErrs := validateTypeAndActionWithSameName(stateConfigDataVariant, actionsConfigData)
 	errs = append(errs, sameNameErrs...)
 
-	// join configs and treat them as one. Actions are treated as types, params are treated as fields
-	jointConfigData := joinConfigs(stateConfigDataDerivative, actionsConfigData)
-
-	// collect all availableIDs and insert them into the jointConfigData so the validator cosinders them to be valid types
-	var availableTypeIDs []string
-	for keyName := range stateConfigDataDerivative {
-		typeName := fmt.Sprintf("%v", keyName)
-		idName := typeName + "ID"
-		availableTypeIDs = append(availableTypeIDs, idName)
-		jointConfigData[idName] = "int"
-	}
-
-	// general validation with joint config so validator is aware of all defined types in
-	// the state config data when validating types used within actions
-	generalErrs := generalValidation(jointConfigData)
+	generalErrs := generalActionsConfigValidation(stateConfigDataVariant, actionsConfigData)
 	errs = append(errs, generalErrs...)
 
-	// collect all names of actions
-	var actionsNames []string
-	for keyName := range actionsConfigData {
-		definedActionName := fmt.Sprintf("%v", keyName)
-		actionsNames = append(actionsNames, definedActionName)
-	}
+	actionUsedAsTypeErrs := validateActionUsedAsType(actionsConfigData)
+	errs = append(errs, actionUsedAsTypeErrs...)
 
-	// pass names of actions as rejectedTypeNames since an action could falsely
-	// be used as a type of a parameter
-	actionUsedAsTypeErr := validateTypeNotFound(jointConfigData, actionsNames...)
-	errs = append(errs, actionUsedAsTypeErr...)
+	var availableTypeIDs []string
+	for keyName := range stateConfigData {
+		typeName := fmt.Sprintf("%v", keyName)
+		availableTypeIDs = append(availableTypeIDs, typeName+"ID")
+	}
 
 	thematicalErrs := thematicalValidationActions(actionsConfigData, availableTypeIDs)
 	errs = append(errs, thematicalErrs...)
 
-	// deduplicate errors as stateConfigDataDerivative is being validated twice (ValidateStateConfig, generalValidation)
-	return deduplicateErrs(errs)
+	return
+}
+
+func generalActionsConfigValidation(stateConfigData, actionsConfigData map[interface{}]interface{}) []error {
+
+	actionsConfigCopy := copyData(actionsConfigData)
+
+	for keyName := range stateConfigData {
+		typeName := fmt.Sprintf("%v", keyName)
+		idName := typeName + "ID"
+		actionsConfigCopy[typeName] = "int"
+		actionsConfigCopy[idName] = "int"
+	}
+
+	// general validation with modified actions data so validator is aware of all defined type IDs in
+	// the state config data when validating types used within actions
+	return generalValidation(actionsConfigCopy)
 }
 
 func deduplicateErrs(errs []error) []error {
@@ -262,15 +280,4 @@ func deduplicateErrs(errs []error) []error {
 	}
 
 	return deduped
-}
-
-func joinConfigs(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) map[interface{}]interface{} {
-	jointConfigData := make(map[interface{}]interface{})
-	for k, v := range stateConfigData {
-		jointConfigData[k] = v
-	}
-	for k, v := range actionsConfigData {
-		jointConfigData[k] = v
-	}
-	return jointConfigData
 }
