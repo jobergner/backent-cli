@@ -134,8 +134,10 @@ func (pb *pathBuilder) addPath(path declarationPath) {
 // a recursive function to travel through the data
 func (pb *pathBuilder) build(path declarationPath, keyName string, value interface{}, fieldLevel fieldLevelKind) {
 
-	if isString(value) {
+	switch {
+	case isString(value):
 		path.addDeclaration(keyName, valueKindString, fieldLevel, value)
+
 		if path.isRecursive() {
 			// detected recursiveness implies this is the end of the path
 			path.setClosureKind(pathClosureKindRecursiveness)
@@ -168,17 +170,19 @@ func (pb *pathBuilder) build(path declarationPath, keyName string, value interfa
 		nextTypeLiteral := extractTypes(valueLiteral)[0]
 		nextValue := pb.data[nextTypeLiteral]
 		pb.build(path, nextTypeLiteral, nextValue, firstFieldLevel)
-	}
 
-	if isMap(value) {
+	case isMap(value):
 		path.addDeclaration(keyName, valueKindObject, fieldLevel, value)
+
 		if path.isRecursive() {
 			// detected recursiveness implies this is the end of the path
 			path.setClosureKind(pathClosureKindRecursiveness)
 			pb.addPath(path)
 			return
 		}
+
 		mapValue := value.(map[interface{}]interface{})
+
 		for _key, _value := range mapValue {
 			// the path is copied; this is basically a fork
 			pathCopy := path.copySelf()
@@ -187,6 +191,7 @@ func (pb *pathBuilder) build(path declarationPath, keyName string, value interfa
 			// pair in the next pb.build() execution
 			pb.build(pathCopy, _keyName, _value, fieldLevel+1)
 		}
+
 	}
 }
 
@@ -200,8 +205,8 @@ func isBasicType(typeString string) bool {
 }
 
 func containsOnlyBasicTypes(declarationTypeString string) bool {
-	extractTypes := extractTypes(declarationTypeString)
-	for _, extractType := range extractTypes {
+	extractedTyped := extractTypes(declarationTypeString)
+	for _, extractType := range extractedTyped {
 		if !isBasicType(extractType) {
 			return false
 		}

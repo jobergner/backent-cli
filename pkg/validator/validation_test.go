@@ -315,21 +315,15 @@ func TestValidateActionsConfig(t *testing.T) {
 	t.Run("should procude expected errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
-				"bar": "int32",
+				"bar": "int64",
 			},
 			"wii": map[interface{}]interface{}{
-				"wuu": "int32",
+				"wuu": "int64",
 			},
 			"baz": map[interface{}]interface{}{
-				"ban":  "int32",
+				"ban":  "int64",
 				"bam":  "foo",
 				"bunt": "[]foo",
-				"bap":  "map[foo]foo",
-				"bal":  "***foo",
-				"slap": "**[]**foo",
-				"arg":  "*foo",
-				"barg": "[3]foo",
-				"buu":  "*anyOf<baz,wii>",
 			},
 		}
 		actionsConfigData := map[interface{}]interface{}{

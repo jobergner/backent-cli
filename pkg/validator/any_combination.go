@@ -15,15 +15,23 @@ type anyOfTypeIterator struct {
 	currentTypeIndex int
 }
 
+func (a *anyOfTypeIterator) inc() {
+	a.currentTypeIndex += 1
+}
+
 func (a anyOfTypeIterator) currentValueString() string {
 	var buf bytes.Buffer
+
 	if a.hasSliceType {
 		buf.WriteString("[]")
 	}
+
 	if a.hasPointerType {
 		buf.WriteString("*")
 	}
+
 	buf.WriteString(a.types[a.currentTypeIndex])
+
 	return buf.String()
 }
 
@@ -57,26 +65,37 @@ func newAnyOfTypeCombinator(data map[interface{}]interface{}) *anyOfTypeCombinat
 }
 
 func (a *anyOfTypeCombinator) build() (errs []error) {
+
 	manipulatedData := copyData(a.originalData)
 
 	for k, v := range manipulatedData {
+
 		keyName := fmt.Sprintf("%v", k)
 		valueObject := v.(map[interface{}]interface{})
+
 		for _k, _v := range valueObject {
+
 			_keyName := fmt.Sprintf("%v", _k)
 			valueString := fmt.Sprintf("%v", _v)
+
 			if isAnyOfTypes(valueString) {
 				if err := validateAnyOfDefinition(valueString); err != nil {
 					errs = append(errs, err)
 				}
+
 				a.anyOfTypes = append(a.anyOfTypes, newAnyOfTypeIterator(keyName, _keyName, valueString))
+
 				delete(valueObject, _keyName)
+
 				manipulatedData[keyName] = valueObject
 			}
+
 		}
+
 	}
 
 	a.data = manipulatedData
+
 	return
 }
 
@@ -85,20 +104,27 @@ func (a *anyOfTypeCombinator) generateCombinations() []map[interface{}]interface
 		a.dataCombinations = append(a.dataCombinations, a.originalData)
 		return a.dataCombinations
 	}
+
 	a.recursivelyIterateAnyOfTypes(0)
+
 	return a.dataCombinations
 }
 
 func (a *anyOfTypeCombinator) recursivelyIterateAnyOfTypes(currentAnyOfTypeIndex int) {
 	for range a.anyOfTypes[currentAnyOfTypeIndex].types {
+
 		if currentAnyOfTypeIndex == len(a.anyOfTypes)-1 {
 			a.generateData()
 		}
+
 		if currentAnyOfTypeIndex < len(a.anyOfTypes)-1 {
 			a.recursivelyIterateAnyOfTypes(currentAnyOfTypeIndex + 1)
 		}
-		a.anyOfTypes[currentAnyOfTypeIndex].currentTypeIndex += 1
+
+		a.anyOfTypes[currentAnyOfTypeIndex].inc()
+
 	}
+
 	a.anyOfTypes[currentAnyOfTypeIndex].currentTypeIndex = 0
 }
 
@@ -106,10 +132,12 @@ func (a *anyOfTypeCombinator) generateData() {
 	dataCombination := copyData(a.data)
 
 	for _, anyOfType := range a.anyOfTypes {
+
 		value := dataCombination[anyOfType.parentName]
 		valueObject := value.(map[interface{}]interface{})
 		valueObject[anyOfType.fieldName] = anyOfType.currentValueString()
 		dataCombination[anyOfType.parentName] = valueObject
+
 	}
 
 	a.dataCombinations = append(a.dataCombinations, dataCombination)
@@ -117,14 +145,22 @@ func (a *anyOfTypeCombinator) generateData() {
 
 func copyData(data map[interface{}]interface{}) map[interface{}]interface{} {
 	newData := make(map[interface{}]interface{})
+
 	for k, v := range data {
+
 		newChildData := make(map[interface{}]interface{})
 		childMapValue := v.(map[interface{}]interface{})
+
 		for _k, _v := range childMapValue {
+
 			newChildData[_k] = _v
+
 		}
+
 		newData[k] = newChildData
+
 	}
+
 	return newData
 }
 
@@ -143,6 +179,7 @@ func stateConfigCombinationsFrom(data map[interface{}]interface{}) ([]map[interf
 	if len(structuralErrs) != 0 {
 		return nil, structuralErrs
 	}
+
 	nonObjectErrs := validateNonObjectType(data)
 	if len(nonObjectErrs) != 0 {
 		return nil, nonObjectErrs
@@ -155,7 +192,5 @@ func stateConfigCombinationsFrom(data map[interface{}]interface{}) ([]map[interf
 		return nil, invalidAnyOfDefinitionErrs
 	}
 
-	cmb.generateCombinations()
-
-	return cmb.dataCombinations, nil
+	return cmb.generateCombinations(), nil
 }

@@ -16,7 +16,7 @@ func TestValidateDataIllegalValue(t *testing.T) {
 			},
 		}
 
-		actualErrors := structuralValidation(data)
+		actualErrors := validateIllegalValue(data)
 		expectedErrors := []error{}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
@@ -34,7 +34,7 @@ func TestValidateDataIllegalValue(t *testing.T) {
 			},
 		}
 
-		actualErrors := structuralValidation(data)
+		actualErrors := validateIllegalValue(data)
 		expectedErrors := []error{
 			newValidationErrorIllegalValue("foo", "root"),
 			newValidationErrorIllegalValue("bar", "root"),
@@ -57,7 +57,7 @@ func TestValidateDataIllegalValue(t *testing.T) {
 			},
 		}
 
-		actualErrors := structuralValidation(data)
+		actualErrors := validateIllegalValue(data)
 		expectedErrors := []error{
 			newValidationErrorIllegalValue("foo", "root"),
 			newValidationErrorIllegalValue("bar", "root"),
@@ -82,7 +82,7 @@ func TestValidateDataIllegalValue(t *testing.T) {
 			"rant": []interface{}{},
 		}
 
-		actualErrors := structuralValidation(data)
+		actualErrors := validateIllegalValue(data)
 		expectedErrors := []error{
 			newValidationErrorIllegalValue("mant", "baz"),
 			newValidationErrorIllegalValue("rant", "root"),
@@ -104,7 +104,7 @@ func TestValidateDataIllegalValue(t *testing.T) {
 			},
 		}
 
-		actualErrors := structuralValidation(data)
+		actualErrors := validateIllegalValue(data)
 		expectedErrors := []error{
 			newValidationErrorIllegalValue("bant", "baz"),
 		}
