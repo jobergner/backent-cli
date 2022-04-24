@@ -90,7 +90,7 @@ func TestMatchErrors(t *testing.T) {
 func TestGeneralValidation(t *testing.T) {
 	t.Run("should procude no errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
-			"foo": "int",
+			"foo": "int64",
 			"bar": "string",
 			"baf": "[2]foo",
 			"bal": "map[foo]bar",
@@ -259,9 +259,9 @@ func TestValidateStateConfig(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"bar": map[interface{}]interface{}{},
 			"baz": map[interface{}]interface{}{
-				"ban":  "int32",
+				"ban":  "int64",
 				"bam":  "bar",
-				"bunt": "[]int",
+				"bunt": "[]int64",
 			},
 		}
 
@@ -276,18 +276,19 @@ func TestValidateStateConfig(t *testing.T) {
 			"fooID": map[interface{}]interface{}{},
 			"bar":   map[interface{}]interface{}{},
 			"baz": map[interface{}]interface{}{
-				"ban":       "int32",
+				"ban":       "int64",
 				"bam":       "bar",
 				"bunt":      "[]foo",
 				"bap":       "map[bar]foo",
 				"bal":       "***bar",
 				"slap":      "**[]**bar",
 				"arg":       "*foo",
-				"unt":       "*[]int",
-				"rnt":       "[]*int",
+				"unt":       "*[]int64",
+				"rnt":       "[]*int64",
 				"barg":      "[3]foo",
 				"iD":        "string",
 				"hasParent": "bool",
+				"bem":       "rune",
 			},
 		}
 
@@ -299,9 +300,10 @@ func TestValidateStateConfig(t *testing.T) {
 			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
 			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
-			newValidationErrorIncompatibleValue("*[]int", "unt", "baz"),
-			newValidationErrorIncompatibleValue("[]*int", "rnt", "baz"),
+			newValidationErrorIncompatibleValue("*[]int64", "unt", "baz"),
+			newValidationErrorIncompatibleValue("[]*int64", "rnt", "baz"),
 			newValidationErrorTypeNameConstraintViolation("fooID"),
+			newValidationErrorUnsupportedType("rune"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
@@ -351,7 +353,7 @@ func TestValidateActionsConfig(t *testing.T) {
 		}
 		actionsConfigData := map[interface{}]interface{}{
 			"fooAction": map[interface{}]interface{}{
-				"foo": "int32",
+				"foo": "int64",
 			},
 			"barAction": map[interface{}]interface{}{
 				"bug":  "fooAction",
@@ -362,7 +364,8 @@ func TestValidateActionsConfig(t *testing.T) {
 				"feet": "string",
 			},
 			"BazAction": map[interface{}]interface{}{
-				"baz": "int32",
+				"baz": "int64",
+				"ban": "int32",
 			},
 		}
 
@@ -374,6 +377,7 @@ func TestValidateActionsConfig(t *testing.T) {
 			newValidationErrorIllegalPointerParameter("barAction", "bum"),
 			newValidationErrorDirectTypeUsage("barAction", "fooAction"),
 			newValidationErrorDirectTypeUsage("barAction", "*baz"),
+			newValidationErrorUnsupportedType("int32"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
@@ -386,7 +390,7 @@ func TestValidateActionsConfig(t *testing.T) {
 func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 	t.Run("returns only pre-validation errors if existent (1/2)", func(t *testing.T) {
 		data := map[interface{}]interface{}{
-			"foo": "int",
+			"foo": "int64",
 			"bar": nil,
 			"baz": map[interface{}]interface{}{
 				"ban": "",
@@ -406,9 +410,9 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 	})
 	t.Run("returns only pre-validation errors if existent (2/2)", func(t *testing.T) {
 		data := map[interface{}]interface{}{
-			"foo": "int",
+			"foo": "int64",
 			"baz": map[interface{}]interface{}{
-				"ban": "int",
+				"ban": "int64",
 			},
 		}
 
@@ -502,7 +506,7 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 				"man": "[]*anyOf<bar,foo>",
 			},
 			"fam": map[interface{}]interface{}{
-				"lam": "int",
+				"lam": "int64",
 			},
 		}
 
@@ -525,7 +529,7 @@ func TestValidateResponsesConfig(t *testing.T) {
 		}
 		actionsConfigData := map[interface{}]interface{}{
 			"dooFoo": map[interface{}]interface{}{
-				"bar": "int",
+				"bar": "int64",
 			},
 		}
 		responsesConfigData := map[interface{}]interface{}{

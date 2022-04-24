@@ -95,6 +95,9 @@ func thematicalActionsValidation(stateConfigDataVariant, actionsConfigData map[i
 	pointerParameterErrs := validateIllegalPointerParameter(actionsConfigData)
 	errs = append(errs, pointerParameterErrs...)
 
+	unsupportedTypeErrs := validateUsupportedType(actionsConfigData)
+	errs = append(errs, unsupportedTypeErrs...)
+
 	return
 }
 
@@ -114,6 +117,9 @@ func thematicalStateValidation(data map[interface{}]interface{}) (errs []error) 
 
 	unavailableFieldNameErrs := validateUnavailableFieldName(data)
 	errs = append(errs, unavailableFieldNameErrs...)
+
+	unsupportedTypeErrs := validateUsupportedType(data)
+	errs = append(errs, unsupportedTypeErrs...)
 
 	return
 }

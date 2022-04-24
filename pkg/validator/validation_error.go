@@ -189,3 +189,11 @@ func newValidationErrorTypeNameConstraintViolation(typeName string) error {
 		),
 	)
 }
+func newValidationErrorUnsupportedType(valueString string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrUnsupportedType: type \"%s\" is not supported",
+			valueString,
+		),
+	)
+}
