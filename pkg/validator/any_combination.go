@@ -68,7 +68,7 @@ func (a *anyOfTypeCombinator) build() (errs []error) {
 
 	manipulatedData := copyData(a.originalData)
 
-	for k, v := range manipulatedData {
+	for k, v := range a.originalData {
 
 		keyName := fmt.Sprintf("%v", k)
 		valueObject := v.(map[interface{}]interface{})
