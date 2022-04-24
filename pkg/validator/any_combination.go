@@ -165,7 +165,7 @@ func copyData(data map[interface{}]interface{}) map[interface{}]interface{} {
 }
 
 func isAnyOfTypes(valueString string) bool {
-	re := regexp.MustCompile(`(\[\])?\*?anyOf<\s*([A-Za-z]+\s*,\s*)*\s*([A-Za-z]+\s*)>`)
+	re := regexp.MustCompile(`(\[\])?\*?anyOf<\s*(([A-Za-z]+\s*,\s*)*\s*([A-Za-z]+\s*))*>`)
 	s := re.FindString(valueString)
 	if len(s) == 0 || len(s) != len(valueString) {
 		return false
@@ -174,17 +174,6 @@ func isAnyOfTypes(valueString string) bool {
 }
 
 func stateConfigCombinationsFrom(data map[interface{}]interface{}) ([]map[interface{}]interface{}, []error) {
-	// pre-validate as we need to have a minimum amount of data entegrity before combining
-	structuralErrs := structuralValidation(data)
-	if len(structuralErrs) != 0 {
-		return nil, structuralErrs
-	}
-
-	nonObjectErrs := validateNonObjectType(data)
-	if len(nonObjectErrs) != 0 {
-		return nil, nonObjectErrs
-	}
-
 	cmb := newAnyOfTypeCombinator(data)
 
 	invalidAnyOfDefinitionErrs := cmb.build()

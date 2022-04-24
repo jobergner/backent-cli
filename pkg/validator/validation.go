@@ -1,50 +1,8 @@
 package validator
 
 import (
-	"errors"
 	"fmt"
-	"reflect"
 )
-
-var golangBasicTypes = []string{"string", "bool", "int8", "uint8", "byte", "int16", "uint16", "int32", "rune", "uint32", "int64", "uint64", "int", "uint", "uintptr", "float32", "float64", "complex64", "complex128"}
-
-const mockPackageName string = "foobar"
-
-func isString(unknown interface{}) bool {
-	v := reflect.ValueOf(unknown)
-	if v.Kind() == reflect.String {
-		return true
-	}
-	return false
-}
-
-func isSlice(unknown interface{}) bool {
-	v := reflect.ValueOf(unknown)
-	if v.Kind() == reflect.Slice {
-		return true
-	}
-	return false
-}
-
-func isMap(unknown interface{}) bool {
-	v := reflect.ValueOf(unknown)
-	if v.Kind() == reflect.Map {
-		return true
-	}
-	return false
-}
-
-func isNil(unknown interface{}) bool {
-	return unknown == nil
-}
-
-func isEmptyString(unknown interface{}) bool {
-	if !isString(unknown) {
-		return false
-	}
-	valueString := fmt.Sprintf("%v", unknown)
-	return valueString == ""
-}
 
 func structuralValidation(data map[interface{}]interface{}) (errs []error) {
 
@@ -84,6 +42,8 @@ func logicalValidation(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
+// generalValidation validates the given data as if it is actual pseudo go-code
+// which means that maps, arrays and non-object types are considered valid as well
 func generalValidation(data map[interface{}]interface{}) (errs []error) {
 
 	structuralErrs := structuralValidation(data)
@@ -104,29 +64,36 @@ func generalValidation(data map[interface{}]interface{}) (errs []error) {
 	return
 }
 
-func thematicalValidationActions(data map[interface{}]interface{}, availableTypeIDs []string) (errs []error) {
-	capitalizationErrs := validateIllegalCapitalization(data)
+func thematicalActionsValidation(stateConfigDataVariant, actionsConfigData map[interface{}]interface{}) (errs []error) {
+
+	sameNameErrs := validateTypeAndActionWithSameName(stateConfigDataVariant, actionsConfigData)
+	errs = append(errs, sameNameErrs...)
+
+	actionUsedAsTypeErrs := validateActionUsedAsType(actionsConfigData)
+	errs = append(errs, actionUsedAsTypeErrs...)
+
+	var availableTypeIDs []string
+	for keyName := range stateConfigDataVariant {
+		typeName := fmt.Sprintf("%v", keyName)
+		availableTypeIDs = append(availableTypeIDs, typeName+"ID")
+	}
+
+	capitalizationErrs := validateIllegalCapitalization(actionsConfigData)
 	errs = append(errs, capitalizationErrs...)
 
-	nonObjectTypeErrs := validateNonObjectType(data)
-	errs = append(errs, nonObjectTypeErrs...)
-
-	incompatibleValueErrs := validateIncompatibleValue(data)
+	incompatibleValueErrs := validateIncompatibleValue(actionsConfigData)
 	errs = append(errs, incompatibleValueErrs...)
 
-	directTypeUsageErrs := validateDirectTypeUsage(data, availableTypeIDs)
+	directTypeUsageErrs := validateDirectTypeUsage(actionsConfigData, availableTypeIDs)
 	errs = append(errs, directTypeUsageErrs...)
 
-	pointerParameterErrs := validateIllegalPointerParameter(data)
+	pointerParameterErrs := validateIllegalPointerParameter(actionsConfigData)
 	errs = append(errs, pointerParameterErrs...)
 
 	return
 }
 
-func thematicalValidationState(data map[interface{}]interface{}) (errs []error) {
-
-	nonObjectTypeErrs := validateNonObjectType(data)
-	errs = append(errs, nonObjectTypeErrs...)
+func thematicalStateValidation(data map[interface{}]interface{}) (errs []error) {
 
 	capitalizationErrs := validateIllegalCapitalization(data)
 	errs = append(errs, capitalizationErrs...)
@@ -143,7 +110,7 @@ func thematicalValidationState(data map[interface{}]interface{}) (errs []error) 
 	return
 }
 
-func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
+func ValidateStateConfig(data map[interface{}]interface{}) []error {
 	// prevalidate structure so we can make our assumptions about how the data looks
 	structuralErrs := structuralValidation(data)
 	if len(structuralErrs) != 0 {
@@ -157,40 +124,48 @@ func ValidateStateConfig(data map[interface{}]interface{}) (errs []error) {
 
 	dataWithoutMetaFields := prepareStateConfig(data)
 
-	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(dataWithoutMetaFields)
-	if len(prevalidationErrs) != 0 {
-		return prevalidationErrs
+	dataCombinations, combinatorErrs := stateConfigCombinationsFrom(dataWithoutMetaFields)
+	if len(combinatorErrs) != 0 {
+		return combinatorErrs
 	}
 
-	for _, anyOfTypeCombination := range dataCombinations {
-		validationErrs := validateStateConfig(anyOfTypeCombination)
-		errs = append(errs, validationErrs...)
-	}
+	var configVariantErrs []error
+	for _, configVariant := range dataCombinations {
 
-	if len(errs) != 0 {
-		return errs
+		generalErrs := generalValidation(configVariant)
+		configVariantErrs = append(configVariantErrs, generalErrs...)
+
+		thematicalErrs := thematicalStateValidation(configVariant)
+		configVariantErrs = append(configVariantErrs, thematicalErrs...)
+
+	}
+	if len(configVariantErrs) != 0 {
+		return configVariantErrs
 	}
 
 	eventErrs := validateInvalidEventUsage(data)
-	errs = append(errs, eventErrs...)
-
-	return deduplicateErrs(errs)
-}
-
-func validateStateConfig(data map[interface{}]interface{}) (errs []error) {
-	generalErrs := generalValidation(data)
-	errs = append(errs, generalErrs...)
-	if len(errs) != 0 {
-		return
+	if len(eventErrs) != 0 {
+		return eventErrs
 	}
 
-	thematicalErrs := thematicalValidationState(data)
-	errs = append(errs, thematicalErrs...)
-
-	return
+	return nil
 }
 
-func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) (errs []error) {
+func validateStateConfig(data map[interface{}]interface{}) []error {
+	generalErrs := generalValidation(data)
+	if len(generalErrs) != 0 {
+		return generalErrs
+	}
+
+	thematicalErrs := thematicalStateValidation(data)
+	if len(thematicalErrs) != 0 {
+		return thematicalErrs
+	}
+
+	return nil
+}
+
+func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) []error {
 	// prevalidate structure so we can make our assumptions about how the data looks
 	structuralErrs := structuralValidation(stateConfigData)
 	if len(structuralErrs) != 0 {
@@ -206,49 +181,50 @@ func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfig
 
 	// responses and action share the same restrictions/requirements
 	responsesAsActionsValidationErrs := ValidateActionsConfig(stateConfigDataWithoutEvents, responsesConfigData)
-	errs = append(errs, responsesAsActionsValidationErrs...)
+	if len(responsesAsActionsValidationErrs) != 0 {
+		return responsesAsActionsValidationErrs
+	}
 
 	responseToUnknownActionErrs := validateResponseToUnknownAction(actionsConfigData, responsesConfigData)
-	errs = append(errs, responseToUnknownActionErrs...)
+	if len(responseToUnknownActionErrs) != 0 {
+		return responseToUnknownActionErrs
+	}
 
-	return
+	return nil
 }
 
-func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) (errs []error) {
-	errs = ValidateStateConfig(stateConfigData)
-	if len(errs) != 0 {
-		return errs
+func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsConfigData map[interface{}]interface{}) []error {
+	stateConfigErrs := ValidateStateConfig(stateConfigData)
+	if len(stateConfigErrs) != 0 {
+		return stateConfigErrs
 	}
 
 	stateConfigDataWithoutMetaFields := prepareStateConfig(stateConfigData)
 
-	dataCombinations, prevalidationErrs := stateConfigCombinationsFrom(stateConfigDataWithoutMetaFields)
-	if len(prevalidationErrs) != 0 {
-		return prevalidationErrs
+	dataCombinations, combinatorErrs := stateConfigCombinationsFrom(stateConfigDataWithoutMetaFields)
+	if len(combinatorErrs) != 0 {
+		return combinatorErrs
 	}
 
 	// use first combination as it does not matter which types of anyOf<> definitions are taken as value
 	stateConfigDataVariant := dataCombinations[0]
 
-	sameNameErrs := validateTypeAndActionWithSameName(stateConfigDataVariant, actionsConfigData)
-	errs = append(errs, sameNameErrs...)
-
-	generalErrs := generalActionsConfigValidation(stateConfigDataVariant, actionsConfigData)
-	errs = append(errs, generalErrs...)
-
-	actionUsedAsTypeErrs := validateActionUsedAsType(actionsConfigData)
-	errs = append(errs, actionUsedAsTypeErrs...)
-
-	var availableTypeIDs []string
-	for keyName := range stateConfigData {
-		typeName := fmt.Sprintf("%v", keyName)
-		availableTypeIDs = append(availableTypeIDs, typeName+"ID")
+	nonObjectTypeErrs := validateNonObjectType(actionsConfigData)
+	if len(nonObjectTypeErrs) != 0 {
+		return nonObjectTypeErrs
 	}
 
-	thematicalErrs := thematicalValidationActions(actionsConfigData, availableTypeIDs)
-	errs = append(errs, thematicalErrs...)
+	generalErrs := generalActionsConfigValidation(stateConfigDataVariant, actionsConfigData)
+	if len(generalErrs) != 0 {
+		return generalErrs
+	}
 
-	return
+	thematicalErrs := thematicalActionsValidation(stateConfigDataVariant, actionsConfigData)
+	if len(thematicalErrs) != 0 {
+		return thematicalErrs
+	}
+
+	return nil
 }
 
 func generalActionsConfigValidation(stateConfigData, actionsConfigData map[interface{}]interface{}) []error {
@@ -265,19 +241,4 @@ func generalActionsConfigValidation(stateConfigData, actionsConfigData map[inter
 	// general validation with modified actions data so validator is aware of all defined type IDs in
 	// the state config data when validating types used within actions
 	return generalValidation(actionsConfigCopy)
-}
-
-func deduplicateErrs(errs []error) []error {
-
-	check := make(map[string]bool)
-	deduped := make([]error, 0)
-	for _, val := range errs {
-		check[val.Error()] = true
-	}
-
-	for val := range check {
-		deduped = append(deduped, errors.New(val))
-	}
-
-	return deduped
 }
