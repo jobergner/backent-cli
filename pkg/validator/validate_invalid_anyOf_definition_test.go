@@ -17,6 +17,10 @@ func TestValidateDataInvalidAnyOfDefinition(t *testing.T) {
 		input := "anyOf<foo>"
 		assert.Equal(t, newValidationErrorInvalidAnyOfDefinition(input), validateAnyOfDefinition(input))
 	})
+	t.Run("returns error on no types in definition", func(t *testing.T) {
+		input := "anyOf<>"
+		assert.Equal(t, newValidationErrorInvalidAnyOfDefinition(input), validateAnyOfDefinition(input))
+	})
 	t.Run("returns error on duplicate type in definition", func(t *testing.T) {
 		input := "anyOf<foo , bar, foo >"
 		assert.Equal(t, newValidationErrorInvalidAnyOfDefinition(input), validateAnyOfDefinition(input))

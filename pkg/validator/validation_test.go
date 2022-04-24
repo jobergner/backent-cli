@@ -265,15 +265,15 @@ func TestValidateStateConfig(t *testing.T) {
 			},
 		}
 
-		errs := validateStateConfig(data)
+		errs := ValidateStateConfig(data)
 
 		assert.Empty(t, errs)
 	})
 
 	t.Run("should procude expected errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
-			"foo": "int",
-			"bar": "float64",
+			"foo": map[interface{}]interface{}{},
+			"bar": map[interface{}]interface{}{},
 			"baz": map[interface{}]interface{}{
 				"ban":       "int32",
 				"bam":       "bar",
@@ -290,12 +290,10 @@ func TestValidateStateConfig(t *testing.T) {
 			},
 		}
 
-		actualErrors := validateStateConfig(data)
+		actualErrors := ValidateStateConfig(data)
 		expectedErrors := []error{
 			newValidationErrorUnavailableFieldName("iD"),
 			newValidationErrorUnavailableFieldName("hasParent"),
-			newValidationErrorNonObjectType("foo"),
-			newValidationErrorNonObjectType("bar"),
 			newValidationErrorIncompatibleValue("map[bar]foo", "bap", "baz"),
 			newValidationErrorIncompatibleValue("***bar", "bal", "baz"),
 			newValidationErrorIncompatibleValue("**[]**bar", "slap", "baz"),
@@ -312,6 +310,29 @@ func TestValidateStateConfig(t *testing.T) {
 }
 
 func TestValidateActionsConfig(t *testing.T) {
+	t.Run("validates structure if actions (no panicking)", func(t *testing.T) {
+		data := map[interface{}]interface{}{
+			"foo": map[interface{}]interface{}{
+				"bar": "int64",
+			},
+		}
+		actionsConfigData := map[interface{}]interface{}{
+			"fooAction": map[interface{}]interface{}{
+				"foo": "fooID",
+			},
+			"bar": "int64",
+		}
+
+		actualErrors := ValidateActionsConfig(data, actionsConfigData)
+		expectedErrors := []error{
+			newValidationErrorNonObjectType("bar"),
+		}
+
+		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
+
+		assert.Empty(t, missingErrors)
+		assert.Empty(t, redundantErrors)
+	})
 	t.Run("should procude expected errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"foo": map[interface{}]interface{}{
@@ -426,13 +447,13 @@ func TestValidateStateConfigWithAnyOfTypes(t *testing.T) {
 	t.Run("on invalid anyOf definitions, it just considers field as ill-defined", func(t *testing.T) {
 		data := map[interface{}]interface{}{
 			"baz": map[interface{}]interface{}{
-				"ban": "anyof<>",
+				"ban": "anyOf<>",
 			},
 		}
 
 		actualErrors := ValidateStateConfig(data)
 		expectedErrors := []error{
-			newValidationErrorInvalidValueString("anyof<>", "ban", "baz"),
+			newValidationErrorInvalidAnyOfDefinition("anyOf<>"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)
