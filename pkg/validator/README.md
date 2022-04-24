@@ -53,9 +53,6 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrTypeAndActionWithSameName | type and action "{Name}" have the same name | Types and Actions with the same name would cause conflicts in the generated code. |
 | ErrInvalidAnyOfDefinition | "{valueString}" is not a valid `anyOf` definition | anyOf definitions can not have single or duplicate types and must be in alphabetical order. |
 | ErrResponeToUnknownAction | there is no action defined for response "{ResponseName}" | a response can only be defined with the same name as the action it belongs to. |
-| ErrTypeNameConstraintViolation | type name violates constraints | a type name may not end with "ID" or contain "_". |
+| ErrTypeNameConstraintViolation | "{TypeName}" violates type name constraints | a type name may not end with "ID" or contain "_". |
+| ErrUnsupportedType | type "{valueString}" is not supported | currently usable types are limited to `int64`, `float64`, `bool`, `string`. |
 <br/>
-
-TODO:
-- (no it does not. why would you use that in state, and it is not really useful in params as user shuld choose either or) needs to allow any IDs `anyOf<foo,bar>ID`
-- handle allowed types (int64, float64, bool, string)
