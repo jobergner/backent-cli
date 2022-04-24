@@ -149,15 +149,23 @@ func copyData(data map[interface{}]interface{}) map[interface{}]interface{} {
 	for k, v := range data {
 
 		newChildData := make(map[interface{}]interface{})
-		childMapValue := v.(map[interface{}]interface{})
 
-		for _k, _v := range childMapValue {
+		if isMap(v) {
+			childMapValue := v.(map[interface{}]interface{})
 
-			newChildData[_k] = _v
+			for _k, _v := range childMapValue {
+
+				newChildData[_k] = _v
+
+			}
+
+			newData[k] = newChildData
+
+		} else {
+
+			newData[k] = v
 
 		}
-
-		newData[k] = newChildData
 
 	}
 

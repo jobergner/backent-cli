@@ -181,3 +181,11 @@ func newValidationErrorUnpureEvent(valueString string) error {
 		),
 	)
 }
+func newValidationErrorTypeNameConstraintViolation(typeName string) error {
+	return errors.New(
+		fmt.Sprintf(
+			"ErrTypeNameConstraintViolation: \"%s\" violates type name constraints",
+			typeName,
+		),
+	)
+}
