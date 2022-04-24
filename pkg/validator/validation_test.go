@@ -272,8 +272,9 @@ func TestValidateStateConfig(t *testing.T) {
 
 	t.Run("should procude expected errors", func(t *testing.T) {
 		data := map[interface{}]interface{}{
-			"foo": map[interface{}]interface{}{},
-			"bar": map[interface{}]interface{}{},
+			"foo":   map[interface{}]interface{}{},
+			"fooID": map[interface{}]interface{}{},
+			"bar":   map[interface{}]interface{}{},
 			"baz": map[interface{}]interface{}{
 				"ban":       "int32",
 				"bam":       "bar",
@@ -300,6 +301,7 @@ func TestValidateStateConfig(t *testing.T) {
 			newValidationErrorIncompatibleValue("[3]foo", "barg", "baz"),
 			newValidationErrorIncompatibleValue("*[]int", "unt", "baz"),
 			newValidationErrorIncompatibleValue("[]*int", "rnt", "baz"),
+			newValidationErrorTypeNameConstraintViolation("fooID"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

@@ -47,21 +47,15 @@ Despite the fact that each of these errors would find a place in one of the abov
 | ErrNonObjectType | type "{TypeName}" is not an object type. | The defined type is not an object. |
 | ErrIllegalCapitalization | {type/field name} "{literal}" starts with a capital letter. | A type or field name starts with a capital letter, which is not allowed. |
 | ErrConflictingSingular | "{KeyName1}" and "{KeyName2}" share the same singular form "{Singular}". | Due to the way state will be used two field names cannot have the same singular form. |
-| ErrUnavailableFieldName | "{KeyName}" not an available name. | Due to internal usage of this FieldName it is unavailable. |
-| ErrDirectTypeUsage | the type "{TypeName}" was used directly in "{ActionName}" instead of it's ID ("{TypeName}ID") | Only IDs of types are available in actions |
-| ErrIllegalPointerParameter | the parameter "{FieldName}" in "{ActionName}" contains a pointer value | Pointers can not be used as parameter as it would not make any sense |
-| ErrTypeAndActionWithSameName | type and action "{Name}" have the same name | Types and Actions with the same name would cause conflicts in the generated code |
-| ErrInvalidAnyOfDefinition | "{valueString}" is not a valid `anyOf` definition | anyOf definitions can not have single or duplicate types and must be in alphabetical order |
-| ErrResponeToUnknownAction | there is no action defined for response "{ResponseName}" | a response can only be defined with the same name as the action it belongs to |
+| ErrUnavailableFieldName | "{KeyName}" not an available name. | Due to internal usage of this FieldName or reserved prefix it is unavailable. |
+| ErrDirectTypeUsage | the type "{TypeName}" was used directly in "{ActionName}" instead of it's ID ("{TypeName}ID") | Only IDs of types are available in actions. |
+| ErrIllegalPointerParameter | the parameter "{FieldName}" in "{ActionName}" contains a pointer value | Pointers can not be used as parameter as it would not make any sense. |
+| ErrTypeAndActionWithSameName | type and action "{Name}" have the same name | Types and Actions with the same name would cause conflicts in the generated code. |
+| ErrInvalidAnyOfDefinition | "{valueString}" is not a valid `anyOf` definition | anyOf definitions can not have single or duplicate types and must be in alphabetical order. |
+| ErrResponeToUnknownAction | there is no action defined for response "{ResponseName}" | a response can only be defined with the same name as the action it belongs to. |
+| ErrTypeNameConstraintViolation | type name violates constraints | a type name may not end with "ID" or contain "_". |
 <br/>
 
 TODO:
 - (no it does not. why would you use that in state, and it is not really useful in params as user shuld choose either or) needs to allow any IDs `anyOf<foo,bar>ID`
-- consider not allowing types with ID suffix
-- do not allow _ in names
-- do not allow field names `Parent{TypeName}`
-- do not allow field names `Set{FieldName}`
-- do not allow `ParentKind`
-- do not allow `Kind`
-- do not allow `Query...`
 - handle allowed types (int64, float64, bool, string)

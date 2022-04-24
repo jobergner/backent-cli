@@ -65,6 +65,11 @@ func generalValidation(data map[interface{}]interface{}) (errs []error) {
 }
 
 func thematicalActionsValidation(stateConfigDataVariant, actionsConfigData map[interface{}]interface{}) (errs []error) {
+	// prevalidate structure so we can make our assumptions about how the data looks
+	nonObjectTypeErrs := validateNonObjectType(actionsConfigData)
+	if len(nonObjectTypeErrs) != 0 {
+		return nonObjectTypeErrs
+	}
 
 	sameNameErrs := validateTypeAndActionWithSameName(stateConfigDataVariant, actionsConfigData)
 	errs = append(errs, sameNameErrs...)
@@ -100,6 +105,9 @@ func thematicalStateValidation(data map[interface{}]interface{}) (errs []error) 
 
 	incompatibleValueErrs := validateIncompatibleValue(data)
 	errs = append(errs, incompatibleValueErrs...)
+
+	typeNameConstraintViolationErrs := validateTypeNameConstraintViolation(data)
+	errs = append(errs, typeNameConstraintViolationErrs...)
 
 	conflictingSingularErrs := validateConflictingSingular(data)
 	errs = append(errs, conflictingSingularErrs...)
@@ -151,20 +159,6 @@ func ValidateStateConfig(data map[interface{}]interface{}) []error {
 	return nil
 }
 
-func validateStateConfig(data map[interface{}]interface{}) []error {
-	generalErrs := generalValidation(data)
-	if len(generalErrs) != 0 {
-		return generalErrs
-	}
-
-	thematicalErrs := thematicalStateValidation(data)
-	if len(thematicalErrs) != 0 {
-		return thematicalErrs
-	}
-
-	return nil
-}
-
 func ValidateResponsesConfig(stateConfigData, actionsConfigData, responsesConfigData map[interface{}]interface{}) []error {
 	// prevalidate structure so we can make our assumptions about how the data looks
 	structuralErrs := structuralValidation(stateConfigData)
@@ -208,11 +202,6 @@ func ValidateActionsConfig(stateConfigData map[interface{}]interface{}, actionsC
 
 	// use first combination as it does not matter which types of anyOf<> definitions are taken as value
 	stateConfigDataVariant := dataCombinations[0]
-
-	nonObjectTypeErrs := validateNonObjectType(actionsConfigData)
-	if len(nonObjectTypeErrs) != 0 {
-		return nonObjectTypeErrs
-	}
 
 	generalErrs := generalActionsConfigValidation(stateConfigDataVariant, actionsConfigData)
 	if len(generalErrs) != 0 {

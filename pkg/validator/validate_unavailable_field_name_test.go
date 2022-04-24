@@ -14,6 +14,7 @@ func TestValidateDataUnavailableFieldName(t *testing.T) {
 				"ban":           "int",
 				"operationKind": "string",
 				"path":          "int",
+				"queryFoo":      "int",
 			},
 		}
 
@@ -21,6 +22,7 @@ func TestValidateDataUnavailableFieldName(t *testing.T) {
 		expectedErrors := []error{
 			newValidationErrorUnavailableFieldName("operationKind"),
 			newValidationErrorUnavailableFieldName("path"),
+			newValidationErrorUnavailableFieldName("queryFoo"),
 		}
 
 		missingErrors, redundantErrors := matchErrors(actualErrors, expectedErrors)

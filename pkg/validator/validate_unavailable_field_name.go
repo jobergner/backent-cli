@@ -2,6 +2,7 @@ package validator
 
 import (
 	"fmt"
+	"strings"
 )
 
 var unavailableFiledNames = []string{
@@ -9,8 +10,16 @@ var unavailableFiledNames = []string{
 	"iD",
 	"operationKind",
 	"hasParent",
+	"parentKind",
+	"kind",
 	"path",
 	"exists",
+}
+
+var unavailableFiledNamePrefixes = []string{
+	"query",
+	"set",
+	"parent",
 }
 
 func isUnavailableFiledName(fieldName string) bool {
@@ -19,6 +28,13 @@ func isUnavailableFiledName(fieldName string) bool {
 			return true
 		}
 	}
+
+	for _, prefix := range unavailableFiledNamePrefixes {
+		if strings.HasPrefix(fieldName, prefix) {
+			return true
+		}
+	}
+
 	return false
 }
 
