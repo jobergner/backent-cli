@@ -1,3 +1,5 @@
+// this package reads all static code from the examples and writes it
+// to a file to use it during runtime later while writing the packages
 package main
 
 import (
@@ -91,12 +93,18 @@ func writeCodeFromDir(path string) string {
 	}
 
 	for _, decl := range decls {
+
 		if needsSkipMarshallerComment(decl) {
 			buf.WriteString("// easyjson:skip\n")
 		}
+
+		// TODO this needs some rework
 		purgeSkipMarshallerComment(decl)
+
 		printer.Fprint(buf, token.NewFileSet(), decl)
+
 		buf.WriteString("\n")
+
 	}
 
 	return buf.String()

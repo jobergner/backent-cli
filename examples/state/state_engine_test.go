@@ -435,6 +435,8 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				zne := se.CreateZone()
+				// TODO fix how slices of basic types work, or what was i thinking when implementing it
+				// maybe do map[type]OperationKind (wont't work if slice contains same string multiple times)
 				zne.AddTag("foo")
 				zne.AddTag("bar")
 				itm := zne.AddItem()
