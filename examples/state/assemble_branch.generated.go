@@ -7,8 +7,9 @@ func (engine *Engine) assembleGearScorePath(element *gearScore, p path, pIndex i
 		gearScoreData = engine.State.GearScore[element.ID]
 	}
 
-	// to prevent element OperationKindUnchanged overwriting OperKindUpdate
-	// set by basic child elements
+	// to prevent element OperationKindUnchanged of element itself overwriting OperKindUpdate
+	// set by basic child elements (this could maybe also be solved by remving paths from assembler
+	// which overlap)
 	if element.OperationKind != OperationKindUpdate && element.OperationKind != OperationKindDelete {
 		element.OperationKind = gearScoreData.OperationKind
 	}
@@ -483,12 +484,35 @@ func (engine *Engine) assembleZonePath(element *zone, p path, pIndex int, includ
 		engine.assemblePlayerPath(&child, p, pIndex+1, includedElements)
 		element.Players[child.ID] = child
 	case zone_tagsIdentifier:
+		// TODO is there a cleaner way?
 		if element.Tags == nil {
-			element.Tags = make([]string, 0, len(zoneData.Tags))
+			if stateZone, ok := engine.State.Zone[element.ID]; ok {
+				element.Tags = make([]string, 0, len(stateZone.Tags))
+				for _, valID := range stateZone.Tags {
+					val := engine.stringValue(valID)
+					element.Tags = append(element.Tags, val.Value)
+				}
+			} else {
+				element.Tags = make([]string, 0, len(zoneData.Tags))
+			}
 		}
+
 		child := engine.stringValue(StringValueID(nextSeg.ID))
-		element.OperationKind = child.OperationKind
-		element.Tags = append(element.Tags, child.Value)
+		switch child.OperationKind {
+		case OperationKindUnchanged:
+			break
+		case OperationKindDelete:
+			var newValues []string
+			for _, val := range element.Tags {
+				if val != child.Value {
+					newValues = append(newValues, val)
+				}
+			}
+			element.Tags = newValues
+		case OperationKindUpdate:
+			element.Tags = append(element.Tags, child.Value)
+		}
+
 	}
 
 	_ = zoneData

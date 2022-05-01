@@ -158,6 +158,43 @@ func TestEngine(t *testing.T) {
 		itm := se.CreateItem()
 		itm.ParentPlayer()
 	})
+	t.Run("handles slices of basic type remove correctly", func(t *testing.T) {
+		se := NewEngine()
+		zne := se.CreateZone()
+		zne.AddTag("foo")
+		zne.AddTag("bar")
+		zne.RemoveTags("bar")
+		assert.Equal(t, 1, len(se.Patch.StringValue))
+	})
+	t.Run("updates slices of basic type remove correctly", func(t *testing.T) {
+		se := NewEngine()
+		zne := se.CreateZone()
+
+		zne.AddTag("foo")
+		zne.AddTag("foo")
+		zne.AddTag("bar")
+
+		se.UpdateState()
+
+		assert.Equal(t, 3, len(se.State.Zone[zne.ID()].Tags))
+		var tags []string
+		for _, t := range se.State.Zone[zne.ID()].Tags {
+			s := se.State.StringValue[t]
+			tags = append(tags, s.Value)
+		}
+		assert.Equal(t, []string{"foo", "foo", "bar"}, tags)
+
+		zne.RemoveTags("bar")
+		assert.Equal(t, 3, len(se.State.Zone[zne.ID()].Tags))
+
+		assert.Equal(t, 3, len(se.State.StringValue))
+		var tags2 []string
+		for _, t := range se.State.Zone[zne.ID()].Tags {
+			s := se.State.StringValue[t]
+			tags2 = append(tags2, s.Value)
+		}
+		assert.Equal(t, []string{"foo", "foo", "bar"}, tags2)
+	})
 }
 
 func TestReferences(t *testing.T) {
@@ -278,7 +315,7 @@ func TestUpdateState(t *testing.T) {
 		assert.False(t, ok)
 	})
 	t.Run("does not delete on illegal delete element with parent", func(t *testing.T) {
-		// todo
+		// TODO
 	})
 	t.Run("adds elements", func(t *testing.T) {
 		se := NewEngine()
@@ -435,8 +472,8 @@ func TestTree(t *testing.T) {
 		newTreeTest(
 			func(se *Engine, expectedTree *Tree) {
 				zne := se.CreateZone()
-				// TODO fix how slices of basic types work, or what was i thinking when implementing it
-				// maybe do map[type]OperationKind (wont't work if slice contains same string multiple times)
+
+				zne.AddTag("foo")
 				zne.AddTag("foo")
 				zne.AddTag("bar")
 				itm := zne.AddItem()
@@ -450,7 +487,7 @@ func TestTree(t *testing.T) {
 					zne.ID(): {
 						ID:            zne.ID(),
 						OperationKind: OperationKindUpdate,
-						Tags:          []string{"baz"},
+						Tags:          []string{"foo", "foo", "baz"},
 						Items: map[ZoneItemID]zoneItem{
 							itm.ID(): {
 								ID:            itm.ID(),
