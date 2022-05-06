@@ -982,6 +982,11 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+- make slices always return same order through getters (the order currenlty may be changed by removers (sort by id ascending?))
+- it is still unclear which methods can be used during broadcasting. We somehow need to limit that.
+- you can call Be<Type> on slices of anyOf types which creates a new anyOf container with new ID. this causes the slice of anyOf IDs to lose track if that anyOfContainer and holds plain wrong information. (interactables)
+
+
 - basic types are currently treated differntly from all other types; they are sent regardless of wether they have uptadet or not
     - solution:
         - make basic types same as other types: own map in state
