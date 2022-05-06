@@ -35,26 +35,17 @@ func (c *Code) ReturnType(typeName string) *Code {
 	return c
 }
 
-func (c *Code) Call(params ...string) *Code {
+func (c *Code) Call(params ...*Code) *Code {
 	c.buf.WriteString("(")
 
-	c.buf.WriteString(strings.Join(params, ", "))
-
-	c.buf.WriteString(")")
-
-	return c
-}
-
-func (c *Code) Block(code ...Code) *Code {
-	c.buf.WriteString("{\n")
-
-	for _, line := range code {
-		c.buf.WriteString(indent)
-		c.buf.WriteString(line.toString())
-		c.buf.WriteString("\n")
+	var paramStrings []string
+	for _, p := range params {
+		paramStrings = append(paramStrings, p.toString())
 	}
 
-	c.buf.WriteString("}\n")
+	c.buf.WriteString(strings.Join(paramStrings, ", "))
+
+	c.buf.WriteString(")")
 
 	return c
 }
