@@ -1,58 +1,50 @@
 package state
 
-type anyOfPlayer_PositionRef struct {
-	anyOfPlayer_PositionWrapper AnyOfPlayer_Position
-	anyOfPlayer_Position        anyOfPlayer_PositionCore
+// we don't want the user to have the option to call `Be<Type>` on
+// *anyOf<> types. This is why we need a limiting interface
+// if some of these types are unused it's due to the fact that
+// they will be generated for all anyOf types, while not all anyOf types
+// are used in combination with a reference
+type AnyOfPlayer_PositionRef interface {
+	Kind() ElementKind
+	Player() Player
+	Position() Position
 }
 
-func (_any anyOfPlayer_PositionRef) Kind() ElementKind {
-	return _any.anyOfPlayer_PositionWrapper.Kind()
+type AnyOfPlayer_ZoneItemRef interface {
+	Kind() ElementKind
+	Player() Player
+	ZoneItem() ZoneItem
 }
 
-func (_any anyOfPlayer_PositionRef) Player() Player {
-	return _any.anyOfPlayer_PositionWrapper.Player()
+type AnyOfItem_Player_ZoneItemRef interface {
+	Kind() ElementKind
+	Item() Item
+	Player() Player
+	ZoneItem() ZoneItem
 }
 
-func (_any anyOfPlayer_PositionRef) Position() Position {
-	return _any.anyOfPlayer_PositionWrapper.Position()
+// we don't want the user to have the option to call `Be<Type>` on
+// []anyOf<> types, as elements in slices are listed by their IDs (in this case the ID of the underlying element)
+// and there is no usecase where Be<Type> on an []anyOf<> type element is more convenient for the user than
+// just deleting and creating a new slice element
+type AnyOfPlayer_PositionSliceElement interface {
+	Kind() ElementKind
+	Player() Player
+	Position() Position
 }
 
-type anyOfPlayer_ZoneItemRef struct {
-	anyOfPlayer_ZoneItemWrapper AnyOfPlayer_ZoneItem
-	anyOfPlayer_ZoneItem        anyOfPlayer_ZoneItemCore
+type AnyOfPlayer_ZoneItemSliceElement interface {
+	Kind() ElementKind
+	Player() Player
+	ZoneItem() ZoneItem
 }
 
-func (_any anyOfPlayer_ZoneItemRef) Kind() ElementKind {
-	return _any.anyOfPlayer_ZoneItemWrapper.Kind()
-}
-
-func (_any anyOfPlayer_ZoneItemRef) Player() Player {
-	return _any.anyOfPlayer_ZoneItemWrapper.Player()
-}
-
-func (_any anyOfPlayer_ZoneItemRef) ZoneItem() ZoneItem {
-	return _any.anyOfPlayer_ZoneItemWrapper.ZoneItem()
-}
-
-type anyOfItem_Player_ZoneItemRef struct {
-	anyOfItem_Player_ZoneItemWrapper AnyOfItem_Player_ZoneItem
-	anyOfItem_Player_ZoneItem        anyOfItem_Player_ZoneItemCore
-}
-
-func (_any anyOfItem_Player_ZoneItemRef) Kind() ElementKind {
-	return _any.anyOfItem_Player_ZoneItemWrapper.Kind()
-}
-
-func (_any anyOfItem_Player_ZoneItemRef) Item() Item {
-	return _any.anyOfItem_Player_ZoneItemWrapper.Item()
-}
-
-func (_any anyOfItem_Player_ZoneItemRef) Player() Player {
-	return _any.anyOfItem_Player_ZoneItemWrapper.Player()
-}
-
-func (_any anyOfItem_Player_ZoneItemRef) ZoneItem() ZoneItem {
-	return _any.anyOfItem_Player_ZoneItemWrapper.ZoneItem()
+type AnyOfItem_Player_ZoneItemSliceElement interface {
+	Kind() ElementKind
+	Item() Item
+	Player() Player
+	ZoneItem() ZoneItem
 }
 
 func (_any AnyOfPlayer_ZoneItem) Kind() ElementKind {

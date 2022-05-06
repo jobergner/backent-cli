@@ -88,17 +88,20 @@ func (_ref PlayerTargetRef) Unset() {
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
 
-func (_ref PlayerTargetRef) Get() anyOfPlayer_ZoneItemRef {
+func (_ref PlayerTargetRef) Get() AnyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
 	anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
-	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
+	return anyContainer
 }
 
-func (_ref PlayerTargetedByRef) Get() anyOfPlayer_ZoneItemRef {
+func (_ref PlayerTargetedByRef) Get() AnyOfPlayer_ZoneItemRef {
 	ref := _ref.playerTargetedByRef.engine.playerTargetedByRef(_ref.playerTargetedByRef.ID)
 	anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
-	return anyOfPlayer_ZoneItemRef{anyOfPlayer_ZoneItem: anyContainer.anyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemWrapper: anyContainer}
+	return anyContainer
 }
+
+// dereferencing is the response to an element, of which other elements held references to, being deleted
+// we do this so elements don't hold references of elements which no longer exist
 
 // this will never be used as events can't be referenced
 // however we'll keep it here just to have more consistency
@@ -164,7 +167,7 @@ func (engine *Engine) dereferencePlayerTargetRefsPlayer(playerID PlayerID) {
 	allPlayerTargetRefIDs := engine.allPlayerTargetRefIDs()
 	for _, refID := range allPlayerTargetRefIDs {
 		ref := engine.playerTargetRef(refID)
-		anyContainer := ref.Get()
+		anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
 			continue
 		}
@@ -179,7 +182,7 @@ func (engine *Engine) dereferencePlayerTargetRefsZoneItem(zoneItemID ZoneItemID)
 	allPlayerTargetRefIDs := engine.allPlayerTargetRefIDs()
 	for _, refID := range allPlayerTargetRefIDs {
 		ref := engine.playerTargetRef(refID)
-		anyContainer := ref.Get()
+		anyContainer := ref.playerTargetRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
 			continue
 		}
@@ -194,7 +197,7 @@ func (engine *Engine) dereferencePlayerTargetedByRefsPlayer(playerID PlayerID) {
 	allPlayerTargetedByRefIDs := engine.allPlayerTargetedByRefIDs()
 	for _, refID := range allPlayerTargetedByRefIDs {
 		ref := engine.playerTargetedByRef(refID)
-		anyContainer := ref.Get()
+		anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindPlayer {
 			continue
 		}
@@ -210,7 +213,7 @@ func (engine *Engine) dereferencePlayerTargetedByRefsZoneItem(zoneItemID ZoneIte
 	allPlayerTargetedByRefIDs := engine.allPlayerTargetedByRefIDs()
 	for _, refID := range allPlayerTargetedByRefIDs {
 		ref := engine.playerTargetedByRef(refID)
-		anyContainer := ref.Get()
+		anyContainer := ref.playerTargetedByRef.engine.anyOfPlayer_ZoneItem(ref.playerTargetedByRef.ReferencedElementID)
 		if anyContainer.anyOfPlayer_ZoneItem.ElementKind != ElementKindZoneItem {
 			continue
 		}

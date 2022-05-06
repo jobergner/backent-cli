@@ -712,9 +712,9 @@ func (_zone Zone) Players() []Player {
 	return players
 }
 
-func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItem {
+func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItemSliceElement {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
-	var interactables []AnyOfItem_Player_ZoneItem
+	var interactables []AnyOfItem_Player_ZoneItemSliceElement
 	for _, anyOfItem_Player_ZoneItemID := range zone.zone.Interactables {
 		interactables = append(interactables, zone.zone.engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID))
 	}
