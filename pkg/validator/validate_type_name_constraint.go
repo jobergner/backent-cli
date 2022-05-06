@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+var unavailableTypeNamePrefixes = []string{
+	"query",
+}
+
 var unavailableTypeNameSuffixes = []string{
 	"ID",
 }
@@ -14,6 +18,11 @@ var unavailableTypeNameSubStrings = []string{
 }
 
 func violatesTypeNameConstraints(typeName string) bool {
+	for _, prefix := range unavailableTypeNamePrefixes {
+		if strings.HasPrefix(typeName, prefix) {
+			return true
+		}
+	}
 
 	for _, suffix := range unavailableTypeNameSuffixes {
 		if strings.HasSuffix(typeName, suffix) {
