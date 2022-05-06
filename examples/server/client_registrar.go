@@ -7,6 +7,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// clientRegistrar keeps track of clients in a tiered manner.
+// incomingClients can be promoted to regular clients
 // easyjson:skip
 type clientRegistrar struct {
 	clients         map[*Client]struct{}

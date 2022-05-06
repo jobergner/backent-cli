@@ -61,8 +61,6 @@ func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	go client.runReadMessages()
 	go client.runWriteMessages()
 
-	// TODO I dont think this works as I think it should work
-	// wait until connection closes
 	<-client.conn.Context().Done()
 
 	log.Debug().Msg("client context done")
