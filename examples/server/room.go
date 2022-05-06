@@ -56,20 +56,8 @@ func (r *Room) AlterState(fn func(*state.Engine)) {
 	fn(r.state)
 }
 
-func (r *Room) RangeClients(fn func(client *Client)) {
-	for c := range r.clients.incomingClients {
-		fn(c)
-	}
-	for c := range r.clients.clients {
-		fn(c)
-	}
-}
-
-func (r *Room) processMessageSync(msg Message) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	response := r.processClientMessage(msg)
+func (r *Room) processMessage(msg Message) {
+	response := r.triggerAction(msg)
 
 	if response.Kind == message.MessageKindNoResponse {
 		return
@@ -89,13 +77,13 @@ func (r *Room) processMessageSync(msg Message) {
 	}
 }
 
-func (r *Room) run(controller Controller, fps int) {
+func (r *Room) run(fps int) {
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
 
 	for {
 		<-ticker.C
 
-		r.tickSync(controller)
+		r.tick()
 
 		if r.mode == RoomModeTerminating {
 			break
@@ -104,6 +92,6 @@ func (r *Room) run(controller Controller, fps int) {
 
 }
 
-func (r *Room) Deploy(controller Controller, fps int) {
-	go r.run(controller, fps)
+func (r *Room) Deploy(fps int) {
+	go r.run(fps)
 }

@@ -37,7 +37,7 @@ func (l *Lobby) CreateRoom(name string) *Room {
 
 	l.Rooms[name] = room
 
-	room.Deploy(l.controller, l.fps)
+	room.Deploy(l.fps)
 
 	return room
 }
@@ -66,7 +66,7 @@ func (l *Lobby) deleteClient(client *Client) {
 	l.signalClientDisconnect(client)
 }
 
-func (l *Lobby) processMessageSync(msg Message) {
+func (l *Lobby) processMessage(msg Message) {
 
 	l.mu.Lock()
 	defer l.mu.Unlock()

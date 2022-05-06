@@ -6,11 +6,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (r *Room) tickSync(controller Controller) {
+func (r *Room) tick() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	controller.OnFrameTick(r.state)
+	r.controller.OnFrameTick(r.state)
 
 	err := r.publishPatch()
 	if err != nil {

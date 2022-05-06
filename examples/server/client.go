@@ -97,10 +97,10 @@ func (c *Client) runReadMessages() {
 		msg.client = c
 
 		if msg.Kind == message.MessageKindGlobal {
-			c.lobby.processMessageSync(msg)
+			c.lobby.processMessage(msg)
 		} else {
 			if c.room != nil {
-				c.room.processMessageSync(msg)
+				c.room.processMessage(msg)
 			}
 		}
 

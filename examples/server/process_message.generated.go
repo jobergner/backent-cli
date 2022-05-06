@@ -6,7 +6,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (r *Room) processClientMessage(msg Message) Message {
+func (r *Room) triggerAction(msg Message) Message {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	switch msg.Kind {
 	case message.MessageKindAction_addItemToPlayer:
 		var params message.AddItemToPlayerParams
