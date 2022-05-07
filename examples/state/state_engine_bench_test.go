@@ -151,7 +151,7 @@ func benchTestRemovePlayers(engine *Engine, zone Zone) {
 	for i := 0; i < int(benchTestNumberOfPlayers/3); i++ {
 		// get the player with getter method
 		player := engine.Player(zone.Players()[nextNum(benchTestNumberOfPlayers, &benchTestNumberOfPlayersCounter)].ID())
-		zone.RemovePlayers(player.ID())
+		zone.RemovePlayer(player.ID())
 	}
 }
 
@@ -185,11 +185,11 @@ func benchTestRemoveInteractables(engine *Engine, zone Zone) {
 		randomInteractable := zone.Interactables()[nextNum(benchTestNumberOfInteractables, &benchTestNumberOfInteractablesCounter)]
 		switch randomInteractable.Kind() {
 		case ElementKindPlayer:
-			zone.RemoveInteractablesPlayer(randomInteractable.Player().ID())
+			zone.RemoveInteractablePlayer(randomInteractable.Player().ID())
 		case ElementKindItem:
-			zone.RemoveInteractablesItem(randomInteractable.Item().ID())
+			zone.RemoveInteractableItem(randomInteractable.Item().ID())
 		case ElementKindZoneItem:
-			zone.RemoveInteractablesZoneItem(randomInteractable.ZoneItem().ID())
+			zone.RemoveInteractableZoneItem(randomInteractable.ZoneItem().ID())
 		}
 	}
 }

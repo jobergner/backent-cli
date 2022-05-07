@@ -357,25 +357,25 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 			break
 		}
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, ok := includedElements[ref.ReferencedElementID.ChildID]; ok {
+		if _, ok := includedElements[ref.ChildID]; ok {
 			referencedDataStatus = ReferencedDataModified
 		}
 		switch nextSeg.Kind {
 		case ElementKindPlayer:
-			referencedElement := engine.Player(PlayerID(ref.ReferencedElementID.ChildID)).player
+			referencedElement := engine.Player(PlayerID(ref.ChildID)).player
 			treeRef := elementReference{
 				OperationKind:        ref.OperationKind,
-				ElementID:            ref.ReferencedElementID.ChildID,
+				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindPlayer,
 				ReferencedDataStatus: referencedDataStatus,
 				ElementPath:          referencedElement.JSONPath,
 			}
 			element.Target = &treeRef
 		case ElementKindZoneItem:
-			referencedElement := engine.ZoneItem(ZoneItemID(ref.ReferencedElementID.ChildID)).zoneItem
+			referencedElement := engine.ZoneItem(ZoneItemID(ref.ChildID)).zoneItem
 			treeRef := elementReference{
 				OperationKind:        ref.OperationKind,
-				ElementID:            ref.ReferencedElementID.ChildID,
+				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindZoneItem,
 				ReferencedDataStatus: referencedDataStatus,
 				ElementPath:          referencedElement.JSONPath,
@@ -388,30 +388,30 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		}
 		ref := engine.playerTargetedByRef(PlayerTargetedByRefID(nextSeg.RefID)).playerTargetedByRef
 		referencedDataStatus := ReferencedDataUnchanged
-		if _, ok := includedElements[ref.ReferencedElementID.ChildID]; ok {
+		if _, ok := includedElements[ref.ChildID]; ok {
 			referencedDataStatus = ReferencedDataModified
 		}
 		switch nextSeg.Kind {
 		case ElementKindPlayer:
-			referencedElement := engine.Player(PlayerID(ref.ReferencedElementID.ChildID)).player
+			referencedElement := engine.Player(PlayerID(ref.ChildID)).player
 			treeRef := elementReference{
 				OperationKind:        ref.OperationKind,
-				ElementID:            ref.ReferencedElementID.ChildID,
+				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindPlayer,
 				ReferencedDataStatus: referencedDataStatus,
 				ElementPath:          referencedElement.JSONPath,
 			}
-			element.TargetedBy[ref.ReferencedElementID.ChildID] = treeRef
+			element.TargetedBy[ref.ChildID] = treeRef
 		case ElementKindZoneItem:
-			referencedElement := engine.ZoneItem(ZoneItemID(ref.ReferencedElementID.ChildID)).zoneItem
+			referencedElement := engine.ZoneItem(ZoneItemID(ref.ChildID)).zoneItem
 			treeRef := elementReference{
 				OperationKind:        ref.OperationKind,
-				ElementID:            ref.ReferencedElementID.ChildID,
+				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindZoneItem,
 				ReferencedDataStatus: referencedDataStatus,
 				ElementPath:          referencedElement.JSONPath,
 			}
-			element.TargetedBy[ref.ReferencedElementID.ChildID] = treeRef
+			element.TargetedBy[ref.ChildID] = treeRef
 		}
 	}
 

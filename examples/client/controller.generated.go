@@ -6,10 +6,7 @@ import (
 )
 
 type Controller interface {
-	AddItemToPlayerBroadcast(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string)
-	AddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
-	MovePlayerBroadcast(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
-	MovePlayerEmit(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
-	SpawnZoneItemsBroadcast(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string)
-	SpawnZoneItemsEmit(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) message.SpawnZoneItemsResponse
+	AddItemToPlayer(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
+	MovePlayer(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
+	SpawnZoneItems(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) message.SpawnZoneItemsResponse
 }

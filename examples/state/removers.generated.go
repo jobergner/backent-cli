@@ -1,6 +1,6 @@
 package state
 
-func (_zone Zone) RemovePlayers(playerToRemove PlayerID) Zone {
+func (_zone Zone) RemovePlayer(playerToRemove PlayerID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 
 	if zone.zone.OperationKind == OperationKindDelete {
@@ -24,7 +24,6 @@ func (_zone Zone) RemovePlayers(playerToRemove PlayerID) Zone {
 		zone.zone.engine.deletePlayer(playerID)
 
 		zone.zone.OperationKind = OperationKindUpdate
-		zone.zone.Meta.sign(zone.zone.engine.BroadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -33,7 +32,7 @@ func (_zone Zone) RemovePlayers(playerToRemove PlayerID) Zone {
 	return zone
 }
 
-func (_zone Zone) RemoveItems(itemToRemove ZoneItemID) Zone {
+func (_zone Zone) RemoveItem(itemToRemove ZoneItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 
 	if zone.zone.OperationKind == OperationKindDelete {
@@ -57,7 +56,6 @@ func (_zone Zone) RemoveItems(itemToRemove ZoneItemID) Zone {
 		zone.zone.engine.deleteZoneItem(zoneItemID)
 
 		zone.zone.OperationKind = OperationKindUpdate
-		zone.zone.Meta.sign(zone.zone.engine.BroadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -66,7 +64,7 @@ func (_zone Zone) RemoveItems(itemToRemove ZoneItemID) Zone {
 	return zone
 }
 
-func (_zone Zone) RemoveInteractablesItem(itemToRemove ItemID) Zone {
+func (_zone Zone) RemoveInteractableItem(itemToRemove ItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 
 	if zone.zone.OperationKind == OperationKindDelete {
@@ -79,18 +77,17 @@ func (_zone Zone) RemoveInteractablesItem(itemToRemove ItemID) Zone {
 		zone.zone.Interactables = cp
 	}
 
-	for i, complexID := range zone.zone.Interactables {
-		if ItemID(complexID.ChildID) != itemToRemove {
+	for i, id := range zone.zone.Interactables {
+		if childID := zone.zone.engine.anyOfItem_Player_ZoneItem(id).anyOfItem_Player_ZoneItem.ChildID; ItemID(childID) != itemToRemove {
 			continue
 		}
 
 		zone.zone.Interactables[i] = zone.zone.Interactables[len(zone.zone.Interactables)-1]
-		zone.zone.Interactables[len(zone.zone.Interactables)-1] = AnyOfItem_Player_ZoneItemID{}
+		zone.zone.Interactables[len(zone.zone.Interactables)-1] = 0
 		zone.zone.Interactables = zone.zone.Interactables[:len(zone.zone.Interactables)-1]
-		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(complexID, true)
+		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(id, true)
 
 		zone.zone.OperationKind = OperationKindUpdate
-		zone.zone.Meta.sign(zone.zone.engine.BroadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -99,7 +96,7 @@ func (_zone Zone) RemoveInteractablesItem(itemToRemove ItemID) Zone {
 	return zone
 }
 
-func (_zone Zone) RemoveInteractablesPlayer(playerToRemove PlayerID) Zone {
+func (_zone Zone) RemoveInteractablePlayer(playerToRemove PlayerID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 
 	if zone.zone.OperationKind == OperationKindDelete {
@@ -112,18 +109,17 @@ func (_zone Zone) RemoveInteractablesPlayer(playerToRemove PlayerID) Zone {
 		zone.zone.Interactables = cp
 	}
 
-	for i, complexID := range zone.zone.Interactables {
-		if PlayerID(complexID.ChildID) != playerToRemove {
+	for i, id := range zone.zone.Interactables {
+		if childID := zone.zone.engine.anyOfItem_Player_ZoneItem(id).anyOfItem_Player_ZoneItem.ChildID; PlayerID(childID) != playerToRemove {
 			continue
 		}
 
 		zone.zone.Interactables[i] = zone.zone.Interactables[len(zone.zone.Interactables)-1]
-		zone.zone.Interactables[len(zone.zone.Interactables)-1] = AnyOfItem_Player_ZoneItemID{}
+		zone.zone.Interactables[len(zone.zone.Interactables)-1] = 0
 		zone.zone.Interactables = zone.zone.Interactables[:len(zone.zone.Interactables)-1]
-		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(complexID, true)
+		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(id, true)
 
 		zone.zone.OperationKind = OperationKindUpdate
-		zone.zone.Meta.sign(zone.zone.engine.BroadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -132,7 +128,7 @@ func (_zone Zone) RemoveInteractablesPlayer(playerToRemove PlayerID) Zone {
 	return zone
 }
 
-func (_zone Zone) RemoveInteractablesZoneItem(zoneItemToRemove ZoneItemID) Zone {
+func (_zone Zone) RemoveInteractableZoneItem(zoneItemToRemove ZoneItemID) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 
 	if zone.zone.OperationKind == OperationKindDelete {
@@ -145,18 +141,17 @@ func (_zone Zone) RemoveInteractablesZoneItem(zoneItemToRemove ZoneItemID) Zone 
 		zone.zone.Interactables = cp
 	}
 
-	for i, complexID := range zone.zone.Interactables {
-		if ZoneItemID(complexID.ChildID) != zoneItemToRemove {
+	for i, id := range zone.zone.Interactables {
+		if childID := zone.zone.engine.anyOfItem_Player_ZoneItem(id).anyOfItem_Player_ZoneItem.ChildID; ZoneItemID(childID) != zoneItemToRemove {
 			continue
 		}
 
 		zone.zone.Interactables[i] = zone.zone.Interactables[len(zone.zone.Interactables)-1]
-		zone.zone.Interactables[len(zone.zone.Interactables)-1] = AnyOfItem_Player_ZoneItemID{}
+		zone.zone.Interactables[len(zone.zone.Interactables)-1] = 0
 		zone.zone.Interactables = zone.zone.Interactables[:len(zone.zone.Interactables)-1]
-		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(complexID, true)
+		zone.zone.engine.deleteAnyOfItem_Player_ZoneItem(id, true)
 
 		zone.zone.OperationKind = OperationKindUpdate
-		zone.zone.Meta.sign(zone.zone.engine.BroadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -189,7 +184,6 @@ func (_player Player) RemoveAction(actionToRemove AttackEventID) Player {
 		player.player.engine.deleteAttackEvent(attackEventID)
 
 		player.player.OperationKind = OperationKindUpdate
-		player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -198,7 +192,7 @@ func (_player Player) RemoveAction(actionToRemove AttackEventID) Player {
 	return player
 }
 
-func (_player Player) RemoveItems(itemToRemove ItemID) Player {
+func (_player Player) RemoveItem(itemToRemove ItemID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 
 	if player.player.OperationKind == OperationKindDelete {
@@ -222,7 +216,6 @@ func (_player Player) RemoveItems(itemToRemove ItemID) Player {
 		player.player.engine.deleteItem(itemID)
 
 		player.player.OperationKind = OperationKindUpdate
-		player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -231,7 +224,7 @@ func (_player Player) RemoveItems(itemToRemove ItemID) Player {
 	return player
 }
 
-func (_player Player) RemoveEquipmentSets(equipmentSetToRemove EquipmentSetID) Player {
+func (_player Player) RemoveEquipmentSet(equipmentSetToRemove EquipmentSetID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 
 	if player.player.OperationKind == OperationKindDelete {
@@ -244,18 +237,17 @@ func (_player Player) RemoveEquipmentSets(equipmentSetToRemove EquipmentSetID) P
 		player.player.EquipmentSets = cp
 	}
 
-	for i, complexID := range player.player.EquipmentSets {
-		if EquipmentSetID(complexID.ChildID) != equipmentSetToRemove {
+	for i, id := range player.player.EquipmentSets {
+		if childID := player.player.engine.playerEquipmentSetRef(id).playerEquipmentSetRef.ChildID; EquipmentSetID(childID) != equipmentSetToRemove {
 			continue
 		}
 
 		player.player.EquipmentSets[i] = player.player.EquipmentSets[len(player.player.EquipmentSets)-1]
-		player.player.EquipmentSets[len(player.player.EquipmentSets)-1] = PlayerEquipmentSetRefID{}
+		player.player.EquipmentSets[len(player.player.EquipmentSets)-1] = 0
 		player.player.EquipmentSets = player.player.EquipmentSets[:len(player.player.EquipmentSets)-1]
-		player.player.engine.deletePlayerEquipmentSetRef(complexID)
+		player.player.engine.deletePlayerEquipmentSetRef(id)
 
 		player.player.OperationKind = OperationKindUpdate
-		player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -264,7 +256,7 @@ func (_player Player) RemoveEquipmentSets(equipmentSetToRemove EquipmentSetID) P
 	return player
 }
 
-func (_player Player) RemoveGuildMembers(guildMemberToRemove PlayerID) Player {
+func (_player Player) RemoveGuildMember(guildMemberToRemove PlayerID) Player {
 	player := _player.player.engine.Player(_player.player.ID)
 
 	if player.player.OperationKind == OperationKindDelete {
@@ -277,18 +269,17 @@ func (_player Player) RemoveGuildMembers(guildMemberToRemove PlayerID) Player {
 		player.player.GuildMembers = cp
 	}
 
-	for i, complexID := range player.player.GuildMembers {
-		if PlayerID(complexID.ChildID) != guildMemberToRemove {
+	for i, id := range player.player.GuildMembers {
+		if childID := player.player.engine.playerGuildMemberRef(id).playerGuildMemberRef.ChildID; PlayerID(childID) != guildMemberToRemove {
 			continue
 		}
 
 		player.player.GuildMembers[i] = player.player.GuildMembers[len(player.player.GuildMembers)-1]
-		player.player.GuildMembers[len(player.player.GuildMembers)-1] = PlayerGuildMemberRefID{}
+		player.player.GuildMembers[len(player.player.GuildMembers)-1] = 0
 		player.player.GuildMembers = player.player.GuildMembers[:len(player.player.GuildMembers)-1]
-		player.player.engine.deletePlayerGuildMemberRef(complexID)
+		player.player.engine.deletePlayerGuildMemberRef(id)
 
 		player.player.OperationKind = OperationKindUpdate
-		player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -310,18 +301,17 @@ func (_player Player) RemoveTargetedByZoneItem(zoneItemToRemove ZoneItemID) Play
 		player.player.TargetedBy = cp
 	}
 
-	for i, complexID := range player.player.TargetedBy {
-		if ZoneItemID(complexID.ChildID) != zoneItemToRemove {
+	for i, id := range player.player.TargetedBy {
+		if childID := player.player.engine.playerTargetedByRef(id).playerTargetedByRef.ChildID; ZoneItemID(childID) != zoneItemToRemove {
 			continue
 		}
 
 		player.player.TargetedBy[i] = player.player.TargetedBy[len(player.player.TargetedBy)-1]
-		player.player.TargetedBy[len(player.player.TargetedBy)-1] = PlayerTargetedByRefID{}
+		player.player.TargetedBy[len(player.player.TargetedBy)-1] = 0
 		player.player.TargetedBy = player.player.TargetedBy[:len(player.player.TargetedBy)-1]
-		player.player.engine.deletePlayerTargetedByRef(complexID)
+		player.player.engine.deletePlayerTargetedByRef(id)
 
 		player.player.OperationKind = OperationKindUpdate
-		player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -343,18 +333,17 @@ func (_player Player) RemoveTargetedByPlayer(playerToRemove PlayerID) Player {
 		player.player.TargetedBy = cp
 	}
 
-	for i, complexID := range player.player.TargetedBy {
-		if PlayerID(complexID.ChildID) != playerToRemove {
+	for i, id := range player.player.TargetedBy {
+		if childID := player.player.engine.playerTargetedByRef(id).playerTargetedByRef.ChildID; PlayerID(childID) != playerToRemove {
 			continue
 		}
 
 		player.player.TargetedBy[i] = player.player.TargetedBy[len(player.player.TargetedBy)-1]
-		player.player.TargetedBy[len(player.player.TargetedBy)-1] = PlayerTargetedByRefID{}
+		player.player.TargetedBy[len(player.player.TargetedBy)-1] = 0
 		player.player.TargetedBy = player.player.TargetedBy[:len(player.player.TargetedBy)-1]
-		player.player.engine.deletePlayerTargetedByRef(complexID)
+		player.player.engine.deletePlayerTargetedByRef(id)
 
 		player.player.OperationKind = OperationKindUpdate
-		player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 		player.player.engine.Patch.Player[player.player.ID] = player.player
 
 		break
@@ -363,7 +352,7 @@ func (_player Player) RemoveTargetedByPlayer(playerToRemove PlayerID) Player {
 	return player
 }
 
-func (_zone Zone) RemoveTags(tagToRemove string) Zone {
+func (_zone Zone) RemoveTag(tagToRemove string) Zone {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 
 	if zone.zone.OperationKind == OperationKindDelete {
@@ -387,7 +376,6 @@ func (_zone Zone) RemoveTags(tagToRemove string) Zone {
 		zone.zone.engine.deleteStringValue(valID)
 
 		zone.zone.OperationKind = OperationKindUpdate
-		zone.zone.Meta.sign(zone.zone.engine.BroadcastingClientID)
 		zone.zone.engine.Patch.Zone[zone.zone.ID] = zone.zone
 
 		break
@@ -409,18 +397,17 @@ func (_equipmentSet EquipmentSet) RemoveEquipment(equipmentToRemove ItemID) Equi
 		equipmentSet.equipmentSet.Equipment = cp
 	}
 
-	for i, complexID := range equipmentSet.equipmentSet.Equipment {
-		if ItemID(complexID.ChildID) != equipmentToRemove {
+	for i, id := range equipmentSet.equipmentSet.Equipment {
+		if childID := equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(id).equipmentSetEquipmentRef.ChildID; ItemID(childID) != equipmentToRemove {
 			continue
 		}
 
 		equipmentSet.equipmentSet.Equipment[i] = equipmentSet.equipmentSet.Equipment[len(equipmentSet.equipmentSet.Equipment)-1]
-		equipmentSet.equipmentSet.Equipment[len(equipmentSet.equipmentSet.Equipment)-1] = EquipmentSetEquipmentRefID{}
+		equipmentSet.equipmentSet.Equipment[len(equipmentSet.equipmentSet.Equipment)-1] = 0
 		equipmentSet.equipmentSet.Equipment = equipmentSet.equipmentSet.Equipment[:len(equipmentSet.equipmentSet.Equipment)-1]
-		equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(complexID)
+		equipmentSet.equipmentSet.engine.deleteEquipmentSetEquipmentRef(id)
 
 		equipmentSet.equipmentSet.OperationKind = OperationKindUpdate
-		equipmentSet.equipmentSet.Meta.sign(equipmentSet.equipmentSet.engine.BroadcastingClientID)
 		equipmentSet.equipmentSet.engine.Patch.EquipmentSet[equipmentSet.equipmentSet.ID] = equipmentSet.equipmentSet
 
 		break

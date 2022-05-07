@@ -10,7 +10,6 @@ func (engine *Engine) setBoolValue(id BoolValueID, val bool) {
 	}
 	boolValue.Value = val
 	boolValue.OperationKind = OperationKindUpdate
-	boolValue.Meta.sign(boolValue.engine.BroadcastingClientID)
 	engine.Patch.BoolValue[id] = boolValue
 }
 
@@ -24,7 +23,6 @@ func (engine *Engine) setFloatValue(id FloatValueID, val float64) {
 	}
 	floatValue.Value = val
 	floatValue.OperationKind = OperationKindUpdate
-	floatValue.Meta.sign(floatValue.engine.BroadcastingClientID)
 	engine.Patch.FloatValue[id] = floatValue
 }
 
@@ -38,7 +36,6 @@ func (engine *Engine) setIntValue(id IntValueID, val int64) {
 	}
 	intValue.Value = val
 	intValue.OperationKind = OperationKindUpdate
-	intValue.Meta.sign(intValue.engine.BroadcastingClientID)
 	engine.Patch.IntValue[id] = intValue
 }
 
@@ -52,7 +49,6 @@ func (engine *Engine) setStringValue(id StringValueID, val string) {
 	}
 	stringValue.Value = val
 	stringValue.OperationKind = OperationKindUpdate
-	stringValue.Meta.sign(stringValue.engine.BroadcastingClientID)
 	engine.Patch.StringValue[id] = stringValue
 }
 
@@ -109,16 +105,15 @@ func (_item Item) SetBoundTo(playerID PlayerID) Item {
 	if item.item.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return item
 	}
-	if PlayerID(item.item.BoundTo.ChildID) == playerID {
-		return item
-	}
-	if item.item.BoundTo != (ItemBoundToRefID{}) {
+	if item.item.BoundTo != 0 {
+		if childID := item.item.engine.itemBoundToRef(item.item.BoundTo).itemBoundToRef.ChildID; PlayerID(childID) == playerID {
+			return item
+		}
 		item.item.engine.deleteItemBoundToRef(item.item.BoundTo)
 	}
-	ref := item.item.engine.createItemBoundToRef(item.item.Path, item_boundToIdentifier, playerID, item.item.ID)
+	ref := item.item.engine.createItemBoundToRef(item.item.Path, item_boundToIdentifier, playerID, item.item.ID, int(playerID))
 	item.item.BoundTo = ref.ID
 	item.item.OperationKind = OperationKindUpdate
-	item.item.Meta.sign(item.item.engine.BroadcastingClientID)
 	item.item.engine.Patch.Item[item.item.ID] = item.item
 	return item
 }
@@ -131,16 +126,15 @@ func (_attackEvent AttackEvent) SetTarget(playerID PlayerID) AttackEvent {
 	if attackEvent.attackEvent.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return attackEvent
 	}
-	if PlayerID(attackEvent.attackEvent.Target.ChildID) == playerID {
-		return attackEvent
-	}
-	if attackEvent.attackEvent.Target != (AttackEventTargetRefID{}) {
+	if attackEvent.attackEvent.Target != 0 {
+		if childID := attackEvent.attackEvent.engine.attackEventTargetRef(attackEvent.attackEvent.Target).attackEventTargetRef.ChildID; PlayerID(childID) == playerID {
+			return attackEvent
+		}
 		attackEvent.attackEvent.engine.deleteAttackEventTargetRef(attackEvent.attackEvent.Target)
 	}
-	ref := attackEvent.attackEvent.engine.createAttackEventTargetRef(attackEvent.attackEvent.Path, attackEvent_targetIdentifier, playerID, attackEvent.attackEvent.ID)
+	ref := attackEvent.attackEvent.engine.createAttackEventTargetRef(attackEvent.attackEvent.Path, attackEvent_targetIdentifier, playerID, attackEvent.attackEvent.ID, int(playerID))
 	attackEvent.attackEvent.Target = ref.ID
 	attackEvent.attackEvent.OperationKind = OperationKindUpdate
-	attackEvent.attackEvent.Meta.sign(attackEvent.attackEvent.engine.BroadcastingClientID)
 	attackEvent.attackEvent.engine.Patch.AttackEvent[attackEvent.attackEvent.ID] = attackEvent.attackEvent
 	return attackEvent
 }
@@ -162,17 +156,16 @@ func (_player Player) SetTargetPlayer(playerID PlayerID) Player {
 	if player.player.engine.Player(playerID).player.OperationKind == OperationKindDelete {
 		return player
 	}
-	if PlayerID(player.player.Target.ChildID) == playerID {
-		return player
-	}
-	if player.player.Target != (PlayerTargetRefID{}) {
+	if player.player.Target != 0 {
+		if childID := player.player.engine.playerTargetRef(player.player.Target).playerTargetRef.ChildID; PlayerID(childID) == playerID {
+			return player
+		}
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(playerID), ElementKindPlayer, player.player.Path, player_targetIdentifier)
 	ref := player.player.engine.createPlayerTargetRef(player.player.Path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindPlayer, int(playerID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
-	player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }
@@ -185,17 +178,16 @@ func (_player Player) SetTargetZoneItem(zoneItemID ZoneItemID) Player {
 	if player.player.engine.ZoneItem(zoneItemID).zoneItem.OperationKind == OperationKindDelete {
 		return player
 	}
-	if ZoneItemID(player.player.Target.ChildID) == zoneItemID {
-		return player
-	}
-	if player.player.Target != (PlayerTargetRefID{}) {
+	if player.player.Target != 0 {
+		if childID := player.player.engine.playerTargetRef(player.player.Target).playerTargetRef.ChildID; ZoneItemID(childID) == zoneItemID {
+			return player
+		}
 		player.player.engine.deletePlayerTargetRef(player.player.Target)
 	}
 	anyContainer := player.player.engine.createAnyOfPlayer_ZoneItem(int(player.player.ID), int(zoneItemID), ElementKindZoneItem, player.player.Path, player_targetIdentifier)
 	ref := player.player.engine.createPlayerTargetRef(player.player.Path, player_targetIdentifier, anyContainer.anyOfPlayer_ZoneItem.ID, player.player.ID, ElementKindZoneItem, int(zoneItemID))
 	player.player.Target = ref.ID
 	player.player.OperationKind = OperationKindUpdate
-	player.player.Meta.sign(player.player.engine.BroadcastingClientID)
 	player.player.engine.Patch.Player[player.player.ID] = player.player
 	return player
 }

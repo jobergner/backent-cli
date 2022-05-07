@@ -37,7 +37,6 @@ func (engine *Engine) deletePlayer(playerID PlayerID) {
 	}
 	if _, ok := engine.State.Player[playerID]; ok {
 		player.OperationKind = OperationKindDelete
-		player.Meta.sign(player.engine.BroadcastingClientID)
 		engine.Patch.Player[player.ID] = player
 	} else {
 		delete(engine.Patch.Player, playerID)
@@ -51,7 +50,6 @@ func (engine *Engine) deleteBoolValue(boolValueID BoolValueID) {
 	}
 	if _, ok := engine.State.BoolValue[boolValueID]; ok {
 		boolValue.OperationKind = OperationKindDelete
-		boolValue.Meta.sign(boolValue.engine.BroadcastingClientID)
 		engine.Patch.BoolValue[boolValue.ID] = boolValue
 	} else {
 		delete(engine.Patch.BoolValue, boolValueID)
@@ -65,7 +63,6 @@ func (engine *Engine) deleteIntValue(intValueID IntValueID) {
 	}
 	if _, ok := engine.State.IntValue[intValueID]; ok {
 		intValue.OperationKind = OperationKindDelete
-		intValue.Meta.sign(intValue.engine.BroadcastingClientID)
 		engine.Patch.IntValue[intValue.ID] = intValue
 	} else {
 		delete(engine.Patch.IntValue, intValueID)
@@ -79,7 +76,6 @@ func (engine *Engine) deleteFloatValue(floatValueID FloatValueID) {
 	}
 	if _, ok := engine.State.FloatValue[floatValueID]; ok {
 		floatValue.OperationKind = OperationKindDelete
-		floatValue.Meta.sign(floatValue.engine.BroadcastingClientID)
 		engine.Patch.FloatValue[floatValue.ID] = floatValue
 	} else {
 		delete(engine.Patch.FloatValue, floatValueID)
@@ -93,7 +89,6 @@ func (engine *Engine) deleteStringValue(stringValueID StringValueID) {
 	}
 	if _, ok := engine.State.StringValue[stringValueID]; ok {
 		stringValue.OperationKind = OperationKindDelete
-		stringValue.Meta.sign(stringValue.engine.BroadcastingClientID)
 		engine.Patch.StringValue[stringValue.ID] = stringValue
 	} else {
 		delete(engine.Patch.StringValue, stringValueID)
@@ -116,7 +111,6 @@ func (engine *Engine) deleteGearScore(gearScoreID GearScoreID) {
 	engine.deleteIntValue(gearScore.Score)
 	if _, ok := engine.State.GearScore[gearScoreID]; ok {
 		gearScore.OperationKind = OperationKindDelete
-		gearScore.Meta.sign(gearScore.engine.BroadcastingClientID)
 		engine.Patch.GearScore[gearScore.ID] = gearScore
 	} else {
 		delete(engine.Patch.GearScore, gearScoreID)
@@ -139,7 +133,6 @@ func (engine *Engine) deletePosition(positionID PositionID) {
 	engine.deleteFloatValue(position.Y)
 	if _, ok := engine.State.Position[positionID]; ok {
 		position.OperationKind = OperationKindDelete
-		position.Meta.sign(position.engine.BroadcastingClientID)
 		engine.Patch.Position[position.ID] = position
 	} else {
 		delete(engine.Patch.Position, positionID)
@@ -161,7 +154,6 @@ func (engine *Engine) deleteAttackEvent(attackEventID AttackEventID) {
 	engine.deleteAttackEventTargetRef(attackEvent.Target)
 	if _, ok := engine.State.AttackEvent[attackEventID]; ok {
 		attackEvent.OperationKind = OperationKindDelete
-		attackEvent.Meta.sign(attackEvent.engine.BroadcastingClientID)
 		engine.Patch.AttackEvent[attackEvent.ID] = attackEvent
 	} else {
 		delete(engine.Patch.AttackEvent, attackEventID)
@@ -187,7 +179,6 @@ func (engine *Engine) deleteItem(itemID ItemID) {
 	engine.deleteAnyOfPlayer_Position(item.Origin, true)
 	if _, ok := engine.State.Item[itemID]; ok {
 		item.OperationKind = OperationKindDelete
-		item.Meta.sign(item.engine.BroadcastingClientID)
 		engine.Patch.Item[item.ID] = item
 	} else {
 		delete(engine.Patch.Item, itemID)
@@ -212,7 +203,6 @@ func (engine *Engine) deleteZoneItem(zoneItemID ZoneItemID) {
 	engine.deletePosition(zoneItem.Position)
 	if _, ok := engine.State.ZoneItem[zoneItemID]; ok {
 		zoneItem.OperationKind = OperationKindDelete
-		zoneItem.Meta.sign(zoneItem.engine.BroadcastingClientID)
 		engine.Patch.ZoneItem[zoneItem.ID] = zoneItem
 	} else {
 		delete(engine.Patch.ZoneItem, zoneItemID)
@@ -241,7 +231,6 @@ func (engine *Engine) deleteZone(zoneID ZoneID) {
 	}
 	if _, ok := engine.State.Zone[zoneID]; ok {
 		zone.OperationKind = OperationKindDelete
-		zone.Meta.sign(zone.engine.BroadcastingClientID)
 		engine.Patch.Zone[zone.ID] = zone
 	} else {
 		delete(engine.Patch.Zone, zoneID)
@@ -263,7 +252,6 @@ func (engine *Engine) deleteEquipmentSet(equipmentSetID EquipmentSetID) {
 	engine.deleteStringValue(equipmentSet.Name)
 	if _, ok := engine.State.EquipmentSet[equipmentSetID]; ok {
 		equipmentSet.OperationKind = OperationKindDelete
-		equipmentSet.Meta.sign(equipmentSet.engine.BroadcastingClientID)
 		engine.Patch.EquipmentSet[equipmentSet.ID] = equipmentSet
 	} else {
 		delete(engine.Patch.EquipmentSet, equipmentSetID)
@@ -277,7 +265,6 @@ func (engine *Engine) deletePlayerGuildMemberRef(playerGuildMemberRefID PlayerGu
 	}
 	if _, ok := engine.State.PlayerGuildMemberRef[playerGuildMemberRefID]; ok {
 		playerGuildMemberRef.OperationKind = OperationKindDelete
-		playerGuildMemberRef.Meta.sign(playerGuildMemberRef.engine.BroadcastingClientID)
 		engine.Patch.PlayerGuildMemberRef[playerGuildMemberRef.ID] = playerGuildMemberRef
 	} else {
 		delete(engine.Patch.PlayerGuildMemberRef, playerGuildMemberRefID)
@@ -291,7 +278,6 @@ func (engine *Engine) deletePlayerEquipmentSetRef(playerEquipmentSetRefID Player
 	}
 	if _, ok := engine.State.PlayerEquipmentSetRef[playerEquipmentSetRefID]; ok {
 		playerEquipmentSetRef.OperationKind = OperationKindDelete
-		playerEquipmentSetRef.Meta.sign(playerEquipmentSetRef.engine.BroadcastingClientID)
 		engine.Patch.PlayerEquipmentSetRef[playerEquipmentSetRef.ID] = playerEquipmentSetRef
 	} else {
 		delete(engine.Patch.PlayerEquipmentSetRef, playerEquipmentSetRefID)
@@ -305,7 +291,6 @@ func (engine *Engine) deleteItemBoundToRef(itemBoundToRefID ItemBoundToRefID) {
 	}
 	if _, ok := engine.State.ItemBoundToRef[itemBoundToRefID]; ok {
 		itemBoundToRef.OperationKind = OperationKindDelete
-		itemBoundToRef.Meta.sign(itemBoundToRef.engine.BroadcastingClientID)
 		engine.Patch.ItemBoundToRef[itemBoundToRef.ID] = itemBoundToRef
 	} else {
 		delete(engine.Patch.ItemBoundToRef, itemBoundToRefID)
@@ -319,7 +304,6 @@ func (engine *Engine) deleteAttackEventTargetRef(attackEventTargetRefID AttackEv
 	}
 	if _, ok := engine.State.AttackEventTargetRef[attackEventTargetRefID]; ok {
 		attackEventTargetRef.OperationKind = OperationKindDelete
-		attackEventTargetRef.Meta.sign(attackEventTargetRef.engine.BroadcastingClientID)
 		engine.Patch.AttackEventTargetRef[attackEventTargetRef.ID] = attackEventTargetRef
 	} else {
 		delete(engine.Patch.AttackEventTargetRef, attackEventTargetRefID)
@@ -333,7 +317,6 @@ func (engine *Engine) deleteEquipmentSetEquipmentRef(equipmentSetEquipmentRefID 
 	}
 	if _, ok := engine.State.EquipmentSetEquipmentRef[equipmentSetEquipmentRefID]; ok {
 		equipmentSetEquipmentRef.OperationKind = OperationKindDelete
-		equipmentSetEquipmentRef.Meta.sign(equipmentSetEquipmentRef.engine.BroadcastingClientID)
 		engine.Patch.EquipmentSetEquipmentRef[equipmentSetEquipmentRef.ID] = equipmentSetEquipmentRef
 	} else {
 		delete(engine.Patch.EquipmentSetEquipmentRef, equipmentSetEquipmentRefID)
@@ -348,7 +331,6 @@ func (engine *Engine) deletePlayerTargetRef(playerTargetRefID PlayerTargetRefID)
 	engine.deleteAnyOfPlayer_ZoneItem(playerTargetRef.ReferencedElementID, false)
 	if _, ok := engine.State.PlayerTargetRef[playerTargetRefID]; ok {
 		playerTargetRef.OperationKind = OperationKindDelete
-		playerTargetRef.Meta.sign(playerTargetRef.engine.BroadcastingClientID)
 		engine.Patch.PlayerTargetRef[playerTargetRef.ID] = playerTargetRef
 	} else {
 		delete(engine.Patch.PlayerTargetRef, playerTargetRefID)
@@ -363,7 +345,6 @@ func (engine *Engine) deletePlayerTargetedByRef(playerTargetedByRefID PlayerTarg
 	engine.deleteAnyOfPlayer_ZoneItem(playerTargetedByRef.ReferencedElementID, false)
 	if _, ok := engine.State.PlayerTargetedByRef[playerTargetedByRefID]; ok {
 		playerTargetedByRef.OperationKind = OperationKindDelete
-		playerTargetedByRef.Meta.sign(playerTargetedByRef.engine.BroadcastingClientID)
 		engine.Patch.PlayerTargetedByRef[playerTargetedByRef.ID] = playerTargetedByRef
 	} else {
 		delete(engine.Patch.PlayerTargetedByRef, playerTargetedByRefID)
@@ -380,7 +361,6 @@ func (engine *Engine) deleteAnyOfPlayer_ZoneItem(anyOfPlayer_ZoneItemID AnyOfPla
 	}
 	if _, ok := engine.State.AnyOfPlayer_ZoneItem[anyOfPlayer_ZoneItemID]; ok {
 		anyOfPlayer_ZoneItem.OperationKind = OperationKindDelete
-		anyOfPlayer_ZoneItem.Meta.sign(anyOfPlayer_ZoneItem.engine.BroadcastingClientID)
 		engine.Patch.AnyOfPlayer_ZoneItem[anyOfPlayer_ZoneItem.ID] = anyOfPlayer_ZoneItem
 	} else {
 		delete(engine.Patch.AnyOfPlayer_ZoneItem, anyOfPlayer_ZoneItemID)
@@ -397,7 +377,6 @@ func (engine *Engine) deleteAnyOfPlayer_Position(anyOfPlayer_PositionID AnyOfPla
 	}
 	if _, ok := engine.State.AnyOfPlayer_Position[anyOfPlayer_PositionID]; ok {
 		anyOfPlayer_Position.OperationKind = OperationKindDelete
-		anyOfPlayer_Position.Meta.sign(anyOfPlayer_Position.engine.BroadcastingClientID)
 		engine.Patch.AnyOfPlayer_Position[anyOfPlayer_Position.ID] = anyOfPlayer_Position
 	} else {
 		delete(engine.Patch.AnyOfPlayer_Position, anyOfPlayer_PositionID)
@@ -414,7 +393,6 @@ func (engine *Engine) deleteAnyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemI
 	}
 	if _, ok := engine.State.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItemID]; ok {
 		anyOfItem_Player_ZoneItem.OperationKind = OperationKindDelete
-		anyOfItem_Player_ZoneItem.Meta.sign(anyOfItem_Player_ZoneItem.engine.BroadcastingClientID)
 		engine.Patch.AnyOfItem_Player_ZoneItem[anyOfItem_Player_ZoneItem.ID] = anyOfItem_Player_ZoneItem
 	} else {
 		delete(engine.Patch.AnyOfItem_Player_ZoneItem, anyOfItem_Player_ZoneItemID)
