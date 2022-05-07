@@ -2,7 +2,7 @@ package state
 
 func (_ref ItemBoundToRef) IsSet() (ItemBoundToRef, bool) {
 	ref := _ref.itemBoundToRef.engine.itemBoundToRef(_ref.itemBoundToRef.ID)
-	return ref, ref.itemBoundToRef.ID != ItemBoundToRefID{}
+	return ref, ref.itemBoundToRef.ID != 0
 }
 
 func (_ref ItemBoundToRef) Unset() {
@@ -15,9 +15,8 @@ func (_ref ItemBoundToRef) Unset() {
 	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	parent.BoundTo = ItemBoundToRefID{}
+	parent.BoundTo = 0
 	parent.OperationKind = OperationKindUpdate
-	parent.Meta.sign(parent.engine.BroadcastingClientID)
 	ref.itemBoundToRef.engine.Patch.Item[parent.ID] = parent
 }
 
@@ -28,7 +27,7 @@ func (_ref ItemBoundToRef) Get() Player {
 
 func (_ref AttackEventTargetRef) IsSet() (AttackEventTargetRef, bool) {
 	ref := _ref.attackEventTargetRef.engine.attackEventTargetRef(_ref.attackEventTargetRef.ID)
-	return ref, ref.attackEventTargetRef.ID != AttackEventTargetRefID{}
+	return ref, ref.attackEventTargetRef.ID != 0
 }
 
 func (_ref AttackEventTargetRef) Unset() {
@@ -41,9 +40,8 @@ func (_ref AttackEventTargetRef) Unset() {
 	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	parent.Target = AttackEventTargetRefID{}
+	parent.Target = 0
 	parent.OperationKind = OperationKindUpdate
-	parent.Meta.sign(parent.engine.BroadcastingClientID)
 	ref.attackEventTargetRef.engine.Patch.AttackEvent[parent.ID] = parent
 }
 
@@ -69,7 +67,7 @@ func (_ref EquipmentSetEquipmentRef) Get() Item {
 
 func (_ref PlayerTargetRef) IsSet() (PlayerTargetRef, bool) {
 	ref := _ref.playerTargetRef.engine.playerTargetRef(_ref.playerTargetRef.ID)
-	return ref, ref.playerTargetRef.ID != PlayerTargetRefID{}
+	return ref, ref.playerTargetRef.ID != 0
 }
 
 func (_ref PlayerTargetRef) Unset() {
@@ -82,9 +80,8 @@ func (_ref PlayerTargetRef) Unset() {
 	if parent.OperationKind == OperationKindDelete {
 		return
 	}
-	parent.Target = PlayerTargetRefID{}
+	parent.Target = 0
 	parent.OperationKind = OperationKindUpdate
-	parent.Meta.sign(parent.engine.BroadcastingClientID)
 	ref.playerTargetRef.engine.Patch.Player[parent.ID] = parent
 }
 
@@ -145,7 +142,7 @@ func (engine *Engine) dereferencePlayerGuildMemberRefs(playerID PlayerID) {
 		ref := engine.playerGuildMemberRef(refID)
 		if ref.playerGuildMemberRef.ReferencedElementID == playerID {
 			parent := engine.Player(ref.playerGuildMemberRef.ParentID)
-			parent.RemoveGuildMembers(playerID)
+			parent.RemoveGuildMember(playerID)
 		}
 	}
 	playerGuildMemberRefIDSlicePool.Put(allPlayerGuildMemberRefIDs)
@@ -157,7 +154,7 @@ func (engine *Engine) dereferencePlayerEquipmentSetRefs(equipmentSetID Equipment
 		ref := engine.playerEquipmentSetRef(refID)
 		if ref.playerEquipmentSetRef.ReferencedElementID == equipmentSetID {
 			parent := engine.Player(ref.playerEquipmentSetRef.ParentID)
-			parent.RemoveEquipmentSets(equipmentSetID)
+			parent.RemoveEquipmentSet(equipmentSetID)
 		}
 	}
 	playerEquipmentSetRefIDSlicePool.Put(allPlayerEquipmentSetRefIDs)

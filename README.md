@@ -986,6 +986,16 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - it is still unclear which methods can be used during broadcasting. We somehow need to limit that.
 - you can call Be<Type> on slices of anyOf types which creates a new anyOf container with new ID. this causes the slice of anyOf IDs to lose track if that anyOfContainer and holds plain wrong information. (interactables)
 
+BIG CHANGE: REMOVE BROADCASTING
+a lot of time and energy went into the broadcasting feature, but I still decided to remove it. The amout of complexity it adds is just not worth it and hard to explain, which made code and documentation harder to reason about.
+additionally the feature was developed with conflict resolution further down the road in mind. However it turns out that resolving confclits would require the server to know which path of conditionals the client took, which the fundamental architecture of the system does not provide.
+these curcumstances make the only benefit of broadcasting a more responsive experience for the user, but there are better client side options to achieve this ([prediction and interpolation](https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking)).
+
+consider broadcasting methods on the controller to be optional, as they can easily be cause for mistakes.
+
+- braodcasting would be a lot more useful if it could handle conflicts. conflicts become a problem when an element remains untouched in one scenario, but gets manipulated in another. Simply defining the unchanged state explicitly won't help because the `BroadcastingClientID` prevents the touched element from being recognized by the client. The server would also need to know which route the client took in a conditional to sent a forced update ONLY when there actually was a conflict. solutions:
+    - can't come up with anything, maybe it should just stay that way
+
 
 - basic types are currently treated differntly from all other types; they are sent regardless of wether they have uptadet or not
     - solution:

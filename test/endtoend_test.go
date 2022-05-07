@@ -58,60 +58,6 @@ func TestEndToEnd(t *testing.T) {
 		time.Sleep(time.Second / fps * 3)
 		kill()
 	})
-	t.Run("Client does not receive update of broadcasted event", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		m := NewMockController(ctrl)
-
-		params := message.MovePlayerParams{
-			ChangeX: 1,
-		}
-
-		m.EXPECT().OnCreation(gomock.Any()).Do(func(lobby *server.Lobby) {
-			lobby.CreateRoom(roomName).AlterState(func(engine *state.Engine) {
-				engine.CreatePosition()
-			})
-		})
-		m.EXPECT().OnClientConnect(gomock.Any(), gomock.Any()).Do(func(client *server.Client, lobby *server.Lobby) {
-			r, _ := lobby.Rooms[roomName]
-			r.AddClient(client)
-		})
-		m.EXPECT().OnFrameTick(gomock.Any()).AnyTimes()
-		m.EXPECT().MovePlayerBroadcast(params, gomock.Any(), "", gomock.Any())
-		m.EXPECT().MovePlayerBroadcast(params, gomock.Any(), roomName, gomock.Any()).Do(
-			func(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string) {
-				p := engine.QueryPositions(func(state.Position) bool { return true })[0]
-				p.SetX(p.X() + params.ChangeX)
-			},
-		)
-		m.EXPECT().MovePlayerEmit(params, gomock.Any(), roomName, gomock.Any())
-
-		kill := startServer(m)
-
-		var i int
-		onUpdateTreeReceived := func(b []byte) {
-			var t state.Tree
-			err := t.UnmarshalJSON(b)
-			if err != nil {
-				panic(err)
-			}
-			i++
-		}
-
-		c, _ := connectClient(m, onUpdateTreeReceived)
-		// we wait until currentState is sent
-		time.Sleep(time.Second / fps * 2)
-		err := c.MovePlayer(params)
-		if err != nil {
-			panic(err)
-		}
-		time.Sleep(time.Second / fps * 2)
-
-		if i != 1 {
-			panic(fmt.Sprintf("did not receive exactly 1 update: %d", i))
-		}
-
-		kill()
-	})
 	t.Run("Room calls actions when triggered by client", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		m := NewMockController(ctrl)
@@ -130,9 +76,7 @@ func TestEndToEnd(t *testing.T) {
 			r.AddClient(client)
 		})
 		m.EXPECT().OnFrameTick(gomock.Any()).AnyTimes()
-		m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), "", gomock.Any())
-		m.EXPECT().AddItemToPlayerBroadcast(params, gomock.Any(), roomName, gomock.Any())
-		m.EXPECT().AddItemToPlayerEmit(params, gomock.Any(), roomName, gomock.Any()).DoAndReturn(
+		m.EXPECT().AddItemToPlayer(params, gomock.Any(), roomName, gomock.Any()).DoAndReturn(
 			func(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse {
 				return expectedResponse
 			},

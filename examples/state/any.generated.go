@@ -65,10 +65,9 @@ func (_any AnyOfPlayer_ZoneItem) BeZoneItem() ZoneItem {
 func (_any anyOfPlayer_ZoneItemCore) beZoneItem(zoneItemID ZoneItemID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	any.engine.deleteAnyOfPlayer_ZoneItem(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfPlayer_ZoneItem(any.ID.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
+	any = any.engine.createAnyOfPlayer_ZoneItem(any.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
 	switch any.FieldIdentifier {
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }
 
@@ -85,10 +84,9 @@ func (_any AnyOfPlayer_ZoneItem) BePlayer() Player {
 func (_any anyOfPlayer_ZoneItemCore) bePlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_ZoneItem(_any.ID).anyOfPlayer_ZoneItem
 	any.engine.deleteAnyOfPlayer_ZoneItem(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfPlayer_ZoneItem(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
+	any = any.engine.createAnyOfPlayer_ZoneItem(any.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_ZoneItem
 	switch any.FieldIdentifier {
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_ZoneItem[any.ID] = any
 }
 
@@ -120,17 +118,15 @@ func (_any AnyOfPlayer_Position) BePosition() Position {
 func (_any anyOfPlayer_PositionCore) bePosition(positionID PositionID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	any.engine.deleteAnyOfPlayer_Position(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfPlayer_Position(any.ID.ParentID, int(positionID), ElementKindPosition, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
+	any = any.engine.createAnyOfPlayer_Position(any.ParentID, int(positionID), ElementKindPosition, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
 	switch any.FieldIdentifier {
 	case item_originIdentifier:
-		item := any.engine.Item(ItemID(any.ID.ParentID)).item
+		item := any.engine.Item(ItemID(any.ParentID)).item
 		item.Origin = any.ID
-		item.Meta.sign(item.engine.BroadcastingClientID)
 		item.engine.Patch.Item[item.ID] = item
 		// we do not set OperationKindUpdate on purpose as it technicaly has not any updated values
 		// however it still has to be put in patch
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }
 
@@ -157,15 +153,13 @@ func (_any AnyOfPlayer_Position) BePlayer() Player {
 func (_any anyOfPlayer_PositionCore) bePlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfPlayer_Position(_any.ID).anyOfPlayer_Position
 	any.engine.deleteAnyOfPlayer_Position(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfPlayer_Position(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
+	any = any.engine.createAnyOfPlayer_Position(any.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfPlayer_Position
 	switch any.FieldIdentifier {
 	case item_originIdentifier:
-		item := any.engine.Item(ItemID(any.ID.ParentID)).item
+		item := any.engine.Item(ItemID(any.ParentID)).item
 		item.Origin = any.ID
-		item.Meta.sign(item.engine.BroadcastingClientID)
 		item.engine.Patch.Item[item.ID] = item
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfPlayer_Position[any.ID] = any
 }
 
@@ -187,10 +181,9 @@ func (_any AnyOfItem_Player_ZoneItem) BeZoneItem() ZoneItem {
 func (_any anyOfItem_Player_ZoneItemCore) beZoneItem(zoneItemID ZoneItemID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
+	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ParentID, int(zoneItemID), ElementKindZoneItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
 	switch any.FieldIdentifier {
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
@@ -207,10 +200,9 @@ func (_any AnyOfItem_Player_ZoneItem) BePlayer() Player {
 func (_any anyOfItem_Player_ZoneItemCore) bePlayer(playerID PlayerID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
+	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ParentID, int(playerID), ElementKindPlayer, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
 	switch any.FieldIdentifier {
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 
@@ -227,10 +219,9 @@ func (_any AnyOfItem_Player_ZoneItem) BeItem() Item {
 func (_any anyOfItem_Player_ZoneItemCore) beItem(itemID ItemID, deleteCurrentChild bool) {
 	any := _any.engine.anyOfItem_Player_ZoneItem(_any.ID).anyOfItem_Player_ZoneItem
 	any.engine.deleteAnyOfItem_Player_ZoneItem(any.ID, deleteCurrentChild)
-	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ID.ParentID, int(itemID), ElementKindItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
+	any = any.engine.createAnyOfItem_Player_ZoneItem(any.ParentID, int(itemID), ElementKindItem, any.ParentElementPath, any.FieldIdentifier).anyOfItem_Player_ZoneItem
 	switch any.FieldIdentifier {
 	}
-	any.Meta.sign(any.engine.BroadcastingClientID)
 	any.engine.Patch.AnyOfItem_Player_ZoneItem[any.ID] = any
 }
 

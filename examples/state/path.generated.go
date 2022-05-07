@@ -128,7 +128,7 @@ type segment struct {
 	ID         int                 `json:"id"` // is 0 when segment is of reference
 	Identifier treeFieldIdentifier `json:"identifier"`
 	Kind       ElementKind         `json:"kind"`
-	RefID      ComplexID           `json:"refID"` // is ComplexID{} if segment is of non-reference
+	RefID      int                 `json:"refID"` // is 0 if segment is of non-reference
 }
 
 type path []segment
@@ -137,7 +137,7 @@ func newPath() path {
 	return make(path, 0)
 }
 
-func (p path) extendAndCopy(fieldIdentifier treeFieldIdentifier, id int, kind ElementKind, refID ComplexID) path {
+func (p path) extendAndCopy(fieldIdentifier treeFieldIdentifier, id int, kind ElementKind, refID int) path {
 	newPath := make(path, len(p), len(p)+1)
 	copy(newPath, p)
 	newPath = append(newPath, segment{id, fieldIdentifier, kind, refID})

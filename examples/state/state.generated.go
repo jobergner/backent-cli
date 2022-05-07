@@ -13,16 +13,16 @@ type PlayerID int
 type PositionID int
 type ZoneID int
 type ZoneItemID int
-type AttackEventTargetRefID ComplexID
-type PlayerGuildMemberRefID ComplexID
-type ItemBoundToRefID ComplexID
-type EquipmentSetEquipmentRefID ComplexID
-type PlayerEquipmentSetRefID ComplexID
-type AnyOfItem_Player_ZoneItemID ComplexID
-type AnyOfPlayer_ZoneItemID ComplexID
-type AnyOfPlayer_PositionID ComplexID
-type PlayerTargetRefID ComplexID
-type PlayerTargetedByRefID ComplexID
+type AttackEventTargetRefID int
+type PlayerGuildMemberRefID int
+type ItemBoundToRefID int
+type EquipmentSetEquipmentRefID int
+type PlayerEquipmentSetRefID int
+type AnyOfItem_Player_ZoneItemID int
+type AnyOfPlayer_ZoneItemID int
+type AnyOfPlayer_PositionID int
+type PlayerTargetRefID int
+type PlayerTargetedByRefID int
 
 type State struct {
 	BoolValue                 map[BoolValueID]boolValue                                     `json:"boolValue"`
@@ -76,45 +76,12 @@ func newState() *State {
 	}
 }
 
-type metaData struct {
-	BroadcastedBy string `json:"broadcastedBy"`
-	TouchedByMany bool   `json:"touchedByMany"`
-}
-
-func (m *metaData) unsign() {
-	m.BroadcastedBy = ""
-	m.TouchedByMany = false
-}
-
-func (m *metaData) sign(clientID string) {
-	if clientID == "" {
-		return
-	}
-
-	if m.TouchedByMany {
-		return
-	}
-
-	if m.BroadcastedBy == "" {
-		m.BroadcastedBy = clientID
-		return
-	}
-
-	if m.BroadcastedBy == clientID {
-		return
-	}
-
-	m.BroadcastedBy = ""
-	m.TouchedByMany = true
-}
-
 type boolValue struct {
 	ID            BoolValueID   `json:"id"`
 	Value         bool          `json:"value"`
 	OperationKind OperationKind `json:"operationKind"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -124,7 +91,6 @@ type intValue struct {
 	OperationKind OperationKind `json:"operationKind"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -134,7 +100,6 @@ type floatValue struct {
 	OperationKind OperationKind `json:"operationKind"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -144,7 +109,6 @@ type stringValue struct {
 	OperationKind OperationKind `json:"operationKind"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -155,7 +119,6 @@ type attackEventCore struct {
 	HasParent     bool                   `json:"hasParent"`
 	JSONPath      string                 `json:"jsonPath"`
 	Path          path                   `json:"path"`
-	Meta          metaData               `json:"meta"`
 	engine        *Engine
 }
 
@@ -171,7 +134,6 @@ type zoneCore struct {
 	HasParent     bool                          `json:"hasParent"`
 	JSONPath      string                        `json:"jsonPath"`
 	Path          path                          `json:"path"`
-	Meta          metaData                      `json:"meta"`
 	engine        *Engine
 }
 
@@ -185,7 +147,6 @@ type zoneItemCore struct {
 	HasParent     bool          `json:"hasParent"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -201,7 +162,6 @@ type itemCore struct {
 	HasParent     bool                   `json:"hasParent"`
 	JSONPath      string                 `json:"jsonPath"`
 	Path          path                   `json:"path"`
-	Meta          metaData               `json:"meta"`
 	engine        *Engine
 }
 
@@ -221,7 +181,6 @@ type playerCore struct {
 	HasParent     bool                      `json:"hasParent"`
 	JSONPath      string                    `json:"jsonPath"`
 	Path          path                      `json:"path"`
-	Meta          metaData                  `json:"meta"`
 	engine        *Engine
 }
 
@@ -235,7 +194,6 @@ type gearScoreCore struct {
 	HasParent     bool          `json:"hasParent"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -249,7 +207,6 @@ type positionCore struct {
 	HasParent     bool          `json:"hasParent"`
 	JSONPath      string        `json:"jsonPath"`
 	Path          path          `json:"path"`
-	Meta          metaData      `json:"meta"`
 	engine        *Engine
 }
 
@@ -263,7 +220,6 @@ type equipmentSetCore struct {
 	HasParent     bool                         `json:"hasParent"`
 	JSONPath      string                       `json:"jsonPath"`
 	Path          path                         `json:"path"`
-	Meta          metaData                     `json:"meta"`
 	engine        *Engine
 }
 
@@ -272,10 +228,10 @@ type EquipmentSet struct{ equipmentSet equipmentSetCore }
 type itemBoundToRefCore struct {
 	ID                  ItemBoundToRefID `json:"id"`
 	ParentID            ItemID           `json:"parentID"`
+	ChildID             int              `json:"childID"`
 	ReferencedElementID PlayerID         `json:"referencedElementID"`
 	OperationKind       OperationKind    `json:"operationKind"`
 	Path                path             `json:"path"`
-	Meta                metaData         `json:"meta"`
 	engine              *Engine
 }
 
@@ -284,10 +240,10 @@ type ItemBoundToRef struct{ itemBoundToRef itemBoundToRefCore }
 type attackEventTargetRefCore struct {
 	ID                  AttackEventTargetRefID `json:"id"`
 	ParentID            AttackEventID          `json:"parentID"`
+	ChildID             int                    `json:"childID"`
 	ReferencedElementID PlayerID               `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
 	Path                path                   `json:"path"`
-	Meta                metaData               `json:"meta"`
 	engine              *Engine
 }
 
@@ -296,10 +252,10 @@ type AttackEventTargetRef struct{ attackEventTargetRef attackEventTargetRefCore 
 type playerGuildMemberRefCore struct {
 	ID                  PlayerGuildMemberRefID `json:"id"`
 	ParentID            PlayerID               `json:"parentID"`
+	ChildID             int                    `json:"childID"`
 	ReferencedElementID PlayerID               `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
 	Path                path                   `json:"path"`
-	Meta                metaData               `json:"meta"`
 	engine              *Engine
 }
 
@@ -308,10 +264,10 @@ type PlayerGuildMemberRef struct{ playerGuildMemberRef playerGuildMemberRefCore 
 type equipmentSetEquipmentRefCore struct {
 	ID                  EquipmentSetEquipmentRefID `json:"id"`
 	ParentID            EquipmentSetID             `json:"parentID"`
+	ChildID             int                        `json:"childID"`
 	ReferencedElementID ItemID                     `json:"referencedElementID"`
 	OperationKind       OperationKind              `json:"operationKind"`
 	Path                path                       `json:"path"`
-	Meta                metaData                   `json:"meta"`
 	engine              *Engine
 }
 
@@ -320,10 +276,10 @@ type EquipmentSetEquipmentRef struct{ equipmentSetEquipmentRef equipmentSetEquip
 type playerEquipmentSetRefCore struct {
 	ID                  PlayerEquipmentSetRefID `json:"id"`
 	ParentID            PlayerID                `json:"parentID"`
+	ChildID             int                     `json:"childID"`
 	ReferencedElementID EquipmentSetID          `json:"referencedElementID"`
 	OperationKind       OperationKind           `json:"operationKind"`
 	Path                path                    `json:"path"`
-	Meta                metaData                `json:"meta"`
 	engine              *Engine
 }
 
@@ -332,11 +288,11 @@ type PlayerEquipmentSetRef struct{ playerEquipmentSetRef playerEquipmentSetRefCo
 type anyOfPlayer_PositionCore struct {
 	ID                AnyOfPlayer_PositionID `json:"id"`
 	ElementKind       ElementKind            `json:"elementKind"`
+	ParentID          int                    `json:"parentID"`
 	ChildID           int                    `json:"childID"`
 	ParentElementPath path                   `json:"parentElementPath"`
 	FieldIdentifier   treeFieldIdentifier    `json:"fieldIdentifier"`
 	OperationKind     OperationKind          `json:"operationKind"`
-	Meta              metaData               `json:"meta"`
 	engine            *Engine
 }
 
@@ -345,11 +301,11 @@ type AnyOfPlayer_Position struct{ anyOfPlayer_Position anyOfPlayer_PositionCore 
 type anyOfPlayer_ZoneItemCore struct {
 	ID                AnyOfPlayer_ZoneItemID `json:"id"`
 	ElementKind       ElementKind            `json:"elementKind"`
+	ParentID          int                    `json:"parentID"`
 	ChildID           int                    `json:"childID"`
 	ParentElementPath path                   `json:"parentElementPath"`
 	FieldIdentifier   treeFieldIdentifier    `json:"fieldIdentifier"`
 	OperationKind     OperationKind          `json:"operationKind"`
-	Meta              metaData               `json:"meta"`
 	engine            *Engine
 }
 
@@ -358,11 +314,11 @@ type AnyOfPlayer_ZoneItem struct{ anyOfPlayer_ZoneItem anyOfPlayer_ZoneItemCore 
 type anyOfItem_Player_ZoneItemCore struct {
 	ID                AnyOfItem_Player_ZoneItemID `json:"id"`
 	ElementKind       ElementKind                 `json:"elementKind"`
+	ParentID          int                         `json:"parentID"`
 	ChildID           int                         `json:"childID"`
 	ParentElementPath path                        `json:"parentElementPath"`
 	FieldIdentifier   treeFieldIdentifier         `json:"fieldIdentifier"`
 	OperationKind     OperationKind               `json:"operationKind"`
-	Meta              metaData                    `json:"meta"`
 	engine            *Engine
 }
 
@@ -371,10 +327,10 @@ type AnyOfItem_Player_ZoneItem struct{ anyOfItem_Player_ZoneItem anyOfItem_Playe
 type playerTargetRefCore struct {
 	ID                  PlayerTargetRefID      `json:"id"`
 	ParentID            PlayerID               `json:"parentID"`
+	ChildID             int                    `json:"childID"`
 	ReferencedElementID AnyOfPlayer_ZoneItemID `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
 	Path                path                   `json:"path"`
-	Meta                metaData               `json:"meta"`
 	engine              *Engine
 }
 
@@ -383,10 +339,10 @@ type PlayerTargetRef struct{ playerTargetRef playerTargetRefCore }
 type playerTargetedByRefCore struct {
 	ID                  PlayerTargetedByRefID  `json:"id"`
 	ParentID            PlayerID               `json:"parentID"`
+	ChildID             int                    `json:"childID"`
 	ReferencedElementID AnyOfPlayer_ZoneItemID `json:"referencedElementID"`
 	OperationKind       OperationKind          `json:"operationKind"`
 	Path                path                   `json:"path"`
-	Meta                metaData               `json:"meta"`
 	engine              *Engine
 }
 

@@ -10,9 +10,6 @@ import (
 )
 
 func (c *Client) AddItemToPlayer(params message.AddItemToPlayerParams) (message.AddItemToPlayerResponse, error) {
-	c.mu.Lock()
-	c.controller.AddItemToPlayerBroadcast(params, c.engine, "", c.id)
-	c.mu.Unlock()
 
 	msgContent, err := params.MarshalJSON()
 	if err != nil {
@@ -61,9 +58,6 @@ func (c *Client) AddItemToPlayer(params message.AddItemToPlayerParams) (message.
 }
 
 func (c *Client) MovePlayer(params message.MovePlayerParams) error {
-	c.mu.Lock()
-	c.controller.MovePlayerBroadcast(params, c.engine, "", c.id)
-	c.mu.Unlock()
 
 	msgContent, err := params.MarshalJSON()
 	if err != nil {
@@ -93,9 +87,6 @@ func (c *Client) MovePlayer(params message.MovePlayerParams) error {
 }
 
 func (c *Client) SpawnZoneItems(params message.SpawnZoneItemsParams) (message.SpawnZoneItemsResponse, error) {
-	c.mu.Lock()
-	c.controller.SpawnZoneItemsBroadcast(params, c.engine, "", c.id)
-	c.mu.Unlock()
 
 	msgContent, err := params.MarshalJSON()
 	if err != nil {

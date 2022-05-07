@@ -19,11 +19,7 @@ func (r *Room) triggerAction(msg Message) Message {
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
 
-		r.state.BroadcastingClientID = msg.client.id
-		r.controller.AddItemToPlayerBroadcast(params, r.state, r.name, msg.client.id)
-		r.state.BroadcastingClientID = ""
-
-		res := r.controller.AddItemToPlayerEmit(params, r.state, r.name, msg.client.id)
+		res := r.controller.AddItemToPlayer(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling response content")
@@ -39,11 +35,7 @@ func (r *Room) triggerAction(msg Message) Message {
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
 
-		r.state.BroadcastingClientID = msg.client.id
-		r.controller.MovePlayerBroadcast(params, r.state, r.name, msg.client.id)
-		r.state.BroadcastingClientID = ""
-
-		r.controller.MovePlayerEmit(params, r.state, r.name, msg.client.id)
+		r.controller.MovePlayer(params, r.state, r.name, msg.client.id)
 		return Message{ID: msg.ID, Kind: message.MessageKindNoResponse}
 	case message.MessageKindAction_spawnZoneItems:
 		var params message.SpawnZoneItemsParams
@@ -53,11 +45,7 @@ func (r *Room) triggerAction(msg Message) Message {
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
 
-		r.state.BroadcastingClientID = msg.client.id
-		r.controller.SpawnZoneItemsBroadcast(params, r.state, r.name, msg.client.id)
-		r.state.BroadcastingClientID = ""
-
-		res := r.controller.SpawnZoneItemsEmit(params, r.state, r.name, msg.client.id)
+		res := r.controller.SpawnZoneItems(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling response content")
