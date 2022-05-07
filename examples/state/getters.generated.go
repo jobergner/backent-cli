@@ -127,6 +127,9 @@ func (_player Player) Target() PlayerTargetRef {
 func (_player Player) TargetedBy() []PlayerTargetedByRef {
 	player := _player.player.engine.Player(_player.player.ID)
 	var targetedBy []PlayerTargetedByRef
+	sort.Slice(player.player.TargetedBy, func(i, j int) bool {
+		return player.player.TargetedBy[i] < player.player.TargetedBy[j]
+	})
 	for _, refID := range player.player.TargetedBy {
 		targetedBy = append(targetedBy, player.player.engine.playerTargetedByRef(refID))
 	}
@@ -145,6 +148,12 @@ func (_player Player) Action() []AttackEvent {
 func (_player Player) Items() []Item {
 	player := _player.player.engine.Player(_player.player.ID)
 	var items []Item
+	// NOTE: we sort before the user receives the items so they always have
+	// the same order (removers disturb order (performance reasons))
+	// since IDs auto increment items will be ordered oldest to youngest
+	sort.Slice(player.player.Items, func(i, j int) bool {
+		return player.player.Items[i] < player.player.Items[j]
+	})
 	for _, itemID := range player.player.Items {
 		items = append(items, player.player.engine.Item(itemID))
 	}
@@ -159,6 +168,9 @@ func (_player Player) GearScore() GearScore {
 func (_player Player) GuildMembers() []PlayerGuildMemberRef {
 	player := _player.player.engine.Player(_player.player.ID)
 	var guildMembers []PlayerGuildMemberRef
+	sort.Slice(player.player.GuildMembers, func(i, j int) bool {
+		return player.player.GuildMembers[i] < player.player.GuildMembers[j]
+	})
 	for _, refID := range player.player.GuildMembers {
 		guildMembers = append(guildMembers, player.player.engine.playerGuildMemberRef(refID))
 	}
@@ -168,6 +180,9 @@ func (_player Player) GuildMembers() []PlayerGuildMemberRef {
 func (_player Player) EquipmentSets() []PlayerEquipmentSetRef {
 	player := _player.player.engine.Player(_player.player.ID)
 	var equipmentSets []PlayerEquipmentSetRef
+	sort.Slice(player.player.EquipmentSets, func(i, j int) bool {
+		return player.player.EquipmentSets[i] < player.player.EquipmentSets[j]
+	})
 	for _, refID := range player.player.EquipmentSets {
 		equipmentSets = append(equipmentSets, player.player.engine.playerEquipmentSetRef(refID))
 	}
@@ -706,6 +721,9 @@ func (_zone Zone) Path() string {
 func (_zone Zone) Players() []Player {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var players []Player
+	sort.Slice(zone.zone.Players, func(i, j int) bool {
+		return zone.zone.Players[i] < zone.zone.Players[j]
+	})
 	for _, playerID := range zone.zone.Players {
 		players = append(players, zone.zone.engine.Player(playerID))
 	}
@@ -715,6 +733,9 @@ func (_zone Zone) Players() []Player {
 func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItemSliceElement {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var interactables []AnyOfItem_Player_ZoneItemSliceElement
+	sort.Slice(zone.zone.Interactables, func(i, j int) bool {
+		return zone.zone.Interactables[i] < zone.zone.Interactables[j]
+	})
 	for _, anyOfItem_Player_ZoneItemID := range zone.zone.Interactables {
 		interactables = append(interactables, zone.zone.engine.anyOfItem_Player_ZoneItem(anyOfItem_Player_ZoneItemID))
 	}
@@ -724,6 +745,9 @@ func (_zone Zone) Interactables() []AnyOfItem_Player_ZoneItemSliceElement {
 func (_zone Zone) Items() []ZoneItem {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var items []ZoneItem
+	sort.Slice(zone.zone.Items, func(i, j int) bool {
+		return zone.zone.Items[i] < zone.zone.Items[j]
+	})
 	for _, zoneItemID := range zone.zone.Items {
 		items = append(items, zone.zone.engine.ZoneItem(zoneItemID))
 	}
@@ -733,6 +757,9 @@ func (_zone Zone) Items() []ZoneItem {
 func (_zone Zone) Tags() []string {
 	zone := _zone.zone.engine.Zone(_zone.zone.ID)
 	var tags []string
+	sort.Slice(zone.zone.Tags, func(i, j int) bool {
+		return zone.zone.Tags[i] < zone.zone.Tags[j]
+	})
 	for _, stringValueID := range zone.zone.Tags {
 		tags = append(tags, zone.zone.engine.stringValue(stringValueID).Value)
 	}
@@ -854,6 +881,9 @@ func (_equipmentSet EquipmentSet) Name() string {
 func (_equipmentSet EquipmentSet) Equipment() []EquipmentSetEquipmentRef {
 	equipmentSet := _equipmentSet.equipmentSet.engine.EquipmentSet(_equipmentSet.equipmentSet.ID)
 	var equipment []EquipmentSetEquipmentRef
+	sort.Slice(equipmentSet.equipmentSet.Equipment, func(i, j int) bool {
+		return equipmentSet.equipmentSet.Equipment[i] < equipmentSet.equipmentSet.Equipment[j]
+	})
 	for _, refID := range equipmentSet.equipmentSet.Equipment {
 		equipment = append(equipment, equipmentSet.equipmentSet.engine.equipmentSetEquipmentRef(refID))
 	}
