@@ -50,5 +50,6 @@ const add_func string = `func add(n1, n2 int) int {
 |package|define package name of output file|`main`|
 |prefix|define prefix for declarations in output file| `""`|
 |exclude|regular expression to match files to exclude| matches nothing|
+|include|regular expression to match files to include| matches everything|
 |only|string to equal the only file to include (eg. "main.go") | is ingored |
 
