@@ -8,17 +8,17 @@ import (
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
-func TestWriteProcessClientMessage(t *testing.T) {
-	t.Run("writes processClientMessage", func(t *testing.T) {
+func TestWriteTriggerAction(t *testing.T) {
+	t.Run("writes triggerAction", func(t *testing.T) {
 		sf := NewFactory(newSimpleASTExample())
-		sf.writeProcessClientMessage()
+		sf.writeTriggerAction()
 
 		buf := new(bytes.Buffer)
 		sf.file.Render(buf)
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			processClientMessage_Room_func,
+			triggerAction_Room_func,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)

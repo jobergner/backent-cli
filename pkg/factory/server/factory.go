@@ -29,7 +29,7 @@ func NewFactory(config *ast.AST) *Factory {
 
 // Write writes source code for a given ActionsConfig
 func (f *Factory) Write() string {
-	f.writeProcessClientMessage().
+	f.writeTriggerAction().
 		writeController()
 
 	buf := bytes.NewBuffer(nil)
