@@ -21,9 +21,10 @@ func check(err error) {
 	}
 }
 
-func scanFiles(directoryPath, excludedIdentifier, onlyIdentifier string) []inputFile {
+func scanFiles(directoryPath, exclude, include, onlyIdentifier string) []inputFile {
 	var files []inputFile
-	excludeExp := regexp.MustCompile(excludedIdentifier)
+	excludeExp := regexp.MustCompile(exclude)
+	includeExp := regexp.MustCompile(include)
 
 	fileInfos, err := ioutil.ReadDir(directoryPath)
 	check(err)
@@ -35,10 +36,13 @@ func scanFiles(directoryPath, excludedIdentifier, onlyIdentifier string) []input
 		if filepath.Ext(fileName) != ".go" {
 			continue
 		}
-		if excludeExp.MatchString(fileName) {
+		if exclude != "" && excludeExp.MatchString(fileName) {
 			continue
 		}
 		if onlyIdentifier != "" && fileName != onlyIdentifier {
+			continue
+		}
+		if include != "" && !includeExp.MatchString(fileName) {
 			continue
 		}
 
@@ -67,11 +71,12 @@ func main() {
 	outputFileName := flag.String("output", "stringified_decls.go", "output file")
 	packageName := flag.String("package", "main", "package name")
 	outputDeclsPrefix := flag.String("prefix", "", "prefix of output declaraton names")
-	excludedIdentifier := flag.String("exclude", "$^", "files to exclude")
+	exclude := flag.String("exclude", "", "files to exclude")
+	include := flag.String("include", "", "files to include")
 	onlyIdentifier := flag.String("only", "", "the only file to include")
 	flag.Parse()
 
-	inputFiles := scanFiles(*inputDirectoryFlag, *excludedIdentifier, *onlyIdentifier)
+	inputFiles := scanFiles(*inputDirectoryFlag, *exclude, *include, *onlyIdentifier)
 	outputFile := newOutputFile(*packageName, *outputDeclsPrefix)
 	for _, inputFile := range inputFiles {
 		for _, decl := range inputFile.decls {
