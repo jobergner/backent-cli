@@ -43,10 +43,6 @@ const sendIdentifyingMessage_Client_func string = `func (c *Client) sendIdentify
 	return nil
 }`
 
-const _SendMessage_Client_func string = `func (c *Client) SendMessage(msg []byte) {
-	c.messageChannel <- msg
-}`
-
 const _ID_Client_func string = `func (c *Client) ID() string {
 	return c.id
 }`
@@ -70,16 +66,14 @@ const runReadMessages_Client_func string = `func (c *Client) runReadMessages() {
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
 			log.Err(err).Str(logging.Message, string(msgBytes)).Msg("failed unmarshalling message")
-			errMsg, _ := Message{message.MessageIDUnknown, message.MessageKindError, []byte("invalid message"), nil}.MarshalJSON()
-			c.messageChannel <- errMsg
 			continue
 		}
 		msg.client = c
 		if msg.Kind == message.MessageKindGlobal {
-			c.lobby.processMessageSync(msg)
+			c.lobby.processMessage(msg)
 		} else {
 			if c.room != nil {
-				c.room.processMessageSync(msg)
+				c.room.processMessage(msg)
 			}
 		}
 	}
@@ -152,12 +146,9 @@ const _Controller_type string = `type Controller interface {
 	OnClientDisconnect(room *Room, clientID string, lobby *Lobby)
 	OnCreation(lobby *Lobby)
 	OnFrameTick(engine *state.Engine)
-	AddItemToPlayerBroadcast(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string)
-	AddItemToPlayerEmit(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
-	MovePlayerBroadcast(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
-	MovePlayerEmit(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
-	SpawnZoneItemsBroadcast(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string)
-	SpawnZoneItemsEmit(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) message.SpawnZoneItemsResponse
+	AddItemToPlayer(params message.AddItemToPlayerParams, engine *state.Engine, roomName, clientID string) message.AddItemToPlayerResponse
+	MovePlayer(params message.MovePlayerParams, engine *state.Engine, roomName, clientID string)
+	SpawnZoneItems(params message.SpawnZoneItemsParams, engine *state.Engine, roomName, clientID string) message.SpawnZoneItemsResponse
 }`
 
 const error_go_import string = `import "errors"`
@@ -192,7 +183,7 @@ const _CreateRoom_Lobby_func string = `func (l *Lobby) CreateRoom(name string) *
 	}
 	room := newRoom(l.controller, name)
 	l.Rooms[name] = room
-	room.Deploy(l.controller, l.fps)
+	room.Deploy(l.fps)
 	return room
 }`
 
@@ -217,7 +208,7 @@ const deleteClient_Lobby_func string = `func (l *Lobby) deleteClient(client *Cli
 	l.signalClientDisconnect(client)
 }`
 
-const processMessageSync_Lobby_func string = `func (l *Lobby) processMessageSync(msg Message) {
+const processMessage_Lobby_func string = `func (l *Lobby) processMessage(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
@@ -256,7 +247,9 @@ const process_message_generated_go_import string = `import (
 	"github.com/rs/zerolog/log"
 )`
 
-const processClientMessage_Room_func string = `func (r *Room) processClientMessage(msg Message) Message {
+const triggerAction_Room_func string = `func (r *Room) triggerAction(msg Message) Message {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	switch msg.Kind {
 	case message.MessageKindAction_addItemToPlayer:
 		var params message.AddItemToPlayerParams
@@ -265,10 +258,7 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Str(logging.MessageContent, string(msg.Content)).Msg("failed unmarshalling params")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
-		r.state.BroadcastingClientID = msg.client.id
-		r.controller.AddItemToPlayerBroadcast(params, r.state, r.name, msg.client.id)
-		r.state.BroadcastingClientID = ""
-		res := r.controller.AddItemToPlayerEmit(params, r.state, r.name, msg.client.id)
+		res := r.controller.AddItemToPlayer(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling response content")
@@ -282,10 +272,7 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Str(logging.MessageContent, string(msg.Content)).Msg("failed unmarshalling params")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
-		r.state.BroadcastingClientID = msg.client.id
-		r.controller.MovePlayerBroadcast(params, r.state, r.name, msg.client.id)
-		r.state.BroadcastingClientID = ""
-		r.controller.MovePlayerEmit(params, r.state, r.name, msg.client.id)
+		r.controller.MovePlayer(params, r.state, r.name, msg.client.id)
 		return Message{ID: msg.ID, Kind: message.MessageKindNoResponse}
 	case message.MessageKindAction_spawnZoneItems:
 		var params message.SpawnZoneItemsParams
@@ -294,10 +281,7 @@ const processClientMessage_Room_func string = `func (r *Room) processClientMessa
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Str(logging.MessageContent, string(msg.Content)).Msg("failed unmarshalling params")
 			return Message{msg.ID, message.MessageKindError, []byte("invalid message"), msg.client}
 		}
-		r.state.BroadcastingClientID = msg.client.id
-		r.controller.SpawnZoneItemsBroadcast(params, r.state, r.name, msg.client.id)
-		r.state.BroadcastingClientID = ""
-		res := r.controller.SpawnZoneItemsEmit(params, r.state, r.name, msg.client.id)
+		res := r.controller.SpawnZoneItems(params, r.state, r.name, msg.client.id)
 		resContent, err := res.MarshalJSON()
 		if err != nil {
 			log.Err(err).Str(logging.MessageKind, string(msg.Kind)).Msg("failed marshalling response content")
@@ -360,19 +344,8 @@ const _AlterState_Room_func string = `func (r *Room) AlterState(fn func(*state.E
 	fn(r.state)
 }`
 
-const _RangeClients_Room_func string = `func (r *Room) RangeClients(fn func(client *Client)) {
-	for c := range r.clients.incomingClients {
-		fn(c)
-	}
-	for c := range r.clients.clients {
-		fn(c)
-	}
-}`
-
-const processMessageSync_Room_func string = `func (r *Room) processMessageSync(msg Message) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	response := r.processClientMessage(msg)
+const processMessage_Room_func string = `func (r *Room) processMessage(msg Message) {
+	response := r.triggerAction(msg)
 	if response.Kind == message.MessageKindNoResponse {
 		return
 	}
@@ -389,19 +362,19 @@ const processMessageSync_Room_func string = `func (r *Room) processMessageSync(m
 	}
 }`
 
-const run_Room_func string = `func (r *Room) run(controller Controller, fps int) {
+const run_Room_func string = `func (r *Room) run(fps int) {
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
 	for {
 		<-ticker.C
-		r.tickSync(controller)
+		r.tick()
 		if r.mode == RoomModeTerminating {
 			break
 		}
 	}
 }`
 
-const _Deploy_Room_func string = `func (r *Room) Deploy(controller Controller, fps int) {
-	go r.run(controller, fps)
+const _Deploy_Room_func string = `func (r *Room) Deploy(fps int) {
+	go r.run(fps)
 }`
 
 const server_go_import string = `import (
@@ -455,7 +428,7 @@ const wsEndpoint_Server_func string = `func (s *Server) wsEndpoint(w http.Respon
 }`
 
 const _Start_Server_func string = `func (s *Server) Start() chan error {
-	log.Info().Msgf("backent running on port %s\n", s.HttpServer.Addr)
+	log.Info().Msgf("server running on port %s\n", s.HttpServer.Addr)
 	serverError := make(chan error)
 	go func() {
 		err := s.HttpServer.ListenAndServe()
@@ -470,10 +443,10 @@ const tick_go_import string = `import (
 	"github.com/rs/zerolog/log"
 )`
 
-const tickSync_Room_func string = `func (r *Room) tickSync(controller Controller) {
+const tick_Room_func string = `func (r *Room) tick() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	controller.OnFrameTick(r.state)
+	r.controller.OnFrameTick(r.state)
 	err := r.publishPatch()
 	if err != nil {
 		return
