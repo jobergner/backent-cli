@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/sergi/go-diff/diffmatchpatch"
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"testing"
+
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 const outputFilePath string = "testdata/actual_output/output.go"
@@ -21,7 +23,7 @@ func TestGenerate(t *testing.T) {
 		"-input", "testdata/input/",
 		"-output", outputFilePath,
 		"-package", "package_name",
-		"-prefix", "golden",
+		"-prefix", "golden_",
 		"-exclude", "fax",
 	).Run()
 
@@ -35,6 +37,8 @@ func TestGenerate(t *testing.T) {
 	}
 
 	dmp := diffmatchpatch.New()
+	fmt.Println("|" + string(actual))
+	fmt.Println("|" + string(expected))
 	diffs := dmp.DiffMain(string(actual), string(expected), false)
 
 	dmp.DiffPrettyText(diffs)
