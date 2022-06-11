@@ -52,9 +52,3 @@ const add_func string = `func add(n1, n2 int) int {
 |exclude|regular expression to match files to exclude| matches nothing|
 |only|string to equal the only file to include (eg. "main.go") | is ingored |
 
-<br/>
-
-## Test of Time
-I left this "tool" as an absolute mess. But I did it on purpose (I swear) to see how much of a pain in the ass it would be to work on when I come back. As expected, it wasn't very pleasant. Since there were no tests I couldn't even think about adding features or fixing bugs. I first had to do a refactoring to make things more readable and easier do grasp while touching as little logic as possible. Then I implemented an end2end test so I could be sure things will not have fallen apart after a next feature is added.
-
-I aimed to get rid of the unwanted deep directory reading that took place ([filepath.Walk](https://golang.org/pkg/path/filepath/#WalkFunc)) and change it to a shallow reading procedure ([ioutil.ReadDir](https://golang.org/pkg/io/ioutil/#ReadDir)). Since I was able to run the tests and see whether everything was still working as before, this change demanded close to no effort.
