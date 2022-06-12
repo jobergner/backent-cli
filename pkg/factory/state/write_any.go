@@ -38,7 +38,7 @@ func (s *Factory) writeAny() *Factory {
 			s.file.Func().Params(asw.receiverParams()).Id("be"+Title(valueType.Name)).Params(asw.params()).Block(
 				asw.reassignAnyContainer(),
 				Id("any").Dot("engine").Dot("delete"+Title(anyNameByField(field))).Call(Id("any").Dot("ID"), Id("deleteCurrentChild")),
-				Id("any").Op("=").Id("any").Dot("engine").Dot("create"+Title(anyNameByField(field))).Call(Id("any").Dot("ID").Dot("ParentID"), Int().Call(Id(asw.v.Name+"ID")), Id("ElementKind"+Title(asw.v.Name)), Id("any").Dot("ParentElementPath"), Id("any").Dot("FieldIdentifier")).Dot(anyNameByField(field)),
+				Id("any").Op("=").Id("any").Dot("engine").Dot("create"+Title(anyNameByField(field))).Call(Id("any").Dot("ParentID"), Int().Call(Id(asw.v.Name+"ID")), Id("ElementKind"+Title(asw.v.Name)), Id("any").Dot("ParentElementPath"), Id("any").Dot("FieldIdentifier")).Dot(anyNameByField(field)),
 				Switch(Id("any").Dot("FieldIdentifier")).Block(
 					ForEachFieldInAST(s.config, func(_field ast.Field) *Statement {
 						if _field.HasSliceValue || _field.HasPointerValue {
@@ -48,14 +48,12 @@ func (s *Factory) writeAny() *Factory {
 							return Empty()
 						}
 						return Case(Id(FieldPathIdentifier(_field))).Block(
-							Id(field.Parent.Name).Op(":=").Id("any").Dot("engine").Dot(Title(field.Parent.Name)).Call(Id(Title(field.Parent.Name)+"ID").Call(Id("any").Dot("ID").Dot("ParentID"))).Dot(field.Parent.Name),
+							Id(field.Parent.Name).Op(":=").Id("any").Dot("engine").Dot(Title(field.Parent.Name)).Call(Id(Title(field.Parent.Name)+"ID").Call(Id("any").Dot("ParentID"))).Dot(field.Parent.Name),
 							Id(field.Parent.Name).Dot(Title(field.Name)).Op("=").Id("any").Dot("ID"),
-							Id(field.Parent.Name).Dot("Meta").Dot("sign").Call(Id(field.Parent.Name).Dot("engine").Dot("BroadcastingClientID")),
 							Id(field.Parent.Name).Dot("engine").Dot("Patch").Dot("Item").Index(Id(field.Parent.Name).Dot("ID")).Op("=").Id(field.Parent.Name),
 						)
 					}),
 				),
-				Id("any").Dot("Meta").Dot("sign").Call(Id("any").Dot("engine").Dot("BroadcastingClientID")),
 				asw.updateContainerInPatch(),
 			)
 		})
@@ -87,21 +85,19 @@ func (s *Factory) writeAnyRefs() *Factory {
 			f: field,
 		}
 
-		s.file.Type().Id(a.typeRefName()).Struct(
-			Id(a.wrapperName()).Id(Title(a.typeName())),
-			Id(a.typeName()).Id(a.typeName()+"Core"),
+		s.file.Type().Id(a.typeRefName()).Interface(
+			Id("Kind").Params().Id("ElementKind").Line(),
+			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
+				return Id(Title(configType.Name)).Params().Id(Title(configType.Name)).Line()
+			}),
 		)
 
-		s.file.Func().Params(a.receiverParams()).Id("Kind").Params().Id("ElementKind").Block(
-			Return(a.elementKind()),
+		s.file.Type().Id(Title(a.typeName())+"SliceElement").Interface(
+			Id("Kind").Params().Id("ElementKind").Line(),
+			ForEachValueOfField(field, func(configType *ast.ConfigType) *Statement {
+				return Id(Title(configType.Name)).Params().Id(Title(configType.Name)).Line()
+			}),
 		)
-
-		field.RangeValueTypes(func(configType *ast.ConfigType) {
-			a.v = configType
-			s.file.Func().Params(a.receiverParams()).Id(Title(configType.Name)).Params().Id(Title(configType.Name)).Block(
-				Return(a.child()),
-			)
-		})
 	})
 
 	return s

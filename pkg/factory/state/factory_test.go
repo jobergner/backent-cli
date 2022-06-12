@@ -1,33 +1,22 @@
 package state
 
 import (
+	"strings"
 	"testing"
 
-	"github.com/jobergner/backent-cli/pkg/ast"
-	"github.com/jobergner/backent-cli/pkg/factory/configs"
-	// "github.com/jobergner/backent-cli/pkg/factory/testutils"
+	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 	// "io/ioutil"
 	// "testing"
 )
 
-func TestEngineFactory(t *testing.T) {
+func TestFactory(t *testing.T) {
 	t.Run("builds successfully", func(t *testing.T) {
+		actual := NewFactory(testutils.NewSimpleASTExample()).Write()
 
-		// f := jen.NewFile("state")
-		// Write(f, configs.StateConfig)
-
-		// buf := new(bytes.Buffer)
-		// f.Render(buf)
-
-		// err := ioutil.WriteFile("tmp/out.go", buf.Bytes(), 0644)
-		// if err != nil {
-		// 	panic(err)
-		// }
-
+		if unmatchedDecls, ok := testutils.FindUnmatchedDecls(actual, decl_to_string_decl_collection); ok {
+			t.Errorf("actual output had missing decls: %s", strings.Join(unmatchedDecls, ", "))
+		} else if redundantDecls, ok := testutils.FindRedundantDecls(actual, decl_to_string_decl_collection); ok {
+			t.Errorf("actual output had redundant delcs: %s", strings.Join(redundantDecls, ", "))
+		}
 	})
-}
-
-func newSimpleASTExample() *ast.AST {
-	simpleAST := ast.Parse(configs.StateConfig, map[interface{}]interface{}{}, map[interface{}]interface{}{})
-	return simpleAST
 }

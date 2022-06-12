@@ -31,6 +31,11 @@ func (s *Factory) writeAdders() *Factory {
 					OnlyIf(field.HasPointerValue, If(a.referencedElementDoesntExist()).Block(
 						Return(),
 					)),
+					If(List(Id("_"), Id("ok")).Op(":=").Add(a.engine().Dot("Patch").Dot(Title(a.t.Name)).Index(a.elementCore().Dot("ID"))), Op("!").Id("ok")).Block(
+						Id("cp").Op(":=").Make(Index().Id(a.valueTypeID()), Len(a.field())),
+						Copy(Id("cp"), a.field()),
+						a.field().Op("=").Id("cp"),
+					),
 					OnlyIf(field.HasPointerValue, a.returnIfReferencedElementIsAlreadyReferenced()),
 					OnlyIf(!field.HasPointerValue, a.createNewElement()),
 					OnlyIf(field.HasAnyValue, &Statement{
@@ -39,7 +44,6 @@ func (s *Factory) writeAdders() *Factory {
 					OnlyIf(field.HasPointerValue, a.createRef()),
 					a.appendElement(),
 					a.setOperationKindUpdate(),
-					a.signElement(),
 					a.updateElementInPatch(),
 					OnlyIf(!valueType.IsBasicType && !field.HasPointerValue, Return(Id(valueType.Name))),
 				)

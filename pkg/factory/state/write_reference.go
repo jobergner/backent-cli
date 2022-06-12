@@ -33,16 +33,15 @@ func (s *Factory) writeReference() *Factory {
 				),
 				r.setRefIDInParent(),
 				r.setParentOperationKind(),
-				r.signParent(),
 				r.updateParentInPatch(),
 			)
 		}
 
 		if field.HasAnyValue {
-			s.file.Func().Params(r.receiverParams()).Id("Get").Params().Id(Lower(r.returnTypeOfGet())+"Ref").Block(
+			s.file.Func().Params(r.receiverParams()).Id("Get").Params().Id(Title(r.returnTypeOfGet())+"Ref").Block(
 				r.reassignRef(),
 				Id("anyContainer").Op(":=").Add(r.getReferencedElement()),
-				Return(r.wrapIntoAnyRefWrapper()),
+				Return(Id("anyContainer")),
 			)
 		} else {
 			s.file.Func().Params(r.receiverParams()).Id("Get").Params().Id(r.returnTypeOfGet()).Block(

@@ -10,7 +10,7 @@ import (
 
 func TestWriteGetters(t *testing.T) {
 	t.Run("writes getters", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeGetters()
 
 		buf := new(bytes.Buffer)

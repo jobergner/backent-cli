@@ -10,7 +10,7 @@ import (
 
 func TestWriteReference(t *testing.T) {
 	t.Run("writes reference", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeReference()
 
 		buf := new(bytes.Buffer)
@@ -39,7 +39,7 @@ func TestWriteReference(t *testing.T) {
 		}
 	})
 	t.Run("writes dereference", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeDereference()
 
 		buf := new(bytes.Buffer)

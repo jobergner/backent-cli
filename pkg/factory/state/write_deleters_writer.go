@@ -72,10 +72,6 @@ func (d deleteTypeWriter) setOperationKind() *Statement {
 	return Id(d.typeName).Dot("OperationKind").Op("=").Id("OperationKindDelete")
 }
 
-func (d deleteTypeWriter) signElement() *Statement {
-	return Id(d.typeName).Dot("Meta").Dot("sign").Call(Id(d.typeName).Dot("engine").Dot("BroadcastingClientID"))
-}
-
 func (d deleteTypeWriter) updateElementInPatch() *Statement {
 	return Id("engine").Dot("Patch").Dot(Title(d.typeName)).Index(Id(d.typeName).Dot("ID")).Op("=").Id(d.typeName)
 }
@@ -173,10 +169,6 @@ func (d deleteGeneratedTypeWriter) deleteAnyContainer() *Statement {
 
 func (d deleteGeneratedTypeWriter) setOperationKind() *Statement {
 	return Id(d.valueTypeName()).Dot("OperationKind").Op("=").Id("OperationKindDelete")
-}
-
-func (d deleteGeneratedTypeWriter) signElement() *Statement {
-	return Id(d.valueTypeName()).Dot("Meta").Dot("sign").Call(Id(d.valueTypeName()).Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (d deleteGeneratedTypeWriter) updateElementInPatch() *Statement {

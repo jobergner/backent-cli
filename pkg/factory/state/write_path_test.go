@@ -10,7 +10,7 @@ import (
 
 func TestWritePath(t *testing.T) {
 	t.Run("writes path identifiers", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeIdentifiers()
 
 		buf := new(bytes.Buffer)
@@ -29,7 +29,7 @@ func TestWritePath(t *testing.T) {
 		}
 	})
 	t.Run("writes path", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writePath()
 
 		buf := new(bytes.Buffer)

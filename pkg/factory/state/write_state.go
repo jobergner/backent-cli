@@ -17,12 +17,12 @@ func (s *Factory) writeIDs() *Factory {
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		s.file.Type().Id(Title(field.ValueTypeName) + "ID").Id("ComplexID")
+		s.file.Type().Id(Title(field.ValueTypeName) + "ID").Int()
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
 
-		s.file.Type().Id(Title(anyNameByField(field)) + "ID").Id("ComplexID")
+		s.file.Type().Id(Title(anyNameByField(field)) + "ID").Int()
 	})
 
 	return s
@@ -133,38 +133,6 @@ func (s *Factory) writeState() *Factory {
 	return s
 }
 
-func (s *Factory) writeMetaData() *Factory {
-	s.file.Type().Id("metaData").Struct(
-		Id("BroadcastedBy").String().Add(Id(metaFieldTag("broadcastedBy"))),
-		Id("TouchedByMany").Bool().Add(Id(metaFieldTag("touchedByMany"))),
-	)
-
-	s.file.Func().Params(Id("m").Id("*metaData")).Id("unsign").Params().Block(
-		Id("m").Dot("BroadcastedBy").Op("=").Lit(""),
-		Id("m").Dot("TouchedByMany").Op("=").False(),
-	)
-
-	s.file.Func().Params(Id("m").Id("*metaData")).Id("sign").Params(Id("clientID").String()).Block(
-		If(Id("clientID").Op("==").Lit("")).Block(
-			Return(),
-		),
-		If(Id("m").Dot("TouchedByMany")).Block(
-			Return(),
-		),
-		If(Id("m").Dot("BroadcastedBy").Op("==").Lit("")).Block(
-			Id("m").Dot("BroadcastedBy").Op("=").Id("clientID"),
-			Return(),
-		),
-		If(Id("m").Dot("BroadcastedBy").Op("==").Id("clientID")).Block(
-			Return(),
-		),
-		Id("m").Dot("BroadcastedBy").Op("=").Lit(""),
-		Id("m").Dot("TouchedByMany").Op("=").True(),
-	)
-
-	return s
-}
-
 func (s *Factory) writeElements() *Factory {
 
 	RangeBasicTypes(func(b BasicType) {
@@ -174,7 +142,6 @@ func (s *Factory) writeElements() *Factory {
 			Id("OperationKind").Id("OperationKind").Id(metaFieldTag("operationKind")).Line(),
 			Id("JSONPath").String().Id(metaFieldTag("jsonPath")),
 			Id("Path").Id("path").Id(metaFieldTag("path")),
-			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 	})
@@ -195,7 +162,6 @@ func (s *Factory) writeElements() *Factory {
 			Id("HasParent").Bool().Id(metaFieldTag("hasParent")).Line(),
 			Id("JSONPath").String().Id(metaFieldTag("jsonPath")),
 			Id("Path").Id("path").Id(metaFieldTag("path")),
-			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 
@@ -212,10 +178,10 @@ func (s *Factory) writeElements() *Factory {
 		s.file.Type().Id(field.ValueTypeName+"Core").Struct(
 			Id("ID").Id(Title(field.ValueTypeName)+"ID").Id(fieldTag("id")).Line(),
 			Id("ParentID").Id(Title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
+			Id("ChildID").Int().Id(fieldTag("childID")).Line(),
 			Id("ReferencedElementID").Id(Title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("Path").Id("path").Id(metaFieldTag("path")),
-			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 		s.file.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
@@ -225,11 +191,11 @@ func (s *Factory) writeElements() *Factory {
 		s.file.Type().Id(anyNameByField(field)+"Core").Struct(
 			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
+			Id("ParentID").Int().Id(fieldTag("parentID")).Line(),
 			Id("ChildID").Int().Id(fieldTag("childID")).Line(),
 			Id("ParentElementPath").Id("path").Id(fieldTag("parentElementPath")).Line(),
 			Id("FieldIdentifier").Id("treeFieldIdentifier").Id(fieldTag("fieldIdentifier")).Line(),
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
-			Id("Meta").Id("metaData").Id(metaFieldTag("meta")),
 			Id("engine").Id("*Engine").Line(),
 		)
 		s.file.Type().Id(Title(anyNameByField(field))).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))

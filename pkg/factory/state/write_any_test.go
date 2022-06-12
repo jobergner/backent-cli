@@ -10,7 +10,7 @@ import (
 
 func TestWriteAny(t *testing.T) {
 	t.Run("writes any", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeAny()
 
 		buf := new(bytes.Buffer)
@@ -46,7 +46,7 @@ func TestWriteAny(t *testing.T) {
 		}
 	})
 	t.Run("writes anyRefs", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeAnyRefs()
 
 		buf := new(bytes.Buffer)
@@ -54,19 +54,12 @@ func TestWriteAny(t *testing.T) {
 
 		actual := testutils.FormatCode(buf.String())
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			anyOfPlayer_PositionRef_type,
-			_Kind_anyOfPlayer_PositionRef_func,
-			_Player_anyOfPlayer_PositionRef_func,
-			_Position_anyOfPlayer_PositionRef_func,
-			anyOfPlayer_ZoneItemRef_type,
-			_Kind_anyOfPlayer_ZoneItemRef_func,
-			_Player_anyOfPlayer_ZoneItemRef_func,
-			_ZoneItem_anyOfPlayer_ZoneItemRef_func,
-			anyOfItem_Player_ZoneItemRef_type,
-			_Kind_anyOfItem_Player_ZoneItemRef_func,
-			_Item_anyOfItem_Player_ZoneItemRef_func,
-			_Player_anyOfItem_Player_ZoneItemRef_func,
-			_ZoneItem_anyOfItem_Player_ZoneItemRef_func,
+			_AnyOfPlayer_PositionRef_type,
+			_AnyOfPlayer_PositionSliceElement_type,
+			_AnyOfPlayer_ZoneItemRef_type,
+			_AnyOfPlayer_ZoneItemSliceElement_type,
+			_AnyOfItem_Player_ZoneItemRef_type,
+			_AnyOfItem_Player_ZoneItemSliceElement_type,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)

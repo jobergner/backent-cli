@@ -11,7 +11,7 @@ func (s *Factory) writeAssemblePlanner() *Factory {
 
 	s.file.Type().Id("assemblePlanner").Struct(
 		Id("updatedPaths").Index().Id("path"),
-		Id("updatedReferencePaths").Map(Id("ComplexID")).Id("path"),
+		Id("updatedReferencePaths").Map(Int()).Id("path"),
 		Id("updatedElementPaths").Map(Int()).Id("path"),
 		Id("includedElements").Map(Int()).Bool(),
 	)
@@ -20,7 +20,7 @@ func (s *Factory) writeAssemblePlanner() *Factory {
 		Return(
 			Id("&assemblePlanner").Values(Dict{
 				Id("updatedPaths"):          Make(Index().Id("path"), Lit(0)),
-				Id("updatedReferencePaths"): Make(Map(Id("ComplexID")).Id("path")),
+				Id("updatedReferencePaths"): Make(Map(Int()).Id("path")),
 				Id("updatedElementPaths"):   Make(Map(Int()).Id("path")),
 				Id("includedElements"):      Make(Map(Int()).Bool()),
 			}),
@@ -67,7 +67,7 @@ func (s *Factory) writeAssemblePlannerPlan() *Factory {
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 			return For(List(Id("_"), Id(field.ValueTypeName)).Op(":=").Range().Id("patch").Dot(Title(field.ValueTypeName))).Block(
-				Id("ap").Dot("updatedReferencePaths").Index(Id("ComplexID").Call(Id(field.ValueTypeName).Dot("ID"))).Op("=").Id(field.ValueTypeName).Dot("Path"),
+				Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(field.ValueTypeName).Dot("ID"))).Op("=").Id(field.ValueTypeName).Dot("Path"),
 			)
 		}),
 		Id("previousLen").Op(":=").Lit(0),
@@ -79,7 +79,7 @@ func (s *Factory) writeAssemblePlannerPlan() *Factory {
 			),
 			For(List(Id("_"), Id("p")).Op(":=").Range().Id("ap").Dot("updatedReferencePaths")).Block(
 				For(List(Id("_"), Id("seg")).Op(":=").Range().Id("p")).Block(
-					If(Id("seg").Dot("RefID").Op("!=").Params(Id("ComplexID").Values())).Block().Else().Block(
+					If(Id("seg").Dot("RefID").Op("!=").Lit(0)).Block().Else().Block(
 						Id("ap").Dot("includedElements").Index(Id("seg").Dot("ID")).Op("=").True(),
 					),
 				),
@@ -131,7 +131,7 @@ func (s *Factory) writeAssemblePlannerFill() *Factory {
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 			return For(List(Id("_"), Id(field.ValueTypeName)).Op(":=").Range().Id("state").Dot(Title(field.ValueTypeName))).Block(
-				Id("ap").Dot("updatedReferencePaths").Index(Id("ComplexID").Call(Id(field.ValueTypeName).Dot("ID"))).Op("=").Id(field.ValueTypeName).Dot("Path"),
+				Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(field.ValueTypeName).Dot("ID"))).Op("=").Id(field.ValueTypeName).Dot("Path"),
 			)
 		}),
 		For(List(Id("_"), Id("p")).Op(":=").Range().Id("ap").Dot("updatedElementPaths")).Block(

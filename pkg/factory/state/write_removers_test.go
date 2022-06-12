@@ -10,7 +10,7 @@ import (
 
 func TestWriteRemovers(t *testing.T) {
 	t.Run("writes removers", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeRemovers()
 
 		buf := new(bytes.Buffer)
@@ -20,17 +20,17 @@ func TestWriteRemovers(t *testing.T) {
 		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
 			_RemoveAction_Player_func,
 			_RemoveEquipment_EquipmentSet_func,
-			_RemoveEquipmentSets_Player_func,
-			_RemoveGuildMembers_Player_func,
-			_RemoveItems_Player_func,
+			_RemoveEquipmentSet_Player_func,
+			_RemoveGuildMember_Player_func,
+			_RemoveItem_Player_func,
 			_RemoveTargetedByPlayer_Player_func,
 			_RemoveTargetedByZoneItem_Player_func,
-			_RemoveInteractablesItem_Zone_func,
-			_RemoveInteractablesPlayer_Zone_func,
-			_RemoveInteractablesZoneItem_Zone_func,
-			_RemoveItems_Zone_func,
-			_RemovePlayers_Zone_func,
-			_RemoveTags_Zone_func,
+			_RemoveInteractableItem_Zone_func,
+			_RemoveInteractablePlayer_Zone_func,
+			_RemoveInteractableZoneItem_Zone_func,
+			_RemoveItem_Zone_func,
+			_RemovePlayer_Zone_func,
+			_RemoveTag_Zone_func,
 		}, "\n"))
 
 		diff, hasDiff := testutils.Diff(actual, expected)

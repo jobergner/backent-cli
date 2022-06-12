@@ -10,7 +10,7 @@ import (
 
 func TestWriteAssembleBranch(t *testing.T) {
 	t.Run("writes assemblers", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeAssembleBranch()
 
 		buf := new(bytes.Buffer)

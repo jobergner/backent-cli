@@ -108,6 +108,9 @@ func (s *Factory) writeGetters() *Factory {
 				f.reassignElement(),
 				// if slice
 				OnlyIf(field.HasSliceValue, f.declareSliceOfElements()),
+				OnlyIf(field.HasSliceValue, Id("sort").Dot("Slice").Call(f.element().Dot(Title(f.f.Name)), Func().Params(Id("i"), Id("j").Int()).Bool().Block(
+					Return(f.element().Dot(Title(f.f.Name)).Index(Id("i")).Op("<").Add(f.element()).Dot(Title(f.f.Name)).Index(Id("j"))),
+				))),
 				OnlyIf(field.HasSliceValue, For(f.loopConditions().Block(
 					f.appendElement(),
 				))),

@@ -139,6 +139,9 @@ func (_player Player) TargetedBy() []PlayerTargetedByRef {
 func (_player Player) Action() []AttackEvent {
 	player := _player.player.engine.Player(_player.player.ID)
 	var action []AttackEvent
+	sort.Slice(player.player.Action, func(i, j int) bool {
+		return player.player.Action[i] < player.player.Action[j]
+	})
 	for _, attackEventID := range player.player.Action {
 		action = append(action, player.player.engine.AttackEvent(attackEventID))
 	}

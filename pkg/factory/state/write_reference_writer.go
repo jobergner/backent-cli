@@ -28,7 +28,7 @@ func (r referenceWriter) isOperationKindDelete() *Statement {
 }
 
 func (r referenceWriter) returnIsSet() *Statement {
-	return Id("ref").Dot(r.f.ValueTypeName).Dot("ID").Op("!=").Id(Title(r.f.ValueTypeName) + "ID").Values()
+	return Id("ref").Dot(r.f.ValueTypeName).Dot("ID").Op("!=").Lit(0)
 }
 
 func (r referenceWriter) deleteSelf() *Statement {
@@ -44,15 +44,11 @@ func (r referenceWriter) parentIsDeleted() *Statement {
 }
 
 func (r referenceWriter) setRefIDInParent() *Statement {
-	return Id("parent").Dot(Title(r.f.Name)).Op("=").Id(Title(r.f.ValueTypeName) + "ID").Values()
+	return Id("parent").Dot(Title(r.f.Name)).Op("=").Lit(0)
 }
 
 func (r referenceWriter) setParentOperationKind() *Statement {
 	return Id("parent").Dot("OperationKind").Op("=").Id("OperationKindUpdate")
-}
-
-func (r referenceWriter) signParent() *Statement {
-	return Id("parent").Dot("Meta").Dot("sign").Call(Id("parent").Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (r referenceWriter) updateParentInPatch() *Statement {
@@ -135,7 +131,7 @@ func (d dereferenceWriter) declareRef() *Statement {
 }
 
 func (d dereferenceWriter) declareAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id("ref").Dot("Get").Call()
+	return Id("anyContainer").Op(":=").Id("ref").Dot(d.f.ValueTypeName).Dot("engine").Dot(anyNameByField(d.f)).Call(Id("ref").Dot(d.f.ValueTypeName).Dot("ReferencedElementID"))
 }
 
 func (d dereferenceWriter) anyContainerContainsElemenKind() *Statement {
@@ -147,7 +143,7 @@ func (d dereferenceWriter) declareParent() *Statement {
 }
 
 func (d dereferenceWriter) removeChildReferenceFromParent() *Statement {
-	return Id("parent").Dot("Remove" + Title(d.f.Name) + d.optionalSuffix()).Call(Id(d.v.Name + "ID"))
+	return Id("parent").Dot("Remove" + Title(Singular(d.f.Name)) + d.optionalSuffix()).Call(Id(d.v.Name + "ID"))
 }
 
 func (d dereferenceWriter) unsetRef() *Statement {

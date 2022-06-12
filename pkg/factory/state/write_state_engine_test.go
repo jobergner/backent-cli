@@ -10,7 +10,7 @@ import (
 
 func TestWriteEngine(t *testing.T) {
 	t.Run("writes operationKind", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeOperationKind()
 
 		buf := new(bytes.Buffer)
@@ -28,7 +28,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes Engine", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeEngine()
 
 		buf := new(bytes.Buffer)
@@ -46,7 +46,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes generateID method", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeGenerateID()
 
 		buf := new(bytes.Buffer)
@@ -63,7 +63,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes updateState method", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeUpdateState()
 
 		buf := new(bytes.Buffer)
@@ -80,7 +80,7 @@ func TestWriteEngine(t *testing.T) {
 		}
 	})
 	t.Run("writes importPatch method", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeImportPatch()
 
 		buf := new(bytes.Buffer)

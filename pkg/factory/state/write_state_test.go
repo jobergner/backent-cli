@@ -10,7 +10,7 @@ import (
 
 func TestWriteState(t *testing.T) {
 	t.Run("writes ids", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeIDs()
 
 		buf := new(bytes.Buffer)
@@ -48,7 +48,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes state", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeState()
 
 		buf := new(bytes.Buffer)
@@ -66,7 +66,7 @@ func TestWriteState(t *testing.T) {
 		}
 	})
 	t.Run("writes isEmpty", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeIsEmpty()
 
 		buf := new(bytes.Buffer)
@@ -82,27 +82,8 @@ func TestWriteState(t *testing.T) {
 			t.Errorf(diff)
 		}
 	})
-	t.Run("writes metaData", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
-		sf.writeMetaData()
-
-		buf := new(bytes.Buffer)
-		sf.file.Render(buf)
-
-		actual := testutils.FormatCode(buf.String())
-		expected := testutils.FormatUnpackagedCode(strings.Join([]string{
-			metaData_type,
-			unsign_metaData_func,
-			sign_metaData_func,
-		}, "\n"))
-
-		diff, hasDiff := testutils.Diff(actual, expected)
-		if hasDiff {
-			t.Errorf(diff)
-		}
-	})
 	t.Run("writes elements", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeElements()
 
 		buf := new(bytes.Buffer)

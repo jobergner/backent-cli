@@ -10,7 +10,7 @@ import (
 
 func TestWriteAssembleTree(t *testing.T) {
 	t.Run("writes assembleTree", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeAssembleTree()
 
 		buf := new(bytes.Buffer)

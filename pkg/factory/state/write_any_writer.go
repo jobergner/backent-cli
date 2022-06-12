@@ -112,7 +112,7 @@ func (a anyRefWriter) wrapperName() string {
 }
 
 func (a anyRefWriter) typeRefName() string {
-	return a.typeName() + "Ref"
+	return Title(a.typeName()) + "Ref"
 }
 
 func (a anyRefWriter) receiverParams() *Statement {

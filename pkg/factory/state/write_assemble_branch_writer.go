@@ -51,11 +51,34 @@ func (a assembleBranchWriter) assembleNextSeg() *Statement {
 func (a assembleBranchWriter) assembleBasicSliceValue() *Statement {
 	return Case(Id(FieldPathIdentifier(*a.f))).Block(
 		If(Id("element").Dot(Title(a.f.Name)).Op("==").Nil()).Block(
-			Id("element").Dot(Title(a.f.Name)).Op("=").Make(Index().Id(a.f.ValueTypeName), Lit(0), Len(Id(a.t.Name+"Data").Dot(Title(a.f.Name)))),
+			If(List(Id("state"+Title(a.t.Name)), Id("ok")).Op(":=").Id("engine").Dot("State").Dot(Title(a.t.Name)).Index(Id("element").Dot("ID")), Id("ok")).Block(
+				Id("element").Dot(Title(a.f.Name)).Op("=").Make(Index().Id(a.f.ValueType().Name), Lit(0), Len(Id("state"+Title(a.t.Name)).Dot(Title(a.f.Name)))),
+				For(List(Id("_"), Id("valID")).Op(":=").Range().Id("state"+Title(a.t.Name)).Dot(Title(a.f.Name))).Block(
+					Id("val").Op(":=").Id("engine").Dot(a.f.ValueType().Name+"Value").Call(Id("valID")),
+					Id("element").Dot(Title(a.f.Name)).Op("=").Append(Id("element").Dot(Title(a.f.Name)), Id("val").Dot("Value")),
+				),
+			).Else().Block(
+				Id("element").Dot(Title(a.f.Name)).Op("=").Make(Index().Id(a.f.ValueType().Name), Lit(0), Len(Id(a.t.Name+"Data").Dot(Title(a.f.Name)))),
+			),
 		),
-		Id("child").Op(":=").Id("engine").Dot(BasicTypes[a.f.ValueTypeName]).Call(Id(Title(BasicTypes[a.f.ValueTypeName])+"ID").Call(Id("nextSeg").Dot("ID"))),
-		Id("element").Dot("OperationKind").Op("=").Id("child").Dot("OperationKind"),
-		Id("element").Dot(Title(a.f.Name)).Op("=").Append(Id("element").Dot(Title(a.f.Name)), Id("child").Dot("Value")),
+		Id("child").Op(":=").Id("engine").Dot(a.f.ValueType().Name+"Value").Call(Id(Title(a.f.ValueType().Name)+"ValueID").Call(Id("nextSeg").Dot("ID"))),
+		Switch(Id("child").Dot("OperationKind")).Block(
+			Case(Id("OperationKindUnchanged")).Block(
+				Break(),
+			),
+			Case(Id("OperationKindDelete")).Block(
+				Var().Id("newValues").Index().Id(a.f.ValueType().Name),
+				For(List(Id("_"), Id("val")).Op(":=").Range().Id("element").Dot(Title(a.f.Name))).Block(
+					If(Id("val").Op("!=").Id("child").Dot("Value")).Block(
+						Id("newValues").Op("=").Append(Id("newValues"), Id("val")),
+					),
+				),
+				Id("element").Dot(Title(a.f.Name)).Op("=").Id("newValues"),
+			),
+			Case(Id("OperationKindUpdate")).Block(
+				Id("element").Dot(Title(a.f.Name)).Op("=").Append(Id("element").Dot(Title(a.f.Name)), Id("child").Dot("Value")),
+			),
+		),
 	)
 }
 
@@ -74,17 +97,17 @@ func (a assembleBranchWriter) assemblePointerNonSliceAnyValue() *Statement {
 			Break(),
 		),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-		If(List(Id("_"), Id("ok")).Op(":=").Id("includedElements").Index(Id("ref").Dot("ReferencedElementID").Dot("ChildID")), Id("ok")).Block(
+		If(List(Id("_"), Id("ok")).Op(":=").Id("includedElements").Index(Id("ref").Dot("ChildID")), Id("ok")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		),
 		Switch(Id("nextSeg").Dot("Kind")).Block(
 			ForEachValueOfField(*a.f, func(valueType *ast.ConfigType) *Statement {
 				a.v = valueType
 				return Case(Id("ElementKind"+Title(a.v.Name))).Block(
-					Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(a.valueTypeID().Call(Id("ref").Dot("ReferencedElementID").Dot("ChildID"))).Dot(a.v.Name),
+					Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(a.valueTypeID().Call(Id("ref").Dot("ChildID"))).Dot(a.v.Name),
 					Id("treeRef").Op(":=").Id("elementReference").Values(
 						Id("OperationKind").Op(":").Id("ref").Dot("OperationKind"),
-						Id("ElementID").Op(":").Id("ref").Dot("ReferencedElementID").Dot("ChildID"),
+						Id("ElementID").Op(":").Id("ref").Dot("ChildID"),
 						Id("ElementKind").Op(":").Id("ElementKind"+Title(a.v.Name)),
 						Id("ReferencedDataStatus").Op(":").Id("referencedDataStatus"),
 						Id("ElementPath").Op(":").Id("referencedElement").Dot("JSONPath"),
@@ -145,21 +168,21 @@ func (a assembleBranchWriter) assemblePointerSliceAnyValue() *Statement {
 		),
 		Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(Title(a.f.ValueTypeName)+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(a.f.ValueTypeName),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
-		If(List(Id("_"), Id("ok")).Op(":=").Id("includedElements").Index(Id("ref").Dot("ReferencedElementID").Dot("ChildID")), Id("ok")).Block(
+		If(List(Id("_"), Id("ok")).Op(":=").Id("includedElements").Index(Id("ref").Dot("ChildID")), Id("ok")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
 		),
 		Switch(Id("nextSeg").Dot("Kind")).Block(
 			ForEachValueOfField(*a.f, func(valueType *ast.ConfigType) *Statement {
 				a.v = valueType
 				return Case(Id("ElementKind"+Title(a.v.Name))).Block(
-					Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(a.valueTypeID().Call(Id("ref").Dot("ReferencedElementID").Dot("ChildID"))).Dot(a.v.Name),
+					Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(a.valueTypeID().Call(Id("ref").Dot("ChildID"))).Dot(a.v.Name),
 					Id("treeRef").Op(":=").Id("elementReference").Values(
 						Id("OperationKind").Op(":").Id("ref").Dot("OperationKind"),
-						Id("ElementID").Op(":").Id("ref").Dot("ReferencedElementID").Dot("ChildID"),
+						Id("ElementID").Op(":").Id("ref").Dot("ChildID"),
 						Id("ElementKind").Op(":").Id("ElementKind"+Title(a.v.Name)),
 						Id("ReferencedDataStatus").Op(":").Id("referencedDataStatus"), Id("ElementPath").Op(":").Id("referencedElement").Dot("JSONPath"),
 					),
-					a.field().Index(Id("ref").Dot("ReferencedElementID").Dot("ChildID")).Op("=").Id("treeRef"),
+					a.field().Index(Id("ref").Dot("ChildID")).Op("=").Id("treeRef"),
 				)
 			}),
 		),

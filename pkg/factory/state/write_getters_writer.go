@@ -182,6 +182,8 @@ func (f fieldGetterWriter) returns() string {
 	switch {
 	case f.f.ValueType().IsBasicType:
 		return f.f.ValueString
+	case f.f.HasSliceValue && f.f.HasAnyValue && !f.f.HasPointerValue:
+		return "[]" + Title(anyNameByField(f.f)) + "SliceElement"
 	case f.f.HasSliceValue:
 		return "[]" + Title(f.returnedType())
 	default:

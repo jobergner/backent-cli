@@ -50,11 +50,9 @@ func (f *Factory) Write() string {
 		writeDereference().
 		writeRemovers().
 		writeSetters().
-		writeComplexID().
 		writeIDs().
 		writeState().
 		writeIsEmpty().
-		writeMetaData().
 		writeElements().
 		writeOperationKind().
 		writeEngine().
