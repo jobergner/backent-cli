@@ -72,6 +72,10 @@ type setRefFieldWeiter struct {
 	v *ast.ConfigType
 }
 
+func (s setRefFieldWeiter) reassignElement() *Statement {
+	return Id(s.f.Parent.Name).Op(":=").Id("_" + s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(Title(s.f.Parent.Name)).Call(Id("_" + s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"))
+}
+
 func (s setRefFieldWeiter) receiverParams() *Statement {
 	return Id("_" + s.f.Parent.Name).Id(Title(s.f.Parent.Name))
 }
@@ -96,10 +100,6 @@ func (s setRefFieldWeiter) returns() string {
 	return Title(s.f.Parent.Name)
 }
 
-func (s setRefFieldWeiter) reassignElement() *Statement {
-	return Id(s.f.Parent.Name).Op(":=").Id("_" + s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(Title(s.f.Parent.Name)).Call(Id("_" + s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"))
-}
-
 func (s setRefFieldWeiter) isOperationKindDelete() *Statement {
 	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
@@ -109,11 +109,11 @@ func (s setRefFieldWeiter) isReferencedElementDeleted() *Statement {
 }
 
 func (s setRefFieldWeiter) isRefAlreadyAssigned() *Statement {
-	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name)).Op("!=").Params(Id(Title(s.f.ValueTypeName) + "ID").Values())
+	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name)).Op("!=").Lit(0)
 }
 
-func (s setRefFieldWeiter) isSameID() *Statement {
-	return Id(Title(s.v.Name) + "ID").Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name)).Dot("ChildID")).Op("==").Add(Id(s.idParam()))
+func (s setRefFieldWeiter) referenceEquals() *Statement {
+	return Id("childID").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(s.f.ValueTypeName).Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name))).Dot(s.f.ValueTypeName).Dot("ChildID")
 }
 
 func (s setRefFieldWeiter) deleteExistingRef() *Statement {
@@ -138,16 +138,25 @@ func (s setRefFieldWeiter) referenceID() *Statement {
 }
 
 func (s setRefFieldWeiter) createNewRefCall() *Statement {
-	return Call(
-		Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("Path"),
-		Id(FieldPathIdentifier(s.f)),
-		(s.referenceID()),
-		Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"),
-		OnlyIf(s.f.HasAnyValue, List(
+	switch {
+	case s.f.HasAnyValue:
+		return Call(
+			Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("Path"),
+			Id(FieldPathIdentifier(s.f)),
+			(s.referenceID()),
+			Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"),
 			Id("ElementKind"+Title(s.v.Name)),
 			Int().Call(Id(s.idParam())),
-		)),
-	)
+		)
+	default:
+		return Call(
+			Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("Path"),
+			Id(FieldPathIdentifier(s.f)),
+			(s.referenceID()),
+			Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("ID"),
+			Int().Call(Id(s.idParam())),
+		)
+	}
 }
 
 func (s setRefFieldWeiter) createNewRef() *Statement {
@@ -160,10 +169,6 @@ func (s setRefFieldWeiter) setNewRef() *Statement {
 
 func (s setRefFieldWeiter) setOperationKind() *Statement {
 	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("OperationKind").Op("=").Id("OperationKindUpdate")
-}
-
-func (s setRefFieldWeiter) signElement() *Statement {
-	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("Meta").Dot("sign").Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("BroadcastingClientID"))
 }
 
 func (s setRefFieldWeiter) setItemInPatch() *Statement {

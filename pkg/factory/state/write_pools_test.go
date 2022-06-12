@@ -10,7 +10,7 @@ import (
 
 func TestWritePools(t *testing.T) {
 	t.Run("writes pools", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writePools()
 
 		buf := new(bytes.Buffer)

@@ -29,16 +29,20 @@ func (s *Factory) writeRemovers() *Factory {
 					If(r.isOperationKindDelete()).Block(
 						Return(Id(configType.Name)),
 					),
+					If(List(Id("_"), Id("ok")).Op(":=").Add(r.engine().Dot("Patch").Dot(Title(r.t.Name)).Index(r.elementCore().Dot("ID"))), Op("!").Id("ok")).Block(
+						Id("cp").Op(":=").Make(Index().Id(r.valueTypeID()), Len(r.field())),
+						Copy(Id("cp"), r.field()),
+						r.field().Op("=").Id("cp"),
+					),
 					For(r.eachElement()).Block(
-						If(r.toRemoveComparator().Op("!=").Id(r.toRemoveParamName())).Block(
+						If(r.idsDontMatch()...).Block(
 							Continue(),
 						),
 						r.field().Index(Id("i")).Op("=").Add(r.field()).Index(Len(r.field()).Lit(-1)),
-						r.field().Index(Len(r.field()).Lit(-1)).Op("=").Add(r.zeroValueID()),
+						r.field().Index(Len(r.field()).Lit(-1)).Op("=").Lit(0),
 						r.field().Op("=").Add(r.field()).Index(Id(""), Len(r.field()).Lit(-1)),
-						OnlyIf(!r.v.IsBasicType, r.deleteElement()),
+						r.deleteElement(),
 						r.elementCore().Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
-						r.elementCore().Dot("Meta").Dot("sign").Call(r.engine().Dot("BroadcastingClientID")),
 						r.engine().Dot("Patch").Dot(Title(r.t.Name)).Index(r.elementCore().Dot("ID")).Op("=").Add(r.elementCore()),
 						Break(),
 					),

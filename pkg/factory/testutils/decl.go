@@ -7,6 +7,9 @@ import (
 	"go/printer"
 	"go/token"
 	"strings"
+
+	_ast "github.com/jobergner/backent-cli/pkg/ast"
+	"github.com/jobergner/backent-cli/pkg/factory/configs"
 )
 
 func evalDeclName(decl ast.Decl) string {
@@ -80,4 +83,76 @@ func stringifyDecl(decl ast.Decl) string {
 	var buf bytes.Buffer
 	printer.Fprint(&buf, token.NewFileSet(), decl)
 	return buf.String()
+}
+
+func isImportDecl(decl ast.Decl) bool {
+	if genDecl, ok := decl.(*ast.GenDecl); ok {
+		if genDecl.Tok == token.IMPORT {
+			return true
+		}
+	}
+	return false
+}
+
+func parseDeclsToString(code string) []string {
+	decls := parseDecls(code)
+
+	var stringifiedDecls []string
+	for _, decl := range decls {
+		stringifiedDecls = append(stringifiedDecls, stringifyDecl(decl))
+	}
+
+	return stringifiedDecls
+}
+
+func FindUnmatchedDecls(code string, collection map[string]string) ([]string, bool) {
+	declMatcher := make(map[string]struct{})
+	for k := range collection {
+		declMatcher[k] = struct{}{}
+	}
+
+	actualDecls := parseDeclsToString(code)
+
+	for declName, expectedDecl := range collection {
+		for _, actualDecl := range actualDecls {
+			if actualDecl != expectedDecl {
+				continue
+			}
+
+			delete(declMatcher, declName)
+		}
+	}
+
+	var unmatchedDecls []string
+	for k := range declMatcher {
+		unmatchedDecls = append(unmatchedDecls, k)
+	}
+
+	return unmatchedDecls, len(declMatcher) > 0
+}
+
+func FindRedundantDecls(code string, collection map[string]string) ([]string, bool) {
+	actualDecls := parseDecls(code)
+
+	declMatcher := make(map[string]struct{})
+	// TODO: this requires evalDeclName of this package to equal declToString's evalDeclName. it's time to merge repos
+	for _, d := range actualDecls {
+		declMatcher[evalDeclName(d)] = struct{}{}
+	}
+
+	for declName := range collection {
+		delete(declMatcher, declName)
+	}
+
+	var redundantDecls []string
+	for k := range declMatcher {
+		redundantDecls = append(redundantDecls, k)
+	}
+
+	return redundantDecls, len(declMatcher) > 0
+}
+
+func NewSimpleASTExample() *_ast.AST {
+	simpleAST := _ast.Parse(configs.StateConfig, map[interface{}]interface{}{}, map[interface{}]interface{}{})
+	return simpleAST
 }

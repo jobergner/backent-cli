@@ -66,6 +66,19 @@ func (a adderWriter) engine() *Statement {
 	return a.elementCore().Dot("engine")
 }
 
+func (a adderWriter) valueTypeID() string {
+	switch {
+	case a.f.ValueType().IsBasicType:
+		return Title(a.f.ValueType().Name) + "ValueID"
+	default:
+		return Title(a.f.ValueTypeName) + "ID"
+	}
+}
+
+func (a adderWriter) field() *Statement {
+	return a.elementCore().Dot(Title(a.f.Name))
+}
+
 func (a adderWriter) referencedElementDoesntExist() *Statement {
 	return a.engine().Dot(Title(a.v.Name)).Call(Id(a.idParam())).Dot(a.v.Name).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
@@ -80,7 +93,7 @@ func (a adderWriter) returnIfReferencedElementIsAlreadyReferencedReturnCondition
 }
 
 func (a adderWriter) returnIfReferencedElementIsAlreadyReferenced() *Statement {
-	return For(List(Id("_"), Id("currentRefID")).Op(":=").Range().Add(a.elementCore()).Dot(Title(a.f.Name))).Block(
+	return For(List(Id("_"), Id("currentRefID")).Op(":=").Range().Add(a.field())).Block(
 		Id("currentRef").Op(":=").Add(a.engine()).Dot(a.f.ValueTypeName).Call(Id("currentRefID")),
 		OnlyIf(a.f.HasAnyValue, Id("anyContainer").Op(":=").Add(a.engine()).Dot(anyNameByField(a.f)).Call(Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID"))),
 		If(a.returnIfReferencedElementIsAlreadyReferencedReturnCondition()).Block(
@@ -149,7 +162,7 @@ func (a adderWriter) createRefCallParams() *Statement {
 	case a.f.HasAnyValue:
 		return Call(a.elementCore().Dot("Path"), Id(FieldPathIdentifier(a.f)), Id("anyContainer").Dot("ID"), a.elementCore().Dot("ID"), Id("ElementKind"+Title(a.v.Name)), Int().Call(Id(a.idParam())))
 	default:
-		return Call(a.elementCore().Dot("Path"), Id(FieldPathIdentifier(a.f)), Id(a.idParam()), Add(a.elementCore()).Dot("ID"))
+		return Call(a.elementCore().Dot("Path"), Id(FieldPathIdentifier(a.f)), Id(a.idParam()), Add(a.elementCore()).Dot("ID"), Int().Call(Id(a.idParam())))
 	}
 }
 
@@ -182,10 +195,6 @@ func (a adderWriter) appendElement() *Statement {
 
 func (a adderWriter) setOperationKindUpdate() *Statement {
 	return Add(a.elementCore()).Dot("OperationKind").Op("=").Id("OperationKindUpdate")
-}
-
-func (a adderWriter) signElement() *Statement {
-	return a.elementCore().Dot("Meta").Dot("sign").Call(a.engine().Dot("BroadcastingClientID"))
 }
 
 func (a adderWriter) updateElementInPatch() *Statement {

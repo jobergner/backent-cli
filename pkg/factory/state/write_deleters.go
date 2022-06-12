@@ -22,7 +22,6 @@ func (s *Factory) writeDeleters() *Factory {
 			),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
-				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),
@@ -68,7 +67,6 @@ func (s *Factory) writeDeleters() *Factory {
 			}),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
-				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),
@@ -90,7 +88,6 @@ func (s *Factory) writeDeleters() *Factory {
 			OnlyIf(d.f.HasAnyValue, d.deleteAnyContainer()),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
-				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),
@@ -114,7 +111,6 @@ func (s *Factory) writeDeleters() *Factory {
 			),
 			If(d.existsInState()).Block(
 				d.setOperationKind(),
-				d.signElement(),
 				d.updateElementInPatch(),
 			).Else().Block(
 				d.deleteFromPatch(),

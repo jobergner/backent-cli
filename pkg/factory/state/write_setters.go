@@ -20,7 +20,6 @@ func (s *Factory) writeSetters() *Factory {
 			),
 			Id(b.Value).Dot("Value").Op("=").Id("val"),
 			Id(b.Value).Dot("OperationKind").Op("=").Id("OperationKindUpdate"),
-			Id(b.Value).Dot("Meta").Dot("sign").Call(Id(b.Value).Dot("engine").Dot("BroadcastingClientID")),
 			Id("engine").Dot("Patch").Dot(Title(b.Value)).Index(Id("id")).Op("=").Id(b.Value),
 		)
 	})
@@ -67,17 +66,16 @@ func (s *Factory) writeSetters() *Factory {
 				If(srfw.isReferencedElementDeleted()).Block(
 					Return(Id(field.Parent.Name)),
 				),
-				If(srfw.isSameID()).Block(
-					Return(Id(field.Parent.Name)),
-				),
 				If(srfw.isRefAlreadyAssigned()).Block(
+					If(srfw.referenceEquals(), Id(Title(valueType.Name)+"ID").Call(Id("childID")).Op("==").Id(srfw.idParam())).Block(
+						Return(Id(field.Parent.Name)),
+					),
 					srfw.deleteExistingRef(),
 				),
 				OnlyIf(field.HasAnyValue, srfw.createAnyContainer()),
 				srfw.createNewRef(),
 				srfw.setNewRef(),
 				srfw.setOperationKind(),
-				srfw.signElement(),
 				srfw.setItemInPatch(),
 				Return(Id(field.Parent.Name)),
 			)

@@ -26,7 +26,7 @@ func (r remover) name() string {
 	if r.f.HasAnyValue {
 		optionalSuffix = Title(r.v.Name)
 	}
-	return "Remove" + Title(r.f.Name) + optionalSuffix
+	return "Remove" + Title(Singular(r.f.Name)) + optionalSuffix
 }
 
 func (r remover) toRemoveParamName() string {
@@ -71,26 +71,6 @@ func (r remover) field() *Statement {
 	return r.elementCore().Dot(Title(r.f.Name))
 }
 
-func (r remover) zeroValueID() *Statement {
-	switch {
-	case r.f.HasAnyValue || r.f.HasPointerValue:
-		return Id(Title(r.f.ValueTypeName) + "ID").Values()
-	default:
-		return Lit(0)
-	}
-}
-
-func (r remover) toRemoveComparator() *Statement {
-	switch {
-	case r.v.IsBasicType:
-		return r.engine().Dot(BasicTypes[r.v.Name]).Call(Id("valID")).Dot("Value")
-	case r.f.HasAnyValue || r.f.HasPointerValue:
-		return Id(Title(r.v.Name) + "ID").Call(Id("complexID").Dot("ChildID"))
-	default:
-		return Id(r.v.Name + "ID")
-	}
-}
-
 func (r remover) eachElementLiteral() *Statement {
 	switch {
 	case r.v.IsBasicType:
@@ -98,7 +78,7 @@ func (r remover) eachElementLiteral() *Statement {
 	case !r.f.HasAnyValue && !r.f.HasPointerValue:
 		return Id(r.v.Name + "ID")
 	default:
-		return Id("complexID")
+		return Id("id")
 	}
 }
 
@@ -106,11 +86,33 @@ func (r remover) eachElement() *Statement {
 	return List(Id("i"), r.eachElementLiteral()).Op(":=").Range().Add(r.field())
 }
 
+func (r remover) valueTypeID() string {
+	switch {
+	case r.f.ValueType().IsBasicType:
+		return Title(r.f.ValueType().Name) + "ValueID"
+	default:
+		return Title(r.f.ValueTypeName) + "ID"
+	}
+}
+
 func (r remover) deleteElement() *Statement {
 	switch {
 	case r.f.HasAnyValue && !r.f.HasPointerValue:
 		return r.engine().Dot("delete"+Title(r.f.ValueTypeName)).Call(r.eachElementLiteral(), True())
+	case r.f.ValueType().IsBasicType:
+		return r.engine().Dot("delete" + Title(r.f.ValueType().Name) + "Value").Call(r.eachElementLiteral())
 	default:
 		return r.engine().Dot("delete" + Title(r.f.ValueTypeName)).Call(r.eachElementLiteral())
+	}
+}
+
+func (r remover) idsDontMatch() []Code {
+	switch {
+	case r.f.HasPointerValue || r.f.HasAnyValue:
+		return []Code{Id("childID").Op(":=").Add(r.engine().Dot(r.f.ValueTypeName).Call(Id("id"))).Dot(r.f.ValueTypeName).Dot("ChildID"), Id(Title(r.v.Name) + "ID").Call(Id("childID")).Op("!=").Id(r.toRemoveParamName())}
+	case r.v.IsBasicType:
+		return []Code{r.engine().Dot(r.v.Name + "Value").Call(r.eachElementLiteral()).Dot("Value").Op("!=").Id(r.toRemoveParamName())}
+	default:
+		return []Code{r.eachElementLiteral().Add(Op("!=").Id(r.toRemoveParamName()))}
 	}
 }

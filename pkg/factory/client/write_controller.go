@@ -12,8 +12,7 @@ func (s *Factory) writeController() *Factory {
 	s.file.Type().Id("Controller").Interface(
 		ForEachActionInAST(s.config, func(action ast.Action) *Statement {
 			return &Statement{
-				Id(Title(action.Name) + "Broadcast").Add(actionParams(action)).Line(),
-				Id(Title(action.Name) + "Emit").Add(actionParams(action)).Add(OnlyIf(action.Response != nil, Id("message").Dot(Title(action.Name)+"Response"))).Line(),
+				Id(Title(action.Name)).Add(actionParams(action)).Add(OnlyIf(action.Response != nil, Id("message").Dot(Title(action.Name)+"Response"))).Line(),
 			}
 		}),
 	)

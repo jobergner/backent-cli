@@ -10,7 +10,7 @@ import (
 
 func TestWriteTree(t *testing.T) {
 	t.Run("writes ReferencedDataStatus", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeReferencedDataStatus()
 
 		buf := new(bytes.Buffer)
@@ -28,7 +28,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes elementKinds", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeElementKinds()
 
 		buf := new(bytes.Buffer)
@@ -46,7 +46,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes tree elements", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeTreeElements()
 
 		buf := new(bytes.Buffer)
@@ -71,7 +71,7 @@ func TestWriteTree(t *testing.T) {
 		}
 	})
 	t.Run("writes tree", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeTree()
 
 		buf := new(bytes.Buffer)

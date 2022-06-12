@@ -64,7 +64,7 @@ func (s *Factory) writePath() *Factory {
 		Id("ID").Int().Add(Id(metaFieldTag("id"))),
 		Id("Identifier").Id("treeFieldIdentifier").Add(Id(metaFieldTag("identifier"))),
 		Id("Kind").Id("ElementKind").Add(Id(metaFieldTag("kind"))),
-		Id("RefID").Id("ComplexID").Add(Id(metaFieldTag("refID"))),
+		Id("RefID").Int().Add(Id(metaFieldTag("refID"))),
 	)
 
 	s.file.Type().Id("path").Index().Id("segment")
@@ -73,7 +73,7 @@ func (s *Factory) writePath() *Factory {
 		Return(Make(Id("path"), Lit(0))),
 	)
 
-	s.file.Func().Params(Id("p").Id("path")).Id("extendAndCopy").Params(Id("fieldIdentifier").Id("treeFieldIdentifier"), Id("id").Int(), Id("kind").Id("ElementKind"), Id("refID").Id("ComplexID")).Id("path").Block(
+	s.file.Func().Params(Id("p").Id("path")).Id("extendAndCopy").Params(Id("fieldIdentifier").Id("treeFieldIdentifier"), Id("id").Int(), Id("kind").Id("ElementKind"), Id("refID").Int()).Id("path").Block(
 		Id("newPath").Op(":=").Make(Id("path"), Len(Id("p")), Len(Id("p")).Op("+").Lit(1)),
 		Copy(Id("newPath"), Id("p")),
 		Id("newPath").Op("=").Append(Id("newPath"), Id("segment").Values(Id("id"), Id("fieldIdentifier"), Id("kind"), Id("refID"))),

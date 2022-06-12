@@ -10,7 +10,7 @@ import (
 
 func TestWriteDeleters(t *testing.T) {
 	t.Run("writes deleters", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeDeleters()
 
 		buf := new(bytes.Buffer)

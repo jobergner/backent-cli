@@ -58,10 +58,6 @@ func (s *Factory) writeGenerateID() *Factory {
 
 func writeImportPatchElement(typeName string) *Statement {
 	return For(List(Id("_"), Id(typeName)).Op(":=").Range().Id("patch").Dot(Title(typeName))).Block(
-		If(Id(typeName).Dot("Meta").Dot("BroadcastedBy").Op("==").Id("engine").Dot("ThisClientID")).Block(
-			Continue(),
-		),
-		Id(typeName).Dot("Meta").Dot("unsign").Call(),
 		Id("engine").Dot("Patch").Dot(Title(typeName)).Index(Id(typeName).Dot("ID")).Op("=").Id(typeName),
 	)
 }
@@ -161,7 +157,6 @@ func writeUpdateElement(u updateStateWriter) *Statement {
 		).Else().Block(
 			OnlyIf(u.t != nil, u.emptyEvents()),
 			u.setOperationKindUnchanged(),
-			u.unsignElement(),
 			u.updateElement(),
 		),
 	)

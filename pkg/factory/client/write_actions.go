@@ -11,9 +11,6 @@ func (s *Factory) writeActions() *Factory {
 
 	s.config.RangeActions(func(action ast.Action) {
 		s.file.Func().Params(Id("c").Id("*Client")).Id(Title(action.Name)).Params(Id("params").Id("message").Dot(Title(action.Name)+"Params")).Add(returnParams(action)).Block(
-			Id("c").Dot("mu").Dot("Lock").Call(),
-			Id("c").Dot("controller").Dot(Title(action.Name)+"Broadcast").Call(Id("params"), Id("c").Dot("engine"), Lit(""), Id("c").Dot("id")),
-			Id("c").Dot("mu").Dot("Unlock").Call(),
 			List(Id("msgContent"), Id("err")).Op(":=").Id("params").Dot("MarshalJSON").Call(),
 			If(Id("err").Op("!=").Nil()).Block(
 				logWithMessageKind(action).Dot("Msg").Call(Lit("failed marshalling parameters")),
