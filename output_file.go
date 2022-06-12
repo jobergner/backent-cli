@@ -40,6 +40,10 @@ func (o *outputFile) addDecl(decl ast.Decl, containingFileName string) {
 
 	o.file.Const().Id(outputDeclName).String().Op("=").Id("`" + outputDeclValue + "`")
 
+	if isImportDecl(decl) { // we currently don't care about import decls
+		return
+	}
+
 	o.writtenDeclNames = append(o.writtenDeclNames, outputDeclName)
 }
 
