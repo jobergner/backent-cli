@@ -28,7 +28,7 @@ func (s setterWriter) newValueParam() string {
 }
 
 func (s setterWriter) params() *Statement {
-	return Id(s.newValueParam()).Id(s.f.ValueTypeName)
+	return Id(s.newValueParam()).Id(ValueTypeName(&s.f))
 }
 
 func (s setterWriter) returns() string {
@@ -44,7 +44,7 @@ func (s setterWriter) isOperationKindDelete() *Statement {
 }
 
 func (s setterWriter) setAttribute() *Statement {
-	return Id(s.t.Name).Dot(s.t.Name).Dot("engine").Dot("set"+Title(BasicTypes[s.f.ValueTypeName])).Call(Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)), Id(s.newValueParam()))
+	return Id(s.t.Name).Dot(s.t.Name).Dot("engine").Dot("set"+Title(BasicTypes[ValueTypeName(&s.f)])).Call(Id(s.t.Name).Dot(s.t.Name).Dot(Title(s.f.Name)), Id(s.newValueParam()))
 }
 
 func (s setterWriter) setOperationKind() *Statement {
@@ -113,11 +113,11 @@ func (s setRefFieldWeiter) isRefAlreadyAssigned() *Statement {
 }
 
 func (s setRefFieldWeiter) referenceEquals() *Statement {
-	return Id("childID").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(s.f.ValueTypeName).Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name))).Dot(s.f.ValueTypeName).Dot("ChildID")
+	return Id("childID").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot(ValueTypeName(&s.f)).Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name))).Dot(ValueTypeName(&s.f)).Dot("ChildID")
 }
 
 func (s setRefFieldWeiter) deleteExistingRef() *Statement {
-	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("delete" + Title(s.f.ValueTypeName)).Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name)))
+	return Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("delete" + Title(ValueTypeName(&s.f))).Call(Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot(Title(s.f.Name)))
 }
 
 func (s setRefFieldWeiter) createAnyContainerCall() *Statement {
@@ -125,13 +125,13 @@ func (s setRefFieldWeiter) createAnyContainerCall() *Statement {
 }
 
 func (s setRefFieldWeiter) createAnyContainer() *Statement {
-	return Id("anyContainer").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create" + Title(anyNameByField(s.f))).Add(s.createAnyContainerCall())
+	return Id("anyContainer").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create" + Title(AnyValueTypeName(&s.f))).Add(s.createAnyContainerCall())
 }
 
 func (s setRefFieldWeiter) referenceID() *Statement {
 	switch {
 	case s.f.HasAnyValue:
-		return Id("anyContainer").Dot(anyNameByField(s.f)).Dot("ID")
+		return Id("anyContainer").Dot(AnyValueTypeName(&s.f)).Dot("ID")
 	default:
 		return Id(s.v.Name + "ID")
 	}
@@ -160,7 +160,7 @@ func (s setRefFieldWeiter) createNewRefCall() *Statement {
 }
 
 func (s setRefFieldWeiter) createNewRef() *Statement {
-	return Id("ref").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create" + Title(s.f.ValueTypeName)).Add(s.createNewRefCall())
+	return Id("ref").Op(":=").Id(s.f.Parent.Name).Dot(s.f.Parent.Name).Dot("engine").Dot("create" + Title(ValueTypeName(&s.f))).Add(s.createNewRefCall())
 }
 
 func (s setRefFieldWeiter) setNewRef() *Statement {

@@ -71,10 +71,10 @@ func (s *Factory) writeImportPatch() *Factory {
 			return writeImportPatchElement(configType.Name)
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
-			return writeImportPatchElement(field.ValueTypeName)
+			return writeImportPatchElement(ValueTypeName(&field))
 		}),
 		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
-			return writeImportPatchElement(anyNameByField(field))
+			return writeImportPatchElement(AnyValueTypeName(&field))
 		}),
 	)
 
@@ -111,13 +111,13 @@ func (s *Factory) writeUpdateState() *Factory {
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 			u.typeName = func() string {
-				return field.ValueTypeName
+				return ValueTypeName(&field)
 			}
 			return writeUpdateElement(u)
 		}),
 		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
 			u.typeName = func() string {
-				return anyNameByField(field)
+				return AnyValueTypeName(&field)
 			}
 			return writeUpdateElement(u)
 		}),
@@ -135,13 +135,13 @@ func (s *Factory) writeUpdateState() *Factory {
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 			u.typeName = func() string {
-				return field.ValueTypeName
+				return ValueTypeName(&field)
 			}
 			return writeClearPatch(u)
 		}),
 		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
 			u.typeName = func() string {
-				return anyNameByField(field)
+				return AnyValueTypeName(&field)
 			}
 			return writeClearPatch(u)
 		}),

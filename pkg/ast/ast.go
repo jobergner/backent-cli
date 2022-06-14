@@ -205,7 +205,6 @@ func (a *AST) fillInReferences() *AST {
 			field.Parent = &configType
 			a.assignFieldTypeReference(&field)
 			a.assignTypeImplementedBy(&field)
-			field.ValueTypeName = fieldValueTypeName(field)
 			if field.HasPointerValue {
 				field.RangeValueTypes(func(fieldValueType *ConfigType) {
 					if configTypeName == fieldValueType.Name {

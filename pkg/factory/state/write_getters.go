@@ -126,7 +126,7 @@ func (s *Factory) writeGetters() *Factory {
 
 		t := typeGetterWriter{
 			name: func() string {
-				return field.ValueTypeName
+				return ValueTypeName(&field)
 			},
 		}
 
@@ -139,7 +139,7 @@ func (s *Factory) writeGetters() *Factory {
 		if field.HasAnyValue {
 
 			i.returns = func() string {
-				return Title(anyNameByField(field)) + "ID"
+				return Title(AnyValueTypeName(&field)) + "ID"
 			}
 
 		} else {
@@ -163,7 +163,7 @@ func (s *Factory) writeGetters() *Factory {
 
 		t := typeGetterWriter{
 			name: func() string {
-				return anyNameByField(field)
+				return AnyValueTypeName(&field)
 			},
 		}
 

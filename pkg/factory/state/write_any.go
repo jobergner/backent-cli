@@ -37,14 +37,14 @@ func (s *Factory) writeAny() *Factory {
 
 			s.file.Func().Params(asw.receiverParams()).Id("be"+Title(valueType.Name)).Params(asw.params()).Block(
 				asw.reassignAnyContainer(),
-				Id("any").Dot("engine").Dot("delete"+Title(anyNameByField(field))).Call(Id("any").Dot("ID"), Id("deleteCurrentChild")),
-				Id("any").Op("=").Id("any").Dot("engine").Dot("create"+Title(anyNameByField(field))).Call(Id("any").Dot("ParentID"), Int().Call(Id(asw.v.Name+"ID")), Id("ElementKind"+Title(asw.v.Name)), Id("any").Dot("ParentElementPath"), Id("any").Dot("FieldIdentifier")).Dot(anyNameByField(field)),
+				Id("any").Dot("engine").Dot("delete"+Title(AnyValueTypeName(&field))).Call(Id("any").Dot("ID"), Id("deleteCurrentChild")),
+				Id("any").Op("=").Id("any").Dot("engine").Dot("create"+Title(AnyValueTypeName(&field))).Call(Id("any").Dot("ParentID"), Int().Call(Id(asw.v.Name+"ID")), Id("ElementKind"+Title(asw.v.Name)), Id("any").Dot("ParentElementPath"), Id("any").Dot("FieldIdentifier")).Dot(AnyValueTypeName(&field)),
 				Switch(Id("any").Dot("FieldIdentifier")).Block(
 					ForEachFieldInAST(s.config, func(_field ast.Field) *Statement {
 						if _field.HasSliceValue || _field.HasPointerValue {
 							return Empty()
 						}
-						if anyNameByField(field) != anyNameByField(_field) {
+						if AnyValueTypeName(&field) != AnyValueTypeName(&_field) {
 							return Empty()
 						}
 						return Case(Id(FieldPathIdentifier(_field))).Block(

@@ -6,22 +6,7 @@ import (
 	"github.com/dave/jennifer/jen"
 	"github.com/jobergner/backent-cli/pkg/ast"
 	"github.com/jobergner/backent-cli/pkg/factory/utils"
-	. "github.com/jobergner/backent-cli/pkg/factory/utils"
 )
-
-func anyNameByField(f ast.Field) string {
-	name := "anyOf"
-	firstIteration := true
-	f.RangeValueTypes(func(configType *ast.ConfigType) {
-		if firstIteration {
-			name += Title(configType.Name)
-		} else {
-			name += "_" + Title(configType.Name)
-		}
-		firstIteration = false
-	})
-	return name
-}
 
 type Factory struct {
 	config *ast.AST

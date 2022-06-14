@@ -1,4 +1,4 @@
-package state
+package client
 
 import (
 	"strings"

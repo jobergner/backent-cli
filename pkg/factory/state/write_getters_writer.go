@@ -172,7 +172,7 @@ func (f fieldGetterWriter) returnedType() string {
 	case f.f.HasPointerValue:
 		return f.f.Parent.Name + Title(Singular(f.f.Name)) + "Ref"
 	case f.f.HasAnyValue && !f.f.HasPointerValue:
-		return anyNameByField(f.f)
+		return AnyValueTypeName(&f.f)
 	default:
 		return f.f.ValueType().Name
 	}
@@ -183,7 +183,7 @@ func (f fieldGetterWriter) returns() string {
 	case f.f.ValueType().IsBasicType:
 		return f.f.ValueString
 	case f.f.HasSliceValue && f.f.HasAnyValue && !f.f.HasPointerValue:
-		return "[]" + Title(anyNameByField(f.f)) + "SliceElement"
+		return "[]" + Title(AnyValueTypeName(&f.f)) + "SliceElement"
 	case f.f.HasSliceValue:
 		return "[]" + Title(f.returnedType())
 	default:
@@ -202,11 +202,11 @@ func (f fieldGetterWriter) declareSliceOfElements() *Statement {
 func (f fieldGetterWriter) loopedElementIdentifier() string {
 	switch {
 	case f.f.ValueType().IsBasicType:
-		return BasicTypes[f.f.ValueTypeName] + "ID"
+		return BasicTypes[ValueTypeName(&f.f)] + "ID"
 	case f.f.HasPointerValue:
 		return "refID"
 	case f.f.HasAnyValue && !f.f.HasPointerValue:
-		return anyNameByField(f.f) + "ID"
+		return AnyValueTypeName(&f.f) + "ID"
 	default:
 		return f.f.ValueType().Name + "ID"
 	}
@@ -220,7 +220,7 @@ func (f fieldGetterWriter) loopConditions() *Statement {
 func (f fieldGetterWriter) appendedItem() *Statement {
 	switch {
 	case f.f.ValueType().IsBasicType:
-		return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(BasicTypes[f.f.ValueTypeName]).Call(Id(f.loopedElementIdentifier())).Dot("Value")
+		return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(BasicTypes[ValueTypeName(&f.f)]).Call(Id(f.loopedElementIdentifier())).Dot("Value")
 	case f.f.HasAnyValue || f.f.HasPointerValue:
 		return Id(f.t.Name).Dot(f.t.Name).Dot("engine").Dot(f.returnedType()).Call(Id(f.loopedElementIdentifier()))
 	default:
@@ -241,7 +241,7 @@ func (f fieldGetterWriter) element() *Statement {
 }
 
 func (f fieldGetterWriter) returnBasicType() *Statement {
-	return f.element().Dot("engine").Dot(BasicTypes[f.f.ValueTypeName]).Call(f.element().Dot(Title(f.f.Name))).Dot("Value")
+	return f.element().Dot("engine").Dot(BasicTypes[ValueTypeName(&f.f)]).Call(f.element().Dot(Title(f.f.Name))).Dot("Value")
 }
 
 func (f fieldGetterWriter) returnNamedType() *Statement {

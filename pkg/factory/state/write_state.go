@@ -17,12 +17,12 @@ func (s *Factory) writeIDs() *Factory {
 	})
 
 	s.config.RangeRefFields(func(field ast.Field) {
-		s.file.Type().Id(Title(field.ValueTypeName) + "ID").Int()
+		s.file.Type().Id(Title(ValueTypeName(&field)) + "ID").Int()
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
 
-		s.file.Type().Id(Title(anyNameByField(field)) + "ID").Int()
+		s.file.Type().Id(Title(AnyValueTypeName(&field)) + "ID").Int()
 	})
 
 	return s
@@ -41,12 +41,12 @@ func (s *Factory) writeIsEmpty() *Factory {
 			)
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
-			return If(Len(Id("s").Dot(Title(field.ValueTypeName))).Op("!=").Lit(0)).Block(
+			return If(Len(Id("s").Dot(Title(ValueTypeName(&field)))).Op("!=").Lit(0)).Block(
 				Return(False()),
 			)
 		}),
 		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
-			return If(Len(Id("s").Dot(Title(anyNameByField(field)))).Op("!=").Lit(0)).Block(
+			return If(Len(Id("s").Dot(Title(AnyValueTypeName(&field)))).Op("!=").Lit(0)).Block(
 				Return(False()),
 			)
 		}),
@@ -76,7 +76,7 @@ func (s *Factory) writeState() *Factory {
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 			s := stateWriter{
 				typeName: func() string {
-					return field.ValueTypeName
+					return ValueTypeName(&field)
 				},
 			}
 
@@ -85,7 +85,7 @@ func (s *Factory) writeState() *Factory {
 		ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
 			s := stateWriter{
 				typeName: func() string {
-					return anyNameByField(field)
+					return AnyValueTypeName(&field)
 				},
 			}
 
@@ -112,7 +112,7 @@ func (s *Factory) writeState() *Factory {
 			ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
 				s := stateWriter{
 					typeName: func() string {
-						return field.ValueTypeName
+						return ValueTypeName(&field)
 					},
 				}
 
@@ -121,7 +121,7 @@ func (s *Factory) writeState() *Factory {
 			ForEachAnyFieldInAST(s.config, func(field ast.Field) *Statement {
 				s := stateWriter{
 					typeName: func() string {
-						return anyNameByField(field)
+						return AnyValueTypeName(&field)
 					},
 				}
 
@@ -172,11 +172,11 @@ func (s *Factory) writeElements() *Factory {
 
 		referencedElementName := field.ValueType().Name
 		if field.HasAnyValue {
-			referencedElementName = anyNameByField(field)
+			referencedElementName = AnyValueTypeName(&field)
 		}
 
-		s.file.Type().Id(field.ValueTypeName+"Core").Struct(
-			Id("ID").Id(Title(field.ValueTypeName)+"ID").Id(fieldTag("id")).Line(),
+		s.file.Type().Id(ValueTypeName(&field)+"Core").Struct(
+			Id("ID").Id(Title(ValueTypeName(&field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ParentID").Id(Title(field.Parent.Name)+"ID").Id(fieldTag("parentID")).Line(),
 			Id("ChildID").Int().Id(fieldTag("childID")).Line(),
 			Id("ReferencedElementID").Id(Title(referencedElementName)+"ID").Id(fieldTag("referencedElementID")).Line(),
@@ -184,12 +184,12 @@ func (s *Factory) writeElements() *Factory {
 			Id("Path").Id("path").Id(metaFieldTag("path")),
 			Id("engine").Id("*Engine").Line(),
 		)
-		s.file.Type().Id(Title(field.ValueTypeName)).Struct(Id(field.ValueTypeName).Id(field.ValueTypeName + "Core"))
+		s.file.Type().Id(Title(ValueTypeName(&field))).Struct(Id(ValueTypeName(&field)).Id(ValueTypeName(&field) + "Core"))
 	})
 
 	s.config.RangeAnyFields(func(field ast.Field) {
-		s.file.Type().Id(anyNameByField(field)+"Core").Struct(
-			Id("ID").Id(Title(anyNameByField(field))+"ID").Id(fieldTag("id")).Line(),
+		s.file.Type().Id(AnyValueTypeName(&field)+"Core").Struct(
+			Id("ID").Id(Title(AnyValueTypeName(&field))+"ID").Id(fieldTag("id")).Line(),
 			Id("ElementKind").Id("ElementKind").Id(fieldTag("elementKind")).Line(),
 			Id("ParentID").Int().Id(fieldTag("parentID")).Line(),
 			Id("ChildID").Int().Id(fieldTag("childID")).Line(),
@@ -198,7 +198,7 @@ func (s *Factory) writeElements() *Factory {
 			Id("OperationKind").Id("OperationKind").Id(fieldTag("operationKind")).Line(),
 			Id("engine").Id("*Engine").Line(),
 		)
-		s.file.Type().Id(Title(anyNameByField(field))).Struct(Id(anyNameByField(field)).Id(anyNameByField(field) + "Core"))
+		s.file.Type().Id(Title(AnyValueTypeName(&field))).Struct(Id(AnyValueTypeName(&field)).Id(AnyValueTypeName(&field) + "Core"))
 	})
 
 	return s

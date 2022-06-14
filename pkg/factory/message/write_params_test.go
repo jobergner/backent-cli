@@ -10,7 +10,7 @@ import (
 
 func TestWriteParameters(t *testing.T) {
 	t.Run("writes parameters", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeParameters()
 
 		buf := new(bytes.Buffer)

@@ -48,9 +48,9 @@ func (e elementWriter) fieldValue() string {
 	}
 
 	if e.f.ValueType().IsBasicType {
-		value += Title(BasicTypes[e.f.ValueTypeName]) + "ID"
+		value += Title(BasicTypes[ValueTypeName(e.f)]) + "ID"
 	} else {
-		value += Title(e.f.ValueTypeName) + "ID"
+		value += Title(ValueTypeName(e.f)) + "ID"
 	}
 
 	return value

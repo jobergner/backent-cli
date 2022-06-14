@@ -10,7 +10,7 @@ import (
 
 func TestWriteController(t *testing.T) {
 	t.Run("writes controller", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeController()
 
 		buf := new(bytes.Buffer)

@@ -75,7 +75,7 @@ func (c creatorWriter) setHasParent() *Statement {
 func (c creatorWriter) createChildElementCall() *Statement {
 	switch {
 	case c.f.ValueType().IsBasicType:
-		return Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)), Lit(defaultValueForBasicType(c.f.ValueTypeName)))
+		return Call(Id("element").Dot("Path"), Id(FieldPathIdentifier(*c.f)), Lit(defaultValueForBasicType(ValueTypeName(c.f))))
 	case c.f.HasAnyValue && c.f.HasPointerValue:
 		return Call(True(), Id("p").Dot(c.f.Name).Call())
 	case c.f.HasAnyValue && !c.f.HasPointerValue:
@@ -93,9 +93,9 @@ func (c creatorWriter) createChildSubElement() *Statement {
 func (c creatorWriter) createChildElement() *Statement {
 	switch {
 	case c.f.ValueType().IsBasicType:
-		return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(BasicTypes[c.f.ValueTypeName])).Add(c.createChildElementCall())
+		return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(BasicTypes[ValueTypeName(c.f)])).Add(c.createChildElementCall())
 	default:
-		return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(c.f.ValueTypeName)).Add(c.createChildElementCall())
+		return Id("element" + Title(c.f.Name)).Op(":=").Id("engine").Dot("create" + Title(ValueTypeName(c.f))).Add(c.createChildElementCall())
 	}
 }
 func (c creatorWriter) setChildElement() *Statement {
@@ -103,7 +103,7 @@ func (c creatorWriter) setChildElement() *Statement {
 	case c.f.ValueType().IsBasicType:
 		return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot("ID")
 	default:
-		return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot(c.f.ValueTypeName).Dot("ID")
+		return Id("element").Dot(Title(c.f.Name)).Op("=").Id("element" + Title(c.f.Name)).Dot(ValueTypeName(c.f)).Dot("ID")
 	}
 }
 
@@ -137,7 +137,7 @@ func (c generatedTypeCreatorWriter) name() string {
 func (c generatedTypeCreatorWriter) referencedElementIDParam() string {
 	switch {
 	case c.f.HasAnyValue:
-		return Title(anyNameByField(c.f)) + "ID"
+		return Title(AnyValueTypeName(&c.f)) + "ID"
 	default:
 		return Title(c.f.ValueType().Name) + "ID"
 	}
@@ -183,7 +183,7 @@ func (c generatedTypeCreatorWriter) setIDRef() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) setIDAny() *Statement {
-	return Id("element").Dot("ID").Op("=").Id(Title(anyNameByField(c.f)) + "ID").Call(Id("engine").Dot("GenerateID").Call())
+	return Id("element").Dot("ID").Op("=").Id(Title(AnyValueTypeName(&c.f)) + "ID").Call(Id("engine").Dot("GenerateID").Call())
 }
 
 func (c generatedTypeCreatorWriter) setChildID() *Statement {
@@ -232,7 +232,7 @@ func (c generatedTypeCreatorWriter) setFieldIdentifier() *Statement {
 }
 
 func (c generatedTypeCreatorWriter) returnElement() *Statement {
-	return Id(Title(anyNameByField(c.f))).Values(Dict{
-		Id(anyNameByField(c.f)): Id("element"),
+	return Id(Title(AnyValueTypeName(&c.f))).Values(Dict{
+		Id(AnyValueTypeName(&c.f)): Id("element"),
 	})
 }

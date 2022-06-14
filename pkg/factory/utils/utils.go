@@ -234,3 +234,27 @@ func Format(buf *bytes.Buffer) error {
 
 	return nil
 }
+
+func ValueTypeName(field *ast.Field) string {
+	if field.HasPointerValue {
+		return field.Parent.Name + Title(Singular(field.Name)) + "Ref"
+	}
+	if field.HasAnyValue {
+		return AnyValueTypeName(field)
+	}
+	return field.ValueType().Name
+}
+
+func AnyValueTypeName(field *ast.Field) string {
+	name := "anyOf"
+	firstIteration := true
+	field.RangeValueTypes(func(configType *ast.ConfigType) {
+		if firstIteration {
+			name += Title(configType.Name)
+		} else {
+			name += "_" + Title(configType.Name)
+		}
+		firstIteration = false
+	})
+	return name
+}
