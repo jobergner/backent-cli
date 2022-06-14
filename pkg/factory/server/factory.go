@@ -6,14 +6,8 @@ import (
 	"github.com/dave/jennifer/jen"
 
 	"github.com/jobergner/backent-cli/pkg/ast"
-	"github.com/jobergner/backent-cli/pkg/factory/configs"
 	"github.com/jobergner/backent-cli/pkg/factory/utils"
 )
-
-func newSimpleASTExample() *ast.AST {
-	simpleAST := ast.Parse(configs.StateConfig, configs.ActionsConfig, configs.ResponsesConfig)
-	return simpleAST
-}
 
 type Factory struct {
 	config *ast.AST
@@ -27,7 +21,6 @@ func NewFactory(config *ast.AST) *Factory {
 	}
 }
 
-// Write writes source code for a given ActionsConfig
 func (f *Factory) Write() string {
 	f.writeTriggerAction().
 		writeController()

@@ -12,15 +12,15 @@ type anyKindWriter struct {
 }
 
 func (a anyKindWriter) receiverParams() *Statement {
-	return Id("_any").Id(Title(anyNameByField(a.f)))
+	return Id("_any").Id(Title(AnyValueTypeName(&a.f)))
 }
 
 func (a anyKindWriter) reassignAnyContainer() *Statement {
-	return Id("any").Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot(anyNameByField(a.f)).Call(Id("_any").Dot(anyNameByField(a.f)).Dot("ID"))
+	return Id("any").Op(":=").Id("_any").Dot(AnyValueTypeName(&a.f)).Dot("engine").Dot(AnyValueTypeName(&a.f)).Call(Id("_any").Dot(AnyValueTypeName(&a.f)).Dot("ID"))
 }
 
 func (a anyKindWriter) containedElementKind() *Statement {
-	return Id("any").Dot(anyNameByField(a.f)).Dot("ElementKind")
+	return Id("any").Dot(AnyValueTypeName(&a.f)).Dot("ElementKind")
 }
 
 type anySetterWriter struct {
@@ -30,19 +30,19 @@ type anySetterWriter struct {
 }
 
 func (a anySetterWriter) wrapperReceiverParams() *Statement {
-	return Id("_any").Id(Title(anyNameByField(a.f)))
+	return Id("_any").Id(Title(AnyValueTypeName(&a.f)))
 }
 
 func (a anySetterWriter) reassignAnyContainerWrapper() *Statement {
-	return Id("any").Op(":=").Id("_any").Dot(anyNameByField(a.f)).Dot("engine").Dot(anyNameByField(a.f)).Call(Id("_any").Dot(anyNameByField(a.f)).Dot("ID"))
+	return Id("any").Op(":=").Id("_any").Dot(AnyValueTypeName(&a.f)).Dot("engine").Dot(AnyValueTypeName(&a.f)).Call(Id("_any").Dot(AnyValueTypeName(&a.f)).Dot("ID"))
 }
 
 func (a anySetterWriter) isAlreadyRequestedElement() *Statement {
-	return Id("any").Dot(anyNameByField(a.f)).Dot("ElementKind").Op("==").Id("ElementKind" + Title(a.v.Name))
+	return Id("any").Dot(AnyValueTypeName(&a.f)).Dot("ElementKind").Op("==").Id("ElementKind" + Title(a.v.Name))
 }
 
 func (a anySetterWriter) isOperationKindDelete() *Statement {
-	return Id("any").Dot(anyNameByField(a.f)).Dot("OperationKind").Op("==").Id("OperationKindDelete")
+	return Id("any").Dot(AnyValueTypeName(&a.f)).Dot("OperationKind").Op("==").Id("OperationKindDelete")
 }
 
 func (a anySetterWriter) currentElement() *Statement {
@@ -50,15 +50,15 @@ func (a anySetterWriter) currentElement() *Statement {
 }
 
 func (a anySetterWriter) createChild() *Statement {
-	return Id(a.v.Name).Op(":=").Id("any").Dot(anyNameByField(a.f)).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id("any").Dot(anyNameByField(a.f)).Dot("ParentElementPath"), Id("any").Dot(anyNameByField(a.f)).Dot("FieldIdentifier"))
+	return Id(a.v.Name).Op(":=").Id("any").Dot(AnyValueTypeName(&a.f)).Dot("engine").Dot("create"+Title(a.v.Name)).Call(Id("any").Dot(AnyValueTypeName(&a.f)).Dot("ParentElementPath"), Id("any").Dot(AnyValueTypeName(&a.f)).Dot("FieldIdentifier"))
 }
 
 func (a anySetterWriter) callSetter() *Statement {
-	return Id("any").Dot(anyNameByField(a.f)).Dot("be"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
+	return Id("any").Dot(AnyValueTypeName(&a.f)).Dot("be"+Title(a.v.Name)).Call(Id(a.v.Name).Dot("ID").Call(), True())
 }
 
 func (a anySetterWriter) receiverParams() *Statement {
-	return Id("_any").Id(anyNameByField(a.f) + "Core")
+	return Id("_any").Id(AnyValueTypeName(&a.f) + "Core")
 }
 
 func (a anySetterWriter) params() (*Statement, *Statement) {
@@ -66,7 +66,7 @@ func (a anySetterWriter) params() (*Statement, *Statement) {
 }
 
 func (a anySetterWriter) reassignAnyContainer() *Statement {
-	return Id("any").Op(":=").Id("_any").Dot("engine").Dot(anyNameByField(a.f)).Call(Id("_any").Dot("ID")).Dot(anyNameByField(a.f))
+	return Id("any").Op(":=").Id("_any").Dot("engine").Dot(AnyValueTypeName(&a.f)).Call(Id("_any").Dot("ID")).Dot(AnyValueTypeName(&a.f))
 }
 
 func (a anySetterWriter) setElementKind() *Statement {
@@ -78,7 +78,7 @@ func (a anySetterWriter) setChildID() *Statement {
 }
 
 func (a anySetterWriter) updateContainerInPatch() *Statement {
-	return Id("any").Dot("engine").Dot("Patch").Dot(Title(anyNameByField(a.f))).Index(Id("any").Dot("ID")).Op("=").Id("any")
+	return Id("any").Dot("engine").Dot("Patch").Dot(Title(AnyValueTypeName(&a.f))).Index(Id("any").Dot("ID")).Op("=").Id("any")
 }
 
 type anyDeleteChildWriter struct {
@@ -87,11 +87,11 @@ type anyDeleteChildWriter struct {
 }
 
 func (d anyDeleteChildWriter) receiverParams() *Statement {
-	return Id("_any").Id(anyNameByField(d.f) + "Core")
+	return Id("_any").Id(AnyValueTypeName(&d.f) + "Core")
 }
 
 func (d anyDeleteChildWriter) reassignAnyContainer() *Statement {
-	return Id("any").Op(":=").Id("_any").Dot("engine").Dot(anyNameByField(d.f)).Call(Id("_any").Dot("ID")).Dot(anyNameByField(d.f))
+	return Id("any").Op(":=").Id("_any").Dot("engine").Dot(AnyValueTypeName(&d.f)).Call(Id("_any").Dot("ID")).Dot(AnyValueTypeName(&d.f))
 }
 
 func (d anyDeleteChildWriter) deleteChild() *Statement {
@@ -104,7 +104,7 @@ type anyRefWriter struct {
 }
 
 func (a anyRefWriter) typeName() string {
-	return anyNameByField(a.f)
+	return AnyValueTypeName(&a.f)
 }
 
 func (a anyRefWriter) wrapperName() string {

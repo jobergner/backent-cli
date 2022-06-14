@@ -71,7 +71,7 @@ func (a adderWriter) valueTypeID() string {
 	case a.f.ValueType().IsBasicType:
 		return Title(a.f.ValueType().Name) + "ValueID"
 	default:
-		return Title(a.f.ValueTypeName) + "ID"
+		return Title(ValueTypeName(&a.f)) + "ID"
 	}
 }
 
@@ -86,16 +86,16 @@ func (a adderWriter) referencedElementDoesntExist() *Statement {
 func (a adderWriter) returnIfReferencedElementIsAlreadyReferencedReturnCondition() *Statement {
 	switch {
 	case a.f.HasAnyValue:
-		return Id(Title(a.v.Name) + "ID").Call(Id("anyContainer").Dot(anyNameByField(a.f)).Dot("ChildID")).Op("==").Id(a.idParam())
+		return Id(Title(a.v.Name) + "ID").Call(Id("anyContainer").Dot(AnyValueTypeName(&a.f)).Dot("ChildID")).Op("==").Id(a.idParam())
 	default:
-		return Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID").Op("==").Id(a.idParam())
+		return Id("currentRef").Dot(ValueTypeName(&a.f)).Dot("ReferencedElementID").Op("==").Id(a.idParam())
 	}
 }
 
 func (a adderWriter) returnIfReferencedElementIsAlreadyReferenced() *Statement {
 	return For(List(Id("_"), Id("currentRefID")).Op(":=").Range().Add(a.field())).Block(
-		Id("currentRef").Op(":=").Add(a.engine()).Dot(a.f.ValueTypeName).Call(Id("currentRefID")),
-		OnlyIf(a.f.HasAnyValue, Id("anyContainer").Op(":=").Add(a.engine()).Dot(anyNameByField(a.f)).Call(Id("currentRef").Dot(a.f.ValueTypeName).Dot("ReferencedElementID"))),
+		Id("currentRef").Op(":=").Add(a.engine()).Dot(ValueTypeName(&a.f)).Call(Id("currentRefID")),
+		OnlyIf(a.f.HasAnyValue, Id("anyContainer").Op(":=").Add(a.engine()).Dot(AnyValueTypeName(&a.f)).Call(Id("currentRef").Dot(ValueTypeName(&a.f)).Dot("ReferencedElementID"))),
 		If(a.returnIfReferencedElementIsAlreadyReferencedReturnCondition()).Block(
 			Return(),
 		),
@@ -130,9 +130,9 @@ func (a adderWriter) createAnyContainerCallParams() *Statement {
 	case a.f.HasPointerValue && !a.f.HasAnyValue:
 		return Call(False(), Nil(), Lit(""))
 	case a.f.HasPointerValue && a.f.HasAnyValue:
-		return Call(Int().Call(a.elementID()), Int().Call(Id(a.idParam())), Id("ElementKind"+Title(a.v.Name)), Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f))).Dot(anyNameByField(a.f))
+		return Call(Int().Call(a.elementID()), Int().Call(Id(a.idParam())), Id("ElementKind"+Title(a.v.Name)), Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f))).Dot(AnyValueTypeName(&a.f))
 	case a.f.HasAnyValue:
-		return Call(Int().Call(a.elementID()), Int().Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID")), Id("ElementKind"+Title(a.v.Name)), Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f))).Dot(anyNameByField(a.f))
+		return Call(Int().Call(a.elementID()), Int().Call(Id(a.v.Name).Dot(a.v.Name).Dot("ID")), Id("ElementKind"+Title(a.v.Name)), Add(a.elementCore()).Dot("Path"), Id(FieldPathIdentifier(a.f))).Dot(AnyValueTypeName(&a.f))
 	default:
 		return Call(False(), Add(a.elementCore()).Dot("path"), Lit(""))
 	}
@@ -140,7 +140,7 @@ func (a adderWriter) createAnyContainerCallParams() *Statement {
 
 func (a adderWriter) createAnyContainer() *Statement {
 	return Id("anyContainer").Op(":=").Add(a.engine()).
-		Dot("create" + Title(anyNameByField(a.f))).
+		Dot("create" + Title(AnyValueTypeName(&a.f))).
 		Add(a.createAnyContainerCallParams())
 }
 
@@ -167,7 +167,7 @@ func (a adderWriter) createRefCallParams() *Statement {
 }
 
 func (a adderWriter) createRef() *Statement {
-	return Id("ref").Op(":=").Add(a.engine()).Dot("create" + Title(a.f.ValueTypeName)).Add(a.createRefCallParams())
+	return Id("ref").Op(":=").Add(a.engine()).Dot("create" + Title(ValueTypeName(&a.f))).Add(a.createRefCallParams())
 }
 
 func (a adderWriter) toAppend() *Statement {

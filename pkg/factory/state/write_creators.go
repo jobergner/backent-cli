@@ -70,7 +70,7 @@ func (s *Factory) writeCreators() *Factory {
 	s.config.RangeRefFields(func(field ast.Field) {
 		c := generatedTypeCreatorWriter{
 			f:        field,
-			typeName: field.ValueTypeName,
+			typeName: ValueTypeName(&field),
 		}
 
 		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(c.params()).Id(c.returns()).Block(
@@ -90,10 +90,10 @@ func (s *Factory) writeCreators() *Factory {
 	s.config.RangeAnyFields(func(field ast.Field) {
 		c := generatedTypeCreatorWriter{
 			f:        field,
-			typeName: anyNameByField(field),
+			typeName: AnyValueTypeName(&field),
 		}
 
-		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("parentID").Int(), Id("childID").Int(), Id("childKind").Id("ElementKind"), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(anyNameByField(field))).Block(
+		s.file.Func().Params(c.receiverParams()).Id(c.name()).Params(Id("parentID").Int(), Id("childID").Int(), Id("childKind").Id("ElementKind"), Id("p").Id("path"), Id("fieldIdentifier").Id("treeFieldIdentifier")).Id(Title(AnyValueTypeName(&field))).Block(
 			c.declareElement(),
 			c.assignEngine(),
 			c.setIDAny(),

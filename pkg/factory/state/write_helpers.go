@@ -27,10 +27,10 @@ func (s *Factory) writeDeduplicate() *Factory {
 
 		d := deduplicateWriter{
 			typeName: func() string {
-				return field.ValueTypeName
+				return ValueTypeName(&field)
 			},
 			idType: func() string {
-				return Title(field.ValueTypeName) + "ID"
+				return Title(ValueTypeName(&field)) + "ID"
 			},
 		}
 
@@ -74,7 +74,7 @@ func (s *Factory) writeAllIDsMethod() *Factory {
 	s.config.RangeRefFields(func(field ast.Field) {
 		a := allIDsMehtodWriter{
 			typeName: func() string {
-				return field.ValueTypeName
+				return ValueTypeName(&field)
 			},
 		}
 

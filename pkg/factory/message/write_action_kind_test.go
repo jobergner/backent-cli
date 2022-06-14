@@ -10,7 +10,7 @@ import (
 
 func TestWriteMessageKinds(t *testing.T) {
 	t.Run("writes message kinds", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeMessageKinds()
 
 		buf := new(bytes.Buffer)

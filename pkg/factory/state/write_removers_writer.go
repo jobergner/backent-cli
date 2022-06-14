@@ -91,25 +91,25 @@ func (r remover) valueTypeID() string {
 	case r.f.ValueType().IsBasicType:
 		return Title(r.f.ValueType().Name) + "ValueID"
 	default:
-		return Title(r.f.ValueTypeName) + "ID"
+		return Title(ValueTypeName(&r.f)) + "ID"
 	}
 }
 
 func (r remover) deleteElement() *Statement {
 	switch {
 	case r.f.HasAnyValue && !r.f.HasPointerValue:
-		return r.engine().Dot("delete"+Title(r.f.ValueTypeName)).Call(r.eachElementLiteral(), True())
+		return r.engine().Dot("delete"+Title(ValueTypeName(&r.f))).Call(r.eachElementLiteral(), True())
 	case r.f.ValueType().IsBasicType:
 		return r.engine().Dot("delete" + Title(r.f.ValueType().Name) + "Value").Call(r.eachElementLiteral())
 	default:
-		return r.engine().Dot("delete" + Title(r.f.ValueTypeName)).Call(r.eachElementLiteral())
+		return r.engine().Dot("delete" + Title(ValueTypeName(&r.f))).Call(r.eachElementLiteral())
 	}
 }
 
 func (r remover) idsDontMatch() []Code {
 	switch {
 	case r.f.HasPointerValue || r.f.HasAnyValue:
-		return []Code{Id("childID").Op(":=").Add(r.engine().Dot(r.f.ValueTypeName).Call(Id("id"))).Dot(r.f.ValueTypeName).Dot("ChildID"), Id(Title(r.v.Name) + "ID").Call(Id("childID")).Op("!=").Id(r.toRemoveParamName())}
+		return []Code{Id("childID").Op(":=").Add(r.engine().Dot(ValueTypeName(&r.f)).Call(Id("id"))).Dot(ValueTypeName(&r.f)).Dot("ChildID"), Id(Title(r.v.Name) + "ID").Call(Id("childID")).Op("!=").Id(r.toRemoveParamName())}
 	case r.v.IsBasicType:
 		return []Code{r.engine().Dot(r.v.Name + "Value").Call(r.eachElementLiteral()).Dot("Value").Op("!=").Id(r.toRemoveParamName())}
 	default:

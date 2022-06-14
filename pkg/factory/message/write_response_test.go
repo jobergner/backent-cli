@@ -10,7 +10,7 @@ import (
 
 func TestWriteResponses(t *testing.T) {
 	t.Run("writes responses", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeResponses()
 
 		buf := new(bytes.Buffer)

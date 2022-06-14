@@ -23,12 +23,12 @@ func (s *Factory) writePools() *Factory {
 
 	s.config.RangeRefFields(func(field ast.Field) {
 
-		s.file.Var().Id(field.ValueTypeName + "CheckPool").Op("=").Id("sync").Dot("Pool").Values(Dict{
-			Id("New"): Func().Params().Interface().Block(Return(Make(Map(Id(Title(field.ValueTypeName) + "ID")).Bool()))),
+		s.file.Var().Id(ValueTypeName(&field) + "CheckPool").Op("=").Id("sync").Dot("Pool").Values(Dict{
+			Id("New"): Func().Params().Interface().Block(Return(Make(Map(Id(Title(ValueTypeName(&field)) + "ID")).Bool()))),
 		})
 
-		s.file.Var().Id(field.ValueTypeName + "IDSlicePool").Op("=").Id("sync").Dot("Pool").Values(Dict{
-			Id("New"): Func().Params().Interface().Block(Return(Make(Index().Id(Title(field.ValueTypeName)+"ID"), Lit(0)))),
+		s.file.Var().Id(ValueTypeName(&field) + "IDSlicePool").Op("=").Id("sync").Dot("Pool").Values(Dict{
+			Id("New"): Func().Params().Interface().Block(Return(Make(Index().Id(Title(ValueTypeName(&field))+"ID"), Lit(0)))),
 		})
 
 	})

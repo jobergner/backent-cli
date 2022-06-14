@@ -77,7 +77,7 @@ func (s *Factory) writeDeleters() *Factory {
 	s.config.RangeRefFields(func(field ast.Field) {
 		d := deleteGeneratedTypeWriter{
 			f:             field,
-			valueTypeName: func() string { return field.ValueTypeName },
+			valueTypeName: func() string { return ValueTypeName(&field) },
 		}
 
 		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params()).Block(
@@ -98,7 +98,7 @@ func (s *Factory) writeDeleters() *Factory {
 	s.config.RangeAnyFields(func(field ast.Field) {
 		d := deleteGeneratedTypeWriter{
 			f:             field,
-			valueTypeName: func() string { return anyNameByField(field) },
+			valueTypeName: func() string { return AnyValueTypeName(&field) },
 		}
 
 		s.file.Func().Params(d.receiverParams()).Id(d.name()).Params(d.params(), Id("deleteChild").Bool()).Block(

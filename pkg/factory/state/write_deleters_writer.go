@@ -104,9 +104,9 @@ func (d deleteTypeWriter) deleteChildCall() *Statement {
 func (d deleteTypeWriter) deleteChildMethodName() string {
 	switch {
 	case d.f.ValueType().IsBasicType:
-		return "delete" + Title(BasicTypes[d.f.ValueTypeName])
+		return "delete" + Title(BasicTypes[ValueTypeName(d.f)])
 	default:
-		return "delete" + Title(d.f.ValueTypeName)
+		return "delete" + Title(ValueTypeName(d.f))
 	}
 }
 
@@ -164,7 +164,7 @@ func (d deleteGeneratedTypeWriter) deleteChild() *Statement {
 }
 
 func (d deleteGeneratedTypeWriter) deleteAnyContainer() *Statement {
-	return Id("engine").Dot("delete"+Title(anyNameByField(d.f))).Call(Id(d.valueTypeName()).Dot("ReferencedElementID"), False())
+	return Id("engine").Dot("delete"+Title(AnyValueTypeName(&d.f))).Call(Id(d.valueTypeName()).Dot("ReferencedElementID"), False())
 }
 
 func (d deleteGeneratedTypeWriter) setOperationKind() *Statement {

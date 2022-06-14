@@ -66,8 +66,8 @@ func (s *Factory) writeAssemblePlannerPlan() *Factory {
 			)
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
-			return For(List(Id("_"), Id(field.ValueTypeName)).Op(":=").Range().Id("patch").Dot(Title(field.ValueTypeName))).Block(
-				Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(field.ValueTypeName).Dot("ID"))).Op("=").Id(field.ValueTypeName).Dot("Path"),
+			return For(List(Id("_"), Id(ValueTypeName(&field))).Op(":=").Range().Id("patch").Dot(Title(ValueTypeName(&field)))).Block(
+				Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(ValueTypeName(&field)).Dot("ID"))).Op("=").Id(ValueTypeName(&field)).Dot("Path"),
 			)
 		}),
 		Id("previousLen").Op(":=").Lit(0),
@@ -130,8 +130,8 @@ func (s *Factory) writeAssemblePlannerFill() *Factory {
 			)
 		}),
 		ForEachRefFieldInAST(s.config, func(field ast.Field) *Statement {
-			return For(List(Id("_"), Id(field.ValueTypeName)).Op(":=").Range().Id("state").Dot(Title(field.ValueTypeName))).Block(
-				Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(field.ValueTypeName).Dot("ID"))).Op("=").Id(field.ValueTypeName).Dot("Path"),
+			return For(List(Id("_"), Id(ValueTypeName(&field))).Op(":=").Range().Id("state").Dot(Title(ValueTypeName(&field)))).Block(
+				Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(ValueTypeName(&field)).Dot("ID"))).Op("=").Id(ValueTypeName(&field)).Dot("Path"),
 			)
 		}),
 		For(List(Id("_"), Id("p")).Op(":=").Range().Id("ap").Dot("updatedElementPaths")).Block(

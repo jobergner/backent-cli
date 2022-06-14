@@ -49,9 +49,9 @@ func (e treeElementWriter) fieldValue() *Statement {
 	if e.f.ValueType().IsBasicType {
 		switch {
 		case e.f.HasSliceValue:
-			return Index().Id(e.f.ValueTypeName)
+			return Index().Id(ValueTypeName(e.f))
 		default:
-			return Id("*" + e.f.ValueTypeName)
+			return Id("*" + ValueTypeName(e.f))
 		}
 	}
 

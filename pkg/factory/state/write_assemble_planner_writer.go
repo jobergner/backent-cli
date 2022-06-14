@@ -14,15 +14,15 @@ type assemblePlannerWriter struct {
 }
 
 func (a assemblePlannerWriter) eachRefInState(source string) *Statement {
-	return List(Id("_"), Id(a.f.ValueTypeName)).Op(":=").Range().Id(source).Dot(Title(a.f.ValueTypeName))
+	return List(Id("_"), Id(ValueTypeName(a.f))).Op(":=").Range().Id(source).Dot(Title(ValueTypeName(a.f)))
 }
 
 func (a assemblePlannerWriter) pathAlreadyIncluded() *Statement {
-	return List(Id("_"), Id("ok")).Op(":=").Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(a.f.ValueTypeName).Dot("ID")))
+	return List(Id("_"), Id("ok")).Op(":=").Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(ValueTypeName(a.f)).Dot("ID")))
 }
 
 func (a assemblePlannerWriter) checkedElementID() *Statement {
-	return Id(a.f.ValueTypeName).Dot("ChildID")
+	return Id(ValueTypeName(a.f)).Dot("ChildID")
 }
 
 func (a assemblePlannerWriter) includedElementsContainReferencedElement() *Statement {
@@ -30,5 +30,5 @@ func (a assemblePlannerWriter) includedElementsContainReferencedElement() *State
 }
 
 func (a assemblePlannerWriter) putPathInUpdatedReferencePaths() *Statement {
-	return Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(a.f.ValueTypeName).Dot("ID"))).Op("=").Id(a.f.ValueTypeName).Dot("Path")
+	return Id("ap").Dot("updatedReferencePaths").Index(Int().Call(Id(ValueTypeName(a.f)).Dot("ID"))).Op("=").Id(ValueTypeName(a.f)).Dot("Path")
 }

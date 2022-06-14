@@ -10,7 +10,7 @@ import (
 
 func TestWriteTriggerAction(t *testing.T) {
 	t.Run("writes triggerAction", func(t *testing.T) {
-		sf := NewFactory(newSimpleASTExample())
+		sf := NewFactory(testutils.NewSimpleASTExample())
 		sf.writeTriggerAction()
 
 		buf := new(bytes.Buffer)

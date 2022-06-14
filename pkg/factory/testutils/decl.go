@@ -153,6 +153,6 @@ func FindRedundantDecls(code string, collection map[string]string) ([]string, bo
 }
 
 func NewSimpleASTExample() *_ast.AST {
-	simpleAST := _ast.Parse(configs.StateConfig, map[interface{}]interface{}{}, map[interface{}]interface{}{})
+	simpleAST := _ast.Parse(configs.StateConfig, configs.ActionsConfig, configs.ResponsesConfig)
 	return simpleAST
 }

@@ -66,26 +66,6 @@ func getSring(value interface{}) string {
 	return fmt.Sprintf("%v", value)
 }
 
-func fieldValueTypeName(field Field) string {
-	if field.HasPointerValue {
-		return field.Parent.Name + title(pluralizeClient.Singular(field.Name)) + "Ref"
-	}
-	if field.HasAnyValue {
-		name := "anyOf"
-		firstIteration := true
-		field.RangeValueTypes(func(configType *ConfigType) {
-			if firstIteration {
-				name += title(configType.Name)
-			} else {
-				name += "_" + title(configType.Name)
-			}
-			firstIteration = false
-		})
-		return name
-	}
-	return field.ValueType().Name
-}
-
 func title(name string) string {
 	return strings.Title(name)
 }

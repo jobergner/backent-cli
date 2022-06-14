@@ -84,7 +84,7 @@ func (a assembleBranchWriter) assembleBasicSliceValue() *Statement {
 
 func (a assembleBranchWriter) assembleBasicNonSliceValue() *Statement {
 	return Case(Id(FieldPathIdentifier(*a.f))).Block(
-		Id("child").Op(":=").Id("engine").Dot(BasicTypes[a.f.ValueTypeName]).Call(Id(a.t.Name+"Data").Dot(Title(a.f.Name))),
+		Id("child").Op(":=").Id("engine").Dot(BasicTypes[ValueTypeName(a.f)]).Call(Id(a.t.Name+"Data").Dot(Title(a.f.Name))),
 		Id("element").Dot("OperationKind").Op("=").Id("child").Dot("OperationKind"),
 		Id("element").Dot(Title(a.f.Name)).Op("=").Id("&child").Dot("Value"),
 	)
@@ -92,7 +92,7 @@ func (a assembleBranchWriter) assembleBasicNonSliceValue() *Statement {
 
 func (a assembleBranchWriter) assemblePointerNonSliceAnyValue() *Statement {
 	return Case(Id(FieldPathIdentifier(*a.f))).Block(
-		Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(Title(a.f.ValueTypeName)+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(a.f.ValueTypeName),
+		Id("ref").Op(":=").Id("engine").Dot(ValueTypeName(a.f)).Call(Id(Title(ValueTypeName(a.f))+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(ValueTypeName(a.f)),
 		If(a.field().Op("!=").Nil().Op("&&").Id("ref").Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
 			Break(),
 		),
@@ -120,7 +120,7 @@ func (a assembleBranchWriter) assemblePointerNonSliceAnyValue() *Statement {
 }
 func (a assembleBranchWriter) assemblePointerSliceNonAnyValue() *Statement {
 	return Case(Id(FieldPathIdentifier(*a.f))).Block(
-		Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(Title(a.f.ValueTypeName)+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(a.f.ValueTypeName),
+		Id("ref").Op(":=").Id("engine").Dot(ValueTypeName(a.f)).Call(Id(Title(ValueTypeName(a.f))+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(ValueTypeName(a.f)),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
 		If(List(Id("_"), Id("ok")).Op(":=").Id("includedElements").Index(Int().Call(Id("ref").Dot("ReferencedElementID"))), Id("ok")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
@@ -141,7 +141,7 @@ func (a assembleBranchWriter) assemblePointerSliceNonAnyValue() *Statement {
 }
 func (a assembleBranchWriter) assemblePointerNonSliceNonAnyValue() *Statement {
 	return Case(Id(FieldPathIdentifier(*a.f))).Block(
-		Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(Title(a.f.ValueTypeName)+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(a.f.ValueTypeName),
+		Id("ref").Op(":=").Id("engine").Dot(ValueTypeName(a.f)).Call(Id(Title(ValueTypeName(a.f))+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(ValueTypeName(a.f)),
 		If(a.field().Op("!=").Nil().Op("&&").Id("ref").Dot("OperationKind").Op("==").Id("OperationKindDelete")).Block(
 			Break(),
 		),
@@ -166,7 +166,7 @@ func (a assembleBranchWriter) assemblePointerSliceAnyValue() *Statement {
 		If(a.field().Op("==").Nil()).Block(
 			a.field().Op("=").Make(Map(Int()).Id("elementReference")),
 		),
-		Id("ref").Op(":=").Id("engine").Dot(a.f.ValueTypeName).Call(Id(Title(a.f.ValueTypeName)+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(a.f.ValueTypeName),
+		Id("ref").Op(":=").Id("engine").Dot(ValueTypeName(a.f)).Call(Id(Title(ValueTypeName(a.f))+"ID").Call(Id("nextSeg").Dot("RefID"))).Dot(ValueTypeName(a.f)),
 		Id("referencedDataStatus").Op(":=").Id("ReferencedDataUnchanged"),
 		If(List(Id("_"), Id("ok")).Op(":=").Id("includedElements").Index(Id("ref").Dot("ChildID")), Id("ok")).Block(
 			Id("referencedDataStatus").Op("=").Id("ReferencedDataModified"),
