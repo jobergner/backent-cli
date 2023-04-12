@@ -1,4 +1,4 @@
-import { import_Update, ReferencedDataStatus, ElementKind, currentState, Tree, OperationKind } from "./index";
+import {import_Update, ReferencedDataStatus, ElementKind, Tree, OperationKind} from "./index";
 
 test("import updates", () => {
   const update: Tree = {
