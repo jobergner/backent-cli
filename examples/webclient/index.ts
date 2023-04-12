@@ -1,20 +1,15 @@
-import { EventEmitter } from "events";
+import {EventEmitter} from "events";
+
+const ErrResponseTimeout = "ErrResponseTimeout"
+const responseTimeout = 1000
 
 export const eventEmitter = new EventEmitter();
-
-declare global {
-  interface Window {
-    movePlayer(changeX: number, changeY: number, player: number): void;
-    addItemToPlayer(item: number, newName: string): string;
-    spawnZoneItems(items: string[]): string;
-  }
-}
 
 export interface AddItemToPlayerResponse {
   playerPath: string;
 }
 
-interface SpawnZoneItemsResponse {
+export interface SpawnZoneItemsResponse {
   newZoneItemPaths: string;
 }
 
@@ -76,7 +71,7 @@ interface AttackEvent {
 
 interface EquipmentSet {
   id: number;
-  equipment?: { [id: number]: ElementReference };
+  equipment?: {[id: number]: ElementReference};
   name?: string;
   operationKind: OperationKind;
   elementKind: ElementKind;
@@ -100,37 +95,37 @@ interface GearScore {
 
 interface Player {
   id: number;
-  action?: { [id: number]: AttackEvent };
-  equipmentSets?: { [id: number]: ElementReference };
+  action?: {[id: number]: AttackEvent};
+  equipmentSets?: {[id: number]: ElementReference};
   gearScore?: GearScore;
-  guildMembers?: { [id: number]: ElementReference };
-  items?: { [id: number]: Item };
+  guildMembers?: {[id: number]: ElementReference};
+  items?: {[id: number]: Item};
   position?: Position;
   target?: ElementReference;
-  targetedBy?: { [id: number]: ElementReference };
+  targetedBy?: {[id: number]: ElementReference};
   operationKind: OperationKind;
   elementKind: ElementKind;
 }
 
 interface Zone {
   id: number;
-  interactables?: { [id: number]: Item | Player | ZoneItem };
-  items?: { [id: number]: ZoneItem };
-  players?: { [id: number]: Player };
+  interactables?: {[id: number]: Item | Player | ZoneItem};
+  items?: {[id: number]: ZoneItem};
+  players?: {[id: number]: Player};
   tags?: string[];
   operationKind: OperationKind;
   elementKind: ElementKind;
 }
 
 export interface Tree {
-  attackEvent?: { [id: number]: AttackEvent };
-  equipmentSet?: { [id: number]: EquipmentSet };
-  gearScore?: { [id: number]: GearScore };
-  item?: { [id: number]: Item };
-  player?: { [id: number]: Player };
-  position?: { [id: number]: Position };
-  zone?: { [id: number]: Zone };
-  zoneItem?: { [id: number]: ZoneItem };
+  attackEvent?: {[id: number]: AttackEvent};
+  equipmentSet?: {[id: number]: EquipmentSet};
+  gearScore?: {[id: number]: GearScore};
+  item?: {[id: number]: Item};
+  player?: {[id: number]: Player};
+  position?: {[id: number]: Position};
+  zone?: {[id: number]: Zone};
+  zoneItem?: {[id: number]: ZoneItem};
 }
 
 export const currentState: Tree = {};
@@ -445,18 +440,131 @@ function importElementReference(current: ElementReference | null | undefined, up
   return update;
 }
 
-export function MovePlayer(changeX: number, changeY: number, player: number) {
-  window.movePlayer(changeX, changeY, player);
+
+enum MessageKind {
+  ID = "id",
+  Error = "error",
+  Update = "update",
+  CurrentState = "currentState",
+  ActionAddItemToPlayer = "addItemToPlayer",
+  ActionMovePlayer = "movePlayer",
+  ActionSpawnZoneItems = "spawnZoneItems",
 }
 
-export function AddItemToPlayer(item: number, newName: string): AddItemToPlayerResponse {
-  const responseString = window.addItemToPlayer(item, newName);
-  return JSON.parse(responseString);
+interface WebSocketMessage {
+  id: string;
+  kind: string;
+  content: string;
 }
 
-export function SpawnZoneItems(items: string[]): SpawnZoneItemsResponse {
-  const responseString = window.spawnZoneItems(items);
-  return JSON.parse(responseString);
+export class Client {
+  private ws: WebSocket;
+  private responseEmitter: EventEmitter;
+  private id: string;
+
+  constructor(url: string) {
+    this.id = ""
+
+    this.ws = new WebSocket(url);
+
+    this.responseEmitter = new EventEmitter()
+
+    this.ws.addEventListener('open', () => {
+      console.log('WebSocket connection opened');
+    });
+
+    this.ws.addEventListener('message', (event) => {
+      console.log('WebSocket message received:', event.data);
+
+      const message = JSON.parse(event.data) as WebSocketMessage;
+
+      switch (message.kind) {
+        case MessageKind.ID:
+          this.id = message.content
+          break;
+        case MessageKind.Update:
+        case MessageKind.CurrentState:
+          RECEIVEUPDATE(message.content)
+          break;
+        case MessageKind.Error:
+          console.log(message)
+          break;
+        default:
+          this.responseEmitter.emit(message.id, JSON.parse(message.content))
+          break;
+      }
+    });
+
+    this.ws.addEventListener('close', () => {
+      console.log('WebSocket connection closed');
+    });
+  }
+
+  public getID() {
+    return this.id;
+  }
+
+  public movePlayer(changeX: number, changeY: number, player: string) {
+    const messageID = this.generateID()
+
+    const message: WebSocketMessage = {
+      id: messageID,
+      kind: MessageKind.ActionMovePlayer,
+      content: JSON.stringify({changeX, changeY, player})
+    };
+
+    this.ws.send(JSON.stringify(message));
+  }
+
+  public addItemToPlayer(item: string, newName: string) {
+    const messageID = this.generateID()
+
+    const message: WebSocketMessage = {
+      id: messageID,
+      kind: MessageKind.ActionAddItemToPlayer,
+      content: JSON.stringify({item, newName})
+    };
+
+    setTimeout(() => {
+      this.ws.send(JSON.stringify(message));
+    }, 0)
+
+    return new Promise((resolve, reject) => {
+      this.responseEmitter.on(messageID, (response: AddItemToPlayerResponse) => {
+        resolve(response)
+      })
+      setTimeout(() => {
+        reject(ErrResponseTimeout)
+      }, responseTimeout)
+    })
+  }
+
+  public spawnZoneItems(items: string[]) {
+    const messageID = this.generateID()
+
+    const message: WebSocketMessage = {
+      id: messageID,
+      kind: MessageKind.ActionSpawnZoneItems,
+      content: JSON.stringify({items})
+    };
+
+    setTimeout(() => {
+      this.ws.send(JSON.stringify(message));
+    }, 0)
+
+    return new Promise((resolve, reject) => {
+      this.responseEmitter.on(messageID, (response: SpawnZoneItemsResponse) => {
+        resolve(response)
+      })
+      setTimeout(() => {
+        reject(ErrResponseTimeout)
+      }, responseTimeout)
+    })
+  }
+
+  private generateID(): string {
+    return Date.now().toString() + Math.random().toString(36).slice(2, 5);
+  }
 }
 
 export function emit_Update(update: Tree) {
