@@ -982,9 +982,6 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
-- make slices always return same order through getters (the order currenlty may be changed by removers (sort by id ascending?))
-- it is still unclear which methods can be used during broadcasting. We somehow need to limit that.
-- you can call Be<Type> on slices of anyOf types which creates a new anyOf container with new ID. this causes the slice of anyOf IDs to lose track if that anyOfContainer and holds plain wrong information. (interactables)
 
 BIG CHANGE: REMOVE BROADCASTING
 a lot of time and energy went into the broadcasting feature, but I still decided to remove it. The amout of complexity it adds is just not worth it and hard to explain, which made code and documentation harder to reason about.
