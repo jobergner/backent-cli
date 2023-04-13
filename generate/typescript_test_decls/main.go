@@ -20,14 +20,16 @@ var literalMatcher = regexp.MustCompile(`([a-zA-Z])\w*`)
 func declarationName(decl string) string {
 	matches := literalMatcher.FindAllString(decl, 3)
 
-	if len(matches) < 3 {
-		panic(fmt.Sprintf("found < 3 matches for this decl:\n%s", decl))
-	}
-
 	if matches[0] == "export" {
+		if len(matches) < 3 {
+			panic(fmt.Sprintf("found < 3 matches for this decl:\n%s", decl))
+		}
 		return fmt.Sprintf("%s_%s", matches[1], matches[2])
 	}
 
+	if len(matches) < 2 {
+		panic(fmt.Sprintf("found < 2 matches for this decl:\n%s", decl))
+	}
 	return fmt.Sprintf("%s_%s", matches[0], matches[1])
 }
 

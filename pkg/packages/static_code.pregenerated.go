@@ -4,17 +4,17 @@ package packages
 var StaticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"nhooyr.io/websocket"
-	"errors"
-	"github.com/google/uuid"
-	"{{path}}/message"
-	"context"
-	"sync"
-	"{{path}}/state"
-	"time"
 	"{{path}}/logging"
 	"github.com/rs/zerolog/log"
 	"{{path}}/connect"
+	"sync"
+	"{{path}}/state"
+	"nhooyr.io/websocket"
+	"errors"
+	"time"
+	"github.com/google/uuid"
+	"{{path}}/message"
+	"context"
 )
 // easyjson:skip
 type Client struct {
@@ -267,18 +267,18 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
-	"{{path}}/connect"
-	"{{path}}/message"
+	"nhooyr.io/websocket"
 	"sync"
 	"{{path}}/state"
+	"time"
 	"fmt"
 	"net/http"
-	"nhooyr.io/websocket"
-	"github.com/google/uuid"
-	"{{path}}/logging"
-	"github.com/rs/zerolog/log"
 	"errors"
-	"time"
+	"github.com/google/uuid"
+	"{{path}}/connect"
+	"{{path}}/logging"
+	"{{path}}/message"
+	"github.com/rs/zerolog/log"
 )
 // easyjson:skip
 type Client struct {
@@ -311,9 +311,6 @@ func (c *Client) sendIdentifyingMessage() error {
 	c.messageChannel <- msgBytes
 	return nil
 }
-func (c *Client) SendMessage(msg []byte) {
-	c.messageChannel <- msg
-}
 func (c *Client) ID() string {
 	return c.id
 }
@@ -334,16 +331,14 @@ func (c *Client) runReadMessages() {
 		err = msg.UnmarshalJSON(msgBytes)
 		if err != nil {
 			log.Err(err).Str(logging.Message, string(msgBytes)).Msg("failed unmarshalling message")
-			errMsg, _ := Message{message.MessageIDUnknown, message.MessageKindError, []byte("invalid message"), nil}.MarshalJSON()
-			c.messageChannel <- errMsg
 			continue
 		}
 		msg.client = c
 		if msg.Kind == message.MessageKindGlobal {
-			c.lobby.processMessageSync(msg)
+			c.lobby.processMessage(msg)
 		} else {
 			if c.room != nil {
-				c.room.processMessageSync(msg)
+				c.room.processMessage(msg)
 			}
 		}
 	}
@@ -414,7 +409,7 @@ func (l *Lobby) CreateRoom(name string) *Room {
 	}
 	room := newRoom(l.controller, name)
 	l.Rooms[name] = room
-	room.Deploy(l.controller, l.fps)
+	room.Deploy(l.fps)
 	return room
 }
 func (l *Lobby) DeleteRoom(name string) {
@@ -435,7 +430,7 @@ func (l *Lobby) deleteClient(client *Client) {
 	}
 	l.signalClientDisconnect(client)
 }
-func (l *Lobby) processMessageSync(msg Message) {
+func (l *Lobby) processMessage(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
@@ -494,18 +489,8 @@ func (r *Room) AlterState(fn func(*state.Engine)) {
 	defer r.mu.Unlock()
 	fn(r.state)
 }
-func (r *Room) RangeClients(fn func(client *Client)) {
-	for c := range r.clients.incomingClients {
-		fn(c)
-	}
-	for c := range r.clients.clients {
-		fn(c)
-	}
-}
-func (r *Room) processMessageSync(msg Message) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	response := r.processClientMessage(msg)
+func (r *Room) processMessage(msg Message) {
+	response := r.triggerAction(msg)
 	if response.Kind == message.MessageKindNoResponse {
 		return
 	}
@@ -521,18 +506,18 @@ func (r *Room) processMessageSync(msg Message) {
 		response.client.closeConnection(logging.ClientBufferFull)
 	}
 }
-func (r *Room) run(controller Controller, fps int) {
+func (r *Room) run(fps int) {
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
 	for {
 		<-ticker.C
-		r.tickSync(controller)
+		r.tick()
 		if r.mode == RoomModeTerminating {
 			break
 		}
 	}
 }
-func (r *Room) Deploy(controller Controller, fps int) {
-	go r.run(controller, fps)
+func (r *Room) Deploy(fps int) {
+	go r.run(fps)
 }
 // easyjson:skip
 type Server struct {
@@ -574,7 +559,7 @@ func (s *Server) wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	s.Lobby.deleteClient(client)
 }
 func (s *Server) Start() chan error {
-	log.Info().Msgf("backent running on port %s\n", s.HttpServer.Addr)
+	log.Info().Msgf("server running on port %s\n", s.HttpServer.Addr)
 	serverError := make(chan error)
 	go func() {
 		err := s.HttpServer.ListenAndServe()
@@ -582,10 +567,10 @@ func (s *Server) Start() chan error {
 	}()
 	return serverError
 }
-func (r *Room) tickSync(controller Controller) {
+func (r *Room) tick() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	controller.OnFrameTick(r.state)
+	r.controller.OnFrameTick(r.state)
 	err := r.publishPatch()
 	if err != nil {
 		return
@@ -650,10 +635,9 @@ func (r *Room) handleIncomingClients() {
 	"importedCode_state": `package state 
 import (
 	"sort"
-	"sync"
-	"bytes"
 	"fmt"
 	"strconv"
+	"sync"
 )
 `,
 }
