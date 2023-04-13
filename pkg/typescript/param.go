@@ -10,5 +10,5 @@ type Param struct {
 }
 
 func (p Param) toString() string {
-	return fmt.Sprintf("%s : %s", p.Id, p.Type.toString())
+	return fmt.Sprintf("%s : %s", p.Id, p.Type.String())
 }

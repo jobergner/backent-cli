@@ -18,6 +18,6 @@ func NewCode() *Code {
 	}
 }
 
-func (c *Code) toString() string {
+func (c *Code) String() string {
 	return c.buf.String()
 }

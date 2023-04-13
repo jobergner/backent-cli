@@ -10,9 +10,9 @@ type InterfaceField struct {
 
 func (i InterfaceField) toString() string {
 	if i.Optional {
-		return fmt.Sprintf("%s?: %s;\n", i.Name, i.Type.toString())
+		return fmt.Sprintf("%s?: %s;\n", i.Name, i.Type.String())
 	}
-	return fmt.Sprintf("%s: %s;\n", i.Name, i.Type.toString())
+	return fmt.Sprintf("%s: %s;\n", i.Name, i.Type.String())
 }
 
 func (c *Code) Interface(name string, fields ...InterfaceField) *Code {
@@ -50,6 +50,6 @@ func (c *Code) Enum(name string, fields ...EnumField) *Code {
 }
 
 func (c *Code) OrType(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf("| %s ", s))
+	c.buf.WriteString(fmt.Sprintf(" | %s", s))
 	return c
 }

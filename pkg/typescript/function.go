@@ -40,7 +40,7 @@ func (c *Code) Call(params ...*Code) *Code {
 
 	var paramStrings []string
 	for _, p := range params {
-		paramStrings = append(paramStrings, p.toString())
+		paramStrings = append(paramStrings, p.String())
 	}
 
 	c.buf.WriteString(strings.Join(paramStrings, ", "))

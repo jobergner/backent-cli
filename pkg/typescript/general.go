@@ -6,34 +6,34 @@ import (
 )
 
 func (c *Code) Index(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf("[%s] ", s))
+	c.buf.WriteString(fmt.Sprintf("[%s]", s))
 	return c
 }
 
 func (c *Code) Id(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf("%s ", s))
+	c.buf.WriteString(fmt.Sprintf(" %s", s))
 	return c
 }
 
 func (c *Code) Dot(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf(".%s ", s))
+	c.buf.WriteString(fmt.Sprintf(".%s", s))
 	return c
 }
 
 func (c *Code) Is(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf(": %s ", s))
+	c.buf.WriteString(fmt.Sprintf(": %s", s))
 	return c
 }
 
 func (c *Code) If(code *Code) *Code {
 	c.buf.WriteString("if (")
-	c.buf.WriteString(code.toString())
+	c.buf.WriteString(code.String())
 	c.buf.WriteString(") ")
 	return c
 }
 
 func (c *Code) ForIn(decl, iterable *Code) *Code {
-	c.buf.WriteString(fmt.Sprintf("for (%s in %s) ", decl.toString(), iterable.toString()))
+	c.buf.WriteString(fmt.Sprintf("for (%s in %s) ", decl.String(), iterable.String()))
 	return c
 }
 
@@ -42,7 +42,7 @@ func (c *Code) Block(code ...*Code) *Code {
 
 	for _, line := range code {
 		c.buf.WriteString(indent)
-		c.buf.WriteString(line.toString())
+		c.buf.WriteString(line.String())
 		c.buf.WriteString("\n")
 	}
 
@@ -57,7 +57,7 @@ type ObjectField struct {
 }
 
 func (o ObjectField) toString() string {
-	return fmt.Sprintf("%s : %s", o.Id, o.Type.toString())
+	return fmt.Sprintf("%s : %s", o.Id, o.Type.String())
 }
 
 func (c *Code) Object(fields ...ObjectField) *Code {

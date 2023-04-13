@@ -57,6 +57,6 @@ func TestCode(t *testing.T) {
   return current;
 }`
 
-		assert.Equal(t, prepare(expected), prepare(actual.toString()))
+		assert.Equal(t, prepare(expected), prepare(actual.String()))
 	})
 }
