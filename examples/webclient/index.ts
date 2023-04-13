@@ -495,7 +495,7 @@ export class Client {
   public getID() {
     return this.id;
   }
-  public movePlayer(changeX: number, changeY: number, player: string) {
+  public movePlayer(changeX: number, changeY: number, player: number) {
     const messageID = this.generateID()
     const message: WebSocketMessage = {
       id: messageID,
@@ -506,7 +506,7 @@ export class Client {
       this.ws.send(JSON.stringify(message));
     }, 0)
   }
-  public addItemToPlayer(item: string, newName: string): Promise<AddItemToPlayerResponse> {
+  public addItemToPlayer(item: number, newName: string): Promise<AddItemToPlayerResponse> {
     const messageID = this.generateID()
     const message: WebSocketMessage = {
       id: messageID,
@@ -525,7 +525,7 @@ export class Client {
       }, responseTimeout)
     })
   }
-  public spawnZoneItems(items: string[]): Promise<SpawnZoneItemsResponse> {
+  public spawnZoneItems(items: number[]): Promise<SpawnZoneItemsResponse> {
     const messageID = this.generateID()
     const message: WebSocketMessage = {
       id: messageID,

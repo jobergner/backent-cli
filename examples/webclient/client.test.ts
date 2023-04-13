@@ -18,7 +18,7 @@ test("client handles actions", async () => {
       switch (message.kind) {
         case MessageKind.ActionAddItemToPlayer:
           expect(message.kind).toEqual(MessageKind.ActionAddItemToPlayer)
-          expect(content).toEqual({item: "foo", newName: "bar"})
+          expect(content).toEqual({item: 123, newName: "bar"})
           const addItemToPlayerResponse = {
             id: message.id,
             kind: MessageKind.ActionAddItemToPlayer,
@@ -28,11 +28,11 @@ test("client handles actions", async () => {
           break;
         case MessageKind.ActionMovePlayer:
           expect(message.kind).toEqual(MessageKind.ActionMovePlayer)
-          expect(content).toEqual({changeX: 1, changeY: 2, player: "foo"})
+          expect(content).toEqual({changeX: 1, changeY: 2, player: 123})
           break;
         case MessageKind.ActionSpawnZoneItems:
           expect(message.kind).toEqual(MessageKind.ActionSpawnZoneItems)
-          expect(content).toEqual({items: ["foo"]})
+          expect(content).toEqual({items: [123]})
           const spawnZoneItemsResponse = {
             id: message.id,
             kind: MessageKind.ActionSpawnZoneItems,
@@ -48,12 +48,12 @@ test("client handles actions", async () => {
 
   const client = new Client(fakeURL)
 
-  const responseAddItemToPlayer = await client.addItemToPlayer("foo", "bar")
+  const responseAddItemToPlayer = await client.addItemToPlayer(123, "bar")
   expect(responseAddItemToPlayer).toEqual(addItemToPlayerResponseContent)
 
-  client.movePlayer(1, 2, "foo")
+  client.movePlayer(1, 2, 123)
 
-  const responseSpawnZoneItems = await client.spawnZoneItems(["foo"])
+  const responseSpawnZoneItems = await client.spawnZoneItems([123])
   expect(responseSpawnZoneItems).toEqual(spawnZoneItemsResponseContent)
 
   mockServer.close()
