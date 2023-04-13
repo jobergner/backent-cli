@@ -1,6 +1,7 @@
 import {EventEmitter} from "events";
 
 const ErrResponseTimeout = "ErrResponseTimeout"
+
 const responseTimeout = 1000
 
 export const eventEmitter = new EventEmitter();
@@ -10,7 +11,7 @@ export interface AddItemToPlayerResponse {
 }
 
 export interface SpawnZoneItemsResponse {
-  newZoneItemPaths: string;
+  newZoneItemPaths: string[];
 }
 
 export enum ReferencedDataStatus {
@@ -441,7 +442,7 @@ function importElementReference(current: ElementReference | null | undefined, up
 }
 
 
-enum MessageKind {
+export enum MessageKind {
   ID = "id",
   Error = "error",
   Update = "update",
@@ -451,7 +452,7 @@ enum MessageKind {
   ActionSpawnZoneItems = "spawnZoneItems",
 }
 
-interface WebSocketMessage {
+export interface WebSocketMessage {
   id: string;
   kind: string;
   content: string;
@@ -461,23 +462,16 @@ export class Client {
   private ws: WebSocket;
   private responseEmitter: EventEmitter;
   private id: string;
-
   constructor(url: string) {
     this.id = ""
-
     this.ws = new WebSocket(url);
-
     this.responseEmitter = new EventEmitter()
-
     this.ws.addEventListener('open', () => {
       console.log('WebSocket connection opened');
     });
-
     this.ws.addEventListener('message', (event) => {
       console.log('WebSocket message received:', event.data);
-
       const message = JSON.parse(event.data) as WebSocketMessage;
-
       switch (message.kind) {
         case MessageKind.ID:
           this.id = message.content
@@ -494,41 +488,34 @@ export class Client {
           break;
       }
     });
-
     this.ws.addEventListener('close', () => {
       console.log('WebSocket connection closed');
     });
   }
-
   public getID() {
     return this.id;
   }
-
   public movePlayer(changeX: number, changeY: number, player: string) {
     const messageID = this.generateID()
-
     const message: WebSocketMessage = {
       id: messageID,
       kind: MessageKind.ActionMovePlayer,
       content: JSON.stringify({changeX, changeY, player})
     };
-
-    this.ws.send(JSON.stringify(message));
+    setTimeout(() => {
+      this.ws.send(JSON.stringify(message));
+    }, 0)
   }
-
-  public addItemToPlayer(item: string, newName: string) {
+  public addItemToPlayer(item: string, newName: string): Promise<AddItemToPlayerResponse> {
     const messageID = this.generateID()
-
     const message: WebSocketMessage = {
       id: messageID,
       kind: MessageKind.ActionAddItemToPlayer,
       content: JSON.stringify({item, newName})
     };
-
     setTimeout(() => {
       this.ws.send(JSON.stringify(message));
     }, 0)
-
     return new Promise((resolve, reject) => {
       this.responseEmitter.on(messageID, (response: AddItemToPlayerResponse) => {
         resolve(response)
@@ -538,20 +525,16 @@ export class Client {
       }, responseTimeout)
     })
   }
-
-  public spawnZoneItems(items: string[]) {
+  public spawnZoneItems(items: string[]): Promise<SpawnZoneItemsResponse> {
     const messageID = this.generateID()
-
     const message: WebSocketMessage = {
       id: messageID,
       kind: MessageKind.ActionSpawnZoneItems,
       content: JSON.stringify({items})
     };
-
     setTimeout(() => {
       this.ws.send(JSON.stringify(message));
     }, 0)
-
     return new Promise((resolve, reject) => {
       this.responseEmitter.on(messageID, (response: SpawnZoneItemsResponse) => {
         resolve(response)
@@ -561,7 +544,6 @@ export class Client {
       }, responseTimeout)
     })
   }
-
   private generateID(): string {
     return Date.now().toString() + Math.random().toString(36).slice(2, 5);
   }
