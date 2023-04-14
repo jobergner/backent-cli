@@ -1,43 +1,32 @@
 package typescript
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
 func TestCode(t *testing.T) {
-
-	prepare := func(s string) string {
-		// ignore whitespace and semicolon, may result in logical differences in syntax
-		// in some cases but is enough for this test
-		s = strings.ReplaceAll(s, "	", "") // tab
-		s = strings.ReplaceAll(s, " ", "") // space
-		s = strings.ReplaceAll(s, ";", "")
-
-		return s
-	}
 
 	t.Run("writes function", func(t *testing.T) {
 
 		actual := Function("importEquipmentSet").Param(Param{"current", Id("EquipmentSet").OrType("null").OrType("undefined")}, Param{"update", Id("EquipmentSet")}).ReturnType("EquipmentSet").Block(
 			If(Id("current").Equals().Id("null").Or().Id("current").Equals().Id("undefined")).Block(
-				Id("current").Id("=").Object(ObjectField{Id("id"), Id("update").Dot("id")}, ObjectField{Id("elementKind"), Id("update").Dot("elementKind")}, ObjectField{Id("operationKind"), Id("update").Dot("operationKind")}),
+				Id("current").Assign().Object(ObjectField{Id("id"), Id("update").Dot("id")}, ObjectField{Id("elementKind"), Id("update").Dot("elementKind")}, ObjectField{Id("operationKind"), Id("update").Dot("operationKind")}).Sc(),
 			),
 			If(Id("update").Dot("equipment").EqualsNot().Id("null").And().Id("update").Dot("equipment").EqualsNot().Id("undefined")).Block(
 				If(Id("current").Dot("equipment").Equals().Id("null").Or().Id("current").Dot("equipment").Equals().Id("undefined")).Block(
-					Id("current").Dot("equipment").Id("=").Object(),
+					Id("current").Dot("equipment").Assign().Object().Sc(),
 				),
 				ForIn(Id("const").Id("id"), Id("update").Dot("equipment")).Block(
-					Id("current").Dot("equipment").Index("id").Id("=").Id("importElementReference").Call(Id("current").Dot("equipment").Index("id"), Id("update").Dot("equipment").Index("id")),
+					Id("current").Dot("equipment").Index(Id("id")).Assign().Id("importElementReference").Call(Id("current").Dot("equipment").Index(Id("id")), Id("update").Dot("equipment").Index(Id("id"))).Sc(),
 				),
 			),
 			If(Id("update").Dot("name").EqualsNot().Id("null").And().Id("update").Dot("name").EqualsNot().Id("undefined")).Block(
-				Id("current").Dot("name").Id("=").Id("update").Dot("name"),
+				Id("current").Dot("name").Assign().Id("update").Dot("name").Sc(),
 			),
-			Return("current"),
-		)
+			Return("current").Sc(),
+		).String()
 
 		expected := `function importEquipmentSet(current: EquipmentSet | null | undefined, update: EquipmentSet): EquipmentSet {
   if (current === null || current === undefined) {
@@ -57,6 +46,9 @@ func TestCode(t *testing.T) {
   return current;
 }`
 
-		assert.Equal(t, prepare(expected), prepare(actual.String()))
+		if actual != expected {
+			diffs := testutils.PrettyDiffText(actual, expected)
+			t.Errorf(diffs)
+		}
 	})
 }

@@ -30,11 +30,11 @@ func (c *Code) Interface(name string, fields ...InterfaceField) *Code {
 
 type EnumField struct {
 	Name  string
-	Value string
+	Value *Code
 }
 
-func (e EnumField) toString() string {
-	return fmt.Sprintf("%s = %s,\n", e.Name, e.Value)
+func (e EnumField) String() string {
+	return fmt.Sprintf("%s = %s,\n", e.Name, e.Value.String())
 }
 
 func (c *Code) Enum(name string, fields ...EnumField) *Code {
@@ -42,7 +42,7 @@ func (c *Code) Enum(name string, fields ...EnumField) *Code {
 
 	for _, f := range fields {
 		c.buf.WriteString(indent)
-		c.buf.WriteString(f.toString())
+		c.buf.WriteString(f.String())
 	}
 
 	c.buf.WriteString("}\n")

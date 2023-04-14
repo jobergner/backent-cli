@@ -9,6 +9,6 @@ type Param struct {
 	Type *Code
 }
 
-func (p Param) toString() string {
-	return fmt.Sprintf("%s : %s", p.Id, p.Type.String())
+func (p Param) String() string {
+	return fmt.Sprintf("%s: %s", p.Id, p.Type.String())
 }
