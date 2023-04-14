@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func (c *Code) Index(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf("[%s]", s))
+func (c *Code) Index(code *Code) *Code {
+	c.buf.WriteString(fmt.Sprintf("[%s]", code.String()))
 	return c
 }
 
@@ -20,8 +20,8 @@ func (c *Code) Dot(s string) *Code {
 	return c
 }
 
-func (c *Code) Is(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf(": %s", s))
+func (c *Code) Is(code *Code) *Code {
+	c.buf.WriteString(fmt.Sprintf(": %s", code.String()))
 	return c
 }
 
@@ -52,7 +52,7 @@ func (c *Code) Block(code ...*Code) *Code {
 }
 
 type ObjectField struct {
-	Id   string
+	Id   *Code
 	Type *Code
 }
 

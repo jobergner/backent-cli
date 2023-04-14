@@ -3,7 +3,6 @@ package typescript
 func Const(name string) *Code {
 	return NewCode().Const(name)
 }
-
 func Let(name string) *Code {
 	return NewCode().Let(name)
 }
@@ -30,4 +29,16 @@ func Id(s string) *Code {
 
 func Return(s string) *Code {
 	return NewCode().Return(s)
+}
+
+func Object(fields ...ObjectField) *Code {
+	return NewCode().Object(fields...)
+}
+
+func Index(code *Code) *Code {
+	return NewCode().Index(code)
+}
+
+func Empty() *Code {
+	return NewCode()
 }

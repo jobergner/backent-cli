@@ -68,7 +68,7 @@ func Diff(actual, expected string) (string, bool) {
 		want := expectedDelcs[name]
 		if got != want {
 			areDifferent = true
-			buf.WriteString(diffDecl(got, want))
+			buf.WriteString(PrettyDiffText(got, want))
 		} else {
 			buf.WriteString("\n____\n\n CORRECT:\n" + want)
 		}
@@ -77,11 +77,7 @@ func Diff(actual, expected string) (string, bool) {
 	return buf.String(), areDifferent
 }
 
-// creates diff and makes whitespace visible
-func diffDecl(actual, expected string) string {
-	dmp := diffmatchpatch.New()
-	diffs := dmp.DiffMain(actual, expected, false)
-
+func withVisibleWhitespace(diffs []diffmatchpatch.Diff) []diffmatchpatch.Diff {
 	for i, diff := range diffs {
 		if diff.Type == diffmatchpatch.DiffDelete || diff.Type == diffmatchpatch.DiffInsert {
 			var buf bytes.Buffer
@@ -96,6 +92,14 @@ func diffDecl(actual, expected string) string {
 			diffs[i] = diff
 		}
 	}
+
+	return diffs
+}
+
+// creates diff and makes whitespace visible
+func PrettyDiffText(actual, expected string) string {
+	dmp := diffmatchpatch.New()
+	diffs := withVisibleWhitespace(dmp.DiffMain(actual, expected, false))
 
 	return `
 __________________________________

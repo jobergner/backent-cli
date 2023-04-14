@@ -7,6 +7,7 @@ import (
 )
 
 func (s *Factory) writeTypeDefinitions() *Factory {
+
 	s.config.RangeTypes(func(configType ast.ConfigType) {
 
 		var fields []InterfaceField
@@ -20,10 +21,15 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 			typesDef := NewCode()
 			first := true
 
-			for _, vt := range field.ValueTypes {
+			for _, vt := range sortValueTypes(field.ValueTypes) {
+				if field.HasPointerValue {
+					typesDef.Id("ElementReference")
+					break
+				}
+
 				if vt.IsBasicType {
 					typesDef.Id(goTypeToTypescriptType(vt.Name))
-					continue
+					break
 				}
 
 				if !first {
@@ -34,6 +40,17 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 				typesDef.Id(Title(vt.Name))
 
 				first = false
+			}
+
+			if field.HasSliceValue {
+				if field.ValueType().IsBasicType {
+					typesDef.Index(Empty())
+				} else {
+					typesDef = Object(ObjectField{
+						Id:   Index(Id("id").Is(Id("number"))),
+						Type: typesDef,
+					})
+				}
 			}
 
 			fields = append(fields, InterfaceField{
@@ -53,6 +70,29 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 
 		s.file.Interface(Title(configType.Name), fields...)
 	})
+
+	s.file.Interface("ElementReference", []InterfaceField{
+		{
+			Name: "operationKind",
+			Type: Id("OperationKind"),
+		},
+		{
+			Name: "elementID",
+			Type: Id("number"),
+		},
+		{
+			Name: "elementKind",
+			Type: Id("ElementKind"),
+		},
+		{
+			Name: "referencedDataStatus",
+			Type: Id("ReferencedDataStatus"),
+		},
+		{
+			Name: "elementPath",
+			Type: Id("string"),
+		},
+	}...)
 
 	return s
 }
