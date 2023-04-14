@@ -1,8 +1,8 @@
 package webclient
 
 const import_EventEmitter = `import {EventEmitter} from "events";`
-const const_ErrResponseTimeout = `const ErrResponseTimeout = "ErrResponseTimeout"`
-const const_responseTimeout = `const responseTimeout = 1000`
+const const_ErrResponseTimeout = `const ErrResponseTimeout = "ErrResponseTimeout";`
+const const_responseTimeout = `const responseTimeout = 1000;`
 const const_eventEmitter = `export const eventEmitter = new EventEmitter();`
 const interface_AddItemToPlayerResponse = `export interface AddItemToPlayerResponse {
   playerPath: string;
@@ -26,7 +26,7 @@ const enum_ElementKind = `export enum ElementKind {
   ElementKindGearScore = "GearScore",
   ElementKindItem = "Item",
   ElementKindPlayer = "Player",
-  ElementKindPosition = "position",
+  ElementKindPosition = "Position",
   ElementKindZone = "Zone",
   ElementKindZoneItem = "ZoneItem",
 }`
@@ -61,7 +61,7 @@ const interface_AttackEvent = `interface AttackEvent {
 }`
 const interface_EquipmentSet = `interface EquipmentSet {
   id: number;
-  equipment?: {[id: number]: ElementReference};
+  equipment?: { [id: number]: ElementReference };
   name?: string;
   operationKind: OperationKind;
   elementKind: ElementKind;
@@ -82,35 +82,35 @@ const interface_GearScore = `interface GearScore {
 }`
 const interface_Player = `interface Player {
   id: number;
-  action?: {[id: number]: AttackEvent};
-  equipmentSets?: {[id: number]: ElementReference};
+  action?: { [id: number]: AttackEvent };
+  equipmentSets?: { [id: number]: ElementReference };
   gearScore?: GearScore;
-  guildMembers?: {[id: number]: ElementReference};
-  items?: {[id: number]: Item};
+  guildMembers?: { [id: number]: ElementReference };
+  items?: { [id: number]: Item };
   position?: Position;
   target?: ElementReference;
-  targetedBy?: {[id: number]: ElementReference};
+  targetedBy?: { [id: number]: ElementReference };
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
 const interface_Zone = `interface Zone {
   id: number;
-  interactables?: {[id: number]: Item | Player | ZoneItem};
-  items?: {[id: number]: ZoneItem};
-  players?: {[id: number]: Player};
+  interactables?: { [id: number]: Item | Player | ZoneItem };
+  items?: { [id: number]: ZoneItem };
+  players?: { [id: number]: Player };
   tags?: string[];
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
 const interface_Tree = `export interface Tree {
-  attackEvent?: {[id: number]: AttackEvent};
-  equipmentSet?: {[id: number]: EquipmentSet};
-  gearScore?: {[id: number]: GearScore};
-  item?: {[id: number]: Item};
-  player?: {[id: number]: Player};
-  position?: {[id: number]: Position};
-  zone?: {[id: number]: Zone};
-  zoneItem?: {[id: number]: ZoneItem};
+  attackEvent?: { [id: number]: AttackEvent };
+  equipmentSet?: { [id: number]: EquipmentSet };
+  gearScore?: { [id: number]: GearScore };
+  item?: { [id: number]: Item };
+  player?: { [id: number]: Player };
+  position?: { [id: number]: Position };
+  zone?: { [id: number]: Zone };
+  zoneItem?: { [id: number]: ZoneItem };
 }`
 const const_currentState = `export const currentState: Tree = {};`
 const function_RECEIVEUPDATE = `function RECEIVEUPDATE(json: string) {
@@ -432,86 +432,86 @@ const class_Client = `export class Client {
   private responseEmitter: EventEmitter;
   private id: string;
   constructor(url: string) {
-    this.id = ""
+    this.id = "";
     this.ws = new WebSocket(url);
-    this.responseEmitter = new EventEmitter()
-    this.ws.addEventListener('open', () => {
-      console.log('WebSocket connection opened');
+    this.responseEmitter = new EventEmitter();
+    this.ws.addEventListener("open", () => {
+      console.log("WebSocket connection opened");
     });
-    this.ws.addEventListener('message', (event) => {
-      console.log('WebSocket message received:', event.data);
+    this.ws.addEventListener("message", (event) => {
+      console.log("WebSocket message received:", event.data);
       const message = JSON.parse(event.data) as WebSocketMessage;
       switch (message.kind) {
         case MessageKind.ID:
-          this.id = message.content
+          this.id = message.content;
           break;
         case MessageKind.Update:
         case MessageKind.CurrentState:
-          RECEIVEUPDATE(message.content)
+          RECEIVEUPDATE(message.content);
           break;
         case MessageKind.Error:
-          console.log(message)
+          console.log(message);
           break;
         default:
-          this.responseEmitter.emit(message.id, JSON.parse(message.content))
+          this.responseEmitter.emit(message.id, JSON.parse(message.content));
           break;
       }
     });
-    this.ws.addEventListener('close', () => {
-      console.log('WebSocket connection closed');
+    this.ws.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
     });
   }
   public getID() {
     return this.id;
   }
-  public movePlayer(changeX: number, changeY: number, player: string) {
-    const messageID = this.generateID()
+  public movePlayer(changeX: number, changeY: number, player: number) {
+    const messageID = this.generateID();
     const message: WebSocketMessage = {
       id: messageID,
       kind: MessageKind.ActionMovePlayer,
-      content: JSON.stringify({changeX, changeY, player})
+      content: JSON.stringify({changeX, changeY, player}),
     };
     setTimeout(() => {
       this.ws.send(JSON.stringify(message));
-    }, 0)
+    }, 0);
   }
-  public addItemToPlayer(item: string, newName: string): Promise<AddItemToPlayerResponse> {
-    const messageID = this.generateID()
+  public addItemToPlayer(item: number, newName: string): Promise<AddItemToPlayerResponse> {
+    const messageID = this.generateID();
     const message: WebSocketMessage = {
       id: messageID,
       kind: MessageKind.ActionAddItemToPlayer,
-      content: JSON.stringify({item, newName})
+      content: JSON.stringify({item, newName}),
     };
     setTimeout(() => {
       this.ws.send(JSON.stringify(message));
-    }, 0)
+    }, 0);
     return new Promise((resolve, reject) => {
       this.responseEmitter.on(messageID, (response: AddItemToPlayerResponse) => {
-        resolve(response)
-      })
+        resolve(response);
+      });
       setTimeout(() => {
-        reject(ErrResponseTimeout)
-      }, responseTimeout)
-    })
+        reject(ErrResponseTimeout);
+      }, responseTimeout);
+    });
   }
-  public spawnZoneItems(items: string[]): Promise<SpawnZoneItemsResponse> {
-    const messageID = this.generateID()
+  public spawnZoneItems(items: number[]): Promise<SpawnZoneItemsResponse> {
+    const messageID = this.generateID();
     const message: WebSocketMessage = {
       id: messageID,
       kind: MessageKind.ActionSpawnZoneItems,
-      content: JSON.stringify({items})
+      content: JSON.stringify({items}),
     };
     setTimeout(() => {
       this.ws.send(JSON.stringify(message));
-    }, 0)
+    }, 0);
     return new Promise((resolve, reject) => {
       this.responseEmitter.on(messageID, (response: SpawnZoneItemsResponse) => {
-        resolve(response)
-      })
+        resolve(response);
+      });
       setTimeout(() => {
-        reject(ErrResponseTimeout)
-      }, responseTimeout)
-    })
+        reject(ErrResponseTimeout);
+      }, responseTimeout);
+    });
   }
   private generateID(): string {
     return Date.now().toString() + Math.random().toString(36).slice(2, 5);

@@ -19,34 +19,42 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 		configType.RangeFields(func(field ast.Field) {
 
 			typesDef := NewCode()
-			first := true
 
-			for _, vt := range sortValueTypes(field.ValueTypes) {
+			first := true
+			done := false
+
+			field.RangeValueTypes(func(vt *ast.ConfigType) {
+				if done {
+					return
+				}
+
 				if field.HasPointerValue {
 					typesDef.Id("ElementReference")
-					break
+					done = true
+					return
 				}
 
 				if vt.IsBasicType {
 					typesDef.Id(goTypeToTypescriptType(vt.Name))
-					break
+					done = true
+					return
 				}
 
 				if !first {
 					typesDef.OrType(Title(vt.Name))
-					continue
+					return
 				}
 
 				typesDef.Id(Title(vt.Name))
 
 				first = false
-			}
+			})
 
 			if field.HasSliceValue {
 				if field.ValueType().IsBasicType {
 					typesDef.Index(Empty())
 				} else {
-					typesDef = Object(ObjectField{
+					typesDef = ObjectSpaced(ObjectField{
 						Id:   Index(Id("id").Is(Id("number"))),
 						Type: typesDef,
 					})

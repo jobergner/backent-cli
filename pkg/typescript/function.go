@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Code) Function(name string) *Code {
-	c.buf.WriteString(fmt.Sprintf("function %s ", name))
+	c.buf.WriteString(fmt.Sprintf("function %s", name))
 	return c
 }
 
@@ -15,7 +15,7 @@ func (c *Code) Param(params ...Param) *Code {
 
 	var paramStrings []string
 	for _, p := range params {
-		paramStrings = append(paramStrings, p.toString())
+		paramStrings = append(paramStrings, p.String())
 	}
 
 	c.buf.WriteString(strings.Join(paramStrings, ", "))
@@ -29,8 +29,6 @@ func (c *Code) ReturnType(typeName string) *Code {
 	c.buf.WriteString(": ")
 
 	c.buf.WriteString(typeName)
-
-	c.buf.WriteString(" ")
 
 	return c
 }

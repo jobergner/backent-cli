@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	indent = "	"
+	indent = "  "
 )
 
 type Code struct {

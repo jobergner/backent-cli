@@ -35,8 +35,20 @@ func Object(fields ...ObjectField) *Code {
 	return NewCode().Object(fields...)
 }
 
+func ObjectSpaced(fields ...ObjectField) *Code {
+	return NewCode().ObjectSpaced(fields...)
+}
+
 func Index(code *Code) *Code {
 	return NewCode().Index(code)
+}
+
+func Export() *Code {
+	return NewCode().Export()
+}
+
+func Lit(s string) string {
+	return NewCode().Lit(s)
 }
 
 func Empty() *Code {
