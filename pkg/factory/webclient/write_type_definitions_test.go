@@ -1,12 +1,10 @@
 package webclient
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestWriteAdders(t *testing.T) {
@@ -27,7 +25,9 @@ func TestWriteAdders(t *testing.T) {
 			interface_ElementReference,
 		}, "\n")
 
-		fmt.Println(actual)
-		assert.Equal(t, expected, actual)
+		diffs := testutils.PrettyDiffText(actual, expected)
+		if len(diffs) > 0 {
+			t.Errorf(diffs)
+		}
 	})
 }

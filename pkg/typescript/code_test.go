@@ -23,7 +23,7 @@ func TestCode(t *testing.T) {
 
 		actual := Function("importEquipmentSet").Param(Param{"current", Id("EquipmentSet").OrType("null").OrType("undefined")}, Param{"update", Id("EquipmentSet")}).ReturnType("EquipmentSet").Block(
 			If(Id("current").Equals().Id("null").Or().Id("current").Equals().Id("undefined")).Block(
-				Id("current").Id("=").Object(ObjectField{"id", Id("update").Dot("id")}, ObjectField{"elementKind", Id("update").Dot("elementKind")}, ObjectField{"operationKind", Id("update").Dot("operationKind")}),
+				Id("current").Id("=").Object(ObjectField{Id("id"), Id("update").Dot("id")}, ObjectField{Id("elementKind"), Id("update").Dot("elementKind")}, ObjectField{Id("operationKind"), Id("update").Dot("operationKind")}),
 			),
 			If(Id("update").Dot("equipment").EqualsNot().Id("null").And().Id("update").Dot("equipment").EqualsNot().Id("undefined")).Block(
 				If(Id("current").Dot("equipment").Equals().Id("null").Or().Id("current").Dot("equipment").Equals().Id("undefined")).Block(
