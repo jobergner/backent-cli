@@ -143,8 +143,9 @@ type zone struct {
 }
 
 type elementReference struct {
+	ID                   int                  `json:"id"`
 	OperationKind        OperationKind        `json:"operationKind"`
-	ElementID            int                  `json:"id"`
+	ElementID            int                  `json:"elementID"`
 	ElementKind          ElementKind          `json:"elementKind"`
 	ReferencedDataStatus ReferencedDataStatus `json:"referencedDataStatus"`
 	ElementPath          string               `json:"elementPath"`

@@ -684,6 +684,7 @@ func TestTree(t *testing.T) {
 					itm.ID(): {
 						ID: itm.ID(),
 						BoundTo: &elementReference{
+							int(itm.BoundTo().itemBoundToRef.ID),
 							OperationKindUnchanged,
 							int(plyr.ID()),
 							ElementKindPlayer,
@@ -785,6 +786,7 @@ func TestTree(t *testing.T) {
 						},
 						GuildMembers: map[PlayerID]elementReference{
 							player2.ID(): {
+								ID:                   int(player1.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUpdate,
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -799,6 +801,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GuildMembers: map[PlayerID]elementReference{
 							player1.ID(): {
+								ID:                   int(player2.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -812,6 +815,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GuildMembers: map[PlayerID]elementReference{
 							player1.ID(): {
+								ID:                   int(player3.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -843,6 +847,7 @@ func TestTree(t *testing.T) {
 						ID: plyr.ID(),
 						GuildMembers: map[PlayerID]elementReference{
 							plyr.ID(): {
+								ID:                   int(plyr.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUpdate,
 								ElementID:            int(plyr.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -881,6 +886,7 @@ func TestTree(t *testing.T) {
 						ID:   itm.ID(),
 						Name: stringPtr("myName"),
 						BoundTo: &elementReference{
+							ID:                   int(itm.BoundTo().itemBoundToRef.ID),
 							OperationKind:        OperationKindUnchanged,
 							ElementID:            int(plyr.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -895,6 +901,7 @@ func TestTree(t *testing.T) {
 						ID: plyr.ID(),
 						EquipmentSets: map[EquipmentSetID]elementReference{
 							eqSet.ID(): {
+								ID:                   int(plyr.EquipmentSets()[0].playerEquipmentSetRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(eqSet.ID()),
 								ElementKind:          ElementKindEquipmentSet,
@@ -910,6 +917,7 @@ func TestTree(t *testing.T) {
 						ID: eqSet.ID(),
 						Equipment: map[ItemID]elementReference{
 							itm.ID(): {
+								ID:                   int(eqSet.Equipment()[0].equipmentSetEquipmentRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(itm.ID()),
 								ElementKind:          ElementKindItem,
@@ -946,6 +954,7 @@ func TestTree(t *testing.T) {
 					itm.ID(): {
 						ID: itm.ID(),
 						BoundTo: &elementReference{
+							ID:                   int(itm.BoundTo().itemBoundToRef.ID),
 							OperationKind:        OperationKindUnchanged,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -970,6 +979,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GuildMembers: map[PlayerID]elementReference{
 							player1.ID(): {
+								ID:                   int(player2.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -1026,6 +1036,7 @@ func TestTree(t *testing.T) {
 
 				se.UpdateState()
 
+				itemBoundToRefID := itm.BoundTo().itemBoundToRef.ID
 				se.DeletePlayer(player1.ID())
 
 				expectedTree.Player = map[PlayerID]player{
@@ -1051,6 +1062,7 @@ func TestTree(t *testing.T) {
 						ID:            itm.ID(),
 						OperationKind: OperationKindUpdate,
 						BoundTo: &elementReference{
+							ID:                   int(itemBoundToRefID),
 							OperationKind:        OperationKindDelete,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1083,6 +1095,7 @@ func TestTree(t *testing.T) {
 					itm.ID(): {
 						ID: itm.ID(),
 						BoundTo: &elementReference{
+							ID:                   int(itm.BoundTo().itemBoundToRef.ID),
 							OperationKind:        OperationKindUpdate,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1106,6 +1119,7 @@ func TestTree(t *testing.T) {
 						ID: player2.ID(),
 						GuildMembers: map[PlayerID]elementReference{
 							player1.ID(): {
+								ID:                   int(player2.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUpdate,
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -1138,8 +1152,8 @@ func TestTree(t *testing.T) {
 
 				se.UpdateState()
 
-				ref, _ := item1.BoundTo().IsSet()
-				ref.Unset()
+				item1Ref, _ := item1.BoundTo().IsSet()
+				item1Ref.Unset()
 
 				item2.SetBoundTo(player1.ID())
 				player2.AddGuildMember(player1.ID())
@@ -1148,6 +1162,7 @@ func TestTree(t *testing.T) {
 					item1.ID(): {
 						ID: item1.ID(),
 						BoundTo: &elementReference{
+							ID:                   int(item1Ref.itemBoundToRef.ID),
 							OperationKind:        OperationKindDelete,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1159,6 +1174,7 @@ func TestTree(t *testing.T) {
 					item2.ID(): {
 						ID: item2.ID(),
 						BoundTo: &elementReference{
+							ID:                   int(item2.BoundTo().itemBoundToRef.ID),
 							OperationKind:        OperationKindUpdate,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1174,6 +1190,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUpdate,
 						GuildMembers: map[PlayerID]elementReference{
 							player1.ID(): {
+								ID:                   int(player2.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUpdate,
 								ElementID:            int(player1.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -1361,6 +1378,7 @@ func TestTree(t *testing.T) {
 							OperationKind: OperationKindUpdate,
 						},
 						Target: &elementReference{
+							ID:                   int(player1.Target().playerTargetRef.ID),
 							OperationKind:        OperationKindUpdate,
 							ElementID:            int(player2.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1417,6 +1435,7 @@ func TestTree(t *testing.T) {
 						},
 						TargetedBy: map[int]elementReference{
 							int(player2.ID()): {
+								ID:                   int(player1.TargetedBy()[0].playerTargetedByRef.ID),
 								OperationKind:        OperationKindUpdate,
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -1465,6 +1484,7 @@ func TestTree(t *testing.T) {
 						ID:            player2.ID(),
 						OperationKind: OperationKindUnchanged,
 						Target: &elementReference{
+							ID:                   int(player2.Target().playerTargetRef.ID),
 							OperationKind:        OperationKindUnchanged,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1513,6 +1533,7 @@ func TestTree(t *testing.T) {
 						ID:            itm.ID(),
 						OperationKind: OperationKindUnchanged,
 						BoundTo: &elementReference{
+							ID:                   int(itm.BoundTo().itemBoundToRef.ID),
 							OperationKind:        OperationKindUnchanged,
 							ElementID:            int(plyr.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1560,6 +1581,7 @@ func TestTree(t *testing.T) {
 						ID:            player1.ID(),
 						OperationKind: OperationKindUpdate,
 						Target: &elementReference{
+							ID:                   int(player1.Target().playerTargetRef.ID),
 							OperationKind:        OperationKindUpdate,
 							ElementID:            int(player2.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1597,6 +1619,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						Equipment: map[ItemID]elementReference{
 							item1.ID(): {
+								ID:                   int(equipmentSet1.Equipment()[0].equipmentSetEquipmentRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(item1.ID()),
 								ElementKind:          ElementKindItem,
@@ -1611,6 +1634,7 @@ func TestTree(t *testing.T) {
 						ID:            item1.ID(),
 						OperationKind: OperationKindUnchanged,
 						BoundTo: &elementReference{
+							ID:                   int(item1.BoundTo().itemBoundToRef.ID),
 							OperationKind:        OperationKindUnchanged,
 							ElementID:            int(player1.ID()),
 							ElementKind:          ElementKindPlayer,
@@ -1625,6 +1649,7 @@ func TestTree(t *testing.T) {
 						OperationKind: OperationKindUnchanged,
 						GuildMembers: map[PlayerID]elementReference{
 							player2.ID(): {
+								ID:                   int(player1.GuildMembers()[0].playerGuildMemberRef.ID),
 								OperationKind:        OperationKindUnchanged,
 								ElementID:            int(player2.ID()),
 								ElementKind:          ElementKindPlayer,
@@ -1658,6 +1683,7 @@ func TestTree(t *testing.T) {
 				item2 := se.CreateItem()
 
 				item1.SetBoundTo(player1.ID())
+				boundToRefID := item1.BoundTo().itemBoundToRef.ID
 
 				se.UpdateState()
 
@@ -1672,6 +1698,7 @@ func TestTree(t *testing.T) {
 						ID:            item1.ID(),
 						OperationKind: OperationKindUpdate,
 						BoundTo: &elementReference{
+							ID:                   int(boundToRefID),
 							ElementKind:          ElementKindPlayer,
 							ElementPath:          newPath().extendAndCopy(playerIdentifier, int(player1.ID()), ElementKindPlayer, 0).toJSONPath(),
 							ElementID:            int(player1.ID()),
@@ -1737,6 +1764,7 @@ func TestTree(t *testing.T) {
 									OperationKind: OperationKindUnchanged,
 								},
 								BoundTo: &elementReference{
+									ID:                   int(itm.item.BoundTo),
 									OperationKind:        OperationKindUnchanged,
 									ElementID:            int(plyr.ID()),
 									ElementKind:          ElementKindPlayer,

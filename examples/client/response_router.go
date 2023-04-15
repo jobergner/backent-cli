@@ -9,17 +9,17 @@ import (
 
 func newReponseRouter() *responseRouter {
 	return &responseRouter{
-		pending: make(map[string]chan []byte),
+		pending: make(map[int]chan []byte),
 	}
 }
 
 // easyjson:skip
 type responseRouter struct {
-	pending map[string]chan []byte
+	pending map[int]chan []byte
 	mu      sync.Mutex
 }
 
-func (r *responseRouter) add(id string, ch chan []byte) {
+func (r *responseRouter) add(id int, ch chan []byte) {
 	r.mu.Lock()
 
 	r.pending[id] = ch
@@ -27,7 +27,7 @@ func (r *responseRouter) add(id string, ch chan []byte) {
 	r.mu.Unlock()
 }
 
-func (r *responseRouter) remove(id string) {
+func (r *responseRouter) remove(id int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -46,7 +46,7 @@ func (r *responseRouter) route(response Message) {
 
 	ch, ok := r.pending[response.ID]
 	if !ok {
-		log.Warn().Str(logging.MessageID, response.ID).Msg("cannot find channel for routing response")
+		log.Warn().Int(logging.MessageID, response.ID).Msg("cannot find channel for routing response")
 		return
 	}
 

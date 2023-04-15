@@ -27,7 +27,9 @@ func (r *Room) publishPatch() error {
 		return nil
 	}
 
-	patchBytes, err := r.state.Patch.MarshalJSON()
+	r.state.AssembleUpdateTree()
+
+	patchBytes, err := r.state.Tree.MarshalJSON()
 	if err != nil {
 		log.Err(err).Msg("failed marshalling patch")
 		return err

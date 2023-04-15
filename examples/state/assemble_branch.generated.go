@@ -91,6 +91,7 @@ func (engine *Engine) assembleEquipmentSetPath(element *equipmentSet, p path, pI
 		}
 		referencedElement := engine.Item(ref.ReferencedElementID).item
 		treeRef := elementReference{
+			ID:                   int(ref.ID),
 			OperationKind:        ref.OperationKind,
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindItem,
@@ -139,6 +140,7 @@ func (engine *Engine) assembleAttackEventPath(element *attackEvent, p path, pInd
 		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
 		treeRef := elementReference{
+			ID:                   int(ref.ID),
 			OperationKind:        ref.OperationKind,
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindPlayer,
@@ -180,6 +182,7 @@ func (engine *Engine) assembleItemPath(element *item, p path, pIndex int, includ
 		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
 		treeRef := elementReference{
+			ID:                   int(ref.ID),
 			OperationKind:        ref.OperationKind,
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindPlayer,
@@ -299,6 +302,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		}
 		referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
 		treeRef := elementReference{
+			ID:                   int(ref.ID),
 			OperationKind:        ref.OperationKind,
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindEquipmentSet,
@@ -324,6 +328,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
 		treeRef := elementReference{
+			ID:                   int(ref.ID),
 			OperationKind:        ref.OperationKind,
 			ElementID:            int(ref.ReferencedElementID),
 			ElementKind:          ElementKindPlayer,
@@ -364,6 +369,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(ref.ChildID)).player
 			treeRef := elementReference{
+				ID:                   int(ref.ID),
 				OperationKind:        ref.OperationKind,
 				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindPlayer,
@@ -374,6 +380,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		case ElementKindZoneItem:
 			referencedElement := engine.ZoneItem(ZoneItemID(ref.ChildID)).zoneItem
 			treeRef := elementReference{
+				ID:                   int(ref.ID),
 				OperationKind:        ref.OperationKind,
 				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindZoneItem,
@@ -395,6 +402,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(ref.ChildID)).player
 			treeRef := elementReference{
+				ID:                   int(ref.ID),
 				OperationKind:        ref.OperationKind,
 				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindPlayer,
@@ -405,6 +413,7 @@ func (engine *Engine) assemblePlayerPath(element *player, p path, pIndex int, in
 		case ElementKindZoneItem:
 			referencedElement := engine.ZoneItem(ZoneItemID(ref.ChildID)).zoneItem
 			treeRef := elementReference{
+				ID:                   int(ref.ID),
 				OperationKind:        ref.OperationKind,
 				ElementID:            ref.ChildID,
 				ElementKind:          ElementKindZoneItem,

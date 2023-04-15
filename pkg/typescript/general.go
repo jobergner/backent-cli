@@ -5,6 +5,16 @@ import (
 	"strings"
 )
 
+func (c *Code) Null() *Code {
+	c.buf.WriteString("null")
+	return c
+}
+
+func (c *Code) Undf() *Code {
+	c.buf.WriteString("undefined")
+	return c
+}
+
 func (c *Code) Index(code *Code) *Code {
 	c.buf.WriteString(fmt.Sprintf("[%s]", code.String()))
 	return c
