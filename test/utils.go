@@ -37,7 +37,6 @@ func startServer(m *MockController) func() {
 }
 
 func connectClient(m *MockController, onMessageReceived func(b []byte)) (*client.Client, func()) {
-
 	ctx, cancel := context.WithCancel(context.Background())
 
 	c, err := client.NewClient(ctx, m, fps)

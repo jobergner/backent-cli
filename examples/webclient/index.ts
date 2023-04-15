@@ -1,8 +1,41 @@
-import {EventEmitter} from "events";
+type EventListener = (arg: any) => void;
+class EventEmitter {
+  private readonly listeners = new Map<number, Set<EventListener>>();
+  public on(event: number, listener: EventListener): void {
+    let listeners = this.listeners.get(event);
+    if (!listeners) {
+      listeners = new Set<EventListener>();
+      this.listeners.set(event, listeners);
+    }
+    listeners.add(listener);
+  }
+  public off(event: number, listener?: EventListener): void {
+    const listeners = this.listeners.get(event);
+    if (!listeners) {
+      return;
+    }
+    if (listener) {
+      listeners.delete(listener);
+      if (listeners.size === 0) {
+        this.listeners.delete(event);
+      }
+    } else {
+      this.listeners.delete(event);
+    }
+  }
+  public emit(event: number, arg: any): void {
+    const listeners = this.listeners.get(event);
+    if (listeners) {
+      listeners.forEach((listener) => listener(arg));
+    }
+  }
+}
 
 const ErrResponseTimeout = "ErrResponseTimeout";
 
 const responseTimeout = 1000;
+
+const elementRegistrar: { [id: number]: boolean } = {};
 
 export const eventEmitter = new EventEmitter();
 
@@ -22,6 +55,7 @@ export enum ReferencedDataStatus {
 export enum OperationKind {
   OperationKindDelete = "DELETE",
   OperationKindUpdate = "UPDATE",
+  OperationKindCreate = "Create",
   OperationKindUnchanged = "UNCHANGED",
 }
 
@@ -38,6 +72,7 @@ export enum ElementKind {
 }
 
 interface ElementReference {
+  id: number;
   operationKind: OperationKind;
   elementID: number;
   elementKind: ElementKind;
@@ -452,7 +487,7 @@ export enum MessageKind {
 }
 
 export interface WebSocketMessage {
-  id: string;
+  id: number;
   kind: string;
   content: string;
 }
@@ -461,6 +496,7 @@ export class Client {
   private ws: WebSocket;
   private responseEmitter: EventEmitter;
   private id: string;
+  private messageN: number;
   constructor(url: string) {
     this.id = "";
     this.ws = new WebSocket(url);
@@ -495,9 +531,10 @@ export class Client {
     return this.id;
   }
   public movePlayer(changeX: number, changeY: number, player: number) {
-    const messageID = this.generateID();
+    this.messageN += 1;
+    const messageID = this.messageN;
     const message: WebSocketMessage = {
-      id: messageID,
+      id: this.messageN,
       kind: MessageKind.ActionMovePlayer,
       content: JSON.stringify({changeX, changeY, player}),
     };
@@ -506,9 +543,10 @@ export class Client {
     }, 0);
   }
   public addItemToPlayer(item: number, newName: string): Promise<AddItemToPlayerResponse> {
-    const messageID = this.generateID();
+    this.messageN += 1;
+    const messageID = this.messageN;
     const message: WebSocketMessage = {
-      id: messageID,
+      id: this.messageN,
       kind: MessageKind.ActionAddItemToPlayer,
       content: JSON.stringify({item, newName}),
     };
@@ -525,9 +563,10 @@ export class Client {
     });
   }
   public spawnZoneItems(items: number[]): Promise<SpawnZoneItemsResponse> {
-    const messageID = this.generateID();
+    this.messageN += 1;
+    const messageID = this.messageN;
     const message: WebSocketMessage = {
-      id: messageID,
+      id: this.messageN,
       kind: MessageKind.ActionSpawnZoneItems,
       content: JSON.stringify({items}),
     };
@@ -543,249 +582,236 @@ export class Client {
       }, responseTimeout);
     });
   }
-  private generateID(): string {
-    return Date.now().toString() + Math.random().toString(36).slice(2, 5);
-  }
 }
 
 export function emit_Update(update: Tree) {
   if (update.attackEvent !== null && update.attackEvent !== undefined) {
     for (const id in update.attackEvent) {
-      emitEquipmentSet(update.attackEvent[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitAttackEvent(update.attackEvent[id]);
     }
   }
   if (update.equipmentSet !== null && update.equipmentSet !== undefined) {
     for (const id in update.equipmentSet) {
-      emitEquipmentSet(update.equipmentSet[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitEquipmentSet(update.equipmentSet[id]);
     }
   }
   if (update.gearScore !== null && update.gearScore !== undefined) {
     for (const id in update.gearScore) {
-      emitGearScore(update.gearScore[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitGearScore(update.gearScore[id]);
     }
   }
   if (update.item !== null && update.item !== undefined) {
     for (const id in update.item) {
-      emitItem(update.item[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitItem(update.item[id]);
     }
   }
   if (update.player !== null && update.player !== undefined) {
     for (const id in update.player) {
-      emitPlayer(update.player[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitPlayer(update.player[id]);
     }
   }
   if (update.position !== null && update.position !== undefined) {
     for (const id in update.position) {
-      emitPosition(update.position[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitPosition(update.position[id]);
     }
   }
   if (update.zone !== null && update.zone !== undefined) {
     for (const id in update.zone) {
-      emitZone(update.zone[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitZone(update.zone[id]);
     }
   }
   if (update.zoneItem !== null && update.zoneItem !== undefined) {
     for (const id in update.zoneItem) {
-      emitZoneItem(update.zoneItem[id], ElementKind.ElementKind_Root, ElementKind.ElementKind_Root);
+      emitZoneItem(update.zoneItem[id]);
     }
   }
 }
 
-function emitEquipmentSet(update: EquipmentSet, parent: ElementKind, fieldName: string) {
+function emitAttackEvent(update: AttackEvent) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
+  }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
+  }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
+  }
+  if (update.target !== null && update.target !== undefined) {
+    emitElementReference(update.target);
+  }
+  eventEmitter.emit(update.id, update);
+}
+
+function emitEquipmentSet(update: EquipmentSet) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
+  }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
+  }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
+  }
   if (update.equipment !== null && update.equipment !== undefined) {
     for (const id in update.equipment) {
-      emitElementReference(update.equipment[id], ElementKind.ElementKindPlayer, "equipment");
+      emitElementReference(update.equipment[id]);
     }
   }
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("equipmentSet", update);
-  }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitGearScore(update: GearScore, parent: ElementKind, fieldName: string) {
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("gearScore", update);
+function emitGearScore(update: GearScore) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
   }
-  if (parent === ElementKind.ElementKindPlayer) {
-    if (fieldName === "gearScore") {
-      eventEmitter.emit("player_gearScore", update);
-    }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
   }
-  if (parent === ElementKind.ElementKindItem) {
-    if (fieldName === "gearScore") {
-      eventEmitter.emit("item_gearScore", update);
-    }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
   }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitItem(update: Item, parent: ElementKind, fieldName: string) {
+function emitItem(update: Item) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
+  }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
+  }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
+  }
   if (update.boundTo !== null && update.boundTo !== undefined) {
-    emitElementReference(update.boundTo, ElementKind.ElementKindPlayer, "boundTo");
+    emitElementReference(update.boundTo);
   }
   if (update.gearScore !== null && update.gearScore !== undefined) {
-    emitGearScore(update.gearScore, ElementKind.ElementKindItem, "gearScore");
+    emitGearScore(update.gearScore);
   }
   if (update.origin !== null && update.origin !== undefined) {
     if (update.elementKind === ElementKind.ElementKindPlayer) {
-      emitPlayer(update.origin, ElementKind.ElementKindItem, "origin");
+      emitPlayer(update.origin);
     }
     if (update.elementKind === ElementKind.ElementKindPosition) {
-      emitPosition(update.origin, ElementKind.ElementKindItem, "origin");
+      emitPosition(update.origin);
     }
   }
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("item", update);
-  }
-  if (parent === ElementKind.ElementKindPlayer) {
-    if (fieldName === "items") {
-      eventEmitter.emit("player_items", update);
-    }
-  }
-  if (parent === ElementKind.ElementKindZone) {
-    if (fieldName === "interactables") {
-      eventEmitter.emit("zone_interactables", update);
-    }
-  }
-  if (parent === ElementKind.ElementKindZoneItem) {
-    if (fieldName === "item") {
-      eventEmitter.emit("zoneItem_item", update);
-    }
-  }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitPosition(update: Position, parent: ElementKind, fieldName: string) {
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("position", update);
+function emitPosition(update: Position) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
   }
-  if (parent === ElementKind.ElementKindPlayer) {
-    if (fieldName === "position") {
-      eventEmitter.emit("player_position", update);
-    }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
   }
-  if (parent === ElementKind.ElementKindZoneItem) {
-    if (fieldName === "position") {
-      eventEmitter.emit("zoneItem_position", update);
-    }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
   }
-  if (parent === ElementKind.ElementKindItem) {
-    if (fieldName === "origin") {
-      eventEmitter.emit("item_origin", update);
-    }
-  }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitPlayer(update: Player, parent: ElementKind, fieldName: string) {
+function emitPlayer(update: Player) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
+  }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
+  }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
+  }
   if (update.equipmentSets !== null && update.equipmentSets !== undefined) {
     for (const id in update.equipmentSets) {
-      emitElementReference(update.equipmentSets[id], ElementKind.ElementKindPlayer, "equipmentSets");
+      emitElementReference(update.equipmentSets[id]);
     }
   }
   if (update.gearScore !== null && update.gearScore !== undefined) {
-    emitGearScore(update.gearScore, ElementKind.ElementKindPlayer, "gearScore");
+    emitGearScore(update.gearScore);
   }
   if (update.guildMembers !== null && update.guildMembers !== undefined) {
     for (const id in update.guildMembers) {
-      emitElementReference(update.guildMembers[id], ElementKind.ElementKindPlayer, "guildMembers");
+      emitElementReference(update.guildMembers[id]);
     }
   }
   if (update.items !== null && update.items !== undefined) {
     for (const id in update.items) {
-      emitItem(update.items[id], ElementKind.ElementKindPlayer, "items");
+      emitItem(update.items[id]);
     }
   }
   if (update.position !== null && update.position !== undefined) {
-    emitPosition(update.position, ElementKind.ElementKindPlayer, "position");
+    emitPosition(update.position);
   }
   if (update.target !== null && update.target !== undefined) {
-    emitElementReference(update.target, ElementKind.ElementKindPlayer, "target");
+    emitElementReference(update.target);
   }
   if (update.targetedBy !== null && update.targetedBy !== undefined) {
     for (const id in update.targetedBy) {
-      emitElementReference(update.targetedBy[id], ElementKind.ElementKindPlayer, "targetedBy");
+      emitElementReference(update.targetedBy[id]);
     }
   }
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("player", update);
-  }
-  if (parent === ElementKind.ElementKindZone) {
-    if (fieldName === "player") {
-      eventEmitter.emit("zone_players", update);
-    }
-    if (fieldName === "interactables") {
-      eventEmitter.emit("zone_interactables", update);
-    }
-  }
-  if (parent === ElementKind.ElementKindItem) {
-    if (fieldName === "origin") {
-      eventEmitter.emit("item_origin", update);
-    }
-  }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitZone(update: Zone, parent: ElementKind, fieldName: string) {
+function emitZone(update: Zone) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
+  }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
+  }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
+  }
   if (update.interactables !== null && update.interactables !== undefined) {
     for (const id in update.interactables) {
-      emitPosition(update.interactables[id], ElementKind.ElementKindZone, "interactables");
+      emitPosition(update.interactables[id]);
     }
   }
   if (update.items !== null && update.items !== undefined) {
     for (const id in update.items) {
-      emitZoneItem(update.items[id], ElementKind.ElementKindZone, "items");
+      emitZoneItem(update.items[id]);
     }
   }
   if (update.players !== null && update.players !== undefined) {
     for (const id in update.players) {
-      emitPlayer(update.players[id], ElementKind.ElementKindZone, "players");
+      emitPlayer(update.players[id]);
     }
   }
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("zone", update);
-  }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitZoneItem(update: ZoneItem, parent: ElementKind, fieldName: string) {
+function emitZoneItem(update: ZoneItem) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
+  }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
+  }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
+  }
   if (update.item !== null && update.item !== undefined) {
-    emitGearScore(update.item, ElementKind.ElementKindZoneItem, "item");
+    emitGearScore(update.item);
   }
   if (update.position !== null && update.position !== undefined) {
-    emitGearScore(update.position, ElementKind.ElementKindZoneItem, "position");
+    emitGearScore(update.position);
   }
-  if (parent === ElementKind.ElementKind_Root) {
-    eventEmitter.emit("zoneItem", update);
-  }
-  if (parent === ElementKind.ElementKindZone) {
-    if (fieldName === "item") {
-      eventEmitter.emit("zone_items", update);
-    }
-    if (fieldName === "interactables") {
-      eventEmitter.emit("zone_interactables", update);
-    }
-  }
+  eventEmitter.emit(update.id, update);
 }
 
-function emitElementReference(update: ElementReference, parent: ElementKind, fieldName: string) {
-  if (parent === ElementKind.ElementKindItem) {
-    if (fieldName === "boundTo") {
-      eventEmitter.emit("item_boundTo", update);
-    }
+function emitElementReference(update: ElementReference) {
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
+    return;
   }
-  if (parent === ElementKind.ElementKindEquipmentSet) {
-    if (fieldName === "equipment") {
-      eventEmitter.emit("equipmentSet_equipment", update);
-    }
+  if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
+    delete elementRegistrar[update.id];
   }
-  if (parent === ElementKind.ElementKindPlayer) {
-    if (fieldName === "equipmentSets") {
-      eventEmitter.emit("player_equipmentSets", update);
-    }
-    if (fieldName === "guildMembers") {
-      eventEmitter.emit("player_guildMembers", update);
-    }
-    if (fieldName === "target") {
-      eventEmitter.emit("player_target", update);
-    }
-    if (fieldName === "targetedBy") {
-      eventEmitter.emit("player_targetedBy", update);
-    }
+  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+    update.operationKind = OperationKind.OperationKindCreate;
   }
+  eventEmitter.emit(update.id, update);
 }
