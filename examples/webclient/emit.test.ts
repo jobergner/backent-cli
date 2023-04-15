@@ -1,4 +1,4 @@
-import { eventEmitter, emit_Update, ReferencedDataStatus, ElementKind, Tree, OperationKind } from "./index";
+import {eventEmitter, emit_Update, ReferencedDataStatus, ElementKind, Tree, OperationKind} from "./index";
 
 test("emit updates", () => {
   const update: Tree = {
@@ -26,6 +26,7 @@ test("emit updates", () => {
           elementKind: ElementKind.ElementKindPosition,
         },
         target: {
+          id: 3,
           operationKind: OperationKind.OperationKindUpdate,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,
@@ -39,19 +40,19 @@ test("emit updates", () => {
   };
 
   const emit_player = jest.fn();
-  eventEmitter.on("player", emit_player);
+  eventEmitter.on(1, emit_player);
 
   const emitPlayer_items = jest.fn();
-  eventEmitter.on("player_items", emitPlayer_items);
+  eventEmitter.on(4, emitPlayer_items);
 
   const emitItem_gearScore = jest.fn();
-  eventEmitter.on("item_gearScore", emitItem_gearScore);
+  eventEmitter.on(5, emitItem_gearScore);
 
   const emitPlayer_position = jest.fn();
-  eventEmitter.on("player_position", emitPlayer_position);
+  eventEmitter.on(2, emitPlayer_position);
 
   const emitPlayer_target = jest.fn();
-  eventEmitter.on("player_target", emitPlayer_target);
+  eventEmitter.on(3, emitPlayer_target);
 
   emit_Update(update);
 

@@ -133,16 +133,16 @@ func (c *Client) processMessage(msg Message) error {
 	return nil
 }
 
-// TODO: is this right?
 func newMessageID() (int, error) {
 	max := big.NewInt(1)
-	max.Exp(big.NewInt(10), big.NewInt(8), nil)
+	max.Exp(big.NewInt(10), big.NewInt(10), nil)
 
 	n, err := rand.Int(rand.Reader, max)
 	if err != nil {
 		log.Err(err).Str(logging.MessageKind, string(message.MessageKindGlobal)).Msg("failed generating message ID")
 		return 0, err
 	}
+
 	return int(n.Int64()), nil
 }
 

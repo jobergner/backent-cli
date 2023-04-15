@@ -1,4 +1,5 @@
 type EventListener = (arg: any) => void;
+
 class EventEmitter {
   private readonly listeners = new Map<number, Set<EventListener>>();
   public on(event: number, listener: EventListener): void {
@@ -492,11 +493,19 @@ export interface WebSocketMessage {
   content: string;
 }
 
+function generateID(): number {
+  const max = 10 ** 10;
+  let n = 0;
+  for (let i = 0; i < 10; i++) {
+    n = n * 10 + Math.floor(Math.random() * 10);
+  }
+  return n % max;
+}
+
 export class Client {
   private ws: WebSocket;
   private responseEmitter: EventEmitter;
   private id: string;
-  private messageN: number;
   constructor(url: string) {
     this.id = "";
     this.ws = new WebSocket(url);
@@ -531,10 +540,9 @@ export class Client {
     return this.id;
   }
   public movePlayer(changeX: number, changeY: number, player: number) {
-    this.messageN += 1;
-    const messageID = this.messageN;
+    const messageID = generateID();
     const message: WebSocketMessage = {
-      id: this.messageN,
+      id: messageID,
       kind: MessageKind.ActionMovePlayer,
       content: JSON.stringify({changeX, changeY, player}),
     };
@@ -543,10 +551,9 @@ export class Client {
     }, 0);
   }
   public addItemToPlayer(item: number, newName: string): Promise<AddItemToPlayerResponse> {
-    this.messageN += 1;
-    const messageID = this.messageN;
+    const messageID = generateID();
     const message: WebSocketMessage = {
-      id: this.messageN,
+      id: messageID,
       kind: MessageKind.ActionAddItemToPlayer,
       content: JSON.stringify({item, newName}),
     };
@@ -563,10 +570,9 @@ export class Client {
     });
   }
   public spawnZoneItems(items: number[]): Promise<SpawnZoneItemsResponse> {
-    this.messageN += 1;
-    const messageID = this.messageN;
+    const messageID = generateID();
     const message: WebSocketMessage = {
-      id: this.messageN,
+      id: messageID,
       kind: MessageKind.ActionSpawnZoneItems,
       content: JSON.stringify({items}),
     };
