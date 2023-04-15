@@ -26,6 +26,7 @@ test("import updates", () => {
           elementKind: ElementKind.ElementKindPosition,
         },
         target: {
+          id: 6,
           operationKind: OperationKind.OperationKindUpdate,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,
@@ -99,6 +100,7 @@ test("import updates", () => {
           elementKind: ElementKind.ElementKindPosition,
         },
         target: {
+          id: 6,
           operationKind: OperationKind.OperationKindUpdate,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,
@@ -135,6 +137,7 @@ test("import creates", () => {
           },
         },
         target: {
+          id: 6,
           operationKind: OperationKind.OperationKindUpdate,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,
@@ -193,6 +196,7 @@ test("import creates", () => {
           elementKind: ElementKind.ElementKindPosition,
         },
         target: {
+          id: 6,
           operationKind: OperationKind.OperationKindUpdate,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,
@@ -228,6 +232,7 @@ test("import deletes", () => {
         operationKind: OperationKind.OperationKindUpdate,
         elementKind: ElementKind.ElementKindPlayer,
         target: {
+          id: 6,
           operationKind: OperationKind.OperationKindDelete,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,
@@ -262,6 +267,7 @@ test("import deletes", () => {
           elementKind: ElementKind.ElementKindPosition,
         },
         target: {
+          id: 6,
           operationKind: OperationKind.OperationKindUpdate,
           elementID: 99,
           elementKind: ElementKind.ElementKindPlayer,

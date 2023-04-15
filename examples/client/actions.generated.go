@@ -66,7 +66,7 @@ func (c *Client) MovePlayer(params message.MovePlayerParams) error {
 		return err
 	}
 
-	msg := Message{int(id), message.MessageKindAction_movePlayer, msgContent}
+	msg := Message{id, message.MessageKindAction_movePlayer, msgContent}
 
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
@@ -92,7 +92,7 @@ func (c *Client) SpawnZoneItems(params message.SpawnZoneItemsParams) (message.Sp
 		return message.SpawnZoneItemsResponse{}, err
 	}
 
-	msg := Message{int(id), message.MessageKindAction_spawnZoneItems, msgContent}
+	msg := Message{id, message.MessageKindAction_spawnZoneItems, msgContent}
 
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {

@@ -65,7 +65,7 @@ test("client triggers updates", async () => {
 
   const updateTree: Tree = {
     equipmentSet: {
-      "1": {
+      1: {
         id: 1,
         name: "foo",
         operationKind: OperationKind.OperationKindUpdate,
