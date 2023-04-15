@@ -36,7 +36,7 @@ const ErrResponseTimeout = "ErrResponseTimeout";
 
 const responseTimeout = 1000;
 
-const elementRegistrar: { [id: number]: boolean } = {};
+export const elementRegistrar: { [id: number]: boolean } = {};
 
 export const eventEmitter = new EventEmitter();
 
@@ -642,6 +642,7 @@ function emitAttackEvent(update: AttackEvent) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   if (update.target !== null && update.target !== undefined) {
     emitElementReference(update.target);
@@ -658,6 +659,7 @@ function emitEquipmentSet(update: EquipmentSet) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   if (update.equipment !== null && update.equipment !== undefined) {
     for (const id in update.equipment) {
@@ -676,6 +678,7 @@ function emitGearScore(update: GearScore) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   eventEmitter.emit(update.id, update);
 }
@@ -689,6 +692,7 @@ function emitItem(update: Item) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   if (update.boundTo !== null && update.boundTo !== undefined) {
     emitElementReference(update.boundTo);
@@ -716,6 +720,7 @@ function emitPosition(update: Position) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   eventEmitter.emit(update.id, update);
 }
@@ -729,6 +734,7 @@ function emitPlayer(update: Player) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   if (update.equipmentSets !== null && update.equipmentSets !== undefined) {
     for (const id in update.equipmentSets) {
@@ -771,6 +777,7 @@ function emitZone(update: Zone) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   if (update.interactables !== null && update.interactables !== undefined) {
     for (const id in update.interactables) {
@@ -799,6 +806,7 @@ function emitZoneItem(update: ZoneItem) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   if (update.item !== null && update.item !== undefined) {
     emitGearScore(update.item);
@@ -818,6 +826,7 @@ function emitElementReference(update: ElementReference) {
   }
   if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
+    elementRegistrar[update.id] = true;
   }
   eventEmitter.emit(update.id, update);
 }
