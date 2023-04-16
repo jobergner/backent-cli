@@ -8,7 +8,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.2.0
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
-	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mailru/easyjson v0.7.7
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.17.0 // indirect

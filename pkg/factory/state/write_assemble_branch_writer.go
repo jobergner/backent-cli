@@ -106,6 +106,7 @@ func (a assembleBranchWriter) assemblePointerNonSliceAnyValue() *Statement {
 				return Case(Id("ElementKind"+Title(a.v.Name))).Block(
 					Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(a.valueTypeID().Call(Id("ref").Dot("ChildID"))).Dot(a.v.Name),
 					Id("treeRef").Op(":=").Id("elementReference").Values(
+						Id("ID").Op(":").Int().Call(Id("ref").Dot("ID")),
 						Id("OperationKind").Op(":").Id("ref").Dot("OperationKind"),
 						Id("ElementID").Op(":").Id("ref").Dot("ChildID"),
 						Id("ElementKind").Op(":").Id("ElementKind"+Title(a.v.Name)),
@@ -127,6 +128,7 @@ func (a assembleBranchWriter) assemblePointerSliceNonAnyValue() *Statement {
 		),
 		Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.f.ValueType().Name)).Call(Id("ref").Dot("ReferencedElementID")).Dot(a.f.ValueType().Name),
 		Id("treeRef").Op(":=").Id("elementReference").Values(
+			Id("ID").Op(":").Int().Call(Id("ref").Dot("ID")),
 			Id("OperationKind").Op(":").Id("ref").Dot("OperationKind"),
 			Id("ElementID").Op(":").Int().Call(Id("ref").Dot("ReferencedElementID")),
 			Id("ElementKind").Op(":").Id("ElementKind"+Title(a.f.ValueType().Name)),
@@ -151,6 +153,7 @@ func (a assembleBranchWriter) assemblePointerNonSliceNonAnyValue() *Statement {
 		),
 		Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.f.ValueType().Name)).Call(Id("ref").Dot("ReferencedElementID")).Dot(a.f.ValueType().Name),
 		Id("treeRef").Op(":=").Id("elementReference").Values(
+			Id("ID").Op(":").Int().Call(Id("ref").Dot("ID")),
 			Id("OperationKind").Op(":").Id("ref").Dot("OperationKind"),
 			Id("ElementID").Op(":").Int().Call(Id("ref").Dot("ReferencedElementID")),
 			Id("ElementKind").Op(":").Id("ElementKind"+Title(a.f.ValueType().Name)),
@@ -177,6 +180,7 @@ func (a assembleBranchWriter) assemblePointerSliceAnyValue() *Statement {
 				return Case(Id("ElementKind"+Title(a.v.Name))).Block(
 					Id("referencedElement").Op(":=").Id("engine").Dot(Title(a.v.Name)).Call(a.valueTypeID().Call(Id("ref").Dot("ChildID"))).Dot(a.v.Name),
 					Id("treeRef").Op(":=").Id("elementReference").Values(
+						Id("ID").Op(":").Int().Call(Id("ref").Dot("ID")),
 						Id("OperationKind").Op(":").Id("ref").Dot("OperationKind"),
 						Id("ElementID").Op(":").Id("ref").Dot("ChildID"),
 						Id("ElementKind").Op(":").Id("ElementKind"+Title(a.v.Name)),

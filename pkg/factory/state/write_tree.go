@@ -83,8 +83,9 @@ func (s *Factory) writeTreeElements() *Factory {
 
 	e := treeElementWriter{}
 	s.file.Type().Id("elementReference").Struct(
+		Id("ID").Int().Id(e.metaFieldTag("id")).Line(),
 		Id("OperationKind").Id("OperationKind").Id(e.metaFieldTag("operationKind")).Line(),
-		Id("ElementID").Int().Id(e.metaFieldTag("id")).Line(),
+		Id("ElementID").Int().Id(e.metaFieldTag("elementID")).Line(),
 		Id("ElementKind").Id("ElementKind").Id(e.metaFieldTag("elementKind")).Line(),
 		Id("ReferencedDataStatus").Id("ReferencedDataStatus").Id(e.metaFieldTag("referencedDataStatus")).Line(),
 		Id("ElementPath").String().Id(e.metaFieldTag("elementPath")).Line(),

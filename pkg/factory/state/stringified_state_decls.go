@@ -523,7 +523,7 @@ const assembleEquipmentSetPath_Engine_func string = `func (engine *Engine) assem
 			referencedDataStatus = ReferencedDataModified
 		}
 		referencedElement := engine.Item(ref.ReferencedElementID).item
-		treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+		treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 		if element.Equipment == nil {
 			element.Equipment = make(map[ItemID]elementReference)
 		}
@@ -558,7 +558,7 @@ const assembleAttackEventPath_Engine_func string = `func (engine *Engine) assemb
 			referencedDataStatus = ReferencedDataModified
 		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
-		treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+		treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 		element.Target = &treeRef
 	}
 	_ = attackEventData
@@ -586,7 +586,7 @@ const assembleItemPath_Engine_func string = `func (engine *Engine) assembleItemP
 			referencedDataStatus = ReferencedDataModified
 		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
-		treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+		treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 		element.BoundTo = &treeRef
 	case item_gearScoreIdentifier:
 		child := element.GearScore
@@ -685,7 +685,7 @@ const assemblePlayerPath_Engine_func string = `func (engine *Engine) assemblePla
 			referencedDataStatus = ReferencedDataModified
 		}
 		referencedElement := engine.EquipmentSet(ref.ReferencedElementID).equipmentSet
-		treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindEquipmentSet, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+		treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindEquipmentSet, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 		if element.EquipmentSets == nil {
 			element.EquipmentSets = make(map[EquipmentSetID]elementReference)
 		}
@@ -704,7 +704,7 @@ const assemblePlayerPath_Engine_func string = `func (engine *Engine) assemblePla
 			referencedDataStatus = ReferencedDataModified
 		}
 		referencedElement := engine.Player(ref.ReferencedElementID).player
-		treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+		treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: int(ref.ReferencedElementID), ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 		if element.GuildMembers == nil {
 			element.GuildMembers = make(map[PlayerID]elementReference)
 		}
@@ -738,11 +738,11 @@ const assemblePlayerPath_Engine_func string = `func (engine *Engine) assemblePla
 		switch nextSeg.Kind {
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(ref.ChildID)).player
-			treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+			treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 			element.Target = &treeRef
 		case ElementKindZoneItem:
 			referencedElement := engine.ZoneItem(ZoneItemID(ref.ChildID)).zoneItem
-			treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindZoneItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+			treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindZoneItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 			element.Target = &treeRef
 		}
 	case player_targetedByIdentifier:
@@ -757,11 +757,11 @@ const assemblePlayerPath_Engine_func string = `func (engine *Engine) assemblePla
 		switch nextSeg.Kind {
 		case ElementKindPlayer:
 			referencedElement := engine.Player(PlayerID(ref.ChildID)).player
-			treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+			treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindPlayer, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 			element.TargetedBy[ref.ChildID] = treeRef
 		case ElementKindZoneItem:
 			referencedElement := engine.ZoneItem(ZoneItemID(ref.ChildID)).zoneItem
-			treeRef := elementReference{OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindZoneItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
+			treeRef := elementReference{ID: int(ref.ID), OperationKind: ref.OperationKind, ElementID: ref.ChildID, ElementKind: ElementKindZoneItem, ReferencedDataStatus: referencedDataStatus, ElementPath: referencedElement.JSONPath}
 			element.TargetedBy[ref.ChildID] = treeRef
 		}
 	}
@@ -5026,8 +5026,9 @@ const zone_type string = `type zone struct {
 	OperationKind	OperationKind		` + "`" + `json:"operationKind"` + "`" + `
 }`
 const elementReference_type string = `type elementReference struct {
+	ID			int			` + "`" + `json:"id"` + "`" + `
 	OperationKind		OperationKind		` + "`" + `json:"operationKind"` + "`" + `
-	ElementID		int			` + "`" + `json:"id"` + "`" + `
+	ElementID		int			` + "`" + `json:"elementID"` + "`" + `
 	ElementKind		ElementKind		` + "`" + `json:"elementKind"` + "`" + `
 	ReferencedDataStatus	ReferencedDataStatus	` + "`" + `json:"referencedDataStatus"` + "`" + `
 	ElementPath		string			` + "`" + `json:"elementPath"` + "`" + `

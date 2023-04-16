@@ -1,5 +1,5 @@
 # required for running main (and examples, as main is used to generate code for examples)
-go run generate/*;
+# go run generate/*;
 
 # required for running examples. initially generatin marshallers causes errors which we swallow
 # easyjson -all -output_filename examples/application/server/gets_generated_easyjson.go examples/application/server/gets_generated.go &> /dev/null;
