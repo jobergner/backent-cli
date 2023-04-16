@@ -22,7 +22,7 @@ func TestWriteEmitUpdate(t *testing.T) {
 			function_emitPlayer,
 			function_emitPosition,
 			function_emitZone,
-			function_emitZoneItem,
+			function_emitZoneItem + "\n",
 		}, "\n")
 
 		if actual != expected {
