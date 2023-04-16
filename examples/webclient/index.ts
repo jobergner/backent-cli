@@ -720,6 +720,11 @@ function emitPlayer(update: Player) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
+  if (update.action !== null && update.action !== undefined) {
+    for (const id in update.action) {
+      emitAttackEvent(update.action[id]);
+    }
+  }
   if (update.equipmentSets !== null && update.equipmentSets !== undefined) {
     for (const id in update.equipmentSets) {
       emitElementReference(update.equipmentSets[id]);
@@ -801,10 +806,10 @@ function emitZoneItem(update: ZoneItem) {
     elementRegistrar[update.id] = true;
   }
   if (update.item !== null && update.item !== undefined) {
-    emitGearScore(update.item);
+    emitItem(update.item);
   }
   if (update.position !== null && update.position !== undefined) {
-    emitGearScore(update.position);
+    emitPosition(update.position);
   }
   eventEmitter.emit(update.id, update);
 }

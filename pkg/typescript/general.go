@@ -48,12 +48,24 @@ func (c *Code) ForIn(decl, iterable *Code) *Code {
 }
 
 func (c *Code) CodeSet(code ...*Code) *Code {
-	for _, segment := range code {
+	for i, segment := range code {
 		s := segment.String()
+		if len(s) == 0 {
+			continue
+		}
 		c.buf.WriteString(s)
+		if i == len(code)-1 {
+			continue
+		}
 		c.buf.WriteString("\n")
 	}
 
+	return c
+}
+
+func (c *Code) FuncBody(code ...*Code) *Code {
+	c.Block(code...)
+	c.buf.WriteString("\n")
 	return c
 }
 
@@ -62,6 +74,9 @@ func (c *Code) Block(code ...*Code) *Code {
 
 	for _, segment := range code {
 		s := segment.String()
+		if len(s) == 0 {
+			continue
+		}
 		lines := strings.Split(s, "\n")
 		for i := range lines {
 			lines[i] = indent + lines[i]
