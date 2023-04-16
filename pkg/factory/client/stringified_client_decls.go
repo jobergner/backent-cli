@@ -3,7 +3,6 @@ package client
 
 const actions_generated_go_import string = `import (
 	"time"
-	"github.com/google/uuid"
 	"github.com/jobergner/backent-cli/examples/logging"
 	"github.com/jobergner/backent-cli/examples/message"
 	"github.com/rs/zerolog/log"
@@ -14,31 +13,29 @@ const _AddItemToPlayer_Client_func string = `func (c *Client) AddItemToPlayer(pa
 		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed marshalling parameters")
 		return message.AddItemToPlayerResponse{}, err
 	}
-	id, err := uuid.NewRandom()
+	id, err := newMessageID()
 	if err != nil {
-		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Msg("failed generating message ID")
 		return message.AddItemToPlayerResponse{}, err
 	}
-	idString := id.String()
-	msg := Message{idString, message.MessageKindAction_addItemToPlayer, msgContent}
+	msg := Message{id, message.MessageKindAction_addItemToPlayer, msgContent}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Int(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return message.AddItemToPlayerResponse{}, err
 	}
 	responseChan := make(chan []byte)
-	c.router.add(idString, responseChan)
-	defer c.router.remove(idString)
+	c.router.add(id, responseChan)
+	defer c.router.remove(id)
 	c.messageChannel <- msgBytes
 	select {
 	case <-time.After(2 * time.Second):
-		log.Err(ErrResponseTimeout).Str(logging.MessageID, msg.ID).Msg("timed out waiting for response")
+		log.Err(ErrResponseTimeout).Int(logging.MessageID, msg.ID).Msg("timed out waiting for response")
 		return message.AddItemToPlayerResponse{}, ErrResponseTimeout
 	case responseBytes := <-responseChan:
 		var res message.AddItemToPlayerResponse
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
-			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Str(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
+			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_addItemToPlayer)).Int(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
 			return message.AddItemToPlayerResponse{}, err
 		}
 		return res, nil
@@ -50,16 +47,14 @@ const _MovePlayer_Client_func string = `func (c *Client) MovePlayer(params messa
 		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Msg("failed marshalling parameters")
 		return err
 	}
-	id, err := uuid.NewRandom()
+	id, err := newMessageID()
 	if err != nil {
-		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Msg("failed generating message ID")
 		return err
 	}
-	idString := id.String()
-	msg := Message{idString, message.MessageKindAction_movePlayer, msgContent}
+	msg := Message{id, message.MessageKindAction_movePlayer, msgContent}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_movePlayer)).Int(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return err
 	}
 	c.messageChannel <- msgBytes
@@ -71,31 +66,29 @@ const _SpawnZoneItems_Client_func string = `func (c *Client) SpawnZoneItems(para
 		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed marshalling parameters")
 		return message.SpawnZoneItemsResponse{}, err
 	}
-	id, err := uuid.NewRandom()
+	id, err := newMessageID()
 	if err != nil {
-		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Msg("failed generating message ID")
 		return message.SpawnZoneItemsResponse{}, err
 	}
-	idString := id.String()
-	msg := Message{idString, message.MessageKindAction_spawnZoneItems, msgContent}
+	msg := Message{id, message.MessageKindAction_spawnZoneItems, msgContent}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
-		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Str(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
+		log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Int(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Msg("failed marshalling message")
 		return message.SpawnZoneItemsResponse{}, err
 	}
 	responseChan := make(chan []byte)
-	c.router.add(idString, responseChan)
-	defer c.router.remove(idString)
+	c.router.add(id, responseChan)
+	defer c.router.remove(id)
 	c.messageChannel <- msgBytes
 	select {
 	case <-time.After(2 * time.Second):
-		log.Err(ErrResponseTimeout).Str(logging.MessageID, msg.ID).Msg("timed out waiting for response")
+		log.Err(ErrResponseTimeout).Int(logging.MessageID, msg.ID).Msg("timed out waiting for response")
 		return message.SpawnZoneItemsResponse{}, ErrResponseTimeout
 	case responseBytes := <-responseChan:
 		var res message.SpawnZoneItemsResponse
 		err := res.UnmarshalJSON(responseBytes)
 		if err != nil {
-			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Str(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
+			log.Err(err).Str(logging.MessageKind, string(message.MessageKindAction_spawnZoneItems)).Int(logging.MessageID, msg.ID).Msg("failed unmarshalling response")
 			return message.SpawnZoneItemsResponse{}, err
 		}
 		return res, nil
