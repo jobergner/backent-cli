@@ -3,6 +3,7 @@ package typescript
 func Const(name string) *Code {
 	return NewCode().Const(name)
 }
+
 func Let(name string) *Code {
 	return NewCode().Let(name)
 }
@@ -49,6 +50,14 @@ func Export() *Code {
 
 func Lit(s string) string {
 	return NewCode().Lit(s)
+}
+
+func Delete() *Code {
+	return NewCode().Delete()
+}
+
+func CodeSet(code ...*Code) *Code {
+	return NewCode().CodeSet(code...)
 }
 
 func Empty() *Code {

@@ -8,13 +8,21 @@ import (
 )
 
 func TestWriteEmitUpdate(t *testing.T) {
-	t.Run("writes tree", func(t *testing.T) {
+	t.Run("writes emit update", func(t *testing.T) {
 		sf := NewFactory(testutils.NewSimpleASTExample())
-		sf.writeTree()
+		sf.writeEmitUpdate()
 
 		actual := sf.file.String()
 		expected := strings.Join([]string{
-			interface_Tree + "\n",
+			function_emit_Update,
+			function_emitAttackEvent,
+			function_emitEquipmentSet,
+			function_emitGearScore,
+			function_emitItem,
+			function_emitPlayer,
+			function_emitPosition,
+			function_emitZone,
+			function_emitZoneItem,
 		}, "\n")
 
 		if actual != expected {

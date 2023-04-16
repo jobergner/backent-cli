@@ -81,6 +81,10 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 
 	s.file.Interface("ElementReference", []InterfaceField{
 		{
+			Name: "id",
+			Type: Id("number"),
+		},
+		{
 			Name: "operationKind",
 			Type: Id("OperationKind"),
 		},

@@ -47,6 +47,16 @@ func (c *Code) ForIn(decl, iterable *Code) *Code {
 	return c
 }
 
+func (c *Code) CodeSet(code ...*Code) *Code {
+	for _, segment := range code {
+		s := segment.String()
+		c.buf.WriteString(s)
+		c.buf.WriteString("\n")
+	}
+
+	return c
+}
+
 func (c *Code) Block(code ...*Code) *Code {
 	c.buf.WriteString(" {\n")
 
@@ -114,5 +124,10 @@ func (c *Code) Sc() *Code {
 
 func (c *Code) Export() *Code {
 	c.buf.WriteString("export ")
+	return c
+}
+
+func (c *Code) Delete() *Code {
+	c.buf.WriteString("delete ")
 	return c
 }
