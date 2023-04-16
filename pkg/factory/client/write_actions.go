@@ -16,35 +16,33 @@ func (s *Factory) writeActions() *Factory {
 				logWithMessageKind(action).Dot("Msg").Call(Lit("failed marshalling parameters")),
 				returnError(action, "err"),
 			),
-			List(Id("id"), Id("err")).Op(":=").Id("uuid").Dot("NewRandom").Call(),
+			List(Id("id"), Id("err")).Op(":=").Id("newMessageID").Call(),
 			If(Id("err").Op("!=").Nil()).Block(
-				logWithMessageKind(action).Dot("Msg").Call(Lit("failed generating message ID")),
 				returnError(action, "err"),
 			),
-			Id("idString").Op(":=").Id("id").Dot("String").Call(),
-			Id("msg").Op(":=").Id("Message").Values(Id("idString"), Id("message").Dot(messageKind(action)), Id("msgContent")),
+			Id("msg").Op(":=").Id("Message").Values(Id("id"), Id("message").Dot(messageKind(action)), Id("msgContent")),
 			List(Id("msgBytes"), Id("err")).Op(":=").Id("msg").Dot("MarshalJSON").Call(),
 			If(Id("err").Op("!=").Nil()).Block(
-				logWithMessageKind(action).Dot("Str").Call(Id("logging").Dot("MessageID"), Id("msg").Dot("ID")).Dot("Str").Call(Id("logging").Dot("Message"), String().Call(Id("msgBytes"))).Dot("Msg").Call(Lit("failed marshalling message")),
+				logWithMessageKind(action).Dot("Int").Call(Id("logging").Dot("MessageID"), Id("msg").Dot("ID")).Dot("Str").Call(Id("logging").Dot("Message"), String().Call(Id("msgBytes"))).Dot("Msg").Call(Lit("failed marshalling message")),
 				returnError(action, "err"),
 			),
 			OnlyIf(action.Response != nil, &Statement{
 				Id("responseChan").Op(":=").Make(Chan().Index().Byte()).Line(),
-				Id("c").Dot("router").Dot("add").Call(Id("idString"), Id("responseChan")).Line(),
-				Defer().Id("c").Dot("router").Dot("remove").Call(Id("idString")).Line(),
+				Id("c").Dot("router").Dot("add").Call(Id("id"), Id("responseChan")).Line(),
+				Defer().Id("c").Dot("router").Dot("remove").Call(Id("id")).Line(),
 			}),
 			Id("c").Dot("messageChannel").Op("<-").Id("msgBytes"),
 			OnlyIf(action.Response != nil, &Statement{
 				Select().Block(
 					Case(Op("<-").Id("time").Dot("After").Call(Lit(2).Op("*").Id("time").Dot("Second"))).Block(
-						Id("log").Dot("Err").Call(Id("ErrResponseTimeout")).Dot("Str").Call(Id("logging").Dot("MessageID"), Id("msg").Dot("ID")).Dot("Msg").Call(Lit("timed out waiting for response")),
+						Id("log").Dot("Err").Call(Id("ErrResponseTimeout")).Dot("Int").Call(Id("logging").Dot("MessageID"), Id("msg").Dot("ID")).Dot("Msg").Call(Lit("timed out waiting for response")),
 						returnError(action, "ErrResponseTimeout"),
 					),
 					Case(Id("responseBytes").Op(":=").Op("<-").Id("responseChan")).Block(
 						Var().Id("res").Id("message").Dot(Title(action.Name)+"Response"),
 						Id("err").Op(":=").Id("res").Dot("UnmarshalJSON").Call(Id("responseBytes")),
 						If(Id("err").Op("!=").Nil()).Block(
-							logWithMessageKind(action).Dot("Str").Call(Id("logging").Dot("MessageID"), Id("msg").Dot("ID")).Dot("Msg").Call(Lit("failed unmarshalling response")),
+							logWithMessageKind(action).Dot("Int").Call(Id("logging").Dot("MessageID"), Id("msg").Dot("ID")).Dot("Msg").Call(Lit("failed unmarshalling response")),
 							returnError(action, "err"),
 						),
 
