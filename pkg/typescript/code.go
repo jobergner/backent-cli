@@ -21,3 +21,7 @@ func NewCode() *Code {
 func (c *Code) String() string {
 	return c.buf.String()
 }
+
+func (c *Code) WriteString(s string) {
+	c.buf.WriteString(s)
+}

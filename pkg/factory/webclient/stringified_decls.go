@@ -12,8 +12,7 @@ const class_Client = `export class Client {
       console.log("WebSocket connection opened");
     });
     this.ws.addEventListener("message", (event) => {
-      console.log("WebSocket message received:", event.data);
-      const message = JSON.parse(event.data) as WebSocketMessage;
+      const message = JSON.parse(event.data);
       switch (message.kind) {
         case MessageKind.ID:
           this.id = message.content;
@@ -37,17 +36,6 @@ const class_Client = `export class Client {
   public getID() {
     return this.id;
   }
-  public movePlayer(changeX: number, changeY: number, player: number) {
-    const messageID = generateID();
-    const message: WebSocketMessage = {
-      id: messageID,
-      kind: MessageKind.ActionMovePlayer,
-      content: JSON.stringify({changeX, changeY, player}),
-    };
-    setTimeout(() => {
-      this.ws.send(JSON.stringify(message));
-    }, 0);
-  }
   public addItemToPlayer(item: number, newName: string): Promise<AddItemToPlayerResponse> {
     const messageID = generateID();
     const message: WebSocketMessage = {
@@ -66,6 +54,17 @@ const class_Client = `export class Client {
         reject(ErrResponseTimeout);
       }, responseTimeout);
     });
+  }
+  public movePlayer(changeX: number, changeY: number, player: number) {
+    const messageID = generateID();
+    const message: WebSocketMessage = {
+      id: messageID,
+      kind: MessageKind.ActionMovePlayer,
+      content: JSON.stringify({changeX, changeY, player}),
+    };
+    setTimeout(() => {
+      this.ws.send(JSON.stringify(message));
+    }, 0);
   }
   public spawnZoneItems(items: number[]): Promise<SpawnZoneItemsResponse> {
     const messageID = generateID();
