@@ -28,8 +28,8 @@ func Id(s string) *Code {
 	return NewCode().Id(s)
 }
 
-func Return(s string) *Code {
-	return NewCode().Return(s)
+func Return() *Code {
+	return NewCode().Return()
 }
 
 func Object(fields ...ObjectField) *Code {
@@ -62,4 +62,32 @@ func CodeSet(code ...*Code) *Code {
 
 func Empty() *Code {
 	return NewCode()
+}
+
+func Private() *Code {
+	return NewCode().Private()
+}
+
+func Public() *Code {
+	return NewCode().Public()
+}
+
+func ArrowFunc(code ...*Code) *Code {
+	return NewCode().ArrowFunc(code...)
+}
+
+func Switch() *Code {
+	return NewCode().Switch()
+}
+
+func Case(matcher *Code, code ...*Code) *Code {
+	return NewCode().Case(matcher, code...)
+}
+
+func Default(code ...*Code) *Code {
+	return NewCode().Default(code...)
+}
+
+func Promise(typeName string) *Code {
+	return NewCode().Promise(typeName)
 }

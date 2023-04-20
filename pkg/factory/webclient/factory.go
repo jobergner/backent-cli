@@ -1,8 +1,6 @@
 package webclient
 
 import (
-	"sort"
-
 	"github.com/jobergner/backent-cli/pkg/ast"
 	"github.com/jobergner/backent-cli/pkg/typescript"
 )
@@ -35,18 +33,41 @@ func goTypeToTypescriptType(t string) string {
 	}
 }
 
-func sortValueTypes(m map[string]*ast.ConfigType) []*ast.ConfigType {
-	values := make([]*ast.ConfigType, 0, len(m))
+func (s *Factory) rangeTypes(fn func(configType ast.ConfigType) *typescript.Code) []*typescript.Code {
+	var code []*typescript.Code
+	s.config.RangeTypes(func(configType ast.ConfigType) {
+		code = append(code, fn(configType))
+	})
+	return code
+}
 
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
+func (s *Factory) rangeActions(fn func(action ast.Action) *typescript.Code) []*typescript.Code {
+	var code []*typescript.Code
+	s.config.RangeActions(func(action ast.Action) {
+		code = append(code, fn(action))
+	})
+	return code
+}
+
+func rangeValueTypes(field ast.Field, fn func(configType *ast.ConfigType) *typescript.Code) []*typescript.Code {
+	var code []*typescript.Code
+	field.RangeValueTypes(func(configType *ast.ConfigType) {
+		code = append(code, fn(configType))
+	})
+	return code
+}
+
+func rangeParams(action ast.Action, fn func(param ast.Field) typescript.Param) []typescript.Param {
+	var params []typescript.Param
+	action.RangeParams(func(param ast.Field) {
+		params = append(params, fn(param))
+	})
+	return params
+}
+
+func onlyIf(condition bool, code *typescript.Code) *typescript.Code {
+	if condition {
+		return code
 	}
-	sort.Strings(keys)
-
-	for _, k := range keys {
-		values = append(values, m[k])
-	}
-
-	return values
+	return typescript.Empty()
 }

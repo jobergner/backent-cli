@@ -7,14 +7,14 @@ import (
 	"github.com/jobergner/backent-cli/pkg/factory/testutils"
 )
 
-func TestWriteEmitUpdate(t *testing.T) {
-	t.Run("writes emit update", func(t *testing.T) {
+func TestWriteClient(t *testing.T) {
+	t.Run("writes client", func(t *testing.T) {
 		sf := NewFactory(testutils.NewSimpleASTExample())
-		sf.writeEmitUpdate()
+		sf.writeClient()
 
 		actual := sf.file.String()
 		expected := strings.Join([]string{
-			function_emit_Update + "\n",
+			class_Client + "\n",
 		}, "\n")
 
 		if actual != expected {

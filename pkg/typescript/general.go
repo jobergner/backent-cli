@@ -122,8 +122,8 @@ func (c *Code) ObjectSpaced(fields ...ObjectField) *Code {
 	return c
 }
 
-func (c *Code) Return(s string) *Code {
-	c.buf.WriteString(fmt.Sprintf("return %s", s))
+func (c *Code) Return() *Code {
+	c.buf.WriteString("return ")
 	return c
 }
 
@@ -144,5 +144,81 @@ func (c *Code) Export() *Code {
 
 func (c *Code) Delete() *Code {
 	c.buf.WriteString("delete ")
+	return c
+}
+
+func (c *Code) Class() *Code {
+	c.buf.WriteString("class ")
+	return c
+}
+
+func (c *Code) Public() *Code {
+	c.buf.WriteString("public ")
+	return c
+}
+
+func (c *Code) Private() *Code {
+	c.buf.WriteString("private ")
+	return c
+}
+
+func (c *Code) New() *Code {
+	c.buf.WriteString("new ")
+	return c
+}
+
+func (c *Code) Promise(typeName string) *Code {
+	c.buf.WriteString(fmt.Sprintf("Promise<%s> ", typeName))
+	return c
+}
+
+func (c *Code) ArrowFunc(code ...*Code) *Code {
+	c.Call(code...)
+	c.buf.WriteString("=> ")
+	return c
+}
+
+func (c *Code) Switch() *Code {
+	c.buf.WriteString("switch ")
+	return c
+}
+
+func (c *Code) Case(matcher *Code, code ...*Code) *Code {
+	c.buf.WriteString(fmt.Sprintf("case %s:", matcher.String()))
+
+	for _, segment := range code {
+		s := segment.String()
+		if len(s) == 0 {
+			continue
+		}
+		lines := strings.Split(s, "\n")
+		for i := range lines {
+			lines[i] = indent + lines[i]
+		}
+		s = strings.Join(lines, "\n")
+		c.buf.WriteString(s)
+		c.buf.WriteString("\n")
+	}
+
+	return c
+}
+
+func (c *Code) Default(code ...*Code) *Code {
+	c.buf.WriteString("default:")
+
+	for _, segment := range code {
+		s := segment.String()
+		if len(s) == 0 {
+			continue
+		}
+		lines := strings.Split(s, "\n")
+		for i := range lines {
+			lines[i] = indent + lines[i]
+		}
+		s = strings.Join(lines, "\n")
+		c.buf.WriteString(s)
+		c.buf.WriteString("\n")
+	}
+
 	return c
 }
