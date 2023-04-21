@@ -35,7 +35,7 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 				}
 
 				if vt.IsBasicType {
-					typesDef.Id(goTypeToTypescriptType(vt.Name))
+					typesDef.Id(s.goTypeToTypescriptType(vt.Name))
 					done = true
 					return
 				}

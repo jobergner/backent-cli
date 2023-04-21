@@ -24,12 +24,18 @@ func NewFactory(config *ast.AST) *Factory {
 	}
 }
 
-func goTypeToTypescriptType(t string) string {
-	switch t {
+func (f *Factory) goTypeToTypescriptType(s string) string {
+	for typeName := range f.config.Types {
+		if typeName+"ID" == s {
+			return "number"
+		}
+	}
+
+	switch s {
 	case "float64", "int64":
 		return "number"
 	default:
-		return t
+		return s
 	}
 }
 

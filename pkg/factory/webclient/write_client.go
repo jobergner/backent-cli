@@ -20,7 +20,7 @@ func (s *Factory) clientActions() []string {
 			return Param{}
 		})
 
-		paramString := paramsStringTemplate(params)
+		paramString := paramsStringTemplate(s, params)
 		content := strings.Join(contentStrings, ", ")
 
 		if action.Response == nil {
@@ -56,10 +56,14 @@ func methodTemplate(name, params, content string) string {
 	)
 }
 
-func paramsStringTemplate(params []ast.Field) string {
+func paramsStringTemplate(s *Factory, params []ast.Field) string {
 	var paramStrings []string
 	for _, p := range params {
-		paramStrings = append(paramStrings, fmt.Sprintf("%s: %s", p.Name, goTypeToTypescriptType(p.ValueString)))
+		typeName := s.goTypeToTypescriptType(p.ValueType().Name)
+		if p.HasSliceValue {
+			typeName = typeName + "[]"
+		}
+		paramStrings = append(paramStrings, fmt.Sprintf("%s: %s", p.Name, typeName))
 	}
 
 	return strings.Join(paramStrings, ", ")
@@ -134,7 +138,8 @@ func clientTemplate(methods []string) string {
     return this.id;
   }
 %s
-}`,
+}
+`,
 		methodsString,
 	)
 }
