@@ -410,10 +410,10 @@ function importItem(current: Item | null | undefined, update: Item): Item {
     current.name = update.name;
   }
   if (update.origin !== null && update.origin !== undefined) {
-    if (update.elementKind == ElementKind.ElementKindPlayer) {
+    if (update.elementKind === ElementKind.ElementKindPlayer) {
       current.origin = importPlayer(current.origin as Player, update.origin);
     }
-    if (update.elementKind == ElementKind.ElementKindPosition) {
+    if (update.elementKind === ElementKind.ElementKindPosition) {
       current.origin = importPosition(current.origin as Position, update.origin);
     }
   }
@@ -510,18 +510,25 @@ function importZone(current: Zone | null | undefined, update: Zone): Zone {
       current.interactables = {};
     }
     for (const id in update.interactables) {
-      if (update.interactables[id].elementKind == ElementKind.ElementKindItem) {
+      if (update.interactables[id].elementKind === ElementKind.ElementKindItem) {
         if (update.interactables[id].operationKind === OperationKind.OperationKindDelete) {
           delete current.interactables[id];
         } else {
           current.interactables[id] = importItem(current.interactables[id] as Item, update.interactables[id]);
         }
       }
-      if (update.interactables[id].elementKind == ElementKind.ElementKindZoneItem) {
+      if (update.interactables[id].elementKind === ElementKind.ElementKindPlayer) {
         if (update.interactables[id].operationKind === OperationKind.OperationKindDelete) {
           delete current.interactables[id];
         } else {
-          current.interactables[id] = importPosition(current.interactables[id] as ZoneItem, update.interactables[id]);
+          current.interactables[id] = importPlayer(current.interactables[id] as Player, update.interactables[id]);
+        }
+      }
+      if (update.interactables[id].elementKind === ElementKind.ElementKindZoneItem) {
+        if (update.interactables[id].operationKind === OperationKind.OperationKindDelete) {
+          delete current.interactables[id];
+        } else {
+          current.interactables[id] = importZoneItem(current.interactables[id] as ZoneItem, update.interactables[id]);
         }
       }
     }
@@ -561,10 +568,10 @@ function importZoneItem(current: ZoneItem | null | undefined, update: ZoneItem):
     return update;
   }
   if (update.item !== null && update.item !== undefined) {
-    current.item = importGearScore(current.item, update.item);
+    current.item = importItem(current.item, update.item);
   }
   if (update.position !== null && update.position !== undefined) {
-    current.position = importGearScore(current.position, update.position);
+    current.position = importPosition(current.position, update.position);
   }
   return current;
 }
