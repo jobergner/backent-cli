@@ -1,11 +1,11 @@
 # required for running main (and examples, as main is used to generate code for examples)
 go run ./generate/static_code/*
 
-# required for running examples. initially generatin marshallers may cause errors which we swallow
-# easyjson -all -output_filename examples/application/server/gets_generated_easyjson.go examples/application/server/gets_generated.go &> /dev/null;
-# easyjson -all -output_filename examples/application/server/message_easyjson.go examples/application/server/message.go &> /dev/null;
-# easyjson -all -output_filename examples/engine/tree_easyjson.go examples/engine/tree.go;
-easyjson -all -omit_empty ./examples/client/*
+# required for running examples
+easyjson -all -omit_empty ./examples/client/ &> /dev/null;
+easyjson -all -omit_empty ./examples/message/ &> /dev/null;
+easyjson -all -omit_empty ./examples/server/ &> /dev/null;
+easyjson -all -omit_empty ./examples/state/ &> /dev/null;
 
 # required for running unit tests
 decltostring -input ./examples/server/ -output ./pkg/factory/server/stringified_server_decls.go -package server -include "\.generated";

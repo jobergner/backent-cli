@@ -6,18 +6,18 @@ var StaticCode = map[string]string{
 `,
 	"importedCode_client": `package client 
 import (
-	"{{path}}/connect"
-	"{{path}}/state"
+	"time"
 	"{{path}}/message"
 	"github.com/rs/zerolog/log"
-	"context"
-	"math/big"
 	"nhooyr.io/websocket"
-	"errors"
-	"time"
+	"{{path}}/state"
 	"{{path}}/logging"
+	"context"
 	"crypto/rand"
+	"math/big"
 	"sync"
+	"{{path}}/connect"
+	"errors"
 )
 // easyjson:skip
 type Client struct {
@@ -247,18 +247,18 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
-	"fmt"
-	"net/http"
-	"nhooyr.io/websocket"
 	"github.com/google/uuid"
 	"{{path}}/logging"
-	"github.com/rs/zerolog/log"
-	"errors"
+	"fmt"
+	"net/http"
 	"time"
+	"nhooyr.io/websocket"
 	"{{path}}/connect"
 	"{{path}}/message"
+	"github.com/rs/zerolog/log"
 	"sync"
 	"{{path}}/state"
+	"errors"
 )
 // easyjson:skip
 type Client struct {
@@ -615,10 +615,10 @@ func (r *Room) handleIncomingClients() {
 `,
 	"importedCode_state": `package state 
 import (
-	"sort"
-	"fmt"
 	"strconv"
 	"sync"
+	"sort"
+	"fmt"
 )
 `,
 }
