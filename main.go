@@ -4,7 +4,6 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,8 +23,7 @@ var outDirPath = flag.String("out", "./tmp", "where to place packages")
 func main() {
 	flag.Parse()
 
-	err := env.EnsureDir(*outDirPath)
-	if err != nil {
+	if err := env.EnsureDir(*outDirPath); err != nil {
 		panic(err)
 	}
 
@@ -45,37 +43,43 @@ func main() {
 
 		dirPath := filepath.Join(*outDirPath, pkg.Name)
 
-		err := env.EnsureDir(dirPath)
-		if err != nil {
+		if err := env.EnsureDir(dirPath); err != nil {
 			panic(err)
 		}
 
-		staticCodeTemplate := packages.StaticCode[pkg.StaticCodeIdentifier]
-		staticCode := strings.ReplaceAll(staticCodeTemplate, "{{path}}", importPath)
+		buf := bytes.NewBuffer(nil)
 
-		buf := bytes.NewBufferString(staticCode)
+		if staticCodeTemplate, ok := packages.StaticCode[pkg.StaticCodeIdentifier]; ok {
+			staticCode := strings.ReplaceAll(staticCodeTemplate, "{{path}}", importPath)
+			if _, err := buf.WriteString(staticCode); err != nil {
+				panic(err)
+			}
+		}
 
 		if pkg.DynamicCodeFactory != nil {
 			customCode := pkg.DynamicCodeFactory.Write()
-
-			buf.WriteString(customCode)
+			if _, err := buf.WriteString(customCode); err != nil {
+				panic(err)
+			}
 		}
 
-		filePath := filepath.Join(dirPath, fmt.Sprintf("%s.go", pkg.Name))
+		filePath := filepath.Join(dirPath, pkg.FileName)
 
-		err = utils.Format(buf)
-		if err != nil {
+		if pkg.Lang() == packages.LangGo {
+			if err = utils.Format(buf); err != nil {
+				panic(err)
+			}
+		}
+
+		if err := os.WriteFile(filePath, buf.Bytes(), 0644); err != nil {
 			panic(err)
 		}
 
-		err = os.WriteFile(filePath, buf.Bytes(), 0644)
-		if err != nil {
-			panic(err)
-		}
-
-		err = marshallers.Generate(filePath)
-		if err != nil {
-			panic(err)
+		if pkg.Lang() == packages.LangGo {
+			err = marshallers.Generate(filePath)
+			if err != nil {
+				panic(err)
+			}
 		}
 
 	}
