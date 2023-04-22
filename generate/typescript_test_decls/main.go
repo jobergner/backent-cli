@@ -44,9 +44,14 @@ func main() {
 	decls := strings.Split(string(content), "\n\n")
 
 	file := jen.NewFile(*packageName)
+	collectionContent := make(jen.Dict)
 	for _, d := range decls {
-		file.Const().Id(declarationName(d)).Op("=").Id("`" + escapeBackticks(strings.TrimSpace(d)) + "`")
+		declName := declarationName(d)
+		collectionContent[jen.Lit(declName)] = jen.Id(declName)
+		file.Const().Id(declName).Op("=").Id("`" + escapeBackticks(strings.TrimSpace(d)) + "`")
 	}
+
+	file.Var().Id("decl_to_string_decl_collection").Op("=").Map(jen.String()).String().Values(collectionContent)
 
 	buf := bytes.NewBuffer(nil)
 	file.Render(buf)

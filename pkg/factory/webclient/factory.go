@@ -12,7 +12,18 @@ type Factory struct {
 
 // Write writes source code for a given StateConfig
 func (f *Factory) Write() string {
-	f.writeTypeDefinitions()
+	f.
+		writeClient().
+		writeElementKind().
+		writeEmitElement().
+		writeEmitUpdate().
+		writeImportElement().
+		writeImportUpdate().
+		writeMessageKind().
+		writeResponseDefinitions().
+		writeStaticCode().
+		writeTree().
+		writeTypeDefinitions()
 
 	return f.file.String()
 }
