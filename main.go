@@ -15,6 +15,10 @@ import (
 	"github.com/jobergner/backent-cli/pkg/marshallers"
 	"github.com/jobergner/backent-cli/pkg/module"
 	"github.com/jobergner/backent-cli/pkg/packages"
+
+	_ "github.com/mailru/easyjson/gen"
+	_ "github.com/mailru/easyjson/jlexer"
+	_ "github.com/mailru/easyjson/jwriter"
 )
 
 var configPath = flag.String("config", "./example.config.json", "path of config")
