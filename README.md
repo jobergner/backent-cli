@@ -5,6 +5,10 @@
 # backent-cli
 backent-cli provides a toolkit to generate a server and a custom API as package which broadcasts state changes of entities automatically.
 
+``````
+gocloc . --not-match-d='node_modules|tmp' --not-match='stringified|easyjson|pregenerated'
+``````
+
 
 ## Installation
 ```
@@ -982,6 +986,10 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 - manages self referencing entitys
 
 ### TODO
+
+- find a better way to include easyjson or find alternative
+- external packages such as UUID are not imported and generating marshallers throws error
+- unnecessary import in message when no element ID is used as action arguments
 
 BIG CHANGE: REMOVE BROADCASTING
 a lot of time and energy went into the broadcasting feature, but I still decided to remove it. The amout of complexity it adds is just not worth it and hard to explain, which made code and documentation harder to reason about.
