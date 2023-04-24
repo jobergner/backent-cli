@@ -107,3 +107,9 @@ func (p PackageInfo) Lang() Language {
 
 	panic(fmt.Errorf("unknown extension %s", ext))
 }
+
+func (p PackageInfo) Paths(baseDirPath string) (string, string) {
+	dirPath := filepath.Join(baseDirPath, p.Name)
+	filePath := filepath.Join(dirPath, p.FileName)
+	return dirPath, filePath
+}

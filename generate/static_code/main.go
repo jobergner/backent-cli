@@ -185,6 +185,9 @@ func main() {
 
 	mapContent := make(jen.Dict)
 	for _, pkg := range packages.Packages(nil) {
+		if pkg.Lang() != packages.LangGo {
+			continue
+		}
 		code := fmt.Sprintf("package %s \n%s", pkg.Name, writeCodeFromDir(pkg.SourcePath))
 		mapContent[jen.Lit(pkg.StaticCodeIdentifier)] = jen.Id("`" + escapeBackticks(code) + "`")
 	}

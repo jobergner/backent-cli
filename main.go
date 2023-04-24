@@ -41,7 +41,7 @@ func main() {
 
 	for _, pkg := range packages.Packages(syntaxTree) {
 
-		dirPath := filepath.Join(*outDirPath, pkg.Name)
+		dirPath, filePath := pkg.Paths(*outDirPath)
 
 		if err := env.EnsureDir(dirPath); err != nil {
 			panic(err)
@@ -63,8 +63,6 @@ func main() {
 			}
 		}
 
-		filePath := filepath.Join(dirPath, pkg.FileName)
-
 		if pkg.Lang() == packages.LangGo {
 			if err = utils.Format(buf); err != nil {
 				panic(err)
@@ -74,14 +72,25 @@ func main() {
 		if err := os.WriteFile(filePath, buf.Bytes(), 0644); err != nil {
 			panic(err)
 		}
+	}
 
-		if pkg.Lang() == packages.LangGo {
-			err = marshallers.Generate(filePath)
-			if err != nil {
-				panic(err)
-			}
+	if err := marshallers.WriteImportFile(*outDirPath); err != nil {
+		panic(err)
+	}
+
+	if err := module.Tidy(); err != nil {
+		panic(err)
+	}
+
+	for _, pkg := range packages.Packages(syntaxTree) {
+		if pkg.Lang() != packages.LangGo {
+			continue
 		}
 
+		_, filePath := pkg.Paths(*outDirPath)
+		if err = marshallers.Generate(filePath); err != nil {
+			panic(err)
+		}
 	}
 }
 

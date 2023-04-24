@@ -41,7 +41,7 @@ func Find(outPath string) (string, string, error) {
 // modName takes the absolute path of a module's root directory
 // and evaluates the module's name
 func modName(path string) (string, error) {
-	cmd := exec.Command("go", "mod", "why")
+	cmd := exec.Command("go", "list", "-m")
 	cmd.Dir = path
 
 	output, err := cmd.Output()
@@ -49,13 +49,11 @@ func modName(path string) (string, error) {
 		return "", err
 	}
 
-	writtenLines := strings.Split(string(output), "\n")
-
-	if len(writtenLines) == 3 {
-		return writtenLines[1], nil
+	if len(output) == 0 {
+		return "", ErrModuleNotFound
 	}
 
-	return "", ErrModuleNotFound
+	return strings.TrimSpace(string(output)), nil
 }
 
 // modFilePath returns the absolute path of the
