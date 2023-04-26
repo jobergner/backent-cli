@@ -23,7 +23,6 @@ func TestWriteStaticCode(t *testing.T) {
 			enum_ReferencedDataStatus,
 			enum_OperationKind,
 			const_currentState,
-			function_RECEIVEUPDATE,
 			interface_WebSocketMessage,
 			function_generateID + "\n",
 		}, "\n")

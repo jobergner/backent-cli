@@ -76,10 +76,10 @@ func (s *Factory) writeTypeDefinitions() *Factory {
 			Type: Id("ElementKind"),
 		})
 
-		s.file.Interface(Title(configType.Name), fields...)
+		s.file.Export().Interface(Title(configType.Name), fields...)
 	})
 
-	s.file.Interface("ElementReference", []InterfaceField{
+	s.file.Export().Interface("ElementReference", []InterfaceField{
 		{
 			Name: "id",
 			Type: Id("number"),

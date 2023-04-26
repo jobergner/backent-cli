@@ -4,7 +4,7 @@ const class_Client = `export class Client {
   private ws: WebSocket;
   private responseEmitter: EventEmitter;
   private id: string;
-  constructor(url: string) {
+  constructor(url: string, onUpdate: (update: Tree) => void = () => null) {
     this.id = "";
     this.ws = new WebSocket(url);
     this.responseEmitter = new EventEmitter();
@@ -19,7 +19,10 @@ const class_Client = `export class Client {
           break;
         case MessageKind.Update:
         case MessageKind.CurrentState:
-          RECEIVEUPDATE(message.content);
+          const update = JSON.parse(message.content) as Tree;
+          emit_Update(update);
+          onUpdate(update);
+          import_Update(currentState, update);
           break;
         case MessageKind.Error:
           console.log(message);
@@ -158,7 +161,7 @@ const enum_ElementKind = `export enum ElementKind {
   ElementKindZone = "Zone",
   ElementKindZoneItem = "ZoneItem",
 }`
-const interface_ElementReference = `interface ElementReference {
+const interface_ElementReference = `export interface ElementReference {
   id: number;
   operationKind: OperationKind;
   elementID: number;
@@ -166,14 +169,14 @@ const interface_ElementReference = `interface ElementReference {
   referencedDataStatus: ReferencedDataStatus;
   elementPath: string;
 }`
-const interface_ZoneItem = `interface ZoneItem {
+const interface_ZoneItem = `export interface ZoneItem {
   id: number;
   item?: Item;
   position?: Position;
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_Item = `interface Item {
+const interface_Item = `export interface Item {
   id: number;
   boundTo?: ElementReference;
   gearScore?: GearScore;
@@ -182,34 +185,34 @@ const interface_Item = `interface Item {
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_AttackEvent = `interface AttackEvent {
+const interface_AttackEvent = `export interface AttackEvent {
   id: number;
   target?: ElementReference;
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_EquipmentSet = `interface EquipmentSet {
+const interface_EquipmentSet = `export interface EquipmentSet {
   id: number;
   equipment?: { [id: number]: ElementReference };
   name?: string;
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_Position = `interface Position {
+const interface_Position = `export interface Position {
   id: number;
   x?: number;
   y?: number;
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_GearScore = `interface GearScore {
+const interface_GearScore = `export interface GearScore {
   id: number;
   level?: number;
   score?: number;
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_Player = `interface Player {
+const interface_Player = `export interface Player {
   id: number;
   action?: { [id: number]: AttackEvent };
   equipmentSets?: { [id: number]: ElementReference };
@@ -222,7 +225,7 @@ const interface_Player = `interface Player {
   operationKind: OperationKind;
   elementKind: ElementKind;
 }`
-const interface_Zone = `interface Zone {
+const interface_Zone = `export interface Zone {
   id: number;
   interactables?: { [id: number]: Item | Player | ZoneItem };
   items?: { [id: number]: ZoneItem };
@@ -242,11 +245,6 @@ const interface_Tree = `export interface Tree {
   zoneItem?: { [id: number]: ZoneItem };
 }`
 const const_currentState = `export const currentState: Tree = {};`
-const function_RECEIVEUPDATE = `function RECEIVEUPDATE(json: string) {
-  const update = JSON.parse(json) as Tree;
-  emit_Update(update);
-  import_Update(currentState, update);
-}`
 const function_import_Update = `export function import_Update(current: Tree, update: Tree) {
   if (update.equipmentSet !== null && update.equipmentSet !== undefined) {
     if (current.equipmentSet === null || current.equipmentSet === undefined) {
@@ -818,7 +816,6 @@ var decl_to_string_decl_collection = map[string]string{
 	"enum_MessageKind":                  enum_MessageKind,
 	"enum_OperationKind":                enum_OperationKind,
 	"enum_ReferencedDataStatus":         enum_ReferencedDataStatus,
-	"function_RECEIVEUPDATE":            function_RECEIVEUPDATE,
 	"function_emitAttackEvent":          function_emitAttackEvent,
 	"function_emitElementReference":     function_emitElementReference,
 	"function_emitEquipmentSet":         function_emitEquipmentSet,

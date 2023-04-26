@@ -987,9 +987,9 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 
 ### TODO
 
-- find a better way to include easyjson or find alternative
-- external packages such as UUID are not imported and generating marshallers throws error
+- cannot properly remove client on OnClientDisconnect
 - unnecessary import in message when no element ID is used as action arguments
+- room.Deploy can be called multiple times
 
 BIG CHANGE: REMOVE BROADCASTING
 a lot of time and energy went into the broadcasting feature, but I still decided to remove it. The amout of complexity it adds is just not worth it and hard to explain, which made code and documentation harder to reason about.

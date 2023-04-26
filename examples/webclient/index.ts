@@ -2,7 +2,7 @@ export class Client {
   private ws: WebSocket;
   private responseEmitter: EventEmitter;
   private id: string;
-  constructor(url: string) {
+  constructor(url: string, onUpdate: (update: Tree) => void = () => null) {
     this.id = "";
     this.ws = new WebSocket(url);
     this.responseEmitter = new EventEmitter();
@@ -17,7 +17,10 @@ export class Client {
           break;
         case MessageKind.Update:
         case MessageKind.CurrentState:
-          RECEIVEUPDATE(message.content);
+          const update = JSON.parse(message.content) as Tree;
+          emit_Update(update);
+          onUpdate(update);
+          import_Update(currentState, update);
           break;
         case MessageKind.Error:
           console.log(message);
@@ -169,7 +172,7 @@ export enum ElementKind {
   ElementKindZoneItem = "ZoneItem",
 }
 
-interface ElementReference {
+export interface ElementReference {
   id: number;
   operationKind: OperationKind;
   elementID: number;
@@ -178,7 +181,7 @@ interface ElementReference {
   elementPath: string;
 }
 
-interface ZoneItem {
+export interface ZoneItem {
   id: number;
   item?: Item;
   position?: Position;
@@ -186,7 +189,7 @@ interface ZoneItem {
   elementKind: ElementKind;
 }
 
-interface Item {
+export interface Item {
   id: number;
   boundTo?: ElementReference;
   gearScore?: GearScore;
@@ -196,14 +199,14 @@ interface Item {
   elementKind: ElementKind;
 }
 
-interface AttackEvent {
+export interface AttackEvent {
   id: number;
   target?: ElementReference;
   operationKind: OperationKind;
   elementKind: ElementKind;
 }
 
-interface EquipmentSet {
+export interface EquipmentSet {
   id: number;
   equipment?: { [id: number]: ElementReference };
   name?: string;
@@ -211,7 +214,7 @@ interface EquipmentSet {
   elementKind: ElementKind;
 }
 
-interface Position {
+export interface Position {
   id: number;
   x?: number;
   y?: number;
@@ -219,7 +222,7 @@ interface Position {
   elementKind: ElementKind;
 }
 
-interface GearScore {
+export interface GearScore {
   id: number;
   level?: number;
   score?: number;
@@ -227,7 +230,7 @@ interface GearScore {
   elementKind: ElementKind;
 }
 
-interface Player {
+export interface Player {
   id: number;
   action?: { [id: number]: AttackEvent };
   equipmentSets?: { [id: number]: ElementReference };
@@ -241,7 +244,7 @@ interface Player {
   elementKind: ElementKind;
 }
 
-interface Zone {
+export interface Zone {
   id: number;
   interactables?: { [id: number]: Item | Player | ZoneItem };
   items?: { [id: number]: ZoneItem };
@@ -263,12 +266,6 @@ export interface Tree {
 }
 
 export const currentState: Tree = {};
-
-function RECEIVEUPDATE(json: string) {
-  const update = JSON.parse(json) as Tree;
-  emit_Update(update);
-  import_Update(currentState, update);
-}
 
 export function import_Update(current: Tree, update: Tree) {
   if (update.equipmentSet !== null && update.equipmentSet !== undefined) {

@@ -105,7 +105,7 @@ func clientTemplate(methods []string) string {
   private ws: WebSocket;
   private responseEmitter: EventEmitter;
   private id: string;
-  constructor(url: string) {
+  constructor(url: string, onUpdate: (update: Tree) => void = () => null) {
     this.id = "";
     this.ws = new WebSocket(url);
     this.responseEmitter = new EventEmitter();
@@ -120,7 +120,10 @@ func clientTemplate(methods []string) string {
           break;
         case MessageKind.Update:
         case MessageKind.CurrentState:
-          RECEIVEUPDATE(message.content);
+          const update = JSON.parse(message.content) as Tree;
+          emit_Update(update);
+          onUpdate(update);
+          import_Update(currentState, update);
           break;
         case MessageKind.Error:
           console.log(message);

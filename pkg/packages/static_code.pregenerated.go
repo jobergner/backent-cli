@@ -4,18 +4,18 @@ package packages
 var StaticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"{{path}}/message"
-	"crypto/rand"
+	"context"
 	"math/big"
+	"sync"
+	"{{path}}/connect"
 	"nhooyr.io/websocket"
-	"{{path}}/state"
 	"errors"
 	"time"
 	"{{path}}/logging"
+	"{{path}}/message"
 	"github.com/rs/zerolog/log"
-	"context"
-	"sync"
-	"{{path}}/connect"
+	"crypto/rand"
+	"{{path}}/state"
 )
 // easyjson:skip
 type Client struct {
@@ -245,18 +245,18 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
+	"{{path}}/message"
+	"errors"
+	"net/http"
+	"nhooyr.io/websocket"
+	"github.com/google/uuid"
+	"{{path}}/connect"
+	"{{path}}/logging"
+	"time"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"sync"
 	"{{path}}/state"
-	"errors"
-	"time"
-	"github.com/google/uuid"
-	"{{path}}/connect"
-	"{{path}}/message"
-	"fmt"
-	"nhooyr.io/websocket"
-	"{{path}}/logging"
-	"net/http"
 )
 // easyjson:skip
 type Client struct {
