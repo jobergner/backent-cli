@@ -69,7 +69,8 @@ func (r *Room) handleIncomingClients() {
 		return
 	}
 
-	stateBytes, err := r.state.State.MarshalJSON()
+	r.state.AssembleFullTree()
+	stateBytes, err := r.state.Tree.MarshalJSON()
 	if err != nil {
 		log.Err(err).Msg("failed marshalling state")
 		return

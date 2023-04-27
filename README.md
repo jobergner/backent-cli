@@ -987,8 +987,10 @@ the `examples/engine` has benchmark tests with their record and improvements mai
 
 ### TODO
 
+- in webclient I need to set OperationKindCreate for the entire tree before emitting as otherwise created children won't have correct operationKind
+- need a way to emit root elements with operationKindCreate (maybe in key 0)
+- go generate also runs decltostring
 - cannot properly remove client on OnClientDisconnect
-- unnecessary import in message when no element ID is used as action arguments
 - room.Deploy can be called multiple times
 
 BIG CHANGE: REMOVE BROADCASTING

@@ -4,18 +4,18 @@ package packages
 var StaticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"context"
-	"math/big"
-	"sync"
+	"github.com/rs/zerolog/log"
 	"{{path}}/connect"
 	"nhooyr.io/websocket"
+	"{{path}}/state"
 	"errors"
 	"time"
-	"{{path}}/logging"
 	"{{path}}/message"
-	"github.com/rs/zerolog/log"
 	"crypto/rand"
-	"{{path}}/state"
+	"math/big"
+	"sync"
+	"{{path}}/logging"
+	"context"
 )
 // easyjson:skip
 type Client struct {
@@ -246,17 +246,17 @@ const (
 	"importedCode_server": `package server 
 import (
 	"{{path}}/message"
-	"errors"
-	"net/http"
-	"nhooyr.io/websocket"
-	"github.com/google/uuid"
-	"{{path}}/connect"
-	"{{path}}/logging"
-	"time"
-	"fmt"
 	"github.com/rs/zerolog/log"
 	"sync"
+	"errors"
+	"fmt"
+	"net/http"
+	"github.com/google/uuid"
+	"{{path}}/logging"
 	"{{path}}/state"
+	"time"
+	"nhooyr.io/websocket"
+	"{{path}}/connect"
 )
 // easyjson:skip
 type Client struct {
@@ -589,7 +589,8 @@ func (r *Room) handleIncomingClients() {
 	if len(r.clients.incomingClients) == 0 {
 		return
 	}
-	stateBytes, err := r.state.State.MarshalJSON()
+	r.state.AssembleFullTree()
+	stateBytes, err := r.state.Tree.MarshalJSON()
 	if err != nil {
 		log.Err(err).Msg("failed marshalling state")
 		return
@@ -613,10 +614,10 @@ func (r *Room) handleIncomingClients() {
 `,
 	"importedCode_state": `package state 
 import (
+	"sort"
 	"fmt"
 	"strconv"
 	"sync"
-	"sort"
 )
 `,
 }

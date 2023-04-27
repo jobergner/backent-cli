@@ -627,7 +627,7 @@ function emitAttackEvent(update: AttackEvent) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -644,7 +644,7 @@ function emitEquipmentSet(update: EquipmentSet) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -663,7 +663,7 @@ function emitGearScore(update: GearScore) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -677,7 +677,7 @@ function emitItem(update: Item) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -705,7 +705,7 @@ function emitPosition(update: Position) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -719,7 +719,7 @@ function emitPlayer(update: Player) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -767,7 +767,7 @@ function emitZone(update: Zone) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -804,7 +804,7 @@ function emitZoneItem(update: ZoneItem) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -824,7 +824,7 @@ function emitElementReference(update: ElementReference) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }

@@ -15,6 +15,7 @@ import (
 	"github.com/jobergner/backent-cli/pkg/marshallers"
 	"github.com/jobergner/backent-cli/pkg/module"
 	"github.com/jobergner/backent-cli/pkg/packages"
+	"golang.org/x/tools/imports"
 
 	_ "github.com/mailru/easyjson/gen"
 	_ "github.com/mailru/easyjson/jlexer"
@@ -73,7 +74,16 @@ func main() {
 			}
 		}
 
-		if err := os.WriteFile(filePath, buf.Bytes(), 0644); err != nil {
+		src := buf.Bytes()
+
+		if pkg.Lang() == packages.LangGo {
+			src, err = postFixImports(src)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		if err := os.WriteFile(filePath, src, 0644); err != nil {
 			panic(err)
 		}
 	}
@@ -119,4 +129,15 @@ func evalImportPath(outPath string) (string, error) {
 	importPath := filepath.Join(modName, modToOut)
 
 	return importPath, nil
+}
+
+func postFixImports(src []byte) ([]byte, error) {
+	formattedSrc, err := imports.Process("test.go", []byte(src), &imports.Options{
+		Comments: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return formattedSrc, nil
 }

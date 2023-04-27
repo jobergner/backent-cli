@@ -595,7 +595,7 @@ const function_emitAttackEvent = `function emitAttackEvent(update: AttackEvent) 
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -611,7 +611,7 @@ const function_emitEquipmentSet = `function emitEquipmentSet(update: EquipmentSe
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -629,7 +629,7 @@ const function_emitGearScore = `function emitGearScore(update: GearScore) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -642,7 +642,7 @@ const function_emitItem = `function emitItem(update: Item) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -669,7 +669,7 @@ const function_emitPosition = `function emitPosition(update: Position) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -682,7 +682,7 @@ const function_emitPlayer = `function emitPlayer(update: Player) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -729,7 +729,7 @@ const function_emitZone = `function emitZone(update: Zone) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -765,7 +765,7 @@ const function_emitZoneItem = `function emitZoneItem(update: ZoneItem) {
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }
@@ -784,7 +784,7 @@ const function_emitElementReference = `function emitElementReference(update: Ele
   if (update.operationKind === OperationKind.OperationKindDelete && elementRegistrar[update.id] !== undefined) {
     delete elementRegistrar[update.id];
   }
-  if (update.operationKind === OperationKind.OperationKindUpdate && elementRegistrar[update.id] === undefined) {
+  if (update.operationKind !== OperationKind.OperationKindDelete && elementRegistrar[update.id] === undefined) {
     update.operationKind = OperationKind.OperationKindCreate;
     elementRegistrar[update.id] = true;
   }

@@ -15,7 +15,7 @@ func (s *Factory) writeEmitElement() *Factory {
 		If(Id("update").Dot("operationKind").Equals().Id("OperationKind").Dot("OperationKindDelete").And().Id("elementRegistrar").Index(Id("update").Dot("id")).EqualsNot().Undf()).Block(
 			Delete().Id("elementRegistrar").Index(Id("update").Dot("id")).Sc(),
 		),
-		If(Id("update").Dot("operationKind").Equals().Id("OperationKind").Dot("OperationKindUpdate").And().Id("elementRegistrar").Index(Id("update").Dot("id")).Equals().Undf()).Block(
+		If(Id("update").Dot("operationKind").EqualsNot().Id("OperationKind").Dot("OperationKindDelete").And().Id("elementRegistrar").Index(Id("update").Dot("id")).Equals().Undf()).Block(
 			Id("update").Dot("operationKind").Assign().Id("OperationKind").Dot("OperationKindCreate").Sc(),
 			Id("elementRegistrar").Index(Id("update").Dot("id")).Assign().Id("true").Sc(),
 		),
