@@ -18,19 +18,19 @@ func TestCode(t *testing.T) {
 				If(Id("current").Dot("equipment").Equals().Id("null").Or().Id("current").Dot("equipment").Equals().Id("undefined")).Block(
 					Id("current").Dot("equipment").Assign().Object().Sc(),
 				),
-				ForIn(Id("const").Id("id"), Id("update").Dot("equipment")).Block(
+				ForIn(Const("id"), Id("update").Dot("equipment")).Block(
 					Id("current").Dot("equipment").Index(Id("id")).Assign().Id("importElementReference").Call(Id("current").Dot("equipment").Index(Id("id")), Id("update").Dot("equipment").Index(Id("id"))).Sc(),
 				),
 			),
 			If(Id("update").Dot("name").EqualsNot().Id("null").And().Id("update").Dot("name").EqualsNot().Id("undefined")).Block(
 				Id("current").Dot("name").Assign().Id("update").Dot("name").Sc(),
 			),
-			Return("current").Sc(),
+			Return().Id("current").Sc(),
 		).String()
 
 		expected := `function importEquipmentSet(current: EquipmentSet | null | undefined, update: EquipmentSet): EquipmentSet {
   if (current === null || current === undefined) {
-    current = { id: update.id, elementKind: update.elementKind, operationKind: update.operationKind };
+    current = {id: update.id, elementKind: update.elementKind, operationKind: update.operationKind};
   }
   if (update.equipment !== null && update.equipment !== undefined) {
     if (current.equipment === null || current.equipment === undefined) {

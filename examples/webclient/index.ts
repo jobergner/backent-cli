@@ -156,7 +156,7 @@ export enum ReferencedDataStatus {
 export enum OperationKind {
   OperationKindDelete = "DELETE",
   OperationKindUpdate = "UPDATE",
-  OperationKindCreate = "Create",
+  OperationKindCreate = "CREATE",
   OperationKindUnchanged = "UNCHANGED",
 }
 

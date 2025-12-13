@@ -4,18 +4,18 @@ package packages
 var StaticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
-	"github.com/rs/zerolog/log"
-	"{{path}}/connect"
-	"nhooyr.io/websocket"
-	"{{path}}/state"
 	"errors"
 	"time"
-	"{{path}}/message"
+	"{{path}}/logging"
+	"context"
 	"crypto/rand"
 	"math/big"
 	"sync"
-	"{{path}}/logging"
-	"context"
+	"{{path}}/state"
+	"{{path}}/message"
+	"github.com/rs/zerolog/log"
+	"{{path}}/connect"
+	"nhooyr.io/websocket"
 )
 // easyjson:skip
 type Client struct {
@@ -168,10 +168,10 @@ func (r *responseRouter) route(response Message) {
 `,
 	"importedCode_connect": `package connect 
 import (
+	"nhooyr.io/websocket"
 	"context"
 	"{{path}}/logging"
 	"github.com/rs/zerolog/log"
-	"nhooyr.io/websocket"
 )
 type Connector interface {
 	Close(reason string)
@@ -245,18 +245,18 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
-	"{{path}}/message"
-	"github.com/rs/zerolog/log"
-	"sync"
-	"errors"
-	"fmt"
-	"net/http"
 	"github.com/google/uuid"
 	"{{path}}/logging"
-	"{{path}}/state"
+	"{{path}}/message"
+	"github.com/rs/zerolog/log"
+	"errors"
 	"time"
+	"fmt"
 	"nhooyr.io/websocket"
 	"{{path}}/connect"
+	"sync"
+	"{{path}}/state"
+	"net/http"
 )
 // easyjson:skip
 type Client struct {
@@ -614,10 +614,10 @@ func (r *Room) handleIncomingClients() {
 `,
 	"importedCode_state": `package state 
 import (
-	"sort"
-	"fmt"
 	"strconv"
 	"sync"
+	"sort"
+	"fmt"
 )
 `,
 }

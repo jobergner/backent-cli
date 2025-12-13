@@ -147,7 +147,7 @@ const enum_ReferencedDataStatus = `export enum ReferencedDataStatus {
 const enum_OperationKind = `export enum OperationKind {
   OperationKindDelete = "DELETE",
   OperationKindUpdate = "UPDATE",
-  OperationKindCreate = "Create",
+  OperationKindCreate = "CREATE",
   OperationKindUnchanged = "UNCHANGED",
 }`
 const enum_ElementKind = `export enum ElementKind {
