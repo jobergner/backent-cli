@@ -27,6 +27,10 @@ func (s *Factory) writeMessageKind() *Factory {
 			Name:  "CurrentState",
 			Value: Id(Lit("currentState")),
 		},
+		EnumField{
+			Name:  "Global",
+			Value: Id(Lit("global")),
+		},
 	)
 
 	s.config.RangeActions(func(action ast.Action) {

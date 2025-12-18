@@ -10,7 +10,7 @@ import (
 func (s *Factory) writeController() *Factory {
 
 	s.file.Type().Id("Controller").Interface(
-		Id(`OnSuperMessage(msg Message, room *Room, client *Client, lobby *Lobby)
+		Id(`OnSuperMessage(msg Message, room *Room, client *Client, lobby *Lobby) Message
 	OnClientConnect(client *Client, lobby *Lobby)
 	OnClientDisconnect(room *Room, clientID string, lobby *Lobby)
 	OnCreation(lobby *Lobby)

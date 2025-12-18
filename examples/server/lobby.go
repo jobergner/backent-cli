@@ -71,7 +71,15 @@ func (l *Lobby) processMessage(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
+	response := l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
+
+	responseBytes, err := response.MarshalJSON()
+	if err != nil {
+		log.Err(err).Str(logging.MessageKind, string(response.Kind)).Msg("failed marshalling super message response")
+		return
+	}
+
+	msg.client.messageChannel <- responseBytes
 }
 
 func (l *Lobby) signalClientDisconnect(client *Client) {

@@ -111,9 +111,11 @@ func (mr *MockControllerMockRecorder) OnFrameTick(engine interface{}) *gomock.Ca
 }
 
 // OnSuperMessage mocks base method.
-func (m *MockController) OnSuperMessage(msg server.Message, room *server.Room, client *server.Client, lobby *server.Lobby) {
+func (m *MockController) OnSuperMessage(msg server.Message, room *server.Room, client *server.Client, lobby *server.Lobby) server.Message {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "OnSuperMessage", msg, room, client, lobby)
+	ret := m.ctrl.Call(m, "OnSuperMessage", msg, room, client, lobby)
+	ret0, _ := ret[0].(server.Message)
+	return ret0
 }
 
 // OnSuperMessage indicates an expected call of OnSuperMessage.

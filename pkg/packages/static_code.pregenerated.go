@@ -4,18 +4,18 @@ package packages
 var StaticCode = map[string]string{
 	"importedCode_client": `package client 
 import (
+	"sync"
+	"{{path}}/state"
+	"context"
+	"{{path}}/connect"
+	"nhooyr.io/websocket"
 	"errors"
 	"time"
 	"{{path}}/logging"
-	"context"
-	"crypto/rand"
-	"math/big"
-	"sync"
-	"{{path}}/state"
 	"{{path}}/message"
 	"github.com/rs/zerolog/log"
-	"{{path}}/connect"
-	"nhooyr.io/websocket"
+	"crypto/rand"
+	"math/big"
 )
 // easyjson:skip
 type Client struct {
@@ -110,19 +110,28 @@ func newMessageID() (int, error) {
 	}
 	return int(n.Int64()), nil
 }
-func (c *Client) SuperMessage(b []byte) error {
+func (c *Client) SuperMessage(b []byte) (Message, error) {
 	id, err := newMessageID()
 	if err != nil {
-		return err
+		return Message{}, err
 	}
 	msg := Message{id, message.MessageKindGlobal, b}
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
 		log.Err(err).Int(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindGlobal)).Msg("failed marshalling message")
-		return err
+		return Message{}, err
 	}
+	responseChan := make(chan Message)
+	c.router.addMessage(id, responseChan)
+	defer c.router.removeMessage(id)
 	c.messageChannel <- msgBytes
-	return nil
+	select {
+	case <-time.After(2 * time.Second):
+		log.Err(ErrResponseTimeout).Int(logging.MessageID, msg.ID).Msg("timed out waiting for response")
+		return Message{}, ErrResponseTimeout
+	case response := <-responseChan:
+		return response, nil
+	}
 }
 var (
 	ErrResponseTimeout = errors.New("timeout")
@@ -133,12 +142,13 @@ type Message struct {
 	Content	[]byte		` + "`" + `json:"content"` + "`" + `
 }
 func newReponseRouter() *responseRouter {
-	return &responseRouter{pending: make(map[int]chan []byte)}
+	return &responseRouter{pending: make(map[int]chan []byte), pendingMsg: make(map[int]chan Message)}
 }
 // easyjson:skip
 type responseRouter struct {
-	pending	map[int]chan []byte
-	mu	sync.Mutex
+	pending		map[int]chan []byte
+	pendingMsg	map[int]chan Message
+	mu		sync.Mutex
 }
 func (r *responseRouter) add(id int, ch chan []byte) {
 	r.mu.Lock()
@@ -155,9 +165,28 @@ func (r *responseRouter) remove(id int) {
 	delete(r.pending, id)
 	close(ch)
 }
+func (r *responseRouter) addMessage(id int, ch chan Message) {
+	r.mu.Lock()
+	r.pendingMsg[id] = ch
+	r.mu.Unlock()
+}
+func (r *responseRouter) removeMessage(id int) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ch, ok := r.pendingMsg[id]
+	if !ok {
+		return
+	}
+	delete(r.pendingMsg, id)
+	close(ch)
+}
 func (r *responseRouter) route(response Message) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	if chMsg, ok := r.pendingMsg[response.ID]; ok {
+		chMsg <- response
+		return
+	}
 	ch, ok := r.pending[response.ID]
 	if !ok {
 		log.Warn().Int(logging.MessageID, response.ID).Msg("cannot find channel for routing response")
@@ -245,18 +274,18 @@ const (
 `,
 	"importedCode_server": `package server 
 import (
-	"github.com/google/uuid"
-	"{{path}}/logging"
-	"{{path}}/message"
-	"github.com/rs/zerolog/log"
+	"{{path}}/state"
 	"errors"
 	"time"
-	"fmt"
 	"nhooyr.io/websocket"
-	"{{path}}/connect"
+	"{{path}}/logging"
+	"{{path}}/message"
 	"sync"
-	"{{path}}/state"
+	"fmt"
 	"net/http"
+	"github.com/google/uuid"
+	"{{path}}/connect"
+	"github.com/rs/zerolog/log"
 )
 // easyjson:skip
 type Client struct {
@@ -411,7 +440,13 @@ func (l *Lobby) deleteClient(client *Client) {
 func (l *Lobby) processMessage(msg Message) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
+	response := l.controller.OnSuperMessage(msg, msg.client.room, msg.client, l)
+	responseBytes, err := response.MarshalJSON()
+	if err != nil {
+		log.Err(err).Str(logging.MessageKind, string(response.Kind)).Msg("failed marshalling super message response")
+		return
+	}
+	msg.client.messageChannel <- responseBytes
 }
 func (l *Lobby) signalClientDisconnect(client *Client) {
 	l.mu.Lock()
@@ -454,6 +489,9 @@ func newRoom(controller Controller, name string) *Room {
 }
 func (r *Room) Name() string {
 	return r.name
+}
+func (r *Room) ClientCount() int {
+	return len(r.clients.clients) + len(r.clients.incomingClients)
 }
 func (r *Room) RemoveClient(client *Client) {
 	r.clients.remove(client)
@@ -614,10 +652,10 @@ func (r *Room) handleIncomingClients() {
 `,
 	"importedCode_state": `package state 
 import (
-	"strconv"
-	"sync"
 	"sort"
 	"fmt"
+	"strconv"
+	"sync"
 )
 `,
 }

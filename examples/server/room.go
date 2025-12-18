@@ -41,6 +41,10 @@ func (r *Room) Name() string {
 	return r.name
 }
 
+func (r *Room) ClientCount() int {
+	return len(r.clients.clients) + len(r.clients.incomingClients)
+}
+
 func (r *Room) RemoveClient(client *Client) {
 	r.clients.remove(client)
 }

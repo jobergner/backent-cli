@@ -9,14 +9,16 @@ import (
 
 func newReponseRouter() *responseRouter {
 	return &responseRouter{
-		pending: make(map[int]chan []byte),
+		pending:    make(map[int]chan []byte),
+		pendingMsg: make(map[int]chan Message),
 	}
 }
 
 // easyjson:skip
 type responseRouter struct {
-	pending map[int]chan []byte
-	mu      sync.Mutex
+	pending    map[int]chan []byte
+	pendingMsg map[int]chan Message
+	mu         sync.Mutex
 }
 
 func (r *responseRouter) add(id int, ch chan []byte) {
@@ -40,9 +42,35 @@ func (r *responseRouter) remove(id int) {
 	close(ch)
 }
 
+func (r *responseRouter) addMessage(id int, ch chan Message) {
+	r.mu.Lock()
+
+	r.pendingMsg[id] = ch
+
+	r.mu.Unlock()
+}
+
+func (r *responseRouter) removeMessage(id int) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	ch, ok := r.pendingMsg[id]
+	if !ok {
+		return
+	}
+
+	delete(r.pendingMsg, id)
+	close(ch)
+}
+
 func (r *responseRouter) route(response Message) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	if chMsg, ok := r.pendingMsg[response.ID]; ok {
+		chMsg <- response
+		return
+	}
 
 	ch, ok := r.pending[response.ID]
 	if !ok {

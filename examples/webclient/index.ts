@@ -10,7 +10,7 @@ export class Client {
       console.log("WebSocket connection opened");
     });
     this.ws.addEventListener("message", (event) => {
-      const message = JSON.parse(event.data);
+      const message = JSON.parse(event.data) as WebSocketMessage;
       switch (message.kind) {
         case MessageKind.ID:
           this.id = message.content;
@@ -26,7 +26,7 @@ export class Client {
           console.log(message);
           break;
         default:
-          this.responseEmitter.emit(message.id, JSON.parse(message.content));
+          this.responseEmitter.emit(message.id, message);
           break;
       }
     });
@@ -36,6 +36,25 @@ export class Client {
   }
   public getID() {
     return this.id;
+  }
+  public superMessage(content: string): Promise<WebSocketMessage> {
+    const messageID = generateID();
+    const message: WebSocketMessage = {
+      id: messageID,
+      kind: MessageKind.Global,
+      content: content,
+    };
+    setTimeout(() => {
+      this.ws.send(JSON.stringify(message));
+    }, 0);
+    return new Promise((resolve, reject) => {
+      this.responseEmitter.on(messageID, (response: WebSocketMessage) => {
+        resolve(response);
+      });
+      setTimeout(() => {
+        reject(ErrResponseTimeout);
+      }, responseTimeout);
+    });
   }
   public addItemToPlayer(item: number, newName: string): Promise<AddItemToPlayerResponse> {
     const messageID = generateID();
@@ -48,8 +67,8 @@ export class Client {
       this.ws.send(JSON.stringify(message));
     }, 0);
     return new Promise((resolve, reject) => {
-      this.responseEmitter.on(messageID, (response: AddItemToPlayerResponse) => {
-        resolve(response);
+      this.responseEmitter.on(messageID, (response: WebSocketMessage) => {
+        resolve(JSON.parse(response.content) as AddItemToPlayerResponse);
       });
       setTimeout(() => {
         reject(ErrResponseTimeout);
@@ -78,8 +97,8 @@ export class Client {
       this.ws.send(JSON.stringify(message));
     }, 0);
     return new Promise((resolve, reject) => {
-      this.responseEmitter.on(messageID, (response: SpawnZoneItemsResponse) => {
-        resolve(response);
+      this.responseEmitter.on(messageID, (response: WebSocketMessage) => {
+        resolve(JSON.parse(response.content) as SpawnZoneItemsResponse);
       });
       setTimeout(() => {
         reject(ErrResponseTimeout);
@@ -143,6 +162,7 @@ export enum MessageKind {
   Error = "error",
   Update = "update",
   CurrentState = "currentState",
+  Global = "global",
   ActionAddItemToPlayer = "addItemToPlayer",
   ActionMovePlayer = "movePlayer",
   ActionSpawnZoneItems = "spawnZoneItems",

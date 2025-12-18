@@ -81,8 +81,8 @@ func methodWithResponseTemplate(name, params, content, responseType string) stri
       this.ws.send(JSON.stringify(message));
     }, 0);
     return new Promise((resolve, reject) => {
-      this.responseEmitter.on(messageID, (response: %s) => {
-        resolve(response);
+      this.responseEmitter.on(messageID, (response: WebSocketMessage) => {
+        resolve(JSON.parse(response.content) as %s);
       });
       setTimeout(() => {
         reject(ErrResponseTimeout);
@@ -113,7 +113,7 @@ func clientTemplate(methods []string) string {
       console.log("WebSocket connection opened");
     });
     this.ws.addEventListener("message", (event) => {
-      const message = JSON.parse(event.data);
+      const message = JSON.parse(event.data) as WebSocketMessage;
       switch (message.kind) {
         case MessageKind.ID:
           this.id = message.content;
@@ -129,7 +129,7 @@ func clientTemplate(methods []string) string {
           console.log(message);
           break;
         default:
-          this.responseEmitter.emit(message.id, JSON.parse(message.content));
+          this.responseEmitter.emit(message.id, message);
           break;
       }
     });
@@ -139,6 +139,25 @@ func clientTemplate(methods []string) string {
   }
   public getID() {
     return this.id;
+  }
+  public superMessage(content: string): Promise<WebSocketMessage> {
+    const messageID = generateID();
+    const message: WebSocketMessage = {
+      id: messageID,
+      kind: MessageKind.Global,
+      content: content,
+    };
+    setTimeout(() => {
+      this.ws.send(JSON.stringify(message));
+    }, 0);
+    return new Promise((resolve, reject) => {
+      this.responseEmitter.on(messageID, (response: WebSocketMessage) => {
+        resolve(response);
+      });
+      setTimeout(() => {
+        reject(ErrResponseTimeout);
+      }, responseTimeout);
+    });
   }
 %s
 }

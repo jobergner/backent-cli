@@ -45,6 +45,8 @@ func (f *Factory) goTypeToTypescriptType(s string) string {
 	switch s {
 	case "float64", "int64":
 		return "number"
+	case "bool":
+		return "boolean"
 	default:
 		return s
 	}

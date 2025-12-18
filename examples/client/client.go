@@ -146,10 +146,10 @@ func newMessageID() (int, error) {
 	return int(n.Int64()), nil
 }
 
-func (c *Client) SuperMessage(b []byte) error {
+func (c *Client) SuperMessage(b []byte) (Message, error) {
 	id, err := newMessageID()
 	if err != nil {
-		return err
+		return Message{}, err
 	}
 
 	msg := Message{id, message.MessageKindGlobal, b}
@@ -157,10 +157,20 @@ func (c *Client) SuperMessage(b []byte) error {
 	msgBytes, err := msg.MarshalJSON()
 	if err != nil {
 		log.Err(err).Int(logging.MessageID, msg.ID).Str(logging.Message, string(msgBytes)).Str(logging.MessageKind, string(message.MessageKindGlobal)).Msg("failed marshalling message")
-		return err
+		return Message{}, err
 	}
+
+	responseChan := make(chan Message)
+	c.router.addMessage(id, responseChan)
+	defer c.router.removeMessage(id)
 
 	c.messageChannel <- msgBytes
 
-	return nil
+	select {
+	case <-time.After(2 * time.Second):
+		log.Err(ErrResponseTimeout).Int(logging.MessageID, msg.ID).Msg("timed out waiting for response")
+		return Message{}, ErrResponseTimeout
+	case response := <-responseChan:
+		return response, nil
+	}
 }
