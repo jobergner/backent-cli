@@ -50,7 +50,7 @@ func (s *Factory) writeAny() *Factory {
 						return Case(Id(FieldPathIdentifier(_field))).Block(
 							Id(field.Parent.Name).Op(":=").Id("any").Dot("engine").Dot(Title(field.Parent.Name)).Call(Id(Title(field.Parent.Name)+"ID").Call(Id("any").Dot("ParentID"))).Dot(field.Parent.Name),
 							Id(field.Parent.Name).Dot(Title(field.Name)).Op("=").Id("any").Dot("ID"),
-							Id(field.Parent.Name).Dot("engine").Dot("Patch").Dot("Item").Index(Id(field.Parent.Name).Dot("ID")).Op("=").Id(field.Parent.Name),
+							Id(field.Parent.Name).Dot("engine").Dot("Patch").Dot(Title(field.Parent.Name)).Index(Id(field.Parent.Name).Dot("ID")).Op("=").Id(field.Parent.Name),
 						)
 					}),
 				),
